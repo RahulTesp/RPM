@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="8.7.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Twilio" Version="7.9.1" />
+    <PackageReference Include="Twilio.AspNet.Common" Version="8.1.1" />
+    <PackageReference Include="Twilio.AspNet.Core" Version="8.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DAL\RPMWeb.Dal\RPMWeb.Dal.csproj" />
+    <ProjectReference Include="..\DAL\RPMWeb.Data.Common\RPMWeb.Data.Common.csproj" />
+  </ItemGroup>
+
+</Project>

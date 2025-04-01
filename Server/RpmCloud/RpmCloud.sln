@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPMWeb.Dal", "..\DAL\RPMWeb.Dal\RPMWeb.Dal.csproj", "{B443D52A-F188-42C9-93B6-133F76694C24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPMWeb.Data.Common", "..\DAL\RPMWeb.Data.Common\RPMWeb.Data.Common.csproj", "{4C20ECF5-7B30-4D84-9E04-DFED4653A12A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Twilio.Comm", "..\RPM.Twilio.Comm\RPM.Twilio.Comm.csproj", "{E66071C3-B092-480A-9448-39E447A559E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RpmCloud", "RpmCloud.csproj", "{99D5E74E-0DBD-4310-B1FC-0F98B34DAF96}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B443D52A-F188-42C9-93B6-133F76694C24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B443D52A-F188-42C9-93B6-133F76694C24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B443D52A-F188-42C9-93B6-133F76694C24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B443D52A-F188-42C9-93B6-133F76694C24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C20ECF5-7B30-4D84-9E04-DFED4653A12A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C20ECF5-7B30-4D84-9E04-DFED4653A12A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C20ECF5-7B30-4D84-9E04-DFED4653A12A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C20ECF5-7B30-4D84-9E04-DFED4653A12A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E66071C3-B092-480A-9448-39E447A559E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E66071C3-B092-480A-9448-39E447A559E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E66071C3-B092-480A-9448-39E447A559E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E66071C3-B092-480A-9448-39E447A559E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99D5E74E-0DBD-4310-B1FC-0F98B34DAF96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99D5E74E-0DBD-4310-B1FC-0F98B34DAF96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99D5E74E-0DBD-4310-B1FC-0F98B34DAF96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99D5E74E-0DBD-4310-B1FC-0F98B34DAF96}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
