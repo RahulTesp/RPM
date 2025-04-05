@@ -1642,16 +1642,22 @@ namespace RPMWeb.Data.Common
         public bool ReadStatus { get; set; }
         public string ModifiedBy { get; set; }
     }
+    //public class SystemNotificationByUser
+    //{
+    //    public SystemNotificationByUser()
+    //    {
+    //        Data = new List<NotificationDataByDate>();
+    //    }
+    //    public int TotalNotifications { get; set; }
+    //    public int TotalUnRead { get; set; }
+    //    //public List<NotificationData> Data { get; set; }
+    //    public List<NotificationDataByDate> Data { get; set; }
+    //}
     public class SystemNotificationByUser
     {
-        public SystemNotificationByUser()
-        {
-            Data = new List<NotificationDataByDate>();
-        }
         public int TotalNotifications { get; set; }
         public int TotalUnRead { get; set; }
-        //public List<NotificationData> Data { get; set; }
-        public List<NotificationDataByDate> Data { get; set; }
+        public List<NotificationDataByDate> Data { get; set; } = new(); // Ensure it's never null
     }
     public class SystemNotificationCount
     {

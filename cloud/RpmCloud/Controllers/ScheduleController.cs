@@ -2,6 +2,7 @@
 using RPMWeb.Data.Common;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
+using Newtonsoft.Json;
 
 namespace RpmCloud.Controllers
 {
@@ -191,9 +192,8 @@ namespace RpmCloud.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [Route("getschedulemasterdata")]
-        [HttpGet]
-        public IActionResult GetMasterDataForSchedules(int RoleId)
+        [HttpGet("getschedulemasterdata")]
+        public IActionResult GetMasterDataForSchedules([FromQuery] int RoleId)
         {
             try
             {
@@ -218,7 +218,7 @@ namespace RpmCloud.Controllers
                     DataSet details = RpmDalFacade.GetMasterDataForSchedules(RoleId, UserName);
                     if (!(details == null))
                     {
-                        return Ok(details);
+                        return Ok(JsonConvert.SerializeObject(details, Formatting.Indented));
                     }
                     return NotFound("Could not find schedule details");
                 }

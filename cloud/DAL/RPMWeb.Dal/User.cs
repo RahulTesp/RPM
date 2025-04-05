@@ -3,6 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
+using System.Linq;
+using Twilio.Rest.Conversations.V1;
 
 namespace RPMWeb.Dal
 {
@@ -742,39 +746,54 @@ namespace RPMWeb.Dal
                         returnParameter.Direction = ParameterDirection.ReturnValue;
                         con.Open();
                         SqlDataReader reader = command.ExecuteReader();
-                        
+
                         while (reader.Read())
                         {
-                            string conversationSid = (!DBNull.Value.Equals(reader["ConversationSid"])) ? Convert.ToString(reader["ConversationSid"]) : null;
-                            if (conversationSid != null)
+                            string? conversationSid = reader["ConversationSid"] != DBNull.Value ? reader["ConversationSid"].ToString() : null;
+
+                            //if (!string.IsNullOrEmpty(conversationSid))
+                            //{
+                            //    TwilioClient.Init(AccountSIDValue, AuthTokenValue);
+                            //    var messages = MessageResource.Read(
+                            //    conversationSid,
+                            //    limit: 1,
+                            //    client: TwilioClient.GetRestClient()); // Fixed order enum
+
+                            //    var lastMessage = messages.FirstOrDefault(); // Avoid multiple enumerations
+
+                            //    if (lastMessage != null)
+                            //    {
+                            //        if (lastMessage.DateCreated == null) 
+                            //        { 
+                            //            throw new Exception("DateCreated is null"); 
+                            //        }
+                            //        conversations.Add($"SID: {conversationSid}, Message: {lastMessage.Body}, Date: {lastMessage.DateCreated.Value.ToString()}");
+                            //    }
+                            //}
+                            // Initialize Twilio client with Account SID and Auth Token
+                            TwilioClient.Init(AccountSIDValue, AuthTokenValue);
+
+                            // Fetch messages from the conversation (limit set to 1 for the last message)
+                            var messages = ConversationResource.Read(
+                                conversationSid,
+                                limit: 1); // Limit to 1 message
+
+                            var lastMessage = messages.FirstOrDefault(); // Get the last message
+
+                            if (lastMessage != null)
                             {
-                                conversations.Add(conversationSid);
-                                //TwilioClient.Init(AccountSIDValue, AuthTokenValue);
-                                //// Retrieve messages from the conversation
-                                //int limit = 30; // Number of messages to retrieve
-                                //int skip = 0;   // Number of messages to skip (pagination)
-                                //ChatDetails chatdetails = new ChatDetails();
-                                //chatdetails.istoken = false;
-                                //chatdetails = RpmDalFacade.GetChatDetails(ToUser);
-    
-                                //var conversations1 = ConversationResource.Read(limit: 10);
+                                if (lastMessage.DateCreated == null)
+                                {
+                                    throw new Exception("DateCreated is null");
+                                }
 
-                                //var client = TwilioClient.GetRestClient();
-                                //TwilioClient.SetRegion("us1");
-                                //Console.WriteLine($"Authenticated as: {client.AccountSid}");
-                                //var messages = MessageResource.ReadAsync(
-                                //    pathConversationSid: "ConversationSid",
-                                //    limit: 20);
-
-                                //foreach (var record in messages)
-                                //{
-                                //    Console.WriteLine(record.AccountSid);
-                                //}
-
-
+                                //conversations.Add($"SID: {conversationSid}, Message: {lastMessage.Body}, Date: {lastMessage.DateCreated.Value.ToString()}");
+                            }
+                            else
+                            {
+                                Console.WriteLine("No messages found in the conversation.");
                             }
                         }
-
                     }
 
                 }

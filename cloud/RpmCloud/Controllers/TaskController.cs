@@ -2,28 +2,22 @@
 using RPMWeb.Data.Common;
 using System.Data;
 using Microsoft.AspNetCore.Mvc;
-
+using Newtonsoft.Json;
 
 namespace RpmCloud.Controllers
 {
-    [Route("api/devices")]
-
-    public class DeviceFeatureController : ControllerBase
+    [Route("api/tasks")]
+    public class TaskController : ControllerBase
     {
         public readonly string CONN_STRING;
-        public DeviceFeatureController(IConfiguration configuration)
+        public TaskController(IConfiguration configuration)
         {
             CONN_STRING = configuration.GetSection("RPM:ConnectionString").Value ?? throw new ArgumentNullException(nameof(CONN_STRING));
         }
-
-        [Route("adddevice")]
+        [Route("addtask")]
         [HttpPost]
-        public IActionResult AddDevice(AddDevicePro info)
+        public IActionResult AddTask(TaskInfo Info)
         {
-            if (info is null)
-            {
-                return BadRequest("Invalid input data");
-            }
             try
             {
                 if (Request.Headers.ContainsKey("Bearer"))
@@ -35,7 +29,7 @@ namespace RpmCloud.Controllers
                         return Unauthorized("Invalid session.");
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
-                    info.CreatedBy = UserName;
+                    Info.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
                         return Unauthorized("Invalid session.");
@@ -44,99 +38,12 @@ namespace RpmCloud.Controllers
                     {
                         return Unauthorized("Invalid session.");
                     }
-                    ReturnMsg resp = RpmDalFacade.AddDeviceProc(info);
-                    if (resp.Val == 1)
+                    var id = RpmDalFacade.AddTask(Info);
+                    if (!id.Equals(0))
                     {
-                        return Ok( resp.Msg);
+                        return Ok(id);
                     }
-                    return BadRequest(resp.Msg);
-                }
-                else
-                {
-                    return Unauthorized("Invalid session.");
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [Route("updatedevice")]
-        [HttpPost]
-        public IActionResult UpdateDevice(UpdateDevice info)
-        {
-            if (info is null)
-            {
-                return BadRequest("Invalid input data");
-            }
-            try
-            {
-                if (Request.Headers.ContainsKey("Bearer"))
-                {
-                    string? s = Request.Headers["Bearer"].FirstOrDefault();
-                    RpmDalFacade.ConnectionString = CONN_STRING;
-                    if (string.IsNullOrEmpty(s))
-                    {
-                        return Unauthorized("Invalid session.");
-                    }
-                    string UserName = RpmDalFacade.IsSessionValid(s);
-                    info.CreatedBy = UserName;
-                    if (string.IsNullOrEmpty(UserName))
-                    {
-                        return Unauthorized("Invalid session.");
-                    }
-                    if (!RpmDalFacade.ValidateTkn(s))
-                    {
-                        return Unauthorized("Invalid session.");
-                    }
-                    int resp = RpmDalFacade.UpdateDeviceProc(info);
-                    if (resp != 0)
-                    {
-                        return Ok( resp);
-                    }
-                    return BadRequest("Cannot Update Device");
-                }
-                else
-                {
-                    return Unauthorized("Invalid session.");
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [Route("devicemasterdata")]
-        [HttpGet]
-        public IActionResult GetDevicesMastrData()
-        {
-
-            try
-            {
-                if (Request.Headers.ContainsKey("Bearer"))
-                {
-                    string? s = Request.Headers["Bearer"].FirstOrDefault();
-                    RpmDalFacade.ConnectionString = CONN_STRING;
-                    if (string.IsNullOrEmpty(s))
-                    {
-                        return Unauthorized("Invalid session.");
-                    }
-                    string UserName = RpmDalFacade.IsSessionValid(s);
-                    if (string.IsNullOrEmpty(UserName))
-                    {
-                        return Unauthorized("Invalid session.");
-                    }
-                    if (!RpmDalFacade.ValidateTkn(s))
-                    {
-                        return Unauthorized("Invalid session.");
-                    }
-
-                    DataSet Device = RpmDalFacade.GetDeviceMasterData(UserName);
-                    if (!(Device == null))
-                    {
-                        return Ok( Device);
-                    }
-                    return NotFound("Could not find Device details");
+                    return BadRequest("Could not save task details");
                 }
                 else
                 {
@@ -152,14 +59,10 @@ namespace RpmCloud.Controllers
                 return BadRequest("Unexpected Error.");
             }
         }
-        [Route("adddevicevendor")]
+        [Route("updatetask")]
         [HttpPost]
-        public IActionResult AddDeviceVendor(AddDeviceVendor info)
+        public IActionResult UpdateTask(TaskInfo Info)
         {
-            if (info is null)
-            {
-                return BadRequest("Invalid input data");
-            }
             try
             {
                 if (Request.Headers.ContainsKey("Bearer"))
@@ -171,7 +74,7 @@ namespace RpmCloud.Controllers
                         return Unauthorized("Invalid session.");
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
-                    info.CreatedBy = UserName;
+                    Info.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
                         return Unauthorized("Invalid session.");
@@ -180,16 +83,11 @@ namespace RpmCloud.Controllers
                     {
                         return Unauthorized("Invalid session.");
                     }
-                    ReturnMsg resp = RpmDalFacade.AddDeviceVendor(info);
-                    if (resp.Val == 1)
+                    if (RpmDalFacade.UpdateTask(Info))
                     {
-                        return Ok( resp.Msg);
+                        return Ok("Task details updated");
                     }
-                    else
-                    {
-                        return BadRequest(resp.Msg);
-                    }
-                    
+                    return BadRequest("Could not update Task details");
                 }
                 else
                 {
@@ -201,58 +99,9 @@ namespace RpmCloud.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [Route("updatedevicevendor")]
-        [HttpPost]
-        public IActionResult UpdateDeviceVendor(UpdateDeviceVendor info)
-        {
-            if (info is null)
-            {
-                return BadRequest("Invalid input data");
-            }
-            try
-            {
-                if (Request.Headers.ContainsKey("Bearer"))
-                {
-                    string? s = Request.Headers["Bearer"].FirstOrDefault();
-                    RpmDalFacade.ConnectionString = CONN_STRING;
-                    if (string.IsNullOrEmpty(s))
-                    {
-                        return Unauthorized("Invalid session.");
-                    }
-                    string UserName = RpmDalFacade.IsSessionValid(s);
-                    info.CreatedBy = UserName;
-                    if (string.IsNullOrEmpty(UserName))
-                    {
-                        return Unauthorized("Invalid session.");
-                    }
-                    if (!RpmDalFacade.ValidateTkn(s))
-                    {
-                        return Unauthorized("Invalid session.");
-                    }
-                    int resp = RpmDalFacade.UpdateDeviceVendor(info);
-                    if (resp != 0)
-                    {
-                        return Ok( resp);
-                    }
-                    else
-                    {
-                        return BadRequest("Cannot Update DeviceVendor Details");
-                    }
-                    
-                }
-                else
-                {
-                    return Unauthorized("Invalid session.");
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [Route("getalldevices")]
+        [Route("worklistgettasks")]
         [HttpGet]
-        public IActionResult GetAllDevices()
+        public IActionResult GetTasks([FromQuery] DateTime StartDate, [FromQuery] DateTime EndDate)
         {
 
             try
@@ -274,16 +123,13 @@ namespace RpmCloud.Controllers
                     {
                         return Unauthorized("Invalid session.");
                     }
-                    List<DeviceInfo> Device = RpmDalFacade.GetDeviceInfo(UserName);
-                    if (!(Device == null))
+
+                    DataSet Tasks = RpmDalFacade.GetTasks( StartDate,  EndDate, UserName);
+                    if (!(Tasks == null))
                     {
-                        return Ok( Device);
+                        return Ok(Tasks);
                     }
-                    else
-                    {
-                        return NotFound("Could not find Device details");
-                    }
-                    
+                    return NotFound("Could not find task details");
                 }
                 else
                 {
@@ -299,14 +145,11 @@ namespace RpmCloud.Controllers
                 return BadRequest("Unexpected Error.");
             }
         }
-        [Route("isvalidvendorcode/{Code}")]
-        [HttpPost]
-        public IActionResult IsValidVendorCode(string Code)
+        [Route("getteamtaskbyidandtasktype")]
+        [HttpGet]
+        public IActionResult GetTasks([FromQuery]  string TaskType, [FromQuery] int CareTeamId,[FromQuery]  DateTime TodayDate, [FromQuery] DateTime StartDate, [FromQuery] DateTime EndDate, [FromQuery] int RoleId )
         {
-            if (Code is null)
-            {
-                return BadRequest("Invalid input data");
-            }
+
             try
             {
                 if (Request.Headers.ContainsKey("Bearer"))
@@ -318,7 +161,6 @@ namespace RpmCloud.Controllers
                         return Unauthorized("Invalid session.");
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
-                   
                     if (string.IsNullOrEmpty(UserName))
                     {
                         return Unauthorized("Invalid session.");
@@ -327,16 +169,13 @@ namespace RpmCloud.Controllers
                     {
                         return Unauthorized("Invalid session.");
                     }
-                    bool resp = RpmDalFacade.IsValidVendorCode(Code,UserName);
-                    if (resp == true)
+
+                    DataSet Tasks = RpmDalFacade.GetTasksByTypeAndId(TaskType, CareTeamId, TodayDate, StartDate, EndDate,RoleId, UserName);
+                    if (!(Tasks == null))
                     {
-                        return Ok( resp);
+                        return Ok(Tasks);
                     }
-                    else
-                    {
-                        return BadRequest(resp);
-                    }
-                    
+                    return NotFound("Could not find task details");
                 }
                 else
                 {
@@ -345,7 +184,104 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                if (ex.Message.Contains("Lifetime validation failed"))
+                {
+                    return BadRequest("Invalid session.");
+                }
+                return BadRequest("Unexpected Error.");
+            }
+        }
+        
+
+        [Route("worklistgettaskbyid")]
+        [HttpGet]
+        public IActionResult GetTaskById([FromQuery] int Id)
+        {
+
+            try
+            {
+                if (Request.Headers.ContainsKey("Bearer"))
+                {
+                    string? s = Request.Headers["Bearer"].FirstOrDefault();
+                    RpmDalFacade.ConnectionString = CONN_STRING;
+                    if (string.IsNullOrEmpty(s))
+                    {
+                        return Unauthorized("Invalid session.");
+                    }
+                    string UserName = RpmDalFacade.IsSessionValid(s);
+                    if (string.IsNullOrEmpty(UserName))
+                    {
+                        return Unauthorized("Invalid session.");
+                    }
+                    if (!RpmDalFacade.ValidateTkn(s))
+                    {
+                        return Unauthorized("Invalid session.");
+                    }
+
+                    GetTask task = RpmDalFacade.GetTaskById(Id);
+                    if (!(task == null))
+                    {
+                        return Ok(task);
+                    }
+                    return NotFound("Could not find task details");
+                }
+                else
+                {
+                    return Unauthorized("Invalid session.");
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("Lifetime validation failed"))
+                {
+                    return BadRequest("Invalid session.");
+                }
+                return BadRequest("Unexpected Error.");
+            }
+        }
+        [Route("gettaskmasterdata")]
+        [HttpGet]
+        public IActionResult GetMasterDataForTask(int RoleId)
+        {
+            try
+            {
+                if (Request.Headers.ContainsKey("Bearer"))
+                {
+                    string? s = Request.Headers["Bearer"].FirstOrDefault();
+                    RpmDalFacade.ConnectionString = CONN_STRING;
+                    if (string.IsNullOrEmpty(s))
+                    {
+                        return Unauthorized("Invalid session.");
+                    }
+                    string UserName = RpmDalFacade.IsSessionValid(s);
+                    if (string.IsNullOrEmpty(UserName))
+                    {
+                        return Unauthorized("Invalid session.");
+                    }
+                    if (!RpmDalFacade.ValidateTkn(s))
+                    {
+                        return Unauthorized("Invalid session.");
+                    }
+
+                    DataSet details = RpmDalFacade.GetMasterDataForTask(RoleId, UserName);
+                    if (!(details == null))
+                    {
+                        return Ok(JsonConvert.SerializeObject(details, Formatting.Indented));
+                    }
+                    return NotFound("Could not find data");
+                }
+                else
+                {
+                    return Unauthorized("Invalid session.");
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("Lifetime validation failed"))
+                {
+                    return BadRequest("Invalid session.");
+                }
+                return BadRequest("Unexpected Error.");
             }
         }
     }

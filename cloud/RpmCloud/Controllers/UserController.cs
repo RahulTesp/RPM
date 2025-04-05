@@ -2,6 +2,7 @@
 using RPMWeb.Data.Common;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
+using Newtonsoft.Json;
 
 namespace RpmCloud.Controllers
 {
@@ -213,7 +214,7 @@ namespace RpmCloud.Controllers
                     DataSet users = RpmDalFacade.GetAllUsers(RoleId,UserName);
                     if (!users.Equals(null))
                     {
-                        return Ok(users);
+                        return Ok(JsonConvert.SerializeObject(users, Formatting.Indented));
                     }
                     return NotFound("Could not find users details");
                 }

@@ -209,23 +209,61 @@ namespace RPMWeb.Dal
                 throw ex;
             }
         }
+        //public bool ValidateTkn(string token)
+        //{
+        //    try
+        //    {
+
+        //        var tokenHandler = new JwtSecurityTokenHandler();
+        //        string key = "remotepatientmonitoring"; //Secret key which will be used later during validation
+        //        var issuer = "http://tesplabs.com";  //normally this will be your site URL
+        //        var bykey = Encoding.ASCII.GetBytes(key);
+        //        tokenHandler.ValidateToken(token, new TokenValidationParameters
+        //        {
+        //            ValidAudience = issuer,
+        //            ValidateIssuerSigningKey = true,
+        //            IssuerSigningKey = new SymmetricSecurityKey(bykey),
+        //            ValidateIssuer = true,
+        //            ValidIssuer = issuer,
+        //            ValidateAudience = false,
+        //            // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
+        //            ClockSkew = TimeSpan.Zero
+        //        }, out SecurityToken validatedToken);
+
+        //        var jwtToken = (JwtSecurityToken)validatedToken;
+        //        if (jwtToken != null)
+        //        {
+        //            return true;
+        //        }
+        //    }
+        //    catch (SecurityTokenExpiredException ex)
+        //    {
+        //        return false;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+        //    return false;
+        //}
         public bool ValidateTkn(string token)
         {
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                string key = "remotepatientmonitoring"; //Secret key which will be used later during validation
-                var issuer = "http://tesplabs.com";  //normally this will be your site URL
-                var bykey = Encoding.ASCII.GetBytes(key);
+                string key = "remotepatientmonitoringtesplabspvtltd"; // Secret key (must be at least 32 characters for HS256)
+                var issuer = "http://sample.com";  // Issuer and Audience
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidAudience = issuer,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(bykey),
+                    IssuerSigningKey = securityKey,
                     ValidateIssuer = true,
                     ValidIssuer = issuer,
-                    ValidateAudience = false,
-                    // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
+                    ValidateAudience = true,
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
 
@@ -235,7 +273,7 @@ namespace RPMWeb.Dal
                     return true;
                 }
             }
-            catch (SecurityTokenExpiredException ex)
+            catch (SecurityTokenExpiredException)
             {
                 return false;
             }
@@ -537,7 +575,6 @@ namespace RPMWeb.Dal
 
             return loginDetails;
         }
-
         public LoginResponseToken CreateNewToken(int time, string connectionString)
         {
             LoginResponseToken resp = new LoginResponseToken();
@@ -545,28 +582,32 @@ namespace RPMWeb.Dal
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    string key = "remotepatientmonitoring"; //Secret key which will be used later during validation    
-                    var issuer = "http://tesplabs.com";  //normally this will be your site URL    
+                    string key = "remotepatientmonitoringtesplabspvtltd"; // Secret key (must be at least 32 characters for HS256)
+                    var issuer = "http://sample.com";  // Issuer and Audience
                     var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
                     var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-                    //Create a List of Claims, Keep claims name short    
-                    var permClaims = new List<Claim>();
-                    permClaims.Add(new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-                    permClaims.Add(new Claim("valid", "1"));
-                    permClaims.Add(new Claim("userid", "1"));
-                    permClaims.Add(new Claim("name", "tesp"));
-                    //Create Security Token object by giving required parameters    
-                    var token = new JwtSecurityToken(issuer, //Issure    
-                                        issuer,  //Audience    
-                                        permClaims,
-                                        expires: DateTime.Now.AddMinutes(time),
-                                        signingCredentials: credentials);
+
+                    // Define claims
+                    var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("valid", "1"),
+                new Claim("userid", "1"),
+                new Claim("name", "tesp")
+            };
+
+                    // Create token
+                    var token = new JwtSecurityToken(
+                        issuer,
+                        issuer,
+                        claims,
+                        expires: DateTime.UtcNow.AddHours(10),
+                        signingCredentials: credentials
+                    );
+
                     var jwttoken = new JwtSecurityTokenHandler().WriteToken(token);
                     resp.tkn = jwttoken;
                     resp.tkt = "Bearer";
-
-
-
                 }
             }
             catch (Exception ex)
@@ -575,6 +616,44 @@ namespace RPMWeb.Dal
             }
             return resp;
         }
+
+        //public LoginResponseToken CreateNewToken(int time, string connectionString)
+        //{
+        //    LoginResponseToken resp = new LoginResponseToken();
+        //    try
+        //    {
+        //        using (SqlConnection connection = new SqlConnection(connectionString))
+        //        {
+        //            string key = "remotepatientmonitoring"; //Secret key which will be used later during validation    
+        //            var issuer = "http://tesplabs.com";  //normally this will be your site URL    
+        //            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+        //            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+        //            //Create a List of Claims, Keep claims name short    
+        //            var permClaims = new List<Claim>();
+        //            permClaims.Add(new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+        //            permClaims.Add(new Claim("valid", "1"));
+        //            permClaims.Add(new Claim("userid", "1"));
+        //            permClaims.Add(new Claim("name", "tesp"));
+        //            //Create Security Token object by giving required parameters    
+        //            var token = new JwtSecurityToken(issuer, //Issure    
+        //                                issuer,  //Audience    
+        //                                permClaims,
+        //                                expires: DateTime.Now.AddMinutes(time),
+        //                                signingCredentials: credentials);
+        //            var jwttoken = new JwtSecurityTokenHandler().WriteToken(token);
+        //            resp.tkn = jwttoken;
+        //            resp.tkt = "Bearer";
+
+
+
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+        //    return resp;
+        //}
         public LoginResponse Login(RPMWeb.Data.Common.RPMLogin verPass, string ConnectionString)
         {
             LoginResponse resp = new LoginResponse();
@@ -742,27 +821,58 @@ namespace RPMWeb.Dal
 
                     if (returnParameter.Value != DBNull.Value)
                     {
+                        //date = DateTime.Parse(returnParameter.Value.ToString());
+                        //DateTime newenddate = date.AddDays(30);
+                        //string key = "remotepatientmonitoring"; //Secret key which will be used later during validation    
+                        //var issuer = "http://tesplabs.com";  //normally this will be your site URL    
+                        //var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+                        //var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+                        ////Create a List of Claims, Keep claims name short    
+                        //var permClaims = new List<Claim>();
+                        //permClaims.Add(new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+                        //permClaims.Add(new Claim("valid", "1"));
+                        //permClaims.Add(new Claim("userid", "1"));
+                        //permClaims.Add(new Claim("name", "tesp"));
+                        ////Create Security Token object by giving required parameters    
+                        //var token = new JwtSecurityToken(issuer, //Issure    
+                        //                    issuer,  //Audience    
+                        //                    permClaims,
+                        //                    expires: DateTime.Now.AddHours(10),
+                        //                    signingCredentials: credentials);
+                        //var jwttoken = new JwtSecurityTokenHandler().WriteToken(token);
+                        //resp.tkn = jwttoken;
+                        //resp.tkt = "Bearer";
+                        // Parse and calculate new expiration date
                         date = DateTime.Parse(returnParameter.Value.ToString());
-                        DateTime newenddate = date.AddDays(30);
-                        string key = "remotepatientmonitoring"; //Secret key which will be used later during validation    
-                        var issuer = "http://tesplabs.com";  //normally this will be your site URL    
+                        DateTime newEndDate = date.AddDays(30);
+
+                        // Secret key (must be at least 32 characters for HS256)
+                        string key = "remotepatientmonitoringtesplabspvtltd";
                         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
                         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-                        //Create a List of Claims, Keep claims name short    
-                        var permClaims = new List<Claim>();
-                        permClaims.Add(new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-                        permClaims.Add(new Claim("valid", "1"));
-                        permClaims.Add(new Claim("userid", "1"));
-                        permClaims.Add(new Claim("name", "tesp"));
-                        //Create Security Token object by giving required parameters    
-                        var token = new JwtSecurityToken(issuer, //Issure    
-                                            issuer,  //Audience    
-                                            permClaims,
-                                            expires: DateTime.Now.AddHours(10),
-                                            signingCredentials: credentials);
+
+                        // Issuer and Audience
+                        var issuer = "http://sample.com";
+
+                        // Define claims
+                        var claims = new List<Claim>
+                        {
+                            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                            new Claim("valid", "1"),
+                            new Claim("userid", "1"),
+                            new Claim("name", "tesp")
+                        };
+
+
+                        // Create token
+                        var token = new JwtSecurityToken(
+                            issuer,
+                            issuer,
+                            claims,
+                            expires: DateTime.UtcNow.AddHours(10),
+                            signingCredentials: credentials
+                        );
                         var jwttoken = new JwtSecurityTokenHandler().WriteToken(token);
-                        resp.tkn = jwttoken;
-                        resp.tkt = "Bearer";
                         Random rnd = new Random();
                         SqlCommand command1 = new SqlCommand("usp_InsLoginSession", connection);
                         command1.CommandType = CommandType.StoredProcedure;
@@ -792,7 +902,7 @@ namespace RPMWeb.Dal
                         }
                         resp.Roles = roles;
 
-                        if (newenddate >= DateTime.Now)
+                        if (newEndDate >= DateTime.Now)
                         {
                             resp.reqPasswordchange = false;
 

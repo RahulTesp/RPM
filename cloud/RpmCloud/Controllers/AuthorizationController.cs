@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
 using System.Net;
+using Newtonsoft.Json;
 
 namespace RpmCloud.Controllers
 {
@@ -988,7 +989,7 @@ namespace RpmCloud.Controllers
                     DataSet Info = RpmDalFacade.GetMasterDataForStatesAndCities(UserName);
                     if (!(Info == null))
                     {
-                        return Ok(Info);
+                        return Ok(JsonConvert.SerializeObject(Info, Formatting.Indented));
                     }
                     return NotFound("Could not find  details");
                 }
@@ -1050,52 +1051,52 @@ namespace RpmCloud.Controllers
                 return BadRequest("Unexpected Error.");
             }
         }
-        [Route("connecthub")]
-        [HttpGet]
-        public IActionResult ConnectNotificationHub()
-        {
-            try
-            {
-                RpmDalFacade.ConnectionString = CONN_STRING;
-                if (Request.Headers.ContainsKey("Bearer"))
-                {
-                    string? s = Request.Headers["Bearer"].FirstOrDefault();
-                    if (string.IsNullOrEmpty(s))
-                    {
-                        return Unauthorized("Invalid session.");
-                    }
-                    string UserName = RpmDalFacade.IsSessionValid(s);
-                    if (string.IsNullOrEmpty(UserName))
-                    {
-                        return Unauthorized("Invalid session.");
-                    }
-                    if (!RpmDalFacade.ValidateTkn(s))
-                    {
-                        return Unauthorized("Invalid session.");
-                    }
-                    List<SystemConfigInfo> lstConfig = DalCommon.GetSystemConfig(CONN_STRING, "Notify", "User");
-                    if (lstConfig == null || lstConfig.Count == 0)
-                    {
-                        throw new Exception("Invalid system config for notifications");
-                    }
-                    SystemConfigInfo? systemConfigInfo = lstConfig.Find(x => x.Name.Equals("PubSubKey"));
-                    if (systemConfigInfo == null) throw new Exception("Invalid system config for notifications");
-                    SystemConfigInfo? _hubnameinfo = lstConfig.Find(x => x.Name.Equals("HubName"));
-                    if (_hubnameinfo == null) throw new Exception("Invalid system config for notifications");
-                    var connString = systemConfigInfo.Value;
-                    var hubname = _hubnameinfo.Value;
-                    return Ok("hubname");
-                }
-                else
-                {
-                    return Unauthorized("Invalid session.");
-                }
-            }
-            catch
-            {
-                return BadRequest("Unexpected Error.");
-            }
-        }
+        //[Route("connecthub")]
+        //[HttpGet]
+        //public IActionResult ConnectNotificationHub()
+        //{
+        //    try
+        //    {
+        //        RpmDalFacade.ConnectionString = CONN_STRING;
+        //        if (Request.Headers.ContainsKey("Bearer"))
+        //        {
+        //            string? s = Request.Headers["Bearer"].FirstOrDefault();
+        //            if (string.IsNullOrEmpty(s))
+        //            {
+        //                return Unauthorized("Invalid session.");
+        //            }
+        //            string UserName = RpmDalFacade.IsSessionValid(s);
+        //            if (string.IsNullOrEmpty(UserName))
+        //            {
+        //                return Unauthorized("Invalid session.");
+        //            }
+        //            if (!RpmDalFacade.ValidateTkn(s))
+        //            {
+        //                return Unauthorized("Invalid session.");
+        //            }
+        //            List<SystemConfigInfo> lstConfig = DalCommon.GetSystemConfig(CONN_STRING, "Notify", "User");
+        //            if (lstConfig == null || lstConfig.Count == 0)
+        //            {
+        //                throw new Exception("Invalid system config for notifications");
+        //            }
+        //            SystemConfigInfo? systemConfigInfo = lstConfig.Find(x => x.Name.Equals("PubSubKey"));
+        //            if (systemConfigInfo == null) throw new Exception("Invalid system config for notifications");
+        //            SystemConfigInfo? _hubnameinfo = lstConfig.Find(x => x.Name.Equals("HubName"));
+        //            if (_hubnameinfo == null) throw new Exception("Invalid system config for notifications");
+        //            var connString = systemConfigInfo.Value;
+        //            var hubname = _hubnameinfo.Value;
+        //            return Ok("hubname");
+        //        }
+        //        else
+        //        {
+        //            return Unauthorized("Invalid session.");
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        return BadRequest("Unexpected Error.");
+        //    }
+        //}
         [Route("Patientlogin")]
         [HttpPost]
         public IActionResult AppPatientLogin(RPMWeb.Data.Common.RPMLogin verPass)

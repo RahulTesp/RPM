@@ -1,21 +1,21 @@
 ﻿using RPMWeb.Dal;
 using RPMWeb.Data.Common;
-using System.Data;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace RpmCloud.Controllers
 {
-    [Route("api/tasks")]
-    public class TaskController : ControllerBase
+    [Route("api")]
+    public class NotificationController : ControllerBase
     {
         public readonly string CONN_STRING;
-        public TaskController(IConfiguration configuration)
+        public NotificationController(IConfiguration configuration)
         {
             CONN_STRING = configuration.GetSection("RPM:ConnectionString").Value ?? throw new ArgumentNullException(nameof(CONN_STRING));
         }
-        [Route("addtask")]
-        [HttpPost]
-        public IActionResult AddTask(TaskInfo Info)
+        [Route("notification/readstatus")]
+        [HttpPut]
+        public IActionResult UpdateReadNotification(NotificationStatusUpdate Info)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace RpmCloud.Controllers
                         return Unauthorized("Invalid session.");
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
-                    Info.CreatedBy = UserName;
+                    Info.ModifiedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
                         return Unauthorized("Invalid session.");
@@ -37,12 +37,12 @@ namespace RpmCloud.Controllers
                     {
                         return Unauthorized("Invalid session.");
                     }
-                    var id = RpmDalFacade.AddTask(Info);
+                    var id = RpmDalFacade.UpdateNotificationReadStatus(Info);
                     if (!id.Equals(0))
                     {
-                        return Ok(id);
+                        return Ok("Patient notification Added");
                     }
-                    return BadRequest("Could not save task details");
+                    return BadRequest("Could not save notification");
                 }
                 else
                 {
@@ -58,53 +58,14 @@ namespace RpmCloud.Controllers
                 return BadRequest("Unexpected Error.");
             }
         }
-        [Route("updatetask")]
-        [HttpPost]
-        public IActionResult UpdateTask(TaskInfo Info)
-        {
-            try
-            {
-                if (Request.Headers.ContainsKey("Bearer"))
-                {
-                    string? s = Request.Headers["Bearer"].FirstOrDefault();
-                    RpmDalFacade.ConnectionString = CONN_STRING;
-                    if (string.IsNullOrEmpty(s))
-                    {
-                        return Unauthorized("Invalid session.");
-                    }
-                    string UserName = RpmDalFacade.IsSessionValid(s);
-                    Info.CreatedBy = UserName;
-                    if (string.IsNullOrEmpty(UserName))
-                    {
-                        return Unauthorized("Invalid session.");
-                    }
-                    if (!RpmDalFacade.ValidateTkn(s))
-                    {
-                        return Unauthorized("Invalid session.");
-                    }
-                    if (RpmDalFacade.UpdateTask(Info))
-                    {
-                        return Ok("Task details updated");
-                    }
-                    return BadRequest("Could not update Task details");
-                }
-                else
-                {
-                    return Unauthorized("Invalid session.");
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [Route("worklistgettasks")]
+
+        [Route("notification/user")]
         [HttpGet]
-        public IActionResult GetTasks([FromQuery] DateTime StartDate, [FromQuery] DateTime EndDate)
+        public IActionResult GetNotification(DateTime? StartDate=null, int Count=10)
         {
-
             try
             {
+                if (!StartDate.HasValue) StartDate = DateTime.Now;
                 if (Request.Headers.ContainsKey("Bearer"))
                 {
                     string? s = Request.Headers["Bearer"].FirstOrDefault();
@@ -123,12 +84,13 @@ namespace RpmCloud.Controllers
                         return Unauthorized("Invalid session.");
                     }
 
-                    DataSet Tasks = RpmDalFacade.GetTasks( StartDate,  EndDate, UserName);
-                    if (!(Tasks == null))
+                    SystemNotificationByUser notifications = RpmDalFacade.GetSystemNotificationsByUser(UserName, StartDate,
+                                                                                        Count, UserName);
+                    if (!(notifications == null))
                     {
-                        return Ok(Tasks);
+                        return Ok(JsonConvert.SerializeObject(notifications, Formatting.None));
                     }
-                    return NotFound("Could not find task details");
+                    return NotFound("Could not find notification details");
                 }
                 else
                 {
@@ -144,11 +106,10 @@ namespace RpmCloud.Controllers
                 return BadRequest("Unexpected Error.");
             }
         }
-        [Route("getteamtaskbyidandtasktype")]
+        [Route("notification/count")]
         [HttpGet]
-        public IActionResult GetTasks([FromQuery]  string TaskType, [FromQuery] int CareTeamId,[FromQuery]  DateTime TodayDate, [FromQuery] DateTime StartDate, [FromQuery] DateTime EndDate, [FromQuery] int RoleId )
+        public IActionResult GetNotificationCount()
         {
-
             try
             {
                 if (Request.Headers.ContainsKey("Bearer"))
@@ -169,12 +130,12 @@ namespace RpmCloud.Controllers
                         return Unauthorized("Invalid session.");
                     }
 
-                    DataSet Tasks = RpmDalFacade.GetTasksByTypeAndId(TaskType, CareTeamId, TodayDate, StartDate, EndDate,RoleId, UserName);
-                    if (!(Tasks == null))
+                    SystemNotificationCount notificationcount = RpmDalFacade.GetSystemNotificationCount(UserName);
+                    if (!(notificationcount == null))
                     {
-                        return Ok(Tasks);
+                        return Ok(notificationcount);
                     }
-                    return NotFound("Could not find task details");
+                    return NotFound("Could not find notification details");
                 }
                 else
                 {
@@ -190,15 +151,16 @@ namespace RpmCloud.Controllers
                 return BadRequest("Unexpected Error.");
             }
         }
+
+
         
-
-        [Route("worklistgettaskbyid")]
-        [HttpGet]
-        public IActionResult GetTaskById([FromQuery] int Id)
+        [Route("notification/deletenotifications")]
+        [HttpPost]
+        public IActionResult DeleteNotification(int notificationId)
         {
-
             try
             {
+
                 if (Request.Headers.ContainsKey("Bearer"))
                 {
                     string? s = Request.Headers["Bearer"].FirstOrDefault();
@@ -217,12 +179,12 @@ namespace RpmCloud.Controllers
                         return Unauthorized("Invalid session.");
                     }
 
-                    GetTask task = RpmDalFacade.GetTaskById(Id);
-                    if (!(task == null))
+                    bool isdelete = RpmDalFacade.DeleteSystemNotificationsByUser(notificationId,UserName);
+                    if (isdelete)
                     {
-                        return Ok(task);
+                        return Ok(isdelete);
                     }
-                    return NotFound("Could not find task details");
+                    return NotFound("Could not find notification details");
                 }
                 else
                 {
@@ -238,12 +200,14 @@ namespace RpmCloud.Controllers
                 return BadRequest("Unexpected Error.");
             }
         }
-        [Route("gettaskmasterdata")]
-        [HttpGet]
-        public IActionResult GetMasterDataForTask(int RoleId)
+
+        [Route("notification/insertfirebasetoken")]
+        [HttpPost]
+        public IActionResult InsertFirebaseToken(string Token)
         {
             try
             {
+
                 if (Request.Headers.ContainsKey("Bearer"))
                 {
                     string? s = Request.Headers["Bearer"].FirstOrDefault();
@@ -262,12 +226,12 @@ namespace RpmCloud.Controllers
                         return Unauthorized("Invalid session.");
                     }
 
-                    DataSet details = RpmDalFacade.GetMasterDataForTask(RoleId, UserName);
-                    if (!(details == null))
+                    bool isinsert = RpmDalFacade.InsertFirebaseToken(UserName, s, Token);
+                    if (isinsert)
                     {
-                        return Ok(details);
+                        return Ok(isinsert);
                     }
-                    return NotFound("Could not find data");
+                    return NotFound("Could not Insert Token");
                 }
                 else
                 {
@@ -283,5 +247,7 @@ namespace RpmCloud.Controllers
                 return BadRequest("Unexpected Error.");
             }
         }
+
+
     }
 }
