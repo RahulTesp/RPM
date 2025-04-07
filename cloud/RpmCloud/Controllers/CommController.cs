@@ -409,7 +409,7 @@ namespace RpmCloud.Controllers
                         chatdetails = RpmDalFacade.GenerateChatToken(chatdetails, UserName,app);
 
                     }
-                    return Ok(chatdetails.token);
+                    return Ok( new { message = chatdetails.token });
                 }
                 else
                 {

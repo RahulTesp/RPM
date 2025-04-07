@@ -2,6 +2,7 @@
 using RPMWeb.Data.Common;
 using System.Data;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace RpmCloud.Controllers
 {
@@ -236,7 +237,8 @@ namespace RpmCloud.Controllers
                     DataSet teamAlerts = RpmDalFacade.GetTeamAlerts(RoleId, UserName);
                     if (!(teamAlerts == null))
                     {
-                        return Ok(teamAlerts);
+                        //return Ok(teamAlerts);
+                        return Ok(JsonConvert.SerializeObject(teamAlerts, Formatting.Indented));
                     }
                     return NotFound("Could not find task details");
                 }
