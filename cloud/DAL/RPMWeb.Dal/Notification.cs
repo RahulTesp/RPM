@@ -723,12 +723,34 @@ namespace RPMWeb.Dal
             }
             return true;
         }
+        public bool ConversationNotification(PatientDetails patient, string UserName, string ConnString)
+        {
+            try
+            {
+                string body = "Message Received from";
+                string msg = string.Empty;
+                firebasenotificationmessage notify = new firebasenotificationmessage();
+                notify.title = msg;
+                notify.body = body;
+                string category = "PatientChat";
+                CareTeamDeatis team = GetCareTeamPhysician(patient.PatientId, UserName, ConnString);
+                //notify Care Team Member
+                NotifyCareTeam(team.CareTeamUserId, ConnString, UserName, msg, category, notify);
+                //notify Physician
+                NotifyCareTeam(team.PhysicianId, ConnString, UserName, msg, category, notify);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return true;
+        }
         private bool NotifyCareTeam(int CareTeamId, string ConnString, string UserName, string msg, string category, firebasenotificationmessage notify)
         {
             try
             {
                 string Receiver = GetUserName(CareTeamId, ConnString);
-                StoreGenericFireBaseNotifications(UserName, msg, UserName, ConnString);
+                StoreGenericFireBaseNotifications(Receiver, msg, UserName, ConnString);
                 List<string> FireBaseTokens = GetGenericFirebaseTokens(Receiver, ConnString);
                 SendGenericFireBaseNotifications(notify, category, FireBaseTokens);
             }

@@ -99,7 +99,7 @@ namespace RpmCloud.Controllers
         }
         [Route("adduser")]
         [HttpPost]
-        public IActionResult RegisterUser(UserProfiles Info)
+        public IActionResult RegisterUser([FromBody] UserProfiles Info)
         {
             try
             {

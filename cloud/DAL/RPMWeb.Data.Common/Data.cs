@@ -92,7 +92,7 @@ namespace RPMWeb.Data.Common
     public class VerifyUserName
     {
         public string UserName { get; set; }
-        public string CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
     }
     public class Login
     {
@@ -499,6 +499,7 @@ namespace RPMWeb.Data.Common
     }
     public class PatientDetails
     {
+        
         public int PatientId { get; set; }
         public string Status { get; set; }
         public string UserName { get; set; }
@@ -816,10 +817,10 @@ namespace RPMWeb.Data.Common
         public int Id { get; set; }
         public int PatientId { get; set; }
         public int PatientProgramId { get; set; }
-        public string Symptom { get; set; }
-        public string Description { get; set; }
+        public string? Symptom { get; set; }
+        public string? Description { get; set; }
         public DateTime SymptomStartDateTime { get; set; }
-        public string CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
 
     }
     public class GetPatientSymptom
@@ -990,16 +991,16 @@ namespace RPMWeb.Data.Common
     public class TaskInfo
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public int TaskTypeId { get; set; }
         public int PatientId { get; set; }
         public int CareteamMemberUserId { get; set; }
         public DateTime DueDate { get; set; }
         public int PriorityId { get; set; }
-        public string Status { get; set; }
-        public int WatcherUserId { get; set; }
-        public string Comments { get; set; }
-        public string CreatedBy { get; set; }
+        public string? Status { get; set; }
+        public int? WatcherUserId { get; set; }
+        public string? Comments { get; set; }
+        public string? CreatedBy { get; set; }
     }
     public class TaskResponse
     {
@@ -1011,37 +1012,37 @@ namespace RPMWeb.Data.Common
         public string CreatedBy { get; set; }
 
     }
-    public class ScheduleInfo
-    {
-        public int Id { get; set; }
-        public int CurrentScheduleId { get; set; }
-        public bool IsPatient { get; set; }
-        public string Schedule { get; set; }
-        public int ScheduleTypeId { get; set; }
-        public bool Mon { get; set; }
-        public bool Tue { get; set; }
-        public bool Wed { get; set; }
-        public bool Thu { get; set; }
-        public bool Fri { get; set; }
-        public bool Sat { get; set; }
-        public bool Sun { get; set; }
-        public int WeekSelection { get; set; }
-        public DateTime CurrentScheduleDate { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public string StartTime { get; set; }
-        public string CurrentScheduleStartTime { get; set; }
-        public int Duration { get; set; }
-        public int CurrentScheduleDuration { get; set; }
-        public string Comments { get; set; }
-        public string CurrentScheduleComments { get; set; }
-        public int AssignedTo { get; set; }
-        public string AssigneeName { get; set; }
-        public int AssignedBy { get; set; }
-        public string CreatedBy { get; set; }
-        public bool IsCompleted { get; set; }
+        public class ScheduleInfo
+        {
+            public int Id { get; set; }
+            public int CurrentScheduleId { get; set; }
+            public bool IsPatient { get; set; }
+            public string? Schedule { get; set; }
+            public int ScheduleTypeId { get; set; }
+            public bool Mon { get; set; }
+            public bool Tue { get; set; }
+            public bool Wed { get; set; }
+            public bool Thu { get; set; }
+            public bool Fri { get; set; }
+            public bool Sat { get; set; }
+            public bool Sun { get; set; }
+            public int WeekSelection { get; set; }
+            public DateTime CurrentScheduleDate { get; set; }
+            public DateTime StartDate { get; set; }
+            public DateTime EndDate { get; set; }
+            public string? StartTime { get; set; }
+            public string? CurrentScheduleStartTime { get; set; }
+            public int Duration { get; set; }
+            public int CurrentScheduleDuration { get; set; }
+            public string? Comments { get; set; }
+            public string? CurrentScheduleComments { get; set; }
+            public int AssignedTo { get; set; }
+            public string? AssigneeName { get; set; }
+            public int AssignedBy { get; set; }
+            public string? CreatedBy { get; set; }
+            public bool IsCompleted { get; set; }
 
-    }
+        }
     public class CurrentScheduleInfo
     {
         public int CurrentScheduleId { get; set; }
@@ -2398,6 +2399,24 @@ namespace RPMWeb.Data.Common
         public string CommUserNameCareTeam { get; set; }
         public string CommUserNamePatient { get; set; }
     }
-    
-    
+    public class ConverationHistory
+    {
+        public string ContactName { get; set; }
+        public string LastMessage { get; set; }
+        public string DateTime { get; set; }
+        public string ConversationSid { get; set; }
+    }
+    public class ConversationHeartBeat
+    {
+        public string ConversationSid { get; set; }
+        public string UserName { get; set; }
+        public DateTimeOffset LastActiveAt { get; set; }
+    }
+
+    public class ConversationsNotification
+    {
+        public string ConversationSid { get; set; }
+        public string ToUser { get; set; }
+        public string FromUser { get; set; }
+    }
 }

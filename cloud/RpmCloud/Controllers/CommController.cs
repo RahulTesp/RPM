@@ -591,7 +591,7 @@ namespace RpmCloud.Controllers
                     string AccountSIDValue = Convert.ToString(AccountSID.Value);
                     string AuthTokenValue = Convert.ToString(AuthToken.Value);
 
-                    List<string> Conversations = RpmDalFacade.GetAllConversations(UserName, ToUser, AccountSIDValue, AuthTokenValue);
+                    List<ConverationHistory> Conversations = RpmDalFacade.GetAllConversations(UserName, ToUser, AccountSIDValue, AuthTokenValue);
                     if (Conversations.Count == 0)
                     {
                         return NotFound("No Conversation History Found");
@@ -691,7 +691,87 @@ namespace RpmCloud.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("chatheartbeat")]
+        public IActionResult UpdateUserConversationActivity(ConversationHeartBeat conv)
+        {
+            try
+            {
+                if (Request.Headers.ContainsKey("Bearer"))
+                {
+                    string? s = Request.Headers["Bearer"].FirstOrDefault();
+                    RpmDalFacade.ConnectionString = CONN_STRING;
+                    if (string.IsNullOrEmpty(s))
+                    {
+                        return Unauthorized("Invalid session.");
+                    }
+                    string UserName = RpmDalFacade.IsSessionValid(s);
+                    if (string.IsNullOrEmpty(UserName))
+                    {
+                        return Unauthorized("Invalid session.");
+                    }
+                    if (!RpmDalFacade.ValidateTkn(s))
+                    {
+                        return Unauthorized("Invalid session.");
+                    }
 
+                    bool isUpdated = RpmDalFacade.UpdateUserConversationActivity(UserName, conv.ConversationSid, conv.LastActiveAt, conv.UserName);
+                    if (isUpdated)
+                    {
+                        return Ok("Activity updated successfully.");
+                    }
+                    else
+                    {
+                        return NotFound("Failed to update activity.");
+                    }
+                }
+                else
+                {
+                    return Unauthorized("Invalid session.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet]
+        [Route("NotifyConversation")]
+        public IActionResult GetActiveUserCountLastMinute(ConversationsNotification conv)
+        {
+            try
+            {
+                if (Request.Headers.ContainsKey("Bearer"))
+                {
+                    string? s = Request.Headers["Bearer"].FirstOrDefault();
+                    RpmDalFacade.ConnectionString = CONN_STRING;
+                    if (string.IsNullOrEmpty(s))
+                    {
+                        return Unauthorized("Invalid session.");
+                    }
+                    string UserName = RpmDalFacade.IsSessionValid(s);
+                    if (string.IsNullOrEmpty(UserName))
+                    {
+                        return Unauthorized("Invalid session.");
+                    }
+                    if (!RpmDalFacade.ValidateTkn(s))
+                    {
+                        return Unauthorized("Invalid session.");
+                    }
+
+                    RpmDalFacade.NotifyConversation(conv.ConversationSid, conv.FromUser, conv.ToUser);
+                    return Ok();
+                }
+                else
+                {
+                    return Unauthorized("Invalid session.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }

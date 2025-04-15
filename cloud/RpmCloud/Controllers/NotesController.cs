@@ -60,7 +60,7 @@ namespace RpmCloud.Controllers
         }
         [Route("addnotev1")]
         [HttpPost]
-        public IActionResult AddNote(NoteInfo_V1 Info)
+        public IActionResult AddNote([FromBody] NoteInfo_V1 Info)
         {
             try
             {

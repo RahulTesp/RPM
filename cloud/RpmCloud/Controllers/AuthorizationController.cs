@@ -21,7 +21,7 @@ namespace RpmCloud.Controllers
         }
         [Route("verifyusername")]
         [HttpPost]
-        public IActionResult VerifyUserName(VerifyUserName verifyUserName)
+        public IActionResult VerifyUserName([FromBody]VerifyUserName verifyUserName)
         {            
             RpmDalFacade.ConnectionString = CONN_STRING;
             if (RpmDalFacade.VerifyUserName(verifyUserName))

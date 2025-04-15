@@ -190,7 +190,8 @@ namespace RpmCloud.Controllers
                     DataSet teamTasks = RpmDalFacade.GetTeamTasks(TodayDate, StartDate, EndDate, RoleId, UserName);
                     if (!(teamTasks == null))
                     {
-                        return Ok(teamTasks);
+                        //return Ok(teamTasks);
+                        return Ok(JsonConvert.SerializeObject(teamTasks, Formatting.Indented));
                     }
                     return NotFound("Could not find task details");
                 }

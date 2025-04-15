@@ -16,7 +16,7 @@ namespace RpmCloud.Controllers
         }
         [Route("addtask")]
         [HttpPost]
-        public IActionResult AddTask(TaskInfo Info)
+        public IActionResult AddTask([FromBody] TaskInfo Info)
         {
             try
             {
@@ -37,6 +37,10 @@ namespace RpmCloud.Controllers
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
                         return Unauthorized("Invalid session.");
+                    }
+                    if (Info.WatcherUserId == null)
+                    {
+                        Info.WatcherUserId = 0;
                     }
                     var id = RpmDalFacade.AddTask(Info);
                     if (!id.Equals(0))
@@ -61,7 +65,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updatetask")]
         [HttpPost]
-        public IActionResult UpdateTask(TaskInfo Info)
+        public IActionResult UpdateTask([FromBody] TaskInfo Info)
         {
             try
             {
@@ -127,7 +131,7 @@ namespace RpmCloud.Controllers
                     DataSet Tasks = RpmDalFacade.GetTasks( StartDate,  EndDate, UserName);
                     if (!(Tasks == null))
                     {
-                        return Ok(Tasks);
+                        return Ok(JsonConvert.SerializeObject(Tasks, Formatting.Indented));
                     }
                     return NotFound("Could not find task details");
                 }
