@@ -177,7 +177,7 @@ namespace RpmCloud.Controllers
                     DataSet Tasks = RpmDalFacade.GetTasksByTypeAndId(TaskType, CareTeamId, TodayDate, StartDate, EndDate,RoleId, UserName);
                     if (!(Tasks == null))
                     {
-                        return Ok(Tasks);
+                        return Ok(JsonConvert.SerializeObject(Tasks, Formatting.Indented));
                     }
                     return NotFound("Could not find task details");
                 }

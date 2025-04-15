@@ -156,7 +156,7 @@ namespace RpmCloud.Controllers
         
         [Route("notification/deletenotifications")]
         [HttpPost]
-        public IActionResult DeleteNotification(int notificationId)
+        public IActionResult DeleteNotification([FromBody] int notificationId)
         {
             try
             {
@@ -203,7 +203,7 @@ namespace RpmCloud.Controllers
 
         [Route("notification/insertfirebasetoken")]
         [HttpPost]
-        public IActionResult InsertFirebaseToken(string Token)
+        public IActionResult InsertFirebaseToken([FromBody] string Token)
         {
             try
             {

@@ -149,7 +149,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updateuser")]
         [HttpPost]
-        public IActionResult UpdateUser(UserProfiles Info)
+        public IActionResult UpdateUser([FromBody] UserProfiles Info)
         {
             try
             {
@@ -271,7 +271,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updateuserpassword")]
         [HttpPost]
-        public IActionResult UpdateUserPassword(ResetUserPW info)
+        public IActionResult UpdateUserPassword([FromBody] ResetUserPW info)
         {
             try
             {
@@ -385,7 +385,7 @@ namespace RpmCloud.Controllers
         }
         [Route("UserStatusCheck")]
         [HttpPost]
-        public IActionResult UserlockStatusCheck(UnlockUser unlockUser)
+        public IActionResult UserlockStatusCheck([FromBody] UnlockUser unlockUser)
         {
             try
             {

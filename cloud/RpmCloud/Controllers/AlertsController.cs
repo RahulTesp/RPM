@@ -197,7 +197,7 @@ namespace RpmCloud.Controllers
         }
 
         [HttpPost("savealertresponse")]
-        public IActionResult SaveAlertResponse(TaskResponse Info)
+        public IActionResult SaveAlertResponse([FromBody] TaskResponse Info)
         {
             try
             {
@@ -242,7 +242,7 @@ namespace RpmCloud.Controllers
         }
 
         [HttpPost("savealertresponsepatient")]
-        public IActionResult SaveAlertResponseFromPatient(TaskResponse Info)
+        public IActionResult SaveAlertResponseFromPatient([FromBody] TaskResponse Info)
         {
             try
             {

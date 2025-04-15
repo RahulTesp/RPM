@@ -20,7 +20,7 @@ namespace RpmCloud.Controllers
         }
         [Route("SMSService")]
         [HttpPost]
-        public IActionResult MessagingService(SendSmsToPatient Info)
+        public IActionResult MessagingService([FromBody] SendSmsToPatient Info)
         {
             try
             {
@@ -466,7 +466,7 @@ namespace RpmCloud.Controllers
 
         [HttpPost]
         [Route("updatechatresource")]
-        public IActionResult UpdateChatResource(ChatResourceDetails chatresource)
+        public IActionResult UpdateChatResource([FromBody] ChatResourceDetails chatresource)
         {
             try
             {
@@ -616,7 +616,7 @@ namespace RpmCloud.Controllers
         [HttpPost]
         [Route("notifibyfirebase")]
 
-        public IActionResult NotificationbyFirebase(string toUser, int tokenid, firebasenotificationmessage notify)
+        public IActionResult NotificationbyFirebase([FromBody] string toUser, int tokenid, firebasenotificationmessage notify)
         {
             try
             {
@@ -655,7 +655,7 @@ namespace RpmCloud.Controllers
        
         [HttpPost]
         [Route("updatechatwebhook")]
-        public IActionResult UpdateChatWebhook(chathook hook)
+        public IActionResult UpdateChatWebhook([FromBody] chathook hook)
         {
             try
             {
@@ -677,7 +677,7 @@ namespace RpmCloud.Controllers
 
         [HttpPost]
         [Route("updatesmswebhook")]
-        public IActionResult UpdatesmsWebhook(smshook hook)
+        public IActionResult UpdatesmsWebhook([FromBody] smshook hook)
         {
             try
             {
@@ -693,7 +693,7 @@ namespace RpmCloud.Controllers
 
         [HttpPost]
         [Route("chatheartbeat")]
-        public IActionResult UpdateUserConversationActivity(ConversationHeartBeat conv)
+        public IActionResult UpdateUserConversationActivity([FromBody] ConversationHeartBeat conv)
         {
             try
             {

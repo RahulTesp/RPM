@@ -16,7 +16,7 @@ namespace RpmCloud.Controllers
         }
         [Route("addcareteam")]
         [HttpPost]
-        public IActionResult AddCareTeam(CareTeams Info)
+        public IActionResult AddCareTeam([FromBody] CareTeams Info)
         {
             try
             {
@@ -58,7 +58,7 @@ namespace RpmCloud.Controllers
         
         [Route("updatecareteam")]
         [HttpPost]
-        public IActionResult UpdateCareTeam(CareTeams Info)
+        public IActionResult UpdateCareTeam([FromBody] CareTeams Info)
         {
             try
             {

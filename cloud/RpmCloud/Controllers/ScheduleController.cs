@@ -65,7 +65,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updateschedule")]
         [HttpPost]
-        public IActionResult UpdateSchedule(ScheduleInfo Info)
+        public IActionResult UpdateSchedule([FromBody] ScheduleInfo Info)
         {
             try
             {
@@ -153,7 +153,7 @@ namespace RpmCloud.Controllers
       
         [Route("updatecompletedschedule")]
         [HttpPost]
-        public IActionResult UpdateCompletedSchedule(CompletedSchedules Info)
+        public IActionResult UpdateCompletedSchedule([FromBody] CompletedSchedules Info)
         {
             try
             {

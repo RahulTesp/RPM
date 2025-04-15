@@ -477,7 +477,7 @@ namespace RpmCloud.Controllers
         }
         [Route("addpatientmedication")]
         [HttpPost]
-        public IActionResult AddPatientMedication(PatientMedication Info)
+        public IActionResult AddPatientMedication([FromBody] PatientMedication Info)
         {
             try
             {
@@ -524,7 +524,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updatepatientmedication")]
         [HttpPost]
-        public IActionResult UpdatePatientMedication(PatientMedication Info)
+        public IActionResult UpdatePatientMedication([FromBody] PatientMedication Info)
         {
             try
             {

@@ -541,7 +541,7 @@ namespace RPMWeb.Data.Common
     public class ResetPatientPW
     {
         public int PatientId { get; set; }
-        public string CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
     }
     public class SearchPatient
     {
@@ -1009,7 +1009,7 @@ namespace RPMWeb.Data.Common
         public string AlertStatus { get; set; }
         public int UserId { get; set; }
         public string Comments { get; set; }
-        public string CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
 
     }
         public class ScheduleInfo
