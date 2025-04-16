@@ -20,7 +20,7 @@ namespace RpmCloud.Controllers
 
         [Route("addpatient")]
         [HttpPost]
-        public IActionResult RegisterPatient(PatientDetails Info)
+        public IActionResult RegisterPatient([FromBody] PatientDetails Info)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace RpmCloud.Controllers
 
         [Route("addimage")]
         [HttpPost]
-        public async Task<IActionResult> ImageUpload(int PatientId)
+        public async Task<IActionResult> ImageUpload([FromBody] int PatientId)
         {
             try
             {
@@ -210,7 +210,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updatepatient")]
         [HttpPost]
-        public IActionResult UpdatePatient(PatientDetails Info)
+        public IActionResult UpdatePatient([FromBody] PatientDetails Info)
         {
             try
             {
@@ -234,17 +234,17 @@ namespace RpmCloud.Controllers
                     }
                     if (RpmDalFacade.UpdatePatient(Info))
                     {
-                        try
-                        {
-                            if (Info.Status.ToLower() == "active" || Info.Status.ToLower() == "readytodischarge" || Info.Status.ToLower() == "discharged")
-                            {
-                                RpmDalFacade.NotifyPatientStatusChange(Info.Status.ToLower(), Info, UserName);
-                            }
-                        }
-                        catch
-                        {
-                            return Ok("Patient details updated");
-                        }
+                        //try
+                        //{
+                        //    if (Info.Status.ToLower() == "active" || Info.Status.ToLower() == "readytodischarge" || Info.Status.ToLower() == "discharged")
+                        //    {
+                        //        RpmDalFacade.NotifyPatientStatusChange(Info.Status.ToLower(), Info, UserName);
+                        //    }
+                        //}
+                        //catch
+                        //{
+                        //    return Ok("Patient details updated");
+                        //}
                         return Ok("Patient details updated");
                     }
                     return BadRequest("Could not update patient details");
@@ -265,7 +265,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updatepatientpassword")]
         [HttpPost]
-        public IActionResult UpdatePatientPassword(ResetPatientPW info)
+        public IActionResult UpdatePatientPassword([FromBody] ResetPatientPW info)
         {
             try
             {
@@ -822,7 +822,7 @@ namespace RpmCloud.Controllers
         }
         [Route("addpatientprogram")]
         [HttpPost]
-        public IActionResult AddPatientProgram(PatientProgramDetailsInsert Info)
+        public IActionResult AddPatientProgram([FromBody] PatientProgramDetailsInsert Info)
         {
             try
             {
@@ -865,7 +865,7 @@ namespace RpmCloud.Controllers
 
         [Route("addnewpatientprogram")]
         [HttpPost]
-        public IActionResult AddNewPatientProgram(PatientProgramDetailsInsert Info)
+        public IActionResult AddNewPatientProgram([FromBody] PatientProgramDetailsInsert Info)
         {
             try
             {
@@ -906,7 +906,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updatepatientprogramdetails")]
         [HttpPost]
-        public IActionResult UpdateProgram(UpdateProgramDetails Info)
+        public IActionResult UpdateProgram([FromBody] UpdateProgramDetails Info)
         {
             try
             {
@@ -947,7 +947,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updatepatientprogram")]
         [HttpPost]
-        public IActionResult UpdatePatientProgram(PatientProgramDetailsUpdate Info)
+        public IActionResult UpdatePatientProgram([FromBody] PatientProgramDetailsUpdate Info)
         {
             try
             {
@@ -1031,7 +1031,7 @@ namespace RpmCloud.Controllers
         }
         [Route("renewpatientprogram")]
         [HttpPost]
-        public IActionResult RenewPatientProgram(PatientProgramRenew Info)
+        public IActionResult RenewPatientProgram([FromBody] PatientProgramRenew Info)
         {
             try
             {
@@ -1072,7 +1072,7 @@ namespace RpmCloud.Controllers
         }
         [Route("addpatientsymptoms")]
         [HttpPost]
-        public IActionResult AddPatientSymptoms(PatientSymptom Info)
+        public IActionResult AddPatientSymptoms([FromBody] PatientSymptom Info)
         {
             try
             {
@@ -1156,7 +1156,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updatepatientsymptoms")]
         [HttpPost]
-        public IActionResult UpdatePatientSymptoms(PatientSymptom Info)
+        public IActionResult UpdatePatientSymptoms([FromBody] PatientSymptom Info)
         {
             try
             {
@@ -1238,7 +1238,7 @@ namespace RpmCloud.Controllers
         }
         [Route("addpatientmedication")]
         [HttpPost]
-        public IActionResult AddPatientMedication(PatientMedication Info)
+        public IActionResult AddPatientMedication([FromBody] PatientMedication Info)
         {
             try
             {
@@ -1283,7 +1283,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updatepatientmedication")]
         [HttpPost]
-        public IActionResult UpdatePatientMedication(PatientMedication Info)
+        public IActionResult UpdatePatientMedication([FromBody] PatientMedication Info)
         {
             try
             {
@@ -2700,7 +2700,7 @@ namespace RpmCloud.Controllers
         }
         [Route("getdiagnosiscodebyvitalid")]
         [HttpPost]
-        public IActionResult getDiagnosisCodeByVitalId(vitalIdsList VitalIds)
+        public IActionResult getDiagnosisCodeByVitalId([FromBody] vitalIdsList VitalIds)
         {
             try
             {

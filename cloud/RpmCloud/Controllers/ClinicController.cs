@@ -14,7 +14,7 @@ namespace RpmCloud.Controllers
         }
         [Route("addclinic")]
         [HttpPost]
-        public IActionResult RegisterClinic(ClinicInfo Info)
+        public IActionResult RegisterClinic([FromBody] ClinicInfo Info)
         {
             try
             {

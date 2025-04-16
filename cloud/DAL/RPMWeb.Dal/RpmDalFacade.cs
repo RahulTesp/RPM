@@ -949,7 +949,7 @@ namespace RPMWeb.Dal
         {
             return new User().GetChatResource(UserName, ToUser, ConnectionString);
         }
-        public static List<string> GetAllConversations(string UserName, string ToUser, string AccountSIDValue, string AuthTokenValue)
+        public static List<ConverationHistory> GetAllConversations(string UserName, string ToUser, string AccountSIDValue, string AuthTokenValue)
         {
             return new User().GetAllConversationsAsync(UserName, ToUser, AccountSIDValue, AuthTokenValue, ConnectionString);
         }
@@ -994,6 +994,15 @@ namespace RPMWeb.Dal
         {
             return new CommServices().GenerateChatToken(chatdetails, UserName, Application, ConnectionString);
         }
+        public static bool UpdateUserConversationActivity(string username, string activeConversationSid, DateTimeOffset lastActiveAt, string actor)
+        {
+            return new User().UpdateUserConversationActivity(username, activeConversationSid, lastActiveAt, actor, ConnectionString);
+        }
+        public static void NotifyConversation(string activeConversationSid, string FromUser, string ToUser)
+        {
+            new User().NotifyConversation(activeConversationSid, FromUser, ToUser, ConnectionString);
+        }
+
     }
 
 }

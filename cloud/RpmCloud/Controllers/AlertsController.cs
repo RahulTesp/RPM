@@ -2,6 +2,7 @@
 using RPMWeb.Data.Common;
 using System.Data;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace RpmCloud.Controllers
 {
@@ -86,7 +87,7 @@ namespace RpmCloud.Controllers
                     DataSet alert = RpmDalFacade.GetTeamAlertsById(AlertType, CareTeamId, RoleId, UserName);
                     if (alert != null)
                     {
-                        return Ok(alert);
+                        return Ok(JsonConvert.SerializeObject(alert, Formatting.Indented));
                     }
                     return NotFound("Could not find alert details");
                 }
@@ -196,7 +197,7 @@ namespace RpmCloud.Controllers
         }
 
         [HttpPost("savealertresponse")]
-        public IActionResult SaveAlertResponse(TaskResponse Info)
+        public IActionResult SaveAlertResponse([FromBody] TaskResponse Info)
         {
             try
             {
@@ -241,7 +242,7 @@ namespace RpmCloud.Controllers
         }
 
         [HttpPost("savealertresponsepatient")]
-        public IActionResult SaveAlertResponseFromPatient(TaskResponse Info)
+        public IActionResult SaveAlertResponseFromPatient([FromBody] TaskResponse Info)
         {
             try
             {

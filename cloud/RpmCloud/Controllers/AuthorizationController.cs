@@ -21,7 +21,7 @@ namespace RpmCloud.Controllers
         }
         [Route("verifyusername")]
         [HttpPost]
-        public IActionResult VerifyUserName(VerifyUserName verifyUserName)
+        public IActionResult VerifyUserName([FromBody]VerifyUserName verifyUserName)
         {            
             RpmDalFacade.ConnectionString = CONN_STRING;
             if (RpmDalFacade.VerifyUserName(verifyUserName))
@@ -33,7 +33,7 @@ namespace RpmCloud.Controllers
 
         [Route("Userlogin")]
         [HttpPost]
-        public IActionResult Login(RPMLogin verPass)
+        public IActionResult Login([FromBody] RPMLogin verPass)
         {
             try
             {
@@ -347,7 +347,7 @@ namespace RpmCloud.Controllers
         }
         [Route("UserloginVerifiy")]
         [HttpPost]
-        public IActionResult LoginWithOtp(RPMWeb.Data.Common.Login verPass)
+        public IActionResult LoginWithOtp([FromBody] RPMWeb.Data.Common.Login verPass)
         {
             try
             {
@@ -458,7 +458,7 @@ namespace RpmCloud.Controllers
 
         [Route("userresetpasswordverifiy")]
         [HttpPost]
-        public IActionResult ResetWithOtp(ResetPassword verPass)
+        public IActionResult ResetWithOtp([FromBody] ResetPassword verPass)
         {
             try
             {
@@ -738,7 +738,7 @@ namespace RpmCloud.Controllers
         }
         [Route("UnlockUser")]
         [HttpPost]
-        public IActionResult UnlockUser(UnlockUser unlockUser)
+        public IActionResult UnlockUser([FromBody] UnlockUser unlockUser)
         {
             try
             {
@@ -827,7 +827,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updatepassword")]
         [HttpPost]
-        public IActionResult UpdatePassword(Updatepassword updatepassword)
+        public IActionResult UpdatePassword([FromBody] Updatepassword updatepassword)
         {
             StatusMessage msg = new StatusMessage();
             try
@@ -1099,7 +1099,7 @@ namespace RpmCloud.Controllers
         //}
         [Route("Patientlogin")]
         [HttpPost]
-        public IActionResult AppPatientLogin(RPMWeb.Data.Common.RPMLogin verPass)
+        public IActionResult AppPatientLogin([FromBody] RPMWeb.Data.Common.RPMLogin verPass)
         {
             try
             {

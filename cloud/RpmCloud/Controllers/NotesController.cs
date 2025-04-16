@@ -15,7 +15,7 @@ namespace RpmCloud.Controllers
         public static string Blob_Conn_String = String.Empty;
         [Route("addnote")]
         [HttpPost]
-        public IActionResult AddNote(NoteInfo Info)
+        public IActionResult AddNote([FromBody] NoteInfo Info)
         {
             try
             {
@@ -60,7 +60,7 @@ namespace RpmCloud.Controllers
         }
         [Route("addnotev1")]
         [HttpPost]
-        public IActionResult AddNote(NoteInfo_V1 Info)
+        public IActionResult AddNote([FromBody] NoteInfo_V1 Info)
         {
             try
             {
@@ -105,7 +105,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updatenotev1")]
         [HttpPost]
-        public IActionResult UpdateNote(NoteInfo_V1 Info)
+        public IActionResult UpdateNote([FromBody] NoteInfo_V1 Info)
         {
             try
             {
@@ -151,7 +151,7 @@ namespace RpmCloud.Controllers
         
         [Route("updatenote")]
         [HttpPost]
-        public IActionResult UpdateNote(NoteInfo Info)
+        public IActionResult UpdateNote([FromBody] NoteInfo Info)
         {
             try
             {
@@ -241,7 +241,7 @@ namespace RpmCloud.Controllers
 
         [Route("CallLogByCareTeam")]
         [HttpPost]
-        public IActionResult DownloadInvoice(CallLogReport callLogReport)
+        public IActionResult DownloadInvoice([FromBody] CallLogReport callLogReport)
         {
             try
             {
@@ -298,7 +298,7 @@ namespace RpmCloud.Controllers
 
         [Route("NonEstablishedCallReport")]
         [HttpPost]
-        public IActionResult NonEstablishedCallReport(nonEstablishedCallReport dates)
+        public IActionResult NonEstablishedCallReport([FromBody] nonEstablishedCallReport dates)
         {
             try
             {
