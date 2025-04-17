@@ -2313,12 +2313,8 @@ namespace RPMWeb.Data.Common
 
 
     }
-
-
-
     public class ChatDetails
     {
-
         public string token { get; set; }
         public bool istoken { get; set; }
 
@@ -2368,7 +2364,6 @@ namespace RPMWeb.Data.Common
         public string ClientIdentity { get; set; }
         public string EventType { get; set; }
         public string Source { get; set; }
-
         public string ConversationSid { get; set; }
         public string ParticipantSid { get; set; }
         //public string DateCreated { get; set; }
@@ -2410,7 +2405,7 @@ namespace RPMWeb.Data.Common
     {
         public string ConversationSid { get; set; }
         public string UserName { get; set; }
-        public DateTimeOffset LastActiveAt { get; set; }
+        public string LastActiveAt { get; set; }
     }
 
     public class ConversationsNotification
