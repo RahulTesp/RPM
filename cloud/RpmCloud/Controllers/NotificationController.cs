@@ -203,7 +203,7 @@ namespace RpmCloud.Controllers
 
         [Route("notification/insertfirebasetoken")]
         [HttpPost]
-        public IActionResult InsertFirebaseToken([FromBody] string Token)
+        public IActionResult InsertFirebaseToken([FromQuery] string Token)
         {
             try
             {

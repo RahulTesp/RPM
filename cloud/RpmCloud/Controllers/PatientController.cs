@@ -1749,7 +1749,6 @@ namespace RpmCloud.Controllers
         [HttpGet]
         public IActionResult GetPatientHealthTrends([FromQuery] int PatientId, [FromQuery] int PatientProgramId, [FromQuery] DateTime StartDate, [FromQuery] DateTime EndDate)
         {
-
             try
             {
                 if (Request.Headers.ContainsKey("Bearer"))
@@ -1772,10 +1771,13 @@ namespace RpmCloud.Controllers
 
                     HealthTrends List = RpmDalFacade.GetPatientHealthTrends(UserName, PatientId, PatientProgramId, StartDate, EndDate, UserName);
 
-                    if (!(List == null))
+                    if (List != null)
                     {
+                        // Remove 'Z' from DateTime values in the response  
+                        List.Time = List.Time.Select(t => DateTime.SpecifyKind(t, DateTimeKind.Unspecified)).ToList();
                         return Ok(List);
                     }
+
                     HealthTrends healthTrends = new HealthTrends();
                     healthTrends.Time = new List<DateTime>();
                     healthTrends.Values = new List<Values>();

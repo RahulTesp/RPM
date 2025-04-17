@@ -451,7 +451,7 @@ namespace RpmCloud.Controllers
                     chatdetails = RpmDalFacade.GetChatDetails(UserName);
                     chatdetails.makeisactivezero = true;
                     chatdetails = RpmDalFacade.GenerateChatToken(chatdetails, UserName, app);
-                    return Ok(chatdetails.token);
+                    return Ok(new { message = chatdetails.token });
                 }
                 else
                 {
@@ -541,7 +541,7 @@ namespace RpmCloud.Controllers
                         return NotFound("No Conversation History Found");
                         
                     }
-                    return Ok(ConversationSid);
+                    return Ok(new { message = ConversationSid });
 
                 }
                 else
@@ -715,7 +715,10 @@ namespace RpmCloud.Controllers
                         return Unauthorized("Invalid session.");
                     }
 
-                    bool isUpdated = RpmDalFacade.UpdateUserConversationActivity(UserName, conv.ConversationSid, conv.LastActiveAt, conv.UserName);
+
+                    string dateTimeString = conv.LastActiveAt;
+                    DateTimeOffset dateTimeOffset = DateTimeOffset.ParseExact(dateTimeString, "M/d/yyyy, h:mm:ss tt zzz", System.Globalization.CultureInfo.InvariantCulture);
+                    bool isUpdated = RpmDalFacade.UpdateUserConversationActivity(UserName, conv.ConversationSid, dateTimeOffset, conv.UserName);
                     if (isUpdated)
                     {
                         return Ok("Activity updated successfully.");
@@ -735,9 +738,9 @@ namespace RpmCloud.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet]
+        [HttpPost]
         [Route("NotifyConversation")]
-        public IActionResult GetActiveUserCountLastMinute(ConversationsNotification conv)
+        public IActionResult GetActiveUserCountLastMinute([FromBody] ConversationsNotification conv)
         {
             try
             {
