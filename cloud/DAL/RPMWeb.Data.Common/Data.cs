@@ -1680,6 +1680,8 @@ namespace RPMWeb.Data.Common
         public string AuditCreatedBy { get; set; }
         public bool IsRead { get; set; }
         public bool IsNotify { get; set; }
+        public int PatientId { get; set; }
+        public int ProgramId { get; set; }
     }
     public class NotificationData : NotificationAuditData
     {
@@ -2413,5 +2415,11 @@ namespace RPMWeb.Data.Common
         public string ConversationSid { get; set; }
         public string ToUser { get; set; }
         public string FromUser { get; set; }
+        public string Message { get; set; }
+    }
+    public class PatientDetials
+    {
+        public int PatientId { get; set; }
+        public int ProgramId { get; set; }
     }
 }

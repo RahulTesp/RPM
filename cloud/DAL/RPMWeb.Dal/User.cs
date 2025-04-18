@@ -754,25 +754,6 @@ namespace RPMWeb.Dal
                         {
                             string? conversationSid = reader["ConversationSid"] != DBNull.Value ? reader["ConversationSid"].ToString() : null;
                             ConverationHistory ConHistory = new ConverationHistory();
-                            //if (!string.IsNullOrEmpty(conversationSid))
-                            //{
-                            //    TwilioClient.Init(AccountSIDValue, AuthTokenValue);
-                            //    var messages = MessageResource.Read(
-                            //    conversationSid,
-                            //    limit: 1,
-                            //    client: TwilioClient.GetRestClient()); // Fixed order enum
-
-                            //    var lastMessage = messages.FirstOrDefault(); // Avoid multiple enumerations
-
-                            //    if (lastMessage != null)
-                            //    {
-                            //        if (lastMessage.DateCreated == null) 
-                            //        { 
-                            //            throw new Exception("DateCreated is null"); 
-                            //        }
-                            //        conversations.Add($"SID: {conversationSid}, Message: {lastMessage.Body}, Date: {lastMessage.DateCreated.Value.ToString()}");
-                            //    }
-                            //}
                             // Initialize Twilio client with Account SID and Auth Token
                             TwilioClient.Init(AccountSIDValue, AuthTokenValue);
 
@@ -804,7 +785,10 @@ namespace RPMWeb.Dal
                                 {
                                     Console.WriteLine("No messages found in the conversation.");
                                 }
-                                conversations.Add(ConHistory);
+                                if (ConHistory.DateTime != null && ConHistory.LastMessage != null)
+                                {
+                                    conversations.Add(ConHistory);
+                                }
                             }
                             
                         }
@@ -954,11 +938,12 @@ namespace RPMWeb.Dal
                 return false;
             }
         }
-        public void NotifyConversation(string activeConversationSid, string FromUser, string ToUser, string connectionString)
+        public void NotifyConversation(string activeConversationSid, string FromUser, string ToUser,string Message, string connectionString)
         {
             int userCount = GetActiveUserCountLastMinute(activeConversationSid, ToUser, connectionString);
-            string msg = "New message from " + FromUser;
-            string body = "Message Received from " + FromUser;
+            string name = GetUserFullNameByUserName(FromUser, connectionString);
+            string msg = $"New message from {name}: {Message}";
+            string body = $"Message received from {name}:\n\n{Message}";
             firebasenotificationmessage notify = new firebasenotificationmessage();
             notify.title = msg;
             notify.body = body;
@@ -969,6 +954,31 @@ namespace RPMWeb.Dal
                 notification.StoreGenericFireBaseNotifications(ToUser, msg, FromUser, connectionString);
                 List<string> FireBaseTokens = notification.GetGenericFirebaseTokens(ToUser, connectionString);
                 notification.SendGenericFireBaseNotifications(notify, category, FireBaseTokens);
+            }
+        }
+        public string GetUserFullNameByUserName(string inputUserName, string connectionString)
+        {
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    SqlCommand command = new SqlCommand("GetUserFullNameByUserName", con);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@InputUserName", inputUserName);
+                    con.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+                    string fullName = null;
+                    if (reader.Read())
+                    {
+                        fullName = reader["FullName"] != DBNull.Value ? reader["FullName"].ToString() : null;
+                    }
+                    con.Close();
+                    return fullName;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
         public int GetActiveUserCountLastMinute(string activeConversationSid, string toUser, string connectionString)

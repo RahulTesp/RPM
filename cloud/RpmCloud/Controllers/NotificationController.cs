@@ -15,7 +15,7 @@ namespace RpmCloud.Controllers
         }
         [Route("notification/readstatus")]
         [HttpPut]
-        public IActionResult UpdateReadNotification(NotificationStatusUpdate Info)
+        public IActionResult UpdateReadNotification([FromBody] NotificationStatusUpdate Info)
         {
             try
             {
@@ -40,7 +40,7 @@ namespace RpmCloud.Controllers
                     var id = RpmDalFacade.UpdateNotificationReadStatus(Info);
                     if (!id.Equals(0))
                     {
-                        return Ok("Patient notification Added");
+                        return Ok(new { message = "Notification Status updated" });
                     }
                     return BadRequest("Could not save notification");
                 }
@@ -88,7 +88,7 @@ namespace RpmCloud.Controllers
                                                                                         Count, UserName);
                     if (!(notifications == null))
                     {
-                        return Ok(JsonConvert.SerializeObject(notifications, Formatting.None));
+                        return Ok(JsonConvert.SerializeObject(notifications, Formatting.Indented));
                     }
                     return NotFound("Could not find notification details");
                 }

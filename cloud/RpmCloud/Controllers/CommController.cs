@@ -425,7 +425,7 @@ namespace RpmCloud.Controllers
 
         [HttpGet]
         [Route("regeneratechattoken")]
-        public IActionResult RegenerateChatToken(string app)
+        public IActionResult RegenerateChatToken([FromQuery] string app)
         {
             try
             {
@@ -594,7 +594,7 @@ namespace RpmCloud.Controllers
                     List<ConverationHistory> Conversations = RpmDalFacade.GetAllConversations(UserName, ToUser, AccountSIDValue, AuthTokenValue);
                     if (Conversations.Count == 0)
                     {
-                        return NotFound("No Conversation History Found");
+                        return NotFound(new { message = "No Conversation History Found" });
 
                     }
                     return Ok(Conversations);
@@ -703,16 +703,16 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { error = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { error = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { error = "Invalid session." });
                     }
 
 
@@ -721,7 +721,7 @@ namespace RpmCloud.Controllers
                     bool isUpdated = RpmDalFacade.UpdateUserConversationActivity(UserName, conv.ConversationSid, dateTimeOffset, conv.UserName);
                     if (isUpdated)
                     {
-                        return Ok("Activity updated successfully.");
+                        return Ok(new { message = "Activity updated successfully." });
                     }
                     else
                     {
@@ -762,7 +762,7 @@ namespace RpmCloud.Controllers
                         return Unauthorized("Invalid session.");
                     }
 
-                    RpmDalFacade.NotifyConversation(conv.ConversationSid, conv.FromUser, conv.ToUser);
+                    RpmDalFacade.NotifyConversation(conv.ConversationSid, conv.FromUser, conv.ToUser,conv.Message);
                     return Ok();
                 }
                 else
