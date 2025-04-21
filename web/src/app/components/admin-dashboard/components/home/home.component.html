@@ -1,0 +1,845 @@
+<ng-container *ngIf="!(loading1 && loading2 && !isLoading)">
+  <div class="overlay"></div>
+  <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
+</ng-container>
+<div class="content">
+  <div class="main_content">
+      <!-- Main Panel -->
+      <div class="main-panel">
+        <div
+          class="Schedule_Container"
+          *ngIf="
+            userAccessRight &&
+            userAccessRight.UserAccessRights[17].AccessRight == 'F'
+          "
+        >
+          <div class="upcoming_Panel">
+            <div class="panel-heading">
+              <h2>Priority Alerts</h2>
+            </div>
+            <div
+              *ngIf="alertsArray && alertsArray.length > 0"
+              class="alert_panel_container"
+            >
+              <div
+                *ngFor="let alert of priorityAlertData; index as i"
+                appAmIVisible
+                (elementVisible)="getAlertData($event)"
+                [isTargetElement]="alert.Index == priorityAlertData.length - 1"
+              >
+                <div
+                  class="alert_panel_content_container"
+                  *ngIf="alert.VitalAlert != 'No Alerts'"
+                >
+                  <div
+                    class="alert_panel_content"
+                    [ngClass]="{
+                      urgent: alert.Priority == 'Critical',
+                      cautious: alert.Priority == 'Cautious',
+                      moderate: alert.Priority == 'Moderate'
+                    }"
+                  >
+                    <div class="alert_left_panel">
+                      <span title="{{ alert.VitalAlert }} " class="alert_title"
+                        >{{ alert.VitalAlert }}
+                      </span>
+                      <p class="alert_patient">{{ alert.PatientName }}</p>
+                    </div>
+                    <div class="alert_right_panel">
+                      <!-- <p class="alert_time">{{notificationtime(alert.Time)}} </p> -->
+                      <p
+                        class="alert_time"
+                        title="{{ convertToLocalTime(alert.Time) }}"
+                      >
+                        {{ convertToLocalTime(alert.Time) }}
+                      </p>
+                      <div class="alert_icon_container">
+                        <img
+                          class="alert_icon"
+                          id="homeAlertAck"
+                          (click)="acknowledgealert(alert)"
+                          src="../../../../../assets/04-Icons/Icons_Alert.svg"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  *ngIf="alert.VitalAlert == 'No Alerts'"
+                  class="alert_panel_no_data"
+                >
+                  <div class="noalertContainer">
+                    <div class="alert_left_panel">
+                      <span class="upcoming_title">No Alerts</span>
+                      <p class="alert_patient"></p>
+                    </div>
+                    <div class="alert_right_panel">
+                      <p class="alert_time"></p>
+                      <div class="alert_icon_container"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- First Raw Container  -->
+        <div
+          class="first_container_panel">
+
+          <!-- *ngIf="
+          userAccessRight && isPatientOverviewVisible[0].AccessRight == 'F'
+        " -->
+          <div
+            class="patient-overview"
+
+          >
+            <div class="patient-overview-container">
+              <div class="panel-heading">
+                <h2>Patient Overview</h2>
+                <button
+                  id="homeaddpatient"
+                  class="addCommonBtn"
+                  (click)="addpatient()"
+                >
+                  ADD PATIENT
+                </button>
+              </div>
+              <div class="patient_overview_main_panel">
+                <!-- <div [ngClass]="is_admin ? '' : 'left_panel_dropdown '">
+                  <div class="dropdown  dropdown_home_first" appearance="outline">
+                    <select  id="dropdownhomeallClinic"  [(ngModel)]="overview" (ngModelChange)="filter_patient_overview($event)" >
+                      <option *ngFor="let list of PatientOverview" value="{{ list.Name }}">
+                        {{ list.Name }}
+                      </option>
+                    </select>
+                  </div>
+                </div> -->
+                <!-- New Code Change 15/05/2023 -->
+                <div class="patient_overview_panel_content">
+                  <div class="patient_left_panel">
+                    <div [ngClass]="is_admin ? '' : 'left_panel_dropdown '">
+                      <div
+                        class="dropdown dropdown_home_first"
+                        appearance="outline"
+                        *ngIf="this.roles[0].Id == 1"
+                      >
+                        <select
+                          id="dropdownhomeallClinic"
+                          [(ngModel)]="overview"
+                          (ngModelChange)="
+                            filter_patient_overview_provider($event)
+                          "
+                        >
+                          <option
+                            *ngFor="let list of PatientOverview"
+                            value="{{ list.Id }}"
+                          >
+                            {{ list.Name }}
+                          </option>
+                        </select>
+                      </div>
+
+                      <div
+                        class="dropdown dropdown_home_first"
+                        appearance="outline"
+                        *ngIf="this.roles[0].Id != 1"
+                      >
+                        <select
+                          id="dropdownhomeallClinic"
+                          [(ngModel)]="overview"
+                          (ngModelChange)="filter_patient_overview($event)"
+                        >
+                          <option
+                            *ngFor="let list of PatientOverview"
+                            value="{{ list.Name }}"
+                          >
+                            {{ list.Name }}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <button
+                        id="btnhomeActive"
+                        class="patient_active"
+                        (click)="
+                          navigatePatientPage('Active', undefined, 'home')
+                        "
+                      >
+                        <p class="active_patients_heading">Active Patients:</p>
+                        <p class="active_patients_number">
+                          {{
+                            PatientOverview && PatientOverview.length > 0
+                              ? this.patients.Active
+                              : 0
+                          }}
+                        </p>
+                      </button>
+                      <button
+                        id="btnhomeTotal"
+                        class="body_panel_title_text"
+                        (click)="
+                          navigatePatientPage(undefined, undefined, 'home')
+                        "
+                      >
+                        Total Patients:
+                        {{
+                          PatientOverview && PatientOverview.length > 0
+                            ? this.patients.Total
+                            : 0
+                        }}
+                      </button>
+                      <button
+                        id="btnhomeOnhold"
+                        class="body_panel_title_text left_last"
+                        (click)="
+                          navigatePatientPage('OnHold', undefined, 'home')
+                        "
+                      >
+                        Onhold Patients:
+                        {{
+                          PatientOverview && PatientOverview.length > 0
+                            ? this.patients.OnHold
+                            : 0
+                        }}
+                      </button>
+                    </div>
+                  </div>
+                  <div class="patient_right_panel">
+                    <div>
+                      <button
+                        id="btnhomePrescribed"
+                        class="body_panel_title_text"
+                        (click)="
+                          navigatePatientPage('Prescribed', undefined, 'home')
+                        "
+                      >
+                        Prescribed Patients:
+                        {{
+                          PatientOverview && PatientOverview.length > 0
+                            ? this.patients.Prescribed
+                            : 0
+                        }}
+                      </button>
+                      <button
+                        id="btnhomeEntrolled"
+                        class="body_panel_title_text"
+                        (click)="
+                          navigatePatientPage('Enrolled', undefined, 'home')
+                        "
+                      >
+                        Enrolled Patients:
+                        {{
+                          PatientOverview && PatientOverview.length > 0
+                            ? this.patients.Enrolled
+                            : 0
+                        }}
+                      </button>
+                      <button
+                        id="btnhomereadytodischarge"
+                        class="body_panel_title_text"
+                        (click)="
+                          navigatePatientPage(
+                            'ReadyToDischarge',
+                            undefined,
+                            'home'
+                          )
+                        "
+                      >
+                        Ready to Discharge:
+                        {{
+                          PatientOverview && PatientOverview.length > 0
+                            ? this.patients.ReadyForDischarge
+                            : 0
+                        }}
+                      </button>
+                      <button
+                        id="btnhomedischarge"
+                        class="body_panel_title_text right_last"
+                        (click)="
+                          navigatePatientPage('Discharged', undefined, 'home')
+                        "
+                      >
+                        Discharged:
+                        {{
+                          PatientOverview && PatientOverview.length > 0
+                            ? this.patients.Discharged
+                            : 0
+                        }}
+                      </button>
+                      <button
+                        id="btnhomedischarge"
+                        class="body_panel_title_text right_last"
+                        (click)="
+                          navigatePatientPage('InActive', undefined, 'home')
+                        "
+                      >
+                        InActive:
+                        {{
+                          PatientOverview && PatientOverview.length > 0
+                            ? this.patients.InActive
+                            : 0
+                        }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- *ngIf="
+          userAccessRight && isHealthoverviewVisible[0].AccessRight == 'F'
+        " -->
+          <div
+            class="patient_health_panel"
+
+
+          >
+            <div class="patient_health_sub_panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Patient Health Overview</h2>
+                </div>
+                <div class="date_btn_panel">
+                  <button
+                    id="btnhomehealthOverviewtToday"
+                    class="btn-date_container"
+                    (click)="healthoverview(1)"
+                    [ngClass]="
+                      heath_overview_frequency == 1
+                        ? 'date_selected_'
+                        : 'date_not_selected'
+                    "
+                  >
+                    Today
+                  </button>
+                  <button
+                    id="btnhomehealthOverviewseven"
+                    class="btn-date_container"
+                    (click)="healthoverview(2)"
+                    [ngClass]="
+                      heath_overview_frequency == 2
+                        ? 'date_selected_'
+                        : 'date_not_selected'
+                    "
+                  >
+                    < 7 days
+                  </button>
+                  <button
+                    id="btnhomehealthOverviewthirty"
+                    class="btn-date_container"
+                    (click)="healthoverview(3)"
+                    [ngClass]="
+                      heath_overview_frequency == 3
+                        ? 'date_selected_'
+                        : 'date_not_selected'
+                    "
+                  >
+                    < 30 days
+                  </button>
+                </div>
+              </div>
+              <div class="health_panel_content">
+                <div class="dropdown dropdown_home" appearance="outline">
+                  <select
+                    class="team_hospital"
+                    id="homeAllVitals"
+                    [(ngModel)]="health_overview_vital"
+                    (ngModelChange)="filter_patient_health_overview($event)"
+                  >
+                    <option
+                      *ngFor="let list of PatientHealthOverview"
+                      value="{{ list.VitalName }}"
+                    >
+                      {{ list.VitalName }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="graph_container_panel">
+                  <div class="circle_graph_content">
+                    <div
+                      id="btnhomehealthOverviewCritical"
+                      (click)="
+                        navigatePatientPage(undefined, 'Critical', 'homehealth')
+                      "
+                    >
+                      <svg height="120px" width="120px">
+                        <circle
+                          cx="50%"
+                          cy="50%"
+                          [attr.r]="Critical_Radius"
+                          stroke="red"
+                          fill="none"
+                          stroke-width="6"
+                        />
+                        <text
+                          x="50%"
+                          y="50%"
+                          text-anchor="middle"
+                          fill="black"
+                          font-size="1rem"
+                          dy=".3em"
+                        >
+                          {{ health_overview ? health_overview.Critical : 0 }}
+                        </text>
+                      </svg>
+                    </div>
+                    <p class="patient_health_data_title graph_title">
+                      Critical Vital Patients
+                    </p>
+                  </div>
+                  <div
+                    id="btnhomehealthOverviewCautious"
+                    class="circle_graph_content"
+                    (click)="
+                      navigatePatientPage(undefined, 'Cautious', 'homehealth')
+                    "
+                  >
+                    <div>
+                      <svg height="120px" width="120px">
+                        <circle
+                          cx="50%"
+                          cy="50%"
+                          [attr.r]="Cautious_Radius"
+                          stroke="#FFBF77"
+                          fill="none"
+                          stroke-width="6"
+                        />
+                        <text
+                          x="50%"
+                          y="50%"
+                          text-anchor="middle"
+                          fill="black"
+                          font-size="1rem"
+                          dy=".3em"
+                        >
+                          {{ health_overview ? health_overview.Cautious : 0 }}
+                        </text>
+                      </svg>
+                    </div>
+                    <p class="graph_title patient_health_data_title">
+                      Cautious Vital Patients
+                    </p>
+                  </div>
+                  <div
+                    id="btnhomehealthOverviewNormal"
+                    class="circle_graph_content"
+                    (click)="
+                      navigatePatientPage(undefined, 'Normal', 'homehealth')
+                    "
+                  >
+                    <div>
+                      <svg height="120px" width="120px">
+                        <circle
+                          cx="50%"
+                          cy="50%"
+                          [attr.r]="Normal_Radius"
+                          stroke="#6DA86F"
+                          fill="none"
+                          stroke-width="6"
+                        />
+                        <text
+                          x="50%"
+                          y="50%"
+                          text-anchor="middle"
+                          fill="black"
+                          font-size="1rem"
+                          dy=".3em"
+                          ng-change="circle()"
+                        >
+                          {{ health_overview ? health_overview.Normal : 0 }}
+                        </text>
+                      </svg>
+                    </div>
+                    <p class="graph_title patient_health_data_title">
+                      Normal Vital Patients
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Billing Information -->
+        <!-- *ngIf="
+        userAccessRight &&
+        userAccessRight.UserAccessRights[2].AccessRight == 'F'
+      " -->
+        <div
+          class="billing-info-panel"
+
+        >
+          <div class="panel-heading billing_heading">
+            <h2>Billing Information</h2>
+            <div
+              class="date_btn_panel"
+              *ngIf="billingType && billingtypeVariable == 'cycle'"
+            >
+              <span
+                id="btnhomebillingc1"
+                class="btn-date_container"
+                (click)="getBillingInfoData('C1')"
+                [ngClass]="
+                  billingCycle == 'C1' ? 'date_selected_' : 'date_not_selected'
+                "
+                >Cycle 1</span
+              >
+              <span
+                id="btnhomebillingc2"
+                class="btn-date_container"
+                (click)="getBillingInfoData('C2')"
+                [ngClass]="
+                  billingCycle == 'C2' ? 'date_selected_' : 'date_not_selected'
+                "
+                >Cycle 2</span
+              >
+            </div>
+
+            <div
+              class="date_btn_panel"
+              *ngIf="billingType && billingtypeVariable == '30days'"
+            >
+              <span
+                id="btnhomebillingc1"
+                class="btn-date_container"
+                (click)="getBillingInfoData('all')"
+                [ngClass]="
+                  billingCycle == 'all' ? 'date_selected_' : 'date_not_selected'
+                "
+                >All</span
+              >
+
+              <span
+                *ngIf="billing_cpt_code != '99453'"
+                id="btnhomebillingc1"
+                class="btn-date_container"
+                (click)="getBillingInfoData('Today')"
+                [ngClass]="
+                  billingCycle == 'Today'
+                    ? 'date_selected_'
+                    : 'date_not_selected'
+                "
+                >Today</span
+              >
+              <span
+                *ngIf="billing_cpt_code != '99453'"
+                id="btnhomebillingc2"
+                class="btn-date_container"
+                (click)="getBillingInfoData('Next7Days')"
+                [ngClass]="
+                  billingCycle == 'Next7Days'
+                    ? 'date_selected_'
+                    : 'date_not_selected'
+                "
+                >Next7Days</span
+              >
+            </div>
+          </div>
+
+          <div class="billing_panel_content">
+            <div class="bill_content_first">
+              <div class="dropdown billing_dropdown" appearance="outline">
+                <select
+                  id="dropdownhomebilling"
+                  placeholder="Select CPT Code"
+                  [(ngModel)]="billing_cpt_code"
+                  (ngModelChange)="getBillingInfoData(billing_cpt_code)"
+                >
+                  <option
+                    *ngFor="let programdata of this.billingCode"
+                    value="{{ programdata }}"
+                  >
+                    {{ programdata }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="bill_content">
+              <p class="body_panel_title_text">Total Patients</p>
+              <p class="bill_content_data">
+                {{ billingInfo ? dataSrcBillingInfo[0].Total : 0 }}
+              </p>
+            </div>
+            <div class="bill_content_seperator"></div>
+            <div
+              *ngIf="
+                billingType &&
+                billingtypeVariable == 'cycle' &&
+                dataSrcBillingInfo &&
+                dataSrcBillingInfo[0].CycleDate == 'false'
+              "
+              class="bill_content"
+            >
+              <p class="body_panel_title_text">Target Met</p>
+              <p class="bill_content_data">
+                {{ billingInfo ? dataSrcBillingInfo[0].TargetMet : 0 }}
+              </p>
+            </div>
+            <div
+              *ngIf="
+                billingType &&
+                billingtypeVariable == '30days' &&
+                billingCycle != 'Today' &&
+                billing_cpt_code != '99453'
+              "
+              class="bill_content"
+            >
+              <p class="body_panel_title_text">Target Met</p>
+              <p class="bill_content_data">
+                {{ billingInfo ? dataSrcBillingInfo[0].TargetMet : 0 }}
+              </p>
+            </div>
+            <div class="bill_content_outline"></div>
+
+            <div
+              *ngIf="
+                billingType &&
+                billingtypeVariable == 'cycle' &&
+                dataSrcBillingInfo &&
+                dataSrcBillingInfo[0].CycleDate == 'true'
+              "
+              class="bill_content"
+            >
+              <p class="body_panel_title_text">Ready To Bill</p>
+              <p class="bill_content_data">
+                {{ billingInfo ? dataSrcBillingInfo[0].ReadyToBill : 0 }}
+              </p>
+            </div>
+            <div
+              *ngIf="
+                (billingType &&
+                  billingtypeVariable == '30days' &&
+                  billingCycle == 'Today') ||
+                (billingType &&
+                  billingtypeVariable == '30days' &&
+                  billing_cpt_code == '99453')
+              "
+              class="bill_content"
+            >
+              <p class="body_panel_title_text">Ready to Bill</p>
+              <p class="bill_content_data">
+                {{ billingInfo ? dataSrcBillingInfo[0].ReadyToBill : 0 }}
+              </p>
+            </div>
+            <div class="bill_content_seperator"></div>
+            <div class="bill_content">
+              <p class="body_panel_title_text">Target Not Met</p>
+              <p class="bill_content_data">
+                {{ billingInfo ? dataSrcBillingInfo[0].TargetNotMet : 0 }}
+              </p>
+            </div>
+            <!-- <div class="bill_content_seperator">
+
+            </div> -->
+            <!-- <div class="bill_content">
+              <p class="body_panel_title_text">Missing Informations</p>
+              <p class="bill_content_data">{{billingInfo?dataSrcBillingInfo[0].MissingInfo:0}}</p>
+            </div>
+            <div class="bill_content_seperator">
+
+            </div>
+            <div class="bill_content">
+              <p class="body_panel_title_text">Onhold Patients</p>
+              <p class="bill_content_data">{{billingInfo?dataSrcBillingInfo[0].OnHold:0}}</p>
+            </div> -->
+          </div>
+        </div>
+        <div class="upcoming-Schedule_Container">
+          <div class="upcoming_Panel">
+            <div class="panel-heading">
+              <h2>Upcoming Schedule</h2>
+            </div>
+            <div class="upcoming_panel_data">
+              <div *ngFor="let schedule of LatestSchedule; index as i">
+                <div
+                  [ngClass]="i == 0 ? 'firstSchedule' : ''"
+                  class="upcoming_panel_container"
+                >
+                  <div class="upcoming_panel_content">
+                    <div class="upcoming_left_panel">
+                      <p class="upcoming_title">{{ schedule.description }}</p>
+                      <p class="upcoming_patient">{{ schedule.patientname }}</p>
+                    </div>
+                    <div class="upcoming_right_panel">
+                      <p class="upcoming_time">{{ schedule.time }}</p>
+                      <div
+                        class="schedule_icon_container"
+                        id="btnHomeEditSchedule"
+                        (click)="navigateEditSchedule(schedule.id)"
+                      >
+                        <img
+                          *ngIf="
+                            LatestSchedule &&
+                            schedule.description != 'No Upcoming Schedules'
+                          "
+                          class="schedule_icon"
+                          src="../../../../../assets/04-Icons/Icons_Arrow - Front.svg"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Last Raw Container  -->
+        <div
+
+          class="last_container_panel"
+        >
+          <div
+
+            class="Task-Container"
+          >
+            <div class="task_panel">
+              <div class="panel-heading">
+                <h2>Today's Alerts & Tasks</h2>
+              </div>
+              <div class="task_container task_due_panel">
+                <p class="task_due">
+                  {{ todayTask && todayTask.length }} Due Today
+                </p>
+                <!-- <p class="task_due">0 Due Today</p> -->
+              </div>
+              <div class="task_panel_content">
+                <div class="task_main_panel">
+                  <div
+                    class="task_container"
+                    *ngFor="let task of todayTask; let last = last"
+                  >
+                    <div
+                      [ngClass]="{ last_task: last }"
+                      class="task_container_content"
+                    >
+                      <p
+                        class="task_title"
+                        [ngStyle]="
+                          task.Priority == 'Critical'
+                            ? { color: '#A20D0A' }
+                            : { color: '#000000' }
+                        "
+                      >
+                        {{ task.VitalAlert }}
+                      </p>
+                      <p
+                        class="task_priority"
+                        [ngClass]="{
+                          priority_low:
+                            task.Priority == 'Low' || task.Priority == 'Normal',
+                          priority_high:
+                            task.Priority == 'High' ||
+                            task.Priority == 'Critical',
+                          priority_medium:
+                            task.Priority == 'Medium' ||
+                            task.Priority == 'Severe',
+                          priority_missing: task.Priority == 'Moderate'
+                        }"
+                      >
+                        {{ task.Priority }}
+                      </p>
+                      <p class="task_assign">{{ task.PatientName }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+
+            class="TeamData_Panel"
+            *ngIf="roles[0].Id != 6 && roles[0].Id != 8"
+          >
+            <div class="team_panel">
+              <div class="panel-heading">
+                <h2>Team Overview</h2>
+              </div>
+              <div class="team_panel_content">
+                <div class="task_table_display">
+                  <mat-table #table [dataSource]="teamtableDataSource">
+                    <ng-container matColumnDef="TeamId">
+                      <mat-header-cell
+                        style="border-radius: 0.8rem 0px 0px 0px !important"
+                        *matHeaderCellDef
+                      ></mat-header-cell>
+                      <mat-cell *matCellDef="let element">
+                        {{ element.Id }}</mat-cell
+                      >
+                    </ng-container>
+
+                    <ng-container matColumnDef="TeamName">
+                      <mat-header-cell *matHeaderCellDef>
+                        Team Name
+                      </mat-header-cell>
+                      <mat-cell *matCellDef="let element">
+                        {{ element.TeamName }}
+                      </mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="Alert">
+                      <mat-header-cell *matHeaderCellDef
+                        >Alert
+                      </mat-header-cell>
+                      <mat-cell *matCellDef="let element">
+                        {{ element.Alerts }}
+                      </mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="DueToday">
+                      <mat-header-cell *matHeaderCellDef>
+                        Due Today
+                      </mat-header-cell>
+                      <mat-cell
+                        style="padding-left: 1rem !important"
+                        *matCellDef="let element"
+                      >
+                        {{ element.DueToday }}
+                      </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="SlaBreached">
+                      <mat-header-cell
+                        style="border-radius: 0rem 0.8rem 0rem 0rem"
+                        *matHeaderCellDef
+                      >
+                        SLA Breached
+                      </mat-header-cell>
+                      <mat-cell
+                        style="padding-left: 1rem !important"
+                        *matCellDef="let element"
+                      >
+                        {{ element.SLABreached }}
+                      </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row
+                      *matHeaderRowDef="columnHeader; sticky: true"
+                    ></mat-header-row>
+                    <mat-row
+                      [style.minHeight.px]="38"
+                      class="table-row"
+                      tabindex="1"
+                      *matRowDef="let row; columns: columnHeader"
+                    ></mat-row>
+                  </mat-table>
+                </div>
+
+                <p class="view_more_table"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side Panel -->
+
+    </div>
+<div class="side-panel">
+  <app-right-sidebar *ngIf="myprofile" [sidepaneldisplay]="1" (masterReload)="masterReload()"></app-right-sidebar>
+</div>
+</div>

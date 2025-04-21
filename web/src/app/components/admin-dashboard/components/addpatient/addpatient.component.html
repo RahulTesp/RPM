@@ -1,0 +1,1788 @@
+<ng-container *ngIf="loading">
+  <div class="overlay"></div>
+  <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
+</ng-container>
+<div class="content">
+  <div class="content-panel">
+    <div class="main-content">
+      <!-- Add Patient  -->
+      <div *ngIf="!PatientProgramStatus" class="upper_panel">
+        <div class="page_title">
+          <h3>Add Patient</h3>
+        </div>
+        <div class="button-group">
+          <button
+            id="btnaddPatientDiscard"
+            class="commonConfirmaddPatientBtn"
+            routerLink="/admin/patients"
+          >
+            DISCARD
+          </button>
+          <button
+            id="btnaddPatientDraftSubmit"
+            *ngIf="!hideSaveDraftButton"
+            class="commonConfirmaddPatientBtn"
+            (click)="
+              buttonname == 'DRAFTS'
+                ? draft()
+                : SubmitPatient(patient_dialog_draft)
+            "
+            [ngStyle]="{
+              'background-color':
+                buttonname == 'SAVEDRAFT' ? '#8226DF' : '#FFFFFF',
+              color: buttonname == 'SAVEDRAFT' ? '#FFFFFF' : '#8226DF'
+            }"
+          >
+            {{ buttonname }}
+          </button>
+          <button
+            id="btnaddPatientConfirmSubmit"
+            *ngIf="!hideConfirmButton"
+            class="commonConfirmaddPatientBtn btn_confirm"
+            (click)="openDialog(myDialog)"
+          >
+            CONFIRM
+          </button>
+        </div>
+      </div>
+      <!-- Add Patient Program  -->
+
+      <div *ngIf="PatientProgramStatus" class="upper_panel">
+        <div class="page_title">
+          <h3>Add Patient Program</h3>
+        </div>
+        <div class="button-group">
+          <button
+            id="btnaddPatientProgramDiscard"
+            class="commonConfirmaddPatientBtn"
+            routerLink="/admin/patients"
+          >
+            DISCARD
+          </button>
+          <button
+            id="btnaddPatientProgramConfirm"
+            *ngIf="!hideConfirmButton"
+            class="commonConfirmaddPatientBtn btn_confirm"
+            (click)="openDialog(myDialog)"
+          >
+            CONFIRM
+          </button>
+        </div>
+      </div>
+      <ng-container
+        *ngIf="master_data && StatesAndCities"
+        [ngSwitch]="draftvariable"
+      >
+        <ng-container *ngSwitchCase="1">
+          <ng-container *ngTemplateOutlet="draftpage"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+          <ng-container *ngTemplateOutlet="mainpage"></ng-container>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<ng-template #draftpage>
+  <p class="main_input_main_heading save_draft_heading">Saved Drafts</p>
+  <div class="user_data_table">
+    <mat-table #table [dataSource]="datasourceDocument">
+      <ng-container matColumnDef="selection">
+        <mat-header-cell
+          *matHeaderCellDef
+          style="border-radius: 20px 0px 0px 0px"
+          class="select-column"
+        >
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element; let rowIndex = index"  class="select-column">
+          <!-- <mat-radio-button
+            color="primary"
+            name="rhSelectionRadio"
+            [value]="rowIndex"
+            (click)="selectRow($event, element)"
+            id="selectdraftRow"
+            [checked]="element.selected"
+          >
+          </mat-radio-button> -->
+          <input
+          type="radio"
+          name="rhSelectionRadio"
+          [value]="rowIndex"
+          [checked]="element.selected"
+          (click)="selectRow($event, element)"
+          id="selectdraftRow-{{ rowIndex }}"
+        />
+        <label [for]="'selectdraftRow-' + rowIndex"></label>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="PatientName">
+        <mat-header-cell *matHeaderCellDef  >
+          <div class="search_input" *ngIf="searchPatientName">
+            <img
+              class="search_icon"
+              src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+              (click)="searchDraft()"
+            /><input
+              class="search_input input_panel"
+              (keyup)="applyDataFilter($event)"
+            />
+          </div>
+          <div class="search_heading_default" *ngIf="!searchPatientName">
+            <img
+              class="search_icon_default"
+              src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              id="p_BillingPnameSearch2"
+              (click)="searchDraftClose()"
+            />
+            Patient Name
+          </div>
+        </mat-header-cell>
+
+        <mat-cell *matCellDef="let element">
+          {{ element.PatientName }}</mat-cell
+        >
+      </ng-container>
+      <ng-container matColumnDef="PatientId">
+        <mat-header-cell *matHeaderCellDef  class="hidden-column"> Patientid </mat-header-cell>
+        <mat-cell *matCellDef="let element" class="hidden-column"> {{ element.PatientId }}</mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="CreatedOn">
+        <mat-header-cell *matHeaderCellDef>
+
+          Date
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <span>{{
+            datepipe.transform(element.CreatedOn, "MMM d, y")
+          }}</span></mat-cell
+        >
+      </ng-container>
+      <ng-container matColumnDef="Time">
+        <mat-header-cell *matHeaderCellDef>
+
+          Time
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <span>{{
+            datepipe.transform(element.CreatedOn, "h:mm a")
+          }}</span></mat-cell
+        >
+      </ng-container>
+      <ng-container matColumnDef="action" >
+        <mat-header-cell
+          class="action-column"
+          *matHeaderCellDef
+          style="border-radius: 0px 20px 0px 0px"
+        >
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element" class="action-column">
+
+          <div
+            class="action_panel" [ngStyle]="{ display: element.selected ? 'flex' : 'none' }">
+             <!-- [ngStyle]="{ display: element.selected ? 'flex' : 'none' }" -->
+            <div class="front_img_container">
+              <img
+                class="front_img"
+                src="../../../../../assets/04-Icons/Icons_Delete.svg"
+                (click)="openDeleteDocumentDialog(element.PatientId)"
+              />
+            </div>
+
+            <div class="front_img_container">
+              <img
+                class="front_img"
+                src="../../../../../assets/04-Icons/Icons_Arrow - Front.svg"
+                (click)="GetDraftedPatientInfo(element.PatientId, 1)"
+                id="getDraftPatientInfo"
+              />
+            </div>
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row
+        *matHeaderRowDef="columnHeader; sticky: true"
+      ></mat-header-row>
+
+      <mat-row
+        [ngClass]="{ selectedrow: row.selected == true }"
+        tabindex="1"
+        [ngClass]="{ rowselected: row.selected == true }"
+        *matRowDef="let row; columns: columnHeader"
+        [style.minHeight.px]="35"
+      ></mat-row>
+    </mat-table>
+  </div>
+</ng-template>
+<!-- </div>  -->
+<ng-template #mainpage>
+  <!-- <div class="addpatient_button_panel uppermenubtnpanel"> -->
+  <div class="uppermenubtnpanel">
+    <div *ngFor="let item of menu; let i = index">
+      <button
+        type="submit"
+        class="uppermenubtn"
+        id="addPatientUpperMenubtn"
+        (click)="ChangeScreen(item.menu_id)"
+        [class.selected]="CurrentMenu == item.menu_id"
+      >
+        {{ item.menu_title }}
+      </button>
+      <!-- [disabled]="PatientInfoForm.invalid" -->
+    </div>
+    <!--  <button>Patient</button>
+    <button [disabled]="PatientInfoForm.invalid">Program</button> -->
+  </div>
+  <ng-container [ngSwitch]="variable">
+    <ng-container *ngSwitchCase="1">
+      <ng-container *ngTemplateOutlet="patientpage"></ng-container>
+    </ng-container>
+    <ng-container *ngSwitchCase="2">
+      <ng-container *ngTemplateOutlet="programpage"></ng-container>
+    </ng-container>
+
+    <ng-container *ngSwitchDefault>
+      <ng-container *ngTemplateOutlet="patientpage"></ng-container>
+    </ng-container>
+  </ng-container>
+</ng-template>
+<ng-template #patientpage>
+  <div
+    class="patientpage"
+  >
+
+      <div class="patient_panel_menu_panel">
+        <div class="patient_menu">
+          <div class="patient_menu_item">
+            <img
+              class="patientInfo_check_icon"
+              src="../../../../../assets/04-Icons/Icons_Check A.svg"
+              alt=""
+            />
+
+            <p id="scrollPatientInfo" (click)="scroll(personaldata)">
+              Personal Information
+            </p>
+          </div>
+
+          <div class="patient_menu_item">
+            <img
+              class="patientInfo_check_icon"
+              src="../../../../../assets/04-Icons/Icons_Check A.svg"
+              alt=""
+            />
+
+            <p id="scrollCommunicationInfo" (click)="scroll(communicationdata)">
+              Communication Details
+            </p>
+          </div>
+
+          <div class="patient_menu_item">
+            <img
+              class="patientInfo_check_icon"
+              src="../../../../../assets/04-Icons/Icons_Check A.svg"
+              alt=""
+            />
+
+            <p id="scrollpreferenceInfo" (click)="scroll(patientpreferences)">
+              Patient Preferences
+            </p>
+          </div>
+        </div>
+      </div>
+
+
+    <div
+      class="patient_main_container"
+    >
+      <form [formGroup]="PatientInfoForm">
+        <div class="personal">
+          <p class="main_input_main_heading">Personal Information</p>
+        </div>
+        <div #personaldata class="sub_panel_content">
+          <div class="personal_information_sub_">
+            <p class="main_input_title">Profile Picture</p>
+            <div class="uploadPhoto">
+              {{ file }}
+              <img
+                id="btnaddPatientImg"
+                (click)="openFile()"
+                class="icon_camera"
+                src="../../../assets/04-Icons/Icons_Camera.svg"
+              />
+              <input
+                id="image"
+                type="file"
+                style="display: none"
+                (change)="handle($event)"
+              />
+            </div>
+          </div>
+          <!--end of column1-->
+          <div class="personal_information_sub_">
+            <div class="userInfoItem">
+              <p class="main_input_title">*First Name</p>
+              <input
+                class="userInfovalue"
+                placeholder="Enter First Name"
+                required
+                formControlName="firstname"
+                maxlength="20"
+                id="addPatientFirstname"
+              />
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    (PatientInfoForm.get('firstname')?.invalid &&
+                      PatientInfoForm.get('firstname')?.touched) ||
+                    (validateForm && PatientInfoForm.get('firstname')?.invalid)
+                  "
+                >
+                  First Name Required
+                </ng-container>
+              </div>
+            </div>
+            <div class="userInfoItem">
+              <p class="main_input_title">Middle Name</p>
+              <input
+                class="userInfovalue"
+                placeholder="Enter Middle Name"
+                notrequired
+                formControlName="middlename"
+                maxlength="20"
+                id="addPatientMiddlename"
+              />
+            </div>
+            <div class="userInfoItem">
+              <p class="main_input_title">*Date of Birth</p>
+              <input
+                class="userInfovalue"
+                placeholder="Enter Date"
+                type="date"
+                required
+                formControlName="dateofbirth"
+                clrDate
+                min="1900-01-01"
+                max="{{ todaty_date }}"
+                (ngModelChange)="checkDateValidity($event)"
+                id="addPatientDOB"
+              />
+              <!-- <mat-form-field class="example-full-width">
+                    <input matInput [matDatepicker]="matDatepicker" datePickerFormat="MMM, DD YYYY" formControlName="dateofbirth"
+                      class="userInfovalue">
+                    <mat-datepicker-toggle matSuffix [for]="matDatepicker"></mat-datepicker-toggle>
+                    <mat-datepicker #matDatepicker></mat-datepicker>
+                  </mat-form-field><br/> -->
+
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    PatientInfoForm.get('dateofbirth')?.invalid &&
+                    PatientInfoForm.get('dateofbirth')?.touched
+                  "
+                >
+                  Date of Birth Required
+                </ng-container>
+                <ng-container *ngIf="futureDateError">
+                  Please Enter valid Date
+                </ng-container>
+              </div>
+            </div>
+            <div class="userInfoItem">
+              <p class="main_input_title">*Gender</p>
+              <select
+                class="userInfovalue"
+                placeholder="Select Gender"
+                formControlName="gender"
+                id="addPatientGender"
+                required
+              >
+                <option value="" disabled selected>Select</option>
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+              </select>
+
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    PatientInfoForm.get('gender')?.invalid &&
+                    PatientInfoForm.get('gender')?.touched
+                  "
+                >
+                  Gender is required
+                </ng-container>
+              </div>
+            </div>
+          </div>
+          <!--end of column2-->
+          <div
+            class="personal_information_sub_ personal_inform_sub_before_seperator"
+          >
+            <div class="userInfoItem">
+              <div class="dummy">
+                <p class="main_input_title">*Last Name</p>
+                <input
+                  class="userInfovalue"
+                  placeholder="Enter Last Name"
+                  notrequired
+                  formControlName="lastname"
+                  maxlength="20"
+                />
+              </div>
+            </div>
+            <div class="userInfoItem">
+              <p class="main_input_title">*Last Name</p>
+              <input
+                class="userInfovalue"
+                placeholder="Enter Last Name"
+                required
+                formControlName="lastname"
+                id="addPatientlastname"
+                maxlength="20"
+              />
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    PatientInfoForm.get('lastname')?.invalid &&
+                    PatientInfoForm.get('lastname')?.touched
+                  "
+                >
+                  Last Name Required
+                </ng-container>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="height_div">
+                <p class="main_input_title">Height</p>
+                <div class="height_division userInfoItem">
+                  <div class="duration_content_panel height_panel">
+                    <select
+                      class="userInfovalue height_subpanel"
+                      [(ngModel)]="HeightFeetValue"
+                      [ngModelOptions]="{ standalone: true }"
+                      id="addPatientheight"
+                    >
+                      <option
+                        *ngFor="let data of heightFeetArray; let i = index"
+                        [value]="data.id"
+                        [selected]="i == 0"
+                      >
+                        {{ data.data }}
+                      </option>
+                    </select>
+
+                    Feet
+                    <select
+                      class="userInfovalue height_subpanel"
+                      [(ngModel)]="HeightInchValue"
+                      [ngModelOptions]="{ standalone: true }"
+                      id="addPatientfeet"
+                    >
+                      <option
+                        *ngFor="let data of heightInchArray; let i = index"
+                        [value]="data.id"
+                        [selected]="i == 0"
+                      >
+                        {{ data.data }}
+                      </option>
+                    </select>
+
+                    Inch
+                  </div>
+
+                  <!-- <div class="unit_panel" >
+                          <select
+                            class="userInfovalue"
+                            required
+                          >
+                            <option value="" disabled selected>Select</option>
+                            <option value="Feet">Feet</option>
+                          </select>
+                        </div> -->
+                </div>
+              </div>
+            </div>
+            <div class="weight_div">
+              <p class="main_input_title">Weight</p>
+              <div class="height_division userInfoItem">
+                <div class="duration_content_panel">
+                  <div class="btn_common_cont">
+                    <img
+                      id="addPatientIncreaseWeight"
+                      (click)="increment_weight()"
+                      class="btn-common"
+                      src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                    />
+                  </div>
+                  <!-- <input class="duration_value" [(ngModel)] ="weightValue" /> -->
+                  <!-- <span class="duration_value">{{ weightValue }}</span> -->
+                  <input
+                    class="duration_value"
+                    [(ngModel)]="weightValue"
+                    [ngModelOptions]="{ standalone: true }"
+                  />
+
+                  <div class="btn_common_cont">
+                    <img
+                      id="addPatientDecreaseWeight"
+                      (click)="decrement_weight()"
+                      class="btn-common"
+                      src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                    />
+                  </div>
+                </div>
+
+                <div class="unit_panel">
+                  <select
+                    id="addPatientSelectPound"
+                    class="userInfovalue"
+                    placeholder="Select Pounds"
+                    required
+                  >
+                    <option value="" disabled selected>Select</option>
+                    <option value="Pound">Pounds</option>
+                  </select>
+                </div>
+              </div>
+              <!-- <div class="height_division">
+                    <div class="duration_time">
+                      <div class="duration_content_panel">
+                        <img
+                          (click)="increment_weight()"
+                          class="btn-common"
+                          src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                        />
+                        <span class="duration_value">{{ weightValue }}</span>
+                        <img
+                          (click)="decrement_weight()"
+                          class="btn-common"
+                          src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                        />
+                      </div>
+                    </div>
+                    <div class="feet">
+                      <div class="userInfoItem">
+                        <select
+                          class="userInfovalue"
+                          placeholder="Select Pounds"
+                          required
+                        >
+                          <option value="Pounds">Pounds</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div> -->
+            </div>
+          </div>
+          <div class="personal_information_sub_seperator"></div>
+          <div class="personal_information_sub_ personal_information_last_">
+            <div class="userInfoItem">
+              <p class="main_input_title">Email</p>
+              <input
+                class="userInfovalue"
+                placeholder="Enter Email Id"
+                id="addPatientemail"
+                formControlName="email"
+                maxlength="50"
+              />
+              <!-- <div class="warn">
+                    <ng-container  *ngIf="PatientInfoForm.get('email')?.invalid && PatientInfoForm.get('email')?.touched">
+                      Email Required
+                    </ng-container>
+                  </div> -->
+            </div>
+            <div class="userInfoItem">
+              <p class="main_input_title">*Mobile Number(Primary)</p>
+              <input
+                class="userInfovalue"
+                placeholder="Enter Mobile Number"
+                required
+                formControlName="mobile"
+                id="addPatientMobile"
+                maxlength="10"
+              />
+
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    PatientInfoForm.get('mobile')?.invalid &&
+                    PatientInfoForm.get('mobile')?.touched
+                  "
+                >
+                  Mobile Number Required
+                </ng-container>
+              </div>
+            </div>
+            <div class="middle">
+              <div class="userInfoItem">
+                <p class="main_input_title">Alternate Number(optional)</p>
+                <input
+                  class="userInfovalue"
+                  placeholder=" Enter Alternate Number"
+                  notrequired
+                  formControlName="alternatenumber"
+                  id="addPatientAlternateNumber"
+                  maxlength="10"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!--end of personal information-->
+          <!-- start of second panel-->
+        </div>
+
+        <div #communicationdata class="personal">
+          <p class="main_input_main_heading">Communication Details</p>
+        </div>
+        <div class="sub_panel_content">
+          <div class="personal_information_sub_">
+            <div class="userInfoItem">
+              <p class="main_input_title">*Clinic Name</p>
+              <select
+                *ngIf="pid != null"
+                class="userInfovalue"
+                formControlName="clinicname"
+                id="addPatientClinicName"
+                required
+              >
+                <ng-container *ngFor="let clinic of master_data.ClinicDetails">
+                  <!-- <option *ngIf="resp.OrganizationID==clinic.Id || http_rpm_patientList.OrganizationID == clinic.Id" [value]="clinic.Id">
+                    {{ clinic.ClinicName }}
+                  </option> -->
+                  <option
+                    *ngIf="
+                      (resp && resp.OrganizationID == clinic.Id) ||
+                      (http_rpm_patientList &&
+                        http_rpm_patientList.OrganizationID == clinic.Id)
+                    "
+                    [value]="clinic.Id"
+                  >
+                    {{ clinic.ClinicName }}
+                  </option>
+                </ng-container>
+              </select>
+              <select
+                *ngIf="pid == null"
+                class="userInfovalue"
+                formControlName="clinicname"
+                id="addPatientClinicName"
+                required
+              >
+                <option value="" disabled selected>Select</option>
+                <option
+                  *ngFor="let clinic of master_data.ClinicDetails"
+                  [value]="clinic.Id"
+                >
+                  {{ clinic.ClinicName }}
+                </option>
+              </select>
+
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    PatientInfoForm.get('clinicname')?.invalid &&
+                    PatientInfoForm.get('clinicname')?.touched
+                  "
+                >
+                  Clinic Name is Required
+                </ng-container>
+              </div>
+            </div>
+          </div>
+
+          <div class="personal_information_sub_">
+            <div class="userInfoItem">
+              <p class="main_input_title">Clinic Code</p>
+              <input
+                class="userInfovalue"
+                placeholder="Clinic Code"
+                formControlName="cliniccode"
+                id="addPatientClinicCode"
+                maxlength="5"
+                [attr.disabled]="true"
+              />
+            </div>
+          </div>
+          <div class="personal_information_sub_">
+            <div class="userInfoItem"></div>
+          </div>
+
+          <div class="personal_information_sub_">
+            <div class="userInfoItem"></div>
+          </div>
+        </div>
+        <div class="sub_panel_content">
+          <div
+            class="personal_information_sub_ personal_inform_sub_before_seperator"
+          >
+            <div class="userInfoItem">
+              <div class="userInfoItem">
+                <p class="main_input_title">*Address Line 1</p>
+                <input
+                  class="userInfovalue"
+                  placeholder="Enter Address Line 1"
+                  required
+                  formControlName="addressline1"
+                  id="addPatientAddressLine1"
+                  maxlength="50"
+                />
+                <div class="warn">
+                  <ng-container
+                    *ngIf="
+                      PatientInfoForm.get('addressline1')?.invalid &&
+                      PatientInfoForm.get('addressline1')?.touched
+                    "
+                  >
+                    Address is Required
+                  </ng-container>
+                </div>
+              </div>
+              <div class="userInfoItem">
+                <p class="main_input_title">Address Line 2</p>
+                <input
+                  class="userInfovalue"
+                  placeholder="Enter Address Line 2"
+                  notrequired
+                  formControlName="addressline2"
+                  id="addPatientAddressLine2"
+                  maxlength="50"
+                />
+                <!-- <div class="warn">
+                    <ng-container  *ngIf="PatientInfoForm.get('addressline2')?.invalid && PatientInfoForm.get('addressline2')?.touched">
+                      Address is  Required
+                    </ng-container>
+                  </div> -->
+              </div>
+
+              <div class="Communication_sub_panel">
+                <div class="Communication_sub_panel_column1">
+                  <div class="userInfoItem">
+                    <p class="main_input_title">*State</p>
+                    <select
+                      class="userInfovalue"
+                      placeholder="Select State"
+                      formControlName="state"
+                      id="addPatientState"
+                      required
+                    >
+                      <option value="" disabled selected>Select</option>
+                      <option
+                        *ngFor="let s of StatesAndCities.States"
+                        [value]="s.StateId"
+                      >
+                        {{ s.StateName }}
+                      </option>
+                    </select>
+                    <div class="warn">
+                      <ng-container
+                        *ngIf="
+                          PatientInfoForm.get('state')?.invalid &&
+                          PatientInfoForm.get('state')?.touched
+                        "
+                      >
+                        State is Required
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+                <div class="Communication_sub_panel_column2">
+                  <div class="userInfoItem">
+                    <p class="main_input_title">*City</p>
+                    <select
+                      class="userInfovalue"
+                      placeholder="Select City"
+                      formControlName="city"
+                      id="addPatientCity"
+                      required
+                    >
+                      <option [ngValue]="null">Select</option>
+                      <option *ngFor="let c of cities" [value]="c.CityId">
+                        {{ c.CityName }}
+                      </option>
+                    </select>
+                    <div class="warn">
+                      <ng-container
+                        *ngIf="
+                          PatientInfoForm.get('city')?.invalid &&
+                          PatientInfoForm.get('city')?.touched
+                        "
+                      >
+                        City is Required
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="Communication_sub_panel">
+                <div class="Communication_sub_panel_column1">
+                  <div class="userInfoItem">
+                    <p class="main_input_title">*Zip Code</p>
+                    <input
+                      class="userInfovalue"
+                      placeholder="Enter Zip Code"
+                      required
+                      formControlName="zipcode"
+                      id="addPatientZipcode"
+                      maxlength="5"
+                    />
+                    <div class="warn">
+                      <ng-container
+                        *ngIf="
+                          PatientInfoForm.get('zipcode')?.invalid &&
+                          PatientInfoForm.get('zipcode')?.touched
+                        "
+                      >
+                        ZipCode is Required
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="Communication_sub_panel_column2">
+                  <div class="userInfoItem">
+                    <p class="main_input_title">*Time Zone</p>
+                    <select
+                      class="userInfovalue"
+                      placeholder="Select Time Zone"
+                      formControlName="timezone"
+                      id="addPatientTimezone"
+                      required
+                    >
+                      <option value="" disabled selected>Select</option>
+                      <option *ngFor="let obj of timezones" [value]="obj.Id">
+                        {{ obj.Name }}
+                      </option>
+                    </select>
+                    <div class="warn">
+                      <ng-container
+                        *ngIf="
+                          PatientInfoForm.get('timezone')?.invalid &&
+                          PatientInfoForm.get('timezone')?.touched
+                        "
+                      >
+                        Time Zone is Required
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="personal_information_sub_seperator"></div>
+          <div class="personal_information_sub_ personal_information_last_">
+            <div class="personal_emergency_contact">
+              <div class="communication_left">
+                <div class="userInfoItem">
+                  <p class="main_input_title">Emergency Contact 1</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="Enter Emergency Contact Name "
+                    notrequired
+                    formControlName="emergencycontact1"
+                    id="addPatientEmergencyContact1"
+                    maxlength="20"
+                  />
+                  <!-- <div class="warn">
+                      <ng-container  *ngIf="PatientInfoForm.get('emergencycontact1')?.invalid && PatientInfoForm.get('emergencycontact1')?.touched">
+                        Contact Name is Required
+                      </ng-container>
+                    </div> -->
+                </div>
+              </div>
+              <div class="communication_right">
+                <div class="userInfoItem">
+                  <p class="main_input_title">Relation</p>
+                  <select
+                    class="userInfovalue"
+                    placeholder="Select Relation"
+                    formControlName="relation1"
+                    id="addPatientRelation1"
+                    notrequired
+                  >
+                    <option value="" selected>None</option>
+                    <option value="Mother">Mother</option>
+                    <option value="Wife">Wife</option>
+                    <option value="Husband">Husband</option>
+                    <option value="Father">Father</option>
+                    <option value="Sister">Sister</option>
+                    <option value="Brother">Brother</option>
+                    <option value="Son">Son</option>
+                    <option value="Daughter">Daughter</option>
+                    <option value="Guardian">Guardian</option>
+                  </select>
+                </div>
+                <div class="userInfoItem">
+                  <p class="main_input_title">Mobile Number</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="Enter Mobile Number"
+                    notrequired
+                    formControlName="relation1_mobile"
+                    id="addPatientRelation1_mobile"
+                    maxlength="10"
+                    notrequired
+                  />
+
+                  <!-- <div class="warn">
+                    <ng-container  *ngIf="PatientInfoForm.get('relation1_mobile')?.invalid && PatientInfoForm.get('relation1_mobile')?.touched">
+                      Mobile Number Required
+                    </ng-container>
+                  </div> -->
+                </div>
+              </div>
+            </div>
+
+            <div class="personal_emergency_contact">
+              <div class="communication_left">
+                <div class="userInfoItem">
+                  <p class="main_input_title">Emergency Contact 2</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="Enter Emergency Contact Name"
+                    notrequired
+                    formControlName="emergencycontact2"
+                    id="addPatientEmergencyContact2"
+                    maxlength="20"
+                  />
+                </div>
+              </div>
+
+              <div class="communication_right">
+                <div class="userInfoItem">
+                  <p class="main_input_title">Relation</p>
+                  <select
+                    class="userInfovalue"
+                    placeholder="Select Relation"
+                    formControlName="relation2"
+                    id="addPatientRelation2"
+                    notrequired
+                  >
+                    <option value="" selected>None</option>
+                    <option value="Mother">Mother</option>
+                    <option value="Wife">Wife</option>
+                    <option value="Husband">Husband</option>
+                    <option value="Father">Father</option>
+                    <option value="Sister">Sister</option>
+                    <option value="Brother">Brother</option>
+                    <option value="Son">Son</option>
+                    <option value="Daughter">Daughter</option>
+                    <option value="Guardian">Guardian</option>
+                  </select>
+                </div>
+                <div class="userInfoItem">
+                  <p class="main_input_title">Mobile Number</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="Enter Mobile Number"
+                    formControlName="relation2_mobile"
+                    id="addPatientRelation2_mobile"
+                    maxlength="10"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div #patientpreferences class="personal">
+          <p class="main_input_main_heading">Patient Preferences</p>
+        </div>
+        <div class="sub_panel_content">
+          <div class="personal_information_sub_">
+            <div class="patient_prference_panel_column1">
+              <div class="preference_sub_panel">
+                <div class="preference_sub_panel_column1">
+                  <div class="userInfoItem">
+                    <p class="main_input_title">Call Time</p>
+                    <input
+                      class="userInfovalue"
+                      placeholder="Select Preferred Call Time"
+                      notrequired
+                      formControlName="calltime"
+                      id="addPatientCalltime1"
+                      maxlength="20"
+                    />
+                  </div>
+                </div>
+                <div class="preference_sub_panel_column2">
+                  <div class="userInfoItem">
+                    <p class="main_input_title">*Select Language</p>
+                    <select
+                      class="userInfovalue"
+                      placeholder="Select Language"
+                      formControlName="language"
+                      id="addPatientLanguage"
+                      required=""
+                    >
+                      <option
+                        *ngFor="let data of languageList; let i = index"
+                        [value]="data"
+                      >
+                        {{ data }}
+                      </option>
+                      <!-- <option value="" disabled selected>Select</option>
+                      <option value="English">English</option>
+                      <option value="Spanish">Spanish</option> -->
+                    </select>
+                    <div class="warn">
+                      <ng-container
+                        *ngIf="
+                          PatientInfoForm.get('language')?.invalid &&
+                          PatientInfoForm.get('language')?.touched
+                        "
+                      >
+                        Please Select Language
+                      </ng-container>
+                    </div>
+                  </div>
+
+                  <!-- <div class="userInfoItem">
+  <p class="main_input_title">*Gender</p>
+  <select
+    class="userInfovalue"
+    placeholder="Select Gender"
+    formControlName="gender"
+    required
+  >
+   <option value="" disabled selected>Select</option>
+    <option value="M">Male</option>
+    <option value="F">Female</option>
+  </select>
+</div> -->
+                </div>
+              </div>
+
+              <div class="userInfoItem">
+                <p class="main_input_title">Preference 2</p>
+                <input
+                  class="userInfovalue"
+                  placeholder="Add Preference 2"
+                  notrequired
+                  formControlName="preference2"
+                  id="addPatientCalltime2"
+                  maxlength="30"
+                />
+              </div>
+              <div class="userInfoItem">
+                <p class="main_input_title">Preference 3</p>
+                <input
+                  class="userInfovalue"
+                  placeholder="Add Preference 3"
+                  notrequired
+                  formControlName="preference3"
+                  id="addPatientCalltime3"
+                  maxlength="30"
+                />
+              </div>
+              <div class="userInfoItem">
+                <p class="main_input_title">Preference 4</p>
+                <input
+                  class="userInfovalue"
+                  placeholder="Add Preference 4"
+                  notrequired
+                  formControlName="preference4"
+                  id="addPatientCalltime4"
+                  maxlength="30"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="patient_prference_panel_column2">
+            <p class="main_input_title">Additional Notes</p>
+            <textarea
+              class="additionalnotes"
+              formControlName="additionalnotes"
+              id="addPatientAdditionalNotes"
+              maxlength="500"
+            ></textarea>
+          </div>
+
+          <!--  </form> -->
+        </div>
+      </form>
+    </div>
+  </div>
+  <!--end of left panel-->
+</ng-template>
+<ng-template #programpage>
+  <div
+    class="programpage">
+
+      <div class="program_panel_menu_panel">
+        <div *ngFor="let menu of program" class="patient_menu">
+          <p
+            id="addPatientMenuIdnavigation"
+            class="program_menu_item"
+            (click)="onClickNavigation1(menu.menu_id)"
+          >
+            <img
+              class="patientInfo_check_icon"
+              src="../../../../../assets/04-Icons/Icons_Check A.svg"
+            />
+            {{ menu.menu_title }}
+          </p>
+        </div>
+    </div>
+    <div
+      class="program_main_container"
+    >
+      <form [formGroup]="programForm">
+        <div class="program_main_container_content">
+          <div class="program_subpanel1">
+            <p class="main_input_main_heading">Program Details</p>
+
+            <div class="Program-details_container">
+              <div class="Program-details_container_sub">
+                <div class="userInfoItem Program-details_container_sub_left">
+                  <p class="main_input_title">*Program Name</p>
+                  <select
+                    class="userInfovalue"
+                    placeholder="Select Program Name"
+                    formControlName="programname"
+                    id="addPatientProgramName"
+                    required
+                  >
+                    <option
+                      *ngFor="let pgm of master_data.ProgramDetailsMasterData"
+                      [value]="pgm.ProgramId"
+                    >
+                      {{ pgm.ProgramName }}
+                    </option>
+                  </select>
+                  <div class="warn">
+                    <ng-container
+                      *ngIf="
+                        programForm.get('programname')?.invalid &&
+                        programForm.get('programname')?.touched
+                      "
+                    >
+                      Program Name is required
+                    </ng-container>
+                  </div>
+                </div>
+
+                <div
+                  class="userInfoItem Program-details_container_sub_right duration_div"
+                >
+                  <div class="duration_div_">
+                    <p class="main_input_title">Duration</p>
+                    <div class="program_duration_content_panel">
+                      <div class="duration_content_panel">
+                        <img
+                          (click)="increment_duration()"
+                          id="addPatientIncreaseDuration"
+                          class="btn-common"
+                          src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                        />
+
+                        <span class="duration_value"> {{ durationValue }}</span>
+
+                        <img
+                          (click)="decrement_duration()"
+                          id="addPatientDecreaseDuration"
+                          class="btn-common"
+                          src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                        />
+                      </div>
+                      <span class="months_duration"> Months </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="Program-details_container_sub">
+                <div class="userInfoItem Program-details_container_sub_left">
+                  <p class="main_input_title">*Start Date</p>
+                  <!-- <input
+                class="userInfovalue"
+                placeholder="startdate"
+                required
+                formControlName="startdate"
+                min="{{todaty_date}}"
+                placeholder="Enter Date"
+                type="text"
+                onfocus="(this.type='date')"
+
+              /> -->
+                  <input
+                    class="userInfovalue"
+                    placeholder="startdate"
+                    required
+                    formControlName="startdate"
+                    id="addPatientStartDate"
+                    min="{{ todaty_date }}"
+                    placeholder="Enter Date"
+                    type="date"
+                  />
+
+                  <div class="warn">
+                    <ng-container
+                      *ngIf="
+                        programForm.get('startdate')?.invalid &&
+                        programForm.get('startdate')?.touched
+                      "
+                    >
+                      start date is Required
+                    </ng-container>
+                  </div>
+                </div>
+
+                <div class="userInfoItem Program-details_container_sub_right">
+                  <p class="main_input_title">End Date</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="End date"
+                    required
+                    formControlName="enddate"
+                    id="addPatientEndDate"
+                    [attr.disabled]="true"
+                    placeholder="Enter Date"
+                    type="date"
+                  />
+                </div>
+              </div>
+
+              <div class="Program-details_container_sub">
+                <div
+                  class="userInfoItem Program-details_container_sub_left"
+                  style="width: 47.5%; margin-right: 2rem"
+                >
+                  <!-- <div *ngFor="let v of vital_selected">
+                <p *ngIf=" v.VitalName != null" class="main_input_title">*Vitals Monitored</p>
+                <div class="userInfovalue">{{ v.VitalName }}</div>
+              </div> -->
+                  <p class="main_input_title">*Vital/Condition Monitored</p>
+                  <mat-select
+                    [(value)]="vitalList"
+                    (selectionChange)="vitalListChange()"
+                    name="vitalList"
+                    multiple
+                    class="common_input_dropdown"
+                    id="addPatientvitalChange"
+                  >
+                    <mat-option
+                      *ngFor="let v of vital_selected"
+                      [value]="v.VitalId"
+                    >
+                      {{ v.VitalName }}
+                    </mat-option>
+                  </mat-select>
+                  <!-- <div class="warn">
+              <ng-container  *ngIf="vitalListStatus">Vital/Condition Monitored is Required</ng-container>
+            </div> -->
+                </div>
+
+                <!-- <div class="userInfoItem Program-details_container_sub_right">
+              <p class="main_input_title">*Target/Month</p>
+              <input
+                class="userInfovalue"
+                placeholder="Enter Target"
+                required
+                formControlName="target"
+              />
+
+
+             </div> -->
+              </div>
+            </div>
+            <div class="goal_container">
+              <div
+                class="goals_note_container"
+                *ngFor="let goal of Goals_Selected; let i = index"
+              >
+                <form class="goal_list" [name]="i">
+                  <div class="goal-details" *ngIf="goal.Goal != null">
+                    <div class="note_dropdown">
+                      <div class="userInfoItem" style="width: 50%">
+                        <p class="main_input_title">Goals</p>
+                        <input
+                          class="userInfovalue"
+                          id="addPatientGoals"
+                          [(ngModel)]="goal.Goal"
+                          [ngModelOptions]="{ standalone: true }"
+                          [disabled]="true"
+                        />
+                      </div>
+                      <br />
+                    </div>
+                    <div>
+                      <textarea
+                        class="userInfovalue"
+                        id="addPatientGoalDescription"
+                        [(ngModel)]="goal.Description"
+                        [ngModelOptions]="{ standalone: true }"
+                      ></textarea>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="program_subpanel2">
+            <p class="main_input_main_heading">Program Timeline</p>
+            <div class="Program-details_container">
+              <div class="Program-details_container_sub">
+                <div class="userInfoItem Program-details_container_sub_left">
+                  <p class="main_input_title">*Assigned Member</p>
+                  <select
+                    class="userInfovalue"
+                    formControlName="assignedMember"
+                    id="addPatientAssignedMember"
+                    required
+                  >
+                    <option
+                      *ngFor="let ctm of master_data.CareTeamMembers"
+                      [value]="ctm.UserId"
+                    >
+                      {{ ctm.CareTeamMemberName }}
+                    </option>
+                  </select>
+                </div>
+                <div
+                  class="userInfoItem Program-details_container_sub_right"
+                ></div>
+              </div>
+            </div>
+
+            <div class="Program-details_container">
+              <div class="Program-details_container_sub">
+                <div class="userInfoItem Program-details_container_sub_left">
+                  <p class="main_input_title">*Program Stage</p>
+                  <select
+                    class="userInfovalue"
+                    formControlName="patientstatus"
+                    id="addPatientStatus"
+                    required
+                  >
+                    <option value="Prescribed" selected>Prescribed</option>
+                  </select>
+                  <div class="warn">
+                    <ng-container
+                      *ngIf="
+                        programForm.get('patientstatus')?.invalid &&
+                        programForm.get('patientstatus')?.touched
+                      "
+                    >
+                      Patientstatus is required
+                    </ng-container>
+                  </div>
+                </div>
+                <div class="userInfoItem Program-details_container_sub_right">
+                  <p class="main_input_title">Date</p>
+                  <input
+                    type="date"
+                    class="userInfovalue"
+                    formControlName="PrescribedDate"
+                    id="addPatientPrescribedDate"
+                    placeholder="Auto Populated"
+                    required
+                  />
+                </div>
+              </div>
+
+              <!-- Second Segment  -->
+              <div class="Program-details_container_sub">
+                <div class="userInfoItem Program-details_container_sub_left">
+                  <p class="main_input_title">Physician</p>
+                  <select
+                    class="userInfovalue"
+                    placeholder="Select physician"
+                    formControlName="physician"
+                    id="addPatientPhysician"
+                  >
+                    <option
+                      *ngFor="let phy of physicianList"
+                      [value]="phy.UserId"
+                    >
+                      {{ phy.PhysicianName }}
+                    </option>
+                  </select>
+                  <!-- <div class="warn">
+                    <ng-container  *ngIf="programForm.get('physician')?.invalid && programForm.get('physician')?.touched">
+                      Physician is required
+                    </ng-container>
+                  </div> -->
+                </div>
+
+                <div class="userInfoItem Program-details_container_sub_right">
+                  <p class="main_input_title">Order Date</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="Order Date"
+                    id="addPatientOrderDate"
+                    formControlName="consultdate"
+                    placeholder="Enter Date"
+                    type="text"
+                    onfocus="(this.type='date')"
+                    max="{{ todaty_date }}"
+                    (ngModelChange)="checkDateValidity($event)"
+                  />
+
+                  <div class="warn">
+                    <!-- <ng-container  *ngIf="programForm.get('consultdate')?.invalid && programForm.get('consultdate')?.touched">
+                      consultdate is Required
+                    </ng-container> -->
+                    <ng-container *ngIf="futureDateError">
+                      Please Enter valid Date
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+              <!-- Third Segment  -->
+              <div class="Program-details_container_sub">
+                <div class="userInfoItem Program-details_container_sub_left">
+                  <p class="main_input_title">*Clinic</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="Clinic"
+                    required
+                    formControlName="clinic"
+                    id="addPatientClinic"
+                    [attr.disabled]="true"
+                  />
+                  <div class="warn">
+                    <ng-container
+                      *ngIf="
+                        programForm.get('clinic')?.invalid &&
+                        programForm.get('clinic')?.touched
+                      "
+                    >
+                      Clinic Required
+                    </ng-container>
+                  </div>
+                </div>
+                <div
+                  style="visibility: false"
+                  class="userInfoItem Program-details_container_sub_right"
+                >
+                  <p class="main_input_title">Clinic Code</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="Clinic Code"
+                    required
+                    formControlName="cliniccode"
+                    id="addPatientClinicCode"
+                    [attr.disabled]="true"
+                  />
+                </div>
+              </div>
+              <!-- Fourth Segment  -->
+
+              <!-- <div  *ngFor="let divData of diagonisticsData; let i = index ;let first=first;" formArrayName="diagnosisData" > -->
+              <!-- <div class="goals_note_container" *ngFor="let goal of Goals_Selected ; let i = index;" >
+                  <form class ="goal_list" [name]="i">
+
+                  </form>
+                </div> -->
+
+              <!-- <div *ngFor="let formGroup of diagnosisData.controls; let index = index; let first = first" formArrayName="diagnosisData">
+                  <div *ngIf="index < 3" [formGroupName]="index">
+                    <div class="Program-details_container_sub">
+                      <div class="userInfoItem Program-details_container_sub_left">
+                        <p class="main_input_title">*Diagnosis</p>
+                        <select
+                          class="userInfovalue"
+                          placeholder="Select Diagnosis"
+                          formControlName="DiagnosisName"
+                          required
+                        >
+                          <option
+                            *ngFor="let Diag_name of Diagnosis_Name"
+                            [value]="Diag_name.DiagnosisName"
+                          >
+                            {{ Diag_name.DiagnosisName }}
+                          </option>
+                        </select>
+
+                      </div>
+                      <div class="userInfoItem Program-details_container_sub_right ">
+
+
+                            <p class="main_input_title">*Code</p>
+                            <div class="diagnosisCode">
+                              <input
+                              class="userInfovalue"
+                              placeholder="Auto Populated"
+                              required
+                              formControlName="DiagnosisCode"
+                            />
+                            <div *ngIf="first">
+                              <img
+                                class="add_icon"
+                                src="../../../../../assets/04-Icons/Icons_Add.svg"
+                                (click)="addNewDiaganostics()"
+                              />
+
+                          </div>
+                            </div>
+                            <div class="warn">
+                              <ng-container  *ngIf="programForm.get('code')?.invalid && programForm.get('code')?.touched">
+                                Code is Required
+                              </ng-container>
+                            </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div> -->
+              <!-- <div class="diagosis_panel" >
+                  <div *ngFor="let Diagnosis of Diagnosis_List ; let i = index;" >
+                      <form  >
+                          <div class ="program_timeline_data">
+                              <div class="userInfoItem program_timeline_data_left">
+                                  <p class="main_input_title"> *Diagnosis</p>
+                                  <select class="userInfovalue diagnosis_title" id="addPatientDiagnosis" title="{{Diagnosis.DiagnosisName}}"  [(ngModel)]='Diagnosis.DiagnosisName' [ngModelOptions]="{standalone: true}" (ngModelChange)="diagnosisChanged($event, i)">
+                                      <option  title="{{Diag_name.DiagnosisName}}" *ngFor="let Diag_name of Diagnosis_Name" [value]="Diag_name.DiagnosisName">{{ Diag_name.DiagnosisName }}
+                                      </option>
+                                  </select>
+
+                                  <small class="text-danger"
+                                      *ngIf="programForm.get('diagnosis')?.invalid && programForm.get('diagnosis')?.touched">Diagnosis name
+                                      is required
+                                  </small>
+                              </div>
+
+                                  <div class="userInfoItem ">
+
+
+                                        <p class="main_input_title"> *Code</p>
+                                        <div class="code">
+                                        <div class="code_data">
+                                        <input class="userInfovalue" id="addPatientDiagnosisCode" [(ngModel)]='Diagnosis.DiagnosisCode' [ngModelOptions]="{standalone: true}" required [disabled]="true"/>
+                                        </div>
+
+                                        <div *ngIf="i==0" >
+                                          <div class="icon_panel">
+                                            <img class="add_icon4" src="../../../../../assets/04-Icons/Icons_Add.svg"
+                                            id="addPatientaddDiaganosis"
+                                            (click)="addNewDiaganostics_Patient()">
+                                            <div class="remove_icon">
+                                              <img class="add_icon4" src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                                              id="addPatientremoveDiaganosis"
+                                              (click)="removeDiaganostics_Patient()">
+                                            </div>
+
+                                          </div>
+
+                                      </div>
+                                    </div>
+                                    <small class="text-danger"
+                                    *ngIf="programForm.get('code')?.invalid && programForm.get('code')?.touched">code is
+                                    Required</small>
+                                  </div>
+
+
+                          </div>
+
+                      </form>
+                  </div>
+              </div> -->
+
+              <div class="diagosis_panel">
+                <div *ngFor="let Diagnosis of Diagnosis_List; let i = index">
+                  <form>
+                    <div class="program_timeline_data">
+                      <div class="userInfoItem program_timeline_data_left">
+                        <p class="main_input_title">*Diagnosis</p>
+                        <ng-autocomplete
+                          id="patientReport"
+                          [initialValue]="Diagnosis.DiagnosisName"
+                          [searchKeyword]="keyword"
+                          [data]="Diagnosis_Name"
+                          placeholder="Select Diagnosis"
+                          (selected)="diagnosisChanged($event, i)"
+                          (inputCleared)="cleared($event, i)"
+                          [itemTemplate]="itemTemplate"
+                          [notFoundTemplate]="notFoundTemplate"
+                        >
+                          >
+                        </ng-autocomplete>
+                        <ng-template #itemTemplate let-item>
+                          <a [innerHTML]="item.DiagnosisField"></a>
+                        </ng-template>
+                        <ng-template #notFoundTemplate let-notFound>
+                          <div [innerHTML]="notFound"></div>
+                        </ng-template>
+
+                        <!-- <select class="userInfovalue diagnosis_title" id="addPatientDiagnosis" title="{{Diagnosis.DiagnosisName}}"  [(ngModel)]='Diagnosis.DiagnosisName' [ngModelOptions]="{standalone: true}" (ngModelChange)="diagnosisChanged($event, i)">
+                                    <option  title="{{Diag_name.DiagnosisName}}" *ngFor="let Diag_name of Diagnosis_Name" [value]="Diag_name.DiagnosisName">{{ Diag_name.DiagnosisName }}
+                                    </option>
+                                </select> -->
+
+                        <small
+                          class="text-danger"
+                          *ngIf="
+                            programForm.get('diagnosis')?.invalid &&
+                            programForm.get('diagnosis')?.touched
+                          "
+                          >Diagnosis name is required
+                        </small>
+                      </div>
+
+                      <div class="userInfoItem">
+                        <p class="main_input_title">*Code</p>
+                        <div class="code">
+                          <div class="code_data">
+                            <!-- <input class="userInfovalue" id="addPatientDiagnosisCode" [(ngModel)]='Diagnosis.DiagnosisCode' [ngModelOptions]="{standalone: true}" required [disabled]="true"/> -->
+                            <input
+                              class="userInfovalue"
+                              id="addPatientDiagnosisCode"
+                              [(ngModel)]="Diagnosis.DiagnosisCode"
+                              [ngModelOptions]="{ standalone: true }"
+                              required
+                              [disabled]="true"
+                            />
+                          </div>
+
+                          <div *ngIf="i == 0">
+                            <div class="icon_panel">
+                              <img
+                                class="add_icon4"
+                                src="../../../../../assets/04-Icons/Icons_Add.svg"
+                                id="addPatientaddDiaganosis"
+                                (click)="addNewDiaganostics_Patient()"
+                              />
+                              <div class="remove_icon">
+                                <img
+                                  class="add_icon4"
+                                  src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                                  id="addPatientremoveDiaganosis"
+                                  (click)="removeDiaganostics_Patient()"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <small
+                          class="text-danger"
+                          *ngIf="
+                            programForm.get('code')?.invalid &&
+                            programForm.get('code')?.touched
+                          "
+                          >code is Required</small
+                        >
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</ng-template>
+<ng-template #myDialog>
+  <div class="dialog">
+    <div class="dialog_container">
+      <div class="Patient_Health">
+        <div class="header">
+          <h3 *ngIf="!newProgramVariable">Are You Sure to add new Patient ?</h3>
+          <h3 *ngIf="newProgramVariable">Are You Sure to add new Program ?</h3>
+        </div>
+        <div class="download">
+          <h4 *ngIf="!newProgramVariable" class="subheading-dialog">
+            New Patient will be created!
+          </h4>
+          <h4 *ngIf="newProgramVariable" class="subheading-dialog">
+            New Program will be created!
+          </h4>
+        </div>
+        <!-- <div class="download">
+          <p>Patient id: {{ pid }}</p>
+        </div> -->
+      </div>
+      <div class="button">
+        <button
+          class="btn_cancel"
+          id="addPatientNewCancel"
+          [mat-dialog-close]="true"
+          (click)="cancel_dialog()"
+        >
+          CANCEL
+        </button>
+        <button
+          class="btn_save"
+          id="addPatientNewConfirm"
+          (click)="confirm_dialog(patient_dialog)"
+        >
+          CONFIRM
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #patient_dialog>
+  <div class="dialog">
+    <div class="dialog_container">
+      <div class="Patient_Health">
+        <div class="check_icon_panel">
+          <img
+            class="check_icon"
+            src="../../../../../assets/04-Icons/Icons_Check A.svg"
+          />
+        </div>
+        <div class="download">
+          <h4 class="subheading-dialog">New Patient added Successfully!</h4>
+        </div>
+        <!-- <div class="download" *ngIf="!newProgramVariable">
+          <p>Patient Password: {{ patientPassword }}</p>
+        </div> -->
+      </div>
+      <div class="confirm_button">
+        <button
+          class="add_button"
+          [mat-dialog-close]="true"
+          (click)="ClearPage()"
+          id="addPatientAnotherPatient"
+        >
+          ADD ANOTHER PATIENT
+        </button>
+        <button
+          class="view_button"
+          id="addPatientViewPatient"
+          (click)="redirectToPateintDetails()"
+        >
+          VIEW PATIENT
+        </button>
+        <button
+          class="continue_button"
+          id="addPatientConfirmEditing"
+          (click)="redirectToEditPateint()"
+        >
+          CONTINUE EDITING
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #patient_dialog_draft>
+  <div class="dialog">
+    <div class="dialog_container">
+      <div class="Patient_Health">
+        <div class="check_icon_panel">
+          <img
+            class="check_icon"
+            src="../../../../../assets/04-Icons/Icons_Check A.svg"
+          />
+        </div>
+        <div class="download">
+          <h4 class="subheading-dialog">New Patient added Successfully!</h4>
+        </div>
+        <div class="download">
+          <p>Patient Password: {{ patientPassword }}</p>
+        </div>
+      </div>
+      <div class="confirm_button_draft">
+        <button class="add_button" [mat-dialog-close]="true" id="addPatient">
+          Ok
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<app-confirm-dialog-panel>
+</app-confirm-dialog-panel>

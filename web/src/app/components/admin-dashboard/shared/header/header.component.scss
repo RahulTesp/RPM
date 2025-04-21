@@ -1,0 +1,378 @@
+.content-panel {
+  width: 100%;
+  height: 4rem;
+  background-color: #e1e6ed;
+  border-bottom: 1px solid #d8dce5;
+  // position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.logoImg {
+  width: 6rem;
+  height: 3rem;
+}
+
+/* Toolbar Left Panel */
+
+.toolbar_left_panel {
+  display: flex;
+  width: 73%;
+  justify-content: space-between;
+  border-right: 1px solid #ccc
+  }
+
+  .side-panel {
+    width: 27%;
+}
+.mat-toolbar-single-row {
+  padding: 0px !important;
+}
+.toolbar_main_left {
+  width: 100%;
+}
+.logo_panel {
+  padding-right: 15px;
+}
+
+.toolbar-welcome {
+  font-size: 0.7rem;
+  line-height: 0.8rem;
+  color: #000000;
+  text-align: left;
+  margin-bottom: 0px;
+  font-family: "Rubik";
+  margin-left: -80px;
+  margin-top: 20px;
+}
+.toolbar_username {
+  font-family: "Rubik";
+  font-size: 0.8rem;
+}
+
+.toolbar-rolename {
+  font-family: "Rubik";
+  font-size: 18px;
+  line-height: 22px;
+  color: #595959;
+  text-align: left;
+}
+
+/* Toolbar Right Panel */
+.toolbar_right_panel {
+  margin: 16px 0px 16px 3px;
+  display: flex;
+}
+.toolbar_sub_left_panel {
+  margin-left: 6.7rem !important;
+}
+
+.DatePanel {
+  width: 100%;
+
+  display: flex;
+}
+
+.DatePanel_container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+  margin-left: 0.8rem !important;
+  padding-right: 3rem;
+}
+
+.DatePanel_container_before {
+  content: "";
+  background-color: #d8dce5;
+  width: 2px;
+  height: 100%;
+}
+
+.tool-icon {
+  display: flex;
+  align-items: center;
+}
+
+.mat-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 10px;
+}
+
+.day {
+  font-size: 0.8rem;
+  line-height: 1rem;
+  color: #164d61;
+  font-family: "Rubik";
+  margin-bottom: 0px !important;
+}
+
+.date {
+  font-size: 0.9rem;
+  line-height: 1.3rem;
+  color: #164d61;
+  font-family: "Rubik";
+  margin-bottom: 0px !important;
+}
+
+.time {
+  font-size: 1.2rem;
+  line-height: 1.5rem;
+  color: #164d61;
+  text-align: left;
+  font-family: "Rubik";
+  margin-bottom: 0px !important;
+  letter-spacing: 0px;
+}
+
+/* Toolbar Icons */
+.toolbar_icons {
+  margin-right: 1.25rem;
+}
+
+.notification {
+  position: relative;
+  margin-top: -0.4rem;
+}
+.searchIcon {
+  margin-left: -20px;
+}
+
+.badge {
+  position: absolute;
+
+  top: -4px;
+  right: 16px;
+  font-size: 0.7rem;
+  color: #d8dce5;
+  border-radius: 50%;
+  width: 13px;
+  height: 13px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Rubik";
+  cursor: pointer;
+  text-align: center;
+  background-color: #8226df;
+}
+
+.notification_container {
+  position: absolute;
+  top: 1.5625rem;
+  right: -0.9375rem;
+  background-color: #164d61;
+  width: 26.75rem;
+  z-index: 2000;
+  height: fit-content;
+  padding: 0.5rem;
+  border-radius: 1rem;
+}
+
+.expand_icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.expand_icon_container {
+  background-color: #edeff5;
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.notification_heading {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  height: 2rem;
+}
+
+.notification_text {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-family: "Rubik";
+}
+
+.notification_content {
+  width: 100%;
+  background-color: #edeff5;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0.7rem 0px;
+  border-radius: 0.5rem;
+}
+.notification_content_panel {
+  overflow-y: scroll;
+  height: 150px;
+}
+
+.notification_title {
+  margin-bottom: 0px;
+}
+.notification_right {
+  display: flex;
+}
+.deleteIcon {
+  width: 1rem;
+  height: 1rem;
+  margin: 0 0.3rem;
+}
+
+.notification_title {
+  font-size: 0.8rem;
+  line-height: 1.2rem;
+  font-family: "Rubik";
+}
+
+@media only screen and (max-width: 1500px) {
+  .toolbar_sub_left_panel {
+    margin-left: 2rem !important;
+  }
+}
+
+/* Tablet Screen */
+@media only screen and (max-width: 80rem) {
+  .DatePanel_container {
+    flex-direction: column-reverse;
+    justify-content: space-around;
+  }
+
+  .date-left {
+    display: flex;
+    padding-right: 0px;
+  }
+
+  .time {
+    font-size: 0.9rem;
+    line-height: 1.5rem;
+    text-align: right;
+    margin-bottom: 0px;
+    color: #164d61;
+  }
+
+  .day {
+    font-size: 0.8rem;
+    line-height: 1.2rem;
+    padding-right: 3px;
+    color: #164d61;
+  }
+
+  .date {
+    font-size: 0.8rem;
+    line-height: 1.2rem;
+    color: #164d61;
+  }
+
+  .mat-toolbar {
+    padding-left: 2.5rem;
+  }
+}
+
+.hamburgIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.logoImg {
+  padding-left: 1rem;
+}
+.userInfovalue {
+  border: none;
+  width: 100%;
+  background-color: #ffff;
+  height: 1.6rem;
+  border-radius: 0.8rem;
+  font-size: 0.8rem;
+  font-family: "Rubik";
+  color: #164d61;
+  padding-left: 0.8rem;
+}
+.userInfovalue:focus {
+  outline: none !important;
+}
+.autocomplete-container .input-container input {
+  height: 30px !important;
+  line-height: 30px !important;
+  border-radius: 0.8rem !important;
+  font-size: 0.7rem !important;
+}
+.autocomplete-container {
+  border-radius: 0.8rem !important;
+}
+::ng-deep .autocomplete-container .suggestions-container ul li {
+  height: fit-content !important;
+}
+.ng-autocomplete ::ng-deep .autocomplete-container {
+  box-shadow: none;
+}
+.ng-autocomplete {
+  width: 14vw !important;
+  font-size: 0.7rem;
+}
+::ng-deep .autocomplete-container .suggestions-container ul li a {
+  font-size: 0.7rem !important;
+  padding: 0px !important;
+  color: #164d61;
+  font-family: "Rubik";
+}
+
+::ng-deep
+  .autocomplete-container
+  .suggestions-container
+  ul
+  ::-webkit-scrollbar {
+  width: 4px !important;
+}
+
+::ng-deep
+  .autocomplete-container
+  .suggestions-container
+  ul
+  ::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  min-height: 5px !important;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}
+.notification_fixed_length {
+  width: 330px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 0.8rem;
+  padding-right: 1rem;
+}
+.notification_list {
+  margin-top: 2% !important;
+}
+::-webkit-scrollbar {
+  display: none;
+}
+.notification-notify-panel {
+  // background-color: ;
+  background-color: #99e8e3;
+  color: #164d61;
+  border: 2px solid #3bcbc4;
+
+  font-family: "Rubik";
+  font-size: 0.8rem;
+  width: 300px;
+  height: 32px;
+  display: flex;
+  padding: 4px;
+  justify-content: flex-start;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  border-radius: 5px;
+}

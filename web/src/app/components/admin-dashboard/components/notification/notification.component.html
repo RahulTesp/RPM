@@ -1,0 +1,155 @@
+<div class="content">
+  <div class="main_content">
+    <!-- Main Panel -->
+    <div class="main-panel">
+      <!-- <div class="Notification_upper_panel"> -->
+      <div class="back_arrow">
+        <div class="back_arrow_container">
+          <img
+            class="arrow-img"
+            id="notfBackHome"
+            src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg"
+            alt=""
+            (click)="backtohome()"
+          />
+        </div>
+        <p class="main_title">Notifications</p>
+      </div>
+
+      <!-- <div class="back_arrow">
+                    <img class="arrow-img" src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg" />
+                    <p class="notification_text">Notifications</p>
+                </div> -->
+      <!-- </div> -->
+
+      <!-- <div class="back_arrow">
+
+              <div class="back_arrow_container">
+                <img class ="arrow-img" src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg" alt="">
+              </div>
+              <p class="main_title"> Notifications</p>
+            </div> -->
+
+      <div class="notification_content">
+        <div class="main-row">
+          <div class="notification_subpanel">
+            <div class="today_notification">
+              <div class="today_header">
+                <p>Open Notifications</p>
+                <!-- <button class="btn_read" (click)="after()">Read All</button> -->
+              </div>
+              <div class="notification_header">
+                <p *ngIf="unread > 0">{{ unread }} Unread</p>
+                <p *ngIf="unread == 0">No Notification For Today</p>
+              </div>
+              <div *ngIf="notifications">
+                <div
+                  class="today_content"
+                  *ngFor="let notification of notifications.Data"
+                >
+                  <div class="notification_description_panel">
+                    <div
+                      *ngFor="
+                        let notification_item of notification.NotificationList
+                      "
+                    >
+                      <div *ngIf="notification_item.IsRead == false">
+                        <div class="notification_item_panel">
+                          <p class="notification_data">
+                            {{ notification_item.Description }}
+                          </p>
+
+                          <div class="notification_right">
+                            <div class="notification_time">
+                              <p class="notification_data_time">
+                                {{
+                                  notificationTime(notification_item.CreatedOn)
+                                }}
+                              </p>
+                            </div>
+                            <div class="img_panel">
+                              <img
+                                class="delete-img"
+                                id="notification"
+                                src="../../../../../../assets/04-Icons/Icons_Unread.svg"
+                                (click)="
+                                  readNotification(
+                                    notification_item.NotificationId,
+                                    notification_item.NotificationAuditId
+                                  )
+                                "
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="history_notification notification_subpanel">
+            <div class="history_notification">
+              <div class="today_header">
+                <p>History</p>
+                <button
+                  class="btn_read clear_all"
+                  (click)="openClearAllDialog()"
+                >
+                  Clear All
+                </button>
+              </div>
+              <div class="history-header">
+                <p>Read Notifications</p>
+              </div>
+              <div *ngIf="notifications">
+                <div
+                  class="today_content"
+                  *ngFor="let notification of notifications.Data"
+                >
+                  <div class="notification_description_panel">
+                    <div
+                      *ngFor="
+                        let notification_item of notification.NotificationList
+                      "
+                    >
+                      <div *ngIf="notification_item.IsRead == true">
+                        <div class="notification_item_panel">
+                          <p class="notification_data">
+                            {{ notification_item.Description }}
+                          </p>
+
+                          <div class="notification_right">
+                            <div class="notification_time">
+                              <p class="notification_data_time">
+                                {{
+                                  notificationTime(notification_item.CreatedOn)
+                                }}
+                              </p>
+                            </div>
+                            <div class="img_panel">
+                              <img
+                                class="delete-img"
+                                src="../../../../../../assets/04-Icons/Icons_Delete.svg"
+                                (click)="
+                                  openDeleteNotificationDialog(
+                                    notification_item.NotificationId
+                                  )
+                                "
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

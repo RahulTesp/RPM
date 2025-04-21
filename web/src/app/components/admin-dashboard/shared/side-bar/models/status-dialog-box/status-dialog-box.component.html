@@ -1,0 +1,11 @@
+<div
+  class="overlay"
+  *ngIf="isStatusDialogVisible"
+  (click)="closeStatusDialog()"
+>
+  <div class="dialog-content" (click)="$event.stopPropagation()">
+    <h2 class="dialog-title">{{ dialogTitle }}</h2>
+    <div class="dialog-message">{{ dialogMessage }}</div>
+    <button class="confirm_button" (click)="closeStatusDialog()">OK</button>
+  </div>
+</div>

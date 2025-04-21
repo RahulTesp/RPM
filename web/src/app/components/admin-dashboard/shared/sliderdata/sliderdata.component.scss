@@ -1,0 +1,119 @@
+.measurement_panel
+{
+  display: flex;
+  width: 100%;
+  height: 30px!important;
+
+}
+.circle_icon
+{
+  width: 30px;
+  height: 30px;
+
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.red_circle
+{
+  background-color: #A20D0A;
+}
+.yellow_circle
+{
+background-color: #9B5D0C;
+}
+.green_circle
+{
+ background-color: #155D16;
+}
+.measure_data
+{
+  display: flex;
+}
+.svg-2011-before
+{
+  width:6vw;
+
+  height:20px;
+}
+.measure_data_panel
+{
+  display: flex;
+  margin-left: 10px;
+  margin-bottom: 30px;
+  margin-top: 20px;
+}
+.measure_value
+{
+position: absolute;
+top: -20px;
+}
+.center_dot
+{
+  background-color: #FFFFFF;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+.measure_line
+{
+  display: flex;
+  align-items: center;
+  position: relative;
+  // background-color: red;
+  // height: 100%;
+}
+.measure_label
+{
+  position: absolute;
+  bottom:-25px;
+  color: #164D61;
+  font-size: 12px;
+  // line-height: 30px;
+}
+.add_icon
+{
+  width: 24px;
+  height: 24px;
+}
+
+.svg-2011-before
+  {
+    width:3vw !important;
+
+  }
+
+  @media only screen and (max-width: 1800px) {
+    .svg-2011-before
+    {
+
+      width:2.5vw !important;
+
+    }
+  }
+
+  @media only screen and (max-width: 1620px) {
+    .svg-2011-before
+    {
+
+      width:2.4vw !important;
+
+    }
+  }
+@media only screen and (max-width: 1280px) {
+  .svg-2011-before
+  {
+
+    width:3.5vw !important;
+
+  }
+}
+@media only screen and (max-width: 1080px) {
+  .svg-2011-before
+  {
+    width:6vw !important;
+
+  }
+}

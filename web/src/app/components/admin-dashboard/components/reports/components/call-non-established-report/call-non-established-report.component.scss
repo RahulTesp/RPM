@@ -1,0 +1,27 @@
+.panel_content {
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 16px;
+  width: 100%;
+  min-height: 180px;
+}
+.panel_content_item {
+  width: 100%;
+}
+.radio {
+  display: flex;
+  width: 100%;
+}
+.task_date_picker_container {
+  width: 100%;
+}
+input[type="radio"] {
+  accent-color: #164d61;
+}
+.durationTitle {
+  font-size: 0.8rem;
+  font-family: "Rubik";
+  color: #164d61;
+  margin-left: 5px;
+}

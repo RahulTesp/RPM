@@ -1,0 +1,413 @@
+<div class="content">
+  <div class="main_content">
+    <div class="main-panel">
+      <div class="back_arrow">
+        <div
+          class="back_arrow_container"
+          id="reports_backHome"
+          (click)="backtohome()"
+        >
+          <img
+            class="arrow-img"
+            src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg"
+            alt=""
+          />
+        </div>
+        <p class="main_title">Reports</p>
+      </div>
+      <div class="uppermenubtnpanel">
+        <button
+          *ngIf="
+            accessRights && accessRights.UserAccessRights[26].AccessRight == 'F'
+          "
+          class="uppermenubtn"
+          [class.selected]="CurrentMenu == 1"
+          (click)="ChangeScreen(1)"
+        >
+          Patient Health
+        </button>
+        <div
+          *ngIf="
+            rolelist[0].Id != 6 && rolelist[0].Id != 4 && rolelist[0].Id != 8
+          "
+        >
+          <button
+            *ngIf="
+              accessRights &&
+              accessRights.UserAccessRights[27].AccessRight == 'F'
+            "
+            class="uppermenubtn"
+            id="reports_Billing"
+            [class.selected]="CurrentMenu == 2"
+            (click)="ChangeScreen(2)"
+          >
+            Billing
+          </button>
+        </div>
+        <div *ngIf="rolelist[0].Id != 6 && rolelist[0].Id != 8">
+          <button
+            *ngIf="
+              accessRights &&
+              accessRights.UserAccessRights[27].AccessRight == 'F'
+            "
+            class="uppermenubtn"
+            id="reports_Billing"
+            [class.selected]="CurrentMenu == 5"
+            (click)="ChangeScreen(5)"
+          >
+            Call Info
+          </button>
+        </div>
+
+        <!-- <button  *ngIf="accessRights&&accessRights.UserAccessRights[28].AccessRight =='F'" class="uppermenubtn" (click)="ChangeScreen(3)"
+           [class.selected]="CurrentMenu == 3">Team Performance</button>
+           <button  *ngIf="accessRights&&accessRights.UserAccessRights[29].AccessRight =='F'" class="uppermenubtn" (click)="ChangeScreen(4)"
+           [class.selected]="CurrentMenu == 4">Devices</button> -->
+      </div>
+
+      <ng-container [ngSwitch]="variable">
+        <ng-container *ngSwitchCase="1">
+          <ng-container *ngTemplateOutlet="patientpage"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="2">
+          <ng-container *ngTemplateOutlet="Billingpage"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="3">
+          <ng-container *ngTemplateOutlet="teampage"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="4">
+          <ng-container *ngTemplateOutlet="devicepage"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="5">
+          <ng-container *ngTemplateOutlet="callInfo"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+          <ng-container *ngTemplateOutlet="patientpage"></ng-container>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+  <!--Main Content-->
+</div>
+<!-- Content-->
+<ng-template #patientpage>
+  <app-patient-data-report
+    [httpPatientList]="http_all_patientList"
+  ></app-patient-data-report>
+</ng-template>
+
+<ng-template #Billingpage>
+  <div class="patientPageTemplaate">
+    <div class="callinfo_sub_menu">
+      <button
+        class="callinfo_sub_menu_item"
+        [class.calllog_active]="billing_variable == 1"
+        style="position: relative; z-index: 200"
+        (click)="getMenuBillingInfo(1)"
+      >
+        Billed Data
+      </button>
+      <button
+        class="callinfo_sub_menu_item"
+        [class.calllog_active]="billing_variable == 2"
+        (click)="getMenuBillingInfo(2)"
+        style="position: relative; z-index: 200"
+      >
+        Billing Summary
+      </button>
+    </div>
+    <ng-container [ngSwitch]="billing_variable">
+      <ng-container *ngSwitchCase="1">
+        <ng-container *ngTemplateOutlet="BillingReport"></ng-container>
+      </ng-container>
+      <ng-container *ngSwitchCase="2">
+        <ng-container *ngTemplateOutlet="BillingReportDetail"></ng-container>
+      </ng-container>
+      <ng-container *ngSwitchCase="3">
+        <ng-container
+          *ngTemplateOutlet="MissingBillingReportDetail"
+        ></ng-container>
+      </ng-container>
+
+      <ng-container *ngSwitchDefault>
+        <ng-container *ngTemplateOutlet="BillingReport"></ng-container>
+      </ng-container>
+    </ng-container>
+  </div>
+</ng-template>
+<ng-template #BillingReport>
+  <app-billing-data-report
+    [http_getActivePatientList]="http_getActivePatientList"
+    [clinicBillingDetails]="clinicBillingDetails"
+  ></app-billing-data-report>
+</ng-template>
+<ng-template #BillingReportDetail>
+  <app-billing-summary-report
+    [http_getActivePatientList]="http_getActivePatientList"
+  ></app-billing-summary-report>
+</ng-template>
+<ng-template #MissingBillingReportDetail>
+  <div class="patientPageTemplaate">
+    <div class="box">
+      <div class="upper_container">
+        <div class="upper_container_item">
+          <p class="upper_item_title">Program Type</p>
+          <div class="upper_item_dropdown">
+            <select
+              class="select-form-text common_item_dropdown"
+              placeholder="All Program"
+              id="report_AllClinics"
+              [(ngModel)]="programType"
+              (ngModelChange)="programChangeBillingDetail($event)"
+            >
+              <option
+                *ngFor="let data of billingTypeProgramArray; let i = index"
+                [value]="data.ProgramType"
+              >
+                {{ data.ProgramType }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="upper_container_item container_item_patient">
+          <p class="upper_item_title">Patient Name</p>
+
+          <ng-autocomplete
+            #autocompletebilling
+            [data]="billingDetailPatientList"
+            [searchKeyword]="keyword"
+            placeholder="Select Patient"
+            (selected)="selectBillingEvent($event)"
+            (inputChanged)="OnChangeSeachDetail($event)"
+            (inputCleared)="onClearSearchbilldetail($event)"
+            (inputFocused)="onFocused($event)"
+            [itemTemplate]="itemTemplate"
+            [notFoundTemplate]="notFoundTemplate"
+          >
+          </ng-autocomplete>
+
+          <ng-template #itemTemplate let-item>
+            <a [innerHTML]="item.searchField"></a>
+          </ng-template>
+
+          <ng-template #notFoundTemplate let-notFound>
+            <div [innerHTML]="notFound"></div>
+          </ng-template>
+        </div>
+
+        <div class="upper_container_item">
+          <p class="upper_item_title">Clinic Name</p>
+          <div class="upper_item_dropdown">
+            <select
+              class="select-form-text common_item_dropdown"
+              placeholder="All Clinics"
+              id="report_AllClinics"
+              [(ngModel)]="clinic"
+            >
+              <option value="" selected>All Clinics</option>
+              <option
+                *ngFor="let c of clinicBillingDetails"
+                [value]="c.ClinicId"
+              >
+                {{ c.ClinicName }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel_content">
+        <div class="panel_content_item">
+          <div class="radio">
+            <div class="radio_label">
+              <mat-radio-button
+                value="0"
+                checked="true"
+                (change)="radioChange($event)"
+                id="report_ByDuration"
+              >
+                <span class="fileformatTitle">
+                  By Duration</span
+                ></mat-radio-button
+              >
+            </div>
+            <div class="task_content task_contnent_date">
+              <div class="task_date_picker_container billing_detailDatepanel">
+                <mat-form-field class="task_date_range_picker">
+                  <mat-date-range-input
+                    [formGroup]="campaignOne"
+                    [rangePicker]="campaignOnePicker"
+                    [comparisonStart]="campaignOne.value.start"
+                    [comparisonEnd]="campaignOne.value.end"
+                  >
+                    <input
+                      matStartDate
+                      id="report_StartDate"
+                      formControlName="start"
+                      placeholder="Start date"
+                      #dateStartactivitySchedule
+                    />
+                    <input
+                      matEndDate
+                      id="report_EndDate"
+                      formControlName="end"
+                      placeholder="End date"
+                      #dateEndactivitySchedule
+                      (dateChange)="
+                        dateRangeScheduleChange(
+                          dateStartactivitySchedule,
+                          dateEndactivitySchedule
+                        )
+                      "
+                    />
+                  </mat-date-range-input>
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="campaignOnePicker"
+                  ></mat-datepicker-toggle>
+                  <mat-date-range-picker
+                    #campaignOnePicker
+                  ></mat-date-range-picker>
+                </mat-form-field>
+              </div>
+              <div class="formatPanel">
+                <div class="fileformat">
+                  <mat-radio-button
+                    value="excel"
+                    name="fileformat"
+                    (change)="fileformatChange($event)"
+                    id="report_fileformatexcel"
+                    ><span class="fileformatTitle"
+                      >Excel</span
+                    ></mat-radio-button
+                  >
+                </div>
+                <div class="fileformat">
+                  <mat-radio-button
+                    value="pdf"
+                    name="fileformat"
+                    (change)="fileformatChange($event)"
+                    id="report_fileformatpdf"
+                    ><span class="fileformatTitle">PDF</span></mat-radio-button
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="button_panel">
+      <button
+        class="button_item_download"
+        mat-raised-button
+        color="primary"
+        [class.spinner]="!buttonclick"
+        [disabled]="!buttonclick"
+        (click)="
+          getMissingBillingReportDetail(
+            dateStartactivitySchedule,
+            dateEndactivitySchedule
+          )
+        "
+        id="report_BillingDownload"
+      >
+        DOWNLOAD REPORT
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #callInfo>
+  <div class="patientPageTemplaate">
+    <div class="callinfo_sub_menu">
+      <button
+        class="callinfo_sub_menu_item"
+        [class.calllog_active]="callSelected == 1"
+        style="position: relative; z-index: 200"
+        (click)="getMenucallInfo(1)"
+      >
+        Call Log
+      </button>
+      <button
+        class="callinfo_sub_menu_item"
+        [class.calllog_active]="callSelected == 2"
+        (click)="getMenucallInfo(2)"
+        style="position: relative; z-index: 200"
+      >
+        Non-Established Calls
+      </button>
+    </div>
+    <ng-container [ngSwitch]="call_variable">
+      <ng-container *ngSwitchCase="1">
+        <ng-container *ngTemplateOutlet="CallLog"></ng-container>
+      </ng-container>
+      <ng-container *ngSwitchCase="2">
+        <ng-container *ngTemplateOutlet="NonEstablished"></ng-container>
+      </ng-container>
+
+      <ng-container *ngSwitchDefault>
+        <ng-container *ngTemplateOutlet="CallLog"></ng-container>
+      </ng-container>
+    </ng-container>
+  </div>
+</ng-template>
+
+<ng-template #CallLog>
+  <app-callinfo-data-report></app-callinfo-data-report>
+</ng-template>
+
+<ng-template #NonEstablished>
+  <app-call-non-established-report></app-call-non-established-report>
+</ng-template>
+
+<ng-template #myDialog>
+  <div class="dialog">
+    <div class="container">
+      <div class="Patient_Health">
+        <div class="header">
+          <h3 *ngIf="this.variable == 1">
+            Are You Sure to Download Patient Report?
+          </h3>
+          <h3 *ngIf="this.variable == 2">
+            Are You Sure to Download Billing Report?
+          </h3>
+          <h3 *ngIf="this.variable == 3">
+            Are You Sure to Download Team Performance Report?
+          </h3>
+          <h3 *ngIf="this.variable == 4">
+            Are You Sure to Download Device Complaint Report?
+          </h3>
+        </div>
+        <div class="body">
+          <h4 *ngIf="this.variable == 1">Patient Health Report!</h4>
+          <h4 *ngIf="this.variable == 2">Billing Report!</h4>
+          <h4 *ngIf="this.variable == 3">Team Name ABCD!</h4>
+          <h4 *ngIf="this.variable == 4">Device Complaint Report</h4>
+        </div>
+        <div class="download">
+          <p *ngIf="this.variable == 1">December,2021</p>
+          <p *ngIf="this.variable == 2">Oct 1,2021 to 29 Dec 2021</p>
+          <p *ngIf="this.variable == 3">December,2021</p>
+          <p *ngIf="this.variable == 4">December,2021</p>
+        </div>
+      </div>
+      <div class="button">
+        <button
+          class="cancel"
+          [mat-dialog-close]="true"
+          id="report_DialogCancel"
+        >
+          Cancel
+        </button>
+        <button class="download_button" id="report_DialogDownload">
+          Download
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #teampage> </ng-template>
+<ng-template #devicepage> </ng-template>

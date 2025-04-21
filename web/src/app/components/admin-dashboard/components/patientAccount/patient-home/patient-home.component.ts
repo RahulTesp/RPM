@@ -1,0 +1,1099 @@
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Resolve, Router } from '@angular/router';
+import { Observable } from 'rxjs';
+
+// import { Options } from '@angular-slider/ngx-slider';
+import { AuthService } from 'src/app/services/auth.service';
+import moment from 'moment';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { DatePipe } from '@angular/common';
+import { RightSidebarComponent } from '../../../shared/right-sidebar/right-sidebar.component';
+import { RPMService } from '../../../sevices/rpm.service';
+
+@Component({
+  selector: 'app-patient-home',
+  templateUrl: './patient-home.component.html',
+  styleUrls: ['./patient-home.component.scss'],
+})
+export class PatientHomeComponent implements OnInit {
+  @ViewChild(RightSidebarComponent) private rightsidebar: RightSidebarComponent;
+  loading = false;
+  tab_addtodo = false;
+  myprofile: any;
+  scheduleData: any;
+  latestAlertsAndTasks: any;
+  chatMessage: any;
+  loading2 = false;
+  patientName: string;
+  patientID: string;
+  patientdob: string;
+  patient_address: string;
+  plan_duration_balance: string;
+  patient_bp_value: string;
+  patient_bp_duration: string;
+  patient_pulse_value: string;
+  patient_pulse_duration: string;
+  patient_bg_value: string;
+  patient_bg_duration: string;
+  PatientInfo: any;
+  patient_id: any;
+  currentDate: any;
+  currentDateNo: any;
+  currentDay: any;
+  currentTime: any;
+  currentMonth: any;
+  public Duration: any;
+  frequencyValue: any;
+  bpplan: boolean = false;
+  bgplan: boolean = false;
+  pulseplan: boolean = false;
+  CurrentProgramSelected: any;
+  ProgramHistory: any;
+  currentpPatientId: any;
+  currentprogramId: any;
+  ActiveProgram: any;
+  call_panel_visible = false;
+  callTime = 0;
+  getTodoList: any;
+  bg_nonfasting_vital_readings: any;
+  careplan: any;
+  careplanStatus: any;
+  interval: any;
+  patient_dob: any;
+  vital_readings: any;
+  tab_todo_list_view = false;
+  ProfileName: any;
+  observable$: Observable<Object>;
+  rolelist: any;
+
+  startTimer() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+    this.interval = setInterval(() => {
+      this.updTimer();
+    }, 1000);
+  }
+
+  updTimer() {
+    let day = '00';
+    this.callTime += 1000;
+    if (this.callTime >= 86400000) {
+      let d = ~~(this.callTime / 86400000); //bitwise operator to remove decimals
+      day = d.toString();
+    }
+    if (day != '00') {
+      this.Duration =
+        day + ':' + new Date(this.callTime).toUTCString().split(/ /)[4];
+    } else {
+      this.Duration = new Date(this.callTime).toUTCString().split(/ /)[4];
+      this.Duration =
+        this.Duration[3] +
+        this.Duration[4] +
+        this.Duration[5] +
+        this.Duration[6] +
+        this.Duration[7];
+    }
+  }
+  stopTimer() {
+    this.callTime = 0;
+    this.Duration = '00:00';
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+  }
+  makeCallReady() {
+    this.call_panel_visible = true;
+    this.startTimer();
+  }
+  chat_panel_visible = false;
+
+  makeChat() {
+    // this.switchvariable=4;
+    // this.chat_panel_visible = true;
+  }
+
+  close_chat_window() {
+    this.chat_panel_visible = false;
+  }
+  close_modal() {
+    this.call_panel_visible = false;
+    this.stopTimer();
+  }
+  constructor(
+    private rpmservice: RPMService,
+    private http: HttpClient,
+    private rpm: RPMService,
+    private route: Router,
+    private auth: AuthService,
+    private _route: ActivatedRoute,
+    public datepipe: DatePipe
+  ) {
+    var that = this;
+
+    this.getPatientData();
+    this.getBillingInfo();
+    this.getTodoListData();
+  }
+
+  getTodoListData() {
+    var that = this;
+    var startDate;
+    var today = new Date();
+    var startdate = this.convertDate(today);
+    var enddate = this.convertDate(today);
+
+    startDate = startdate + 'T00:00:00';
+    enddate = enddate + 'T23:59:59';
+
+    // startDate = this.auth.ConvertToUTCRangeInput(new Date(startDate));
+    // enddate = this.auth.ConvertToUTCRangeInput(new Date(enddate));
+
+    that.rpm
+      .rpm_get(
+        `/api/patients/gettodolist?StartDate=${startDate}&EndDate=${enddate}`
+      )
+      .then((data: any) => {
+        this.getTodoList = data;
+      });
+  }
+  billingInfo: any;
+  billingratio: any;
+  getBillingInfo() {
+    var that = this;
+    that.rpmservice
+      .rpm_get(`/api/patients/getcurrentcyclereading`)
+      .then((data) => {
+        this.billingInfo = data;
+        this.billingratio =
+          (this.billingInfo.TotalReadings / this.billingInfo.DaysCompleted) *
+          100;
+      });
+  }
+  onclickcancel() {
+    this.call_panel_visible = false;
+  }
+  program_name: any;
+  CompleteionPercentage = 0;
+  patiantVital: any;
+  programStartTime: any;
+  programEndTime: any;
+  program_endTime: any;
+  programStart: any;
+  PatientCriticalAlerts: any;
+  http_get_symptoms: any;
+  currentPhysician: any;
+  assignedMember: any;
+  getSymptom() {
+    this.rpm.rpm_get(`/api/patients/getpatientsymptoms`).then((data: any) => {
+      this.http_get_symptoms = data;
+      this.PatientCriticalAlerts = [];
+      var tempEvents = this.http_get_symptoms.filter(
+        (data: { Symptom: string }) => {
+          return data.Symptom == 'Critical Event';
+        }
+      );
+      for (let dataEvents of tempEvents) {
+        var objEvents = {
+          Priority: 'Critical',
+          VitalAlert: dataEvents.Description,
+          Time: dataEvents.SymptomStartDateTime,
+        };
+        this.PatientCriticalAlerts.push(objEvents);
+      }
+    });
+  }
+  prescribedassignedDate: any;
+  getPatientData() {
+    var that = this;
+    that.loading2 = true;
+    // that.rpmservice.rpm_get('/api/patients/getpatient').then((data) => {
+    that.rpmservice.rpm_get('/api/patients/getpatient').then((data: any) => {
+      that.myprofile = data;
+
+      this.program_name = this.myprofile['PatientProgramdetails'].ProgramName;
+      this.patiantVital =
+        this.myprofile['PatientProgramdetails'].PatientVitalInfos;
+      this.patiantVital = this.patiantVital.filter(
+        (ds: { Selected: boolean }) => ds.Selected == true
+      );
+
+      this.programStartTime = this.myprofile['PatientProgramdetails'].StartDate;
+      this.programEndTime = this.myprofile['PatientProgramdetails'].EndDate;
+      this.program_endTime = this.datepipe.transform(
+        this.convertToLocalTime(this.programEndTime),
+        'MMM/dd/yyyy'
+      );
+      this.programStart = this.datepipe.transform(
+        this.convertToLocalTime(this.programStartTime),
+        'MMM/dd/yyyy'
+      );
+      this.currentPhysician =
+        this.myprofile.PatientPrescribtionDetails.Physician;
+      this.assignedMember = this.myprofile.PatientProgramdetails.AssignedMember;
+
+      this.CompleteionPercentage =
+        (that.myprofile.ProfileSummary.CurrentDuration /
+          that.myprofile.ProfileSummary.TotalDuration) *
+        100;
+
+      this.ProfileName =
+        that.myprofile.FirstName + ' ' + that.myprofile.LastName;
+      sessionStorage.setItem('user_name', this.ProfileName);
+      sessionStorage.setItem('userid', that.myprofile.UserId);
+      that.loading2 = false;
+      that.patientName =
+        that.myprofile.PatientDetails.FirstName +
+        that.myprofile.PatientDetails.MiddleName +
+        ' ' +
+        that.myprofile.PatientDetails.LastName;
+      that.patientID = that.myprofile.PatientDetails.UserId;
+      this.patient_dob = this.convertDateforPatientDOB(
+        that.myprofile.PatientDetails.DOB
+      );
+      that.patientdob = this.patient_dob;
+      that.patient_address =
+        that.myprofile.PatientDetails.CityName +
+        ',' +
+        that.myprofile.PatientDetails.State;
+      that.plan_duration_balance =
+        that.myprofile.PatientProgramdetails.ProgramStatus;
+
+      that.careplan = that.myprofile.PatientProgramdetails.PatientVitalInfos;
+      that.careplanStatus = that.myprofile.PatientProgramdetails.Status;
+      const patientcareplan: string[] = [];
+      for (
+        let i = 0;
+        i < that.myprofile.PatientProgramdetails.PatientVitalInfos.length;
+        i++
+      ) {
+        patientcareplan.push(
+          that.myprofile.PatientProgramdetails.PatientVitalInfos[i].Vital
+        );
+      }
+
+      if (patientcareplan.includes('Blood Glucose')) {
+        this.bgplan = true;
+      } else if (patientcareplan.includes('Blood Pressure')) {
+        this.bpplan = true;
+      } else if (patientcareplan.includes('Pulse')) {
+        this.pulseplan = true;
+      }
+    });
+  }
+  ngOnInit(): void {
+    this.switchvariable = 1;
+    this.rolelist = sessionStorage.getItem('Roles');
+    this.rolelist = JSON.parse(this.rolelist);
+    var programrole = this.rolelist[0].ProgramName;
+
+    // this.lineChartLabels = [
+    //   'Oct-29,Sat-08:00AM',
+    //   'Oct-30,Sun-08:00AM',
+    //   'Oct-31,Mon-08:00AM',
+    //   'Nov-1,Tue-08:00AM',
+    //   'Nov-2,Wed-08:00AM',
+    //   'Nov-3,Thu-08:00AM',
+    //   'Nov-4,Fri-08:00AM',
+    // ];
+
+    // this.ProgramHistory = [];
+    // this.chatMessage = [
+    //   {
+    //     text: 'Hi',
+    //     id: '1',
+    //     chat: 'receiver',
+    //   },
+    //   { text: 'Hello', id: '2', chat: 'sender' },
+    //   {
+    //     text: 'What Knid of problem facing',
+    //     id: '2',
+    //     chat: 'sender',
+    //   },
+    //   {
+    //     text: 'Nothing',
+    //     id: '1',
+    //     chat: 'receiver',
+    //   },
+    // ];
+    this.CurrentProgramSelected = undefined;
+    this._route.queryParams.subscribe((params) => {
+      this.getHealthTrends();
+    });
+    this.getSymptom();
+  }
+  // onProgramHstoryChange(programId: any) {
+  //   this.CurrentProgramSelected = programId;
+  // }
+
+  public lineChartData: Array<any> = [
+    {
+      data: [61, 61, 64, 65, 65, 63, 61],
+      label: 'Normal',
+      lineTension: 0,
+    },
+  ];
+  public chartData: any = [];
+
+  public chartData2: any = [];
+  public lineChartData2: Array<any> = [];
+
+  public lineChartLabels: Array<any> = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+  ];
+  public lineChartOptions: any = {
+    responsive: true,
+    pan: {
+      enabled: true,
+      mode: 'xy',
+      rangeMin: {
+        // Format of min pan range depends on scale type
+        x: null,
+        y: null,
+      },
+      rangeMax: {
+        // Format of max pan range depends on scale type
+        x: null,
+        y: null,
+      },
+      // Function called once panning is completed
+      // Useful for dynamic data loading
+      onPan: function (e: any) {
+        console.log(`I was panned!!!`, e);
+      },
+    },
+    zoom: {
+      enabled: true,
+      drag: false,
+
+      // Drag-to-zoom rectangle style can be customized
+      // drag: {
+      // 	 borderColor: 'rgba(225,225,225,0.3)'
+      // 	 borderWidth: 5,
+      // 	 backgroundColor: 'rgb(225,225,225)'
+      // },
+
+      // Zooming directions. Remove the appropriate direction to disable
+      // Eg. 'y' would only allow zooming in the y direction
+      mode: 'xy',
+
+      rangeMin: {
+        // Format of min zoom range depends on scale type
+        x: null,
+        y: null,
+      },
+      rangeMax: {
+        // Format of max zoom range depends on scale type
+        x: null,
+        y: null,
+      },
+
+      // Speed of zoom via mouse wheel
+      // (percentage of zoom on a wheel event)
+      speed: 0.1,
+
+      // Function called once zooming is completed
+      // Useful for dynamic data loading
+    },
+    maintainAspectRatio: false,
+    line: {
+      tension: 0.5,
+    },
+    legend: {
+      display: true,
+      position: 'bottom',
+      labels: {
+        boxWidth: 10,
+      },
+    },
+  };
+  public lineChartColors: Array<any> = [
+    {
+      // backgroundColor: 'red',
+      fill: false,
+      borderColor: 'orange',
+      pointBackgroundColor: 'orange',
+      // pointBorderColor: '#fff',
+      pointBorderColor: 'orange',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: 'rgba(148,159,177,0.8)',
+    },
+    {
+      // backgroundColor: 'red',
+      fill: false,
+      borderColor: 'green',
+      pointBackgroundColor: 'green',
+      // pointBorderColor: '#fff',
+      pointBorderColor: 'green',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: 'rgba(148,159,177,0.8)',
+    },
+    {
+      // backgroundColor: 'green',
+      fill: false,
+      borderColor: 'lightblue',
+      pointBackgroundColor: 'blue',
+      // pointBorderColor: '#fff',
+      pointBorderColor: 'blue',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: 'rgba(148,159,177,0.8)',
+    },
+  ];
+
+  public lineChartLegend: boolean = true;
+  public lineChartType: any = 'line';
+
+  minValue: number = 30;
+  maxValue: number = 75;
+  middle: number = 20;
+
+
+  http_healthtrends: any;
+  daycount: number;
+  bg_vital_readings: any;
+  patient_vital_name: any;
+  vital_unit: any;
+
+  getHealthTrends() {
+    this.daycount = 7;
+
+
+    var date1;
+    var date2;
+
+    var that = this;
+    date1 = new Date();
+    var utcdate1 = this.convertDate(date1) + 'T23:59:59';
+
+    date1 = this.convertDate(date1.setDate(date1.getDate()));
+
+    date2 = new Date();
+
+    date2 = this.convertDate(
+      date2.setDate(date2.getDate() - (this.daycount - 1))
+    );
+    //date2 = this.convertDate(date2.setDate(date2.getDate() - daycount));
+    var utcdate2 = this.convertDate(date2) + 'T00:00:00';
+
+    utcdate1 = this.auth.ConvertToUTCRangeInput(new Date(utcdate1));
+    utcdate2 = this.auth.ConvertToUTCRangeInput(new Date(utcdate2));
+
+    this.loading = true;
+    this.rpm
+      .rpm_get(
+        `/api/patients/getpatienthealthtrends?StartDate=${utcdate2}&EndDate=${utcdate1}`
+      )
+      .then(
+        (data) => {
+          this.http_healthtrends = data;
+
+          if (this.http_healthtrends.LatestVitalMeasure != null) {
+            this.patient_vital_name =
+              this.http_healthtrends.LatestVitalMeasure.VitalName;
+            this.patient_bp_value =
+              this.http_healthtrends.LatestVitalMeasure.Value;
+
+            this.vital_unit = this.http_healthtrends.LatestVitalMeasure.unit;
+            this.patient_bp_duration =
+              this.http_healthtrends.LatestVitalMeasure.Date;
+
+            if (that.http_healthtrends.Values.length > 0) {
+              that.lineChartLabels = that.convertDateforHealthTrends(
+                that.http_healthtrends.Time
+              );
+            }
+
+            // console.log(this.lineChartLabels);
+          } else {
+            this.patient_vital_name = this.billingInfo.PatientVital;
+            this.patient_bp_value = 'No Reading';
+          }
+
+          if (
+            this.http_healthtrends &&
+            that.http_healthtrends.Values.length > 0
+          ) {
+            var temp = [];
+            var j = 0;
+            for (var item of that.http_healthtrends.Values) {
+              var i = 0;
+              for (var x of item.data) {
+                if (j == 0) {
+                  try {
+                    if (
+                      x == null &&
+                      i > 0 &&
+                      i < item.data.length &&
+                      that.http_healthtrends.VitalName != 'Blood Glucose'
+                    ) {
+                      var linedt1 = this.lineChartLabels[i].split(' - ');
+                      var linedt0 = this.lineChartLabels[i - 1].split(' - ');
+                      var linedt2 = this.lineChartLabels[i + 1].split(' - ');
+                      if (
+                        linedt1[0] == linedt0[0] ||
+                        linedt1[0] == linedt2[0]
+                      ) {
+                        this.lineChartLabels.splice(i, 1);
+                        var k = 0;
+                        for (var tmpitem of that.http_healthtrends.Values) {
+                          that.http_healthtrends.Values[k].data.splice(i, 1);
+
+                          k = k + 1;
+                        }
+                      }
+                    }
+                    i = i + 1;
+                  } catch (ex) {
+                    console.log('exception' + ex);
+                  }
+                }
+              }
+              j = j + 1;
+              var obj = {
+                data: item.data,
+                label: item.label,
+                fill: false,
+                lineTension: 0.5,
+              };
+              temp.push(obj);
+            }
+            that.lineChartData = temp;
+
+            this.loading = false;
+          } else {
+            this.setEmptyGraph();
+            this.loading = false;
+          }
+        },
+        (err) => {
+          this.setEmptyGraph();
+        }
+      );
+  }
+  // setEmptyGraph() {
+  //   var date_val = new Date();
+  //   var x = [0, 1, 2, 3, 4, 5, 6];
+  //   var DefaultDates = [];
+  //   var date_val_set = '';
+  //   for (var item1 of x) {
+  //     date_val_set = this.convertDate(date_val.setDate(date_val.getDate()));
+  //     DefaultDates.push(date_val_set);
+  //     date_val_set = this.convertDate(date_val.setDate(date_val.getDate() - 1));
+  //   }
+
+  //   this.http_healthtrends = {
+  //     VitalName: '',
+  //     VitalId: 1,
+  //     Time: DefaultDates.reverse(),
+  //     Values: [{ data: [null, null, null, null, null, null, null], label: '' }],
+  //   };
+  //   if (this.http_healthtrends) {
+  //     this.lineChartLabels = this.convertDateforHealthTrends(
+  //       this.http_healthtrends.Time
+  //     );
+  //   }
+
+  //   var temp = [];
+  //   for (var item of this.http_healthtrends.Values) {
+  //     var obj = {
+  //       data: item.data,
+  //       label: item.label,
+  //       fill: false,
+  //       lineTension: 0.5,
+  //     };
+  //     temp.push(obj);
+  //   }
+  //   this.lineChartData = temp;
+  // }
+  setEmptyGraph() {
+    var date_val = new Date();
+    var x = [1, 2, 3, 4, 5, 6, 7];
+    var DefaultDates = [];
+    var date_val_set = '';
+    for (var item1 of x) {
+      date_val_set = this.convertDate(date_val.setDate(date_val.getDate()));
+      DefaultDates.push(date_val_set);
+      date_val_set = this.convertDate(date_val.setDate(date_val.getDate() - 1));
+    }
+
+    this.http_healthtrends = {
+      VitalName: 'No Data',
+      VitalId: 1,
+      Time: DefaultDates.reverse(), //["2022-07-28T00:00:00","2022-07-29T01:00:00","2022-08-01T10:00:00", "2022-08-01T00:00:00", "2022-08-02T02:00:00","2022-08-03T12:00:00","2022-08-04T00:00:00"],
+      Values: [
+        { data: [null, null, null, null, null, null, null], label: 'Vital' },
+      ],
+    };
+    this.lineChartLabels = this.convertDateforHealthTrends(
+      this.http_healthtrends.Time
+    );
+
+    var temp = [];
+    for (var item of this.http_healthtrends.Values) {
+      var obj = {
+        data: item.data,
+        label: item.label,
+        fill: false,
+        lineTension: 0.5,
+      };
+      temp.push(obj);
+    }
+    this.lineChartData = temp;
+  }
+  retArr: Array<string>;
+  convertDateforHealthTrends(dateArr: any) {
+    this.retArr = [];
+
+    for (let dateval of dateArr) {
+      var newdate;
+      if (this.http_healthtrends.Values[0].label != 'Vital') {
+        newdate = this.convertToLocalTime(dateval);
+      } else {
+        newdate = dateval;
+      }
+
+      if (newdate.includes('T')) {
+        var dt = newdate.split('T');
+      } else {
+        var dt = newdate.split(' ');
+      }
+
+      var dtSplit = dt[0].split('-');
+
+      var month = '';
+      switch (dtSplit[1]) {
+        case '01':
+          month = 'Jan';
+          break;
+        case '02':
+          month = 'Feb';
+          break;
+        case '03':
+          month = 'Mar';
+          break;
+        case '04':
+          month = 'Apr';
+          break;
+        case '05':
+          month = 'May';
+          break;
+        case '06':
+          month = 'Jun';
+          break;
+        case '07':
+          month = 'Jul';
+          break;
+        case '08':
+          month = 'Aug';
+          break;
+        case '09':
+          month = 'Sep';
+          break;
+        case '10':
+          month = 'Oct';
+          break;
+        case '11':
+          month = 'Nov';
+          break;
+        case '12':
+          month = 'Dec';
+          break;
+      }
+      var dat = month + '-' + dtSplit[2];
+
+      if (this.http_healthtrends.Values[0].label != 'Vital') {
+        var time = this.datepipe.transform(
+          this.convertToLocalTime(dateval),
+          'h:mm a'
+        );
+      } else {
+        var time = this.datepipe.transform(dateval, 'h:mm a');
+      }
+      dat = dat + ' - ' + time;
+      this.retArr.push(dat);
+    }
+
+    return this.retArr;
+  }
+  convertDate(dateval: any) {
+    let today = new Date(dateval);
+    let dd = today.getDate();
+    let dd2;
+    if (dd < 10) {
+      dd2 = '0' + dd;
+    } else {
+      dd2 = dd;
+    }
+    let mm = today.getMonth() + 1;
+    let mm2;
+    if (mm < 10) {
+      mm2 = '0' + mm;
+    } else {
+      mm2 = mm;
+    }
+    const yyyy = today.getFullYear();
+    dateval = yyyy + '-' + mm2 + '-' + dd2;
+    return dateval;
+  }
+  convertToLocalTime(stillUtc: any): string | any {
+    if (!stillUtc) {
+      return null;
+    }
+
+    if (stillUtc.includes('+')) {
+      stillUtc = stillUtc.split('+')[0];
+    }
+
+    stillUtc = stillUtc + 'Z'; // ensure UTC format
+    const local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    return local;
+  }
+
+  convertDateforPatientDOB(dateArr: any) {
+    var dt = dateArr.split('T');
+    var dtSplit = dt[0].split('-');
+    var month = '';
+    switch (dtSplit[1]) {
+      case '01':
+        month = 'Jan';
+        break;
+      case '02':
+        month = 'Feb';
+        break;
+      case '03':
+        month = 'Mar';
+        break;
+      case '04':
+        month = 'Apr';
+        break;
+      case '05':
+        month = 'May';
+        break;
+      case '06':
+        month = 'Jun';
+        break;
+      case '07':
+        month = 'Jul';
+        break;
+      case '08':
+        month = 'Aug';
+        break;
+      case '09':
+        month = 'Sep';
+        break;
+      case '10':
+        month = 'Oct';
+        break;
+      case '11':
+        month = 'Nov';
+        break;
+      case '12':
+        month = 'Dec';
+        break;
+    }
+    // console.log(dt[0])
+    const bdate = new Date(dt[0]);
+    const timeDiff = Math.abs(Date.now() - bdate.getTime());
+    var age = Math.floor(timeDiff / (1000 * 3600 * 24) / 365);
+    var dob =
+      month + ' ' + dtSplit[2] + ',' + dtSplit[0] + '(' + age + 'years)';
+    return dob;
+  }
+
+  notificationtime(date: any) {
+    let today = new Date();
+    let notification_date = this.convertToLocalTime(date);
+
+    let notification_date_sample: Date | null = null;
+    if (notification_date) {
+      notification_date_sample = new Date(notification_date);
+    }
+
+    let msgInfo: string = '';
+    if(notification_date_sample){
+      let diff_min = Math.round(
+        (today.getTime() - notification_date_sample.getTime()) / 60000
+      );
+    if (diff_min == 0) {
+      msgInfo = 'Few Seconds Ago';
+    } else if (diff_min < 60) {
+      msgInfo = diff_min + ' Min' + ' ' + 'Ago';
+    } else if (diff_min < 1440) {
+      var hr = Math.round(diff_min / 60);
+      msgInfo = hr + ' Hrs' + ' ' + 'Ago';
+    } else if (diff_min > 1440 && diff_min <= 10080) {
+      //2880
+
+      var day = this.datediff(notification_date_sample, today);
+
+      let dayofweek = notification_date_sample.getDay();
+      // if (day < ) {
+      //   msgInfo = day + ' ' + '-' + ' ' + 'Days' + ' ' + 'Ago';
+      // } else {
+      let dayval = '';
+      switch (dayofweek) {
+        case 0:
+          dayval = 'Sunday';
+          break;
+        case 1:
+          dayval = 'Monday';
+          break;
+        case 2:
+          dayval = 'Tuesday';
+          break;
+        case 3:
+          dayval = 'Wednesday';
+          break;
+        case 4:
+          dayval = 'Thursday';
+          break;
+        case 5:
+          dayval = 'Friday';
+          break;
+        case 6:
+          dayval = 'Saturday';
+          break;
+        // }
+      }
+      msgInfo = dayval;
+
+      // } else if (diff_min > 2880 && diff_min < 10080) {
+    } else if (diff_min > 10080 && diff_min < 20160) {
+      msgInfo = '1 Week Ago';
+    } else if (diff_min > 20161 && diff_min < 30240) {
+      msgInfo = '2 week Ago';
+    } else if (diff_min > 30241 && diff_min < 40320) {
+      msgInfo = '3 week Ago';
+    } else if (diff_min > 40321 && diff_min < 302400) {
+      var monthdiff = this.monthDiff(notification_date_sample, today);
+
+      msgInfo = monthdiff + ' ' + 'Months Ago';
+    }
+    // else if (diff_min > 86401 && diff_min < 172800) {
+
+    //   msgInfo = '2 month Ago';
+    // } else if (diff_min > 172801 && diff_min < 216000) {
+
+    //   msgInfo = '3 month Ago';
+    // } else if (diff_min > 216001 && diff_min < 259200) {
+
+    //   msgInfo = '4 month Ago';
+    // } else if (diff_min > 259201 && diff_min < 302400) {
+    //   msgInfo = '5 month Ago';
+    // } else if (diff_min > 302401 && diff_min < 345600) {
+    //   msgInfo = '6 month Ago';
+    // }
+    else {
+      if ((this.patient_bp_value = 'No Reading')) {
+        msgInfo = ' ';
+      } else {
+        msgInfo = 'more Than 5 months';
+      }
+    }
+  }
+
+    return msgInfo;
+  }
+
+  monthDiff(dateFrom: any, dateTo: any) {
+    return (
+      dateTo.getMonth() -
+      dateFrom.getMonth() +
+      12 * (dateTo.getFullYear() - dateFrom.getFullYear())
+    );
+  }
+
+  datediff(first: any, second: any) {
+    return Math.floor((second - first) / (1000 * 60 * 60 * 24));
+  }
+
+  task = [
+    {
+      alert: 'No data',
+      assigned: 'No data',
+      priority: 'No data',
+    },
+  ];
+  switchvariable: any;
+  tab_navigatetodolist() {
+    this.tab_addtodo = true;
+  }
+  navigatetodolist() {
+    this.switchvariable = 2;
+  }
+  meditation_table_id: any;
+  SelectedMedicalScheduleInterval: any;
+  SelectedMedicalScheduleTime: any;
+  SelectedUserData: any;
+  SelectUserId: any;
+  ScheduleMon = 0;
+  ScheduleTue = 0;
+  ScheduleWed = 0;
+  ScheduleThur = 0;
+  ScheduleFri = 0;
+  ScheduleSat = 0;
+  ScheduleSun = 0;
+  ScheduleSubMon = 0;
+  ScheduleSubTue = 0;
+  ScheduleSubWed = 0;
+  ScheduleSubThur = 0;
+  ScheduleSubFri = 0;
+  ScheduleSubSat = 0;
+  ScheduleSubSun = 0;
+  morningSchedule = 0;
+  eveningSchedule = 0;
+  aftNoonSchedule = 0;
+  nightSchedule = 0;
+  updateMedicationForm = new FormGroup({
+    updatemedicineName: new FormControl(null),
+    scheduleInterval: new FormControl(null, [Validators.required]),
+    scheduleTime: new FormControl(null, [Validators.required]),
+    scheduleMorning: new FormControl(null),
+    scheduleAfterNoon: new FormControl(null),
+    scheduleEvening: new FormControl(null),
+    scheduleNight: new FormControl(null),
+    medicationstartDate: new FormControl(null),
+    medicationendDate: new FormControl(null),
+    medicationcomment: new FormControl(null),
+  });
+  navigatetodo(data: any) {
+    this.switchvariable = 3;
+    this.meditation_table_id = data.Id;
+
+    var scheduleArray = data.MedicineSchedule.split(',');
+    this.SelectedMedicalScheduleInterval = scheduleArray[0];
+    this.SelectedMedicalScheduleTime = scheduleArray[1].trim();
+
+    this.updateMedicationForm.controls['updatemedicineName'].setValue(
+      data.Medicinename
+    );
+    this.updateMedicationForm.controls['scheduleInterval'].setValue(
+      data.SelectedMedicalScheduleInterval
+    );
+    this.updateMedicationForm.controls['scheduleTime'].setValue(
+      data.SelectedMedicalScheduleTime
+    );
+    this.updateMedicationForm.controls['scheduleMorning'].setValue(
+      data.Morning
+    );
+    this.updateMedicationForm.controls['scheduleAfterNoon'].setValue(
+      data.AfterNoon
+    );
+    this.updateMedicationForm.controls['scheduleEvening'].setValue(
+      data.Evening
+    );
+    this.updateMedicationForm.controls['scheduleNight'].setValue(data.Night);
+    this.updateMedicationForm.controls['medicationstartDate'].setValue(
+      this.convertToLocalTime(data.StartDate)
+    );
+    this.updateMedicationForm.controls['medicationendDate'].setValue(
+      this.convertToLocalTime(data.EndDate)
+    );
+
+    this.updateMedicationForm.controls['medicationcomment'].setValue(
+      data.Description
+    );
+
+    if (data.Morning == true) {
+      this.morningSchedule = 1;
+    } else {
+      this.morningSchedule = 0;
+    }
+    if (data.AfterNoon == true) {
+      this.aftNoonSchedule = 1;
+    } else {
+      this.aftNoonSchedule = 0;
+    }
+    if (data.Evening == true) {
+      this.eveningSchedule = 1;
+    } else {
+      this.eveningSchedule = 0;
+    }
+    if (data.Night == true) {
+      this.nightSchedule = 1;
+    } else {
+      this.nightSchedule = 0;
+    }
+  }
+  onClickMinimize() {
+    this.switchvariable = 1;
+  }
+  cancel() {
+    this.switchvariable = 1;
+  }
+  tab_minimizeScreen() {
+    this.tab_addtodo = false;
+  }
+  tab_cancel() {
+    this.tab_addtodo = false;
+  }
+  durationValue = 10;
+  increment_duration() {
+    if (this.durationValue < 10) {
+      this.durationValue++;
+    } else if (this.durationValue >= 10) {
+      this.durationValue++;
+    } else {
+      this.durationValue = 10;
+    }
+  }
+
+  decrement_duration() {
+    if (this.durationValue > 0) {
+      this.durationValue--;
+    } else {
+      this.durationValue = 0;
+    }
+  }
+  toogle: boolean = false;
+  minimize = {
+    height: '3rem',
+    position: 'fixed',
+    bottom: '0px',
+    overflow: 'hidden',
+  };
+  maximize = { height: '90vh' };
+  minimumstyle = {};
+  maximimumstyle = {};
+  minimizeValue = false;
+  minimizeScreen() {
+    //  this.toogle=!this.toogle;
+    //  this.minimizeValue = true;
+    this.switchvariable = 1;
+  }
+  maximizeScreen() {
+    this.toogle = !this.toogle;
+    this.minimizeValue = false;
+  }
+
+  addSchedule() {}
+  weekFrequency = [
+    {
+      id: 1,
+      weekPeriod: 'First Week',
+    },
+    {
+      id: 2,
+      weekPeriod: 'Second Week',
+    },
+    {
+      id: 3,
+      weekPeriod: 'Third Week',
+    },
+    {
+      id: 4,
+      weekPeriod: 'Fourth Week',
+    },
+    {
+      id: 5,
+      weekPeriod: 'Last Week',
+    },
+  ];
+}

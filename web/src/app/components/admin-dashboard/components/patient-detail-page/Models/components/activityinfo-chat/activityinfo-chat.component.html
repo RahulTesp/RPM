@@ -1,0 +1,147 @@
+<div class="activitychatInfo" >
+  <!-- ChatInfoTemplate  Table  Start-->
+
+    <div class="activitychatInfo_table">
+
+      <div>
+        <mat-table #table [dataSource]="dataSourceTable">
+
+
+          <ng-container matColumnDef="ContactName">
+            <mat-header-cell *matHeaderCellDef> Contact Name </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.ContactName }}</mat-cell
+            >
+          </ng-container>
+
+          <ng-container matColumnDef="LastMessage">
+            <mat-header-cell *matHeaderCellDef> LastMessage </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.LastMessage }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="Date">
+            <mat-header-cell *matHeaderCellDef> Date </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              <span >{{
+                datepipe.transform(element.DateTime, "MMM d, y")
+              }}</span>
+
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="Time">
+            <mat-header-cell *matHeaderCellDef> Time </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ datepipe.transform(element.DateTime, "h:mm a") }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="ConversationSid" >
+            <mat-header-cell class="hidden-column"  *matHeaderCellDef> ConversationSid </mat-header-cell>
+            <mat-cell class="hidden-column"  *matCellDef="let element">
+              {{ element.ConversationSid }}
+            </mat-cell>
+          </ng-container>
+          <div>
+            <ng-container matColumnDef="actions">
+              <mat-header-cell *matHeaderCellDef class="action-column"> </mat-header-cell>
+              <mat-cell class="action-column" *matCellDef="let element" let rowIndex="index;">
+                <div>
+                  <button
+                  class="iconbutton"
+                  id="pd_OpenSch"
+                  (click)="getMessagesByConversationSid(element.ConversationSid)">
+                  <img
+                    class="front_img"
+                    src="../../../../../../assets/04-Icons/Icons_Arrow - Front.svg"
+                  />
+                </button>
+                </div>
+              </mat-cell>
+            </ng-container>
+          </div>
+
+          <mat-header-row
+            *matHeaderRowDef="displaychatColumns"
+          ></mat-header-row>
+          <mat-row
+            class="table-row"
+            tabindex="1"
+            *matRowDef="let row; columns: displaychatColumns"
+          ></mat-row>
+        </mat-table>
+      </div>
+    </div>
+
+  <!-- ChatInfoTemplate  Table End-->
+  <!-- ChatInfoTemplate  side Chat Start-->
+          <div class="activity_chatInfo_panel"  *ngIf="showMessagePanel">
+           <div class="activity_chatInfo_data">
+            <div class="chat_panel_upper">
+              <p>Chats</p>
+              <img
+                class="chaticon"
+                src="../../../../../assets/04-Icons/Icons_Cancel A.svg"
+                (click)="closeChatPanel()"
+              />
+            </div>
+            <div
+            class="messanger-chat-row"
+            *ngFor="let message of dataSourceChatPaneldata&&dataSourceChatPaneldata.Messages; let i = index"
+          >
+            <div class="chat-date" >
+              <div class="beforeTime"></div>
+              <div class="timeblock">
+                {{  datepipe.transform(message.DateTime, "MMM d, y") }}
+              </div>
+              <div class="afterTime"></div>
+            </div>
+            <div>
+              <div
+                class="right-chat"
+                *ngIf="userName != message?.Author"
+              >
+                <div class="user-message-content">
+                  <div class="user-message-bg">
+                    <div class="incoming_msg">
+                      <div class="messge_right">
+                        <p>{{ message?.Message }}</p>
+                        <div class="message_time">
+                          {{ datepipe.transform(message.DateTime, "h:mm a") }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="left-chat"
+                *ngIf="userName == message?.author"
+              >
+                <div class="user-message-content">
+                  <div class="user-message-bg">
+                    <div class="outgoing_msg">
+                      <div
+                        class="messge_left">
+                        <p>
+                          {{ message?.Message }}
+                        </p>
+                        <div class="message_lower_panel">
+                          <div class="message_time">
+                            {{ datepipe.transform(message.DateTime, "h:mm a") }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+           </div>
+
+
+           </div>
+</div>

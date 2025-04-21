@@ -1,0 +1,120 @@
+// Side Button Common
+
+.btn_tool {
+
+
+  margin-top: 10px;
+  width: 50px;
+  height: 56px;
+  padding: 0px;
+  margin: 0px;
+  background-color: #8226DF;
+  border-radius: 16px 0px 0px 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.plus_icon
+{
+
+  filter: brightness(0) saturate(100%) invert(23%) sepia(90%) saturate(2467%) hue-rotate(260deg) brightness(84%) contrast(111%);
+}
+.plus_icon_container
+{
+  background-color: #ffffff;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+.spinner_overlay {
+
+  position: fixed;
+  right: 0;
+  top:100px;
+  width: 26%;
+  height: 100%;
+  background-color: #ffff;
+  opacity: .8;
+  z-index: 2000;
+}
+
+.example-overlay {
+  position: absolute;
+  right: 0;
+  top: 0px;
+  background-color: #590CA7;
+  align-items: center;
+
+  z-index: 2000;
+  border-radius: 16px 0px 0px 16px;
+
+}
+.btn_tool_close
+{
+  margin-top: 10px;
+  width: 50px;
+  height: 56px;
+  padding: 0px;
+  margin: 0px;
+  background-color: #8226DF;
+  border-radius: 16px 0px 0px 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+
+ul.example-overlay {
+  margin: 0 auto;
+  padding: 0;
+  z-index: 2000;
+
+
+}
+
+.example-overlay li {
+  cursor: pointer;
+  list-style: none;
+  margin-top: 2px;
+  color: #F2F2F2;
+  z-index: 2000;
+
+}
+
+.side_menu_item
+{
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) saturate(100%) invert(99%) sepia(1%) saturate(0%) hue-rotate(196deg) brightness(106%) contrast(101%)
+}
+.side_menu_item_container
+{
+  width: 40px;
+  height: 40px;
+  margin-bottom: 16px;
+  background-color: #8226DF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  position: relative;
+
+}
+::ng-deep .mat-tooltip {
+  /* your own custom styles here */
+  /* e.g. */
+  color: #ffffff;
+  background-color: #8226DF;
+  position: absolute;
+  top: -30px;
+  left: -58px;
+
+}
+
+@media only screen and (max-width: 1280px) {
+  .spinner_overlay {
+    width: 0%;
+
+  }
+}

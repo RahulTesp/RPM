@@ -1,0 +1,3404 @@
+<ng-container *ngIf="loading">
+  <div class="overlay"></div>
+  <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
+</ng-container>
+
+<div class="content">
+  <div class="content-panel">
+    <div
+      class="main-content"
+    >
+      <div class="upper_panel">
+        <div class="page_title">
+          <h3>Edit Patient</h3>
+        </div>
+        <div class="button-group">
+          <button
+            class="commonConfirmaddPatientBtn"
+            id="editbacktodetailpage"
+            (click)="backtodetailpage()"
+          >
+            DISCARD
+          </button>
+          <button
+            class="commonConfirmaddPatientBtn btn_confirm"
+            id="editOpenDialogpage"
+            (click)="openDialog(myDialog)"
+          >
+            CONFIRM
+          </button>
+        </div>
+      </div>
+      <div class="uppermenubtnpanel">
+        <div *ngFor="let item of menu; let i = index">
+          <button
+            type="submit"
+            id="editChangescreen"
+            class="uppermenubtn"
+            (click)="ChangeScreen(item.menu_id)"
+            [class.selected]="CurrentMenu == item.menu_id"
+          >
+            {{ item.menu_title }}
+          </button>
+        </div>
+      </div>
+      <ng-container
+        *ngIf="master_data && StatesAndCities"
+        [ngSwitch]="variable"
+      >
+        <ng-container *ngSwitchCase="1">
+          <ng-container *ngTemplateOutlet="patientpage"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="2">
+          <ng-container *ngTemplateOutlet="programpage"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+          <ng-container *ngTemplateOutlet="patientpage"></ng-container>
+        </ng-container>
+      </ng-container>
+    </div>
+    <div
+      class="side-panel"
+    >
+      <div class="edit_data_panel">
+        <ng-container [ngTemplateOutlet]="addeditpage"></ng-container>
+      </div>
+    </div>
+    <div
+      class="side-panel"
+
+    >
+      <div class="edit_data_panel">
+        <ng-container [ngTemplateOutlet]="addDocument"></ng-container>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #patientpage>
+    <div class="patientpage">
+        <div class="patient_panel_menu_panel">
+          <div class="patient_menu">
+            <div class="patient_menu_item">
+              <img
+                class="patientInfo_check_icon"
+                src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                alt=""
+              />
+              <p id="editPersonalDataScroll" (click)="scroll(personaldata)">
+                Personal Information
+              </p>
+            </div>
+            <div class="patient_menu_item">
+              <img
+                class="patientInfo_check_icon"
+                src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                alt=""
+              />
+              <p
+                id="editCommunicationDataScroll"
+                (click)="scroll(communicationdata)"
+              >
+                Communication Details
+              </p>
+            </div>
+            <div class="patient_menu_item">
+              <img
+                class="patientInfo_check_icon"
+                src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                alt=""
+              />
+              <p
+                id="editPatientPreferenceScroll "
+                (click)="scroll(patientpreferences)"
+              >
+                Patient Preferences
+              </p>
+            </div>
+          </div>
+
+      </div>
+      <div
+        class="patient_main_container"
+      >
+        <form
+          [formGroup]="PatientInfoForm"
+          id="editPersonalSubmit"
+          (ngSubmit)="onSubmit()"
+        >
+          <div #personaldata>
+            <div class="personal">
+              <p class="main_input_main_heading">Personal Information</p>
+            </div>
+            <div class="side_panel_content">
+              <div class="personal_information">
+                <div class="personal_info_data_container">
+                  <p>Profile Picture</p>
+                  <div
+                    class="uploadPhoto"
+                    [ngStyle]="{
+                      'background-image': 'url(' + Patientdata.PatientDetails.Picture + ')',
+                      'background-repeat': 'no-repeat',
+                      'background-size': '100% 100%'
+                    }"
+                  >
+                    <!-- <img class="icon_camera" src="../../../assets/04-Icons/Icons_Camera.svg" /> -->
+                    {{ profilePic }}
+                    <img
+                      id="editOpenImage"
+                      (click)="openImage()"
+                      class="icon_camera"
+                      src="../../../assets/04-Icons/Icons_Camera.svg"
+                    />
+                    <input
+                      id="image"
+                      type="file"
+                      style="display: none"
+                      (change)="handleImage($event)"
+                    />
+                  </div>
+                </div>
+                <!--end of column1-->
+                <div class="personal_info_data_container">
+                  <div class="userInfoItem">
+                    <p class="main_input_title">*First Name</p>
+                    <!-- <input [attr.disabled]="Patientdata.PatientProgramdetails.Status == 'Active' ? true : null" class="userInfovalue" placeholder="Enter First Name" required
+                                    formControlName="firstname"  maxlength="20" /> -->
+                    <input
+                      class="userInfovalue"
+                      placeholder="Enter First Name"
+                      required
+                      formControlName="firstname"
+                      id="editFirstName"
+                      maxlength="20"
+                    />
+                    <div class="warn">
+                      <ng-container
+                        *ngIf="
+                          PatientInfoForm.get('firstname')?.invalid &&
+                          PatientInfoForm.get('firstname')?.touched
+                        "
+                      >
+                        First Name is Required
+                      </ng-container>
+                    </div>
+                  </div>
+                  <div class="userInfoItem">
+                    <p class="main_input_title">Middle Name</p>
+                    <!-- <input [attr.disabled]="Patientdata.PatientProgramdetails.Status == 'Active' ? true : null" class="userInfovalue" placeholder="Enter Middle Name" notrequired
+                                    formControlName="middlename"  maxlength="20" /> -->
+                    <input
+                      class="userInfovalue"
+                      placeholder="Enter Middle Name"
+                      notrequired
+                      formControlName="middlename"
+                      id="editMiddleName"
+                      maxlength="20"
+                    />
+                  </div>
+                  <div class="userInfoItem">
+                    <p class="main_input_title">*Date of Birth</p>
+                    <input
+                      class="userInfovalue"
+                      required
+                      formControlName="dateofbirth"
+                      id="editDOB"
+                      type="date"
+                      min="1900-01-01"
+                      max="2022-01-01"
+                      (ngModelChange)="checkDateValidity($event)"
+                    />
+                    <div class="warn">
+                      <ng-container
+                        *ngIf="
+                          PatientInfoForm.get('dateofbirth')?.invalid &&
+                          PatientInfoForm.get('dateofbirth')?.touched
+                        "
+                      >
+                        Date of Birth Required
+                      </ng-container>
+                      <ng-container *ngIf="futureDateError">
+                        Please Enter valid Date
+                      </ng-container>
+                    </div>
+                  </div>
+                  <div class="userInfoItem">
+                    <p class="main_input_title">*Gender</p>
+                    <!-- <select [attr.disabled]="Patientdata.PatientProgramdetails.Status == 'Active' ? true : null" class="userInfovalue" placeholder="Select Gender" formControlName="gender"
+                                    required> -->
+                    <select
+                      class="userInfovalue"
+                      placeholder="Select Gender"
+                      formControlName="gender"
+                      id="editGender"
+                      required
+                    >
+                      <!-- <option value='undefined'>Gender</option> -->
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+
+                    <div class="warn">
+                      <ng-container
+                        *ngIf="
+                          PatientInfoForm.get('gender')?.invalid &&
+                          PatientInfoForm.get('gender')?.touched
+                        "
+                      >
+                        Gender is Required
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+                <!--end of column2-->
+                <div
+                  class="personal_info_data_container personal_information_sub_seperator_before"
+                >
+                  <div class="userInfoItem">
+                    <div class="dummy">
+                      <p class="main_input_title">*Last Name</p>
+                      <input
+                        [attr.disabled]="true"
+                        class="userInfovalue"
+                        placeholder="Enter Last Name"
+                        notrequired
+                      />
+                    </div>
+                  </div>
+                  <div class="userInfoItem">
+                    <p class="main_input_title">*Last Name</p>
+                    <!-- <input [attr.disabled]="Patientdata.PatientProgramdetails.Status == 'Active' ? true : null" class="userInfovalue" placeholder="Enter Last Name" required
+                                    formControlName="lastname" maxlength="20" /> -->
+
+                    <input
+                      class="userInfovalue"
+                      placeholder="Enter Last Name"
+                      required
+                      formControlName="lastname"
+                      id="editLastName"
+                      maxlength="20"
+                    />
+                    <small
+                      class="text-danger"
+                      *ngIf="
+                        PatientInfoForm.get('lastname')?.invalid &&
+                        PatientInfoForm.get('lastname')?.touched
+                      "
+                      >Last Name Required</small
+                    >
+                  </div>
+                  <div class="form-group">
+                    <div class="height_div userInfoItem">
+                      <p class="main_input_title">Height</p>
+                      <div class="height_division">
+                        <div class="duration_content_panel">
+                          <select
+                            class="userInfovalue height_subpanel"
+                            id="editHeight"
+                            [(ngModel)]="HeightFeetValue"
+                            [ngModelOptions]="{ standalone: true }"
+                          >
+                            <option
+                              *ngFor="
+                                let data of heightFeetArray;
+                                let i = index
+                              "
+                              [value]="data.id"
+                              [selected]="i == 0"
+                            >
+                              {{ data.data }}
+                            </option>
+                          </select>
+
+                          Feet
+                          <select
+                            class="userInfovalue height_subpanel"
+                            id="editFeet"
+                            [(ngModel)]="HeightInchValue"
+                            [ngModelOptions]="{ standalone: true }"
+                          >
+                            <option
+                              *ngFor="
+                                let data of heightInchArray;
+                                let i = index
+                              "
+                              [value]="data.id"
+                              [selected]="i == 0"
+                            >
+                              {{ data.data }}
+                            </option>
+                          </select>
+                        Inch
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="weight_div userInfoItem">
+                    <p class="main_input_title">weight</p>
+                    <div class="height_division">
+                      <div class="duration_content_panel">
+                        <div class="btn_common_cont">
+                          <img
+                            (click)="increment_weight()"
+                            class="btn-common"
+                            id="editIncreaseWeight"
+                            src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                          />
+                        </div>
+
+                        <!-- <span class="duration_value">{{ weightValue }}</span> -->
+                        <input
+                          class="duration_value"
+                          [(ngModel)]="weightValue"
+                          [ngModelOptions]="{ standalone: true }"
+                        />
+                        <div class="btn_common_cont">
+                          <img
+                            id="editDecreaseWeight"
+                            (click)="decrement_weight()"
+                            class="btn-common"
+                            src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                          />
+                        </div>
+                      </div>
+
+                      <div class="userInfoItem">
+                        <select
+                          class="userInfovalue"
+                          placeholder="Select Pounds"
+                          id="editPounds"
+                        >
+                          <option value="Pounds">Pounds</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="personal_information_sub_seperator"></div>
+                <div
+                  class="personal_info_data_container personal_info_data_container_last"
+                >
+                  <div class="userInfoItem">
+                    <p class="main_input_title">Email</p>
+                    <input
+                      class="userInfovalue"
+                      placeholder="Enter Email Id"
+                      formControlName="email"
+                      id="editEmail"
+                      maxlength="50"
+                    />
+
+                  </div>
+                  <div class="userInfoItem">
+                    <p class="main_input_title">*Mobile Number(Primary)</p>
+                    <input
+                      class="userInfovalue"
+                      placeholder="Enter Mobile Number"
+                      required
+                      formControlName="mobile"
+                      id="editMobile"
+                      maxlength="10"
+                    />
+
+                    <div class="warn">
+                      <ng-container
+                        *ngIf="
+                          PatientInfoForm.get('mobile')?.invalid &&
+                          PatientInfoForm.get('mobile')?.touched
+                        "
+                      >
+                        Mobile Number Required
+                      </ng-container>
+                    </div>
+                  </div>
+                  <div class="middle">
+                    <div class="userInfoItem">
+                      <p class="main_input_title">Alternate Number(Optional)</p>
+                      <input
+                        class="userInfovalue"
+                        placeholder=" Enter Alternate Number"
+                        notrequired
+                        formControlName="alternatenumber"
+                        id="editAlternateNumber"
+                        maxlength="10"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--end of personal information-->
+              <!-- start of second panel-->
+            </div>
+          </div>
+
+          <div #communicationdata class="personal">
+            <p class="main_input_main_heading">Communication Details</p>
+          </div>
+          <div class="communication_sub_panel">
+                <div class="communication_sub_panel1">
+                  <div class="userInfoItem">
+                    <p class="main_input_title">*Clinic Name</p>
+                    <input
+                      [attr.disabled]="true"
+                      class="userInfovalue"
+                      required
+                      formControlName="clinicname"
+                      id="editClinicName"
+                    />
+
+                  </div>
+                </div>
+
+
+                <div class="communication_sub_panel2">
+                  <div class="userInfoItem">
+                    <p class="main_input_title">Clinic Code</p>
+                    <input
+                      [attr.disabled]="true"
+                      class="userInfovalue"
+                      placeholder="Clinic Code"
+                      notrequired
+                      formControlName="cliniccode"
+                      id="editClinicCode"
+                    />
+                  </div>
+                </div>
+
+
+          </div>
+          <div class="side_panel_content1">
+            <div class="Communication_panel">
+              <div
+                class="Communication_panel_column1 personal_information_sub_seperator_before"
+              >
+                <div class="userInfoItem">
+                  <p class="main_input_title">*Address Line 1</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="Enter Address Line 1"
+                    formControlName="addressline1"
+                    required
+                    maxlength="50"
+                    id="editAddressLine1"
+                  />
+                  <div class="warn">
+                    <ng-container
+                      *ngIf="
+                        PatientInfoForm.get('addressline1')?.invalid &&
+                        PatientInfoForm.get('addressline1')?.touched
+                      "
+                    >
+                      Address is Required
+                    </ng-container>
+                  </div>
+                </div>
+                <div class="userInfoItem">
+                  <p class="main_input_title">Address Line 2</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="Enter Address Line 2"
+                    notrequired
+                    formControlName="addressline2"
+                    id="editAddressLine2"
+                    maxlength="50"
+                  />
+                </div>
+                <div class="Communication_sub_panel">
+                  <div class="Communication_sub_panel_column1">
+                    <div class="userInfoItem">
+                      <p class="main_input_title">*State</p>
+                      <select
+                        class="userInfovalue"
+                        placeholder="Select  State"
+                        formControlName="state"
+                        id="editState"
+                        notrequired
+                      >
+                        <option
+                          *ngFor="let s of StatesAndCities.States"
+                          [value]="s.StateId"
+                        >
+                          {{ s.StateName }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="Communication_sub_panel_column2">
+                    <div class="userInfoItem">
+                      <p class="main_input_title">*City</p>
+                      <select
+                        class="userInfovalue"
+                        placeholder="Select City"
+                        formControlName="city"
+                        id="editCity"
+                      >
+                        <option [ngValue]="null">Select</option>
+                        <option *ngFor="let c of cities" [value]="c.CityId">
+                          {{ c.CityName }}
+                        </option>
+                      </select>
+                      <div class="warn">
+                        <ng-container
+                          *ngIf="
+                            PatientInfoForm.get('city')?.invalid &&
+                            PatientInfoForm.get('city')?.touched
+                          "
+                        >
+                          City is Required
+                        </ng-container>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="Communication_sub_panel">
+                  <div class="Communication_sub_panel_column1">
+                    <div class="userInfoItem">
+                      <p class="main_input_title">*Zip Code</p>
+                      <input
+                        class="userInfovalue"
+                        placeholder="Enter Zip Code"
+                        formControlName="zipcode"
+                        id="editZipcode"
+                        maxlength="5"
+                        required
+                      />
+                      <div class="warn">
+                        <ng-container
+                          *ngIf="
+                            PatientInfoForm.get('zipcode')?.invalid &&
+                            PatientInfoForm.get('zipcode')?.touched
+                          "
+                        >
+                          ZipCode is Required
+                        </ng-container>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="Communication_sub_panel_column2">
+                    <div class="userInfoItem">
+                      <p class="main_input_title">*Time Zone</p>
+                      <select
+                        class="userInfovalue"
+                        placeholder="Select timezone"
+                        formControlName="timezone"
+                        id="editTimezone"
+                      >
+                        <option *ngFor="let obj of timezones" [value]="obj.Id">
+                          {{ obj.Name }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="personal_information_sub_seperator"></div>
+              <div class="Communication_panel_column2">
+                <div class="Communication_panel_column_sub">
+                  <div class="userInfoItem Communication_panel_column_sub_left">
+                    <p class="main_input_title">Emergency Contact 1</p>
+                    <input
+                      class="userInfovalue"
+                      placeholder="Enter Emergency Contact Name"
+                      notrequired
+                      formControlName="emergencycontact1"
+                      id="editEmergencyContact1"
+                      maxlength="20"
+                    />
+                  </div>
+                  <div class="Communication_panel_column_sub_item">
+                    <div class="userInfoItem">
+                      <p class="main_input_title">Relation</p>
+                      <select
+                        class="userInfovalue"
+                        placeholder="Select Relation"
+                        formControlName="relation1"
+                        id="editRelation1"
+                        notrequired
+                      >
+                        <option value="">None</option>
+                        <option value="Mother">Mother</option>
+                        <option value="Wife">Wife</option>
+                        <option value="Husband">Husband</option>
+                        <option value="Father">Father</option>
+                        <option value="Sister">Sister</option>
+                        <option value="Brother">Brother</option>
+                        <option value="Son">Son</option>
+                        <option value="Daughter">Daughter</option>
+                        <option value="Guardian">Guardian</option>
+                      </select>
+                    </div>
+                    <div class="userInfoItem">
+                      <p class="main_input_title">Mobile Number</p>
+                      <input
+                        class="userInfovalue"
+                        placeholder="Enter Mobile Number"
+                        maxlength="10"
+                        notrequired
+                        formControlName="relation1_mobile"
+                        id="editRelation1_mobile"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="Communication_panel_column_sub">
+                  <div class="userInfoItem Communication_panel_column_sub_left">
+                    <div class="userInfoItem">
+                      <p class="main_input_title">Emergency Contact 2</p>
+                      <input
+                        class="userInfovalue"
+                        placeholder="Enter Emergency Contact Name "
+                        notrequired
+                        formControlName="emergencycontact2"
+                        id="editEmergencyContact2"
+                      />
+                    </div>
+                  </div>
+                  <div class="Communication_panel_column_sub_item">
+                    <div class="userInfoItem">
+                      <p class="main_input_title">Relation</p>
+                      <select
+                        class="userInfovalue"
+                        placeholder="Select Relation"
+                        formControlName="relation2"
+                        id="editRelation2"
+                        notrequired
+                      >
+                        <option value="">None</option>
+                        <option value="Mother">Mother</option>
+                        <option value="Wife">Wife</option>
+                        <option value="Husband">Husband</option>
+                        <option value="Father">Father</option>
+                        <option value="Sister">Sister</option>
+                        <option value="Brother">Brother</option>
+                        <option value="Son">Son</option>
+                        <option value="Daughter">Daughter</option>
+                        <option value="Guardian">Guardian</option>
+                      </select>
+                    </div>
+                    <div class="userInfoItem">
+                      <p class="main_input_title">Mobile Number</p>
+                      <input
+                        class="userInfovalue"
+                        placeholder="Enter  Mobile Number"
+                        maxlength="10"
+                        formControlName="relation2_mobile"
+                        id="editRelation2_mobile"
+                        notrequired
+                      />
+                      <!-- <small class="text-danger"
+                                      *ngIf="PatientInfoForm.get('relation2_mobile')?.invalid && PatientInfoForm.get('relation2_mobile')?.touched">Mobile
+                                      Number
+                                      Required</small> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            #patientpreferences
+            class="personal"
+            class="preference_panelContent"
+          >
+            <div>
+              <p class="main_input_main_heading">Patient Preferences</p>
+            </div>
+              <div class="patient_prference_panel">
+
+                  <div class="patient_prference_panel_column1">
+                    <div class="preference_sub_panel">
+                      <div class="preference_sub_panel_column1">
+                        <div class="userInfoItem">
+                          <p class="main_input_title">Call Time</p>
+                          <input
+                            class="userInfovalue"
+                            maxlength="20"
+                            placeholder="Select Preffered Call Time"
+                            notrequired
+                            formControlName="calltime"
+                            id="editCallTime1"
+                          />
+                        </div>
+                      </div>
+                      <div class="preference_sub_panel_column2">
+                        <div class="userInfoItem">
+                          <p class="main_input_title">*Select Language</p>
+                          <select
+                            class="userInfovalue"
+                            placeholder="Select  language"
+                            formControlName="language"
+                            id="editLanguage"
+                            required
+                          >
+                            <option
+                              *ngFor="let data of languageList; let i = index"
+                              [value]="data"
+                            >
+                              {{ data }}
+                            </option>
+                          </select>
+                          <div class="warn">
+                            <ng-container
+                              *ngIf="
+                                PatientInfoForm.get('language')?.invalid &&
+                                PatientInfoForm.get('language')?.touched
+                              "
+                            >
+                              Please Select Language
+                            </ng-container>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="userInfoItem">
+                      <p class="main_input_title">Preference 2</p>
+                      <input
+                        class="userInfovalue"
+                        maxlength="50"
+                        placeholder="Add Preference 2"
+                        notrequired
+                        formControlName="preference2"
+                        id="editCallTime2"
+                      />
+                    </div>
+                    <div class="userInfoItem">
+                      <p class="main_input_title">Preference 3</p>
+                      <input
+                        class="userInfovalue"
+                        maxlength="50"
+                        placeholder="Add Preference 3"
+                        notrequired
+                        formControlName="preference3"
+                        id="editCallTime3"
+                      />
+                    </div>
+                    <div class="userInfoItem">
+                      <p class="main_input_title">Preference 4</p>
+                      <input
+                        class="userInfovalue"
+                        maxlength="50"
+                        placeholder="Add Preference 4"
+                        notrequired
+                        formControlName="preference4"
+                        id="editCallTime4"
+                      />
+                    </div>
+
+                </div>
+
+                  <div class="patient_prference_panel_column2">
+                    <p>Additional Notes</p>
+                    <textarea
+                      class="additionalnotes noteTextArea1"
+                      formControlName="additionalnotes"
+                      id="addPatientAdditionalNotes"
+                      maxlength="500"
+                    ></textarea>
+                  </div>
+            </div>
+
+
+          </div>
+        </form>
+      </div>
+    </div>
+    <!--end of left panel-->
+  </ng-template>
+  <ng-template #programpage>
+    <div class="programpage">
+
+        <div class="program_panel_menu_panel">
+          <div class="patient_menu">
+            <div class="patient_menu_item">
+              <img
+                class="patientInfo_check_icon"
+                src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                alt=""
+              />
+
+              <p (click)="scroll(personaldata)" id="editProgramDetailsScroll">
+                Program Details
+              </p>
+            </div>
+            <div
+              class="patient_menu_item"
+              *ngIf="
+                this.Patientdata &&
+                this.Patientdata.PatientProgramdetails.ProgramName != 'CCM' &&
+                this.Patientdata.PatientProgramdetails.ProgramName != 'PCM'
+              "
+            >
+              <img
+                class="patientInfo_check_icon"
+                src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                alt=""
+              />
+              <p (click)="scroll(devicedetails)" id="editDeviceDetailsScroll">
+                Device Details
+              </p>
+            </div>
+            <div
+              class="patient_menu_item"
+              *ngIf="
+                this.Patientdata &&
+                this.Patientdata.PatientProgramdetails.ProgramName != 'CCM' &&
+                this.Patientdata.PatientProgramdetails.ProgramName != 'PCM'
+              "
+            >
+              <img
+                class="patientInfo_check_icon"
+                src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                alt=""
+              />
+              <p
+                (click)="scroll(vitalScheduledata_)"
+                id="editVitalSchedulesScroll"
+              >
+                Vital Schedules
+              </p>
+            </div>
+
+            <div class="patient_menu_item">
+              <img
+                class="patientInfo_check_icon"
+                src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                alt=""
+              />
+
+              <p (click)="scroll(billingdetails)" id="editBillingDetailsScroll">
+                Billing & Insurance
+              </p>
+            </div>
+            <div class="patient_menu_item">
+              <img
+                class="patientInfo_check_icon"
+                src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                alt=""
+              />
+
+              <p (click)="scroll(documents)" id="editDocumentsScroll">
+                Documents
+              </p>
+            </div>
+          </div>
+      </div>
+      <div
+
+        class="program_main_container"
+      >
+        <div class="edit">
+          <div class="edit_patient_progress" [class.disabled]="ImageStatus">
+            <!-- <div class="edit_patient_progress"> -->
+            <div class="edit_patient_progress edit_patient_progress_outer">
+              <!-- <div
+              [class.disabled] = "onHold"
+              class="edit_patient_progress edit_patient_progress_outer"
+              [attr.disabled]="ActivePanelBar()"
+              [class.disabled]="ActivePanelBar()"
+            > -->
+              <div
+                class="measure_line"
+                id="editPatientStatusPrescribed"
+                (click)="ConfirmChangePatientStatus('Prescribed', 2)"
+              >
+                <img
+                  class="arrow-check"
+                  [class.visited]="isPrescribed == true"
+                  src="{{ prescribed_img }}"
+                />
+                <svg class="svg_setsize">
+                  <line
+                    x1="0"
+                    y1="10"
+                    x2="170"
+                    y2="10"
+                    stroke="#C1C7D5"
+                    stroke-width="8"
+                  />
+                </svg>
+                <p class="measure_label">Prescribed</p>
+              </div>
+              <div
+                class="measure_line"
+                id="editPatientStatusEnrolled"
+                (click)="ConfirmChangePatientStatus('Enrolled', 2)"
+              >
+                <img
+                  class="arrow-check"
+                  [class.visited]="isEnrolled == true"
+                  src="{{ enrolled_img }}"
+                />
+                <svg class="svg_setsize">
+                  <line
+                    x1="0"
+                    y1="10"
+                    x2="170"
+                    y2="10"
+                    stroke="#C1C7D5"
+                    stroke-width="8"
+                  />
+                </svg>
+                <p class="measure_label">Enrolled</p>
+              </div>
+              <div
+                class="measure_line"
+                id="editPatientStatusActive"
+                (click)="OnClickActive()"
+              >
+                <img
+                  class="arrow-check"
+                  [class.visited]="isActive == true"
+                  src="{{ active_img }}"
+                />
+                <svg class="svg_setsize">
+                  <line
+                    x1="0"
+                    y1="10"
+                    x2="170"
+                    y2="10"
+                    stroke="#C1C7D5"
+                    stroke-width="8"
+                  />
+                </svg>
+                <p class="measure_label">
+                  {{ getStatusValue() }}
+                </p>
+              </div>
+              <div
+                class="measure_line"
+                id="editPatientStatusReadyToDischarge"
+                (click)="ConfirmChangePatientStatus('ReadyToDischarge', 2)"
+              >
+                <img
+                  class="arrow-check"
+                  [class.visited]="isReadyToDischarge == true"
+                  src="{{ readytodischarge_img }}"
+                />
+                <svg class="svg_setsize">
+                  <line
+                    x1="0"
+                    y1="10"
+                    x2="0"
+                    y2="10"
+                    stroke="#C1C7D5"
+                    stroke-width="8"
+                  />
+                </svg>
+
+                <p class="measure_label ready_to_discharge">
+                  Ready To Discharge
+                </p>
+              </div>
+              <div
+                *ngIf="
+                  Patientdata.PatientProgramdetails.Status == 'ReadyToDischarge'
+                "
+                class="measure_line"
+                id="editPatientStatusDischarged"
+                (click)="ConfirmChangePatientStatus('ReActive', 2)"
+              >
+                <img
+                  class="arrow-check"
+                  [class.visited]="isReActive == true"
+                  src="{{ isReActive_img }}"
+                />
+                <svg class="svg_setsize"></svg>
+                <p class="measure_label">Reactivate</p>
+              </div>
+            </div>
+          </div>
+          <!-- Re- Active New status Introduced -->
+          <div class="edit_patient2" style="margin-right: 0.8rem">
+            <div class="onhold_panel" [class.disabled]="ImageStatus">
+              <div
+                class="measure_onholdline"
+                id="editPatientStatusInActive"
+                (click)="ConfirmChangePatientStatus('Discharged', 2)"
+              >
+                <img
+                  class="arrow-onholdcheck"
+                  src="{{ discharged_img }}"
+                  style="background-color: #ffffff"
+                />
+                <p class="measureonhold_label" style="color: #c1c7d5">
+                  Discharge
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="edit_patient2">
+            <div class="onhold_panel">
+              <div
+                class="measure_onholdline"
+                id="editPatientStatusInActive"
+                [class.disabled]="setDisableInActivePanel()"
+                (click)="ConfirmChangePatientStatus('InActive', 2)"
+              >
+                <img
+                  class="arrow-onholdcheck"
+                  src="{{ inactive_img }}"
+                  style="background-color: #ffffff"
+                />
+                <p class="measureonhold_label" style="color: #c1c7d5">
+                  InActive
+                </p>
+              </div>
+            </div>
+          </div> -->
+          <div class="edit_patient2">
+            <div class="onhold_panel" [class.disabled]="ImageStatus">
+              <div
+                class="measure_onholdline"
+                id="editPatientStatusOnHold"
+                (click)="ConfirmChangePatientStatus('OnHold', 2)"
+              >
+                <img
+                  class="arrow-onholdcheck"
+                  src="{{ onhold_img }}"
+                  style="background-color: #ffffff"
+                />
+                <p class="measureonhold_label" style="color: #c1c7d5">
+                  On Hold
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form [formGroup]="programForm">
+
+          <div #personaldata class="program_details_main_panel">
+            <div class="program_subpanel1">
+              <div class="personal program_detail_panel">
+                <p class="main_input_main_heading">Program Details</p>
+              </div>
+              <div class="flex-program-details">
+                <div class="program_left_panel">
+                  <div class="start_date">
+                    <div class="userInfoItem">
+                      <p class="main_input_title">*Program Name</p>
+                      <select
+                        class="userInfovalue"
+                        id="editProgramName"
+                        placeholder="Select Program Name"
+                        formControlName="programname"
+                        [attr.disabled]="true"
+                        required
+                      >
+                        <option
+                          *ngFor="
+                            let pgm of master_data.ProgramDetailsMasterData
+                          "
+                          [value]="pgm.ProgramId"
+                        >
+                          {{ pgm.ProgramName }}
+                        </option>
+                      </select>
+
+                      <div class="warn">
+                        <ng-container
+                          *ngIf="
+                            programForm.get('programname')?.invalid &&
+                            programForm.get('programname')?.touched
+                          "
+                        >
+                          Program Name is Required
+                        </ng-container>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="start_date">
+                    <div class="userInfoItem">
+                      <p class="main_input_title">*Start Date</p>
+                      <input
+                        class="userInfovalue"
+                        placeholder="startdate"
+                        required
+                        formControlName="startdate"
+                        id="editStartDate"
+                        type="date"
+                      />
+                      <!-- [attr.disabled]="Patientdata.PatientProgramdetails.Status == 'Active'
+                                                  || Patientdata.PatientProgramdetails.Status == 'OnHold'
+                                                  || Patientdata.PatientProgramdetails.Status == 'ReadyToDischarge'
+                                                  || Patientdata.PatientProgramdetails.Status == 'Discharged' ? true : null" -->
+
+                      <div class="warn">
+                        <ng-container
+                          *ngIf="
+                            programForm.get('startdate')?.invalid &&
+                            programForm.get('startdate')?.touched
+                          "
+                        >
+                          start date is Required
+                        </ng-container>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="vital_sub_Box">
+                    <div class="userInfoItem">
+                      <p class="main_input_title">
+                        *Vitals/Condition Monitored
+                      </p>
+                      <!-- <div *ngFor="let v of vital_selected">
+                                              <div class="userInfovalue ">{{v.VitalName}}</div>
+                                          </div> -->
+
+                      <mat-select
+                        [(value)]="vitalList"
+                        (selectionChange)="vitalListChange()"
+                        name="vitalList"
+                        id="editVitalList"
+                        multiple
+                        class="common_input_dropdown"
+                      >
+                        <mat-option
+                          *ngFor="let v of vital_selected"
+                          [value]="v.VitalId"
+                        >
+                          {{ v.VitalName }}
+                        </mat-option>
+                      </mat-select>
+                    </div>
+                  </div>
+                </div>
+                <div class="program_right_panel">
+                  <div class="userInfoItem">
+                    <div class="duration_div_">
+                      <p class="main_input_title">Duration</p>
+                      <div class="program_duration_content_panel">
+                        <div class="duration_content_panel">
+                          <div class="btn_common_cont">
+                            <img
+                              (click)="increment_duration()"
+                              id="editIncreaseDuration"
+                              style="position: relative; z-index: 100"
+                              class="btn-common"
+                              src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                            />
+                          </div>
+
+                          <span class="duration_value">
+                            {{ durationValue }}</span
+                          >
+                          <div class="btn_common_cont">
+                            <img
+                              (click)="decrement_duration()"
+                              id="editDecreaseDuration"
+                              class="btn-common"
+                              src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                            />
+                          </div>
+                        </div>
+                        <span class="months_duration"> Months </span>
+                      </div>
+                      <div class="warn">
+                        <ng-container *ngIf="durationValue < 0">
+                          InValid Duration Value
+                        </ng-container>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="userInfoItem">
+                    <p class="main_input_title">End Date</p>
+                    <input
+                      class="userInfovalue"
+                      placeholder="End date"
+                      required
+                      formControlName="enddate"
+                      id="editEndDate"
+                      type="date"
+                    />
+                  </div>
+
+                  <!-- <div class="userInfoItem">
+                                              <p class="main_input_title"> *Target/Month</p>
+                                              <input class="userInfovalue" placeholder="16 days" required
+                                                  formControlName="target" />
+                                              <small class="text-danger"
+                                                  *ngIf="programForm.get('target')?.invalid && programForm.get('target')?.touched">End date
+                                                  are
+                                                  Required</small>
+                                          </div> -->
+                </div>
+
+                <div
+                  *ngIf="Patientdata.PatientProgramdetails.Status != 'Active'"
+                >
+                  <img
+                    id="editprogramNameEditPanel"
+                    *ngIf="
+                      DeviceNotAvaliable &&
+                      Patientdata.PatientProgramdetails.Status != 'Active' &&
+                      Patientdata.PatientProgramdetails.Status !=
+                        'ReadyToDischarge' &&
+                      Patientdata.PatientProgramdetails.Status != 'OnHold' &&
+                      Patientdata.PatientProgramdetails.Status !=
+                        'Discharged' &&
+                      Patientdata.PatientProgramdetails.Status != 'InActive'
+                    "
+                    (click)="programNameEditPanel()"
+                    class="edit-icon"
+                    src="../../../../../assets/04-Icons/Icons_Edit.svg"
+                  />
+                </div>
+              </div>
+              <div class="goal-details">
+                <div
+                  class="goals_note_container"
+                  *ngFor="let goal of Goals_Selected; let i = index"
+                >
+                  <form class="goal_list" [name]="i">
+                    <div>
+                      <div class="note_dropdown">
+                        <div class="userInfoItem" style="width: 48%">
+                          <p class="main_input_title">Goals</p>
+                          <input
+                            class="userInfovalue"
+                            [(ngModel)]="goal.Goal"
+                            [ngModelOptions]="{ standalone: true }"
+                            [disabled]="true"
+                          />
+                        </div>
+                        <br />
+                      </div>
+                      <!-- <mat-form-field class="noteTextArea">
+                        <textarea
+                          class="goal_description"
+                          id="editGoalDescription"
+                          matInput
+                          cdkTextareaAutosize
+                          cdkAutosizeMinRows="1"
+                          cdkAutosizeMaxRows="5"
+                          [(ngModel)]="goal.Description"
+                          [ngModelOptions]="{ standalone: true }"
+                        ></textarea>
+                      </mat-form-field> -->
+                      <textarea
+                        class="goal_description noteTextArea"
+                        formControlName="additionalnotes"
+                        id="addPatientAdditionalNotes"
+                        [(ngModel)]="goal.Description"
+                        maxlength="500"
+                      ></textarea>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div class="program_subpanel2">
+              <div class="personal">
+                <p class="main_input_main_heading">Program Timeline</p>
+                <!-- <img class="add_icon1" src="../../../../../assets/04-Icons/Icons_Add A.svg" /> -->
+              </div>
+              <div class="program-timeline_subpanel">
+                <div
+                  class="program_column1 program_column1_sub_left"
+                >
+                  <div class="userInfoItem">
+                    <p class="main_input_title">*Assigned Member</p>
+                    <select
+                      class="userInfovalue"
+                      formControlName="assignedMember"
+                      id="editAssignedMember"
+                      required
+                    >
+                      <option
+                        *ngFor="let ctm of careTeamMembers"
+                        [value]="ctm.UserId"
+                      >
+                        {{ ctm.CareTeamMemberName }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div
+                  class="program_column1"
+                ></div>
+              </div>
+              <!-- <p> Program Time Line</p> -->
+              <div class="program-timeline">
+                <div>
+                  <!-- First Segment  -->
+                  <div class="program_timeline_data">
+                    <div class="userInfoItem program_timeline_data_left">
+                      <p class="main_input_title">*Program Stage</p>
+                      <select
+                        class="userInfovalue"
+                        formControlName="patientstatus"
+                        id="editPateintStatus"
+                        required
+                      >
+                        <option value="Prescribed" selected>Prescribed</option>
+                      </select>
+                      <div class="warn">
+                        <ng-container
+                          *ngIf="
+                            programForm.get('patientstatus')?.invalid &&
+                            programForm.get('patientstatus')?.touched
+                          "
+                        >
+                          Patientstage is required
+                        </ng-container>
+                      </div>
+                    </div>
+
+                    <div class="userInfoItem">
+                      <p class="main_input_title">Date</p>
+                      <input
+                        [attr.disabled]="
+                          Patientdata.PatientProgramdetails.Status ==
+                            'Active' ||
+                          Patientdata.PatientProgramdetails.Status ==
+                            'OnHold' ||
+                          Patientdata.PatientProgramdetails.Status ==
+                            'ReadyToDischarge' ||
+                          Patientdata.PatientProgramdetails.Status ==
+                            'Discharged'
+                            ? true
+                            : null
+                        "
+                        class="userInfovalue"
+                        formControlName="PrescribedDate"
+                        id="editPrescribedDate"
+                        placeholder="Auto Populated"
+                        type="date"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <!-- Second Segment  -->
+                  <div class="program_timeline_data">
+                    <div class="userInfoItem program_timeline_data_left">
+                      <p class="main_input_title">Physician</p>
+                      <select
+                        class="userInfovalue"
+                        placeholder="Select physician"
+                        formControlName="physician"
+                        id="editPhysician"
+                      >
+                        <!-- <option *ngFor="let phy of master_data.PhysicianDetails" [value]="phy.UserId"> -->
+                        <option
+                          *ngFor="let phy of physicianList"
+                          [value]="phy.UserId"
+                        >
+                          {{ phy.PhysicianName }}
+                        </option>
+                      </select>
+                      <!-- <small class="text-danger"  *ngIf="programForm.get('physician')?.invalid && programForm.get('physician')?.touched">Physicianis required</small> -->
+                    </div>
+
+                    <div class="userInfoItem">
+                      <p class="main_input_title">Order Date</p>
+                      <input
+                        class="userInfovalue"
+                        placeholder="Order Date"
+                        formControlName="consultdate"
+                        type="date"
+                        id="editOrderDate"
+                        (ngModelChange)="checkDateValidity($event)"
+                      />
+                      <small
+                        class="text-danger"
+                        *ngIf="
+                          programForm.get('consultdate')?.invalid &&
+                          programForm.get('consultdate')?.touched
+                        "
+                        >consultdate is Required</small
+                      >
+                      <div class="warn">
+                        <ng-container *ngIf="futureDateError">
+                          Please Enter valid Date
+                        </ng-container>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Third Segment  -->
+                  <div class="program_timeline_data">
+                    <div class="userInfoItem program_timeline_data_left">
+                      <p class="main_input_title">Clinic</p>
+                      <input
+                        [attr.disabled]="true"
+                        class="userInfovalue"
+                        placeholder="Clinic"
+                        required
+                        formControlName="clinic"
+                        id="editClinic"
+                      />
+                      <small
+                        class="text-danger"
+                        *ngIf="
+                          programForm.get('clinic')?.invalid &&
+                          programForm.get('clinic')?.touched
+                        "
+                        >Clinic Required</small
+                      >
+                    </div>
+                    <div class="userInfoItem">
+                      <p class="main_input_title">Clinic Code</p>
+                      <input
+                        [attr.disabled]="true"
+                        class="userInfovalue"
+                        placeholder="Clinic Code"
+                        required
+                        formControlName="cliniccode"
+                        id="editClinicCode"
+                      />
+                    </div>
+                  </div>
+                  <!-- Fourth Segment  -->
+
+                  <!-- <div class="diagosis_panel">
+                      <div
+                        *ngFor="let Diagnosis of Diagnosis_List; let i = index"
+                      >
+                        <form [name]="i">
+                          <div class="program_timeline_data">
+                            <div class="userInfoItem program_timeline_data_left">
+                              <p class="main_input_title">*Diagnosis</p>
+
+                              <select
+                                class="userInfovalue diagnosis_title"
+                                id="editDiagnosis"
+                                title="{{ Diagnosis.DiagnosisName }}"
+                                [(ngModel)]="Diagnosis.DiagnosisName"
+                                [ngModelOptions]="{ standalone: true }"
+                                (ngModelChange)="diagnosisChanged($event, i)"
+                              >
+                                <option
+                                  title="{{ Diag_name.DiagnosisName }}"
+                                  *ngFor="let Diag_name of Diagnosis_Name"
+                                  [value]="Diag_name.DiagnosisName"
+                                >
+                                  {{ Diag_name.DiagnosisName }}
+                                </option>
+                              </select>
+
+                              <small
+                                class="text-danger"
+                                *ngIf="
+                                  programForm.get('diagnosis')?.invalid &&
+                                  programForm.get('diagnosis')?.touched
+                                "
+                                >Diagnosis name is required
+                              </small>
+                            </div>
+
+                            <div class="userInfoItem">
+                              <p class="main_input_title">*Code</p>
+                              <div class="code">
+                                <div class="code_data">
+                                  <input
+                                    class="userInfovalue"
+                                    [(ngModel)]="Diagnosis.DiagnosisCode"
+                                    [ngModelOptions]="{ standalone: true }"
+                                    required
+                                    [disabled]="true"
+                                  />
+                                </div>
+
+                                <div *ngIf="i == 0">
+                                  <div class="icon_panel">
+                                    <img
+                                      class="add_icon4"
+                                      src="../../../../../assets/04-Icons/Icons_Add.svg"
+                                      id="editaddNewDiaganostics"
+                                      (click)="addNewDiaganostics()"
+                                    />
+                                    <div class="remove_icon">
+                                      <img
+                                        class="add_icon4"
+                                        src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                                        id="editremoveDiaganostics"
+                                        (click)="removeDiaganostics_Patient()"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <small
+                                class="text-danger"
+                                *ngIf="
+                                  programForm.get('code')?.invalid &&
+                                  programForm.get('code')?.touched
+                                "
+                                >code is Required</small
+                              >
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div> -->
+
+                  <div class="diagosis_panel">
+                    <div
+                      *ngFor="let Diagnosis of Diagnosis_List; let i = index"
+                    >
+                      <form>
+                        <div class="program_timeline_data">
+                          <div class="userInfoItem program_timeline_data_left">
+                            <p class="main_input_title">*Diagnosis</p>
+                            <ng-autocomplete
+                              id="editpatientReport"
+                              [initialValue]="Diagnosis.DiagnosisName"
+                              [searchKeyword]="keywordDignostics"
+                              [data]="Diagnosis_Name"
+                              placeholder="Select Diagnosis"
+                              (selected)="diagnosisChanged($event, i)"
+                              (inputCleared)="cleared($event, i)"
+                              [itemTemplate]="itemTemplate"
+                              [notFoundTemplate]="notFoundTemplate"
+                            >
+                              >
+                            </ng-autocomplete>
+                            <ng-template #itemTemplate let-item>
+                              <a [innerHTML]="item.DiagnosisField"></a>
+                            </ng-template>
+                            <ng-template #notFoundTemplate let-notFound>
+                              <div [innerHTML]="notFound"></div>
+                            </ng-template>
+
+                            <small
+                              class="text-danger"
+                              *ngIf="
+                                programForm.get('diagnosis')?.invalid &&
+                                programForm.get('diagnosis')?.touched
+                              "
+                              >Diagnosis name is required
+                            </small>
+                          </div>
+
+                          <div class="userInfoItem">
+                            <p class="main_input_title">*Code</p>
+                            <div class="code">
+                              <div class="code_data">
+                                <input
+                                  class="userInfovalue"
+                                  id="editPatientDiagnosisCode"
+                                  [(ngModel)]="Diagnosis.DiagnosisCode"
+                                  [ngModelOptions]="{ standalone: true }"
+                                  required
+                                  [disabled]="true"
+                                />
+                              </div>
+
+                              <div *ngIf="i == 0">
+                                <div class="icon_panel">
+                                  <img
+                                    class="add_icon4"
+                                    src="../../../../../assets/04-Icons/Icons_Add.svg"
+                                    id="editaddNewDiaganostics"
+                                    (click)="addNewDiaganostics()"
+                                  />
+                                  <div class="remove_icon">
+                                    <img
+                                      class="add_icon4"
+                                      src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                                      id="editremoveDiaganostics"
+                                      (click)="removeDiaganostics_Patient()"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <small
+                              class="text-danger"
+                              *ngIf="
+                                programForm.get('code')?.invalid &&
+                                programForm.get('code')?.touched
+                              "
+                              >code is Required</small
+                            >
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="program_timeline_container">
+                <div
+                  *ngIf="
+                    EnrolmentDetails.Status != null &&
+                    EnrolmentDetails.Status == 'Enrolled'
+                  "
+                  class="extend_program-timeline"
+                >
+<div class="program_column1">
+                      <div class="userInfoItem">
+                        <p class="main_input_title">*Patient Stage</p>
+
+                        <select class="userInfovalue" required>
+                          <option value="Enrolled" selected>Enrolled</option>
+                        </select>
+                      </div>
+
+                      <div class="userInfoItem">
+                        <p class="main_input_title">Enroll Personal</p>
+                        <ng-container
+                          *ngFor="
+                            let member of EnrolmentDetails.patientEnrolledInfos
+                          "
+                        >
+                          <p class="userInfovalue">
+                            {{ member.EnrollmentPersonal }}
+                          </p>
+                        </ng-container>
+                      </div>
+                    </div>
+                    <div class="program_column2">
+                      <!-- <div class="userInfoItem">
+                                          <p class="main_input_title"> Date</p>
+                                          <p class="userInfovalue" >{{convertDateMMDD(EnrolmentDetails.AssignedDate)}}</p>
+
+                                      </div> -->
+                      <div class="userInfoItem">
+                        <p class="main_input_title">Date</p>
+                        <input
+                          [attr.disabled]="
+                            Patientdata.PatientProgramdetails.Status ==
+                              'Active' ||
+                            Patientdata.PatientProgramdetails.Status ==
+                              'OnHold' ||
+                            Patientdata.PatientProgramdetails.Status ==
+                              'ReadyToDischarge' ||
+                            Patientdata.PatientProgramdetails.Status ==
+                              'Discharged'
+                              ? true
+                              : null
+                          "
+                          class="userInfovalue"
+                          formControlName="EntrolledDate"
+                          id="editEnrolledDate"
+                          placeholder="Auto Populated"
+                          type="date"
+                          required
+                        />
+                      </div>
+
+                  </div>
+                </div>
+
+                <div
+                  *ngIf="ActiveDetails.Status == 'Active'"
+                  class="extend_program-timeline"
+                >
+                  <div class="program_column1">
+                      <div class="userInfoItem">
+                        <p class="main_input_title">*Patient Stage</p>
+
+                        <select class="userInfovalue" required>
+                          <option value="Active" selected>Active</option>
+                        </select>
+                      </div>
+
+                      <div class="userInfoItem">
+                        <p class="main_input_title">Care Team Member</p>
+                        <p class="userInfovalue">
+                          {{ ActiveDetails.AssigneeName }}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="program_column2">
+                      <div class="userInfoItem">
+                        <p class="main_input_title">Date</p>
+                        <p class="userInfovalue">
+                          {{
+                            convertDateMMDD(
+                              this.convertToLocalTime(
+                                ActiveDetails.AssignedDate
+                              )
+                            )
+                          }}
+                        </p>
+                      </div>
+                    </div>
+
+                </div>
+                <div
+                  *ngIf="ReadyToDischarge.Status == 'ReadyToDischarge'"
+                  class="extend_program-timeline"
+                >
+                <div class="program_column1">
+                      <div class="userInfoItem">
+                        <p class="main_input_title">*Patient Stage</p>
+
+                        <select class="userInfovalue" required>
+                          <option value="ReadyToDischarge" selected>
+                            ReadyToDischarge
+                          </option>
+                        </select>
+                      </div>
+
+                      <div class="userInfoItem">
+                        <p class="main_input_title">Care Team Member</p>
+                        <p class="userInfovalue">
+                          {{ ReadyToDischarge.AssigneeName }}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="program_column2">
+                      <div class="userInfoItem">
+                        <p class="main_input_title">Date</p>
+                        <p class="userInfovalue">
+                          {{
+                            convertDateMMDD(
+                              this.convertToLocalTime(
+                                ReadyToDischarge.AssignedDate
+                              )
+                            )
+                          }}
+                        </p>
+                      </div>
+                    </div>
+
+                </div>
+                <div
+                  *ngIf="Discharged.Status == 'Discharged'"
+                  class="extend_program-timeline"
+                >
+                    <div class="program_column1">
+                      <div class="userInfoItem">
+                        <p class="main_input_title">*Patient Stage</p>
+
+                        <select class="userInfovalue" required>
+                          <option value="ReadyToDischarge" selected>
+                            Discharged
+                          </option>
+                        </select>
+                      </div>
+
+                      <div class="userInfoItem">
+                        <p class="main_input_title">Care Team Member</p>
+                        <p class="userInfovalue">
+                          {{ Discharged.AssigneeName }}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="program_column2">
+                      <div class="userInfoItem">
+                        <p class="main_input_title">Date</p>
+                        <p class="userInfovalue">
+                          {{ convertDateMMDD(Discharged.AssignedDate) }}
+                        </p>
+                      </div>
+                    </div>
+
+                </div>
+                <div
+                  *ngIf="OnHold && OnHold.Status == 'OnHold'"
+                  class="extend_program-timeline"
+                >
+                  <div class="program_column1">
+                      <div class="userInfoItem">
+                        <p class="main_input_title">*Patient Stage</p>
+
+                        <select class="userInfovalue" required>
+                          <option value="ReadyToDischarge" selected>
+                            Onhold
+                          </option>
+                        </select>
+                      </div>
+
+                      <div class="userInfoItem">
+                        <p class="main_input_title">Care Team Member</p>
+                        <p class="userInfovalue">{{ OnHold.AssigneeName }}</p>
+                      </div>
+                    </div>
+                    <div class="program_column2">
+                      <div class="userInfoItem">
+                        <p class="main_input_title">Date</p>
+                        <p class="userInfovalue">
+                          {{
+                            convertDateMMDD(
+                              this.convertToLocalTime(OnHold.AssignedDate)
+                            )
+                          }}
+                        </p>
+                      </div>
+
+                  </div>
+                </div>
+                <div
+                  *ngIf="InActive && InActive.Status == 'InActive'"
+                  class="extend_program-timeline"
+                >
+                    <div class="program_column1">
+                      <div class="userInfoItem">
+                        <p class="main_input_title">*Patient Stage</p>
+
+                        <select class="userInfovalue" required>
+                          <option value="InActive" selected>InActive</option>
+                        </select>
+                      </div>
+
+                      <div class="userInfoItem">
+                        <p class="main_input_title">Care Team Member</p>
+                        <p class="userInfovalue">{{ InActive.AssigneeName }}</p>
+                      </div>
+                    </div>
+                    <div class="program_column2">
+                      <div class="userInfoItem">
+                        <p class="main_input_title">Date</p>
+                        <p class="userInfovalue">
+                          {{
+                            convertDateMMDD(
+                              this.convertToLocalTime(InActive.AssignedDate)
+                            )
+                          }}
+                        </p>
+                      </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <!--edit patient page-->
+        <div class="device_Vital_panel">
+          <div #devicedetails>
+            <div class="device-detail-panel">
+              <div
+                *ngIf="
+                  this.Patientdata &&
+                  this.Patientdata.PatientProgramdetails.ProgramName != 'CCM' &&
+                  this.Patientdata.PatientProgramdetails.ProgramName != 'PCM'
+                "
+              >
+                <div class="device">
+                  <p
+                    *ngIf="
+                      this.Patientdata &&
+                      this.Patientdata.PatientProgramdetails.ProgramName !=
+                        'CCM' &&
+                      this.Patientdata.PatientProgramdetails.ProgramName !=
+                        'PCM'
+                    "
+                    class="main_input_main_heading"
+                  >
+                    Device Details
+                  </p>
+                  <img
+                    *ngIf="
+                      this.Patientdata &&
+                      this.Patientdata.PatientProgramdetails.ProgramName !=
+                        'CCM' &&
+                      this.Patientdata.PatientProgramdetails.ProgramName !=
+                        'PCM' &&
+                      DeviceNotAvaliable
+                    "
+                    id="editAddNewDevice"
+                    class="add_icon1"
+                    src="../../../../../assets/04-Icons/Icons_Add A.svg"
+                    (click)="addNewDevice()"
+                  />
+                </div>
+                <div
+                  class="program_info_data device_panel"
+                  *ngFor="let device of patientdevicedetails; let i = index"
+                >
+                  <form [name]="i">
+                    <div class="device-main-panel"
+                      *ngIf="
+                        this.Patientdata &&
+                        this.Patientdata.PatientProgramdetails.ProgramName !=
+                          'CCM' &&
+                        this.Patientdata.PatientProgramdetails.ProgramName !=
+                          'PCM'
+                      "
+                    >
+
+                        <div class="first_panel">
+                          <div class="userInfoItem">
+                            <p class="main_input_title">*Vital Monitoring</p>
+                            <div *ngIf="device.DeviceStatus == 'InActive'">
+                              <select
+                                class="userInfovalue"
+                                id="editDeviceVitalInActive"
+                                [(ngModel)]="device.VitalId"
+                                [ngModelOptions]="{ standalone: true }"
+                              >
+                                <ng-container
+                                  *ngFor="let x of patientdevicedetails"
+                                >
+                                  <option
+                                    *ngIf="x.VitalName != ''"
+                                    value="{{ x.VitalId }}"
+                                  >
+                                    {{ x.VitalName }}
+                                  </option>
+                                </ng-container>
+                              </select>
+                            </div>
+                            <div *ngIf="device.DeviceStatus != 'InActive'">
+                              <select
+                                [disabled]="true"
+                                class="userInfovalue"
+                                id="editDeviceVitalActive"
+                                [(ngModel)]="device.VitalId"
+                                [ngModelOptions]="{ standalone: true }"
+                              >
+                                <ng-container
+                                  *ngFor="let x of patientdevicedetails"
+                                >
+                                  <option
+                                    *ngIf="x.VitalName != ''"
+                                    value="{{ x.VitalId }}"
+                                  >
+                                    {{ x.VitalName }}
+                                  </option>
+                                </ng-container>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+
+
+                        <div class="second_panel">
+                          <div class="userInfoItem">
+                            <p class="main_input_title">*Device Type</p>
+                            <select
+                              [disabled]="true"
+                              id="editDeviceType"
+                              *ngIf="device.DeviceCommunicationType"
+                              class="userInfovalue"
+                              [(ngModel)]="device.DeviceCommunicationType"
+                              [ngModelOptions]="{ standalone: true }"
+                            >
+                              <option [value]="device.DeviceCommunicationType">
+                                {{ device.DeviceCommunicationType }}
+                              </option>
+                            </select>
+
+                            <select
+                              *ngIf="!device.DeviceCommunicationType"
+                              class="userInfovalue"
+                              id="editDeviceTypeLTE"
+                              placeholder="LTE"
+                              [(ngModel)]="deviceTypeDataId"
+                              [ngModelOptions]="{ standalone: true }"
+                              (ngModelChange)="deviceCommunicationTypeChange()"
+                            >
+                              <option
+                                *ngFor="let v of CommunicationType"
+                                [value]="v.Id"
+                              >
+                                {{ v.DeviceCommunicationTypeName }}
+                              </option>
+                            </select>
+                          </div>
+                        </div>
+
+
+                        <div class="third_panel">
+                          <div class="userInfoItem">
+                            <p class="main_input_title">*Device</p>
+                            <select
+                              [disabled]="true"
+                              id="editDeviceName"
+                              *ngIf="device.DeviceName"
+                              class="userInfovalue"
+                              [(ngModel)]="device.DeviceName"
+                              [ngModelOptions]="{ standalone: true }"
+                            >
+                              <option [value]="device.DeviceName">
+                                {{ device.DeviceName }}
+                              </option>
+                            </select>
+                            <select
+                              *ngIf="!device.DeviceName"
+                              class="userInfovalue"
+                            >
+                              <ng-container *ngFor="let v of devArr">
+                                <option
+                                  *ngIf="v.VitalId == device.VitalId"
+                                  [value]="v.DeviceName"
+                                >
+                                  {{ v.DeviceName }}
+                                </option>
+                              </ng-container>
+                            </select>
+                          </div>
+                          <div class="userInfoItem">
+                            <p class="main_input_title">*Device Id</p>
+                            <div *ngIf="device.VitalId == 1">
+                              <div *ngIf="device.DeviceStatus == 'InActive'">
+                                <ng-autocomplete
+                                  [data]="deviceListBP"
+                                  [searchKeyword]="keyword"
+                                  placeholder="Select Device"
+                                  id="editDeviceId1"
+                                  (selected)="selectEvent($event, i)"
+                                  (inputChanged)="onChangeSearch($event)"
+                                  (inputFocused)="onFocused($event)"
+                                  [itemTemplate]="itemTemplate"
+                                  [notFoundTemplate]="notFoundTemplate"
+                                >
+                                </ng-autocomplete>
+
+                                <ng-template #itemTemplate let-item>
+                                  <a [innerHTML]="item.DeviceNumber"></a>
+                                </ng-template>
+
+                                <ng-template #notFoundTemplate let-notFound>
+                                  <div [innerHTML]="notFound"></div>
+                                </ng-template>
+                              </div>
+                              <select
+                                [disabled]="true"
+                                *ngIf="device.DeviceStatus != 'InActive'"
+                                class="userInfovalue"
+                                [(ngModel)]="device.DeviceNumber"
+                                [ngModelOptions]="{ standalone: true }"
+                              >
+                                <option [value]="device.DeviceNumber">
+                                  {{ device.DeviceNumber }}
+                                </option>
+                              </select>
+                            </div>
+                            <div *ngIf="device.VitalId == 2">
+                              <div *ngIf="device.DeviceStatus == 'InActive'">
+                                <ng-autocomplete
+                                  [data]="deviceListBG"
+                                  [searchKeyword]="keyword"
+                                  placeholder="Select Device"
+                                  id="editDeviceId2"
+                                  (selected)="selectEvent($event, i)"
+                                  (inputCleared)="clearEvent($event, i)"
+                                  (inputChanged)="onChangeSearch($event)"
+                                  (inputFocused)="onFocused($event)"
+                                  [itemTemplate]="itemTemplate"
+                                  [notFoundTemplate]="notFoundTemplate"
+                                >
+                                </ng-autocomplete>
+
+                                <ng-template #itemTemplate let-item>
+                                  <a [innerHTML]="item.DeviceNumber"></a>
+                                </ng-template>
+
+                                <ng-template #notFoundTemplate let-notFound>
+                                  <div [innerHTML]="notFound"></div>
+                                </ng-template>
+                              </div>
+                              <select
+                                [disabled]="true"
+                                *ngIf="device.DeviceStatus != 'InActive'"
+                                class="userInfovalue"
+                                [(ngModel)]="device.DeviceNumber"
+                                [ngModelOptions]="{ standalone: true }"
+                              >
+                                <option [value]="device.DeviceNumber">
+                                  {{ device.DeviceNumber }}
+                                </option>
+                              </select>
+                            </div>
+                            <div *ngIf="device.VitalId == 3">
+                              <div *ngIf="device.DeviceStatus == 'InActive'">
+                                <ng-autocomplete
+                                  [data]="deviceListWS"
+                                  [searchKeyword]="keyword"
+                                  placeholder="Select Device"
+                                  id="editDeviceId3"
+                                  (selected)="selectEvent($event, i)"
+                                  (inputCleared)="clearEvent($event, i)"
+                                  (inputChanged)="onChangeSearch($event)"
+                                  (inputFocused)="onFocused($event)"
+                                  [itemTemplate]="itemTemplate"
+                                  [notFoundTemplate]="notFoundTemplate"
+                                >
+                                </ng-autocomplete>
+
+                                <ng-template #itemTemplate let-item>
+                                  <a [innerHTML]="item.DeviceNumber"></a>
+                                </ng-template>
+
+                                <ng-template #notFoundTemplate let-notFound>
+                                  <div [innerHTML]="notFound"></div>
+                                </ng-template>
+                              </div>
+                              <select
+                                [disabled]="true"
+                                *ngIf="device.DeviceStatus != 'InActive'"
+                                class="userInfovalue"
+                                [(ngModel)]="device.DeviceNumber"
+                                [ngModelOptions]="{ standalone: true }"
+                              >
+                                <option [value]="device.DeviceNumber">
+                                  {{ device.DeviceNumber }}
+                                </option>
+                              </select>
+                            </div>
+                            <div *ngIf="device.VitalId == 4">
+                              <div *ngIf="device.DeviceStatus == 'InActive'">
+                                <ng-autocomplete
+                                  [data]="deviceListOX"
+                                  [searchKeyword]="keyword"
+                                  placeholder="Select Device"
+                                  id="editDeviceId4"
+                                  (selected)="selectEvent($event, i)"
+                                  (inputCleared)="clearEvent($event, i)"
+                                  (inputChanged)="onChangeSearch($event)"
+                                  (inputFocused)="onFocused($event)"
+                                  [itemTemplate]="itemTemplate"
+                                  [notFoundTemplate]="notFoundTemplate"
+                                >
+                                </ng-autocomplete>
+
+                                <ng-template #itemTemplate let-item>
+                                  <a [innerHTML]="item.DeviceNumber"></a>
+                                </ng-template>
+
+                                <ng-template #notFoundTemplate let-notFound>
+                                  <div [innerHTML]="notFound"></div>
+                                </ng-template>
+                              </div>
+                              <select
+                                [disabled]="true"
+                                *ngIf="device.DeviceStatus != 'InActive'"
+                                class="userInfovalue"
+                                [(ngModel)]="device.DeviceNumber"
+                                [ngModelOptions]="{ standalone: true }"
+                              >
+                                <option [value]="device.DeviceNumber">
+                                  {{ device.DeviceNumber }}
+                                </option>
+                              </select>
+                            </div>
+
+                            <!-- <select [disabled]="true"  *ngIf="device.DeviceNumber" class="userInfovalue" [(ngModel)]="device.DeviceNumber" [ngModelOptions]="{standalone: true}">
+                                                        <option [value]="device.DeviceNumber">{{device.DeviceNumber}}</option>
+                                                </select>
+                                                <select  *ngIf="!device.DeviceNumber" class="userInfovalue" [(ngModel)]="device.DeviceNumber" [ngModelOptions]="{standalone: true}">
+                                                    <ng-container *ngFor="let v of master_data.DeviceDetails">
+                                                        <option *ngIf="v.VitalId==device.VitalId"
+                                                            [value]="v.DeviceNumber">{{v.DeviceNumber}}
+                                                        </option>
+                                                    </ng-container>
+
+                                                </select> -->
+                          </div>
+                        </div>
+
+
+                        <div class="fourth_panel">
+                          <div class="userInfoItem">
+                            <p class="main_input_title">*Device Status</p>
+                            <select
+                              [disabled]="true"
+                              class="userInfovalue"
+                              id="editDeviceStatus"
+                              [(ngModel)]="patientdevicedetails[i].DeviceStatus"
+                              [ngModelOptions]="{ standalone: true }"
+                              placeholder="Error"
+                            >
+                              <option value="Error">Error</option>
+                              <option value="Active">Active</option>
+                              <option value="Used">Used</option>
+                            </select>
+                            <img
+                              *ngIf="
+                                patientdevicedetails[i].DeviceStatus == 'Active'
+                              "
+                              class="icon_error"
+                              src="../../../../../assets/04-Icons/Icons_Check.svg"
+                            />
+                            <img
+                              *ngIf="
+                                patientdevicedetails[i].DeviceStatus != 'Active'
+                              "
+                              class="icon_error"
+                              src="../../../../../assets/04-Icons/Icons_Error A_add.svg"
+                            />
+                            <!-- <p style="visibility: hidden;">TEST</p> -->
+                            <!-- <button *ngIf="patientdevicedetails[i].DeviceStatus =='Error'" class="test_device" (click)="TestDevice(i)">TEST DEVICE</button> -->
+                            <button
+                              *ngIf="
+                                patientdevicedetails[i].DeviceStatus == 'Active'
+                              "
+                              id="editMarkDeviceError"
+                              class="test_device"
+                              (click)="MarkDeviceErrorDialog(i)"
+                            >
+                              MARK ERROR
+                            </button>
+                            <button
+                              *ngIf="
+                                patientdevicedetails[i].DeviceStatus == 'Active'
+                              "
+                              id="editRemoveDevice"
+                              class="test_device"
+                              (click)="RemoveDeviceDialog(i)"
+                            >
+                              REMOVE DEVICE
+                            </button>
+                            <button
+                              *ngIf="
+                                patientdevicedetails[i].DeviceStatus ==
+                                'InActive'
+                              "
+                              id="editRegisterDevice"
+                              class="test_device"
+                              (click)="RegisterDevice(i)"
+                            >
+                              REGISTER DEVICE
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                    <div *ngIf="device.DeviceStatus == 'InActive'">
+                      <img
+                        class="add_icon1"
+                        src="../../../../../assets/04-Icons/Icons_Delete.svg"
+                        id="editdeleteDevice"
+                        (click)="deleteDevice(i)"
+                      />
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- </form> -->
+
+          <div #vitalScheduledata_>
+            <div
+              *ngFor="let PatientVitalInfo of PatientVitalInfos; let i = index"
+            >
+              <form [name]="i">
+                <div>
+                  <div class="device">
+                    <p class="main_input_main_heading">Vital schedules</p>
+                    <!-- <img class="add_icon1" src="../../../../../assets/04-Icons/Icons_Add A.svg" /> -->
+                  </div>
+                  <div class="vital_data_panel">
+                    <div class="vital_data_left_panel">
+                      <div class="vital_data_left_sub1">
+                        <div class="userInfoItem">
+                          <p class="main_input_title">*Vital Monitoring</p>
+                          <select
+                            *ngIf="vital_selected"
+                            class="userInfovalue"
+                            id="editVitalMonitoring"
+                            [ngModelOptions]="{ standalone: true }"
+                            [(ngModel)]="PatientVitalInfo.VitalId"
+                            (ngModelChange)="vitalchanged($event, i)"
+                          >
+                            <ng-container *ngFor="let v of vital_selected">
+                              <option [value]="v.VitalId">
+                                {{ v.VitalName }}
+                              </option>
+                            </ng-container>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="vital_data_left_sub2">
+                        <div class="userInfoItem">
+                          <p class="main_input_title">Schedule</p>
+
+                          <select
+                            class="userInfovalue"
+                            id="editVitalSchedule"
+                            required
+                            [ngModelOptions]="{ standalone: true }"
+                            [(ngModel)]="PatientVitalInfo.VitalScheduleId"
+                            (ngModelChange)="
+                              scheduleChanged(PatientVitalInfo.VitalScheduleId)
+                            "
+                          >
+                            <ng-container *ngFor="let v of vitalschedule">
+                              <option [value]="v.Id">{{ v.Name }}</option>
+                            </ng-container>
+                          </select>
+                        </div>
+                        <div class="userInfoItem">
+                          <select
+                            class="userInfovalue"
+                            id="editVitalScheduleList"
+                            required
+                            [ngModelOptions]="{ standalone: true }"
+                            [(ngModel)]="PatientVitalInfo.ScheduleId"
+                          >
+                            <option
+                              *ngFor="let v of master_data.ScheduleLists"
+                              [value]="v.Id"
+                            >
+                              {{ v.Name }}
+                            </option>
+                          </select>
+                        </div>
+
+                        <p>*Intervals</p>
+                        <div class="vital_interval_item_panel">
+                          <div class="vital_interval_item">
+                          <label for="editVitalScheduleM" class="checkbox-label">
+                            <input type="checkbox" id="editVitalScheduleM" [(ngModel)]="PatientVitalInfo.Morning"
+                              [ngModelOptions]="{ standalone: true }"
+                                                      />
+                                                      M
+                                                    </label>
+
+                          </div>
+                          <div class="vital_interval_item">
+                        <label for="editVitalScheduleAN" class="checkbox-label">
+                          <input type="checkbox" id="editVitalScheduleAN" [(ngModel)]="PatientVitalInfo.Afternoon"
+                            [ngModelOptions]="{ standalone: true }"
+                                                      />
+                                                      AN
+                                                    </label>
+                                                  </div>
+                          <div class="vital_interval_item">
+                          <label for="editVitalScheduleE" class="checkbox-label">
+                            <input type="checkbox" id="editVitalScheduleE" [(ngModel)]="PatientVitalInfo.Evening"
+                              [ngModelOptions]="{ standalone: true }"
+                                                        />
+                                                        E
+                                                      </label>
+                                                    </div>
+                                                    <div class="vital_interval_item">
+                        <label for="editVitalScheduleN" class="checkbox-label">
+                          <input type="checkbox" id="editVitalScheduleN" [(ngModel)]="PatientVitalInfo.Night"
+                            [ngModelOptions]="{ standalone: true }"
+                                                      />
+                                                      N
+                                                    </label>
+                                                  </div>
+                                                </div>
+                      </div>
+                    </div>
+
+                    <div class="vital_data_right_panel">
+                      <form [name]="i">
+                        <div
+                          *ngFor="
+                            let VitalMeasureInfo of PatientVitalInfo.VitalMeasureInfos;
+                            let count = index
+                          "
+                        >
+                          <div class="vital_data_right_sub">
+                            <div class="vital_userInfoItem devicemeasure">
+                              <p class="main_input_title">Measurement</p>
+                              <input
+                                class="userInfovalue"
+                                id="editVitalMeasurement"
+                                [ngModelOptions]="{ standalone: true }"
+                                [(ngModel)]="VitalMeasureInfo.MeasureName"
+                              />
+                            </div>
+                            <div class="deviceunit_last_">
+                              <p class="main_input_title">Unit</p>
+                              <div class="deviceunit_last">
+                                <div class="userInfoItem deviceunit">
+                                  <p class="userInfovalue align_unit">
+                                    {{ VitalMeasureInfo.UnitName }}
+                                  </p>
+                                </div>
+                                <img
+                                  id="editVital"
+                                  (click)="editVital(i, count)"
+                                  class="edit-icon"
+                                  src="../../../../../assets/04-Icons/Icons_Edit.svg"
+                                />
+                              </div>
+                            </div>
+
+                            <!-- (click)="editprogram()" -->
+                          </div>
+
+                          <app-sliderdata
+                            [low_critical]="VitalMeasureInfo.CriticallMinimum"
+                            [low_cautious]="VitalMeasureInfo.CautiousMinimum"
+                            [low_normal]="VitalMeasureInfo.NormalMinimum"
+                            [high_normal]="VitalMeasureInfo.NormalMaximum"
+                            [high_cautious]="VitalMeasureInfo.CautiousMaximum"
+                            [high_critical]="VitalMeasureInfo.CriticalMaximum"
+                          ></app-sliderdata>
+
+                          <!-- Measurement Panel End -->
+                        </div>
+
+                        <!-- Measurement Second Panel -->
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div [formGroup]="programForm_3">
+            <div #billingdetails class="billing_container">
+              <div class="device">
+                <p class="main_input_main_heading">Billing Information</p>
+              </div>
+
+              <div class="billing_panel">
+
+
+                    <div class="billing_first_panel">
+                      <div class="billing_userInfoItem">
+                        <p class="main_input_title">
+                          Available Billing CPT Code
+                        </p>
+                        <div class="bill_code_panel">
+                          <img
+                            class="arrow-check2"
+                            src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                          />
+                          <input
+                            class="userInfovalue"
+                            formControlName="billingcode1"
+                            id="editBillingCode1"
+                            [attr.disabled]="true"
+                          />
+                        </div>
+                      </div>
+
+                      <div
+                        class="billing_userInfoItem"
+                        *ngIf="programForm_3.controls.billingcode3.value != ''"
+                      >
+                        <!-- <div class="bill_code_panel">
+                          <img
+                            class="arrow-check2"
+                            src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                          />
+                          <input
+                            class="userInfovalue"
+                            formControlName="billingcode2"
+                            id="editBillingCode2"
+                            [attr.disabled]="true"
+                          />
+                        </div>
+                         -->
+                        <div class="bill_code_panel">
+                          <img
+                            class="arrow-check2"
+                            src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                          />
+                          <input
+                            class="userInfovalue"
+                            formControlName="billingcode3"
+                            id="editBillingCode3"
+                            [attr.disabled]="true"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <div class="billing_second_panel">
+                      <div class="billing_userInfoItem">
+                        <p class="main_input_title" style="visibility: hidden">
+                          Available Billing CPT Code
+                        </p>
+
+                        <div class="billing_userInfoItem">
+                          <div class="bill_code_panel">
+                            <img
+                              class="arrow-check2"
+                              src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                            />
+                            <input
+                              class="userInfovalue"
+                              formControlName="billingcode2"
+                              id="editBillingCode2"
+                              [attr.disabled]="true"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        class="billing_userInfoItem"
+                        *ngIf="programForm_3.controls.billingcode4.value != ''"
+                      >
+                        <div class="bill_code_panel">
+                          <img
+                            class="arrow-check2"
+                            src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                          />
+                          <input
+                            class="userInfovalue"
+                            formControlName="billingcode4"
+                            id="editBillingCode4"
+                            [attr.disabled]="true"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+
+              </div>
+            </div>
+            <div class="program_last_container">
+              <div class="vital_schedules_container">
+                <div class="device">
+                  <p class="main_input_main_heading">Insurance Details</p>
+                </div>
+              </div>
+              <div class="insurance_panel">
+
+
+                    <div class="first_panel">
+                      <div class="userInfoItem">
+                        <p class="main_input_title">Primary Insurance</p>
+                        <!-- <select class="userInfovalue" formControlName="insurance1">
+                                                <option  *ngFor="let v of insuracevendors"
+                                                    [value]="v.VendorId">{{v.VendorName}}
+                                                </option>
+                                            </select> -->
+
+                        <ng-autocomplete
+                          [data]="insuracevendors"
+                          [searchKeyword]="keyword_primary_insurance"
+                          [initialValue]="insurance_pname"
+                          placeholder="Select Insurance"
+                          id="editPrimaryInsurance"
+                          (selected)="selectEvent__primary_Insurance($event)"
+                          (inputChanged)="
+                            onChangeSearch_primary_Insurance($event)
+                          "
+                          (inputFocused)="onFocused_primary_Insurance($event)"
+                          (inputCleared)="clearEvent_primary_Insurance($event)"
+                          [itemTemplate]="itemTemplate"
+                          [notFoundTemplate]="notFoundTemplate"
+                        >
+                        </ng-autocomplete>
+
+                        <ng-template #itemTemplate let-item>
+                          <a [innerHTML]="item.VendorName"></a>
+                        </ng-template>
+
+                        <ng-template #notFoundTemplate let-notFound>
+                          <div [innerHTML]="notFound"></div>
+                        </ng-template>
+                        <small
+                          class="text-danger"
+                          *ngIf="
+                            programForm.get('insurance1')?.invalid &&
+                            programForm.get('insurance1')?.touched
+                          "
+                          >Primary Insurace Required</small
+                        >
+                      </div>
+                    </div>
+
+
+                    <div class="second_panel">
+                      <div class="userInfoItem">
+                        <p class="main_input_title">
+                          Additional Insurance(optional)
+                        </p>
+                        <!-- <select class="userInfovalue" formControlName="insurance2">
+                                                <option  *ngFor="let v of insuracevendors"
+                                                    [value]="v.VendorId">{{v.VendorName}}
+                                                </option>
+                                            </select> -->
+                        <ng-autocomplete
+                          [data]="insuracevendors"
+                          [searchKeyword]="keyword_secondary_insurance"
+                          [initialValue]="insurance_sname"
+                          id="editAdditionalInsurance1"
+                          placeholder="Select Insurance"
+                          (selected)="selectEvent__secondary_Insurance($event)"
+                          (inputChanged)="
+                            onChangeSearch_secondary_Insurance($event)
+                          "
+                          (inputFocused)="onFocused_secondary_Insurance($event)"
+                          (inputCleared)="
+                            clearEvent_secondary_Insurance($event)
+                          "
+                          [itemTemplate]="itemTemplate"
+                          [notFoundTemplate]="notFoundTemplate"
+                        >
+                        </ng-autocomplete>
+
+                        <ng-template #itemTemplate let-item>
+                          <a [innerHTML]="item.VendorName"></a>
+                        </ng-template>
+
+                        <ng-template #notFoundTemplate let-notFound>
+                          <div [innerHTML]="notFound"></div>
+                        </ng-template>
+                      </div>
+                      <div class="userInfoItem">
+                        <!-- <select class="userInfovalue" formControlName="insurance3">
+                                                <option  *ngFor="let v of insuracevendors"
+                                                    [value]="v.VendorId">{{v.VendorName}}
+                                                </option>
+                                            </select> -->
+                        <ng-autocomplete
+                          [data]="insuracevendors"
+                          [searchKeyword]="keyword_ternary_insurance"
+                          [initialValue]="insurance_tname"
+                          id="editAdditionalInsurance2"
+                          placeholder="Select Insurance"
+                          (selected)="selectEvent__ternary_Insurance($event)"
+                          (inputChanged)="
+                            onChangeSearch_ternary_Insurance($event)
+                          "
+                          (inputFocused)="onFocused_ternary_Insurance($event)"
+                          (inputCleared)="clearEvent_ternary_Insurance($event)"
+                          [itemTemplate]="itemTemplate"
+                          [notFoundTemplate]="notFoundTemplate"
+                        >
+                        </ng-autocomplete>
+
+                        <ng-template #itemTemplate let-item>
+                          <a [innerHTML]="item.VendorName"></a>
+                        </ng-template>
+
+                        <ng-template #notFoundTemplate let-notFound>
+                          <div [innerHTML]="notFound"></div>
+                        </ng-template>
+                      </div>
+                    </div>
+
+
+              </div>
+              <div>
+                <div class="vital_schedules_container">
+                  <div class="device">
+                    <p class="main_input_main_heading">Documents</p>
+                    <img
+                      class="add_icon1"
+                      src="../../../../../assets/04-Icons/Icons_Add A.svg"
+                      id="editAddDocument"
+                      (click)="openAddDoc()"
+                    />
+                  </div>
+                </div>
+                <div #documents class="documents_panel">
+                  <table mat-table [dataSource]="datasourceDocument">
+                    <ng-container matColumnDef="position">
+                      <th mat-header-cell *matHeaderCellDef>No.</th>
+                      <td mat-cell *matCellDef="let element">
+                        {{ element.position }}
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="Document_Type">
+                      <th
+                        mat-header-cell
+                        *matHeaderCellDef
+                        style="border-radius: 20px 0px 0px 0px !important"
+                      >
+                        Document Type
+                      </th>
+                      <td mat-cell *matCellDef="let element">
+                        {{ element.DocumentType }}
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="Document_Name">
+                      <th mat-header-cell *matHeaderCellDef>Document Name</th>
+                      <td mat-cell *matCellDef="let element">
+                        {{ element.DocumentName }}
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="Uploaded_Date">
+                      <th mat-header-cell *matHeaderCellDef>Uploaded Date</th>
+                      <td mat-cell *matCellDef="let element">
+                        <span>{{
+                          datepipe.transform(element.CreatedOn, "MMM d, y")
+                        }}</span>
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="Document">
+                      <th
+                        mat-header-cell
+                        *matHeaderCellDef
+                        style="border-radius: 0px 20px 0px 0px"
+                      >
+                        Document
+                      </th>
+                      <td mat-cell *matCellDef="let element">
+                        <img
+                          class="notes_icon"
+                          src="../../../../../assets/04-Icons/Icons_Reports.svg"
+                          id="editDownlaodDocument"
+                          (click)="downloadFile(element.DocumentUNC)"
+                        />
+                        <img
+                          class="notes_icon"
+                          src="../../../../../assets/04-Icons/Icons_Delete.svg"
+                          id="editDownlaodDocument"
+                          (click)="openDeleteDocumentDialog(element.Id)"
+                        />
+                      </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr
+                      mat-row
+                      *matRowDef="let row; columns: displayedColumns"
+                      [style.minHeight.px]="35"
+                    ></tr>
+                    <!--
+                    <mat-row
+                    [style.minHeight.px]="35"
+                    *matRowDef="let row; columns: displayedColumns"
+                    [ngClass]="{}"
+                  ></mat-row> -->
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!--end of edit patient-->
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #myDialog>
+    <div class="dialog">
+      <div class="dialog_container">
+        <div class="Patient_Health">
+          <div class="header">
+            <h3>Are You Sure to Update Patient ?</h3>
+          </div>
+          <div class="download">
+            <h4 class="subheading-dialog">Patient Details will be updated!</h4>
+          </div>
+          <!-- <div class="download">
+                    <p> Patient id:{{pid}}</p>
+                </div> -->
+        </div>
+        <div class="button">
+          <button
+            class="btn_cancel"
+            id="editCancelbtn"
+            [mat-dialog-close]="true"
+          >
+            CANCEL
+          </button>
+          <button
+            class="btn_save"
+            id="editConfirmbtn"
+            (click)="confirmDialog(myDialogSuccess, myDialogFailure)"
+          >
+            CONFIRM
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #myDialogSuccess>
+    <div class="dialog">
+      <div class="dialog_container">
+        <div class="Patient_Health">
+          <div class="header">
+            <h3>Update Patient</h3>
+          </div>
+          <div class="download">
+            <h4 class="subheading-dialog">
+              Patient Details Updated Successfully...!
+            </h4>
+          </div>
+          <!-- <div class="download">
+                    <p> Patient id:{{pid}}</p>
+                </div> -->
+        </div>
+        <div class="button">
+          <button
+            class="btn_cancel"
+            id="editCancelOk"
+            [mat-dialog-close]="true"
+          >
+            CANCEL
+          </button>
+          <button
+            class="btn_save"
+            id="editConfirmOk"
+            (click)="redirect_patient()"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #myDialogFailure>
+    <div class="dialog">
+      <div class="dialog_container">
+        <div class="Patient_Health">
+          <div class="header">
+            <h3>Update Patient</h3>
+          </div>
+          <div class="download">
+            <h4 class="subheading-dialog">
+              Could not Update Patient Details...!
+            </h4>
+          </div>
+          <!-- <div class="download">
+                    <p> Patient id:{{pid}}</p>
+                </div> -->
+        </div>
+        <div class="button">
+          <button
+            id="editfailCancelOk"
+            class="edit_cancel"
+            [mat-dialog-close]="true"
+          >
+            CANCEL
+          </button>
+          <button
+            id="editfailConfirmOk"
+            class="edit_save"
+            (click)="redirect_patient()"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #addeditpage>
+    <div *ngIf="editvariable" class="addtemplate common_template">
+      <div class="common_main_title">Update Vital measurement</div>
+      <div class="common_content">
+        <p class="common_content_title">Vital Monitoring</p>
+        <div class="vital_panel">
+          <div class="userInfoItem_side_panel">
+            <input
+              [attr.disabled]="true"
+              id="editUpdateVital"
+              class="common_input_dropdown"
+              [(ngModel)]="vitalName"
+            />
+            <!-- <select class="common_input_dropdown" [(ngModel)]="vialName">
+                    <option value="">Blood Glucose</option>
+                    <option>1</option>
+                    <option>2</option>
+                  </select> -->
+            <!-- <img class="arrow-check2" src="../../../../../assets/04-Icons/Icons_Check A.svg" /> -->
+          </div>
+          <!-- <button class="btn_setDefault">SetDefault</button> -->
+        </div>
+      </div>
+      <!-- <div class="common_content">
+            <p class="common_content_title"> Device</p>
+            <div class="userInfoItem_side_panel ">
+              <input class="common_input_dropdown" [(ngModel)]="deviceName"/>
+              <img class="arrow-check2" src="../../../../../assets/04-Icons/Icons_Check A.svg" />
+            </div>
+        </div> -->
+      <div class="common_content">
+        <p class="common_content_title">Measurement</p>
+        <div class="vital_panel">
+          <div class="userInfoItem_side_panel">
+            <!-- <select class="common_input_dropdown">
+                    <option value="">Glucose Level - Before Meal</option>
+                    <option value="1">First Option</option>
+                     <option value="2">second option</option>
+                   </select> -->
+            <input
+              [attr.disabled]="true"
+              id="editUpdateVitalMeasurement"
+              class="common_input_dropdown"
+              [(ngModel)]="vitalMeasureName"
+            />
+            <!-- <img class="add_icon_side_panel" src="../../../../../assets/04-Icons/Icons_Add.svg" /> -->
+          </div>
+        </div>
+      </div>
+      <!-- <div class="common_content">
+            <p class="common_content_title"> Unit</p>
+            <input class="common_input_dropdown" [(ngModel)]="unitName"/>
+            <select class="common_input_dropdown unit_dropdown">
+                <option value="">mg/DL</option>
+                <option value="1">First Option</option>
+                <option value="2">second option</option>
+            </select>
+        </div> -->
+      <p class="common_content_title">Normal</p>
+      <div class="vital_range_panel">
+        <!-- <div class="custom-slider"> -->
+          <!-- <ngx-slider
+            (mouseup)="displayValue()"
+            id="editUpdateNormal"
+            [options]="options"
+            [(value)]="minValue"
+            [(highValue)]="maxValue"
+          >
+          </ngx-slider> -->
+          <!-- <mat-slider min="0" max="maxValue" step="1" [(ngModel)]="minValue"></mat-slider> -->
+
+        <!-- </div> -->
+        <form>
+          <app-dual-range-slider
+            [min]="0"
+            [max]="200"
+            [formControl]="rangeControl">
+          </app-dual-range-slider>
+        </form>
+<!--
+        <p>Selected Range: {{ rangeControl.value | json }}</p> -->
+      </div>
+      <p class="common_content_title">Cautious</p>
+      <div class="cautious_range_panel">
+        <div class="Threshold_panel">
+          <div class="threshold_division">
+            <p>Lower Threshold</p>
+            <div class="height_division">
+              <div class="duration_time">
+                <div class="duration_content_panel">
+                  <img
+                    (click)="lowerthresholdvalue_increment()"
+                    id="editCautiousIncreaseLT"
+                    class="btn-common"
+                    src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                  />
+                  <!-- <span class="duration_value">{{lowerthresholdvalue }} </span> -->
+                  <input
+                    type="number"
+                    id="editCautiousNumber"
+                    class="duration_value vitalvalue"
+                    [(ngModel)]="lowerthresholdvalue"
+                    [ngModelOptions]="{ standalone: true }"
+                  />
+                  <img
+                    (click)="lowerthresholdvalue_decrement()"
+                    id="editCautiousDecreaseLT"
+                    class="btn-common"
+                    src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="threshold_division">
+            <p>Higher Threshold</p>
+            <div class="height_division">
+              <div class="duration_time">
+                <div class="duration_content_panel">
+                  <img
+                    (click)="higherthresholdvalue_increment()"
+                    id="editCautiousIncreaseHT"
+                    class="btn-common"
+                    src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                  />
+                  <!-- <span class="duration_value">{{ higherthresholdvalue }} </span> -->
+                  <input
+                    type="number"
+                    class="duration_value vitalvalue"
+                    [(ngModel)]="higherthresholdvalue"
+                    [ngModelOptions]="{ standalone: true }"
+                  />
+                  <img
+                    (click)="higherthresholdvalue_decrement()"
+                    id="editCautiousDecreaseHT"
+                    class="btn-common"
+                    src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="common_content_title">Critical</p>
+      <div class="critical_range_panel">
+        <div class="Threshold_panel">
+          <div class="threshold_division">
+            <p>Lower Threshold</p>
+            <div class="height_division">
+              <div class="duration_time">
+                <div class="duration_content_panel">
+                  <img
+                    (click)="lowercriticalthreshold_increment()"
+                    id="editCriticalIncreaseLT"
+                    class="btn-common"
+                    src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                  />
+                  <!-- <span class="duration_value">{{lowercriticalthreshold }} </span> -->
+                  <input
+                    type="number"
+                    class="duration_value vitalvalue"
+                    [(ngModel)]="lowercriticalthreshold"
+                    [ngModelOptions]="{ standalone: true }"
+                  />
+                  <img
+                    (click)="lowercriticalthreshold_decrement()"
+                    id="editCriticalDecreaseLT"
+                    class="btn-common"
+                    src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="threshold_division">
+            <p>Higher Threshold</p>
+            <div class="height_division">
+              <div class="duration_time">
+                <div class="duration_content_panel">
+                  <img
+                    (click)="highercriticalthreshold_increment()"
+                    id="editCriticalIncreaseHT"
+                    class="btn-common"
+                    src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                  />
+                  <!-- <span class="duration_value">{{ highercriticalthreshold }} </span> -->
+                  <input
+                    type="number"
+                    class="duration_value vitalvalue"
+                    [(ngModel)]="highercriticalthreshold"
+                    [ngModelOptions]="{ standalone: true }"
+                  />
+                  <img
+                    (click)="highercriticalthreshold_decrement()"
+                    id="editCriticalDecreaseHT"
+                    class="btn-common"
+                    src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="schedule_lower_container">
+        <button
+          class="btn_cancel"
+          id="editCanceleVital"
+          (click)="addeditpage_cancel()"
+        >
+          CANCEL
+        </button>
+        <button
+          class="btn_save"
+          id="editupdateVital"
+          (click)="updateVitalMesaures()"
+        >
+          UPDATE
+        </button>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #addDocument>
+    <div *ngIf="documentAddFlag" class="addtemplate common_template">
+      <div class="common_main_title">Add Document</div>
+      <div class="common_template_content">
+        <div class="common_content">
+          <p class="common_content_title">Document Type</p>
+          <div>
+            <select
+              class="common_input_dropdown"
+              id="editDocumentType"
+              [(ngModel)]="docType"
+            >
+              <option value="PatientConsentForm">Patient Consent Form</option>
+            </select>
+            <!-- <input /> -->
+          </div>
+        </div>
+        <div class="common_content">
+          <p class="common_content_title">Description</p>
+
+          <input
+            class="common_input_dropdown"
+            id="editDocumentDescription"
+            [(ngModel)]="docDesc"
+          />
+        </div>
+        <div class="common_content">
+          <!-- <p class="common_content_title">File</p>
+          <div>
+            <input
+              id="doc"
+              type="file"
+              class="common_input_dropdown"
+              id="editOpenFile"
+              (change)="openFileData($event)"
+            />
+          </div> -->
+          <div class="doc_attachment">
+            <input
+              type="text"
+              class="common_input_dropdown"
+              placeholder="Select Attachment"
+              disabled
+              value="{{ file }}"
+            />
+
+            <div class="add_container">
+              <img
+                class="add-img"
+                src="../../../../../assets/04-Icons/Icons_Add.svg"
+                (click)="fileInput.click()"
+              />
+              <input
+                #fileInput
+                type="file"
+                (change)="openFileData($event)"
+                style="display: none"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="schedule_lower_container">
+        <button
+          class="btn_cancel"
+          id="editDocumentCancel"
+          (click)="CancelDocForm()"
+        >
+          CANCEL
+        </button>
+        <button
+          class="btn_save"
+          id="editDocumentSave"
+          mat-raised-button
+          [class.spinner]="DownloadStatus"
+          [disabled]="DownloadStatus"
+          (click)="AddDocument()"
+        >
+          SAVE
+        </button>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #programedit>
+    <div class="mydialogBox">
+      <div class="dialogrenewDatePanel">
+        <div class="header">
+          <h3>Edit Program Details</h3>
+        </div>
+        <form [formGroup]="editProgramdata" class="renewForm">
+          <div class="renewDatePanel">
+            <p class="main_input_title">*Program Name</p>
+            <select
+              class="userInfovalue editprogramdropdown"
+              placeholder="Select Program Name"
+              formControlName="programname"
+              id="editProgramNameDialog"
+              required
+            >
+              <option
+                *ngFor="let pgm of master_data.ProgramDetailsMasterData"
+                [value]="pgm.ProgramId"
+              >
+                {{ pgm.ProgramName }}
+              </option>
+            </select>
+
+            <div class="userInfoItem">
+              <p class="main_input_title">*Vitals/Condition Monitored</p>
+
+              <mat-select
+                [(value)]="editvitalList"
+                (selectionChange)="vitalEditPgmListChange()"
+                name="vitalList"
+                id="editVitalListDialog"
+                multiple
+                class="common_input_dropdown"
+              >
+                <mat-option
+                  *ngFor="let v of editProgramVital"
+                  [value]="v.VitalId"
+                >
+                  {{ v.VitalName }}
+                </mat-option>
+              </mat-select>
+            </div>
+
+            <!-- <div *ngFor="let Diag of diaganosisMainList; let i = index"> -->
+            <!-- <div class="diagonsis_panel">
+                <div class="left_panel">
+                  <p class="main_input_title">*Diagnosis</p>
+
+                  <select
+                    class="userInfovalue editdiagnosis_title"
+                    id="editDiagnosisDialog"
+                    title="{{ Diag.DiagnosisName }}"
+                    [(ngModel)]="Diag.DiagnosisName"
+                    [ngModelOptions]="{ standalone: true }"
+                    (ngModelChange)="EditProgramdiagnosisChanged($event, i)"
+                  >
+                    <option [value]="undefined">Select</option>
+                    <option
+                      title="{{ Diag_name.DiagnosisName }}"
+                      *ngFor="let Diag_name of editProgramDiagoList"
+                      [value]="Diag_name.DiagnosisName"
+                    >
+                      {{ Diag_name.DiagnosisName }}
+                    </option>
+                  </select>
+
+                  <small
+                    class="text-danger"
+                    *ngIf="
+                      editProgramdata.get('diagnosis')?.invalid &&
+                      editProgramdata.get('diagnosis')?.touched
+                    "
+                    >Diagnosis name is required
+                  </small>
+                </div>
+
+                <div class="right_panel">
+                  <p class="main_input_title">*Code</p>
+                  <div class="code">
+                    <div class="code_data">
+                      <input
+                        class="userInfovalue"
+                        id="editDiagnosisCodeDialog"
+                        [(ngModel)]="Diag.DiagnosisCode"
+                        [ngModelOptions]="{ standalone: true }"
+                        required
+                        [disabled]="true"
+                      />
+                    </div>
+
+                    <div *ngIf="i == 0">
+
+                      <div class="icon_panel">
+                        <img
+                          class="add_icon4"
+                          src="../../../../../assets/04-Icons/Icons_Add.svg"
+                          (click)="programaddNewDiaganostic()"
+                          id="editAddNewDiaganostic"
+                        />
+                        <div class="remove_icon">
+                          <img
+                            class="add_icon4"
+                            src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                            (click)="programaremoveNewDiaganostic()"
+                            id="editRemoveNewDiaganostic"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <small
+                    class="text-danger"
+                    *ngIf="
+                      editProgramdata.get('code')?.invalid &&
+                      editProgramdata.get('code')?.touched
+                    "
+                    >code is Required</small
+                  >
+                </div>
+              </div> -->
+            <div class="diagosis_panel">
+              <div *ngFor="let Diagnosis of diaganosisMainList; let i = index">
+                <form>
+                  <div class="program_timeline_data">
+                    <div class="userInfoItem program_timeline_data_left">
+                      <p class="main_input_title">*Diagnosis</p>
+                      <ng-autocomplete
+                        id="editpatientProgram"
+                        [initialValue]="Diagnosis.DiagnosisName"
+                        [searchKeyword]="keywordDignosticsEdit"
+                        [data]="editProgramDiagoList"
+                        placeholder="Select Diagnosis"
+                        (selected)="EditProgramdiagnosisChanged($event, i)"
+                        (inputCleared)="clearedEdit($event, i)"
+                        [itemTemplate]="itemTemplate"
+                        [notFoundTemplate]="notFoundTemplate"
+                      >
+                      </ng-autocomplete>
+                      <ng-template #itemTemplate let-item>
+                        <a [innerHTML]="item.DiagnosisFieldEdit"></a>
+                      </ng-template>
+                      <ng-template #notFoundTemplate let-notFound>
+                        <div [innerHTML]="notFound"></div>
+                      </ng-template>
+
+                      <small
+                        class="text-danger"
+                        *ngIf="
+                          editProgramdata.get('code')?.invalid &&
+                          editProgramdata.get('code')?.touched
+                        "
+                        >code is Required</small
+                      >
+                    </div>
+
+                    <div class="userInfoItem">
+                      <p class="main_input_title">*Code</p>
+                      <div class="code">
+                        <div class="code_data">
+                          <input
+                            class="userInfovalue"
+                            id="editPatientDiagnosisCode"
+                            [(ngModel)]="Diagnosis.DiagnosisCode"
+                            [ngModelOptions]="{ standalone: true }"
+                            required
+                            [disabled]="true"
+                          />
+                        </div>
+
+                        <div *ngIf="i == 0">
+                          <div class="icon_panel">
+                            <img
+                              class="add_icon4"
+                              src="../../../../../assets/04-Icons/Icons_Add.svg"
+                              id="editAddNewDiaganostic"
+                              (click)="programaddNewDiaganostic()"
+                            />
+                            <div class="remove_icon">
+                              <img
+                                class="add_icon4"
+                                src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                                id="editRemoveNewDiaganostic"
+                                (click)="programaremoveNewDiaganostic()"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <small
+                        class="text-danger"
+                        *ngIf="
+                          programForm.get('code')?.invalid &&
+                          programForm.get('code')?.touched
+                        "
+                        >code is Required</small
+                      >
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <!-- </div> -->
+          </div>
+        </form>
+        <div class="btn_panel">
+          <button
+            class="btn_cancel"
+            (click)="EditProgramCancel()"
+            id="editProgramDataCancel"
+          >
+            CANCEL
+          </button>
+          <button
+            class="btn_save"
+            id="editProgramDatasbmit"
+            (click)="EditProgramData()"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>
+<app-confirm-dialog-panel
+
+>
+</app-confirm-dialog-panel>

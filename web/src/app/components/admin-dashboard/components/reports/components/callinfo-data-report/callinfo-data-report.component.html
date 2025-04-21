@@ -1,0 +1,87 @@
+<app-report-common-layout
+  (downloadClicked)="downloadCallInfo()"
+  [loadingstatus]="buttonclick"
+>
+  <div report-selection-actions>
+    <div class="upper-panel">
+      <div class="upper_container_item upper-panel-data">
+        <p class="upper_item_title">CareTeam</p>
+
+        <ng-autocomplete
+          id="patientReport"
+          [data]="http_userlist"
+          [searchKeyword]="keyword2"
+          placeholder="Select CareTeam"
+          (selected)="selectCallInfoEvent($event)"
+          (inputChanged)="onChangeCallinfoSearch($event)"
+          (inputCleared)="onClearCallinfoSearch($event)"
+          (inputFocused)="onFocused($event)"
+          [itemTemplate]="itemTemplate"
+          [notFoundTemplate]="notFoundTemplate"
+        >
+        </ng-autocomplete>
+        <ng-template #itemTemplate let-item>
+          <a [innerHTML]="item.UserName"></a>
+        </ng-template>
+
+        <ng-template #notFoundTemplate let-notFound>
+          <div [innerHTML]="notFound"></div>
+        </ng-template>
+        <img
+          *ngIf="!selectedcareTeam"
+          class="search_icon"
+          src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+        />
+      </div>
+    </div>
+  </div>
+  <div class="panel_content">
+    <div class="panel_content_item">
+      <div class="radio">
+        <div class="task_content task_contnent_date">
+          <div class="task_date_picker_container">
+            <p class="durationTitle">Enter Duration</p>
+            <app-date-range-control
+              (DateRangeSelected)="GetDateRange($event)"
+              #dateRange
+            ></app-date-range-control>
+            <!-- <mat-form-field class="task_date_range_picker" floatLabel="never">
+                <mat-date-range-input
+                  [formGroup]="calllogrange"
+                  [rangePicker]="picker1"
+                  [max]="maxCallLogDate"
+                >
+                  <input
+                    matStartDate
+                    formControlName="start"
+                    placeholder="Start date"
+                    id="report_StartDate"
+                    readonly
+                    #dateStartcall
+                  />
+                  <input
+                    matEndDate
+                    formControlName="end"
+                    placeholder="End date"
+                    id="report_EndDate"
+                    readonly
+                    #dateEndcall
+                  />
+                </mat-date-range-input>
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="picker1"
+                ></mat-datepicker-toggle>
+                <mat-date-range-picker
+                  (closed)="resetMaxDate()"
+                  (opened)="openDatepicker()"
+                  disabled="false"
+                  #picker1
+                ></mat-date-range-picker>
+              </mat-form-field> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-report-common-layout>

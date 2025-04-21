@@ -1,0 +1,7 @@
+<svg id="Key_Icon" data-name="Key Icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><defs>
+<style>.cls-1{fill:#155D16 ;}.cls-2{fill:none;}.cls-3{fill:#ffffff;}</style>
+</defs>
+<circle class="cls-1" cx="12" cy="12" r="12"/><rect class="cls-2" width="24" height="24"/>
+<path class="cls-3" d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm0,19a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z"/>
+<path class="cls-3" d="M18.35,8.65a.48.48,0,0,0-.7,0L10,16.29,6.35,12.65a.49.49,0,0,0-.7.7l4,4a.48.48,0,0,0,.7,0l8-8A.48.48,0,0,0,18.35,8.65Z"/>
+</svg>

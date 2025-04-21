@@ -1,0 +1,184 @@
+<div class="summary_chat_container">
+  <div class="Summary-Chat-title">
+    <div class="chat_panel_upper">
+      <p>Chats</p>
+      <img
+        class="chaticon"
+        src="../../../../../assets/04-Icons/Icons_Cancel A.svg"
+        (click)="closeChatPanelEmitter()"
+      />
+    </div>
+  </div>
+
+  <div class="message_container" #scrollBottom (scroll)="onUserScroll()">
+    <div>
+      <div class="chat-area">
+        <div
+          class="no-chat-item text-info"
+          *ngIf="!currentConversation; else chatArea"
+        >
+          <!-- <span>Please select person to chat or create new chat</span> -->
+        </div>
+
+        <ng-template #chatArea>
+          <div class="chat-box">
+            <div class="message-area">
+              <div
+                class="no-messages"
+                *ngIf="messages?.length && messages.length < 0; else messageBox"
+              >
+                <span>No messages yet!</span>
+                <p>Send the first message from below</p>
+              </div>
+              <ng-template #messageBox>
+                <div
+                  class="p-2 msg-block"
+                  #chatBox
+                  infiniteScroll
+                  (scrolledUp)="loadMessages()"
+                >
+                  <div
+                    class="messanger-chat-row"
+                    *ngFor="let message of messages; let i = index"
+                  >
+                    <div class="chat-date" *ngIf="getDatefrom(message)">
+                      <div class="beforeTime"></div>
+                      <div class="timeblock">
+                        {{ message?.dateUpdated | date : "mediumDate" }}
+                      </div>
+                      <div class="afterTime"></div>
+                    </div>
+                    <div>
+                      <div
+                        class="right-chat"
+                        *ngIf="userName != message?.author"
+                      >
+                        <div class="user-message-content">
+                          <div class="user-message-bg">
+                            <div class="incoming_msg">
+                              <div class="messge_right">
+                                <p>{{ message?.body }}</p>
+                                <div class="message_time">
+                                  {{ message?.dateUpdated | date : "hh:mm a" }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        class="left-chat"
+                        *ngIf="userName == message?.author"
+                      >
+                        <div class="user-message-content">
+                          <div class="user-message-bg">
+                            <div class="outgoing_msg">
+                              <div
+                                class="messge_left"
+                                *ngIf="editingMessage?.index !== message.index"
+                              >
+                                <p>
+                                  {{ message?.body }}
+                                </p>
+                                <div class="message_lower_panel">
+                                  <div class="message_time">
+                                    {{
+                                      message?.dateUpdated | date : "hh:mm a"
+                                    }}
+                                  </div>
+                                  <div>
+                                    <img
+                                      class="delete-img"
+                                      src="../../../../../assets/04-Icons/Icons_Delete A.svg"
+                                      (click)="deleteMessage(message)"
+                                    />
+                                    <img
+                                      class="delete-img"
+                                      src="../../../../../assets/04-Icons/Icons_Edit A.svg"
+                                      (click)="startEditingMessage(message)"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div
+                                *ngIf="editingMessage?.index === message.index"
+                                class="message-edit"
+                              >
+                                <div class="chat-edit-panel">
+                                  <textarea
+                                    [(ngModel)]="editMessageText"
+                                    rows="3"
+                                  ></textarea>
+                                  <div class="edit-actions">
+                                    <div class="check_button">
+                                      <img
+                                        class="edit-status-img"
+                                        src="../../../../../assets/04-Icons/Icons_Check.svg"
+                                        (click)="saveEdit()"
+                                      />
+                                    </div>
+                                    <div class="cross_icon">
+                                      <img
+                                        class="edit-status-img"
+                                        src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                                        (click)="cancelEditing()"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+      <button
+        *ngIf="!isUserAtBottom"
+        class="scroll-button"
+        (click)="scrollToLatestMessage()"
+      >
+        ⬇ Scroll to Latest
+      </button>
+    </div>
+
+    <div class="text-center loader" *ngIf="isLoading">
+      <div class="spinner-border text-info" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div class="alert alert-danger" role="alert" *ngIf="error">
+      {{ error }}
+    </div>
+    <div class="alert alert-warning" role="alert" *ngIf="isTyping">
+      Typing...
+    </div>
+  </div>
+
+  <div class="send-block">
+    <textarea
+      class="chatTypearea"
+      [(ngModel)]="message"
+      name="chat-message"
+      id="txt-send"
+      placeholder="Type something..."
+      (keydown)="currentConversation?.typing()"
+    ></textarea>
+    <div class="chat_send_icon">
+      <img
+        class="callIcon"
+        src="../../../../../assets/04-Icons/Icons_Send.svg"
+        (click)="message.trim() && sendMessage()"
+      />
+    </div>
+  </div>
+</div>

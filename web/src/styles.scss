@@ -1,0 +1,1083 @@
+@import "../node_modules/angular-notifier/styles";
+
+html,
+body {
+  height: 100%;
+  background-color: #e1e6ed;
+}
+body {
+  margin: 0;
+  font-family: "Rubik";
+  // overflow-y:hidden
+}
+
+@font-face {
+  font-family: "Rubik";
+  src: local("Rubik"), url(./assets/Fonts/Rubik-Regular.ttf) format("truetype");
+}
+@font-face {
+  font-family: "Rubik-normal";
+  src: local("Rubik"), url(./assets/Fonts/Rubik-Light.ttf) format("truetype");
+}
+
+.front_img {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+.front_img_container {
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background-color: #edeff5;
+  margin-right: 0.7rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+// dropdown
+
+.dropdown select {
+  padding-left: 0.8rem;
+  height: 2rem;
+  max-width: 100%;
+  min-width: 100%;
+  border-radius: 1rem;
+  border: none;
+  color: #164d61;
+  outline: none;
+  font-family: "Rubik";
+  background-color: #edeff5 !important;
+  border: 1px solid #d8dce5 !important;
+  font-size: 0.8rem;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 32 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>')
+    no-repeat right #edeff5;
+  -webkit-appearance: none;
+}
+.dropdown option {
+  color: #164d61;
+  font-size: 12px;
+}
+.dropdown select:focus {
+  outline: none;
+}
+.all_buttons {
+  width: 7.142857142857143em !important;
+  height: 2.2857142857142856em !important;
+  font-size: 14px;
+  background-color: #8226df;
+  border-radius: 20px;
+  color: #f2f2f2;
+  font-family: "Rubik-normal";
+  line-height: 20px;
+  outline: none !important;
+  border: none;
+}
+
+button {
+  outline: none;
+}
+
+.TextDecor {
+  text-transform: capitalize;
+}
+
+.submenu {
+  width: 9.375em !important;
+  height: 1.875em !important;
+  font-size: 0.93rem !important;
+  font-family: "Rubik";
+}
+
+.Smallformheader {
+  font-size: 18px !important;
+}
+
+.SmallFormlabel {
+  font-size: 12px !important;
+}
+.SmallFormSelect {
+  font-size: 12px !important;
+  height: 25px !important;
+}
+
+.SmallFormButton {
+  font-size: 12px !important;
+  width: 7.142857142857143em !important;
+  height: 2.2857142857142856em !important;
+}
+
+.SmallFormInput {
+  font-size: 12px !important;
+  height: 25px !important;
+}
+.SmallFormTextArea {
+  font-size: 12px !important;
+  padding-left: 2%;
+}
+
+// Common Template Start
+
+// Lower Button Panel
+
+// ::-webkit-scrollbar {
+
+//   display: none;
+
+// }
+
+.medication_schedule_sub_cont {
+  width: 100%;
+}
+.duration_main_cont {
+  display: flex;
+}
+.common_main_title:hover {
+  color: #3bcbc4;
+}
+.duration_text {
+  color: #c1c7d5;
+  font-size: 0.8rem;
+  font-family: "Rubik";
+  margin-right: 0.8rem;
+}
+// Common Template Start
+.common_template {
+  background-color: #164d61;
+  padding: 2rem 0.8rem 0.8rem 0.8rem;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  // position: relative;
+  overflow-y: scroll;
+  width: 100%;
+}
+.common_content_description {
+  padding-bottom: 1.2rem !important;
+}
+.btn-common {
+  width: 1.2rem;
+  height: 1.2rem;
+  // background-color: #edeff5;
+  background-color: #e1e6ed;
+  border-radius: 0.4rem;
+}
+.btn_common_cont {
+  padding: 2px;
+  background-color: #e1e6ed;
+  display: flex;
+  align-items: center;
+}
+.self_assign_icon_cont:hover {
+  background-color: #d8dce5 !important;
+}
+.common_template_content {
+  overflow-y: auto;
+  background-color: #164d61;
+  height: 498px;
+  overflow-x: hidden;
+  width: 100%;
+  padding-top: 0.8rem;
+  padding-right: 0.8rem;
+}
+::placeholder {
+  color: #c1c7d5;
+  font-size: 0.8rem;
+  font-family: "Rubik";
+  // padding-left: 0.8rem;
+}
+.btn_cancel:hover {
+  background-color: #3bcbc4;
+  color: #fff;
+}
+.btn_cancel {
+  background-color: #edeff5;
+  border: 1px solid #3bcbc4;
+  width: 5rem;
+  height: 2rem;
+  color: #164d61;
+  font-family: "Rubik";
+  font-size: 0.8rem;
+  line-height: 1.25rem;
+  border-radius: 1rem !important;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  outline: none !important;
+}
+.btn_save:hover {
+  background-color: #3bcbc4;
+  color: #164d61;
+}
+.btn_save {
+  width: 5rem;
+  height: 2rem;
+  color: #fff;
+  font-family: "Rubik";
+  font-size: 0.8rem;
+  line-height: 1.25rem;
+  border-radius: 1rem !important;
+  background-color: #99e8e3;
+  border: 1px solid #edeff5;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.common_content_title {
+  color: #8be3d9;
+  font-size: 0.7rem;
+  line-height: 1.2rem;
+  font-family: "Rubik";
+  margin-bottom: 0px !important;
+  padding-left: 0.8rem;
+}
+.common_template textarea {
+  height: 3.75rem;
+  width: 100%;
+  background-color: #edeff5;
+  border-radius: 0.4rem;
+  padding-left: 0.8rem;
+  font-family: "Rubik";
+  font-size: 0.8rem;
+}
+// Lower Container
+.common_template .lower_container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  bottom: 0rem;
+  background-color: #164d61;
+  padding-top: 3rem;
+}
+// Lower Button Panel
+
+.common_content {
+  width: 100%;
+  padding-bottom: 0.5rem;
+}
+// ::-webkit-scrollbar {
+//   display: none;
+// }
+.mdc-data-table__header-cell {
+  color: #164D61;
+  background-color: #CFF4F5 !important;
+  font-size: 12px;
+  font-family: "Rubik";
+
+}
+
+.add_symptom_input {
+  background-color: #ffff;
+  border-radius: 8px;
+  height: 2rem;
+}
+
+.common_input_dropdown {
+  font-size: 0.8rem;
+  background-color: #edeff5;
+
+  border-radius: 0.5rem;
+  height: 1.7rem;
+  width: 100%;
+  padding: 0.3rem;
+  padding-left: 0.8rem;
+  outline: none;
+  border: none !important;
+}
+.common_input_text {
+  font-size: 0.8rem;
+  background-color: #edeff5;
+  padding: 0.11rem 0.4rem 0.11rem 0.8rem;
+  border-radius: 0.5rem;
+  height: 1.7rem;
+  width: 100%;
+}
+.common_main_title {
+  font-size: 1.2rem;
+  font-family: "Rubik";
+  line-height: 1.25rem;
+  color: #ffffff;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+}
+
+// Table Content Common Style
+
+.mdc-data-table__header-cell {
+  background-color: #cff4f5;
+  color: #164d61;
+  font-family: "Rubik" !important;
+  font-size: 0.7rem !important;
+}
+
+.mdc-data-table__row {
+  background-color: #ffffff !important;
+  height: 10px !important;
+}
+.mdc-data-table__cell {
+  font-size: 0.7rem !important;
+  font-family: "Rubik";
+  height: 5px !important;
+
+}
+.mat-mdc-icon-button .mat-mdc-button-touch-target {
+  width: 1rem !important;
+  height: 1rem !important;
+}
+
+.page_title {
+  font-size: 1.31rem !important;
+  line-height: 1.5rem !important;
+  font-family: "Rubik";
+  font-weight: 600;
+  color: #164d61;
+  margin-bottom: 0px !important;
+}
+
+td {
+  background-color: #ffffff;
+  padding: 0.25rem;
+}
+.team_detail_schedule th {
+  min-width: 100px;
+  background-color: #cff4f5;
+  color: #164d61;
+  font-size: 0.75rem;
+  padding: 0.8rem 0.8rem 0.8rem 0.3rem;
+  font-family: "Rubik";
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  font-weight: 400;
+}
+.team_detail_schedule {
+  margin-top: -0.6rem;
+}
+.mdc-data-table__header-row {
+  background-color: #e1e6ed !important;
+}
+
+// tr{
+//   background-color: #EDEFF5 !important;
+
+// }
+// td{
+//   font-size: 0.75rem !important;
+// }
+
+.patient-detail-panel-heading {
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.5rem;
+  color: #164d61;
+  font-family: "Rubik";
+}
+.mat-mdc-paginator {
+  background-color: #e1e6ed;
+}
+.mat-mdc-paginator-range-label {
+  margin: 0 4px !important;
+  font-family: "Rubik" !important;
+  font-size: 0.6rem !important;
+  color: #164d61 !important;
+}
+.mat-mdc-paginator-range-actions {
+  height: 1.2rem !important;
+}
+.mat-mdc-paginator-container {
+  min-height: 2rem !important;
+  background-color: #e1e6ed !important;
+}
+.schedule_lower_container {
+  padding-top: 2rem;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+// 125%  Calculation
+
+.main_content {
+  padding: 0rem 0rem 0rem 2rem;
+}
+input[type="radio"] {
+  accent-color:#164d61; /* Material Blue or any color you like */
+}
+// .content-panel
+// {
+//   padding-top: 3.1rem;
+// }
+.main-panel {
+  width: 100%;
+  height: 90vh;
+  position: relative;
+  // padding-left: 2rem;
+  // margin-right: 2rem !important;
+  padding-top: 3rem;
+}
+
+.right-menu-panel {
+  position: absolute;
+  right: 40px;
+  top: 20px;
+}
+
+.addCommonBtn {
+  min-width: 5.7rem;
+  height: 2rem;
+  padding: 0.55rem 0.4rem;
+  font-size: 0.8rem;
+  font-family: "Rubik-normal";
+  text-transform: uppercase;
+  background-color: #8226df;
+  color: #ffffff;
+  line-height: 1rem;
+  border: 0.05rem solid #ffffff;
+  border-radius: 1rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+.addCommonBtn:hover {
+  background-color: #590ca7;
+}
+// Upper Page Back arrow
+
+.arrow-img {
+  width: 2.4rem;
+  height: 1.2rem;
+  // padding-right:0.8rem;
+}
+.back_arrow_container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+}
+.back_arrow_container:hover {
+  background-color: #d8dce5;
+}
+.back_arrow {
+  display: flex;
+  align-items: center;
+  padding-bottom: 1.3rem;
+}
+.main_title {
+  font-size: 1.2rem;
+  line-height: 1.5rem;
+  font-family: "Rubik";
+  font-weight: 600;
+  color: #164d61;
+  text-align: left;
+  margin-bottom: 0px !important;
+}
+
+//  Upper Menu Button Style
+
+.uppermenubtn {
+  min-width: 150px;
+  max-width: 150px;
+  height: 2.2rem;
+  font-family: "Rubik";
+  border-radius: 0.4rem;
+  font-size: 0.8rem;
+  line-height: 1.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.55rem;
+  color: #164d61;
+  border: none;
+  margin-right: 0.4rem;
+  background-color: #edeff5;
+  outline: none;
+}
+.uppermenubtn:hover {
+  background-color: #d8dce5;
+}
+.uppermenubtn:focus {
+  outline: none !important;
+}
+.uppermenubtnpanel {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+}
+.upperoverviewpanel {
+  width: 100%;
+  height: 4.8rem;
+  background-color: #8be3d9;
+  border-radius: 0.8rem;
+  padding: 0.4rem 0.4rem 0.4rem 0.4rem;
+  margin-top: 1.2rem;
+  display: flex;
+  margin-bottom: 1rem;
+  // align-items: center;
+}
+
+.upper_last_box {
+  margin-right: 0px !important;
+}
+.upperpanel_subtitle {
+  font-size: 0.7rem;
+  font-family: "Rubik";
+  color: #164d61;
+  line-height: 0.9rem;
+  margin-bottom: 3px !important;
+}
+
+.upperpanel_subBox_subtitle {
+  text-align: center;
+  color: #000000;
+}
+.upperpanel_subBox {
+  height: 4rem;
+  background-color: #99e8e3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.4rem;
+  margin-right: 0.4rem;
+  width: 100%;
+}
+.upperpanel_subBox:hover {
+  background-color: #3bcbc4;
+}
+.upperpanel_subBox_value {
+  font-size: 1.2rem;
+  text-align: center;
+  color: #000000;
+  margin-bottom: 3px !important;
+}
+.upperpanel_subtitle_dropdown {
+  padding-left: 0.8rem;
+}
+.upperpanel_subBox_dropdown {
+  height: 4rem;
+  background-color: #8be3d9;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  border-radius: 0.4rem;
+  width: 100%;
+  margin-right: 0.8rem;
+}
+.input_title {
+  font-size: 0.7rem;
+  color: #164d61;
+  line-height: 1.25rem;
+  font-family: "Rubik";
+  text-align: left;
+  padding-left: 0.4rem;
+}
+
+// Schedule Table Common Style
+
+// td{
+//   background-color: #ffffff ;
+//   padding: 0.4rem;
+//   font-family: "Rubik";
+//   }
+::ng-deep .mat-mdc-paginator .mat-mdc-paginator-page-size {
+  display: none !important;
+}
+
+::ng-deep .mat-mdc-paginator {
+  background-color: #e1e6ed;
+}
+::ng-deep .mat-mdc-paginator-navigation-previous,
+::ng-deep .mat-mdc-paginator-navigation-next {
+  outline: none !important;
+}
+
+th {
+  background-color: #cff4f5;
+  // min-width: 150px;
+  padding: 1.2rem 0.4rem 0.938rem 0.4rem;
+  min-height: 3rem;
+  color: #164d61;
+  font-size: 0.7rem;
+  font-family: "Rubik";
+}
+// tr{
+//   background-color: #EDEFF5;
+// }
+@media only screen and (max-width: 56rem) {
+  .upperpanel_subtitle {
+    font-size: 0.6rem;
+  }
+  .mat-header-cell {
+    font-size: 0.6rem !important;
+  }
+  .mat-cell {
+    font-size: 0.6rem !important;
+  }
+}
+
+// SideBar Component Style For Add Edit Container
+
+// Side Toolbar Style Start
+.btn_tool_close {
+  width: 2.8rem;
+  height: 2.8rem;
+  padding: 0px;
+  margin: 0px;
+  background-color: #590ca7;
+  border-radius: 1rem 0rem 0rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  outline: none;
+  border: none;
+}
+
+.btn_tool {
+  width: 2.8rem;
+  height: 2.8rem;
+  padding: 0px;
+  margin: 0px;
+  background-color: #8226df;
+  border-radius: 0.8rem 0rem 0rem 0.8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  outline: none;
+  border: none;
+}
+.plus_icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  filter: brightness(0) saturate(100%) invert(23%) sepia(90%) saturate(2467%)
+    hue-rotate(260deg) brightness(84%) contrast(111%);
+}
+.plus_icon_container {
+  background-color: #ffffff;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.close_icon {
+  filter: brightness(0) invert(1);
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.plus_icon_containerclose {
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+}
+.side_menu_item_container {
+  width: 2.2rem;
+  height: 2.2rem;
+  margin-bottom: 1rem;
+  background-color: #8226df;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  position: relative;
+  margin: 0.8rem auto;
+}
+.side_menu_item {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) saturate(100%) invert(99%) sepia(1%) saturate(0%)
+    hue-rotate(196deg) brightness(106%) contrast(101%);
+}
+.plus_icon_side_bar {
+  width: 1.5rem;
+  height: 1.5rem;
+  filter: invert(100%) sepia(98%) saturate(0%) hue-rotate(351deg)
+    brightness(104%) contrast(103%);
+}
+
+.btn_bg {
+  position: absolute;
+  top: 1.25rem;
+  right: 0px;
+}
+
+// Side Toolbar Style End
+
+// Task Common  Template Start
+
+// Task Template
+
+.add_watcher_icon {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+.add_watcher_img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  width: 1.6rem;
+  height: 1.6rem;
+  background-color: #edeff5;
+}
+.add_watcher_container {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.8rem;
+  display: flex;
+  justify-content: center;
+}
+.add_watcer_title {
+  color: #8be3d9;
+  font-size: 0.8rem;
+  line-height: 1.25rem;
+  font-family: "Rubik";
+  font-weight: 100;
+  margin-right: 12px;
+  margin-bottom: 0px !important;
+}
+
+.task_content_date {
+  display: flex;
+}
+.Self_assign {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.priority_task_dropdown {
+  width: 100%;
+}
+.task_content_dropdown_self {
+  width: 55%;
+  margin-right: 1.2rem;
+}
+
+.task_date_picker_container {
+  padding-right: 0px;
+  width: 60%;
+  padding-right: 1.2rem;
+}
+
+.task_priority {
+  width: 50%;
+}
+.self_assign_icon {
+  display: flex;
+  width: 50%;
+  align-items: center;
+  // justify-content: flex-end;
+}
+.self_assign_icon_cont {
+  border-radius: 50%;
+  padding: 1px;
+  background-color: #edeff5;
+
+  margin-right: 3px;
+}
+.self_assign_icon_cont_active {
+  background-color: #3bcbc4;
+}
+.self_assign_icon_cont_inactive {
+  background-color: #edeff5;
+}
+.add_check_icon {
+  width: 0.85rem;
+  height: 0.8rem;
+}
+
+.warn {
+  color: #ff3636;
+  font-size: 0.6rem;
+  text-align: left;
+  height: 0.4rem;
+  padding-left: 0.8rem;
+}
+// Common Task Template End
+
+// Common Schedule Template Start
+
+.frequency_content_dropdown {
+  width: 100%;
+}
+.schedule_monthy_dropdown {
+  width: 50%;
+  background-color: #edeff5;
+  height: 2rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  outline: none;
+  padding: 3px 6px 3px 16px;
+}
+
+.schedule_date_panel {
+  display: flex;
+  width: 100%;
+}
+
+::ng-deep .mat-form-field-underline {
+  display: none;
+}
+
+.schedule_date_picker {
+  margin-right: 5px;
+}
+
+.schedule_date_picker {
+  width: 100%;
+  border-radius: 8px;
+  outline: none;
+}
+
+.duration_time {
+  width: 100%;
+  height: 100%;
+}
+
+.duration_value {
+  background-color: #edeff5;
+  width: 2rem;
+  height: 1.2rem;
+  color: #c1c7d5;
+  text-align: center;
+  margin-bottom: 0px;
+  border: none;
+}
+
+.duration_value:focus {
+  border: none;
+  color: #000000;
+}
+.duration_content_panel {
+  display: flex;
+  border-radius: 8px;
+  background-color: #edeff5;
+  width: fit-content;
+  padding: 3px;
+  height: 1.7rem;
+}
+.assignee_container {
+  padding-top: 2rem;
+}
+.start_date {
+  width: 100%;
+  margin-right: 1.2rem;
+}
+.end_date {
+  width: 100%;
+}
+.schedule_timer_content {
+  display: flex;
+
+  width: 100%;
+}
+.start_date_timer {
+  margin-right: 1.2rem;
+  width: 100%;
+}
+.time_input {
+  height: 1.7rem;
+  width: 8.75rem;
+  border-radius: 8px;
+  padding-left: 0.8rem;
+}
+.schedule_content {
+  padding: 8px 0px;
+}
+
+.frequency_monthly_panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.schedule_week_item {
+  margin-right: 3px;
+}
+
+.frequency_week {
+  width: 90%;
+  margin-top: 0.8rem;
+  margin-bottom: 0.4rem;
+  background-color: #164d61;
+  display: flex;
+  flex-direction: column;
+}
+.frequency_sub_panel {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 1rem;
+}
+.frequency_monthly_panel {
+  margin-top: 10px;
+}
+
+// Common Schedule Template End
+
+.smallForm {
+  padding: 3em 1em 2.5em 1em;
+  .add_clinic-item {
+    padding-bottom: 0.75em;
+  }
+}
+.commonConfirmaddPatientBtn:hover {
+  background-color: #590ca7;
+  border: 1px solid #ffffff;
+}
+.commonConfirmaddPatientBtn {
+  width: 5.8rem;
+  height: 2rem;
+  border-radius: 1rem;
+  border: 1px solid #c9b7e9;
+  background: #8226df;
+  font-family: "Rubik";
+  color: #ffffff;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+input.mat-input-element {
+  margin-top: -0.32rem !important;
+
+  margin-left: 0.2rem;
+}
+::ng-deep .mat-mdc-paginator-page-size {
+  display: none !important;
+}
+
+select {
+  outline: none !important;
+}
+.common_item_dropdown {
+  background-color: #edeff5;
+  border: 2px solid #d8dce5;
+  border-radius: 20px;
+  height: 30px;
+  width: 12vw;
+  color: #164d61;
+  font-size: 12px;
+  line-height: 20px;
+  font-family: "Rubik";
+  padding-left: 0.8rem;
+}
+.common_input_dropdown {
+  width: 100%;
+}
+
+.task_content_dropdown_self {
+  width: 100%;
+}
+
+.commonIcon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+.date_not_selected:hover {
+  background-color: #e1e6ed;
+}
+.btn-date_container {
+  font-size: 0.7rem;
+  line-height: 1.25rem;
+  background-color: #164d61;
+  color: #ffff;
+  height: fit-content;
+  border-radius: 1rem;
+  padding: 0.3rem;
+  border: none;
+  font-family: "Rubik-normal";
+  text-align: center;
+  outline: none;
+  height: 1.5rem;
+  min-width: 1.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+@font-face {
+  font-family: "Gotham";
+
+  src: local("Gotham"), url(./assets/Fonts/GothamMedium.ttf) format("truetype");
+}
+.patient_container {
+  padding-bottom: 1.5rem !important;
+  width: 70%;
+}
+.patient_container_2 {
+  padding-bottom: 1.5rem !important;
+}
+.mat-form-field-type-mat-date-range-input .mat-form-field-infix {
+  font-size: 0.8rem;
+  font-family: "Rubik";
+}
+.autocomplete-container .input-container input {
+  height: 1.7rem !important;
+  line-height: 1.5rem !important;
+  border-radius: 0.5rem;
+  font-size: 0.7rem !important;
+  background-color: #edeff5 !important;
+  padding: 0rem 0rem 0rem 0.8rem;
+}
+.autocomplete-container {
+  height: 30px !important;
+  border-radius: 0.5rem;
+  box-shadow: none !important;
+}
+.autocomplete-container .suggestions-container ul li {
+  margin-left: 5% !important;
+  line-height: 1.5rem !important;
+}
+button {
+  outline: none;
+}
+button:focus {
+  outline: none;
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner:before {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  border-top-color: #3bcbc4;
+  animation: spinner 0.8s linear infinite;
+}
+
+.common_input_dropdown {
+  font-size: 0.8rem;
+  background-color: #edeff5;
+
+  border-radius: 0.5rem;
+  height: 1.7rem;
+  width: 100%;
+  padding: 0.3rem;
+  padding-left: 0.8rem;
+  outline: none;
+  border: none !important;
+  margin: 0.2rem;
+}
+
+// Patient Login  Common Style

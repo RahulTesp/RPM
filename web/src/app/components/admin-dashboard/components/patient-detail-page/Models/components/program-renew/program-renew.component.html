@@ -1,0 +1,67 @@
+<div class="mydialogBox">
+  <div class="dialogrenewDatePanel">
+    <div class="header">
+      <h3>Select Program Renew Date</h3>
+    </div>
+    <form [formGroup]="renewProgramForm" class="renewForm">
+      <div class="renewDatePanel">
+        <!-- Left Panel Start -->
+        <div class="left_panel">
+          <p class="common_content_title renew_date">Start date :</p>
+          <input
+            class="common_input_dropdown"
+            type="date"
+            min="{{ today_date }}"
+            formControlName="startdate"
+            id="pd_RenewStart"
+          />
+
+          <p class="common_content_title renew_date">End date :</p>
+          <input
+            class="common_input_dropdown"
+            type="date"
+            [attr.disabled]="true"
+            formControlName="pgmendDate"
+            id="pd_RenewEnd"
+          />
+        </div>
+        <!-- Left Panel End -->
+        <!-- Right Panel Start -->
+        <div class="right_panel">
+          <div class="duration_div_">
+            <p class="common_content_title renew_date">Duration</p>
+            <div class="program_duration_content_panel">
+              <div class="duration_content_panel">
+                <img
+                  (click)="increment_duration()"
+                  class="btn-common"
+                  src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                  id="pd_RenewDurationIncrease"
+                />
+
+                <span class="duration_value"> {{ durationValue }}</span>
+
+                <img
+                  (click)="decrement_duration()"
+                  class="btn-common"
+                  src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                  id="pd_RenewDurationIncrease"
+                />
+              </div>
+              <span class="months_duration"> Months </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="btn_panel">
+      <button class="btn_cancel" (click)="Cancelrenew()" id="pd_RenewCancel">
+        CANCEL
+      </button>
+
+      <button class="btn_save" (click)="renewProgram()" id="pd_RenewSubmit">
+        Submit
+      </button>
+    </div>
+  </div>
+</div>

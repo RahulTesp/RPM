@@ -1,0 +1,70 @@
+<div class="date-picker-panel">
+  <div class="date-range-picker">
+    <!-- Button with a calendar icon to open the calendar modal -->
+
+    <!-- Read-only text box displaying the selected date range -->
+    <input
+      type="text"
+      [value]="selectedRange"
+      readonly
+      placeholder="Select date range"
+      class="selected-range"
+    />
+
+    <img
+      (click)="openCalendar()"
+      class="open-calendar-btn"
+      src="../../../../../assets/04-Icons/Icons_Calendar.svg"
+      alt="Calendar Icon"
+    />
+  </div>
+
+  <!-- Calendar Modal -->
+  <div
+    class="modal-overlay"
+    *ngIf="isCalendarOpen"
+    (click)="onOverlayClick($event)"
+  >
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="calendar-header">
+        <button class="btn-month" (click)="previousMonth()">&lt;</button>
+        <!-- <span>{{ currentYear }} - {{ monthNames[currentMonth] }}</span> -->
+        <select [(ngModel)]="currentYear" (change)="generateCalendar()">
+          <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+        </select>
+        <!-- Month dropdown -->
+        <select [(ngModel)]="currentMonth" (change)="generateCalendar()">
+          <option *ngFor="let month of monthNames; let i = index" [value]="i">
+            {{ month }}
+          </option>
+        </select>
+        <button class="btn-month" (click)="nextMonth()">&gt;</button>
+      </div>
+      <div class="calendar-grid">
+        <!-- Weekday headers -->
+        <div
+          class="calendar-day header"
+          *ngFor="let day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']"
+        >
+          {{ day }}
+        </div>
+        <!-- Calendar cells -->
+        <div
+          class="calendar-day"
+          *ngFor="let dayObj of calendarDays"
+          [ngClass]="{
+            'other-month': !dayObj.isCurrentMonth,
+            selected: isSelected(dayObj.date)
+          }"
+          (click)="selectDate(dayObj.date)"
+        >
+          {{ dayObj.date.getDate() }}
+        </div>
+      </div>
+      <div class="modal-buttons">
+        <button (click)="applyDateRange()">OK</button>
+        <button (click)="closeCalendar()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>

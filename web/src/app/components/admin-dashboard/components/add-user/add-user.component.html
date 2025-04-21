@@ -1,0 +1,386 @@
+<div class="content">
+  <div class="main_content">
+    <div class="content-panel">
+      <!-- Main Panel -->
+      <div
+        class="main-panel" >
+        <div class="upper_panel">
+          <div class="page_title">
+            <h3>{{ editVariable ? "Edit User" : "Add User" }}</h3>
+          </div>
+          <div class="button-group">
+            <!-- <button class=" btn_panel_item btn_draft" disabled >SAVE DRAFT</button> -->
+            <button
+              id="btnaduserdiscard"
+              class="commonConfirmaddPatientBtn btn_discard"
+              (click)="discard()"
+            >
+              DISCARD
+            </button>
+            <button
+              id="btnaduseregister"
+              class="commonConfirmaddPatientBtn btn_confirm"
+              (click)="registerUser()"
+            >
+              CONFIRM
+            </button>
+          </div>
+        </div>
+        <form [formGroup]="registerForm">
+          <div class="main_sub_panel">
+            <div class="userInfo">
+              <div class="panel_title">
+                <p>User Information</p>
+              </div>
+              <div class="userInfoContent">
+                <div class="userInfoContLeft">
+                  <div class="uploadPhoto">
+                    <img
+                      class="icon_camera"
+                      src="../../../assets/04-Icons/Icons_Camera.svg"
+                    />
+                  </div>
+                  <div class="userInfoItem">
+                    <p class="userInfoTitle input_title">*Email ID</p>
+                    <input
+                      class="userInfovalue common_input_text"
+                      id="adUserEmail"
+                      placeholder="Email ID"
+                      maxlength="50"
+                      required
+                      formControlName="email"
+                    />
+                    <small
+                      class="text-danger"
+                      *ngIf="
+                        registerForm.get('email')?.invalid &&
+                        registerForm.get('email')?.touched
+                      "
+                      >Email is Required</small
+                    >
+                  </div>
+                  <div class="userInfoItem">
+                    <p class="userInfoTitle input_title">
+                      *Mobile Number (Primary)
+                    </p>
+                    <input
+                      class="userInfovalue common_input_text"
+                      id="adUserMobile"
+                      placeholder="Mobile Number"
+                      maxlength="10"
+                      required
+                      formControlName="phone"
+                    />
+                    <small
+                      class="text-danger"
+                      *ngIf="
+                        registerForm.get('phone')?.invalid &&
+                        registerForm.get('phone')?.touched
+                      "
+                      >Mobile Number is Required</small
+                    >
+                  </div>
+                  <div class="userInfoItem" style="visibility: hidden">
+                    <p class="userInfoTitle input_title">DOB</p>
+                    <input
+                      class="userInfovalue common_input_text"
+                      id="adUserDOB"
+                      placeholder="DOB"
+                    />
+                  </div>
+                  <!-- <div class="userInfoItem">
+                    <p class="userInfoTitle input_title">*DOB</p>
+                    <input  type="date" class="userInfovalue common_input_text" placeholder="Mobile Number" required formControlName ="dob" min="1900-01-01"
+                    max="{{convertDate(myDate)}}"/>
+                    <small class="text-danger" *ngIf="registerForm.get('dob')?.invalid && registerForm.get('dob')?.touched">Date of Birth is Required</small>
+
+                  </div> -->
+                  <!-- <div class="userInfoItem">
+                    <p class="userInfoTitle input_title">*Gender</p>
+                    <select class="userInfovalue common_input_dropdown" placeholder="Gender" required formControlName ="gender" >
+                      <option *ngFor="let gender of GenderArray; let i = index;" [value]="gender.value">{{gender.name}} </option>
+                    </select>
+                    <small class="text-danger" *ngIf="registerForm.get('gender')?.invalid && registerForm.get('gender')?.touched">Gender is Required</small>
+                  </div> -->
+                </div>
+                <div class="userInfoContRight">
+                  <div class="userInfoItem">
+                    <p class="userInfoTitle input_title">*First Name</p>
+                    <input
+                      class="userInfovalue common_input_text"
+                      id="adUserFname"
+                      placeholder="*First Name"
+                      maxlength="20"
+                      required
+                      formControlName="fname"
+                    />
+                    <small
+                      class="text-danger"
+                      *ngIf="
+                        registerForm.get('fname')?.invalid &&
+                        registerForm.get('fname')?.touched
+                      "
+                      >First Name is Required</small
+                    >
+                  </div>
+                  <div class="userInfoItem">
+                    <p class="userInfoTitle input_title">Middle Name</p>
+                    <input
+                      class="userInfovalue common_input_text"
+                      id="adUserMname"
+                      placeholder="Middle Name"
+                      maxlength="20"
+                      notrequired
+                      formControlName="middlename"
+                    />
+                  </div>
+                  <div class="userInfoItem">
+                    <p class="userInfoTitle input_title">*Last Name</p>
+                    <input
+                      class="userInfovalue common_input_text"
+                      id="adUserLname"
+                      placeholder="*Last Name"
+                      maxlength="20"
+                      required
+                      formControlName="lname"
+                    />
+                    <small
+                      class="text-danger"
+                      *ngIf="
+                        registerForm.get('lname')?.invalid &&
+                        registerForm.get('lname')?.touched
+                      "
+                      >Last Name is Required</small
+                    >
+                  </div>
+                  <div class="userInfoItem">
+                    <p class="userInfoTitle input_title">*User Name</p>
+                    <div class="usernamevalue">
+                      <input
+                        class="userInfovalue common_input_text"
+                        [attr.disabled]="userVerifyCompleted ? true : null"
+                        placeholder="*User Name"
+                        maxlength="20"
+                        required
+                        formControlName="uname"
+                        id="adUserUname"
+                      />
+                      <button
+                        *ngIf="!userbuttondisplay"
+                        class="btnverify"
+                        [disabled]="editVariable"
+                        id="btnadduserverify"
+                        (click)="userVerify()"
+                      >
+                        Verify
+                      </button>
+                    </div>
+                    <small
+                      class="text-danger"
+                      *ngIf="registerForm.get('uname')?.valid && verifyUser"
+                      >User Name Already Exist</small
+                    >
+                    <small
+                      class="text-success"
+                      *ngIf="registerForm.get('uname')?.valid && successUser"
+                      >User Name Verified Successfully</small
+                    >
+                    <small
+                      class="text-success"
+                      *ngIf="
+                        registerForm.get('uname')?.valid &&
+                        registerForm.get('uname')?.touched
+                      "
+                    ></small>
+                    <small
+                      class="text-danger"
+                      *ngIf="
+                        registerForm.get('uname')?.invalid &&
+                        registerForm.get('uname')?.touched
+                      "
+                      >User Name is Required</small
+                    >
+                  </div>
+                  <div class="userInfoItem" *ngIf="http_state">
+                    <p class="userInfoTitle input_title">*State</p>
+                    <select
+                      class="userInfovalue common_input_dropdown"
+                      placeholder="Select Category"
+                      required
+                      formControlName="state"
+                      id="adUserState"
+                      [(ngModel)]="stateVariable"
+                      (change)="filterCitybyState()"
+                    >
+                      <option [ngValue]="undefined" hidden>Select State</option>
+                      <option
+                        *ngFor="let data of http_state.States; let i = index"
+                        [value]="data.StateId"
+                      >
+                        {{ data.StateName }}
+                      </option>
+                    </select>
+                    <small
+                      class="text-danger"
+                      *ngIf="
+                        registerForm.get('state')?.invalid &&
+                        registerForm.get('state')?.touched
+                      "
+                      >State Name is Required</small
+                    >
+                  </div>
+                  <div class="userInfoItem">
+                    <p class="userInfoTitle input_title">*City</p>
+                    <select
+                      class="userInfovalue common_input_dropdown"
+                      placeholder="Select Category"
+                      required
+                      formControlName="city"
+                      id="adUserCity"
+                      [(ngModel)]="cityVariable"
+                    >
+                      <option [ngValue]="undefined" hidden>Select City</option>
+                      <option
+                        *ngFor="let data of cityArray; let i = index"
+                        [value]="data.CityId"
+                      >
+                        {{ data.CityName }}
+                      </option>
+                    </select>
+                    <small
+                      class="text-danger"
+                      *ngIf="
+                        registerForm.get('city')?.invalid &&
+                        registerForm.get('city')?.touched
+                      "
+                      >City Name is Required</small
+                    >
+                  </div>
+                  <div class="userInfoItem">
+                    <p class="userInfoTitle input_title">*ZipCode</p>
+                    <input
+                      class="userInfovalue common_input_text"
+                      placeholder="ZipCode"
+                      maxlength="5"
+                      required
+                      formControlName="zipcode"
+                      id="asUserZipcode"
+                    />
+                    <small
+                      class="text-danger"
+                      *ngIf="
+                        registerForm.get('zipcode')?.invalid &&
+                        registerForm.get('zipcode')?.touched
+                      "
+                      >Zip code is Required</small
+                    >
+                  </div>
+                  <div class="userInfoItem">
+                    <p class="userInfoTitle input_title">*Time Zone</p>
+                    <select
+                      class="userInfovalue common_input_dropdown"
+                      placeholder="Select Category"
+                      required
+                      formControlName="timezone"
+                      id="adUserTimezone"
+                    >
+                      <option *ngFor="let obj of timezones" [value]="obj.Id">
+                        {{ obj.Name }}
+                      </option>
+                    </select>
+                    <small
+                      class="text-danger"
+                      *ngIf="
+                        registerForm.get('timezone')?.invalid &&
+                        registerForm.get('timezone')?.touched
+                      "
+                      >Time Zone is Required</small
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="userRole">
+              <div class="panel_title">
+                <p>User Role</p>
+              </div>
+              <div class="userRoleContent">
+                <div class="userRoleContLeft">
+                  <div class="userInfoItem">
+                    <p class="userInfoTitle input_title">*User Role</p>
+                    <div   [class.isDisabled]="editVariable">
+                      <!-- <mat-form-field>
+
+                        <mat-select
+                          id="adduserroleselect"
+                          class="common_input_dropdown"
+                          [disabled]="userCountStatus ? true : false"
+                          formControlName="userrole"
+                          [(value)]="selectedUserRole"
+                          id="adUserUrole"
+                        >
+                          <mat-option
+                            *ngFor="let user of UserList"
+                            [value]="user.Id"
+                            >{{ user.Role }}</mat-option
+                          >
+                        </mat-select>
+                      </mat-form-field> -->
+                      <select class="common_input_dropdown" formControlName="userrole" [disabled]="userCountStatus">
+                        <option value="">Select Role</option>
+                        <option *ngFor="let user of UserList" [value]="user.Id">
+                          {{ user.Role }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  <div *ngIf="clinicdisplay" class="userInfoItem">
+                    <p class="userInfoTitle input_title">*Clinic Name</p>
+                    <select
+                      class="userInfovalue common_input_dropdown"
+                      placeholder="Select Category"
+                      required
+                      id="adUserClinicName"
+                      formControlName="clinicname"
+                      [attr.disabled]="editVariable"
+                    >
+                      <option [ngValue]="undefined" hidden>
+                        Select Clinic
+                      </option>
+                      <option
+                        *ngFor="let clinic of http_clinicData; let i = index"
+                        [value]="clinic.Id"
+                      >
+                        {{ clinic.Name }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="userRoleContRight">
+                  <button
+                    *ngIf="unlockAccountStatus == true"
+                    class="unlock"
+                    id="btnadduserunlock"
+                    (click)="UnlockAccount()"
+                  >
+                    Unlock User
+                  </button>
+                  <!-- <p class="userInfoTitle input_title">Access Right</p>
+                <div *ngFor="let item of accessList">
+                  <div class="accessright">
+                    <img class="check_icon" src="../../../assets/04-Icons/Icons_Check A.svg" />
+                    <p class="userInfoTitle input_title">{{item.accessright}}</p>
+                  </div>
+                </div> -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <!-- Side Panel -->
+
+    </div>
+  </div>
+</div>
+<app-confirm-dialog-panel></app-confirm-dialog-panel>

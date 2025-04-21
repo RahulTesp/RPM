@@ -1,0 +1,4119 @@
+<ng-container *ngIf="loading && loading2">
+  <div class="overlay"></div>
+  <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
+</ng-container>
+<div class="container_panel">
+  <div class="main_panel">
+    <div class="main-content-panel01" [ngStyle]="{ width: '98%' }">
+      <div class="main_page_upper_panel">
+        <div class="page-header">
+          <div class="page-header-panel">
+            <div class="title_panel">
+              <div class="back_arrow_container">
+                <img
+                  class="arrow-img"
+                  src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg"
+                  (click)="backhome()"
+                />
+              </div>
+              <p class="page_title" *ngIf="activePage == 'ProgramInfo'">
+                Program
+              </p>
+              <p class="page_title" *ngIf="activePage == 'ClinicalInfo'">
+                Vital
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="call_container" *ngIf="callVariable">
+          <ng-container *ngTemplateOutlet="callpanel"></ng-container>
+        </div>
+      </div>
+
+      <div class="doc_container" *ngIf="documentVariable">
+        <ng-container *ngTemplateOutlet="docpanel"></ng-container>
+      </div>
+      <div class="chat_container" *ngIf="chatVariable">
+        <ng-container *ngTemplateOutlet="chatpanel"></ng-container>
+      </div>
+      <div class="schedule_container" *ngIf="scheduleVariable">
+        <ng-container *ngTemplateOutlet="schedulepanel"></ng-container>
+      </div>
+      <div class="medication_container" *ngIf="medicationVariable">
+        <ng-container *ngTemplateOutlet="medicationpanel"></ng-container>
+      </div>
+      <div class="medication_container" *ngIf="medication_update_variable">
+        <ng-container *ngTemplateOutlet="updatemedicationpanel"></ng-container>
+      </div>
+      <div class="upload_container" *ngIf="uploadVariable">
+        <ng-container *ngTemplateOutlet="uploadpanel"></ng-container>
+      </div>
+
+      <div class="update_container" *ngIf="updateVariable">
+        <ng-container *ngTemplateOutlet="updatepanel"></ng-container>
+      </div>
+      <div class="note_container" *ngIf="activitycallVariable">
+        <ng-container *ngTemplateOutlet="notetemplate"></ng-container>
+      </div>
+      <div class="main_page_lower_panel">
+        <div class="profile_container">
+          <!-- Profile Container Start -->
+          <div class="patient_info_panel">
+            <div class="upper_container">
+              <div class="img_container mat-card-avatar">
+                <img
+                  class="profileimg"
+                  src="{{
+                    http_rpm_patientList &&
+                      http_rpm_patientList.PatientDetails.Picture
+                  }}"
+                />
+              </div>
+              <div class="patient_detail_container">
+                <p class="patient_main_data">{{ patientName }}</p>
+                <p class="patient_main_data">
+                  Patient ID:
+                  {{
+                    http_rpm_patientList &&
+                      http_rpm_patientList.PatientDetails.UserName
+                  }}
+                </p>
+                <div class="patient_profile_data_cont">
+                  <p class="patient_sub_data patient_info_sub_container">
+                    {{ patientdob }}
+                  </p>
+                  <p class="patient_sub_data">{{ patient_address }}</p>
+                </div>
+              </div>
+              <div class="patient_communication_container">
+                <div class="device_icon device_icon_left">
+                  <!-- <img
+                    class="device_img"
+                    src="../../../../../assets/04-Icons/Icons_Phone A.svg"
+                    (click)="makeCallReady()"
+                  /> -->
+                </div>
+                <div class="device_icon">
+                  <!-- <img
+                    class="device_img"
+                    src="../../../../../assets/04-Icons/Icons_Chat A.svg"
+                    (click)="onClickChat()"
+                  /> -->
+                </div>
+              </div>
+
+              <!--<div class="time_container">
+                              <div class="careplan">
+                               <p class="plan_data"> Care Plan-BG+BP</p>
+                               <button class="active">Active</button>
+                              </div>
+                              <p class="plan_data"> 08/12 Months</p>
+                              <section class="time_container_progress" >
+                                <mat-progress-bar   mode="determinate" value="40"></mat-progress-bar>
+                              </section>  
+                          </div>-->
+            </div>
+            <div class="bottom_container">
+              <div class="plan_data">
+                <div class="plan_data_upperpanel">
+                  <div class="plan_data_upperpanel_left">
+                    <span>
+                      {{
+                        http_rpm_patientList &&
+                          http_rpm_patientList.ProfileSummary.ProgramName
+                      }}
+                    </span>
+                  </div>
+                  <div class="plan_data_upperpanel_right">
+                    <span
+                      class="status_display"
+                      [ngClass]="{
+                        patient_active: careplanStatus == 'Active',
+                        patient_prescribed:
+                          careplanStatus == 'Prescribed' ||
+                          careplanStatus == 'Enrolled',
+                        patient_discharge:
+                          careplanStatus == 'Discharged' ||
+                          careplanStatus == 'ReadyToDischarge',
+                        patient_onhold: careplanStatus == 'OnHold'
+                      }"
+                      >{{ careplanStatus }}</span
+                    >
+                  </div>
+                </div>
+                <!-- <div class="plan_data_lowerpanel">
+                  <div class="profile_care_paln_duration">
+                    <span class="care_paln_duration_text">
+                      {{
+                        http_rpm_patientList &&
+                          http_rpm_patientList.ProfileSummary.CompletedDuration
+                      }}
+                    </span>
+                  </div>
+                  <div
+                    class="progress"
+                    style="height: 10px; border-radius: 25px"
+                  >
+                    <div
+                      class="progress-bar"
+                      role="progressbar"
+                      aria-valuenow="100"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                      [style.width.%]="CompleteionPercentage"
+                      [ngStyle]="{
+                        'background-color':
+                          CompleteionPercentage > 100 ? '#155d16' : '#ffbf77'
+                      }"
+                    >
+                      <span class="sr-only"> </span>
+                    </div>
+                  </div>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <p class="main_title_sub" *ngIf="program_name == 'RPM'">
+            Vital Reading Status
+          </p>
+          <div class="summary_billing_content" *ngIf="program_name == 'RPM'">
+            <div class="billing_cont_sub">
+              <p class="billing_cont_sub_heading">
+                {{ billingInfo && billingInfo.PatientVital }}
+              </p>
+
+              <div class="progress" style="height: 28px; border-radius: 25px">
+                <div
+                  class="progress-bar"
+                  role="progressbar"
+                  aria-valuenow="70"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  [style.width.%]="billingratio"
+                  style="background-color: #e1e6ed"
+                >
+                  <p class="billing-progressvalue">
+                    {{ billingInfo && billingInfo.TotalReadings }}/{{
+                      billingInfo && billingInfo.DaysCompleted
+                    }}
+                    Days
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Profile Container End-->
+
+        <!-- Central Panel Start -->
+        <!-- class ="centeral_panel" -->
+        <div class="middle_panel">
+          <div class="uppermenubtnpanel">
+            <div *ngFor="let item of menu">
+              <button
+                class="uppermenubtn_detail"
+                (click)="ChangeScreen(item.menu_id)"
+                [class.selected]="CurrentMenu == item.menu_id"
+                style="z-index: 200; position: relative"
+              >
+                {{ item.menu_title }}
+              </button>
+            </div>
+          </div>
+          <div class="panel_layout_container">
+            <div class="panel_render_container">
+              <ng-container [ngSwitch]="variable">
+                <ng-container *ngSwitchCase="1">
+                  <ng-container *ngTemplateOutlet="programInfo"></ng-container>
+                </ng-container>
+                <ng-container *ngSwitchCase="2">
+                  <ng-container *ngTemplateOutlet="clinicInfo"></ng-container>
+                </ng-container>
+                <ng-container *ngSwitchCase="3">
+                  <ng-container *ngTemplateOutlet="activityInfo"></ng-container>
+                </ng-container>
+                <ng-container *ngSwitchDefault>
+                  <ng-container *ngTemplateOutlet="programInfo"></ng-container>
+                </ng-container>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #notetemplate>
+  <div class="common_template update_note_template">
+    <form>
+      <div class="common_main_title">Update Note</div>
+
+      <div class="common_template_content">
+        <div class="note_dropdown common_content">
+          <p class="common_content_title">Note Type</p>
+
+          <select
+            class="common_input_dropdown"
+            placeholder="Select Category"
+            id="pd_updateNoteType"
+            required
+            name="noteId"
+            #noteId="ngModel"
+            [(ngModel)]="NoteTypeId"
+            [ngModelOptions]="{ standalone: true }"
+            [disabled]="true"
+          >
+            <option [value]="undefined">Select Category</option>
+
+            <option
+              *ngFor="let data of noteTypeIdArray; let i = index"
+              [value]="data.Id"
+            >
+              {{ data.Name }}
+            </option>
+          </select>
+          <div class="warn">
+            <ng-container *ngIf="noteId?.invalid && noteId?.touched">
+              Schedule Type is required.
+            </ng-container>
+          </div>
+        </div>
+        <div class="call_connect_panel common_content">
+          <div class="establish_sub_content">
+            <p class="common_content_title content_titl-radio">
+              Non-Established Call
+            </p>
+            <input
+              class="isestablished"
+              type="radio"
+              id="1"
+              name="sample"
+              [value]="false"
+              [(ngModel)]="establishedValue"
+            />
+            <!-- <input  type="radio" value="0"  [checked]="iscallestablished" (change)="iscallestablished = !iscallestablished"> -->
+          </div>
+          <div class="establish_sub_content">
+            <p class="common_content_title content_titl-radio">
+              Established Call
+            </p>
+            <input
+              class="isestablished"
+              type="radio"
+              id="b"
+              name="sample"
+              [value]="true"
+              [(ngModel)]="establishedValue"
+            />
+            <!-- <input class="isestablished" type="radio" value="1" [checked]="iscallestablished" (change)="iscallestablished = !iscallestablished"> -->
+          </div>
+        </div>
+        <p class="common_content_title">With/Intended With</p>
+
+        <div class="call_connect_panel common_content">
+          <div class="establish_sub_content">
+            <p class="common_content_title content_titl-radio">Patient</p>
+            <input
+              class="isestablished"
+              type="radio"
+              id="1"
+              name="Caregiver"
+              [value]="false"
+              [(ngModel)]="caregiver"
+            />
+          </div>
+
+          <div class="establish_sub_content">
+            <p class="common_content_title content_titl-radio">Caregiver</p>
+
+            <input
+              input
+              class="isestablished"
+              type="radio"
+              id="2"
+              name="Caregiver"
+              [value]="true"
+              [(ngModel)]="caregiver"
+            />
+          </div>
+        </div>
+        <div class="common_content">
+          <p class="common_content_title">Time</p>
+
+          <input
+            class="common_input_dropdown"
+            id="pd_noteTime"
+            type="text"
+            step="1"
+            min="00:00:00"
+            max="24:00:00"
+            placeholder="Select Time"
+            [(ngModel)]="NoteTime"
+            [ngModelOptions]="{ standalone: true }"
+            [disabled]="true"
+          />
+        </div>
+
+        <div
+          class="questionpanel"
+          *ngFor="
+            let note of QuestionArrayBase;
+            let i = index;
+            let first = first
+          "
+        >
+          <div
+            *ngIf="
+              note.AnswerTypes &&
+              note.AnswerTypes.length > 0 &&
+              note.Question != 'Readings Summary Report'
+            "
+          >
+            <details>
+              <summary class="common_content_title common_content_data_title">
+                {{ note.Question }}
+              </summary>
+              <div class="answer_panel" *ngIf="note.AnswerTypes.length > 0">
+                <div
+                  *ngFor="
+                    let ans of note.AnswerTypes;
+                    let i = index;
+                    let first = first
+                  "
+                >
+                  <div class="answer_sub">
+                    <input
+                      class="answer_check"
+                      type="checkbox"
+                      id="pd_updateNote1"
+                      [(ngModel)]="ans.Checked"
+                      [ngModelOptions]="{ standalone: true }"
+                    />
+                    <p class="answer_descr">{{ ans.Answer }}</p>
+                  </div>
+                </div>
+                <div>
+                  <textarea
+                    class="extra_note_data"
+                    id="pd_updateNote1Extra"
+                    [(ngModel)]="note.Notes"
+                    [ngModelOptions]="{ standalone: true }"
+                  ></textarea>
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <!-- Sub Question Start -->
+          <div
+            *ngIf="
+              note.SubQuestions.length > 0 &&
+              note.Question != 'Readings Summary Report'
+            "
+          >
+            <details>
+              <summary class="common_content_title common_content_data_title">
+                {{ note.Question }}
+              </summary>
+              <div
+                class="Sub_question_panel"
+                *ngIf="note.SubQuestions.length > 0"
+              >
+                <div
+                  *ngFor="
+                    let question of note.SubQuestions;
+                    let i = index;
+                    let first = first
+                  "
+                >
+                  <details [open]="first ? true : false">
+                    <summary
+                      class="common_content_title common_content_data_title"
+                    >
+                      {{ question.Question }}
+                    </summary>
+                    <div class="answer_panel">
+                      <div
+                        *ngFor="
+                          let ans of question.AnswerTypes;
+                          let i = index;
+                          let first = first
+                        "
+                      >
+                        <div class="answer_sub">
+                          <input
+                            class="answer_check"
+                            type="checkbox"
+                            id="pd_updateNote2"
+                            [(ngModel)]="ans.Checked"
+                            [ngModelOptions]="{ standalone: true }"
+                          />
+                          <p class="answer_descr">{{ ans.Answer }}</p>
+                        </div>
+                      </div>
+                      <div>
+                        <textarea
+                          class="extra_note_data"
+                          id="pd_updateNote2Extra"
+                          [(ngModel)]="question.Notes"
+                          [ngModelOptions]="{ standalone: true }"
+                        ></textarea>
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              </div>
+            </details>
+          </div>
+          <!-- Sub Question End -->
+
+          <div *ngIf="note.Question == 'Readings Summary Report'">
+            <details>
+              <summary class="common_content_title common_content_data_title">
+                {{ note.Question }}
+              </summary>
+              <div class="answer_panel" *ngIf="note.AnswerTypes.length > 0">
+                <p class="vital_descr">{{ this.vitals[0].Vital }}</p>
+
+                <div
+                  *ngFor="
+                    let ans of note.AnswerTypes;
+                    let i = index;
+                    let first = first
+                  "
+                >
+                  <div class="answer_sub">
+                    <input
+                      class="answer_check"
+                      type="checkbox"
+                      id="{{ i }}"
+                      [(ngModel)]="ans.Checked"
+                      [checked]="ans.Checked"
+                      [name]="note.Question"
+                      [value]="ans.AnswerId"
+                      (click)="isAllSelected($event)"
+                      [ngModelOptions]="{ standalone: true }"
+                    />
+
+                    <p class="answer_descr">{{ ans.Answer }}</p>
+                  </div>
+                </div>
+                <div>
+                  <textarea
+                    class="extra_note_data"
+                    [(ngModel)]="note.Notes"
+                    [ngModelOptions]="{ standalone: true }"
+                  ></textarea>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Test Note template end -->
+
+        <p class="common_content_title">Additional Notes</p>
+        <div>
+          <textarea
+            [(ngModel)]="additionaNotes"
+            id="pd_updateAdditionalNote"
+            [ngModelOptions]="{ standalone: true }"
+          ></textarea>
+        </div>
+      </div>
+      <!-- <div class="lower_container">
+        <div>
+          <button class="btn_note" class="btn_cancel" (mousedown)="OnpreviewUpdateCancel()">CANCEL</button>
+        </div>
+        <div>
+          <button class="btn_note"  class="btn_save" (click)="getCallDataupdatePreview()">SUMMARY</button>
+
+
+        </div>
+      </div> -->
+
+      <div *ngIf="QuestionArrayBase.length > 0" class="lower_container">
+        <div>
+          <button
+            class="btn_note"
+            class="btn_cancel"
+            id="pd_updateNoteCancel1"
+            (mousedown)="OnpreviewUpdateCancel()"
+          >
+            CANCEL
+          </button>
+        </div>
+        <div>
+          <button
+            class="btn_note"
+            class="btn_save"
+            id="pd_updateNoteSummary"
+            (click)="getCallDataupdatePreview()"
+          >
+            SUMMARY
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="QuestionArrayBase.length == 0" class="lower_container">
+        <div>
+          <button
+            class="btn_cancel"
+            id="pd_updateNoteCancel2"
+            (click)="OnpreviewUpdateCancel()"
+            [mat-dialog-close]="true"
+          >
+            CANCEL
+          </button>
+        </div>
+        <div></div>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #myPreviewUpdateTemp>
+  <div class="dialog">
+    <div>
+      <p class="summary_heading">Summary</p>
+    </div>
+    <div class="change_password_container">
+      <div
+        class="questionpanel preview_questionpanel"
+        *ngFor="let note of QuestionArrayBase; let i = index; let first = first"
+      >
+        <div *ngIf="note.Question != 'Readings Summary Report'">
+          <div class="common_content_title preview_question_title">
+            {{ note.Question }}
+          </div>
+
+          <div
+            class="answer_panel"
+            *ngIf="note.AnswerTypes && note.AnswerTypes.length > 0"
+          >
+            <div
+              *ngFor="
+                let ans of note.AnswerTypes;
+                let i = index;
+                let first = first
+              "
+            >
+              <div class="answer_sub">
+                <input
+                  type="checkbox"
+                  id="pd_smryUpdate1"
+                  [(ngModel)]="ans.Checked"
+                  [ngModelOptions]="{ standalone: true }"
+                />
+                <p class="answer_descr">{{ ans.Answer }}</p>
+              </div>
+            </div>
+            <div>
+              <textarea
+                class="extra_note_data"
+                id="pd_smryUpdateExtra1"
+                [(ngModel)]="note.Notes"
+                [ngModelOptions]="{ standalone: true }"
+              >
+              </textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="subquestion_panel" *ngIf="note.SubQuestions.length > 0">
+          <div
+            *ngFor="
+              let question of note.SubQuestions;
+              let i = index;
+              let first = first
+            "
+          >
+            <div *ngIf="question.Question != 'Readings Summary Report'">
+              <p class="common_content_title preview_question_title">
+                {{ i + 1 }} : {{ question.Question }}
+              </p>
+              <div class="answer_panel">
+                <div
+                  *ngFor="
+                    let ans of question.AnswerTypes;
+                    let i = index;
+                    let first = first
+                  "
+                >
+                  <div class="answer_sub">
+                    <input
+                      type="checkbox"
+                      id="pd_smryUpdate2"
+                      [(ngModel)]="ans.Checked"
+                    />
+                    <p class="answer_descr">{{ ans.Answer }}</p>
+                  </div>
+                </div>
+                <div>
+                  <textarea
+                    class="extra_note_data"
+                    id="pd_smryUpdateExtra2"
+                    [(ngModel)]="question.Notes"
+                    [ngModelOptions]="{ standalone: true }"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="note.Question == 'Readings Summary Report'">
+          <p class="common_content_title preview_question_title">
+            {{ note.Question }}
+          </p>
+          <div class="answer_panel" *ngIf="note.AnswerTypes.length > 0">
+            <p class="vital_descr">{{ this.vitals[0].Vital }}</p>
+
+            <div
+              *ngFor="
+                let ans of note.AnswerTypes;
+                let i = index;
+                let first = first
+              "
+            >
+              <div class="answer_sub">
+                <input
+                  class="answer_check"
+                  type="checkbox"
+                  id="{{ i }}"
+                  [(ngModel)]="ans.Checked"
+                  [checked]="ans.Checked"
+                  [name]="note.Question"
+                  [value]="ans.AnswerId"
+                  (click)="isAllSelected($event)"
+                  [ngModelOptions]="{ standalone: true }"
+                />
+                <p class="answer_descr">{{ ans.Answer }}</p>
+              </div>
+            </div>
+            <div>
+              <textarea
+                class="extra_note_data"
+                [(ngModel)]="note.Notes"
+                [ngModelOptions]="{ standalone: true }"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="common_content_title">Additional Notes</p>
+      <div>
+        <textarea
+          class="additionalNotes"
+          id="pd_smryUpdateAdditional"
+          [(ngModel)]="additionaNotes"
+          [ngModelOptions]="{ standalone: true }"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="button_panel note_preview_button_panel">
+      <button
+        class="btn_cancel"
+        [mat-dialog-close]="true"
+        id="pd_smryUpdateCancel"
+        (click)="OnpreviewUpdateCancel()"
+      >
+        CANCEL
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #callpanel>
+  <div class="callpanel">
+    <!--<div class="call_leftpanel">
+       <div class="call_counter">
+          <p>00:02</p>
+       </div>
+    </div>-->
+    <div class="call_timer_panel">
+      <p class="call_timer">{{ Duration }}</p>
+    </div>
+    <div class="call_centerpanel">
+      <div class="callIcon_panel">
+        <img
+          class="micIcon"
+          src="../../../../../assets/04-Icons/Icons_Mic.svg"
+        />
+        <div class="callIcon_phone">
+          <img
+            class="phoneIcon"
+            src="../../../../../assets/04-Icons/Icons_Phone End.svg"
+          />
+        </div>
+        <img
+          class="micIcon"
+          src="../../../../../assets/04-Icons/Icons_Video.svg"
+        />
+
+        <!-- <div class="callIcon_container">
+        <img class="callIcon" src="../../../../../assets/04-Icons/Icons_Chat List.svg"/>
+        </div> -->
+
+        <!-- <div class="selectNumber"> -->
+        <!--  <select [(ngModel)]="phoneno" name="contactnumber" id="contactnumber">
+            <option [value]="phoneNumberPrimary">{{phoneNumberPrimary}}</option>
+            <option [value]="phoneNumberSecondary">{{phoneNumberSecondary}}</option>
+          </select> -->
+
+        <!--  <img class="phoneIcon"  src= "../../../../../assets/04-Icons/Icons_Phone End.svg"/>
+         
+        </div> -->
+      </div>
+    </div>
+    <div class="call_rightpanel">
+      <img
+        class="call_close_icon"
+        src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+        (click)="onclickcancel()"
+      />
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #chatpanel>
+  <div class="common_template doc_template">
+    <img
+      class="minimize-img"
+      src="../../../../../assets/04-Icons/Icons_Minimize A.svg"
+      (click)="close_chat_window()"
+    />
+    <div class="Summary-Chat-title">Chat / {{ patientName }}</div>
+    <!-- <div class="message_container">
+       
+        <ng-container *ngTemplateOutlet="incoming_msg"></ng-container>
+        <ng-container *ngTemplateOutlet="outgoing_msg"></ng-container>
+      </div> -->
+    <div style="height: 77%; margin-top: 5px">
+      <div>
+        <h2 class="chat_h2_line">
+          <span class="chat_h2_span">Nov 4,2022</span>
+        </h2>
+      </div>
+      <div style="height: auto" *ngFor="let data of chatMessage">
+        <div
+          class="chat_window_settings"
+          *ngIf="
+            data.chat != 'receiver';
+            then senderTemplate;
+            else receiverTemplate
+          "
+        ></div>
+        <ng-template #senderTemplate>
+          <div class="sender_content">
+            <div class="sender_content_text">{{ data.text }}</div>
+          </div>
+        </ng-template>
+        <ng-template #receiverTemplate>
+          <br />
+          <div class="receiver_content">
+            <div class="receiver_content_text">{{ data.text }}</div>
+          </div>
+          <br />
+        </ng-template>
+      </div>
+    </div>
+
+    <div class="chat_lower_container">
+      <input class="message_input_field" placeholder="Type your Message..." />
+      <img
+        class="sms-send-img"
+        src="../../../../../assets/04-Icons/Icons_Send.svg"
+      />
+    </div>
+  </div>
+  <!-- <div class="chat_modal" *ngIf="chat_panel_visible">
+				
+      <img class="minimize-img" src="../../../../../assets/04-Icons/Icons_Minimize A.svg" (click)="close_chat_window()" />
+      <div class="Chat_main_title">
+        Chat/{{patientName}}
+      </div>
+      <div style="height:77%;margin-top:5px;overflow-y: scroll;">					
+        <div>						
+          <h2 class="chat_h2_line">
+            <span class="chat_h2_span" >Nov 4,2022</span>
+          </h2>
+        </div>					
+          <div style="height:auto;" *ngFor="let data of chatMessage" >												
+          <div class="chat_window_settings" *ngIf="data.chat!='receiver' then senderTemplate else receiverTemplate"></div>
+          <ng-template #senderTemplate>
+            <div class="sender_content">
+              <div class="sender_content_text">{{data.text}}</div>
+            </div>
+          </ng-template>		
+          <ng-template #receiverTemplate>						
+            <br/>
+            <div class="receiver_content">
+              <div class="receiver_content_text">{{data.text}}</div>
+            </div>
+            <br/>
+          </ng-template>
+        
+        </div>
+      </div>
+      
+    </div> -->
+</ng-template>
+<!-- Chat Incoming Message Template -->
+<!-- <ng-template #incoming_msg>
+  <div class="incoming_msg">
+    <p class="recived-message">Hello</p>
+  </div>
+</ng-template> -->
+<!-- Chat Outgoing Message Template -->
+
+<!-- <ng-template #outgoing_msg>
+  <div class="outgoing_msg">
+    <p class="send-message">Hello</p>
+  </div>
+</ng-template> -->
+
+<!-- Program Info Template Main first Menu Start -->
+<ng-template #programInfo>
+  <div class="programInfo">
+    <div class="program_main_data_panel">
+      <!-- Program Main panel Start -->
+
+      <!-- ProgramInfo Menu Panel Start -->
+      <div class="programInfo_menu">
+        <div class="programInfo_menu_item">
+          <img
+            class="programInfo_check_icon"
+            src="../../../../../assets/04-Icons/Icons_Check A.svg"
+            alt=""
+          />
+          <button (click)="scroll(programInfodata)">Program Details</button>
+        </div>
+        <div class="programInfo_menu_item" *ngIf="program_name == 'RPM'">
+          <img
+            class="programInfo_check_icon"
+            src="../../../../../assets/04-Icons/Icons_Check A.svg"
+            alt=""
+          />
+          <button (click)="scroll(deviceInfodata)">Device Details</button>
+        </div>
+        <div class="programInfo_menu_item" *ngIf="program_name == 'RPM'">
+          <img
+            class="programInfo_check_icon"
+            src="../../../../../assets/04-Icons/Icons_Check A.svg"
+            alt=""
+          />
+          <button (click)="scroll(vitalInfodata)">Vital Schedules</button>
+        </div>
+
+        <div class="programInfo_menu_item">
+          <img
+            class="programInfo_check_icon"
+            src="../../../../../assets/04-Icons/Icons_Check A.svg"
+            alt=""
+          />
+          <button (click)="scroll(insuranceInfodata)">Insurance Details</button>
+        </div>
+        <div class="programInfo_menu_item">
+          <img
+            class="programInfo_check_icon"
+            src="../../../../../assets/04-Icons/Icons_Check A.svg"
+            alt=""
+          />
+          <button (click)="scroll(documentInfodata)">Documents</button>
+        </div>
+        <div class="programInfo_menu_item">
+          <img
+            class="programInfo_check_icon"
+            src="../../../../../assets/04-Icons/Icons_Check A.svg"
+            alt=""
+          />
+          <button (click)="scroll(programtimelinedata)">
+            Program Timeline
+          </button>
+        </div>
+      </div>
+
+      <!-- ProgramInfo Menu Panel End -->
+
+      <div class="program_base_panel">
+        <div #programInfodata class="program_info_main">
+          <div class="program_detail">
+            <div class="program_details_sub">
+              <!-- Program Detail Start -->
+              <div class="patient-detail-panel-heading">Program Details</div>
+              <div class="program_detail_data">
+                <div class="program_detail_rowOne">
+                  <div class="program_detail_rowOne_left">
+                    <p class="program_data_title">Program Name</p>
+                    <p class="program_data_value">
+                      {{
+                        http_rpm_patientList &&
+                          http_rpm_patientList.ProfileSummary.ProgramName
+                      }}
+                    </p>
+                  </div>
+                  <div class="program_detail_rowOne_right">
+                    <p class="program_data_title">Duration</p>
+                    <p class="program_data_value">
+                      {{ PatientProgramduration }}
+                    </p>
+                  </div>
+                </div>
+                <div class="program_detail_rowOne">
+                  <div class="program_detail_rowOne_left">
+                    <p class="program_data_title">Start Date</p>
+                    <p class="program_data_value">
+                      {{ programStart | date : "mediumDate" }}
+                    </p>
+                  </div>
+                  <div class="program_detail_rowOne_right">
+                    <p class="program_data_title">End Date</p>
+                    <p class="program_data_value">
+                      {{ program_endTime | date : "mediumDate" }}
+                    </p>
+                  </div>
+                </div>
+                <!-- <div class="program_detail_rowOne">
+                          <div class="program_detail_rowOne_left">
+                            <p class="program_data_title"> Vitals Monitored</p>
+                            <p class="program_data_value">Blood Glucose</p>
+                          </div>
+                          <div class="program_detail_rowOne_right" style="visibility: hidden;">
+                              <p class="program_data_title"> End Date</p>
+                              <p class="program_data_value">Aug 31,2022</p>
+                            </div>
+                  </div> -->
+                <div class="program_detail_rowOne">
+                  <div class="vital_name program_detail_rowOne_left">
+                    <p class="program_data_title">Vitals Monitored</p>
+                    <div *ngFor="let vital of patiantVital">
+                      <p class="program_data_value">
+                        {{ vital.Vital }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="program_detail_rowOne_right">
+                    <!-- <p class="program_data_title">Target / Month</p>
+                    <p class="program_data_value ">{{http_rpm_patientList['PatientProgramdetails'].TargetReadings}}</p> -->
+                  </div>
+                </div>
+              </div>
+              <div class="patient-detail-panel-heading">Care Team</div>
+              <div class="program_detail_data">
+                <div class="program_detail_rowOne">
+                  <div class="program_detail_rowOne_left">
+                    <p class="program_data_title">Physician</p>
+                    <p class="program_data_value">{{ currentPhysician }}</p>
+                  </div>
+                  <div class="program_detail_rowOne_right">
+                    <p class="program_data_title">Care Team Personal</p>
+                    <p class="program_data_value">{{ assignedMember }}</p>
+                  </div>
+                </div>
+                <div class="program_detail_rowOne">
+                  <div
+                    class="program_detail_rowOne_left"
+                    style="visibility: hidden"
+                  >
+                    <p class="program_data_title">Start Date</p>
+                    <p class="program_data_value"></p>
+                  </div>
+                  <div class="program_detail_rowOne_right">
+                    <p class="program_data_title">Care Team Manager</p>
+                    <p class="program_data_value">
+                      {{
+                        http_rpm_patientList &&
+                          http_rpm_patientList.PatientProgramdetails.Manager
+                      }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <!-- <div class="program_detail_data">
+                <div class="program_detail_rowOne">
+                  <div class="program_detail_rowOne_left">
+                    <p class="program_data_title">Delegation</p>
+                    <p class="program_data_value"></p>
+                  </div>
+                  <div class="program_detail_rowOne_right">
+                    <p class="program_data_title">Start Date</p>
+                    <p class="program_data_value"></p>
+                  </div>
+                </div>
+                <div class="program_detail_rowOne">
+                  <div
+                    class="program_detail_rowOne_left"
+                    style="visibility: hidden"
+                  >
+                    <p class="program_data_title">Start Date</p>
+                    <p class="program_data_value"></p>
+                  </div>
+                  <div class="program_detail_rowOne_right">
+                    <p class="program_data_title">End Date</p>
+                    <p class="program_data_value"></p>
+                  </div>
+                </div>
+              </div> -->
+            </div>
+          </div>
+          <!-- Program Goals Start -->
+          <div class="program_goals">
+            <div class="patient-detail-panel-heading">Program Goals</div>
+            <div class="goal_detail_data">
+              <p class="program_data_title">Goal</p>
+              <div
+                *ngFor="
+                  let goal of http_rpm_patientList &&
+                    http_rpm_patientList['PatientProgramGoals'].goalDetails
+                "
+              >
+                <div>
+                  <p class="program_data_value">{{ goal.Goal }}</p>
+                  <div class="goal_data_value">
+                    <!-- <div *ngFor="let goal_item  of goal.details"> -->
+                    <p class="goal_description">{{ goal.Description }}</p>
+                    <!-- </div> -->
+                  </div>
+                </div>
+              </div>
+              <!-- <p class="program_data_title">*Potential Barriers</p> -->
+              <!-- <div
+                *ngFor="let potentialbarriers of programgoals.potentialbarriers"
+              >
+                <div>
+                  <p class="program_data_value">
+                    {{ potentialbarriers.category }}
+                  </p>
+                  <p class="goal_data_value">{{ potentialbarriers.details }}</p>
+                </div>
+              </div> -->
+            </div>
+          </div>
+        </div>
+        <div #deviceInfodata class="device_details">
+          <div
+            class="patient-detail-panel-heading"
+            *ngIf="program_name == 'RPM'"
+          >
+            Device Details
+          </div>
+
+          <div *ngFor="let device of devicedetails">
+            <div class="device_details_content" *ngIf="program_name == 'RPM'">
+              <div class="device_detail_left">
+                <div class="device_detail_sub_panel_left">
+                  <p class="program_data_title">Vitals Monitoring</p>
+                  <p class="program_data_value">{{ device.VitalName }}</p>
+                </div>
+                <div class="device_detail_sub_panel_right">
+                  <p class="program_data_title">Device ID</p>
+                  <p class="program_data_value">{{ device.DeviceNumber }}</p>
+                </div>
+              </div>
+              <div class="device_detail_right">
+                <div class="device_detail_right_sub">
+                  <div class="device_right_detail_sub_left">
+                    <div>
+                      <p class="program_data_title">Device</p>
+                      <p class="program_data_value">{{ device.DeviceName }}</p>
+                    </div>
+                    <div>
+                      <p class="program_data_title">Device Type</p>
+                      <p class="program_data_value">
+                        {{ device.DeviceCommunicationType }}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="device_right_detail_sub_right">
+                    <div>
+                      <p class="program_data_title">Device Status</p>
+                      <p class="program_data_value">
+                        {{ device.DeviceStatus }}
+                      </p>
+                    </div>
+                    <div>
+                      <!-- <button class="btn_test_device">TEST DEVICE</button> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div #vitalInfodata class="vital_details">
+          <div
+            class="patient-detail-panel-heading"
+            *ngIf="program_name == 'RPM'"
+          >
+            Vital Schedules
+          </div>
+          <div class="vital_schedule_data" *ngIf="program_name == 'RPM'">
+            <div *ngFor="let v of vitaldetails">
+              <div id="vitalGlucose">
+                <div class="vital_data_panel">
+                  <div class="vital_data_left_panel">
+                    <div class="vital_data_left_sub">
+                      <p class="program_data_title">Vitals Monitoring</p>
+                      <p class="program_data_value">{{ v.VitalName }}</p>
+                    </div>
+                    <div class="vital_data_sub__">
+                      <p class="program_data_title">Schedule</p>
+                      <p class="program_data_value">{{ v.ScheduleName }}</p>
+                      <p class="program_data_value vitalschedule">
+                        {{ v.VitalScheduleName }}
+                      </p>
+                      <div class="vital_interval">
+                        <p class="program_data_title">Intervals</p>
+                        <div class="vital_interval_item_panel">
+                          <div
+                            class="vital_interval_item"
+                            [ngClass]="
+                              v.Morning
+                                ? 'vital_interval_item_selcted'
+                                : 'vital_interval_item_notSelected'
+                            "
+                          >
+                            M
+                          </div>
+
+                          <div
+                            class="vital_interval_item"
+                            [ngClass]="
+                              v.Afternoon
+                                ? 'vital_interval_item_selcted'
+                                : 'vital_interval_item_notSelected'
+                            "
+                          >
+                            AF
+                          </div>
+
+                          <div
+                            class="vital_interval_item"
+                            [ngClass]="
+                              v.Evening
+                                ? 'vital_interval_item_selcted'
+                                : 'vital_interval_item_notSelected'
+                            "
+                          >
+                            E
+                          </div>
+
+                          <div
+                            class="vital_interval_item"
+                            [ngClass]="
+                              v.Night
+                                ? 'vital_interval_item_selcted'
+                                : 'vital_interval_item_notSelected'
+                            "
+                          >
+                            N
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="vital_data_right_panel">
+                    <div *ngFor="let d of v.VitalMeasureInfos">
+                      <div class="vital_data_right_sub">
+                        <div class="vital_sub_measurement">
+                          <p class="program_data_title">Measurement</p>
+                          <p class="program_data_value">{{ d.MeasureName }}</p>
+                        </div>
+                        <div class="vital_sub_unit">
+                          <p class="program_data_title">Unit</p>
+                          <p class="program_data_value">{{ d.UnitName }}</p>
+                        </div>
+                      </div>
+                      <!--   Measurement Panel Start-->
+                      <!--   Measurement Panel Start-->
+                      <app-sliderdata
+                        [low_critical]="d.CriticallMinimum"
+                        [low_cautious]="d.CautiousMinimum"
+                        [low_normal]="d.NormalMinimum"
+                        [high_normal]="d.NormalMaximum"
+                        [high_cautious]="d.CautiousMaximum"
+                        [high_critical]="d.CriticalMaximum"
+                      ></app-sliderdata>
+
+                      <!-- Measurement Panel End -->
+                    </div>
+
+                    <!-- Measurement Second Panel -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div #insuranceInfodata class="program_insurance">
+          <div class="patient-detail-panel-heading">Insurance Details</div>
+          <div class="Program_insurance_data">
+            <div class="Program_insurance_left">
+              <p class="insurance_sub_title">Primary Insurance</p>
+              <div>
+                <p
+                  class="insurance_value"
+                  *ngIf="
+                    http_rpm_patientList &&
+                    http_rpm_patientList.PatientInsurenceDetails
+                      .PatientInsurenceInfos.length > 0
+                  "
+                >
+                  {{
+                    http_rpm_patientList.PatientInsurenceDetails
+                      .PatientInsurenceInfos[0].InsuranceVendorName
+                  }}
+                </p>
+                <p
+                  class="insurance_value"
+                  *ngIf="
+                    http_rpm_patientList &&
+                    http_rpm_patientList.PatientInsurenceDetails
+                      .PatientInsurenceInfos.length == 0
+                  "
+                >
+                  Not Avaliable
+                </p>
+              </div>
+            </div>
+            <div class="Program_insurance_right">
+              <p
+                class="insurance_sub_title"
+                *ngIf="
+                  http_rpm_patientList &&
+                  http_rpm_patientList.PatientInsurenceDetails
+                    .PatientInsurenceInfos.length > 1
+                "
+              >
+                Additional Insurance (Optional)
+              </p>
+              <div>
+                <p
+                  class="insurance_value"
+                  *ngIf="
+                    http_rpm_patientList &&
+                    http_rpm_patientList.PatientInsurenceDetails
+                      .PatientInsurenceInfos.length > 1
+                  "
+                >
+                  {{
+                    http_rpm_patientList.PatientInsurenceDetails
+                      .PatientInsurenceInfos[1].InsuranceVendorName
+                  }}
+                </p>
+                <p
+                  class="insurance_value"
+                  *ngIf="
+                    http_rpm_patientList &&
+                    http_rpm_patientList.PatientInsurenceDetails
+                      .PatientInsurenceInfos.length > 2
+                  "
+                >
+                  {{
+                    http_rpm_patientList.PatientInsurenceDetails
+                      .PatientInsurenceInfos[2].InsuranceVendorName
+                  }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div #documentInfodata>
+          <div class="document_panel">
+            <div class="patient-detail-panel-heading">Documents</div>
+            <!-- <img
+              class="add_icon"
+              src="../../../../../assets/04-Icons/Icons_Add Main.svg"
+              (click)="addDocumentPage()"
+            /> -->
+          </div>
+          <div>
+            <div class="billing_table">
+              <mat-table #table [dataSource]="documentData">
+                <ng-container matColumnDef="DocumentType">
+                  <mat-header-cell
+                    [ngStyle]="{ 'border-radius': '16px 0px 0px 0px' }"
+                    *matHeaderCellDef
+                  >
+                    Document Type
+                  </mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    {{ element.DocumentType }}
+                  </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="Description">
+                  <mat-header-cell
+                    [ngStyle]="{ 'border-radius': '0px 0px 0px 0px' }"
+                    *matHeaderCellDef
+                  >
+                    Document Name
+                  </mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    {{ element.DocumentName }}
+                  </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="CreatedOn">
+                  <mat-header-cell
+                    [ngStyle]="{ 'border-radius': '0px 0px 0px 0px' }"
+                    *matHeaderCellDef
+                  >
+                    Last Updated
+                  </mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    {{
+                      datepipe.transform(
+                        convertToLocalTime(element.CreatedOn),
+                        "MMM d,y"
+                      )
+                    }}
+                  </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="DocumentUNC">
+                  <mat-header-cell
+                    [ngStyle]="{ 'border-radius': '0px 16px 0px 0px' }"
+                    *matHeaderCellDef
+                  >
+                    File
+                  </mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    <img
+                      class="noteImg"
+                      src="../../../../../assets/04-Icons/Icons_Notes.svg"
+                      (click)="openPdf(element.DocumentUNC)"
+                    />
+                  </mat-cell>
+                </ng-container>
+                <mat-header-row
+                  *matHeaderRowDef="documentTableColumns; sticky: true"
+                ></mat-header-row>
+                <mat-row
+                  [style.minHeight.px]="35"
+                  *matRowDef="let row; columns: documentTableColumns"
+                  [ngClass]="{}"
+                ></mat-row>
+              </mat-table>
+            </div>
+          </div>
+        </div>
+
+        <div #programtimelinedata class="program_info_main">
+          <div class="program_timeline">
+            <div class="program_details_sub">
+              <div class="patient-detail-panel-heading">Program Timeline</div>
+              <div class="program_detail_data">
+                <div class="program_detail_rowOne">
+                  <div class="program_detail_rowOne_left">
+                    <p class="program_data_title">Patient Status</p>
+                    <p
+                      class="program_data_value"
+                      style="background-color: #cff4f5"
+                    >
+                      {{
+                        http_rpm_patientList &&
+                          http_rpm_patientList["PatientPrescribtionDetails"]
+                            .Status
+                      }}
+                    </p>
+                  </div>
+                  <div class="program_detail_rowOne_right">
+                    <p class="program_data_title">Date</p>
+                    <p class="program_data_value">
+                      {{ prescribedassignedDate | date : "mediumDate" }}
+                    </p>
+                  </div>
+                </div>
+                <div class="program_detail_rowOne">
+                  <div class="program_detail_rowOne_left">
+                    <p class="program_data_title">Physician</p>
+                    <p class="program_data_value">
+                      {{
+                        http_rpm_patientList &&
+                          http_rpm_patientList["PatientPrescribtionDetails"]
+                            .Physician
+                      }}
+                    </p>
+                  </div>
+                  <div class="program_detail_rowOne_right">
+                    <p class="program_data_title">Consultaion Date</p>
+                    <p class="program_data_value">
+                      {{ patientconsultationDate | date : "mediumDate" }}
+                    </p>
+                  </div>
+                </div>
+                <div class="program_detail_rowOne">
+                  <div class="program_detail_rowOne_left">
+                    <p class="program_data_title">Clinic</p>
+                    <p class="program_data_value">
+                      {{ clinicName }}
+                    </p>
+                  </div>
+                  <div class="program_detail_rowOne_right">
+                    <p class="program_data_title">Clinic Code</p>
+                    <p class="program_data_value">
+                      {{ clinicCode }}
+                    </p>
+                  </div>
+                </div>
+                <!--  <div class="program_detail_rowOne">
+                  <div class="program_detail_rowOne_left">
+                    <p class="program_data_title"> Diagnosis</p>
+                    <p class="program_data_value ">Hypertension</p>
+                    <p class="program_data_value vitalschedule">Hyperlipidemia</p>
+                    <p class="program_data_value vitalschedule">Elevated Blood Glucose</p>
+                  </div>
+                  <div class="program_detail_rowOne_right" >
+                      <p class="program_data_title"> Code</p>
+                      <p class="program_data_value "> ICD-9-401</p>
+                      <p class="program_data_value vitalschedule"> ICD-10-E78.5</p>
+                      <p class="program_data_value vitalschedule"> ICD-10-R73</p>
+                    </div>
+              </div> -->
+                <div
+                  class="program_timeline_lower_panel"
+                  *ngFor="
+                    let diagnosis of http_rpm_patientList &&
+                      http_rpm_patientList['PatientPrescribtionDetails']
+                        .PatientDiagnosisInfos;
+                    let first = first;
+                    let index = index
+                  "
+                >
+                  <div class="diagonosis_panel">
+                    <div class="program_detail_rowOne_left">
+                      <p
+                        class="program_data_title"
+                        *ngIf="first && { display: 'block' }"
+                      >
+                        Diagnosis
+                      </p>
+                      <p class="program_data_value">
+                        {{ diagnosis.DiagnosisName }}
+                      </p>
+                    </div>
+
+                    <div class="program_detail_rowOne_right">
+                      <p
+                        class="program_data_title"
+                        *ngIf="first && { display: 'block' }"
+                      >
+                        Code
+                      </p>
+                      <p class="program_data_value">
+                        {{ diagnosis.DiagnosisCode }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="program_details_sub">
+            <div
+              class="patient-detail-panel-heading"
+              style="visibility: hidden"
+            >
+              Program Timeline
+            </div>
+            <div
+              *ngIf="
+                http_rpm_patientList &&
+                http_rpm_patientList.PatientEnrolledDetails.Status != null
+              "
+            >
+              <div class="program_detail_data">
+                <div class="program_detail_rowOne">
+                  <div class="program_detail_rowOne_left">
+                    <p class="program_data_title">Patient Status</p>
+                    <p
+                      class="program_data_value"
+                      style="background-color: #cff4f5"
+                    >
+                      Enrolled
+                    </p>
+                  </div>
+                  <div class="program_detail_rowOne_right">
+                    <p class="program_data_title">Date</p>
+                    <p class="program_data_value">
+                      {{
+                        convertToLocalTime(
+                          http_rpm_patientList &&
+                            http_rpm_patientList.PatientEnrolledDetails
+                              .AssignedDate
+                        ) | date : "mediumDate"
+                      }}
+                    </p>
+                  </div>
+                </div>
+                <div class="program_detail_rowOne">
+                  <div class="program_detail_rowOne_left">
+                    <p class="program_data_title">Enrollement Personal</p>
+                    <div
+                      *ngFor="
+                        let mem of http_rpm_patientList &&
+                          http_rpm_patientList.PatientEnrolledDetails
+                            .patientEnrolledInfos
+                      "
+                    >
+                      <p class="program_data_value programdata_p">
+                        {{ mem.EnrollmentPersonal }}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    class="program_detail_rowOne_right"
+                    style="visibility: hidden"
+                  >
+                    <p class="program_data_title">Onboard Personal</p>
+                    <p class="program_data_value">John Abraham</p>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="program_detail_data"
+                *ngIf="
+                  http_rpm_patientList &&
+                  http_rpm_patientList.ActivePatientDetails.Status != null
+                "
+              >
+                <div>
+                  <div class="program_detail_rowOne">
+                    <div class="program_detail_rowOne_left">
+                      <p class="program_data_title">Patient Status</p>
+                      <p
+                        class="program_data_value"
+                        style="background-color: #cff4f5"
+                      >
+                        Active
+                      </p>
+                    </div>
+                    <div class="program_detail_rowOne_right">
+                      <p class="program_data_title">Date</p>
+                      <p class="program_data_value">
+                        {{
+                          convertToLocalTime(
+                            http_rpm_patientList &&
+                              http_rpm_patientList.ActivePatientDetails
+                                .AssignedDate
+                          ) | date : "mediumDate"
+                        }}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="program_detail_rowOne">
+                    <div class="program_detail_rowOne_left">
+                      <p class="program_data_title">Care Team Personal</p>
+                      <p class="program_data_value">
+                        {{
+                          http_rpm_patientList &&
+                            http_rpm_patientList.ActivePatientDetails
+                              .AssigneeName
+                        }}
+                      </p>
+                    </div>
+                    <div
+                      class="program_detail_rowOne_right"
+                      style="visibility: hidden"
+                    >
+                      <!-- <p class="program_data_title">Care Team Manager</p>
+                      <p class="program_data_value">
+                        {{
+                          http_rpm_patientList &&
+                            http_rpm_patientList.ActivePatientDetails
+                              .ManagerName
+                        }}
+                      </p> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="program_detail_data"
+                *ngIf="
+                  http_rpm_patientList &&
+                  http_rpm_patientList.ReadyForDischargePatientDetails.Status !=
+                    null
+                "
+              >
+                <div>
+                  <div class="program_detail_rowOne">
+                    <div class="program_detail_rowOne_left">
+                      <p class="program_data_title">Patient Status</p>
+                      <p
+                        class="program_data_value"
+                        style="background-color: #cff4f5"
+                      >
+                        Ready To Discharge
+                      </p>
+                    </div>
+                    <div class="program_detail_rowOne_right">
+                      <p class="program_data_title">Date</p>
+                      <p class="program_data_value">
+                        {{
+                          convertToLocalTime(
+                            http_rpm_patientList.ReadyForDischargePatientDetails
+                              .AssignedDate
+                          ) | date : "mediumDate"
+                        }}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="program_detail_rowOne">
+                    <div class="program_detail_rowOne_left">
+                      <p class="program_data_title">Assigned Personal</p>
+                      <p class="program_data_value">
+                        {{
+                          http_rpm_patientList.ReadyForDischargePatientDetails
+                            .AssigneeName
+                        }}
+                      </p>
+                    </div>
+                    <div
+                      class="program_detail_rowOne_right"
+                      style="visibility: hidden"
+                    >
+                      <p class="program_data_title">Care Team Manager</p>
+                      <p class="program_data_value"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="program_detail_data"
+                *ngIf="
+                  http_rpm_patientList &&
+                  http_rpm_patientList.OnHoldPatientDetais.Status == 'OnHold'
+                "
+              >
+                <div>
+                  <div class="program_detail_rowOne">
+                    <div class="program_detail_rowOne_left">
+                      <p class="program_data_title">Patient Status</p>
+                      <p
+                        class="program_data_value"
+                        style="background-color: #cff4f5"
+                      >
+                        On Hold
+                      </p>
+                    </div>
+                    <div class="program_detail_rowOne_right">
+                      <p class="program_data_title">Date</p>
+                      <p class="program_data_value">
+                        {{
+                          convertToLocalTime(
+                            http_rpm_patientList.OnHoldPatientDetais
+                              .AssignedDate
+                          ) | date : "mediumDate"
+                        }}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="program_detail_rowOne">
+                    <div class="program_detail_rowOne_left">
+                      <p class="program_data_title">Assigned Personal</p>
+                      <p class="program_data_value">
+                        {{
+                          http_rpm_patientList.OnHoldPatientDetais.AssigneeName
+                        }}
+                      </p>
+                    </div>
+                    <div
+                      class="program_detail_rowOne_right"
+                      style="visibility: hidden"
+                    >
+                      <p class="program_data_title">Care Team Manager</p>
+                      <p class="program_data_value"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="program_detail_data">
+                <div
+                  *ngIf="
+                    http_rpm_patientList &&
+                    http_rpm_patientList.InActivePatientDetais.Status ==
+                      'InActive'
+                  "
+                >
+                  <div class="program_detail_rowOne">
+                    <div class="program_detail_rowOne_left">
+                      <p class="program_data_title">Patient Status</p>
+                      <p
+                        class="program_data_value"
+                        style="background-color: #cff4f5"
+                      >
+                        InActive
+                      </p>
+                    </div>
+                    <div class="program_detail_rowOne_right">
+                      <p class="program_data_title">Date</p>
+                      <p class="program_data_value">
+                        {{
+                          convertToLocalTime(
+                            http_rpm_patientList &&
+                              http_rpm_patientList.InActivePatientDetais
+                                .AssignedDate
+                          ) | date : "mediumDate"
+                        }}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="program_detail_rowOne">
+                    <div class="program_detail_rowOne_left">
+                      <p class="program_data_title">Assigned Personal</p>
+                      <p class="program_data_value">
+                        {{
+                          http_rpm_patientList.InActivePatientDetais
+                            .AssigneeName
+                        }}
+                      </p>
+                    </div>
+                    <div
+                      class="program_detail_rowOne_right"
+                      style="visibility: hidden"
+                    >
+                      <p class="program_data_title">Care Team Manager</p>
+                      <p class="program_data_value"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #docpanel>
+  <!-- <div class="common_template doc_template">
+    <div class="common_main_title">Add Document</div>
+    <form [formGroup]="addDocumentForm">
+      <div class="common_template_content">
+        <div class="common_content">
+          <p class="common_content_title">Document Type</p>
+          <div>
+            <select
+              class="common_input_dropdown"
+              [(ngModel)]="docType"
+              formControlName="docType"
+            >
+              <option value="PatientConsentForm">Patient Consent Form</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="common_content">
+          <p class="common_content_title">Description</p>
+          <textarea
+            class="SmallFormTextArea"
+            placeholder="Signed Document from Patient"
+            [(ngModel)]="docDesc"
+            formControlName="docDesc"
+          >
+          </textarea>
+        </div>
+        <div class="common_content" style="margin-top: 32px">
+          <p class="common_content_title">Attachment</p>
+          <div class="doc_attachment">
+            <input
+              class="common_input_dropdown"
+              placeholder="Select Attachment"
+              type="file"
+              (change)="openFile($event)"
+            />
+
+            <div class="add_container">
+              <img
+                class="add-doc-img"
+                src="../../../../../assets/04-Icons/Icons_Add.svg"
+                (click)="onClickDocumentAdd()"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="lower_container">
+      <button class="btn_cancel" (click)="onClickdocCancel()">CANCEL</button>
+      <button class="btn_save" (click)="uploaddoc()">UPLOAD</button>
+    </div>
+  </div> -->
+</ng-template>
+<!-- Program Info Template Main first Menu End -->
+<ng-template #myPreviewPdf>
+  <div class="dialogPdf">
+    <ngx-extended-pdf-viewer
+      [src]="pdfs"
+      [useBrowserLocale]="true"
+      [textLayer]="true"
+      [showHandToolButton]="true"
+      [showPresentationModeButton]="true"
+      [(page)]="page"
+      [(pageLabel)]="pageLabel"
+      [showDownloadButton]="true"
+      [showOpenFileButton]="false"
+      [showPrintButton]="true"
+    >
+    </ngx-extended-pdf-viewer>
+  </div>
+</ng-template>
+
+<!-- Clinic Info Template  Second Menu  Start-->
+<!-- ################################################################################## -->
+<ng-template #clinicInfo
+  ><router-outlet>
+    <div class="clinicInfo">
+      <div class="clinical_main_data_panel">
+        <!-- Clinical Menu Start -->
+        <div class="clinicalInfo_menu">
+          <div
+            class="clinic_Menu_panel"
+            *ngFor="let menu_item of clinicInfoMenu"
+          >
+            <button
+              class="{{
+                clinicalMenuVariable == menu_item.menu_id
+                  ? 'clinic_current_menu'
+                  : 'clinicalInfo_menu_item'
+              }}"
+              (click)="ClinicalInfoMenuSelect(menu_item.menu_id)"
+            >
+              {{ menu_item.menu_title }}
+            </button>
+          </div>
+        </div>
+        <!-- Clinical Menu End -->
+        <div class="clinical_detail_data">
+          <ng-container [ngSwitch]="clinicalMenuVariable">
+            <ng-container *ngSwitchCase="1">
+              <ng-container
+                *ngTemplateOutlet="vitalReadingsInfo"
+              ></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="2">
+              <ng-container *ngTemplateOutlet="healthTrendInfo"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="3">
+              <ng-container *ngTemplateOutlet="medicationInfo"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="4">
+              <ng-container *ngTemplateOutlet="symptomsInfo"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="5">
+              <ng-container *ngTemplateOutlet="uploadInfo"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+              <ng-container
+                *ngTemplateOutlet="vitalReadingsInfo"
+              ></ng-container>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </router-outlet>
+</ng-template>
+<!-- Sub Templates for Clinical activitySecond Main Menu-->
+<!-- VitalReadingInfo Start  Clinical activity First  Sub-Menu  -->
+<ng-template #vitalReadingsInfo>
+  <div class="vitalReadingsInfo_panel">
+    <div class="vitalReadingupper_panel">
+      <div class="vitalReadings">
+        <div
+          class="vitalReadingsMenu"
+          *ngIf="
+            (http_vitalGlucoseData && http_vitalGlucoseData.length > 0) ||
+            (vital_temporaryData && vital_temporaryData.length > 0) ||
+            (http_VitalOxygen && http_VitalOxygen.length > 0) ||
+            (http_VitalWight && http_VitalWight.length > 0)
+          "
+        >
+          <button
+            class="vitalReading_menu_item"
+            *ngIf="http_vitalGlucoseData && http_vitalGlucoseData.length > 0"
+            id="pd_vital_BG"
+            (click)="ChangeVitalScreen('BloodGlucose')"
+          >
+            BloodGlucose
+          </button>
+          <button
+            class="vitalReading_menu_item"
+            *ngIf="vital_temporaryData && vital_temporaryData.length > 0"
+            id="pd_Vital_BP"
+            (click)="ChangeVitalScreen('BloodPressure')"
+          >
+            BloodPressure
+          </button>
+          <button
+            class="vitalReading_menu_item"
+            *ngIf="http_VitalOxygen && http_VitalOxygen.length > 0"
+            (click)="ChangeVitalScreen('Oxygen')"
+            id="pd_Vital_O"
+          >
+            Oxygen
+          </button>
+          <button
+            class="vitalReading_menu_item"
+            *ngIf="http_VitalWight && http_VitalWight.length > 0"
+            (click)="ChangeVitalScreen('Weight')"
+            id="pd_Vital_W"
+          >
+            Weight
+          </button>
+        </div>
+      </div>
+
+      <div class="vital-reading-range">
+        <mat-form-field appearance="outline">
+          <mat-label>Enter a date range</mat-label>
+          <mat-date-range-input
+            [formGroup]="frmvitalrange"
+            [rangePicker]="picker"
+          >
+            <input
+              matStartDate
+              formControlName="start"
+              placeholder="Start date"
+            />
+            <input
+              matEndDate
+              formControlName="end"
+              placeholder="End date"
+              id="pd_VitaldateRange"
+              (dateChange)="rangeVitalScheduleCalc()"
+            />
+          </mat-date-range-input>
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="vital_monitoring_table">
+      <ng-container [ngSwitch]="currentVital">
+        <ng-container *ngSwitchCase="'BloodPressure'">
+          <ng-container *ngTemplateOutlet="BloodPressure"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'BloodGlucose'">
+          <ng-container *ngTemplateOutlet="BloodGlucose"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'Oxygen'">
+          <ng-container *ngTemplateOutlet="BloodOxygen"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'Weight'">
+          <ng-container *ngTemplateOutlet="Weight"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'None'">
+          <div
+            *ngIf="
+              http_vitalGlucoseData &&
+              http_vitalGlucoseData.length > 0 &&
+              vital_temporaryData &&
+              vital_temporaryData.length == 0
+            "
+          >
+            <ng-container *ngTemplateOutlet="BloodPressure"></ng-container>
+          </div>
+          <div
+            *ngIf="
+              http_vitalGlucoseData &&
+              http_vitalGlucoseData.length == 0 &&
+              vital_temporaryData &&
+              vital_temporaryData.length > 0
+            "
+          >
+            <ng-container *ngTemplateOutlet="BloodPressure"></ng-container>
+          </div>
+          <div
+            *ngIf="
+              http_vitalGlucoseData &&
+              http_vitalGlucoseData.length > 0 &&
+              vital_temporaryData &&
+              vital_temporaryData.length > 0 &&
+              http_VitalOxygen &&
+              http_VitalOxygen.length > 0 &&
+              http_VitalWight &&
+              http_VitalWight.length > 0
+            "
+          >
+            <ng-container *ngTemplateOutlet="BloodPressure"></ng-container>
+          </div>
+          <div
+            *ngIf="
+              vital_temporaryData &&
+              vital_temporaryData.length == 0 &&
+              http_vitalGlucoseData &&
+              http_vitalGlucoseData.length > 0 &&
+              http_VitalOxygen &&
+              http_VitalOxygen.length > 0 &&
+              http_VitalWight &&
+              http_VitalWight.length > 0
+            "
+          >
+            <ng-container *ngTemplateOutlet="BloodGlucose"></ng-container>
+          </div>
+          <div
+            *ngIf="
+              vital_temporaryData &&
+              vital_temporaryData.length == 0 &&
+              http_vitalGlucoseData &&
+              http_vitalGlucoseData.length == 0 &&
+              http_VitalOxygen &&
+              http_VitalOxygen.length > 0 &&
+              http_VitalWight &&
+              http_VitalWight.length > 0
+            "
+          >
+            <ng-container *ngTemplateOutlet="BloodOxygen"></ng-container>
+          </div>
+          <div
+            *ngIf="
+              vital_temporaryData &&
+              vital_temporaryData.length == 0 &&
+              http_vitalGlucoseData &&
+              http_vitalGlucoseData.length == 0 &&
+              http_VitalOxygen &&
+              http_VitalOxygen.length == 0 &&
+              http_VitalWight &&
+              http_VitalWight.length > 0
+            "
+          >
+            <ng-container *ngTemplateOutlet="Weight"></ng-container>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #BloodPressure>
+  <table class="team_detail_schedule">
+    <tr>
+      <th [ngStyle]="{ 'border-radius': '16px 0px 0px 0px' }">
+        <img
+          class="sort_icon_default"
+          src="../../../../../assets/04-Icons/Icons_Sort.svg"
+          id="pd_BPvitalSort"
+          (click)="sortVitalBPColumn()"
+        />Date
+      </th>
+      <th>Time</th>
+      <th [ngStyle]="{ 'padding-left': '0.8rem' }">Systolic</th>
+      <th [ngStyle]="{ 'padding-left': '0.8rem' }">Diastolic</th>
+      <th [ngStyle]="{ 'padding-left': '1.3rem' }">Pulse</th>
+      <th [ngStyle]="{ 'border-radius': '0px 16px 0px 0px' }">Remarks</th>
+    </tr>
+    <ng-container *ngFor="let vitalitem of vital_temporaryData">
+      <ng-container
+        *ngFor="
+          let vital_data of vitalitem.BloodPressureReadings;
+          let index = index
+        "
+      >
+        <tr>
+          <td
+            class="main_time"
+            *ngIf="index === 0"
+            [attr.rowspan]="vitalitem.BloodPressureReadings.length"
+          >
+            <span *ngIf="vitalitem.ReadingDate">{{
+              datepipe.transform(vitalitem.ReadingDate, "MMM d, y")
+            }}</span>
+          </td>
+          <td
+            *ngIf="vital_data.ReadingTime"
+            [ngStyle]="{ 'border-radius': '8px 0px 0px 8px' }"
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.BloodPressureReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.BloodPressureReadings[index].Status == 'Cautious'
+            }"
+          >
+            {{ datepipe.transform(vital_data.ReadingTime, "h:mm a") }}
+          </td>
+          <td
+            class="schedule_type"
+            [ngStyle]="{ 'min-width': '30px' }"
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.BloodPressureReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.BloodPressureReadings[index].Status == 'Cautious'
+            }"
+          >
+            <button
+              class="systolicbtn"
+              id="pd_VitalSystolic"
+              [ngClass]="{
+                vitalprssureCritical:
+                  vitalitem.BloodPressureReadings[index].SystolicStatus ==
+                  'Critical',
+                vitalprssureCautious:
+                  vitalitem.BloodPressureReadings[index].SystolicStatus ==
+                  'Cautious',
+                vitalprssureNormal:
+                  vitalitem.BloodPressureReadings[index].SystolicStatus ==
+                  'Normal'
+              }"
+            >
+              {{ vital_data.Systolic }}
+            </button>
+          </td>
+          <td
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.BloodPressureReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.BloodPressureReadings[index].Status == 'Cautious'
+            }"
+          >
+            <button
+              class="systolicbtn"
+              id="pd_VitalDiastolic"
+              [ngClass]="{
+                vitalprssureCritical:
+                  vitalitem.BloodPressureReadings[index].DiastolicStatus ==
+                  'Critical',
+                vitalprssureCautious:
+                  vitalitem.BloodPressureReadings[index].DiastolicStatus ==
+                  'Cautious',
+                vitalprssureNormal:
+                  vitalitem.BloodPressureReadings[index].DiastolicStatus ==
+                  'Normal'
+              }"
+            >
+              {{ vital_data.Diastolic }}
+            </button>
+          </td>
+          <td
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.BloodPressureReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.BloodPressureReadings[index].Status == 'Cautious'
+            }"
+          >
+            <button
+              class="systolicbtn"
+              id="pd_VitalPulse"
+              [ngClass]="{
+                vitalprssureCritical:
+                  vitalitem.BloodPressureReadings[index].pulseStatus ==
+                  'Critical',
+                vitalprssureCautious:
+                  vitalitem.BloodPressureReadings[index].pulseStatus ==
+                  'Cautious',
+                vitalprssureNormal:
+                  vitalitem.BloodPressureReadings[index].pulseStatus == 'Normal'
+              }"
+            >
+              {{ vital_data.pulse }}
+            </button>
+          </td>
+          <td
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.BloodPressureReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.BloodPressureReadings[index].Status == 'Cautious'
+            }"
+            [ngStyle]="{ 'border-radius': '0px 8px 8px 0px' }"
+          >
+            {{ vital_data.Remarks }}
+          </td>
+        </tr>
+      </ng-container>
+    </ng-container>
+  </table>
+</ng-template>
+
+<!-- Glucose Table  Start-->
+<ng-template #BloodGlucose>
+  <table class="team_detail_schedule">
+    <tr>
+      <th [ngStyle]="{ 'border-radius': '16px 0px 0px 0px' }">
+        <img
+          class="sort_icon_default"
+          src="../../../../../assets/04-Icons/Icons_Sort.svg"
+          (click)="sortVitalGlucoseColumn()"
+          id="pd_BGvitalSort"
+        />Date
+      </th>
+      <th>Time</th>
+      <th>Schedule</th>
+      <th *ngIf="http_vitalGlucoseData && http_vitalGlucoseData.length > 0">
+        Blood Glucose (mg/dL)
+      </th>
+      <th [ngStyle]="{ 'border-radius': '0px 16px 0px 0px' }">Remarks</th>
+    </tr>
+    <ng-container *ngFor="let vitalitem of http_vitalGlucoseData">
+      <ng-container
+        *ngFor="
+          let vital_data of vitalitem.BloodGlucoseReadings;
+          let index = index
+        "
+      >
+        <tr>
+          <td
+            class="main_time"
+            *ngIf="index === 0"
+            [attr.rowspan]="vitalitem.BloodGlucoseReadings.length"
+          >
+            <span *ngIf="vitalitem.ReadingDate">{{
+              datepipe.transform(vitalitem.ReadingDate, "MMM d, y")
+            }}</span>
+          </td>
+          <td
+            [ngStyle]="{ 'border-radius': '8px 0px 0px 8px' }"
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.BloodGlucoseReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.BloodGlucoseReadings[index].Status == 'Cautious'
+            }"
+          >
+            {{ datepipe.transform(vital_data.ReadingTime, "h:mm a") }}
+          </td>
+          <td
+            class="schedule_type"
+            [ngStyle]="{ 'min-width': '30px' }"
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.BloodGlucoseReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.BloodGlucoseReadings[index].Status == 'Cautious'
+            }"
+          >
+            {{ vital_data.Schedule }}
+          </td>
+          <td
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.BloodGlucoseReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.BloodGlucoseReadings[index].Status == 'Cautious'
+            }"
+          >
+            <button
+              class="systolicbtn"
+              [ngClass]="{
+                vitalprssureCritical:
+                  vitalitem.BloodGlucoseReadings[index].Status == 'Critical',
+                vitalprssureCautious:
+                  vitalitem.BloodGlucoseReadings[index].Status == 'Cautious',
+                vitalprssureNormal:
+                  vitalitem.BloodGlucoseReadings[index].Status == 'Normal'
+              }"
+              id="pd_VitalBGmgdl"
+            >
+              {{ vital_data.BGmgdl }}
+            </button>
+          </td>
+          <td
+            class="remark_column"
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.BloodGlucoseReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.BloodGlucoseReadings[index].Status == 'Cautious'
+            }"
+            [ngStyle]="{ 'border-radius': '0px 8px 8px 0px' }"
+          >
+            {{ vital_data.Remarks }}
+          </td>
+        </tr>
+      </ng-container>
+    </ng-container>
+  </table>
+</ng-template>
+
+<!-- Glucose Table  End-->
+
+<ng-template #BloodOxygen>
+  <table class="team_detail_schedule">
+    <tr>
+      <th [ngStyle]="{ 'border-radius': '16px 0px 0px 0px' }">
+        <img
+          class="sort_icon_default"
+          src="../../../../../assets/04-Icons/Icons_Sort.svg"
+          id="pd_OvitalSort"
+          (click)="sortOxygenColumn()"
+        />Date
+      </th>
+      <th>Time</th>
+      <th [ngStyle]="{ 'padding-left': '1rem' }">Oxygen</th>
+      <th [ngStyle]="{ 'padding-left': '1rem' }">Pulse</th>
+
+      <th [ngStyle]="{ 'border-radius': '0px 16px 0px 0px' }">Remarks</th>
+    </tr>
+    <ng-container *ngFor="let vitalitem of http_VitalOxygen">
+      <ng-container
+        *ngFor="
+          let vital_data of vitalitem.BloodOxygenReadings;
+          let index = index
+        "
+      >
+        <tr>
+          <td
+            class="main_time"
+            *ngIf="index === 0"
+            [attr.rowspan]="vitalitem.BloodOxygenReadings.length"
+          >
+            <span>{{
+              datepipe.transform(vitalitem.ReadingDate, "MMM d, y")
+            }}</span>
+          </td>
+          <td
+            [ngStyle]="{ 'border-radius': '8px 0px 0px 8px' }"
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.BloodOxygenReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.BloodOxygenReadings[index].Status == 'Cautious'
+            }"
+          >
+            {{ datepipe.transform(vital_data.ReadingTime, "h:mm a") }}
+          </td>
+          <td
+            class="schedule_type"
+            [ngStyle]="{ 'min-width': '30px' }"
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.BloodOxygenReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.BloodOxygenReadings[index].Status == 'Cautious'
+            }"
+          >
+            <button
+              class="systolicbtn"
+              id="pd_VitalOxygen"
+              [ngClass]="{
+                vitalprssureCritical:
+                  vitalitem.BloodOxygenReadings[index].OxygenStatus ==
+                  'Critical',
+                vitalprssureCautious:
+                  vitalitem.BloodOxygenReadings[index].OxygenStatus ==
+                  'Cautious',
+                vitalprssureNormal:
+                  vitalitem.BloodOxygenReadings[index].OxygenStatus == 'Normal'
+              }"
+            >
+              {{ vital_data.Oxygen }}
+            </button>
+          </td>
+          <td
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.BloodOxygenReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.BloodOxygenReadings[index].Status == 'Cautious'
+            }"
+          >
+            <button
+              class="systolicbtn"
+              id="pd_VitalPulseOx"
+              [ngClass]="{
+                vitalprssureCritical:
+                  vitalitem.BloodOxygenReadings[index].PulseStatus ==
+                  'Critical',
+                vitalprssureCautious:
+                  vitalitem.BloodOxygenReadings[index].PulseStatus ==
+                  'Cautious',
+                vitalprssureNormal:
+                  vitalitem.BloodOxygenReadings[index].PulseStatus == 'Normal'
+              }"
+            >
+              {{ vital_data.Pulse }}
+            </button>
+          </td>
+
+          <td
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.BloodOxygenReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.BloodOxygenReadings[index].Status == 'Cautious'
+            }"
+            [ngStyle]="{ 'border-radius': '0px 8px 8px 0px' }"
+          >
+            {{ vital_data.Remarks }}
+          </td>
+        </tr>
+      </ng-container>
+    </ng-container>
+  </table>
+</ng-template>
+
+<ng-template #Weight>
+  <table class="team_detail_schedule">
+    <tr>
+      <th [ngStyle]="{ 'border-radius': '16px 0px 0px 0px' }">
+        <img
+          class="sort_icon_default"
+          src="../../../../../assets/04-Icons/Icons_Sort.svg"
+          id="pd_WvitalSort"
+          (click)="sortWeightColumn()"
+        />Date
+      </th>
+      <th>Time</th>
+      <th>Weight(Lbs)</th>
+      <th [ngStyle]="{ 'border-radius': '0px 16px 0px 0px' }">Remarks</th>
+    </tr>
+    <ng-container *ngFor="let vitalitem of http_VitalWight">
+      <ng-container
+        *ngFor="let vital_data of vitalitem.WeightReadings; let index = index"
+      >
+        <tr>
+          <td
+            class="main_time"
+            *ngIf="index === 0"
+            [attr.rowspan]="vitalitem.WeightReadings.length"
+          >
+            <span>{{
+              datepipe.transform(vitalitem.ReadingDate, "MMM d, y")
+            }}</span>
+          </td>
+          <td
+            [ngStyle]="{ 'border-radius': '8px 0px 0px 8px' }"
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.WeightReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.WeightReadings[index].Status == 'Cautious'
+            }"
+          >
+            {{ datepipe.transform(vital_data.ReadingTime, "h:mm a") }}
+          </td>
+
+          <td
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.WeightReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.WeightReadings[index].Status == 'Cautious'
+            }"
+          >
+            <button
+              class="systolicbtn"
+              id="pd_VitalBWlbs"
+              [ngClass]="{
+                vitalprssureCritical:
+                  vitalitem.WeightReadings[index].Status == 'Critical',
+                vitalprssureCautious:
+                  vitalitem.WeightReadings[index].Status == 'Cautious',
+                vitalprssureNormal:
+                  vitalitem.WeightReadings[index].Status == 'Normal'
+              }"
+            >
+              {{ vital_data.BWlbs }}
+            </button>
+          </td>
+
+          <td
+            [ngClass]="{
+              vitalCritical:
+                vitalitem.WeightReadings[index].Status == 'Critical',
+              vitalCautious:
+                vitalitem.WeightReadings[index].Status == 'Cautious'
+            }"
+            [ngStyle]="{ 'border-radius': '0px 8px 8px 0px' }"
+          >
+            {{ vital_data.Remarks }}
+          </td>
+        </tr>
+      </ng-container>
+    </ng-container>
+  </table>
+</ng-template>
+
+<!-- VitalReadingInfo End Clinical activity First  Sub-Menu  -->
+<ng-template #healthTrendInfo>
+  <div class="healthtrend_upper_panel">
+    <p class="healthtrend_heading">
+      {{ http_healthtrends && http_healthtrends.VitalName }}
+    </p>
+
+    <div class="date_btn_panel" fxLayout="row">
+      <!-- <button
+        class="btn-date_container"
+        (click)="healthtrends(7)"
+        [ngClass]="
+          heath_trends_frequency == 7 ? 'date_selected_' : 'date_not_selected'
+        "
+      >
+        7 Days
+      </button>
+      <button
+        class="btn-date_container"
+        (click)="healthtrends(30)"
+        [ngClass]="
+          heath_trends_frequency == 30 ? 'date_selected_' : 'date_not_selected'
+        "
+      >
+        30 Days
+      </button> -->
+
+      <button
+        class="btn-helath-select"
+        (click)="getHealthTrends('current_week')"
+        [ngClass]="
+          healthtrendgrahselect == 'current_week'
+            ? 'date_selected_'
+            : 'date_not_selected'
+        "
+      >
+        Week
+      </button>
+      <button
+        class="btn-helath-select"
+        (click)="getHealthMonth('current_month')"
+        [ngClass]="
+          healthtrendgrahselect == 'current_month'
+            ? 'date_selected_'
+            : 'date_not_selected'
+        "
+      >
+        Month
+      </button>
+    </div>
+    <!-- <div>
+      <button (click)="getHealthTrendWeek(7, 'previous')">Previous</button>
+      <span> {{ this.WeekStartDate }}</span
+      >-----<span>{{ this.WeekEndDate }}</span>
+      <button (click)="getHealthTrendWeek(7, 'next')">Next</button>
+    </div>
+    <div>
+      <button (click)="getHealthMonth('previous')">Previous</button>
+      <span> {{ this.Current_month_temp }}</span>
+      <button (click)="getHealthMonth('next')">Next</button>
+    </div> -->
+  </div>
+
+  <div class="recent_vital_panel_container">
+    <!--    <p class="recent_vital_panel_title">Recent Vitals</p> -->
+
+    <div class="recent_vital_panel">
+      <div
+        class="healthtrend_datedisplay"
+        *ngIf="healthtrendgrahselect == 'current_week'"
+      >
+        <div class="arrow-img-panel">
+          <img
+            class="arrow-img"
+            src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg"
+            (click)="getHealthTrendWeek(7, 'previous')"
+          />
+        </div>
+        <div class="healthtrend_labal_middle">
+          <span> {{ this.WeekStartDate | date : "mediumDate" }} </span> To
+          <span>{{ this.WeekEndDate | date : "mediumDate" }}</span>
+        </div>
+
+        <div class="arrow-img-panel">
+          <img
+            class="arrow-img"
+            src="../../../../../assets/04-Icons/Icons_Arrow - Front.svg"
+            button
+            (click)="getHealthTrendWeek(7, 'next')"
+          />
+        </div>
+      </div>
+      <div
+        class="healthtrend_datedisplay"
+        *ngIf="healthtrendgrahselect == 'current_month'"
+      >
+        <div class="arrow-img-panel">
+          <img
+            class="arrow-img"
+            src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg"
+            (click)="getHealthMonth('previous')"
+          />
+        </div>
+        <div class="healthtrend_labal_middle">
+          <!-- <span> {{ this.Current_month_temp }}</span> -->
+          <span>{{
+            selectedMonthName(this.Current_month_temp, this.currentYear)
+          }}</span>
+        </div>
+
+        <div class="arrow-img-panel">
+          <img
+            class="arrow-img"
+            src="../../../../../assets/04-Icons/Icons_Arrow - Front.svg"
+            button
+            (click)="getHealthMonth('next')"
+          />
+        </div>
+      </div>
+
+      <div class="patient_vital_bp_graph_container" *ngIf="http_healthtrends">
+        <div class="graph_header_separator"></div>
+
+        <div style="display: block; width: 90%; height: 450px; margin-left: 5%">
+          <canvas
+            class="charttrends"
+            baseChart
+            width="1"
+            height="1"
+            [datasets]="lineChartData"
+            [labels]="lineChartLabels"
+            [options]="lineChartOptions"
+            [legend]="lineChartLegend"
+            [type]="lineChartType"
+          >
+          </canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #medicationInfo>
+  <div class="task_date_panel">
+    <!-- <img
+      class="add-img"
+      src="../../../../../assets/04-Icons/Icons_Add Main.svg"
+      (click)="navigateclinicmedication()"
+    /> -->
+  </div>
+  <div class="medicationInfoData">
+    <div class="medicationInfo_table">
+      <div>
+        <mat-table #table [dataSource]="dataSourceTable">
+          <ng-container matColumnDef="selection">
+            <mat-header-cell
+              [ngStyle]="{ 'border-radius': '16px 0px 0px 0px' }"
+              *matHeaderCellDef
+            >
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element; let rowIndex = index">
+              <mat-radio-button
+                color="primary"
+                name="rhSelectionRadio"
+                [value]="rowIndex"
+                (click)="selectmedicationRow($event, element)"
+                [checked]="element.selected"
+              >
+              </mat-radio-button>
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="Id">
+            <mat-header-cell *matHeaderCellDef>Id </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{ element.Id }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="Medicinename">
+            <mat-header-cell *matHeaderCellDef>Medicine Name </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.Medicinename }}</mat-cell
+            >
+          </ng-container>
+          <ng-container matColumnDef="MedicineSchedule">
+            <mat-header-cell *matHeaderCellDef> Schedule </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.MedicineSchedule }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="Morning">
+            <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.Morning }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="AfterNoon">
+            <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.AfterNoon }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="Evening">
+            <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.Evening }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="Night">
+            <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{ element.Night }} </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="interval">
+            <mat-header-cell *matHeaderCellDef>Interval / Day </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              <div class="medication_interval_data">
+                <div
+                  class="{{
+                    element.Morning
+                      ? 'interval_data_active'
+                      : 'interval_data_disable'
+                  }}"
+                >
+                  <div class="interval_data_item">M</div>
+                </div>
+                <div
+                  class="{{
+                    element.AfterNoon
+                      ? 'interval_data_active'
+                      : 'interval_data_disable'
+                  }}"
+                >
+                  <div class="interval_data_item">A</div>
+                </div>
+                <div
+                  class="{{
+                    element.Evening
+                      ? 'interval_data_active'
+                      : 'interval_data_disable'
+                  }}"
+                >
+                  <div class="interval_data_item">E</div>
+                </div>
+                <div
+                  class="{{
+                    element.Night
+                      ? 'interval_data_active'
+                      : 'interval_data_disable'
+                  }}"
+                >
+                  <div class="interval_data_item">N</div>
+                </div>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="StartDate">
+            <mat-header-cell *matHeaderCellDef> Start Date </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              <span *ngIf="element.StartDate">{{
+                datepipe.transform(element.StartDate, "MMM d,y")
+              }}</span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="EndDate">
+            <mat-header-cell *matHeaderCellDef> EndDate </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              <span *ngIf="element.EndDate">{{
+                datepipe.transform(element.EndDate, "MMM d,y")
+              }}</span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="Description">
+            <mat-header-cell *matHeaderCellDef> Remark </mat-header-cell>
+            <mat-cell *matCellDef="let element; let rowIndex = index">{{
+              element.Description
+            }}</mat-cell>
+          </ng-container>
+          <!-- Action Column -->
+          <div>
+            <!-- <ng-container matColumnDef="actions">
+              <mat-header-cell
+                *matHeaderCellDef
+                [ngStyle]="{ 'border-radius': '0px 16px 0px 0px' }"
+              >
+              </mat-header-cell>
+              <mat-cell *matCellDef="let element" let rowIndex="index;">
+                <div
+                  class="{{ element.selected ? 'displayIcon' : 'hideIcon' }}"
+                >
+                  <div class="displayIcon">
+                    <div class="front_img_container">
+                      <img
+                        class="front_img"
+                        src="../../../../../../assets/04-Icons/Icons_Edit.svg"
+                        (click)="getMedicationData(element)"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </mat-cell>
+            </ng-container> -->
+          </div>
+          <mat-header-row
+            *matHeaderRowDef="displayedMedicationColumns"
+          ></mat-header-row>
+          <mat-row
+            [style.minHeight.px]="30"
+            *matRowDef="let row; columns: displayedMedicationColumns"
+          ></mat-row>
+        </mat-table>
+        <mat-paginator
+          [length]="http_medication_data ? total_number : 0"
+          [pageSize]="8"
+          [pageIndex]="0"
+        >
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #symptomsInfo>
+  <div class="task_date_panel">
+    <!-- <div>
+      <mat-form-field appearance="outline">
+        <mat-label>Select Range</mat-label>
+        <mat-date-range-input [rangePicker]="picker">
+          <input
+            matStartDate
+            placeholder="Start date"
+            readonly
+            #dateRangeStart
+          />
+          <input matEndDate placeholder="End date" readonly #dateRangeEnd />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+    </div> -->
+  </div>
+  <div class="symtomsInfoData">
+    <div class="symtoms_table">
+      <div>
+        <mat-table #table [dataSource]="dataSourceTableSymptom">
+          <ng-container matColumnDef="Id">
+            <mat-header-cell
+              [ngStyle]="{ 'border-radius': '16px 0px 0px 0px' }"
+              *matHeaderCellDef
+            >
+              Id
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{ element.Id }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="Symptom">
+            <mat-header-cell *matHeaderCellDef> Symptoms </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.Symptom }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="Description">
+            <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.Description }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="SymptomStartDateTime">
+            <mat-header-cell *matHeaderCellDef> Date </mat-header-cell>
+            <!--  <mat-cell *matCellDef="let element">{{element.Date}} -->
+            <mat-cell *matCellDef="let element">
+              <span *ngIf="element.SymptomStartDateTime">{{
+                datepipe.transform(
+                  convertToLocalTime(element.SymptomStartDateTime),
+                  "MMM d, y"
+                )
+              }}</span>
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="time">
+            <mat-header-cell
+              [ngStyle]="{ 'border-radius': '0px 16px 0px 0px' }"
+              *matHeaderCellDef
+            >
+              Time
+            </mat-header-cell>
+            <!--  <mat-cell *matCellDef="let element">{{element.Time}} -->
+            <mat-cell *matCellDef="let element">
+              <span *ngIf="element.SymptomStartDateTime">{{
+                datepipe.transform(
+                  convertToLocalTime(element.SymptomStartDateTime),
+                  "h:mm a"
+                )
+              }}</span>
+            </mat-cell>
+          </ng-container>
+          <div></div>
+
+          <mat-header-row
+            *matHeaderRowDef="symtomsTableColumn"
+          ></mat-header-row>
+          <mat-row
+            [style.minHeight.px]="30"
+            *matRowDef="let row; columns: symtomsTableColumn"
+          ></mat-row>
+        </mat-table>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #uploadInfo>
+  <div class="uploadInfoData">
+    <div class="task_date_panel">
+      <img
+        class="add-img"
+        src="../../../../../assets/04-Icons/Icons_Add Main.svg"
+        (click)="navigateclinicupload()"
+      />
+    </div>
+    <div class="uploadInfo_table">
+      <div class="example-container mat-elevation-z8">
+        <!--   <mat-table #table [dataSource]="dataSourceTable"> -->
+        <mat-table #table [dataSource]="dataSourceTable">
+          <ng-container matColumnDef="DocumentType">
+            <mat-header-cell
+              [ngStyle]="{ 'border-radius': '16px 0px 0px 0px' }"
+              *matHeaderCellDef
+            >
+              Document Type
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.DocumentType }}</mat-cell
+            >
+          </ng-container>
+
+          <ng-container matColumnDef="DocumentName">
+            <mat-header-cell *matHeaderCellDef> Document Name </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.DocumentName }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="CreatedOn">
+            <mat-header-cell *matHeaderCellDef> Last Updated </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{
+                datepipe.transform(
+                  convertToLocalTime(element.CreatedOn),
+                  "MMM d,y"
+                )
+              }}</mat-cell
+            >
+          </ng-container>
+          <div>
+            <ng-container matColumnDef="actions">
+              <mat-header-cell
+                [ngStyle]="{ 'border-radius': '0px 16px 0px 0px' }"
+                *matHeaderCellDef
+                >Report
+              </mat-header-cell>
+              <mat-cell *matCellDef="let element" let rowIndex="index;">
+                <div>
+                  <!--   <button mat-icon-button matTooltip="Click to Edit" class="iconbutton" color="primary"
+                      (click)="clickDocument(element.rowIndex)">
+                      <mat-icon>print</mat-icon>
+                    </button> -->
+
+                  <img
+                    class="noteImg"
+                    src="../../../../../assets/04-Icons/Icons_Notes.svg"
+                    (click)="openDocUpdatePanel(element)"
+                  />
+                </div>
+              </mat-cell>
+            </ng-container>
+          </div>
+
+          <mat-header-row
+            *matHeaderRowDef="displayeduploadColumns"
+          ></mat-header-row>
+          <mat-row
+            [style.minHeight.px]="30"
+            *matRowDef="let row; columns: displayeduploadColumns"
+          ></mat-row>
+        </mat-table>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #medicationpanel>
+  <div class="common_template doc_template">
+    <form [formGroup]="addMedicationForm">
+      <div class="common_main_title">Add Medication</div>
+      <div class="common_template_content">
+        <div class="common_content">
+          <p class="common_content_title">Medicine Name</p>
+          <div>
+            <input
+              class="common_input_dropdown"
+              placeholder="Enter Medicine Name"
+              formControlName="medicineName"
+            />
+          </div>
+        </div>
+        <div class="common_content add_clinc_branch">
+          <div class="add_clinic-item_sub">
+            <p class="common_content_title">*Schedule</p>
+            <select
+              class="common_input_dropdown"
+              formControlName="scheduleInterval"
+              [(ngModel)]="SelectedMedicalScheduleInterval"
+            >
+              <option [ngValue]="undefined" hidden>Select Interval</option>
+              <option *ngFor="let interval of IntervalArray" [value]="interval">
+                {{ interval }}
+              </option>
+            </select>
+            <p
+              class="text-danger"
+              *ngIf="
+                addMedicationForm.get('scheduleInterval')?.invalid &&
+                addMedicationForm.get('scheduleInterval')?.touched
+              "
+            >
+              Schedule is Required
+            </p>
+          </div>
+          <div class="add_clinic-item_sub" style="margin-right: 0px">
+            <p class="common_content_title" style="visibility: hidden">
+              *Schedule
+            </p>
+            <select
+              class="common_input_dropdown"
+              formControlName="scheduleTime"
+              [(ngModel)]="SelectedMedicalScheduleTime"
+            >
+              <option [ngValue]="undefined" hidden>Select Interval</option>
+              <option *ngFor="let interval of IntervalTime" [value]="interval">
+                {{ interval }}
+              </option>
+            </select>
+            <p
+              class="text-danger"
+              *ngIf="
+                addMedicationForm.get('scheduleTime')?.invalid &&
+                addMedicationForm.get('scheduleTime')?.touched
+              "
+            >
+              scheduleTime is Required
+            </p>
+          </div>
+        </div>
+        <div class="add_clinic-item_sub" style="padding-top: 0.8rem">
+          <p class="common_content_title">* Intervals</p>
+          <div class="frequency_sub_panel">
+            <div class="schedule_daily_item">
+              <input
+                class="schedule_checkbox"
+                type="checkbox"
+                formControlName="scheduleMorning"
+                id="mor"
+                name="morning"
+                value="mor"
+              />
+              <label for="Mor" class="common_content_title"> Mor </label>
+            </div>
+
+            <div class="schedule_daily_item">
+              <input
+                class="schedule_checkbox"
+                type="checkbox"
+                formControlName="scheduleAfterNoon"
+                id="after"
+                name="afternoon"
+                value="after"
+              />
+              <label for="afternoon" class="common_content_title">
+                afternoon
+              </label>
+            </div>
+
+            <div class="schedule_daily_item">
+              <input
+                class="schedule_checkbox"
+                type="checkbox"
+                formControlName="scheduleEvening"
+                id="even"
+                name="evening"
+                value="eve"
+              />
+              <label for="eve" class="common_content_title"> eve </label>
+            </div>
+            <div class="schedule_daily_item">
+              <input
+                class="schedule_checkbox"
+                type="checkbox"
+                formControlName="scheduleNight"
+                id="night"
+                name="night"
+                value="night"
+              />
+              <label for="night" class="common_content_title"> night </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="common_content add_clinc_branch">
+          <div class="add_clinic-item_sub">
+            <p class="common_content_title">Start Date</p>
+            <!--  <input class="common_input_dropdown"  formControlName='medicationstartDate' type="date"/> -->
+            <input
+              type="text"
+              onfocus="(this.type='date')"
+              placeholder="Date"
+              onchange="mydateFormat($event)"
+              class="common_input_dropdown"
+              formControlName="medicationstartDate"
+            />
+          </div>
+
+          <div class="add_clinic-item_sub">
+            <p class="common_content_title">End Date</p>
+
+            <input
+              type="text"
+              onfocus="(this.type='date')"
+              placeholder="Date"
+              onchange="mydateFormat($event)"
+              class="common_input_dropdown"
+              formControlName="medicationendDate"
+            />
+          </div>
+        </div>
+
+        <div class="common_content">
+          <p class="common_content_title">Comments</p>
+          <textarea
+            class="SmallFormTextArea"
+            placeholder="Add Comments"
+            formControlName="medicationcomment"
+          >
+          </textarea>
+        </div>
+      </div>
+      <div class="lower_container">
+        <button class="btn_cancel" (click)="onClickmedicationCancel()">
+          CANCEL
+        </button>
+        <button class="btn_save" (click)="addMedication()">Save</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #updatemedicationpanel>
+  <div class="common_template doc_template">
+    <form [formGroup]="updateMedicationForm">
+      <div class="common_main_title">Update Medication</div>
+      <div class="common_template_content">
+        <div class="common_content">
+          <p class="common_content_title">Medicine Name</p>
+          <div>
+            <input
+              class="common_input_dropdown"
+              placeholder="Enter Medicine Name"
+              formControlName="updatemedicineName"
+            />
+          </div>
+        </div>
+        <div class="common_content add_clinc_branch">
+          <div class="add_clinic-item_sub">
+            <p class="common_content_title">*Schedule</p>
+            <select
+              class="common_input_dropdown"
+              formControlName="scheduleInterval"
+              [(ngModel)]="SelectedMedicalScheduleInterval"
+            >
+              <option [ngValue]="undefined" hidden>Select Interval</option>
+              <option *ngFor="let interval of IntervalArray" [value]="interval">
+                {{ interval }}
+              </option>
+            </select>
+            <p
+              class="text-danger"
+              *ngIf="
+                updateMedicationForm.get('scheduleInterval')?.invalid &&
+                updateMedicationForm.get('scheduleInterval')?.touched
+              "
+            >
+              Schedule is Required
+            </p>
+          </div>
+          <div class="add_clinic-item_sub" style="margin-right: 0px">
+            <p class="common_content_title" style="visibility: hidden">
+              *Schedule
+            </p>
+            <select
+              class="common_input_dropdown"
+              formControlName="scheduleTime"
+              [(ngModel)]="SelectedMedicalScheduleTime"
+            >
+              <option [ngValue]="undefined" hidden>Select Interval</option>
+              <option *ngFor="let interval of IntervalTime" [value]="interval">
+                {{ interval }}
+              </option>
+            </select>
+            <p
+              class="text-danger"
+              *ngIf="
+                updateMedicationForm.get('scheduleTime')?.invalid &&
+                updateMedicationForm.get('scheduleTime')?.touched
+              "
+            >
+              scheduleTime is Required
+            </p>
+          </div>
+        </div>
+        <div class="add_clinic-item_sub" style="padding-top: 0.8rem">
+          <p class="common_content_title">* Intervals</p>
+          <div class="frequency_sub_panel">
+            <div class="schedule_daily_item">
+              <input
+                class="schedule_checkbox"
+                type="checkbox"
+                formControlName="scheduleMorning"
+                id="mor"
+                name="morning"
+                value="mor"
+              />
+              <label for="Mor" class="common_content_title"> Mor </label>
+            </div>
+
+            <div class="schedule_daily_item">
+              <input
+                class="schedule_checkbox"
+                type="checkbox"
+                formControlName="scheduleAfterNoon"
+                id="after"
+                name="afternoon"
+                value="after"
+              />
+              <label for="afternoon" class="common_content_title">
+                afternoon
+              </label>
+            </div>
+
+            <div class="schedule_daily_item">
+              <input
+                class="schedule_checkbox"
+                type="checkbox"
+                formControlName="scheduleEvening"
+                id="even"
+                name="evening"
+                value="eve"
+              />
+              <label for="eve" class="common_content_title"> eve </label>
+            </div>
+            <div class="schedule_daily_item">
+              <input
+                class="schedule_checkbox"
+                type="checkbox"
+                formControlName="scheduleNight"
+                id="night"
+                name="night"
+                value="night"
+              />
+              <label for="night" class="common_content_title"> night </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="common_content add_clinc_branch">
+          <div class="add_clinic-item_sub">
+            <p class="common_content_title">Start Date</p>
+            <input
+              type="text"
+              onfocus="(this.type='date')"
+              placeholder="Date"
+              onchange="mydateFormat($event)"
+              class="common_input_dropdown"
+              formControlName="medicationstartDate"
+            />
+          </div>
+
+          <div class="add_clinic-item_sub">
+            <p class="common_content_title">End Date</p>
+            <!-- <input class="common_input_dropdown"  formControlName='medicationendDate' type="date"/> -->
+            <input
+              type="text"
+              onfocus="(this.type='date')"
+              placeholder="Date"
+              onchange="mydateFormat($event)"
+              class="common_input_dropdown"
+              formControlName="medicationendDate"
+            />
+          </div>
+        </div>
+
+        <div class="common_content">
+          <p class="common_content_title">Comments</p>
+          <textarea
+            class="SmallFormTextArea"
+            placeholder="Add Comments"
+            formControlName="medicationcomment"
+          >
+          </textarea>
+        </div>
+      </div>
+      <div class="lower_container">
+        <button class="btn_cancel" (click)="onClickmedicationCancel()">
+          CANCEL
+        </button>
+
+        <button class="btn_save" (click)="updateMedication()">Update</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #uploadpanel>
+  <div class="common_template doc_template">
+    <!-- [ngStyle]="toogle ? minimize : maximize" -->
+
+    <!-- <img
+      *ngIf="minimizeValue"
+      class="maximizebutton"
+      (click)="maximizeScreen()"
+      src="../../../../../assets/04-Icons/Icons_Expand.svg"
+    />
+    <img
+      *ngIf="!minimizeValue"
+      class="minimizebutton"
+      (click)="minimizeScreen()"
+      src="../../../../../assets/04-Icons/Icons_Minimize.svg"
+    /> -->
+
+    <div class="common_main_title">Upload Document</div>
+    <div class="common_template_content">
+      <div class="common_content">
+        <div class="add_clinic-item_sub">
+          <p class="common_content_title">Document Type</p>
+          <select class="common_input_dropdown" [(ngModel)]="docType">
+            <option [ngValue]="undefined" hidden>Enter Document Type</option>
+            <option value="PatientConsentForm">Patient Consent Form</option>
+            <option value="Report">Report</option>
+          </select>
+        </div>
+      </div>
+      <div class="common_content">
+        <p class="common_content_title">Description</p>
+        <textarea [(ngModel)]="docDesc"> </textarea>
+      </div>
+
+      <div class="common_content" style="margin-top: 32px">
+        <p class="common_content_title">Attachment</p>
+
+        <div class="doc_attachment">
+          <input
+            type="text"
+            class="common_input_dropdown"
+            placeholder="Select Attachment"
+            disabled
+            value="{{ fileName }}"
+          />
+
+          <div class="add_container">
+            <img
+              class="add-img"
+              src="../../../../../assets/04-Icons/Icons_Add.svg"
+              (click)="fileInput.click()"
+            />
+            <input
+              #fileInput
+              type="file"
+              (change)="openFileData($event)"
+              style="display: none"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="lower_container">
+      <button class="btn_cancel" (click)="onClickuploadCancel()">CANCEL</button>
+      <button class="btn_save" (click)="uploaddoc()">Upload</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #updatepanel>
+  <div class="common_template doc_template">
+    <div class="common_main_title">Update Document</div>
+    <div class="common_template_content">
+      <div class="common_content">
+        <div class="add_clinic-item_sub">
+          <p class="common_content_title">Document Type</p>
+          <select class="common_input_dropdown" [(ngModel)]="docType">
+            <option [ngValue]="undefined" hidden>Enter Document Type</option>
+            <option value="PatientConsentForm">Patient Consent Form</option>
+            <option value="Report">Report</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="common_content" style="margin-top: 32px">
+        <p class="common_content_title">Attachment</p>
+
+        <div class="doc_attachment">
+          <input
+            type="text"
+            class="common_input_dropdown"
+            placeholder="Select Attachment"
+            disabled
+            value="{{ fileName }}"
+          />
+
+          <div class="add_container">
+            <img
+              class="add-img"
+              src="../../../../../assets/04-Icons/Icons_Add.svg"
+              (click)="fileInput.click()"
+            />
+            <input
+              #fileInput
+              type="file"
+              (change)="openFileData($event)"
+              style="display: none"
+            />
+          </div>
+        </div>
+      </div>
+      <button
+        class="common_input_dropdown document_view_btn"
+        style="background-color: #8be3d9"
+        (click)="openPdf(documentviewSrc)"
+      >
+        <!-- (click)="openPdf(element.DocumentUNC)" -->
+
+        Document View
+      </button>
+    </div>
+
+    <div class="lower_container">
+      <button class="btn_cancel" (click)="onClickupdatedocCancel()">
+        CANCEL
+      </button>
+      <!-- <button class="btn_save">Update</button> -->
+    </div>
+  </div>
+</ng-template>
+<!-- Clinic Info Template  Second Menu  End-->
+
+<!-- activity Info Template 3rd Main Menu Start  -->
+<!-- ################################################################################## -->
+<ng-template #activityInfo>
+  <div class="activityInfo">
+    <div class="activityInfo_main_panel">
+      <div class="activityInfo_data_panel">
+        <!-- Activity Menu Start -->
+        <div class="activityInfo_menu">
+          <div
+            class="activity_panel"
+            *ngFor="let menu_item of activityInfoMenu"
+          >
+            <button
+              class="{{
+                activityMenuVariable == menu_item.menu_id
+                  ? 'activityInfo_item_active'
+                  : 'activityInfo_item'
+              }}"
+              (click)="activityInfoMenuSelect(menu_item.menu_id)"
+              style="position: relative; z-index: 200"
+            >
+              {{ menu_item.menu_title }}
+            </button>
+          </div>
+        </div>
+        <!-- Activity Menu End -->
+        <div class="acivity_detail_data">
+          <ng-container [ngSwitch]="activityMenuVariable">
+            <!-- <ng-container *ngSwitchCase="1">
+              <ng-container
+                *ngTemplateOutlet="activityInfoSchedule"
+              ></ng-container>
+            </ng-container> -->
+            <ng-container *ngSwitchCase="2">
+              <ng-container *ngTemplateOutlet="activityInfoCall"></ng-container>
+            </ng-container>
+            <!-- <ng-container *ngSwitchCase="3">
+              <ng-container
+                *ngTemplateOutlet="activityInfoReviews"
+              ></ng-container>
+            </ng-container> -->
+            <ng-container *ngSwitchCase="3">
+              <ng-container *ngTemplateOutlet="activityInfoChat"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="4">
+              <ng-container *ngTemplateOutlet="activityInfoSMS"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="5">
+              <ng-container
+                *ngTemplateOutlet="activityInfogoalStatus"
+              ></ng-container>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Activity 3rd Main Menu Sub Menu Template -->
+
+<!-- Activity 3rd Main Menu - Sub Menu  Schedules Template Start -->
+<ng-template #activityInfoSchedule>
+  <div class="activityInfoSchedule">
+    <div class="task_date_panel">
+      <div>
+        <mat-form-field appearance="outline">
+          <mat-label>Enter a date range</mat-label>
+          <mat-date-range-input
+            [formGroup]="frmactivitySchedulerange"
+            [rangePicker]="picker"
+          >
+            <input
+              matStartDate
+              formControlName="start"
+              placeholder="Start date"
+            />
+            <input
+              matEndDate
+              formControlName="end"
+              placeholder="End date"
+              (dateChange)="rangeActivityScheduleCalc()"
+            />
+          </mat-date-range-input>
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="schedule_table_container">
+      <table class="team_detail_schedule">
+        <tr>
+          <th [ngStyle]="{ 'border-radius': '16px 0px 0px 0px' }">
+            <!-- <img
+              class="sort_icon_default"
+              src="../../../../../assets/04-Icons/Icons_Sort.svg"
+            />Date -->
+            Date
+          </th>
+          <th>Time</th>
+          <th>Schedule Type</th>
+          <th>Description</th>
+          <th [ngStyle]="{ 'border-radius': '0px 16px 0px 0px' }">
+            <!-- <img
+              class="sort_icon_default"
+              src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+            />Assigned Member -->Assigned Member
+          </th>
+          <!--  <th [ngStyle]="{'border-radius':'0px 16px 0px 0px'}"></th> -->
+        </tr>
+        <ng-container *ngFor="let scheduleitem of http_ActivityScheduleData">
+          <ng-container
+            *ngFor="
+              let schedule_data of scheduleitem.SchedueInfos;
+              let index = index
+            "
+          >
+            <tr>
+              <td
+                style="background-color: #edeff5"
+                *ngIf="index === 0"
+                [attr.rowspan]="scheduleitem.SchedueInfos.length"
+              >
+                <!--    {{(scheduleitem.ScheduleDate).split("T")[0]}} -->
+                {{ datepipe.transform(scheduleitem.ScheduleDate, "MMM d, y") }}
+              </td>
+              <td [ngStyle]="{ 'border-radius': '8px 0px 0px 8px' }">
+                {{ schedule_data.ScheduleTime }}
+              </td>
+              <td class="schedule_type">
+                {{ schedule_data.ScheduleType }}
+              </td>
+              <td>
+                {{ schedule_data.Description }}
+              </td>
+              <td>
+                {{ schedule_data.AssignedByName }}
+              </td>
+            </tr>
+          </ng-container>
+        </ng-container>
+      </table>
+    </div>
+  </div>
+</ng-template>
+<ng-template #schedulepanel> </ng-template>
+
+<!-- Activity 3rd Main Menu - Sub Menu  Schedules Template End -->
+
+<!-- Activity 3rd Main Menu - Sub Menu  Calls Template Start -->
+<ng-template #activityInfoCall>
+  <div class="task_date_panel">
+    <div>
+      <mat-form-field appearance="outline">
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input
+          [formGroup]="frmactivityCallrange"
+          [rangePicker]="picker"
+        >
+          <input
+            matStartDate
+            formControlName="start"
+            placeholder="Start date"
+            id="pd_CallStartdate"
+          />
+          <input
+            matEndDate
+            formControlName="end"
+            placeholder="End date"
+            id="pd_CallEnddate"
+            (dateChange)="rangeActivityCallCalc()"
+          />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker maxRange="7" #picker></mat-date-range-picker>
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="activityInfoCallData">
+    <div class="activityInfoCall_table">
+      <div>
+        <!--  <mat-table #table [dataSource]="dataSourceTable"> -->
+        <mat-paginator [length]="10" [pageSize]="5" [pageIndex]="0">
+        </mat-paginator>
+        <mat-table #table [dataSource]="dataSourceTable">
+          <ng-container matColumnDef="Id">
+            <mat-header-cell
+              [ngStyle]="{ 'border-radius': '16px 0px 0px 0px' }"
+              *matHeaderCellDef
+            >
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{ element.Id }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="AllCalls">
+            <mat-header-cell *matHeaderCellDef> All Calls </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.NoteType }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="Duration">
+            <mat-header-cell *matHeaderCellDef> Call Duration </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              <span>{{ timeConvert(element.Duration) }}</span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="Date">
+            <mat-header-cell *matHeaderCellDef>Date </mat-header-cell>
+            <!-- <mat-cell *matCellDef="let element"><span>{{element.CreatedOn}}</span></mat-cell> -->
+            <mat-cell *matCellDef="let element">
+              <span *ngIf="element.CreatedOn">{{
+                datepipe.transform(
+                  convertToLocalTime(element.CreatedOn),
+                  "MMM d, yyyy"
+                )
+              }}</span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="Time">
+            <mat-header-cell *matHeaderCellDef>Time </mat-header-cell>
+            <!-- <mat-cell *matCellDef="let element"><span>{{element.CreatedOn}}</span></mat-cell> -->
+            <mat-cell *matCellDef="let element">
+              <span *ngIf="element.CreatedOn">{{
+                datepipe.transform(
+                  convertToLocalTime(element.CreatedOn),
+                  "h:mm a"
+                )
+              }}</span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="CompletedBy">
+            <mat-header-cell *matHeaderCellDef> Completed By </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.CompletedBy }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="CallType">
+            <mat-header-cell *matHeaderCellDef> CallType</mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.CallType }}
+            </mat-cell>
+          </ng-container>
+
+          <!-- <ng-container matColumnDef="Notes">
+            <mat-header-cell
+              [ngStyle]="{ 'border-radius': '0px 16px 0px 0px' }"
+              *matHeaderCellDef
+            >
+              Notes
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"
+              ><img
+                src="../../../../../assets/04-Icons/Icons_Notes.svg"
+                class="noteImg"
+                (click)="getCallnotedata(element)"
+              />
+            </mat-cell>
+          </ng-container> -->
+
+          <mat-header-row
+            *matHeaderRowDef="CallNotesColumnHeader"
+          ></mat-header-row>
+          <mat-row
+            [style.minHeight.px]="30"
+            *matRowDef="let row; columns: CallNotesColumnHeader"
+          ></mat-row>
+        </mat-table>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<!-- Activity 3rd Main Menu - Sub Menu  Calls Template Start -->
+
+<!-- Activity 3rd Main Menu - Sub Menu  Reviews Template Start -->
+
+<!-- Activity 3rd Main Menu - Sub Menu  Chat Template Start -->
+<ng-template #activityInfoChat>
+  <div class="activitygoal">
+    <div class="program_goals">
+      <div class="task_date_panel">
+        <div>
+          <mat-form-field appearance="outline">
+            <mat-label>Max range 7 days</mat-label>
+            <mat-date-range-input [rangePicker]="picker">
+              <input
+                matStartDate
+                placeholder="Start date"
+                readonly
+                #dateRangeStart
+              />
+              <input matEndDate placeholder="End date" readonly #dateRangeEnd />
+            </mat-date-range-input>
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="picker"
+            ></mat-datepicker-toggle>
+            <mat-date-range-picker maxRange="7" #picker></mat-date-range-picker>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="activityInfoCallData">
+        <div class="activityInfoCall_table">
+          <div>
+            <!--  <mat-table #table [dataSource]="dataSourceTable"> -->
+            <mat-table #table [dataSource]="dataSourceTableChat">
+              <ng-container matColumnDef="selection">
+                <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+                <mat-cell *matCellDef="let element; let rowIndex = index">
+                  <mat-radio-button
+                    color="primary"
+                    name="rhSelectionRadio"
+                    [value]="rowIndex"
+                    (click)="selectRow($event, element)"
+                    [checked]="element.selected"
+                  >
+                  </mat-radio-button>
+                </mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="Id">
+                <mat-header-cell
+                  [ngStyle]="{ 'border-radius': '16px 0px 0px 0px' }"
+                  *matHeaderCellDef
+                >
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{ element.Id }}</mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="Date">
+                <mat-header-cell *matHeaderCellDef>Date </mat-header-cell>
+                <!-- <mat-cell *matCellDef="let element"><span>{{element.CreatedOn}}</span></mat-cell> -->
+                <mat-cell *matCellDef="let element">
+                  {{ element.Date }}</mat-cell
+                >
+              </ng-container>
+
+              <ng-container matColumnDef="Time">
+                <mat-header-cell *matHeaderCellDef>Time </mat-header-cell>
+                <!--  <mat-cell *matCellDef="let element"><span>{{element.CreatedOn}}</span></mat-cell> -->
+                <mat-cell *matCellDef="let element">
+                  {{ element.Time }}</mat-cell
+                >
+              </ng-container>
+
+              <ng-container matColumnDef="Contactname">
+                <mat-header-cell *matHeaderCellDef>
+                  Contactname
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                  {{ element.Contactname }}
+                </mat-cell>
+              </ng-container>
+
+              <div style="width: 0px">
+                <ng-container matColumnDef="action">
+                  <mat-header-cell
+                    [ngStyle]="{ 'border-radius': '0px 16px 0px 0px' }"
+                    *matHeaderCellDef
+                  >
+                  </mat-header-cell>
+                  <mat-cell *matCellDef="let element" let rowIndex="index;">
+                    <div
+                      class="{{
+                        element.selected ? 'displayIcon' : 'hideIcon'
+                      }}"
+                    >
+                      <div class="displayIcon">
+                        <div class="front_img_container">
+                          <img
+                            class="front_img"
+                            src="../../../../../../assets/04-Icons/Icons_Arrow - Front.svg"
+                            (click)="onclickchatarrow(element)"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </mat-cell>
+                </ng-container>
+              </div>
+
+              <mat-header-row
+                *matHeaderRowDef="ChatColumnHeader"
+              ></mat-header-row>
+              <mat-row
+                [style.minHeight.px]="30"
+                *matRowDef="let row; columns: ChatColumnHeader"
+                [ngClass]="{ selectedrow: row.selected == true }"
+              ></mat-row>
+            </mat-table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="program_goals">
+      <div class="chat_modal" *ngIf="chat_panel_visible">
+        <div style="height: 60%; margin-top: 5px">
+          <div style="height: auto" *ngFor="let data of chatMessage">
+            <div
+              class="chat_window_settings"
+              *ngIf="
+                data.chat != 'receiver';
+                then senderTemplate;
+                else receiverTemplate
+              "
+            ></div>
+            <ng-template #senderTemplate>
+              <div class="sender_content">
+                <div class="sender_content_text">{{ data.text }}</div>
+              </div>
+            </ng-template>
+            <ng-template #receiverTemplate>
+              <br />
+              <div class="receiver_content">
+                <div class="receiver_content_text">{{ data.text }}</div>
+              </div>
+              <br />
+            </ng-template>
+            <!-- <div class="block">
+          Block
+        </div>
+        <div class="error-label">This field is required.</div> -->
+          </div>
+        </div>
+
+        <div>
+          <h2 class="chat_h2_line">
+            <span class="chat_h2_span">Nov 4,2022</span>
+          </h2>
+        </div>
+        <input class="message_input_field" placeholder="Type your Message..." />
+      </div>
+    </div>
+  </div>
+</ng-template>
+<!-- Activity 3rd Main Menu - Sub Menu  Chat Template End -->
+<ng-template #activityInfoSMS>
+  <div class="task_date_panel">
+    <div>
+      <mat-form-field appearance="outline">
+        <mat-label>Max range 7 days</mat-label>
+        <mat-date-range-input [rangePicker]="picker">
+          <input
+            matStartDate
+            placeholder="Start date"
+            readonly
+            #dateRangeStart
+          />
+          <input matEndDate placeholder="End date" readonly #dateRangeEnd />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker maxRange="7" #picker></mat-date-range-picker>
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="activityInfoCallData">
+    <div class="activityInfoCall_table">
+      <div>
+        <!--   <mat-table #table [dataSource]="dataSourceTable"> -->
+
+        <mat-table #table [dataSource]="dataSourceTableSMS">
+          <ng-container matColumnDef="Date">
+            <mat-header-cell
+              [ngStyle]="{ 'border-radius': '16px 0px 0px 0px' }"
+              *matHeaderCellDef
+              >Date
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element">{{ element.Date }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="Time">
+            <mat-header-cell *matHeaderCellDef>Time </mat-header-cell>
+            <mat-cell *matCellDef="let element">{{ element.Time }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="Message">
+            <mat-header-cell *matHeaderCellDef>message </mat-header-cell>
+            <mat-cell *matCellDef="let element">{{ element.message }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="Contactname">
+            <mat-header-cell
+              [ngStyle]="{ 'border-radius': '0px 16px 0px 0px' }"
+              *matHeaderCellDef
+            >
+              Contactname
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.Contactname }}
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="SmsColumnHeader"></mat-header-row>
+          <mat-row
+            [style.minHeight.px]="30"
+            *matRowDef="let row; columns: SmsColumnHeader"
+          ></mat-row>
+        </mat-table>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #activityInfogoalStatus>
+  <div class="activitygoal">
+    <!-- Program Goals Start -->
+
+    <div class="program_goals">
+      <div class="patient-detail-panel-heading">Program Goals</div>
+      <div class="activity_goal_detail_data">
+        <p class="program_data_title">Goal</p>
+        <div *ngFor="let goals of programgoals.goals">
+          <div>
+            <p class="program_data_value">{{ goals.category }}</p>
+            <div class="goal_data_value">
+              <!-- <div *ngFor="let goal_item  of goal.details"> -->
+              <p class="goal_description">{{ goals.details }}</p>
+              <!-- </div> -->
+            </div>
+          </div>
+        </div>
+        <p class="program_data_title">*Potential Barriers</p>
+        <div *ngFor="let potentialbarriers of programgoals.potentialbarriers">
+          <div>
+            <p class="program_data_value">{{ potentialbarriers.category }}</p>
+            <p class="goal_data_value">{{ potentialbarriers.details }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="program_goals">
+      <div class="task_date_panel" style="margin-bottom: 0px">
+        <div>
+          <mat-form-field appearance="outline">
+            <mat-label>Max range 7 days</mat-label>
+            <mat-date-range-input [rangePicker]="picker">
+              <input
+                matStartDate
+                placeholder="Start date"
+                readonly
+                #dateRangeStart
+              />
+              <input matEndDate placeholder="End date" readonly #dateRangeEnd />
+            </mat-date-range-input>
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="picker"
+            ></mat-datepicker-toggle>
+            <mat-date-range-picker maxRange="7" #picker></mat-date-range-picker>
+          </mat-form-field>
+        </div>
+      </div>
+      <mat-table
+        #table
+        [dataSource]="dataSourceTableGoal"
+        style="margin-left: 20px; margin-top: -1px"
+      >
+        <ng-container matColumnDef="Id">
+          <mat-header-cell
+            [ngStyle]="{ 'border-radius': '16px 0px 0px 0px' }"
+            *matHeaderCellDef
+          >
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{ element.Id }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="Date">
+          <mat-header-cell *matHeaderCellDef>Date </mat-header-cell>
+          <!--   <mat-cell *matCellDef="let element"><span>{{element.CreatedOn}}</span></mat-cell> -->
+          <mat-cell *matCellDef="let element">{{ element.Date }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="Time">
+          <mat-header-cell *matHeaderCellDef>Time </mat-header-cell>
+          <!--   <mat-cell *matCellDef="let element"><span>{{element.CreatedOn}}</span></mat-cell> -->
+          <mat-cell *matCellDef="let element">{{ element.Time }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="Contactname">
+          <mat-header-cell
+            [ngStyle]="{ 'border-radius': '0px 16px 0px 0px' }"
+            *matHeaderCellDef
+          >
+            Contactname
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            {{ element.Contactname }}
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row
+          *matHeaderRowDef="displayedGoalColumns"
+        ></mat-header-row>
+        <mat-row
+          [style.minHeight.px]="30"
+          *matRowDef="let row; columns: displayedGoalColumns"
+        ></mat-row>
+      </mat-table>
+    </div>
+  </div>
+</ng-template>
+<ng-template #myPreviewPdf>
+  <div class="dialogPdf">
+    <img
+      class="cancel-img"
+      src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+    />
+    <ngx-extended-pdf-viewer
+      [src]="pdfs"
+      [useBrowserLocale]="true"
+      [textLayer]="true"
+      [showHandToolButton]="true"
+      [showPresentationModeButton]="true"
+      [(page)]="page"
+      [(pageLabel)]="pageLabel"
+      [showDownloadButton]="true"
+      [showOpenFileButton]="false"
+      [showPrintButton]="true"
+    >
+    </ngx-extended-pdf-viewer>
+  </div>
+</ng-template>

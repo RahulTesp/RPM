@@ -1,0 +1,12 @@
+<div class="overlay"  *ngIf="(confirmDialog.showDialog$ | async)"  (click)="onCancel()">
+  <div class="dialog-box" (click)="$event.stopPropagation()">
+    <div class="dialog-box-content">
+      <h3>{{ title }}</h3>
+      <p>{{ message }}</p>
+      <div class="buttons">
+        <button class="confirm" (click)="onsubmit(true)">Ok</button>
+        <button *ngIf="showCancel" class="cancel" (click)="onCancel()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>

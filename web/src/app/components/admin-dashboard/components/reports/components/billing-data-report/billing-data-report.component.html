@@ -1,0 +1,199 @@
+<app-report-common-layout
+  (downloadClicked)="getBillingReport()"
+  [loadingstatus]="buttonclick"
+>
+  <div report-selection-actions>
+    <div class="upper-panel">
+      <div class="upper_container_item">
+        <p class="upper_item_title">Patient Name</p>
+        <ng-autocomplete
+          [data]="http_getActivePatientList"
+          [searchKeyword]="keyword"
+          placeholder="Select Patient"
+          (selected)="selectEvent($event)"
+          (inputChanged)="onChangeSearch($event)"
+          (inputCleared)="onClearSearch($event)"
+          (inputFocused)="onFocused($event)"
+          [itemTemplate]="itemTemplate"
+          [notFoundTemplate]="notFoundTemplate"
+        >
+        </ng-autocomplete>
+
+        <ng-template #itemTemplate let-item>
+          <a [innerHTML]="item.searchField"></a>
+        </ng-template>
+
+        <ng-template #notFoundTemplate let-notFound>
+          <div [innerHTML]="notFound"></div>
+        </ng-template>
+        <img
+          *ngIf="!selectedBillingPatient"
+          class="search_icon"
+          src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+        />
+      </div>
+      <div class="upper_container_item">
+        <p class="upper_item_title">Clinic Name</p>
+        <div class="upper_item_dropdown">
+          <select
+            class="select-form-text common_item_dropdown"
+            placeholder="All Clinics"
+            id="report_AllClinics"
+            [(ngModel)]="clinic"
+          >
+            <option value="" selected>All Clinics</option>
+            <option *ngFor="let c of clinicBillingDetails" [value]="c.ClinicId">
+              {{ c.ClinicName }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="upper_container_item">
+        <p class="upper_item_title">All CPT Codes</p>
+        <div class="upper_item_dropdown">
+          <select
+            class="select-form-text common_item_dropdown"
+            id="dropdownreportbilling"
+            placeholder="Select CPT Code"
+            [(ngModel)]="cptcode"
+          >
+            <option value="">All CPT Codes</option>
+            <option
+              *ngFor="let programdata of billingCode"
+              value="{{ programdata }}"
+            >
+              {{ programdata }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="panel_content">
+    <div class="panel_content_item">
+      <div class="radio">
+        <div class="radio_label" [ngClass]="{ disableDiv: isMonth == true }">
+          <label for="report_ByMonth" class="fileformatTitle">
+            <input
+              type="radio"
+              id="report_ByMonth"
+              name="reportFilter"
+              value="1"
+              (change)="radioChange($event)"
+            />
+            By Month
+          </label>
+        </div>
+        <div class="task_content task_contnent_date">
+          <div [ngClass]="{ disableDiv: isMonth != true }">
+            <input
+              class="task_date_picker"
+              type="month"
+              id="report_MonthPicker"
+              [(ngModel)]="month"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="radio second_panel">
+        <div class="radio_label">
+          <label for="report_ByDuration" class="fileformatTitle">
+            <input
+              type="radio"
+              id="report_ByDuration"
+              name="reportFilter"
+              value="0"
+              checked
+              (change)="radioChange($event)"
+            />
+            By Duration
+          </label>
+        </div>
+        <div class="task_content task_contnent_date">
+          <div
+            class="task_date_picker_container"
+            [ngClass]="{ disableDiv: isMonth == true }"
+          >
+            <app-date-range-control
+              (DateRangeSelected)="GetDateRange($event)"
+              #dateRange
+            ></app-date-range-control>
+          </div>
+
+          <!-- <div
+            class="task_date_picker_container"
+            [ngClass]="{ disableDiv: isMonth == true }"
+          >
+            <mat-form-field class="task_date_range_picker">
+              <mat-date-range-input
+                [formGroup]="campaignOne"
+                [rangePicker]="campaignOnePicker"
+                [comparisonStart]="campaignOne.value.start"
+                [comparisonEnd]="campaignOne.value.end"
+              >
+                <input
+                  matStartDate
+                  id="report_StartDate"
+                  formControlName="start"
+                  placeholder="Start date"
+                  #dateStartactivitySchedule
+                  touchUi="true"
+                />
+                <input
+                  matEndDate
+                  id="report_EndDate"
+                  formControlName="end"
+                  placeholder="End date"
+                  #dateEndactivitySchedule
+                  (dateChange)="
+                    dateRangeScheduleChange(
+                      dateStartactivitySchedule,
+                      dateEndactivitySchedule
+                    )
+                  "
+                  touchUi="true"
+                />
+              </mat-date-range-input>
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="campaignOnePicker"
+              ></mat-datepicker-toggle>
+              <div [ngClass]="{ disableDiv: isMonth == true }">
+                <mat-date-range-picker
+                  #campaignOnePicker
+                ></mat-date-range-picker>
+              </div>
+            </mat-form-field>
+          </div> -->
+          <div class="formatPanel">
+            <div class="fileformat">
+              <label for="report_fileformatexcel" class="fileformatTitle">
+                <input
+                  type="radio"
+                  id="report_fileformatexcel"
+                  name="fileformat"
+                  value="excel"
+                  (change)="fileformatChange($event)"
+                />
+                Excel
+              </label>
+            </div>
+            <div class="fileformat">
+              <label for="report_fileformatpdf" class="fileformatTitle">
+                <input
+                  type="radio"
+                  id="report_fileformatpdf"
+                  name="fileformat"
+                  value="pdf"
+                  (change)="fileformatChange($event)"
+                />
+                PDF
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-report-common-layout>

@@ -1,0 +1,47 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.dialog-content {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+.dialog-content {
+  background-color: #164d61;
+}
+
+.confirm_button {
+  background: #99e8e3;
+  border: 1px solid #3bcbc4;
+  width: 50px;
+  height: 25px;
+  color: #164d61;
+  font-family: "Rubik";
+  font-size: 16px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.dialog-message {
+  color: #edeff5;
+  font-family: "Rubik";
+  font-size: 1rem;
+}
+.dialog-title {
+  color: #3bcbc4;
+  font-family: "Rubik";
+  font-size: 1.5rem;
+}

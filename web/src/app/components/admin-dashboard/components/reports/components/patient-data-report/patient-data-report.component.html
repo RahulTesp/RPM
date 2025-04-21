@@ -1,0 +1,166 @@
+<app-report-common-layout
+  (downloadClicked)="dateRangeSet()"
+  [loadingstatus]="downloadstatus"
+>
+  <div report-selection-actions>
+    <div class="upper_container_item upper-panel-data">
+      <p class="upper_item_title">Patient Name</p>
+
+      <ng-autocomplete
+        id="patientReport"
+        [data]="httpPatientList"
+        [searchKeyword]="keyword1"
+        placeholder="Select Patient"
+        (selected)="selectEvent1($event)"
+        (inputChanged)="onChangeSearch1($event)"
+        (inputCleared)="onClearSearch1($event)"
+        (inputFocused)="onFocused($event)"
+        [itemTemplate]="itemTemplate"
+        [notFoundTemplate]="notFoundTemplate"
+      >
+      </ng-autocomplete>
+      <ng-template #itemTemplate let-item>
+        <a [innerHTML]="item.patientsearchField"></a>
+      </ng-template>
+
+      <ng-template #notFoundTemplate let-notFound>
+        <div [innerHTML]="notFound"></div>
+      </ng-template>
+      <img
+        *ngIf="!this.selectedPatient"
+        class="search_icon"
+        src="../../../../../../../assets/04-Icons/Icons_Search Small.svg"
+      />
+    </div>
+  </div>
+  <div class="panel_content">
+    <div class="panel_content_item">
+      <div class="radio">
+        <div
+          class="radio_label"
+          [ngClass]="{ disableDiv: patientIsMonth == true }"
+        >
+          <label for="report_ByMonth">
+            <input
+              type="radio"
+              id="report_ByMonth"
+              name="patientFilter"
+              value="1"
+              (change)="radioChangePatient($event)"
+            />
+            <span class="fileformatTitle">By Month</span>
+          </label>
+        </div>
+        <div
+          class="task_content task_contnent_date"
+          [ngClass]="{ disableDiv: patientIsMonth == false }"
+        >
+          <div class="task_date_picker_container">
+            <input
+              class="task_date_picker"
+              type="month"
+              id="report_MonthPicker"
+              [(ngModel)]="month1"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="radio">
+        <div class="radio_label">
+          <label>
+            <input
+              type="radio"
+              name="patientFilter"
+              value="0"
+              (change)="radioChangePatient($event)"
+              checked
+            />
+            <span class="fileformatTitle">By Duration</span>
+          </label>
+        </div>
+        <div
+          class="task_contnent_date"
+          [ngClass]="{ disableDiv: patientIsMonth == true }"
+        >
+          <div class="task_date_picker_container">
+            <div floatLabel="never">
+              <app-date-range-control
+                (DateRangeSelected)="GetDateRange($event)"
+                #dateRange
+              ></app-date-range-control>
+            </div>
+            <!-- <mat-form-field class="task_date_range_picker" floatLabel="never">
+              <mat-date-range-input
+                [formGroup]="range"
+                [rangePicker]="picker1"
+                [max]="maxDate"
+              >
+                <input
+                  matStartDate
+                  formControlName="start"
+                  placeholder="Start date"
+                  id="report_StartDate"
+                  readonly
+                />
+                <input
+                  matEndDate
+                  formControlName="end"
+                  placeholder="End date"
+                  id="report_EndDate"
+                  readonly
+                />
+              </mat-date-range-input>
+
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="picker1"
+              ></mat-datepicker-toggle>
+
+              <mat-date-range-picker
+                (closed)="resetMaxDate()"
+                (opened)="openDatepicker()"
+                #picker1
+              ></mat-date-range-picker>
+            </mat-form-field> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-report-common-layout>
+<div
+  class="summary_graph_container"
+  style="overflow: hidden; visibility: hidden"
+>
+  <div
+    id="pdfGraph"
+    style="
+      display: block;
+      width: 100%;
+      height: 98%;
+      visibility: hidden;
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    "
+    *ngIf="http_healthtrends"
+  >
+    <canvas
+      class="charttrends"
+      baseChart
+      width="1"
+      height="1"
+      [datasets]="lineChartData"
+      [labels]="lineChartLabels"
+      [options]="lineChartOptions"
+      [legend]="lineChartLegend"
+      id="pd_healthTrends"
+      [type]="'line'"
+    >
+    </canvas>
+  </div>
+</div>
+<app-confirm-dialog-panel
+
+>
+</app-confirm-dialog-panel>

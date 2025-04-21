@@ -1,0 +1,2091 @@
+<ng-container *ngIf="loading">
+  <div class="overlay"></div>
+  <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
+</ng-container>
+
+<div class="content">
+  <div class="main_content">
+
+      <div
+
+        class="main-panel"
+
+      >
+        <div>
+          <div class="right-menu-panel">
+            <div *ngIf="variable == 1">
+              <button
+                class="addCommonBtn"
+                id="btnAdminAddClinic"
+                (click)="addClinicPage()"
+              >
+                ADD CLINIC
+              </button>
+            </div>
+            <div *ngIf="variable == 2">
+              <button
+                class="addCommonBtn"
+                id="btnAdminAddUser"
+                (click)="addUser()"
+              >
+                ADD USER
+              </button>
+            </div>
+            <div *ngIf="variable == 2">
+              <button
+                class="addCommonBtn"
+                id="btnAdminAddTeam"
+                (click)="addTeam()"
+              >
+                ADD Team
+              </button>
+            </div>
+            <div *ngIf="variable == 2">
+              <button
+                class="addCommonBtn"
+                id="btnAdminEditTeam"
+                (click)="editTeam()"
+              >
+                Edit Team
+              </button>
+            </div>
+          </div>
+          <div class="back_arrow">
+            <div
+              class="back_arrow_container"
+              id="adminBackHome"
+              (click)="backtohome()"
+            >
+              <img
+                class="arrow-img"
+                src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg"
+              />
+            </div>
+
+            <p class="main_title">Admin</p>
+          </div>
+
+          <div class="uppermenubtnpanel">
+            <div *ngFor="let item of adminMenu">
+              <button
+                class="uppermenubtn"
+                id="adminChangeScreen"
+                (click)="ChangeScreen(item.menu_id)"
+                [class.menuselected]="CurrentMenu == item.menu_id"
+              >
+                {{ item.menu_title }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="templates">
+          <ng-container [ngSwitch]="variable">
+            <ng-container *ngSwitchCase="1">
+              <ng-container *ngTemplateOutlet="clinicPage"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="2">
+              <ng-container
+                *ngTemplateOutlet="usermanagementPage"
+              ></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="3">
+              <ng-container *ngTemplateOutlet="systemPage"></ng-container>
+            </ng-container>
+
+            <ng-container *ngSwitchDefault>
+              <ng-container *ngTemplateOutlet="clinicPage"></ng-container>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+      <!-- Side Panel -->
+
+      <div class="side-panel">
+        <!-- [ngStyle]="addVar == 1 ?{'background-color': '#FFFFFF'} : {'background-color': '#164D61'}" -->
+
+        <ng-container [ngSwitch]="addVar">
+          <div class="add_clinic">
+            <ng-container *ngSwitchCase="1">
+              <div>
+                <app-right-sidebar
+                  [sidepaneldisplay]="1"
+                  id="adminGetAllUser"
+                  (UserReload)="getAllUser()"
+                ></app-right-sidebar>
+              </div>
+            </ng-container>
+          </div>
+          <div class="add_clinic">
+            <ng-container *ngSwitchCase="2">
+              <ng-container *ngTemplateOutlet="addClinic"></ng-container>
+            </ng-container>
+          </div>
+
+          <ng-container *ngSwitchCase="3">
+            <ng-container *ngTemplateOutlet="addprogram"></ng-container>
+          </ng-container>
+
+          <div>
+            <ng-container *ngSwitchCase="4">
+              <ng-container *ngTemplateOutlet="addbillingCode"></ng-container>
+            </ng-container>
+          </div>
+          <div>
+            <ng-container *ngSwitchCase="5">
+              <ng-container *ngTemplateOutlet="editprogram"></ng-container>
+            </ng-container>
+          </div>
+          <div>
+            <ng-container *ngSwitchCase="6">
+              <ng-container *ngTemplateOutlet="editbillingCode"></ng-container>
+            </ng-container>
+          </div>
+          <div>
+            <ng-container *ngSwitchCase="7">
+              <ng-container *ngTemplateOutlet="addvital"></ng-container>
+            </ng-container>
+          </div>
+          <div>
+            <ng-container *ngSwitchCase="8">
+              <ng-container *ngTemplateOutlet="editVital"></ng-container>
+            </ng-container>
+          </div>
+
+          <!--
+          <ng-container *ngSwitchDefault>
+            <div class="alert_panel">
+              <ng-container *ngTemplateOutlet="alert_menu"></ng-container>
+
+            </div>
+          </ng-container> -->
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+<!-- Clinic Page Start -->
+<ng-template #clinicPage>
+  <div class="clinicPagetemplate">
+    <div class="upperoverviewpanel">
+      <div class="upperpanel_subBox_dropdown" style="padding-left: 0.4rem">
+        <span class="upperpanel_subtitle upperpanel_subtitle_dropdown"
+          >Clinic Name
+        </span>
+        <div class="dropdown" appearance="outline">
+          <select
+            id="dropdownclinicname"
+            [(ngModel)]="SelectClinic"
+            (change)="SetDropdownFilter()"
+          >
+            <option value="all">All Clinics</option>
+            <option
+              *ngFor="let data of http_clinic_data; let i = index"
+              [value]="data.Name"
+            >
+              {{ data.Name }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="upperpanel_subBox_dropdown">
+        <span class="upperpanel_subtitle upperpanel_subtitle_dropdown"
+          >Location</span
+        >
+        <div class="dropdown" appearance="outline">
+          <select
+            id="dropdownlocation"
+            [(ngModel)]="selectLocation"
+            (change)="SetDropdownFilter()"
+          >
+            <option value="all">All Locations</option>
+            <option
+              *ngFor="let data of selectLocationArray; let i = index"
+              [value]="data.CityId"
+            >
+              {{ data.CityName }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div
+        id="btnTotalClinic"
+        class="upperpanel_subBox"
+        [class.selected_cont]="clinic_containerSelection == 1"
+        (click)="FilterByStatus('none')"
+      >
+        <span class="upperpanel_subtitle">Total </span>
+        <span class="upperpanel_subBox_value">{{
+          http_clinic_data ? totalClinicNumber : 0
+        }}</span>
+      </div>
+      <div
+        id="btnActiveClinic"
+        class="upperpanel_subBox"
+        (click)="FilterByStatus('Active')"
+        [class.selected_cont]="clinic_containerSelection == 2"
+      >
+        <span class="upperpanel_subtitle">Active Clinics </span>
+        <span class="upperpanel_subBox_value">{{
+          http_clinic_data ? active_clinic.length : 0
+        }}</span>
+      </div>
+      <div
+        id="btnInActiveClinic"
+        class="upperpanel_subBox upper_last_box"
+        (click)="FilterByStatus('Inactive')"
+        [class.selected_cont]="clinic_containerSelection == 3"
+      >
+        <span class="upperpanel_subtitle">Inactive Clinics </span>
+        <span class="upperpanel_subBox_value"
+          >{{ http_clinic_data ? inactive_clinic.length : 0 }}
+        </span>
+      </div>
+    </div>
+
+    <div class="clinicPage_lower_page">
+      <div class="clincal_data_table">
+        <mat-paginator
+          [length]="http_clinic_data ? total_number : 0"
+          [pageSize]="8"
+          [pageIndex]="0"
+        >
+        </mat-paginator>
+        <mat-table
+          class="task_table_display"
+          #table
+          [dataSource]="tableDataSource"
+        >
+          <ng-container matColumnDef="selection">
+            <mat-header-cell
+            class="hidden-column"
+              style="border-radius: 20px 0px 0px 0px"
+              *matHeaderCellDef
+
+            >
+            </mat-header-cell>
+            <mat-cell class="hidden-column" *matCellDef="let element; let rowIndex = index">
+
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="Id">
+            <mat-header-cell class="hidden-column" *matHeaderCellDef></mat-header-cell>
+            <mat-cell class="hidden-column" *matCellDef="let element"> {{ element.Id }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="Name">
+            <mat-header-cell *matHeaderCellDef>
+              <div class="search_input" *ngIf="searchValueName">
+                <img
+                  class="search_icon"
+                  src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                  id="inputClinicName"
+                  (click)="closeSerachClick()"
+                /><input
+                  class="input_panel"
+                  (keyup)="applyDataFilter($event)"
+                  (focus)="setupFilter('Name')"
+                />
+              </div>
+              <div class="search_heading_default" *ngIf="!searchValueName">
+                <img
+                  class="search_icon_default"
+                  src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                  (click)="searchNameClick()"
+                />Clinic Name
+              </div></mat-header-cell
+            >
+            <mat-cell
+              style="padding-left: 0.4rem !important"
+              *matCellDef="let element; let rowIndex = index"
+            >
+            <input type="radio" id="selectClinicRow_{{ rowIndex }}" class="small-radio" name="rhSelectionRadio" [value]="rowIndex"
+              (click)="selectRow($event, element)" [checked]="element.selected" />
+            <label for="selectClinicRow_{{ rowIndex }}"></label>
+            <span class="clinic-name-field">{{ element.Name }}</span>
+
+            </mat-cell
+            >
+          </ng-container>
+
+          <ng-container matColumnDef="Code">
+            <mat-header-cell *matHeaderCellDef>
+              <!-- <div class="search_input" *ngIf="searchValueCode"><img  class="search_icon" src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              (click)="searchCodeClick()"><input class="search_input input_panel" (keyup)="applyFilter($event)" >
+            </div> -->
+              <!-- <div class="search_heading_default" *ngIf="!searchValueCode"> <img  class="search_icon" src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              (click)="searchCodeClick()">Clinic Code</div> -->
+              Clinic Code
+            </mat-header-cell>
+            <mat-cell
+
+              *matCellDef="let element"
+            >
+              {{ element.Code }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="PatientCount">
+            <mat-header-cell *matHeaderCellDef>Patients </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.PatientCount }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="PhysicianCount">
+            <mat-header-cell *matHeaderCellDef>
+              <!-- <img class="sort_icon" src="../../../../../assets/04-Icons/Icons_Sort.svg" /> -->
+              Physician
+            </mat-header-cell>
+            <mat-cell
+
+              *matCellDef="let element"
+            >
+              {{ element.PhysicianCount }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="Active">
+            <mat-header-cell *matHeaderCellDef>
+              Status
+              <!-- <div class="task_priority">
+                <select>
+                  <option value="1">Status</option>
+
+                    </select>
+              </div> -->
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.Active ? "Active" : "InActive" }}
+            </mat-cell>
+          </ng-container>
+
+          <div>
+            <ng-container matColumnDef="action">
+              <mat-header-cell
+                style="border-radius: 0px 20px 0px 0px"
+                *matHeaderCellDef
+              >
+              </mat-header-cell>
+              <mat-cell *matCellDef="let element" let rowIndex="index;">
+                <div
+                  class="{{ element.selected ? 'displayIcon' : 'hideIcon' }}"
+                >
+                  <!-- <div class="front_img_container">
+                    <img class="front_img" src="../../../../../../assets/04-Icons/Icons_Delegation.svg" />
+                  </div> -->
+                  <div class="front_img_container">
+                    <img
+                      class="front_img"
+                      src="../../../../../../assets/04-Icons/Icons_Arrow - Front.svg"
+                      id="btnaddClinic"
+                      (click)="navigateAddClinic(element)"
+                    />
+                  </div>
+                </div>
+              </mat-cell>
+            </ng-container>
+          </div>
+
+          <mat-header-row
+            *matHeaderRowDef="columnHeader; sticky: true"
+          ></mat-header-row>
+          <mat-row
+            [style.minHeight.px]="38"
+            class="table-row"
+            tabindex="1"
+            [ngClass]="{ selected: row.selected == true }"
+            *matRowDef="let row; columns: columnHeader"
+            [ngClass]="{ selectedrow: row.selected == true }"
+          ></mat-row>
+        </mat-table>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Clinic Page end -->
+
+<!-- UserManagement Page Start -->
+<ng-template #usermanagementPage>
+  <div *ngIf="http_userlist" class="usermanagement_panel">
+    <div class="upperoverviewpanel_">
+      <div
+        *ngFor="let user of userDataArray; let last = last"
+        id="userPanelCountClick"
+        class="upperpanel_subBox"
+      >
+        <div
+          class="upperpanel_subBox"
+          (click)="userPanelCountClick(user.Name)"
+          [class.selected_cont]="user_containerSelection == user.Name"
+        >
+          <span class="upperpanel_subtitle upperpanel_subBox_subtitle">
+            {{ user.Name }}
+          </span>
+          <span class="upperpanel_subBox_value">{{ user.Count }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="user_data_table">
+      <mat-paginator [pageSize]="8" [pageIndex]="0"> </mat-paginator>
+
+      <mat-table
+        class="task_table_display"
+        #table
+        [dataSource]="tableDataSource"
+      >
+        <ng-container matColumnDef="selection">
+          <mat-header-cell *matHeaderCellDef class="hidden-column"> </mat-header-cell>
+          <mat-cell class="hidden-column" *matCellDef="let element; let rowIndex = index">
+            <!-- <mat-radio-button
+              class="selectionClinic"
+              color="primary"
+              name="rhSelectionRadio"
+              [value]="rowIndex"
+              (click)="selectRow($event, element)"
+              [checked]="element.selected"
+              id="selectUserRow"
+            >
+            </mat-radio-button> -->
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="UserName">
+          <!-- <mat-header-cell *matHeaderCellDef> <img class="search_icon" src="../../../../../assets/04-Icons/Icons_Search Small.svg"/> Name </mat-header-cell> -->
+          <mat-header-cell *matHeaderCellDef>
+            <div class="search_input" *ngIf="searchUserList_Name">
+              <img
+                class="search_icon"
+                src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                id="inputusername"
+                (click)="searchUserListClose()"
+              /><input
+                class="input_panel"
+                (keyup)="applyDataFilter($event)"
+                (focus)="setupFilter('UserName')"
+              />
+            </div>
+            <div class="search_heading_default" *ngIf="!searchUserList_Name">
+              <img
+                class="search_icon_default"
+                src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                (click)="searchUserListName()"
+                id="searchUserName"
+              />
+              Name
+            </div>
+          </mat-header-cell>
+
+          <mat-cell *matCellDef="let element ;  let rowIndex = index"><input type="radio" class="selection-clinic"
+              name="rhSelectionRadio" [value]="rowIndex" (click)="selectRow($event, element)" [checked]="element.selected"
+              id="selectUserRow_{{ rowIndex }}" />
+            <label for="selectUserRow_{{ rowIndex }}"></label>
+            <span class="username-field"
+              [ngClass]="
+                getUserstatus(element.IsActive) == 'Inactive'
+                  ? 'inactivestatus'
+                  : 'activestatus'
+              "
+              >{{ element.UserName }}</span
+            ></mat-cell
+          >
+        </ng-container>
+
+        <ng-container matColumnDef="PatientCount">
+          <mat-header-cell *matHeaderCellDef>
+            <!-- <img class="sort_icon" src="../../../../../assets/04-Icons/Icons_Sort.svg" /> -->
+            Patients
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <span
+              [ngClass]="
+                getUserstatus(element.IsActive) == 'Inactive'
+                  ? 'inactivestatus'
+                  : 'activestatus'
+              "
+              >{{ element.PatientCount }}</span
+            >
+          </mat-cell>
+        </ng-container>
+
+        <!-- style="padding-left:0.9rem !important ;" -->
+        <ng-container matColumnDef="ActiveSince">
+          <mat-header-cell
+            *matHeaderCellDef
+            style="padding-left: 0.9rem !important"
+          >
+            <!-- <img class="sort_icon" src="../../../../../assets/04-Icons/Icons_Sort.svg" /> -->
+            Active Since
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <span
+              [ngClass]="
+                getUserstatus(element.IsActive) == 'Inactive'
+                  ? 'inactivestatus'
+                  : 'activestatus'
+              "
+            >
+              {{ datePipe.transform(element.ActiveSince, "MMM d, y") }}</span
+            >
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="LastActivity">
+          <mat-header-cell
+            *matHeaderCellDef
+            style="padding-left: 0.9rem !important"
+          >
+            <!-- <img class="sort_icon" src="../../../../../assets/04-Icons/Icons_Sort.svg" /> -->
+            Last Activity
+          </mat-header-cell>
+          <!-- {{  datePipe.transform(element.LastActivity, "MMM d, y") }} -->
+          <mat-cell *matCellDef="let element">
+            <span
+              [ngClass]="
+                getUserstatus(element.IsActive) == 'Inactive'
+                  ? 'inactivestatus'
+                  : 'activestatus'
+              "
+            >
+              {{ datePipe.transform(element.LastActivity, "MMM d, y") }}
+            </span>
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="Role">
+          <mat-header-cell *matHeaderCellDef> Role </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <span
+              [ngClass]="
+                getUserstatus(element.IsActive) == 'Inactive'
+                  ? 'inactivestatus'
+                  : 'activestatus'
+              "
+              >{{ element.Role }}</span
+            >
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="Status">
+          <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <span
+              [ngClass]="
+                getUserstatus(element.IsActive) == 'Inactive'
+                  ? 'inactivestatus'
+                  : 'activestatus'
+              "
+              >{{ getUserstatus(element.IsActive) }}</span
+            >
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="Group">
+          <mat-header-cell *matHeaderCellDef>
+            <div
+              id="inputAllGroup"
+              class="search_input"
+              *ngIf="searchALLValueCode"
+            >
+              <img
+                class="search_icon"
+                src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                (click)="searchUserALLClose()"
+              /><input
+                class="input_panel"
+                (keyup)="applyDataFilter($event)"
+                (focus)="setupFilter('Group')"
+              />
+            </div>
+            <div class="search_heading_default" *ngIf="!searchALLValueCode">
+              <img
+                class="search_icon_default"
+                src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                (click)="searchUserALLCODE()"
+                id="searchAllGroup"
+              />
+              Groups
+            </div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <span
+              title="{{ element.Group }}"
+              class="group_container"
+              [ngClass]="
+                getUserstatus(element.IsActive) == 'Inactive'
+                  ? 'inactivestatus'
+                  : 'activestatus'
+              "
+            >
+              {{ element.Group }}
+            </span>
+          </mat-cell>
+        </ng-container>
+
+        <div>
+          <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+            <mat-cell *matCellDef="let element" let rowIndex="index;">
+              <div class="{{ element.selected ? 'displayIcon' : 'hideIcon' }}">
+                <!-- <div class="front_img_container">
+                <img class="front_img" src="../../../../../../assets/04-Icons/Icons_Delegation.svg" />
+                </div> -->
+                <div
+                  class="front_img_container"
+                  *ngIf="getUserstatus(element.IsActive) != 'Inactive'"
+                >
+                  <img
+                    class="front_img"
+                    src="../../../../../../assets/04-Icons/Icons_Arrow - Front.svg"
+                    id="btnnavigateUserPage"
+                    (click)="navigateUserPage(element)"
+                  />
+                </div>
+                <div
+                  class="img__wrap"
+                  *ngIf="getUserstatus(element.IsActive) != 'Inactive'"
+                >
+                  <div class="front_img_container">
+                    <img
+                      class="front_img"
+                      src="../../../../../../assets/04-Icons/Icons_Delete.svg"
+                      id="btndeactivate"
+                      (click)="openDeactivateDialog(element)"
+                    />
+                    <p class="img__description">Deactivate</p>
+                  </div>
+                </div>
+              </div>
+            </mat-cell>
+          </ng-container>
+        </div>
+
+        <mat-header-row
+          *matHeaderRowDef="userColumnHeader; sticky: true"
+        ></mat-header-row>
+        <mat-row
+          [style.minHeight.px]="35"
+          class="table-row"
+          tabindex="1"
+          *matRowDef="let row; columns: userColumnHeader"
+          [ngClass]="{ selectedrow: row.selected == true }"
+        ></mat-row>
+      </mat-table>
+    </div>
+  </div>
+</ng-template>
+<!-- UserManagement End -->
+<!-- System Rules Template -->
+<ng-template #systemPage>
+
+</ng-template>
+
+<!-- Program Details -->
+<ng-template #programDetails>
+  <div *ngIf="http_systemRules">
+    <div class="program_title_panel">
+      <p class="program_main_title">Program & Goals</p>
+      <img
+        class="add_icon"
+        src="../../../../../assets/04-Icons/Icons_Add Main.svg"
+        id="addProgramPage"
+        (click)="addProgramPage()"
+      />
+    </div>
+
+    <div *ngFor="let program of http_systemRules.program_details">
+      <div class="program_detail_content">
+        <div class="edit_icon_container">
+          <img
+            id="systemruleeditProgram"
+            class="edit_icon"
+            src="../../../../../assets/04-Icons/Icons_Edit.svg"
+            (click)="editProgram()"
+          />
+        </div>
+        <div class="programdetails_panel">
+          <p class="program_title">Program Name</p>
+          <div class="prgram_name_panel">
+            <img
+              class="program_name_check_icon"
+              src="../../../../../assets/04-Icons/Icons_Check A.svg"
+            />
+            <p class="program_name_container">{{ program.program_name }}</p>
+          </div>
+        </div>
+        <div class="programdetails_subpanel">
+          <div class="programdetails_subpanel_left">
+            <div class="vital_panel_sub">
+              <p class="program_title">Vitals Monitored</p>
+              <p class="program_Value">{{ program.vital_name }}</p>
+            </div>
+
+            <div class="vital_panel_sub">
+              <p class="program_title">Duration</p>
+              <p class="program_Value">{{ program.duration }}</p>
+            </div>
+          </div>
+
+          <div class="programdetails_subpanel_right">
+            <p class="program_title">Goals</p>
+            <p class="program_Value_content">Blood Pressure</p>
+            <div class="program_Value">
+              <div *ngFor="let goal of program.goal_content">
+                <p>- {{ goal }}</p>
+              </div>
+            </div>
+            <p class="program_Value_content measures">Gerenal</p>
+            <div class="program_Value">
+              <div *ngFor="let measures of program.other_measures">
+                <p>- {{ measures }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<!-- Billing Info -->
+<ng-template #Billing_panel>
+  <div class="program_title_panel">
+    <p class="program_main_title">Billing Codes</p>
+    <img
+      class="add_icon"
+      id="addbillicode"
+      src="../../../../../assets/04-Icons/Icons_Add Main.svg"
+      (click)="addBillingCode()"
+    />
+  </div>
+  <!-- ngFor -->
+
+  <div *ngFor="let billing of http_systemRules.billing_details">
+    <div class="billing_panel">
+      <div class="edit_icon_container">
+        <img
+          id="editbillicode"
+          class="edit_icon"
+          src="../../../../../assets/04-Icons/Icons_Edit.svg"
+          (click)="editBillingCode()"
+        />
+      </div>
+
+      <div class="cpt_code">
+        <p class="program_title">CPT Code</p>
+        <div class="prgram_name_panel">
+          <img
+            class="program_name_check_icon"
+            src="../../../../../assets/04-Icons/Icons_Check A.svg"
+          />
+          <p class="program_name_container">{{ billing.cpt_code }}</p>
+        </div>
+      </div>
+
+      <div class="billing_sub_panel">
+        <div class="billing_sub_panel_left">
+          <div class="frequency_cycle">
+            <p class="program_title">Frequency</p>
+            <p class="billing_value">
+              {{ billing.billing_frequency }}
+              {{ billing.billing_frequency_unit }}
+            </p>
+          </div>
+
+          <div class="billing_cycle">
+            <p class="program_title">Billing Cycle</p>
+            <p class="billing_value">
+              {{ billing.billing_period }} {{ billing.billing_period_unit }}
+            </p>
+          </div>
+
+          <div class="target">
+            <p class="program_title">Target</p>
+            <p class="billing_value">{{ billing.target_text }}</p>
+          </div>
+        </div>
+
+        <div class="billing_require">
+          <p class="program_title">Requirements</p>
+          <div class="billing_requirement_value">
+            <div *ngFor="let requirement of billing.requirement">
+              <p>- {{ requirement }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<!-- Billing Info -->
+<ng-template #Vital_Page>
+  <div class="program_title_panel">
+    <p class="program_main_title">Vital Rules</p>
+    <img
+      class="add_icon"
+      src="../../../../../assets/04-Icons/Icons_Add Main.svg"
+      id="addVitalPage"
+      (click)="addVital()"
+    />
+  </div>
+
+  <div class="billing_panel" *ngFor="let vital of http_systemRules.vital_rules">
+    <div class="edit_icon_container">
+      <img
+        class="edit_icon"
+        src="../../../../../assets/04-Icons/Icons_Edit.svg"
+        id="editVitalPage"
+        (click)="editVitalPage()"
+      />
+    </div>
+
+    <!-- <ng-container
+    [ngTemplateOutlet]="vital.vital_id == 1 ? glucose_template : blood_Pressure_template"
+    [ngTemplateOutletContext]="{vital:vital}">
+</ng-container> -->
+    <ng-container [ngSwitch]="vital.vital_id">
+      <ng-container *ngSwitchCase="1">
+        <ng-container
+          *ngTemplateOutlet="glucose_template; context: { vital: vital }"
+        ></ng-container>
+      </ng-container>
+      <ng-container *ngSwitchCase="2">
+        <ng-container
+          *ngTemplateOutlet="blood_Pressure_template; context: { vital: vital }"
+        ></ng-container>
+      </ng-container>
+      <ng-container *ngSwitchCase="3">
+        <ng-container
+          *ngTemplateOutlet="weight_template; context: { vital: vital }"
+        ></ng-container>
+      </ng-container>
+      <ng-container *ngSwitchDefault>
+        <ng-container *ngTemplateOutlet="weight_template"></ng-container>
+      </ng-container>
+    </ng-container>
+  </div>
+  <!-- ngFor -->
+</ng-template>
+<!-- Medicine List -->
+<ng-template #medicine_page>
+  <div class="medicine_table"></div>
+</ng-template>
+
+<!-- Vital Rules -->
+<ng-template #glucose_template let-vital="vital">
+  <div>
+    <p class="program_title">Vital to be Monitored</p>
+    <div class="vital_name_panel">
+      <img
+        class="program_name_check_icon"
+        src="../../../../../assets/04-Icons/Icons_Check A.svg"
+      />
+      <p>{{ vital.vital_to_be_monitered }}</p>
+    </div>
+    <div class="vital_measure_main_panel">
+      <div class="vital_measure_left_panel">
+        <p class="program_title">Device</p>
+        <p class="program_vital_Value">{{ vital.device }}</p>
+      </div>
+      <div class="vital_measure_right_panel">
+        <div>
+          <!-- Measurement Start -->
+          <div *ngFor="let vital_measure of vital.measurement">
+            <div class="vital_sub_panel">
+              <div class="mesaurement_panel">
+                <p class="program_title">Measurement</p>
+                <p class="program_vital_Value">
+                  {{ vital_measure.measurement_name }}
+                </p>
+              </div>
+              <div class="unit_panel">
+                <p class="program_title">Unit</p>
+                <p class="program_vital_Value">mg/dL</p>
+              </div>
+            </div>
+
+            <div class="measurement_panel">
+              <app-sliderdata
+                [low_critical]="vital_measure.measurement_values.low_critical"
+                [low_cautious]="vital_measure.measurement_values.low_cautious"
+                [low_normal]="vital_measure.measurement_values.low_normal"
+                [high_normal]="vital_measure.measurement_values.high_normal"
+                [high_cautious]="vital_measure.measurement_values.high_cautious"
+                [high_critical]="vital_measure.measurement_values.high_critical"
+              >
+              </app-sliderdata>
+            </div>
+          </div>
+          <!-- Measurement End -->
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #blood_Pressure_template let-vital="vital">
+  <div>
+    <p class="program_title">Vital to be Monitored</p>
+    <div class="vital_name_panel">
+      <img
+        class="program_name_check_icon"
+        src="../../../../../assets/04-Icons/Icons_Check A.svg"
+      />
+      <p>{{ vital.vital_to_be_monitered }}</p>
+    </div>
+    <div class="vital_measure_main_panel">
+      <div class="vital_measure_left_panel">
+        <p class="program_title">Device</p>
+        <p class="program_vital_Value">{{ vital.device }}</p>
+      </div>
+      <div class="vital_measure_right_panel">
+        <div>
+          <!-- Measurement Start -->
+          <div *ngFor="let vital_measure of vital.measurement">
+            <div class="vital_sub_panel">
+              <div class="mesaurement_panel">
+                <p class="program_title">Measurement</p>
+                <p class="program_vital_Value">
+                  {{ vital_measure.measurement_name }}
+                </p>
+              </div>
+              <div class="unit_panel">
+                <p class="program_title">Unit</p>
+                <p class="program_vital_Value">mg/dL</p>
+              </div>
+            </div>
+
+            <div class="measurement_panel">
+              <app-sliderdata
+                [low_critical]="vital_measure.measurement_values.low_critical"
+                [low_cautious]="vital_measure.measurement_values.low_cautious"
+                [low_normal]="vital_measure.measurement_values.low_normal"
+                [high_normal]="vital_measure.measurement_values.high_normal"
+                [high_cautious]="vital_measure.measurement_values.high_cautious"
+                [high_critical]="vital_measure.measurement_values.high_critical"
+              >
+              </app-sliderdata>
+            </div>
+          </div>
+          <!-- Measurement End -->
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #weight_template let-vital="vital">
+  <div>
+    <p class="program_title">Vital to be Monitored</p>
+    <div class="vital_name_panel">
+      <img
+        class="program_name_check_icon"
+        src="../../../../../assets/04-Icons/Icons_Check A.svg"
+      />
+      <p>{{ vital.vital_to_be_monitered }}</p>
+    </div>
+    <div class="vital_measure_main_panel">
+      <div class="vital_measure_left_panel">
+        <p class="program_title">Device</p>
+        <p class="program_vital_Value">{{ vital.device }}</p>
+      </div>
+      <div class="vital_measure_right_panel">
+        <div>
+          <!-- Measurement Start -->
+          <div *ngFor="let vital_measure of vital.measurement">
+            <div class="vital_sub_panel">
+              <div class="mesaurement_panel">
+                <p class="program_title">Measurement</p>
+                <p class="program_vital_Value">
+                  {{ vital_measure.measurement_name }}
+                </p>
+              </div>
+              <div class="unit_panel">
+                <p class="program_title">Unit</p>
+                <p class="program_vital_Value">mg/dL</p>
+              </div>
+            </div>
+
+            <div class="measurement_panel">
+              <app-sliderdata
+                [low_critical]="vital_measure.measurement_values.low_critical"
+                [low_cautious]="vital_measure.measurement_values.low_cautious"
+                [low_normal]="vital_measure.measurement_values.low_normal"
+                [high_normal]="vital_measure.measurement_values.high_normal"
+                [high_cautious]="vital_measure.measurement_values.high_cautious"
+                [high_critical]="vital_measure.measurement_values.high_critical"
+              >
+              </app-sliderdata>
+            </div>
+          </div>
+          <!-- Measurement End -->
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Add Clinic -->
+
+<ng-template #addClinic>
+  <div class="common_template">
+    <form [formGroup]="registerClinic">
+      <div class="common_main_title">
+        {{ switchingVariable ? "Update Clinic" : "Add Clinic" }}
+      </div>
+      <div class="common_template_content">
+        <div class="common_content">
+          <p class="common_content_title">*Clinic Name</p>
+
+          <div>
+            <input
+              class="common_input_dropdown"
+              required
+              formControlName="clinicname"
+              id="adminAddClinicName"
+              placeholder="Enter Clinic Name"
+            />
+            <p
+              class="text-danger SmallFormMessage"
+              *ngIf="
+                registerClinic.get('clinicname')?.invalid &&
+                registerClinic.get('clinicname')?.touched
+              "
+            >
+              Clinic Name is Required
+            </p>
+          </div>
+        </div>
+        <div class="common_content add_clinc_branch">
+          <!-- <div class="add_clinic-item_sub">
+            <p class="add_clinic_dropdown_title">Branch Name</p>
+            <input class="add_clinic_input" [attr.disabled]="true"    placeholder="Enter Branch Name" formControlName ="branchname" />
+          </div> -->
+          <div *ngIf="switchingVariable" class="add_clinic-item_sub">
+            <p class="common_content_title">*Clinic Code</p>
+            <input
+              [attr.disabled]="true"
+              class="common_input_dropdown"
+              required
+              formControlName="cliniccode"
+              id="adminAddClinicCode"
+              placeholder="Enter Unique Code"
+              maxlength="4"
+            />
+            <p
+              class="text-danger SmallFormMessage"
+              *ngIf="
+                registerClinic.get('cliniccode')?.invalid &&
+                registerClinic.get('cliniccode')?.touched
+              "
+            >
+              Clinic Code is Required
+            </p>
+          </div>
+
+          <div *ngIf="!switchingVariable" class="add_clinic-item_sub">
+            <p class="common_content_title">*Clinic Code</p>
+            <input
+              class="common_input_dropdown"
+              required
+              formControlName="cliniccode"
+              placeholder="Enter Clinic Name"
+              id="adminAddCliniCode"
+              placeholder="Enter Unique Code"
+              maxlength="4"
+            />
+            <p
+              class="text-danger SmallFormMessage"
+              *ngIf="
+                registerClinic.get('cliniccode')?.invalid &&
+                registerClinic.get('cliniccode')?.touched
+              "
+            >
+              Clinic Code is Required
+            </p>
+          </div>
+        </div>
+        <div class="common_content add_clinc_branch">
+          <div class="add_clinic-item_sub add_clinic-item_sub_left">
+            <p class="common_content_title">*Mobile Number</p>
+            <input
+              class="common_input_dropdown"
+              placeholder="Enter Number"
+              maxlength="10"
+              formControlName="mobile"
+              id="clinicMobile"
+            />
+            <p
+              class="text-danger SmallFormMessage"
+              *ngIf="
+                registerClinic.get('mobile')?.invalid &&
+                registerClinic.get('mobile')?.touched
+              "
+            >
+              Mobile Number is Required
+            </p>
+          </div>
+          <div class="add_clinic-item_sub">
+            <p class="common_content_title">Alternate Number</p>
+            <input
+              class="common_input_dropdown"
+              placeholder="Enter Number"
+              maxlength="10"
+              notrequired
+              formControlName="altMobile"
+              id="clinicAltMobile"
+            />
+          </div>
+        </div>
+        <div class="common_content">
+          <p class="common_content_title">*Address Line 1</p>
+          <input
+            class="common_input_dropdown"
+            placeholder="Enter Address Line 1"
+            required
+            formControlName="addressline1"
+            id="clinicAddress1"
+          />
+          <p
+            class="text-danger SmallFormMessage"
+            *ngIf="
+              registerClinic.get('addressline1')?.invalid &&
+              registerClinic.get('addressline1')?.touched
+            "
+          >
+            Address is Required
+          </p>
+        </div>
+        <div class="common_content">
+          <p class="common_content_title">Address Line 2</p>
+          <input
+            class="common_input_dropdown"
+            formControlName="addressline2"
+            id="clinicAddress2"
+            placeholder="Enter Address Line 2"
+          />
+        </div>
+        <div class="common_content">
+          <div class="add_clinic-item_sub">
+            <p class="common_content_title" notrequired>*Zip Code</p>
+            <input
+              class="common_input_dropdown"
+              formControlName="zipcode"
+              id="clinicZipcode"
+              maxlength="5"
+              placeholder="Enter Zip Code"
+            />
+            <p
+              class="text-danger SmallFormMessage"
+              *ngIf="
+                registerClinic.get('zipcode')?.invalid &&
+                registerClinic.get('zipcode')?.touched
+              "
+            >
+              Please Select Zip Code
+            </p>
+          </div>
+        </div>
+        <div *ngIf="http_state" class="common_content">
+          <p class="common_content_title">*State</p>
+          <select
+            class="common_input_dropdown"
+            notrequired
+            formControlName="clinic_state"
+            id="clinicState"
+            (change)="filterCitybyState()"
+          >
+            <option [ngValue]="undefined" hidden>Select State</option>
+            <option
+              *ngFor="let data of http_state.States; let i = index"
+              [value]="data.StateId"
+            >
+              {{ data.StateName }}
+            </option>
+          </select>
+          <p
+            class="text-danger SmallFormMessage"
+            *ngIf="
+              registerClinic.get('clinic_state')?.invalid &&
+              registerClinic.get('clinic_state')?.touched
+            "
+          >
+            Please Select State
+          </p>
+        </div>
+        <div class="common_content add_clinic-item_sub">
+          <p class="common_content_title">*City</p>
+          <select
+            class="common_input_dropdown"
+            required
+            id="clinicCity"
+            formControlName="clinic_city"
+            required
+          >
+            <option [ngValue]="undefined" hidden>Select City</option>
+            <option
+              *ngFor="let data of cityArray; let i = index"
+              [value]="data.CityId"
+            >
+              {{ data.CityName }}
+            </option>
+          </select>
+          <p
+            class="text-danger SmallFormMessage"
+            *ngIf="
+              registerClinic.get('clinic_city')?.invalid &&
+              registerClinic.get('clinic_city')?.touched
+            "
+          >
+            Please Select City
+          </p>
+        </div>
+
+        <div class="common_content">
+          <p class="common_content_title">*Time Zone</p>
+          <select
+            class="common_input_dropdown"
+            id="clinicTimeZone"
+            formControlName="time_zone"
+          >
+            <option *ngFor="let obj of timezones" [value]="obj.Id">
+              {{ obj.Name }}
+            </option>
+          </select>
+          <p
+            class="text-danger SmallFormMessage"
+            *ngIf="
+              registerClinic.get('time_zone')?.invalid &&
+              registerClinic.get('time_zone')?.touched
+            "
+          >
+            Please Select Time Zone
+          </p>
+        </div>
+      </div>
+      <div class="lower_container">
+        <div>
+          <button
+            class="btn_cancel"
+            id="btnclinicCancel"
+            (click)="onClickCancel()"
+          >
+            CANCEL
+          </button>
+        </div>
+        <div>
+          <button
+            class="btn_save"
+            id="btnClinicUpdate"
+            *ngIf="switchingVariable"
+            (click)="UpdateClinic()"
+          >
+            UPDATE
+          </button>
+          <button
+            class="btn_save"
+            id="btnClinicAdd"
+            (click)="AddClinic()"
+            *ngIf="!switchingVariable"
+          >
+            SAVE
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- Add Program -->
+<ng-template #addprogram>
+  <div class="addtemplate">
+    <p class="main_add_title">
+      {{ switchingVariable ? "Update Program" : "Add Program" }}
+    </p>
+    <div class="upper_container">
+      <div class="add_template_content">
+        <p class="add_content_title">Vitals Monitoring</p>
+
+        <select class="add_template_dropdown" id="vitalOption">
+          <option value="one">First option</option>
+          <option value="two">Second option</option>
+        </select>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Duration</p>
+        <div class="duration_content_panel">
+          <img
+            (click)="increment()"
+            id="increaseDuration"
+            class="btn-common"
+            src="../../../../../assets/04-Icons/Icons_Plus.svg"
+          />
+          <span class="duration_value">{{ durationValue }}</span>
+          <img
+            (click)="decrement()"
+            id="decreaseDuration"
+            class="btn-common"
+            src="../../../../../assets/04-Icons/Icons_Minus.svg"
+          />
+        </div>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Goals</p>
+        <!-- Goal Add Container -->
+        <div class="goal_add_container">
+          <div class="goal_add_upper_panel">
+            <select class="add_goal_dropdown" id="goalOption">
+              <option value="one">First option</option>
+              <option value="two">Second option</option>
+            </select>
+
+            <img
+              class="add_goal_icon"
+              src="../../../../../assets/04-Icons/Icons_Add A.svg"
+              id="adminAddGoal"
+              (click)="onAddData()"
+            />
+          </div>
+          <textarea class="goal_text_area" id="goalTextarea"> </textarea>
+
+          <div *ngFor="let divData of dataSource_element; let i = index">
+            <div *ngIf="i < 3">
+              <mat-form-field class="add_goal_dropdown">
+                <mat-select placeholder="Select Category">
+                  <mat-option value="one">First option</mat-option>
+                  <mat-option value="two">Second option</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <!-- Note Container Text Area -->
+              <textarea class="goal_text_area"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Program Name</p>
+        <div class="program_generate_container">
+          <div class="program_name_sub_container">
+            <img
+              class="program_check_icon"
+              src="../../../../../assets/04-Icons/Icons_Check A.svg"
+            />
+            <input class="program_name_input" placeholder="Auto Generated" />
+          </div>
+          <button class="btn_note" class="btn_save">GENERATE</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="lower_container">
+      <div>
+        <button
+          class="btn_note"
+          class="btn_cancel"
+          id="adminAdprogramCancel"
+          (mousedown)="onClickCancel()"
+        >
+          CANCEL
+        </button>
+      </div>
+      <div>
+        <button
+          class="btn_note"
+          class="btn_save"
+          id="btnAdProgramSave
+       "
+        >
+          SAVE
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #addbillingCode>
+  <div class="addtemplate">
+    <p class="main_add_title">Add Billing Code</p>
+    <div class="upper_container">
+      <div class="add_template_content">
+        <p class="add_content_title">Billing Code</p>
+        <mat-form-field class="add_template_dropdown">
+          <mat-select placeholder="Select Category" id="billingOption">
+            <mat-option value="one">First option</mat-option>
+            <mat-option value="two">Second option</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Frequency</p>
+        <!-- frequency -->
+        <div class="frequency_container">
+          <div class="duration_content_panel">
+            <img
+              (click)="frequencyincrement()"
+              id="frequencyIncrease"
+              class="btn-common"
+              src="../../../../../assets/04-Icons/Icons_Plus.svg"
+            />
+            <span class="duration_value">{{ durationValue }}</span>
+            <img
+              (click)="frequencydecrement()"
+              id="frequencyDecrease"
+              class="btn-common"
+              src="../../../../../assets/04-Icons/Icons_Minus.svg"
+            />
+          </div>
+          <mat-form-field class="add_frequency_dropdown">
+            <mat-select placeholder="/ Month" id="frequencyOption">
+              <mat-option value="one">First option</mat-option>
+              <mat-option value="two">Second option</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <!-- frequency End-->
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Billing Cycle</p>
+        <!-- frequency -->
+        <div class="frequency_container">
+          <div class="duration_content_panel">
+            <img
+              (click)="increment()"
+              id="billingCycleIncrease"
+              class="btn-common"
+              src="../../../../../assets/04-Icons/Icons_Plus.svg"
+            />
+            <span class="duration_value">{{ durationValue }}</span>
+            <img
+              (click)="decrement()"
+              class="btn-common"
+              id="billingCycleDecrease"
+              src="../../../../../assets/04-Icons/Icons_Minus.svg"
+            />
+          </div>
+          <mat-form-field class="add_frequency_dropdown">
+            <mat-select placeholder="Days" id="dausOption">
+              <mat-option value="one">First option</mat-option>
+              <mat-option value="two">Second option</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <!-- frequency End-->
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Target</p>
+        <!-- frequency -->
+        <div class="frequency_container">
+          <div class="duration_content_panel">
+            <img
+              (click)="increment()"
+              id="targetIncrease"
+              class="btn-common"
+              src="../../../../../assets/04-Icons/Icons_Plus.svg"
+            />
+            <span class="duration_value">{{ durationValue }}</span>
+            <img
+              (click)="decrement()"
+              id="targetDecrease"
+              class="btn-common"
+              src="../../../../../assets/04-Icons/Icons_Minus.svg"
+            />
+          </div>
+          <mat-form-field class="add_frequency_dropdown">
+            <mat-select placeholder="Minutes" id="minuteOption">
+              <mat-option value="one">First option</mat-option>
+              <mat-option value="two">Second option</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <!-- frequency End-->
+      </div>
+
+      <div class="add_template_content">
+        <p class="add_content_title">Requirements</p>
+        <textarea class="textarea_template"></textarea>
+      </div>
+    </div>
+
+    <div class="lower_container">
+      <div>
+        <button
+          class="btn_note"
+          class="btn_cancel"
+          id="billingCycleCancel"
+          (mousedown)="onClickCancel()"
+        >
+          CANCEL
+        </button>
+      </div>
+      <div>
+        <button class="btn_note" class="btn_save">SAVE</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #addvital>
+  <div class="addtemplate">
+    <p class="main_add_title">Add Vital Rule</p>
+    <div class="upper_container">
+      <div class="add_template_content">
+        <p class="add_content_title">Vitals Monitoring</p>
+        <select class="add_template_dropdown">
+          <option value="one">First option</option>
+          <option value="two">Second option</option>
+        </select>
+
+        <!-- <mat-form-field class="add_template_dropdown">
+
+        <mat-select placeholder="Select Category">
+          <mat-option value="one">First option</mat-option>
+          <mat-option value="two">Second option</mat-option>
+        </mat-select>
+      </mat-form-field> -->
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Device</p>
+        <mat-form-field class="add_template_dropdown">
+          <mat-select placeholder="Select Category">
+            <mat-option value="one">First option</mat-option>
+            <mat-option value="two">Second option</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Measurement</p>
+        <mat-form-field class="add_template_dropdown">
+          <mat-select placeholder="Select Category">
+            <mat-option value="one">First option</mat-option>
+            <mat-option value="two">Second option</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Unit</p>
+        <select class="add_template_dropdown">
+          <option value="one">First option</option>
+          <option value="two">Second option</option>
+        </select>
+        <!-- <mat-form-field class="add_template_dropdown">
+
+       <mat-select placeholder="Select Category">
+         <mat-option value="one">First option</mat-option>
+         <mat-option value="two">Second option</mat-option>
+       </mat-select>
+     </mat-form-field> -->
+      </div>
+
+      <div class="add_template_content">
+        <p class="add_content_title">Normal Range</p>
+
+        <div class="custom-slider">
+          <!-- <ngx-slider
+            (mouseup)="displayValue()"
+            [options]="options"
+            [(value)]="minValue"
+            [(highValue)]="maxValue"
+          >
+          </ngx-slider> -->
+        </div>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Cautious Vital Range</p>
+        <div class="vitalrange_container">
+          <div>
+            <p class="vitalrange_title">Below Normal Range</p>
+            <div class="duration_content_panel">
+              <img
+                (click)="increment()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Plus.svg"
+              />
+              <span class="duration_value">{{ durationValue }}</span>
+              <img
+                (click)="decrement()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Minus.svg"
+              />
+            </div>
+          </div>
+
+          <div>
+            <p class="vitalrange_title">Above Normal Range</p>
+            <div class="duration_content_panel">
+              <img
+                (click)="increment()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Plus.svg"
+              />
+              <span class="duration_value">{{ durationValue }}</span>
+              <img
+                (click)="decrement()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Minus.svg"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Critical Vital Range</p>
+
+        <div class="vitalrange_container">
+          <div>
+            <p class="vitalrange_title">Below Normal Range</p>
+            <div class="duration_content_panel">
+              <img
+                (click)="increment()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Plus.svg"
+              />
+              <span class="duration_value">{{ durationValue }}</span>
+              <img
+                (click)="decrement()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Minus.svg"
+              />
+            </div>
+          </div>
+
+          <div>
+            <p class="vitalrange_title">Above Normal Range</p>
+            <div class="duration_content_panel">
+              <img
+                (click)="increment()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Plus.svg"
+              />
+              <span class="duration_value">{{ durationValue }}</span>
+              <img
+                (click)="decrement()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Minus.svg"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lower_container">
+      <div>
+        <button
+          class="btn_note"
+          class="btn_cancel"
+          (mousedown)="onClickCancel()"
+        >
+          CANCEL
+        </button>
+      </div>
+      <div>
+        <button class="btn_note" class="btn_save">SAVE</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #editprogram>
+  <div class="addtemplate">
+    <p class="main_add_title">Update Program</p>
+    <div class="upper_container">
+      <div class="add_template_content">
+        <div class="add_template_content">
+          <p class="add_content_title">Program Name</p>
+          <div class="program_generate_container">
+            <div class="program_name_sub_container">
+              <img
+                class="program_check_icon"
+                src="../../../../../assets/04-Icons/Icons_Check A.svg"
+              />
+              <input class="program_name_input" placeholder="Care Plan-BG" />
+            </div>
+            <div class="edit_icon_pgm">
+              <img
+                class="edit_icon"
+                src="../../../../../assets/04-Icons/Icons_Edit A.svg"
+              />
+            </div>
+          </div>
+        </div>
+        <p class="add_content_title">Vitals Monitoring</p>
+        <select class="add_template_dropdown">
+          <option value="">Blood Glucose</option>
+          <option value="one">First option</option>
+          <option value="two">Second option</option>
+        </select>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Duration</p>
+        <div class="duration_content_panel">
+          <img
+            (click)="edit_increment()"
+            class="btn-common"
+            src="../../../../../assets/04-Icons/Icons_Plus.svg"
+          />
+          <span class="duration_value">{{ editdurationValue }}</span>
+          <img
+            (click)="edit_decrement()"
+            class="btn-common"
+            src="../../../../../assets/04-Icons/Icons_Minus.svg"
+          />
+        </div>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Goals</p>
+        <!-- Goal Add Container -->
+        <div class="goal_add_container">
+          <div class="goal_add_upper_panel">
+            <select class="add_goal_dropdown">
+              <option value="one">First option</option>
+              <option value="two">Second option</option>
+            </select>
+
+            <img
+              class="add_goal_icon"
+              src="../../../../../assets/04-Icons/Icons_Add A.svg"
+              (click)="onAddData()"
+            />
+          </div>
+          <textarea class="goal_text_area"> </textarea>
+
+          <div *ngFor="let divData of dataSource_element; let i = index">
+            <div *ngIf="i < 3">
+              <select class="add_goal_dropdown">
+                <option value="one">First option</option>
+                <option value="two">Second option</option>
+              </select>
+              <!-- Note Container Text Area -->
+              <textarea class="goal_text_area"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lower_container">
+      <div>
+        <button
+          class="btn_note"
+          class="btn_cancel"
+          (mousedown)="onClickCancel()"
+        >
+          CANCEL
+        </button>
+      </div>
+      <div>
+        <button class="btn_note" class="btn_save">SAVE</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<!-- Edit Billing Code Start -->
+<ng-template #editbillingCode>
+  <div class="addtemplate">
+    <p class="main_add_title">Update Billing Code</p>
+    <div class="upper_container">
+      <div class="add_template_content">
+        <p class="add_content_title">Billing Code</p>
+        <select class="add_template_dropdown">
+          <option value="one">First option</option>
+          <option value="one">Second option</option>
+        </select>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Frequency</p>
+        <!-- frequency -->
+        <div class="frequency_container">
+          <div class="duration_content_panel">
+            <img
+              (click)="frequencyincrement()"
+              class="btn-common"
+              src="../../../../../assets/04-Icons/Icons_Plus.svg"
+            />
+            <span class="duration_value">{{ durationValue }}</span>
+            <img
+              (click)="frequencydecrement()"
+              class="btn-common"
+              src="../../../../../assets/04-Icons/Icons_Minus.svg"
+            />
+          </div>
+
+          <select class="add_frequency_dropdown">
+            <option value="one">First option</option>
+            <option value="one">Second option</option>
+          </select>
+        </div>
+        <!-- frequency End-->
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Billing Cycle</p>
+        <!-- frequency -->
+        <div class="frequency_container">
+          <div class="duration_content_panel">
+            <img
+              (click)="increment()"
+              class="btn-common"
+              src="../../../../../assets/04-Icons/Icons_Plus.svg"
+            />
+            <span class="duration_value">{{ durationValue }}</span>
+            <img
+              (click)="decrement()"
+              class="btn-common"
+              src="../../../../../assets/04-Icons/Icons_Minus.svg"
+            />
+          </div>
+
+          <select class="add_frequency_dropdown">
+            <option value="one">First option</option>
+            <option value="one">Second option</option>
+          </select>
+        </div>
+        <!-- frequency End-->
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Target</p>
+        <!-- frequency -->
+        <div class="frequency_container">
+          <div class="duration_content_panel">
+            <img
+              (click)="increment()"
+              class="btn-common"
+              src="../../../../../assets/04-Icons/Icons_Plus.svg"
+            />
+            <span class="duration_value">{{ durationValue }}</span>
+            <img
+              (click)="decrement()"
+              class="btn-common"
+              src="../../../../../assets/04-Icons/Icons_Minus.svg"
+            />
+          </div>
+
+          <select class="add_frequency_dropdown">
+            <option value="one">Minutes</option>
+            <option value="one">Second option</option>
+          </select>
+        </div>
+        <!-- frequency End-->
+      </div>
+
+      <div class="add_template_content">
+        <p class="add_content_title">Requirements</p>
+        <textarea class="textarea_template"></textarea>
+      </div>
+    </div>
+
+    <div class="lower_container">
+      <div>
+        <button
+          class="btn_note"
+          class="btn_cancel"
+          (mousedown)="onClickCancel()"
+        >
+          CANCEL
+        </button>
+      </div>
+      <div>
+        <button class="btn_note" class="btn_save">SAVE</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<!-- Edit Billing Code End -->
+<!-- Edit Vital Start -->
+<ng-template #editVital>
+  <div class="addtemplate">
+    <p class="main_add_title">Update Vital Rule</p>
+    <div class="upper_container">
+      <div class="add_template_content">
+        <p class="add_content_title">Vitals Monitoring</p>
+
+        <select class="add_template_dropdown">
+          <option value="one">Minutes</option>
+          <option value="one">Second option</option>
+        </select>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Device</p>
+        <select class="add_template_dropdown">
+          <option value="one">Minutes</option>
+          <option value="one">Second option</option>
+        </select>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Measurement</p>
+        <select class="add_template_dropdown">
+          <option value="one">Minutes</option>
+          <option value="one">Second option</option>
+        </select>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Unit</p>
+        <select class="add_template_dropdown">
+          <option value="one">Minutes</option>
+          <option value="one">Second option</option>
+        </select>
+      </div>
+
+      <div class="add_template_content">
+        <p class="add_content_title">Normal Range</p>
+
+        <div class="custom-slider">
+          <!-- <ngx-slider
+            (mouseup)="displayValue()"
+            [options]="options"
+            [(value)]="minValue"
+            [(highValue)]="maxValue"
+          >
+          </ngx-slider> -->
+        </div>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Cautious Vital Range</p>
+        <div class="vitalrange_container">
+          <div>
+            <p class="vitalrange_title">Below Normal Range</p>
+            <div class="duration_content_panel">
+              <img
+                (click)="increment()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Plus.svg"
+              />
+              <span class="duration_value">{{ durationValue }}</span>
+              <img
+                (click)="decrement()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Minus.svg"
+              />
+            </div>
+          </div>
+
+          <div>
+            <p class="vitalrange_title">Above Normal Range</p>
+            <div class="duration_content_panel">
+              <img
+                (click)="increment()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Plus.svg"
+              />
+              <span class="duration_value">{{ durationValue }}</span>
+              <img
+                (click)="decrement()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Minus.svg"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="add_template_content">
+        <p class="add_content_title">Critical Vital Range</p>
+
+        <div class="vitalrange_container">
+          <div>
+            <p class="vitalrange_title">Below Normal Range</p>
+            <div class="duration_content_panel">
+              <img
+                (click)="increment()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Plus.svg"
+              />
+              <span class="duration_value">{{ durationValue }}</span>
+              <img
+                (click)="decrement()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Minus.svg"
+              />
+            </div>
+          </div>
+
+          <div>
+            <p class="vitalrange_title">Above Normal Range</p>
+            <div class="duration_content_panel">
+              <img
+                (click)="increment()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Plus.svg"
+              />
+              <span class="duration_value">{{ durationValue }}</span>
+              <img
+                (click)="decrement()"
+                class="btn-common"
+                src="../../../../../assets/04-Icons/Icons_Minus.svg"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lower_container">
+      <div>
+        <button
+          class="btn_note"
+          class="btn_cancel"
+          (mousedown)="onClickCancel()"
+        >
+          CANCEL
+        </button>
+      </div>
+      <div>
+        <button class="btn_note" class="btn_save">SAVE</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<!-- Edit Vital End -->
+<!-- Alert Menu -->
+<ng-template #alert_menu>
+  <!-- Alert Panel -->
+  <div *ngIf="http_listener" class="alert_panel">
+    <div class="alert_heading_panel">
+      <h2>Critical Alerts</h2>
+      <!-- <div class="btn_bg">
+      <app-right-common-button></app-right-common-button>
+    </div> -->
+    </div>
+    <div class="alert_panel_container">
+      <div *ngFor="let alert of http_listener.alerts; index as i">
+        <!-- <div class="alert_panel_content" [ngClass]="i ==0 ?'firstAlaram':'' "> -->
+        <div
+          class="alert_panel_content"
+          [ngClass]="alert.priority == 'normal' ? 'normal' : 'urgent'"
+        >
+          <div class="alert_left_panel">
+            <p class="alert_title">{{ alert.alert_description }}</p>
+            <p class="alert_patient">{{ alert.patient_name }}</p>
+          </div>
+          <div class="alert_right_panel">
+            <p class="alert_time">{{ notificationtime(alert.duedate) }}</p>
+            <div class="alert_icon_container">
+              <img
+                class="alert_icon"
+                src="../../../../../assets/04-Icons/Icons_Alert.svg"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Upcoming Panel -->
+  <div *ngIf="http_listener" class="upcoming_Panel">
+    <div class="upcoming_heading_panel">
+      <h2>Upcoming Schedule</h2>
+    </div>
+    <div *ngFor="let schedule of http_listener.schedule; index as i">
+      <div
+        class="upcoming_panel_content"
+        [ngClass]="i == 0 ? 'firstSchedule' : ''"
+      >
+        <div class="upcoming_left_panel">
+          <p class="upcoming_title">{{ schedule.description }}</p>
+          <p class="upcoming_patient">{{ schedule.patientname }}</p>
+        </div>
+        <div class="upcoming_right_panel">
+          <p class="upcoming_time">
+            {{ notificationtime(schedule.start_date) }}
+          </p>
+          <img
+            class="schedule_icon"
+            src="../../../../../assets/04-Icons/Icons_Arrow - Front.svg"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<app-confirm-dialog-panel>
+</app-confirm-dialog-panel>

@@ -1,0 +1,857 @@
+// Basic Container
+
+.content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.content-panel {
+  width: 100%;
+    display: flex;
+  height: 90vh;
+
+}
+.team_detail_schedule td {
+  font-size: 0.7rem;
+  font-family: "Rubik";
+}
+
+.main-panel {
+  width: 73%;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.side-panel {
+  width: 27%;
+}
+.side-panel {
+  background-color: #ffffff;
+
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+}
+.upper-header-panel {
+  padding-top: 60px;
+}
+
+// Add Task
+.add_task_button {
+  position: absolute;
+  top: 24px;
+  right: 20px;
+}
+
+// Button Panel
+
+.task_menu_button_panel {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  margin-bottom: 24px !important;
+  padding-top: 26px;
+}
+.btn-task-menu {
+  width: 180px;
+  height: 40px;
+  background-color: #edeff5;
+  border-radius: 8px;
+  border: none;
+  font-size: 18px;
+  line-height: 22px;
+  color: #164d61;
+  margin-right: 8px;
+  outline: none;
+}
+
+.selected {
+  background-color: #164d61;
+  color: #ffffff;
+}
+// Alert upper panel
+.alert_upperPanel {
+  width: 90%;
+}
+
+.alert_overview_data_first {
+  background-color: transparent;
+  width: 100%;
+}
+
+.mat-cell:first-of-type {
+  padding-left: 0.8rem !important;
+}
+.mat-header-cell:first-of-type {
+  padding-left: 0.8rem !important;
+}
+.mat-header-cell:nth-of-type(5) {
+  padding-left: 0.4rem !important;
+}
+
+// .alert_overview_data
+// {
+
+//   width: 20%;
+
+// }
+
+// Task Overview
+.task_upper_panel {
+  margin-bottom: 0px !important;
+}
+
+.task_overview_data_first {
+  width: 16%;
+  background-color: #8be3d9;
+}
+.task_overview_data {
+  width: 20%;
+}
+
+// Task table
+.task_table_content {
+  width: 100%;
+  border-radius: 16px;
+
+  position: relative;
+}
+.task_table_display {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.priority_content {
+  width: 3.6rem;
+  height: 1.2rem;
+  border-radius: 0.6rem;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.7rem;
+}
+.urgent {
+  position: relative;
+}
+.due_date {
+  color: #9b5d0c;
+  position: relative;
+}
+
+.due_datepending {
+  position: relative;
+}
+.due_datepending::before {
+  content: "";
+  display: block;
+  height: 80%;
+  width: 6px;
+  position: absolute;
+  top: 5px;
+  left: 0;
+  background-color: #ffbf77;
+  border-radius: 0px 8px 8px 0px;
+}
+
+.test_urgent {
+  background-color: #155d16 !important;
+}
+
+.missing {
+  position: relative;
+}
+
+.missing::before {
+  content: "";
+  display: block;
+  height: 80%;
+  width: 6px;
+  position: absolute;
+  top: 5px;
+  left: 0;
+  background-color: #ffbf77;
+  border-radius: 0px 8px 8px 0px;
+}
+
+.urgent::before {
+  content: "";
+  display: block;
+  height: 80%;
+  width: 6px;
+  position: absolute;
+  top: 5px;
+  left: 0;
+  background-color: #fd5276;
+  border-radius: 0px 8px 8px 0px;
+}
+.priority_urgent {
+  color: #ffffff;
+  background-color: #fd5276;
+}
+.priority_low {
+  background-color: #ffffff;
+  color: #155d16;
+  border: 1px solid #6da86f;
+}
+.priority_high {
+  background-color: #fcd0cf;
+  border: 1px solid #fd5276;
+  color: #a20d0a;
+}
+.priority_medium {
+  background-color: #ffe0b5;
+  border: 1px solid #ffbf77;
+  color: #9b5d0c;
+}
+
+.priority_missing {
+  background-color: #ffffff;
+  color: #9b5d0c;
+  border: 1px solid #9b5d0c;
+}
+
+// Schedule Panel
+
+// Schedule Table
+.task_date_panel {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  align-items: center;
+}
+.task_schedule {
+  width: 100%;
+}
+
+.task_date_panel {
+  padding-right: 16px !important;
+}
+
+.img_table_add {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%)
+    hue-rotate(353deg) brightness(102%) contrast(104%);
+}
+.shedule_table_container {
+  height: 50vh;
+  overflow-y: auto;
+}
+.table_add_container {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #164d61;
+  display: flex;
+  justify-content: center;
+  margin-left: 8px;
+  margin-bottom: 3px;
+}
+table {
+  width: 100%;
+  background-color: transparent !important;
+  border-spacing: 0 2px !important;
+  // border-radius: 12px;
+  border-collapse: collapse;
+  border-radius: 0.75rem;
+}
+.mat-table {
+  background-color: transparent !important;
+  border-collapse: separate;
+  border-spacing: 0px 8px !important;
+}
+
+table tr:last-child td /*To remove the last border*/ {
+  border-bottom: 0px solid !important;
+}
+
+
+
+td.mat-cell:first-child {
+  border: none;
+  border-radius: 8px 0px 0px 8px;
+}
+
+td.mat-cell:last-child {
+  border: none;
+  border-radius: 0px 8px 8px 0px;
+}
+.mat-cell {
+  border: none;
+}
+
+.schedule-cell-data-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-bottom: 6px;
+}
+.schedule-cell-data.ng-star-inserted:first {
+  border: none;
+  border-radius: 8px 0px 0px 8px;
+}
+
+tr.mat-row {
+  //  background: #D9D9D9; /* Old browsers */
+  background: #edeff5;
+}
+.task_table_content th.mat-header-cell {
+  border-bottom-style: none;
+}
+
+::ng-deep.schedule-cell-data {
+  margin: 0px 0px 4px 0px !important;
+}
+.schedule_front_arrow {
+  width: 18px;
+  height: 18px;
+}
+
+#divCart {
+  display: block;
+  width: 400px;
+  height: 400px;
+}
+
+
+// KPI Performance
+.kpi_performance {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  // overflow-y: scroll;
+}
+.graph_panel {
+  width: 100%;
+  height: 100%;
+  margin-right: 20px;
+}
+
+.button_panel {
+  display: flex;
+}
+.graph_title_bar {
+  display: flex;
+  justify-content: space-between;
+}
+.graph_content_container {
+  background-color: #ffffff;
+  width: 100%;
+  height: fit-content;
+  border-radius: 16px;
+  margin-top: 12px;
+  padding-top: 100px;
+  position: relative;
+  padding-bottom: 50px;
+}
+
+.graph_title_bar p {
+  font-size: 18px;
+  line-height: 24px;
+  color: #164d61;
+  font-family: "Rubik";
+  margin-bottom: 0px;
+}
+
+.btn-year {
+  width: 84px;
+  font-size: 12px;
+  line-height: 30px;
+
+  height: 32px;
+  border-radius: 16px;
+  padding: 2px 4px 2px 4px;
+  border: none;
+  background-color: #e1e6ed;
+  color: #164d61;
+}
+
+.btn-week {
+  width: 84px;
+  background-color: #e1e6ed;
+  color: #164d61;
+  height: 32px;
+  border-radius: 16px;
+  padding: 2px 4px 2px 4px;
+  font-size: 12px;
+  line-height: 30px;
+  border: none;
+}
+
+.btn-month {
+  width: 84px;
+  height: 32px;
+  border-radius: 16px;
+  padding: 2px 4px 2px 4px;
+  font-size: 12px;
+  line-height: 30px;
+  background-color: #164d61;
+  color: #ffffff;
+  border: none;
+}
+.button_panel {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 1px;
+}
+
+.task_table_content .search_input {
+  border: none;
+
+  outline: none;
+
+  background-color: #8be3d9;
+  border-radius: 12px;
+  width: 80%;
+  border: none;
+  align-items: center;
+  min-height: 1.5rem;
+  max-height: 1.5rem;
+  display: flex;
+}
+.input_panel {
+  border: none;
+
+  outline: none;
+  border-radius: 12px;
+  width: 100%;
+  border: none;
+  align-items: center;
+  min-height: 1.5rem;
+  max-height: 1.5rem;
+  background-color: #8be3d9;
+}
+.task_table_content .search_icon_default {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) saturate(100%) invert(97%) sepia(42%) saturate(4666%)
+    hue-rotate(131deg) brightness(87%) contrast(79%);
+}
+.task_table_content .search_icon {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) saturate(100%) invert(100%) sepia(1%) saturate(1151%)
+    hue-rotate(52deg) brightness(109%) contrast(100%);
+}
+.task_table_content .task_priority select {
+  background-color: #cff4f5;
+  outline: none;
+  border: none;
+  color: #164d61 !important;
+
+  padding: 4px 24px 3px 5px;
+  border-radius: 12px;
+  // font-size: 14px;
+  font-family: "Rubik";
+}
+.task_priority select:focus {
+  background-color: #8be3d9;
+}
+.task_priority select {
+  direction: rtl;
+}
+.task_priority select option {
+  direction: ltr;
+}
+.search_heading_default {
+  display: flex;
+  align-items: center;
+}
+// .mat-column-priority {
+//   flex: 0 0 100px;
+// }
+// .mat-column-action {
+//   flex: 0 0 20px;
+// }
+
+// .mat-column-PatientId {
+//   flex: 0 0 0;
+// }
+// .mat-column-PatientProgramID {
+//   flex: 0 0 0;
+// }
+// .mat-column-PatientProgramId {
+//   flex: 0 0 0;
+// }
+
+// .mat-column-Patient {
+//   flex: 0 0 15%;
+// }
+// .mat-column-Priority {
+//   flex: 0 0 10%;
+// }
+// .mat-column-VitalAlert {
+//   flex: 0 0 25%;
+//   padding-right: 0.8rem;
+// }
+.iconbutton {
+  border-radius: 50%;
+  border: none;
+  background-color: #e1e6ed;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5rem 0.8rem 0.5rem 0rem;
+}
+
+// .task_table_content .mat-column-alert_name {
+//   flex: 0 0 25%;
+// }
+.graph_content_date_panel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+.graph_container_date {
+  color: #164d61;
+  font-family: "Rubik";
+  padding-top: 35px;
+  padding-right: 30px;
+  font-size: 16px;
+}
+
+.action-tab {
+  display: flex;
+}
+.schedule_table .mat-table {
+  // border: 1px solid black;
+
+  background-color: #edeff5 !important;
+  .mat-cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .mat-cell {
+      min-height: 60px;
+      width: 100%;
+      border-bottom: 1px solid grey;
+      display: flex;
+      padding: 0px;
+
+      justify-content: center;
+      align-items: center;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+}
+.schedule-cell-data {
+  background-color: #ffffff;
+
+}
+.schedule-data {
+  text-align: left;
+  width: 100%;
+  padding-left: 16px;
+}
+
+@media only screen and (max-width: 1280px) {
+  .main-panel {
+    position: relative;
+    width: 100%;
+  }
+  .side-panel {
+    width: 0%;
+    background-color: #e1e6ed;
+    z-index: 1000;
+  }
+  .right-menu-panel {
+    position: absolute;
+    right: 40px;
+    top: 20px;
+  }
+  .ack_task_template {
+    position: absolute;
+    right: 0px;
+  }
+
+  .common_template {
+    position: absolute;
+    width: 300px;
+    right: 0px !important;
+    top: 0px;
+  }
+
+  .kpi_performance {
+    overflow-y: scroll;
+  }
+  .main_content {
+    padding-right: 16px;
+  }
+  .graph_panel {
+    width: 80%;
+    height: 90%;
+    margin-left: 60px;
+    margin-bottom: 150px !important;
+  }
+  .schedule_data_panel {
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    width: 400px;
+    height: 100%;
+    z-index: 800;
+  }
+
+
+  .kpi_performance {
+    flex-direction: column;
+  }
+}
+
+@media only screen and (max-width: 810px) {
+  .btn-task-menu {
+    width: 160px;
+    font-size: 14px;
+  }
+  .mat-header-cell {
+    font-size: 12px !important;
+  }
+  .task_table_content .task_priority select {
+    font-size: 12px !important;
+  }
+}
+@media only screen and (max-width: 1550px) {
+}
+.mat-header-cell {
+  font-size: 12px !important;
+}
+::ng-deep .mat-paginator .mat-paginator-page-size {
+  display: none;
+}
+::ng-deep .mat-paginator {
+  background-color: #e1e6ed;
+}
+
+
+
+::ng-deep .mat-form-field-underline {
+  display: none;
+}
+
+.mat-paginator-navigation-previous {
+  display: none !important;
+}
+
+.mat-paginator-navigation-next {
+  display: none !important;
+}
+::ng-deep body .cdk-overlay-container {
+  .mat-tooltip-panel {
+    display: none !important;
+  }
+}
+
+::ng-deep .mat-select-arrow {
+  border: none !important;
+}
+
+.team_detail_schedule {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 1px;
+  // background-color: #EDEFF5;
+  border-radius: 20px;
+  padding-top: 0px;
+}
+
+.main_time {
+  min-width: 100px;
+  background-color: #edeff5;
+  text-align: start;
+  padding-left: 16px;
+}
+
+.task_table_content .sort_icon_default {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) saturate(100%) invert(97%) sepia(42%) saturate(4666%)
+    hue-rotate(131deg) brightness(87%) contrast(79%);
+}
+
+.team_detail_schedule .sort_icon_default {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) saturate(100%) invert(97%) sepia(42%) saturate(4666%)
+    hue-rotate(131deg) brightness(87%) contrast(79%);
+}
+.iconbutton:focus {
+  outline: none;
+}
+
+mat-header-cell,
+mat-cell {
+  justify-content: start;
+}
+
+// .mat-column-action {
+//   flex: 0 0 7% !important;
+// }
+// .mat-column-VitalAlert {
+//   flex: 0 0 22% !important;
+// }
+// .mat-column-TaskID {
+//   flex: 0 0 0 !important;
+// }
+// .mat-column-TaskType {
+//   flex: 0 0 22% !important;
+// }
+.Critical_text {
+  color: #a20d0a !important;
+}
+.Missing_text {
+  color: #9b5d0c;
+}
+.patient_name_task {
+  margin-bottom: 20px;
+}
+
+.main_content_display {
+  width: 100%;
+}
+mat-progress-spinner {
+  position: absolute;
+  top: 40%;
+  left: 40%;
+  transform: translate(-50%, -50%);
+  z-index: 103;
+}
+
+.overlay {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  z-index: 102;
+  backdrop-filter: blur(2px);
+}
+
+
+::-webkit-scrollbar {
+  display: none;
+  width: 8px !important;
+}
+
+
+::ng-deep .hide-arrow .mat-sort-header-arrow {
+  color: #3bcbc4;
+}
+::ng-deep
+  .mat-sort-header-container:not(.mat-sort-header-sorted)
+  .mat-sort-header-arrow {
+  // opacity: 0.54 !important;
+  transform: translateY(0px) !important;
+}
+.patient_name_col:hover {
+  cursor: pointer;
+  color: #c1c7d5;
+}
+.schedule_action_panel {
+  display: flex;
+}
+.complete_schedule {
+  display: flex;
+  justify-content: right;
+  padding: 0.8rem;
+}
+
+.date_panel_cont {
+  display: flex;
+  align-items: center;
+}
+.selected_cont {
+  background-color: #164d61 !important;
+  color: #ffffff !important;
+}
+.selected_cont_first {
+  background-color: transparent;
+}
+
+.selected_cont p {
+  color: #ffffff;
+}
+.date_panel_cont_task {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dialogContainer {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.btn-sent {
+  width: 200px;
+  height: fit-content;
+  padding: 10px 75px;
+  background-color: #99e8e3;
+  border: 2px solid #3bcbc4;
+  color: #ffffff;
+  border-radius: 20px;
+}
+.message_btn_action_panel {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.messageContainer {
+  width: 540px;
+  height: 100%;
+}
+.message_letter_count {
+  width: 100%;
+  text-align: right;
+}
+
+.message_container_panel {
+  background-color: #ffffff !important;
+  border-radius: 8px;
+  padding: 8px;
+  width: 100%;
+  height: 100%;
+  border: none;
+
+  outline: none;
+}
+.messagetemplate {
+  background-color: #edeff5;
+  border-radius: 16px;
+  width: 550px;
+
+  height: 200px;
+  padding: 16px;
+  display: flex;
+}
+.message_panel {
+  width: 520px;
+  color: rgba(0, 0, 0, 0.87);
+  word-wrap: break-word;
+}
+.messagedescr {
+  overflow-y: auto;
+  max-height: 1.5rem;
+  margin-right: 10px;
+  padding-right: 5px;
+}
+::ng-deep .hidden-column {
+  display: none !important;
+}
+.action-column {
+  width: 80px;
+  max-width: 80px;
+  min-width: 80px;
+}
