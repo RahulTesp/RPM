@@ -769,10 +769,19 @@ namespace RPMWeb.Dal
                                 string fullName = GetUserFullName(userId, ConnectionString);
                                 ConHistory.ContactName = fullName;
                                 // Fetch the last 50 messages (Twilio returns in chronological order)
-                                var messages = MessageResource.Read(conversationSid, limit: 50).ToList();
+                                var messages = MessageResource.Read(conversationSid).ToList();
 
                                 var lastMessage = messages.LastOrDefault(); // Get the latest one
-
+                                List<MessageHistoryItem> messageHistoryItems = new List<MessageHistoryItem>();
+                                foreach (var message in messages)
+                                {
+                                    MessageHistoryItem messageHistoryItem = new MessageHistoryItem();
+                                    messageHistoryItem.DateTime = message.DateCreated?.ToLocalTime().ToString();
+                                    messageHistoryItem.Message = message.Body;
+                                    messageHistoryItem.Author = message.Author;
+                                    messageHistoryItems.Add(messageHistoryItem);
+                                }
+                                ConHistory.Messages = messageHistoryItems;
                                 if (lastMessage != null)
                                 {
                                     

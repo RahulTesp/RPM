@@ -2402,6 +2402,7 @@ namespace RPMWeb.Data.Common
         public string LastMessage { get; set; }
         public string DateTime { get; set; }
         public string ConversationSid { get; set; }
+        public List<MessageHistoryItem> Messages { get; set; }
     }
     public class ConversationHeartBeat
     {
@@ -2421,5 +2422,11 @@ namespace RPMWeb.Data.Common
     {
         public int PatientId { get; set; }
         public int ProgramId { get; set; }
+    }
+    public class MessageHistoryItem
+    {
+        public string Message { get; set; }
+        public string DateTime { get; set; }
+        public string Author { get; set; }
     }
 }
