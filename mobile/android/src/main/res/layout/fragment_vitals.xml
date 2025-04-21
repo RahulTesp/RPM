@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/profile_card_body_bg"
+    tools:context="com.rpm.clynx.fragments.VitalsFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_grey1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <android.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/profile_card_body_bg"
+            android:labelFor="@id/constraint2"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            android:navigationIcon="@drawable/ic_baseline_west_24"
+            app:layout_constraintTop_toTopOf="parent"
+            android:gravity="center_horizontal">
+            <TextView
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vitals"
+                android:textAlignment="center"
+                android:textColor="@color/Primary_dark"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:background="@color/transparent"
+                android:src="@drawable/ic_icons_phone_a"
+                android:layout_marginEnd="@dimen/margin_20dp"
+                 />
+
+        </android.widget.Toolbar>
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="80dp"
+        android:layout_marginLeft="@dimen/margin_20dp"
+        android:layout_marginRight="@dimen/margin_20dp">
+
+        <ImageButton
+            android:id="@+id/prevdateonvital"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="end"
+            android:background="@color/transparent"
+            android:textColor="@color/todolist_color1"
+            android:src="@drawable/ic_outline_keyboard_arrow_left_24" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:layout_weight="4"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:id="@+id/VitalFragment_today_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text=""
+                android:textSize="16sp"
+                android:textColor="@color/todolist_color1"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/nextdateonvital"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="end"
+            android:background="@color/transparent"
+            android:src="@drawable/ic_baseline_keyboard_arrow_right_24"
+            android:textColor="@color/todolist_color1"/>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_main"
+        android:layout_width="400dp"
+        android:layout_height="599dp"
+        android:layout_marginTop="130dp"
+        android:background="@color/background_grey1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <TextView
+            android:id="@+id/todo_nofoactivites"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginStart="10dp"
+            android:padding="10dp"
+            android:text="Vitals"
+            android:textColor="@color/todolist_color1"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview_vitals"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="70dp"
+            android:background="@color/background_grey1"
+            android:orientation="horizontal"></androidx.recyclerview.widget.RecyclerView>
+
+        <TextView
+            android:id="@+id/empty_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/no_data_available"
+            android:visibility="gone" />
+    </FrameLayout>
+</FrameLayout>

@@ -1,0 +1,198 @@
+<!--<RelativeLayout-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:padding="8dp">-->
+
+<!--    &lt;!&ndash; Date Header Layout &ndash;&gt;-->
+<!--    <View-->
+<!--        android:id="@+id/leftDivider"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:layout_centerVertical="true"-->
+<!--        android:layout_alignParentStart="true"-->
+<!--        android:layout_toStartOf="@+id/dateTextView"-->
+<!--        android:background="@drawable/divider_bg" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/dateTextView"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_centerInParent="true"-->
+<!--        android:padding="@dimen/margin_10dp"-->
+<!--        android:background="@drawable/chat_date_bg"-->
+<!--        android:textColor="@color/Primary_text"-->
+<!--        android:textSize="14sp"-->
+<!--        android:textStyle="bold" />-->
+
+<!--    <View-->
+<!--        android:id="@+id/rightDivider"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:layout_centerVertical="true"-->
+<!--        android:layout_alignParentEnd="true"-->
+<!--        android:layout_toEndOf="@+id/dateTextView"-->
+<!--        android:background="@drawable/divider_bg" />-->
+
+
+
+
+<!--    &lt;!&ndash; Outgoing Message Layout &ndash;&gt;-->
+<!--    <LinearLayout-->
+<!--        android:id="@+id/outgoingLayout"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@id/dateTextView"-->
+<!--        android:layout_alignParentEnd="true"-->
+<!--        android:layout_marginTop="60dp"-->
+<!--        android:layout_marginStart="150dp">-->
+
+<!--        <RelativeLayout-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="5dp"-->
+<!--            android:layout_marginTop="25dp"-->
+<!--            android:background="@drawable/outgoing_msg_bubble">-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/outgoingMessageText"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_alignParentStart="true"-->
+<!--                android:layout_alignParentEnd="true"-->
+<!--                android:layout_gravity="end"-->
+<!--                android:padding="8dp"-->
+<!--                android:text="Outgoing Message" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/outgoingTime"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_below="@id/outgoingMessageText"-->
+<!--                android:layout_alignStart="@id/outgoingMessageText"-->
+<!--                android:padding="4dp"-->
+<!--                android:text="Outgoing Time" />-->
+<!--        </RelativeLayout>-->
+
+<!--        &lt;!&ndash; Other views within the outgoing message layout &ndash;&gt;-->
+<!--    </LinearLayout>-->
+<!--</RelativeLayout>-->
+
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <!-- Date Header Layout with Horizontal Line -->
+    <LinearLayout
+        android:id="@+id/dateHeaderLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_centerHorizontal="true">
+
+        <!-- Left Divider -->
+        <View
+            android:id="@+id/leftDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@drawable/divider_bg" />
+
+        <!-- Date Text -->
+        <TextView
+            android:id="@+id/dateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="6dp"
+            android:background="@drawable/chat_date_bg"
+            android:textColor="@color/Primary_text"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:text="Feb 13, 2025"
+            android:layout_marginHorizontal="8dp" />
+
+        <!-- Right Divider -->
+        <View
+            android:id="@+id/rightDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@drawable/divider_bg" />
+
+    </LinearLayout>
+
+    <!-- Outgoing Message Layout -->
+    <RelativeLayout
+        android:id="@+id/outgoingLayout"
+        android:layout_width="170dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dateHeaderLayout"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="100dp"
+        android:padding="8dp"
+
+        android:background="@drawable/outgoing_msg_bubble">
+
+        <TextView
+            android:id="@+id/outgoingTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:textIsSelectable="true"
+            android:textSize="12sp"
+            android:textColor="@color/ChatMsgTimeClr"
+            android:text="Outgoing Time" />
+        <TextView
+            android:id="@+id/outgoingMessageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/ChatTimeBlack"
+            android:textSize="16sp"
+            android:layout_below="@id/outgoingTime"
+            android:layout_alignStart="@id/outgoingTime"
+            android:layout_marginTop="2dp"
+            android:text="Outgoing Message" />
+
+
+
+        <!-- Edit and Delete Buttons at Bottom-Right -->
+        <LinearLayout
+            android:id="@+id/buttonContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp"
+            android:paddingBottom="12dp"
+            android:layout_marginEnd="10dp"
+            android:padding="4dp"
+            android:visibility="gone"
+            >
+
+            <!-- Edit Button -->
+            <ImageButton
+                android:id="@+id/editMessageDateButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="4dp"
+                android:src="@drawable/icons_edit"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+
+            <!-- Delete Button -->
+            <ImageButton
+                android:id="@+id/deleteMessageDateButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/icons_delete"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>
