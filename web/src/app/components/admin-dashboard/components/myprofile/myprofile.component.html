@@ -1,0 +1,440 @@
+<ng-container *ngIf="loading && loading1">
+  <div class="overlay"></div>
+  <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
+</ng-container>
+
+<div class="content">
+  <div *ngIf="display_edit" class="back_arrow">
+    <!-- <img
+      class="arrow-img"
+      src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg"
+    />
+    <p class="profile_text">My Profile</p> -->
+    <div class="back_arrow">
+      <div
+        class="back_arrow_container"
+        id="myProfBackHome"
+        (click)="backtohome()"
+      >
+        <img
+          class="arrow-img"
+          src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg"
+          alt=""
+        />
+      </div>
+      <p class="main_title">My Profile</p>
+    </div>
+  </div>
+
+  <!-- <div  class="main-panel" > -->
+  <div
+    class="content-mainpanel"
+  >
+    <div
+      class="main-panel"
+    >
+      <div *ngIf="!display_edit" class="upper_panel">
+        <div class="page_title">
+          <h3>Edit Profile</h3>
+        </div>
+        <div class="button-group">
+          <button
+            class="commonConfirmaddPatientBtn"
+            id="btnMyProfDiscard"
+            (click)="discardPage()"
+          >
+            DISCARD
+          </button>
+
+          <button
+            class="commonConfirmaddPatientBtn btn_confirm"
+            id="btnMyProfConfirm"
+            (click)="updateUser()"
+          >
+            CONFIRM
+          </button>
+        </div>
+      </div>
+
+      <form
+        [formGroup]="registerprofile"
+        class="registerprofile"
+        *ngIf="http_user_data"
+      >
+        <div class="main_sub_panel">
+          <div class="userInfo">
+            <div class="panel_title">
+              <h2>User Information</h2>
+              <img
+                class="icon_edit"
+                id="myProfEdit"
+                (click)="editprofile()"
+                src="../../../../../assets/04-Icons/Icons_Edit.svg"
+              />
+            </div>
+
+            <div class="userInfoContent">
+              <div class="userInfoContLeft">
+                <div class="uploadPhoto">
+                  <img
+                    class="icon_camera"
+                    src="../../../assets/04-Icons/Icons_Camera.svg"
+                  />
+                </div>
+                <div class="userInfoItem">
+                  <p class="userInfoTitle">*Email ID</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="Email ID"
+                    required
+                    formControlName="email"
+                    id="myProfEmail"
+                  />
+                  <div class="warn">
+                    <ng-container
+                      *ngIf="
+                        registerprofile.get('email')?.invalid &&
+                        registerprofile.get('email')?.touched
+                      "
+                      >Email is Required
+                    </ng-container>
+                  </div>
+                </div>
+
+                <div class="userInfoItem">
+                  <p class="userInfoTitle">*Mobile Number (Primary)</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="Mobile Number"
+                    required
+                    formControlName="mobile"
+                    id="myProfMobile"
+                  />
+                  <div class="warn">
+                    <ng-container
+                      *ngIf="
+                        registerprofile.get('mobile')?.invalid &&
+                        registerprofile.get('mobile')?.touched
+                      "
+                      >Mobile Number is Required
+                    </ng-container>
+                  </div>
+                </div>
+                <!-- <div class="userInfoItem">
+                    <p class="userInfoTitle">DOB</p>
+                    <input
+                      class="userInfovalue"
+                      required
+                      formControlName="dob"
+                      type="date"
+                      required
+                    />
+                  </div> -->
+                <!-- <div class="userInfoItem">
+                    <p class="userInfoTitle">Gender</p>
+                    <select
+                      class="userInfovalue"
+                      formControlName="gender"
+                      placeholder="Select Gender"
+                    >
+                      <option [ngValue]="undefined" hidden>
+                        Select Gender
+                      </option>
+                      <option
+                        *ngFor="let gender of GenderArray; let i = index"
+                        [value]="gender.value"
+                      >
+                        {{ gender.name }}
+                      </option>
+                    </select>
+                    <small
+                      class="text-danger"
+                      *ngIf="
+                        registerprofile.get('gender')?.invalid &&
+                        registerprofile.get('gender')?.touched
+                      "
+                      >Gender is Required</small
+                    >
+                  </div> -->
+              </div>
+              <div class="userInfoContRight">
+                <div class="userInfoItem">
+                  <p class="userInfoTitle">*First Name</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="*First Name"
+                    required
+                    formControlName="firstname"
+                    id="myProfFname"
+                  />
+                  <div class="warn">
+                    <ng-container
+                      *ngIf="
+                        registerprofile.get('firstname')?.invalid &&
+                        registerprofile.get('firstname')?.touched
+                      "
+                      >First Name is Required
+                    </ng-container>
+                  </div>
+                </div>
+                <div class="userInfoItem">
+                  <p class="userInfoTitle">Middle Name</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="Middle Name"
+                    formControlName="middlename"
+                    id="myProfMname"
+                  />
+                </div>
+                <div class="userInfoItem">
+                  <p class="userInfoTitle">*Last Name</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="*Last Name"
+                    required
+                    formControlName="lastname"
+                    id="myProfLname"
+                  />
+
+                  <div class="warn">
+                    <ng-container
+                      *ngIf="
+                        registerprofile.get('lastname')?.invalid &&
+                        registerprofile.get('lastname')?.touched
+                      "
+                      >Last Name is Required
+                    </ng-container>
+                  </div>
+                </div>
+                <div class="userInfoItem">
+                  <p class="userInfoTitle">*User Name</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="*User Name"
+                    required
+                    formControlName="username"
+                    id="myProfUname"
+                  />
+
+                  <div class="warn">
+                    <ng-container
+                      *ngIf="
+                        registerprofile.get('uname')?.invalid &&
+                        registerprofile.get('uname')?.touched
+                      "
+                      >User Name is Required
+                    </ng-container>
+                  </div>
+                </div>
+                <div class="userInfoItem">
+                  <p class="userInfoTitle">*State</p>
+                  <select
+                    class="userInfovalue"
+                    formControlName="state"
+                    required
+                    [(ngModel)]="stateVariable"
+                    (change)="filterCitybyState()"
+                    id="myProfState"
+                  >
+                    <option [ngValue]="undefined" hidden>Select State</option>
+                    <option
+                      *ngFor="let data of http_state.States; let i = index"
+                      [value]="data.StateId"
+                    >
+                      {{ data.StateName }}
+                    </option>
+                  </select>
+                  <div class="warn">
+                    <ng-container
+                      *ngIf="
+                        registerprofile.get('state')?.invalid &&
+                        registerprofile.get('state')?.touched
+                      "
+                      >State is Required
+                    </ng-container>
+                  </div>
+                </div>
+                <div class="userInfoItem">
+                  <p class="userInfoTitle">*City</p>
+                  <select
+                    class="userInfovalue"
+                    formControlName="city"
+                    required
+                    [(ngModel)]="cityVariable"
+                    (change)="selectedCity()"
+                    id="myProfCity"
+                  >
+                    <option [ngValue]="undefined" hidden>Select City</option>
+                    <option
+                      *ngFor="let data of cityArray"
+                      [value]="data.CityId"
+                    >
+                      {{ data.CityName }}
+                    </option>
+                  </select>
+                  <div class="warn">
+                    <ng-container
+                      *ngIf="
+                        registerprofile.get('city')?.invalid &&
+                        registerprofile.get('city')?.touched
+                      "
+                      >City is Required
+                    </ng-container>
+                  </div>
+                </div>
+                <div class="userInfoItem">
+                  <p class="userInfoTitle">*Zip Code</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="*Zip Code"
+                    required
+                    formControlName="zipcode"
+                    id="myProfZipcode"
+                  />
+                  <div class="warn">
+                    <ng-container
+                      *ngIf="
+                        registerprofile.get('zipcode')?.invalid &&
+                        registerprofile.get('zipcode')?.touched
+                      "
+                      >ZipCode is Required
+                    </ng-container>
+                  </div>
+                </div>
+                <div class="userInfoItem">
+                  <p class="userInfoTitle">*Time Zone</p>
+                  <select
+                    class="userInfovalue"
+                    placeholder="Select Category"
+                    required
+                    formControlName="timezone"
+                    id="myProfTimezone"
+                  >
+                    <option *ngFor="let data of TimeZoneList" [value]="data.Id">
+                      {{ data.Name }}
+                    </option>
+                  </select>
+                  <div class="warn">
+                    <ng-container
+                      *ngIf="
+                        registerprofile.get('timezone')?.invalid &&
+                        registerprofile.get('timezone')?.touched
+                      "
+                      >Time Zone is Required
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="userRole">
+            <!-- <form [formGroup]="roleform"> -->
+            <div class="panel_title">
+              <h2>User Role</h2>
+            </div>
+
+            <div class="userRoleContent">
+              <div class="userRoleContLeft">
+                <div class="userInfoItem">
+                  <p class="userInfoTitle input_title">*User Role</p>
+                  <mat-form-field>
+                    <!-- class="userInfovalue" -->
+                    <mat-select
+                      [disabled]="true"
+                      class="common_input_dropdown"
+                      formControlName="userrole"
+                      [(value)]="selectedUserRole"
+                    >
+                      <mat-option
+                        *ngFor="let user of UserList"
+                        [value]="user.Id"
+                        >{{ user.Role }}</mat-option
+                      >
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <!--
+                  <div class="userInfoItem">
+                    <p class="userInfoTitle">User Role</p>
+                    <mat-form-field class="common_input_dropdown">
+                      <mat-select
+                        formControlName="userrole"
+                        [(value)]="selectedUserRole"
+                        multiple
+                      >
+                        <mat-option
+                          *ngFor="let user of UserList"
+                          [value]="user.Id"
+                          >{{ user.Role }}</mat-option
+                        >
+                      </mat-select>
+                    </mat-form-field>
+                  </div> -->
+                <div class="userInfoItem" style="display: none">
+                  <p class="userInfoTitle">Team Name</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="team name"
+                    id="myProfTeamName"
+                  />
+                </div>
+                <div class="userInfoItem" style="display: none">
+                  <p class="userInfoTitle">Manager Name</p>
+                  <input
+                    class="userInfovalue"
+                    placeholder="Manager Name"
+                    id="myProfManagerName"
+                  />
+                </div>
+              </div>
+              <!-- <div class="userRoleContRight">
+                  <p class="userInfoTitle">Access Rights</p>
+                  <div *ngFor="let item of accessList">
+                    <div class="accessright">
+                      <img
+                        class="check_icon"
+                        src="../../../assets/04-Icons/Icons_Check A.svg"
+                      />
+                      <p class="userInfoTitle">{{ item.accessright }}</p>
+                    </div>
+                  </div>
+                </div> -->
+            </div>
+            <!-- </form> -->
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- </div> -->
+</div>
+<ng-template #myDialog>
+  <div class="dialog">
+    <div class="container">
+      <div class="Patient_Health">
+        <div class="header">
+          <h3>Are You Sure to Update your Profile Details?</h3>
+        </div>
+        <div class="body">
+          <h4>Profile details will be Updated</h4>
+        </div>
+        <div class="download">
+          <p>User ID:{{ http_user_data?.UserId }}</p>
+        </div>
+      </div>
+      <div class="button_dialog_panel">
+        <button class="btn_cancel" id="myProfCancel" [mat-dialog-close]="true">
+          CANCEL
+        </button>
+        <button
+          class="confirm_button"
+          id="myProfConfirm"
+          (click)="updateUser()"
+        >
+          CONFIRM
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>

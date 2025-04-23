@@ -5,6 +5,7 @@ using Google.Apis.Auth.OAuth2;
 using RPMWeb.Data.Common;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using iText.Kernel.Pdf.Action;
 
 namespace RPMWeb.Dal
 {
@@ -74,6 +75,9 @@ namespace RPMWeb.Dal
                                                      int Count, string user, string ConnectionString)
         {
             SystemNotificationByUser ret = new SystemNotificationByUser();
+            PatientDetials pdt = new PatientDetials();
+            pdt.PatientId = 0;
+            pdt.PatientId = 0;
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConnectionString))
@@ -89,6 +93,12 @@ namespace RPMWeb.Dal
                     while (reader.Read())
                     {
                         string username = (!DBNull.Value.Equals(reader["UserName"])) ? reader["UserName"].ToString() : string.Empty;
+                        string CreatedBy = (!DBNull.Value.Equals(reader["CreatedBy"])) ? reader["CreatedBy"].ToString() : string.Empty;
+                        if (!string.IsNullOrEmpty(username))
+                        {
+                            pdt = GetPatientAndProgramByUserName(UserName, ConnectionString);
+
+                        }
                         string userrole = (!DBNull.Value.Equals(reader["RoleName"])) ? reader["RoleName"].ToString() : string.Empty;
                         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(userrole)) continue;
                         NotificationData info = new NotificationData();
@@ -100,6 +110,8 @@ namespace RPMWeb.Dal
                         info.SubType = (!DBNull.Value.Equals(reader["Type"])) ? reader["Name"].ToString() : string.Empty;
                         info.IsRead = (!DBNull.Value.Equals(reader["IsRead"])) ? Convert.ToBoolean(reader["IsRead"]) : false;
                         info.IsNotify = (!DBNull.Value.Equals(reader["IsNotify"])) ? Convert.ToBoolean(reader["IsNotify"]) : true;
+                        info.PatientId = pdt.PatientId;
+                        info.ProgramId = pdt.ProgramId;
 
                         NotificationDataByDate nd = ret.Data.Find(x => x.NotificationDate.Date.Equals(info.CreatedOn.Date));
                         if (nd != null)
@@ -133,6 +145,41 @@ namespace RPMWeb.Dal
             return ret;
 
         }
+        public PatientDetials GetPatientAndProgramByUserName(string username, string connectionString)
+        {
+            PatientDetials pdt = new PatientDetials();
+            pdt.PatientId = 0;
+            pdt.PatientId = 0;
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    SqlCommand command = new SqlCommand("GetPatientAndProgramByUserName", connection);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@InputUserName", username);
+
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            int patientId = reader["PatientId"] != DBNull.Value ? Convert.ToInt32(reader["PatientId"]) : 0;
+                            int patientProgramId = reader["PatientProgramId"] != DBNull.Value ? Convert.ToInt32(reader["PatientProgramId"]) : 0;
+                            pdt.PatientId = patientId;
+                            pdt.PatientId = patientProgramId;
+                            return pdt;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving patient and program by username", ex);
+            }
+
+            return pdt;
+        }
+
         public SystemNotificationCount GetSystemNotificationCount(string UserName, string ConnectionString)
         {
             SystemNotificationCount ret = new SystemNotificationCount();
@@ -532,7 +579,7 @@ namespace RPMWeb.Dal
             catch (Exception ex) { throw; }
             return isOnline;
         }
-        public void StoreGenericFireBaseNotifications(string username, string notification, string CreatedBy, string CONN_STRING)
+        public void StoreGenericFireBaseNotifications(string username, string notification, string FromUser, string CONN_STRING)
         {
             try
             {
@@ -543,8 +590,14 @@ namespace RPMWeb.Dal
                 sn.UserId = UserId;
                 sn.NotificationTypeId = 35;
                 sn.Desc = notification;
-                sn.CreatedBy = CreatedBy;
-                fcmnotification.AddSystemNotification(sn, CONN_STRING);
+                sn.CreatedBy = FromUser;
+                int notificationid = fcmnotification.AddSystemNotification(sn, CONN_STRING);
+                NotificationAuditData auditData = new NotificationAuditData();
+                auditData.NotificationId = notificationid;
+                auditData.IsRead = false;
+                auditData.IsNotify = true;
+                auditData.AuditCreatedBy = FromUser;
+                fcmnotification.AddSystemNotificationAudit(auditData, CONN_STRING);
 
             }
             catch

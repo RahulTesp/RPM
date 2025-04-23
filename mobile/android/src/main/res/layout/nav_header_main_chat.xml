@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/nav_header_height"
+                android:background="@android:color/transparent"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_vertical"
+        android:paddingTop="25dp">
+
+        <ImageView
+            android:id="@+id/imageViewUserIcon"
+            style="@style/RoundedTabLayoutStyle"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:gravity="center"
+            android:src="@drawable/eye_button"/>
+
+        <TextView
+            android:id="@+id/textViewUsername"
+            style="@style/CardView"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/imageViewUserIcon"
+            android:gravity="center"
+            android:text="@string/fab_transformation_scrim_behavior"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/amber_50"/>
+
+        <Button
+            android:id="@+id/buttonLogout"
+            style="@style/CardView.Dark"
+            android:layout_width="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp"
+            android:background="@android:color/transparent"
+            android:text="@string/first_fragment_label"
+            android:textColor="@color/accent2"/>
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/eye_button"/>
+</RelativeLayout>

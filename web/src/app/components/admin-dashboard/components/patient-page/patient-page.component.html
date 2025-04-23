@@ -1,0 +1,1051 @@
+<ng-container *ngIf="patiletListLoading">
+  <div class="overlay"></div>
+  <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
+</ng-container>
+<div class="content">
+
+
+      <!-- Main Panel -->
+      <div class="main-panel">
+        <div>
+          <div class="right-menu-panel">
+            <!-- <button class="btn-admin-right-menu">ADD PATIENT</button> -->
+            <button
+              class="addCommonBtn"
+              id="p_addPatient"
+              (click)="addpatient()"
+            >
+              ADD PATIENT
+            </button>
+            <!-- <button  (click)="addpatient()">ADD PATIENT</button> -->
+          </div>
+          <div class="back_arrow">
+            <div
+              class="back_arrow_container"
+              id="p_backHome"
+              (click)="backtohome()"
+            >
+              <img
+                class="arrow-img"
+                src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg"
+                alt=""
+              />
+            </div>
+            <p class="main_title">Patients</p>
+          </div>
+
+          <div class="uppermenubtnpanel">
+            <!-- //btn-patient-menu submenu -->
+            <div *ngFor="let item of menu">
+              <button
+                class="uppermenubtn"
+                id="p_changeScreen"
+                (click)="ChangeScreen(item.menu_id)"
+                [class.selected]="CurrentMenuItem == item.menu_id"
+              >
+                {{ item.menu_title }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <ng-container [ngSwitch]="variable">
+          <ng-container *ngSwitchCase="1">
+            <ng-container *ngTemplateOutlet="patientListPage"></ng-container>
+          </ng-container>
+          <ng-container *ngSwitchCase="2">
+            <ng-container *ngTemplateOutlet="billingInfo"></ng-container>
+          </ng-container>
+          <ng-container *ngSwitchCase="3">
+            <ng-container *ngTemplateOutlet="taskKPI"></ng-container>
+          </ng-container>
+
+          <ng-container *ngSwitchDefault>
+            <ng-container *ngTemplateOutlet="patientListPage"></ng-container>
+          </ng-container>
+        </ng-container>
+      </div>
+      <div class="side-panel">
+        <app-right-sidebar [sidepaneldisplay]="1"></app-right-sidebar>
+      </div>
+
+
+</div>
+
+<ng-template #patientListPage>
+  <div class="patientListPage">
+    <div class="date_btn_panel">
+      <span
+        class="btn-date_container"
+        id="p_todayPatientList"
+        (click)="getDurationPatientList('today')"
+        [ngClass]="duration_val == 0 ? 'date_selected_' : 'date_not_selected'"
+        >Today</span
+      >
+      <span
+        class="btn-date_container"
+        id="p_7dayPatientList"
+        (click)="getDurationPatientList('7day')"
+        [ngClass]="duration_val == 1 ? 'date_selected_' : 'date_not_selected'"
+      >
+        < 7 days</span
+      >
+      <span
+        class="btn-date_container"
+        id="p_30dayPatientList"
+        (click)="getDurationPatientList('30day')"
+        [ngClass]="duration_val == 2 ? 'date_selected_' : 'date_not_selected'"
+      >
+        < 30 Days</span
+      >
+    </div>
+
+    <div class="upperoverviewpanel">
+      <div class="upperpanel_subBox_dropdown" style="padding-left: 0.4rem">
+        <p class="upperpanel_subtitle upperpanel_subtitle_dropdown">
+          Patient Type
+        </p>
+        <div class="dropdown" appearance="outline">
+          <select
+            class="team_alert_dropdown"
+            name="patient_type"
+            id="p_patientStatusType"
+            [(ngModel)]="patientTypeSelect"
+            (change)="dropDownSelect()"
+          >
+            <!-- <option [ngValue]="undefined" hidden>All Patients</option> -->
+            <!-- <option  *ngFor="let data of patientListArray; let i = index;" [value]="data.PatientType">{{data.PatientType}} </option> -->
+            <!-- <option  *ngFor="let data of patientactiveArray; let i = index;" [value]="data.PatientType">{{data.PatientType}} </option> -->
+            <option [ngValue]="undefined" selected>All Patients</option>
+            <option value="Prescribed">Prescribed</option>
+            <option value="Enrolled">Enrolled</option>
+            <option value="Active">Active</option>
+            <option value="OnHold">OnHold</option>
+            <option value="ReadyToDischarge">Ready To Discharge</option>
+            <option value="Discharged">Discharged</option>
+            <option value="InActive">InActive</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="upperpanel_subBox_dropdown">
+        <p class="upperpanel_subtitle upperpanel_subtitle_dropdown">Vitals</p>
+        <div class="dropdown" appearance="outline">
+          <select
+            name="patient_type"
+            id="p_patientVital"
+            [(ngModel)]="patientVitalSelect"
+            (change)="dropDownSelect()"
+          >
+            <option [ngValue]="undefined" selected>All Vitals</option>
+            <option
+              *ngFor="let data of patientVitalsArray; let i = index"
+              [value]="data.Vital"
+            >
+              {{ data.Vital }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div
+        class="patient_overview_total upperpanel_subBox"
+        [class.selected]="containerSelection == 1"
+        id="p_TotalPatient"
+        (click)="onClickPatientTotal()"
+      >
+        <p
+          class="upperpanel_subtitle upperpanel_subBox_subtitle"
+          [class.selected]="containerSelection == 1"
+        >
+          Total
+        </p>
+        <p
+          *ngIf="!(loading && loading1)"
+          class="upperpanel_subBox_value"
+          [class.selected]="containerSelection == 1"
+        >
+          {{ masterData ? totaltableList : 0 }}
+        </p>
+      </div>
+      <div
+        class="upperpanel_subBox patient_overview_critical"
+        [class.selected]="containerSelection == 2"
+        id="p_CriticalPatient"
+        (click)="onClickPatientCritical()"
+      >
+        <p
+          class="upperpanel_subtitle upperpanel_subBox_subtitle"
+          [class.selected]="containerSelection == 2"
+        >
+          Critical Vital Patients
+        </p>
+        <p
+          *ngIf="!(loading && loading1)"
+          class="upperpanel_subBox_value"
+          [class.selected]="containerSelection == 2"
+        >
+          {{ masterData ? critical_patient_data_array.length : 0 }}
+        </p>
+      </div>
+      <div
+        class="upperpanel_subBox patient_overview_cautious"
+        [class.selected]="containerSelection == 3"
+        id="p_CautiousPatient"
+        (click)="onClickPatientCautious()"
+      >
+        <p
+          class="upperpanel_subtitle upperpanel_subBox_subtitle"
+          [class.selected]="containerSelection == 3"
+        >
+          Cautious Vital Patients
+        </p>
+        <p
+          *ngIf="!(loading && loading1)"
+          class="upperpanel_subBox_value"
+          [class.selected]="containerSelection == 3"
+        >
+          {{ masterData ? cautious_patient_data_array.length : 0 }}
+        </p>
+      </div>
+      <div
+        class="upperpanel_subBox upper_last_box patient_overview_normal"
+        [class.selected]="containerSelection == 4"
+        id="p_NormalPatient"
+        (click)="onClickPatientNormal()"
+      >
+        <p
+          class="upperpanel_subtitle upperpanel_subBox_subtitle"
+          [class.selected]="containerSelection == 4"
+        >
+          Normal Vital Patients
+        </p>
+        <p
+          *ngIf="!(loading && loading1)"
+          class="upperpanel_subBox_value"
+          [class.selected]="containerSelection == 4"
+        >
+          {{ masterData ? normal_patient_data_array.length : 0 }}
+        </p>
+      </div>
+    </div>
+    <!-- <mat-paginator  [length]="100"
+    [pageSize]="10"
+    [pageIndex]="0"
+    >
+     </mat-paginator> -->
+    <div class="upperPanelPatientTable">
+      <mat-paginator
+        [length]="totalPatientCount && totalPatientCount"
+        [pageSize]="10"
+        [pageIndex]="pageIndxValue"
+        (page)="getNextBillingDetails($event)"
+      >
+      </mat-paginator>
+      <span class="dwnld" (click)="downloadCsv()"
+        ><img class="dwnldIcon" src="../../../../../assets/down-arrow.png"
+      /></span>
+    </div>
+    <div class="patient_table_content">
+      <!-- <mat-table *ngIf="http_patient_data&&http_patients_with_device" #table [dataSource]="dataSourceTableList" class="patient_detail_table" matSort > -->
+      <mat-table
+        #table
+        [dataSource]="dataSourceTableList"
+        class="patient_detail_table"
+        matSort
+      >
+        <ng-container matColumnDef="selection">
+          <mat-header-cell
+            *matHeaderCellDef
+            class="hidden-column"
+            style="border-radius: 0.8rem 0px 0px 0px !important"
+          >
+          </mat-header-cell>
+          <mat-cell  *matCellDef="let element; let rowIndex = index"  class="hidden-column">
+
+            <input
+            type="radio"
+            name="rhSelectionRadio"
+            [value]="rowIndex"
+            [checked]="element.selected"
+            (click)="selectRow($event, element)"
+            id="selectdraftRow-{{ rowIndex }}"
+          />
+          <label [for]="'selectdraftRow-' + rowIndex"></label>
+
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="PatientId">
+          <mat-header-cell *matHeaderCellDef class="hidden-column"></mat-header-cell>
+          <mat-cell class="hidden-column" *matCellDef="let element; let rowIndex = index">
+
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="PatientNumber">
+          <mat-header-cell *matHeaderCellDef class="patient-number-column">
+
+            Patient Number
+          </mat-header-cell>
+          <mat-cell
+            *matCellDef="let element; let rowIndex = index"
+           class="patient-number-column"
+              >
+              <input
+              type="radio"
+              name="rhSelectionRadio"
+              [value]="rowIndex"
+              [checked]="element.selected"
+              (click)="selectRow($event, element)"
+              id="selectdraftRow-{{ rowIndex }}"
+            />
+            <label [for]="'selectdraftRow-' + rowIndex"></label>
+              <span class="patient-number">{{ element.PatientNumber }}</span>
+
+            </mat-cell>
+            <!-- <mat-cell
+                                                        class="patient-number-column"
+
+                                                          *matCellDef="let element; let rowIndex = index"
+                                                        >
+                      {{ element.PatientNumber }}
+                    </mat-cell> -->
+        </ng-container>
+        <ng-container matColumnDef="PatientName">
+          <mat-header-cell
+
+            *matHeaderCellDef
+          >
+            <div class="search_input" *ngIf="searchPatientList_Name">
+              <img
+                class="search_icon"
+                src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                id="p_patientNameSearch1"
+                (click)="refreshTable()"
+                (click)="searchPatientListNameClose()"
+              /><input
+                class="input_panel"
+                id="p_patientSearchInput"
+                (keyup)="applyDataFilter($event)"
+                (focus)="setupFilter('PatientName')"
+                [value]="patientSearch"
+              />
+            </div>
+            <div class="search_heading_default" *ngIf="!searchPatientList_Name">
+              <img
+                class="search_icon_default"
+                src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                (click)="searchPatientListName()"
+                id="p_patientNameSearch2"
+              />
+              Patient Name
+            </div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <span
+              class="patient_name_col"
+              (click)="clickHandler(element)"
+              title="{{ element.PatientName }}"
+              >{{ element.PatientName }}
+            </span>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="ProgramName">
+          <mat-header-cell *matHeaderCellDef>
+            Program Name
+            <div>
+              <!-- <select class="task_priority" dir="rtl">
+              <option value="1"> Program </option>
+              <option value="2">To do</option>
+              <option value="3">In Progress</option>
+           </select> -->
+            </div>
+          </mat-header-cell>
+          <mat-cell
+
+            *matCellDef="let element"
+          >
+            {{ element.ProgramName }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="ProgramDuration">
+          <mat-header-cell *matHeaderCellDef mat-sort-header class="hide-arrow"
+            >Enrolled Date
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <span>{{
+              getEntrollDate(element.EnrolledDate)
+            }}</span>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="PhysicianName">
+          <mat-header-cell *matHeaderCellDef>
+            <!-- <div class="search_input" *ngIf="searchPatientList_physician"><img  class="search_icon" src="../../../../../assets/04-Icons/Icons_Cancel.svg" (click)="onreloadAfterFilter($event)"
+            (click)="searchPatientListPhysician()"><input class="search_input input_panel"(change)="applyFilterphysicianby($event)" >
+          </div> -->
+            <div class="search_input" *ngIf="searchPatientList_physician">
+              <img
+                class="search_icon"
+                src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                (click)="refreshTable()"
+                (click)="searchPatientListPhysicianClose()"
+                id="p_PhysicianSearch1"
+              /><input
+                class="search_input input_panel"
+                id="p_PhsycianSearchInput"
+                (keyup)="applyDataFilter($event)"
+                (focus)="setupFilter('PhysicianName')"
+                [value]="phySearchValue"
+              />
+            </div>
+            <div
+              class="search_heading_default"
+              *ngIf="!searchPatientList_physician"
+            >
+              <img
+                class="search_icon_default"
+                src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                (click)="searchPatientListPhysician()"
+                id="p_PhysicianSearch2"
+              />Physician Name
+            </div></mat-header-cell
+          >
+          <mat-cell
+
+            *matCellDef="let element"
+            ><span class="patient_name_col" title="{{ element.PhysicianName }}"
+              >{{ element.PhysicianName }}
+            </span>
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="Priority">
+          <mat-header-cell *matHeaderCellDef class="hidden-column"> </mat-header-cell>
+          <mat-cell class="hidden-column" *matCellDef="let element">
+            {{ element.Priority }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="CinicNameOrAssigned">
+          <div>
+            <mat-header-cell *matHeaderCellDef>
+              <div class="search_input" *ngIf="searchPatientList_assign">
+                <img
+                  class="search_icon"
+                  src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                  (click)="refreshTable()"
+                  (click)="searchPatientListAssignClose()"
+                  id="p_ClinicSearch1"
+                /><input
+                  class="search_input input_panel"
+                  (keyup)="applyDataFilter($event)"
+                  id="p_ClinicSearchInput"
+                  (focus)="setupFilter('ClinicName')"
+                  [value]="clinicNameSerach"
+                />
+              </div>
+              <div
+                class="search_heading_default"
+                *ngIf="!searchPatientList_assign"
+              >
+                <img
+                  class="search_icon_default"
+                  src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                  (click)="searchPatientListAssign()"
+                  id="p_ClinicSearch2"
+                />
+                Clinic Name
+              </div>
+            </mat-header-cell>
+            <mat-cell
+
+              *matCellDef="let element"
+            >
+              <span *ngIf="element.ClinicName != undefined">
+                {{ element.ClinicName }}
+              </span>
+            </mat-cell>
+          </div>
+
+          <!-- <div *ngIf="roles[0].Id != 1">
+            <mat-header-cell *matHeaderCellDef>
+
+              <div class="search_input" *ngIf="searchPatientList_assign"><img  class="search_icon" src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                (click)="searchPatientListAssign()" id="p_AssignedSearch1"><input class="search_input input_panel"(keyup)="applyDataFilter($event)" id="p_AssignedSearchInput" (focus)="setupFilter('AssignedMember')"  >
+              </div>
+              <div class="search_heading_default" *ngIf="!searchPatientList_assign"> <img  class="search_icon_default" src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                (click)="searchPatientListAssign()" id="p_AssiginedSearch2"> Assigned Member</div>
+             </mat-header-cell>
+            <mat-cell style="padding-left:1.5rem !important ;" *matCellDef="let element"> {{element.AssignedMember}} </mat-cell>
+          </div> -->
+        </ng-container>
+
+        <ng-container matColumnDef="Assigned">
+          <mat-header-cell *matHeaderCellDef>
+            <div class="search_input" *ngIf="searchPatient_assignMember">
+              <img
+                class="search_icon"
+                src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                (click)="refreshTable()"
+                (click)="searchPatientAssignedMemberClose()"
+                id="p_AssignedSearchdata1"
+              /><input
+                class="search_input input_panel"
+                (keyup)="applyDataFilter($event)"
+                id="p_AssignedSearchInput"
+                (focus)="setupFilter('AssignedMember')"
+                [value]="assigneeSerach"
+              />
+            </div>
+            <div
+              class="search_heading_default"
+              *ngIf="!searchPatient_assignMember"
+            >
+              <img
+                class="search_icon_default"
+                src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                (click)="searchPatientAssignedMember()"
+                id="p_AssignedSearchdata2"
+              />
+              Assigned Member
+            </div>
+          </mat-header-cell>
+          <mat-cell
+
+            *matCellDef="let element"
+          >
+            {{ element.AssignedMember }}
+          </mat-cell>
+        </ng-container>
+
+        <!-- <div style="width: 0px"> -->
+        <ng-container matColumnDef="action">
+        <mat-header-cell *matHeaderCellDef class="action-column"> </mat-header-cell>
+        <mat-cell *matCellDef="let element" class="action-column">
+          <div [ngClass]="element.selected ? 'displayIcon' : 'hideIcon'">
+            <div class="front_img_container">
+              <img class="front_img" src="../../../../../../assets/04-Icons/Icons_Arrow - Front.svg" (click)="clickHandler(element)"
+                id="p_GotoPatient" />
+              </div>
+              </div>
+              </mat-cell>
+          </ng-container>
+<!-- </div> -->
+        <ng-container matColumnDef="PatientProgramId">
+          <mat-header-cell
+          class="hidden-column"
+            *matHeaderCellDef
+            style="border-radius: 0.8rem 0.8rem 0.8rem 0.8rem"
+          >
+          </mat-header-cell>
+          <mat-cell class="hidden-column" *matCellDef="let element"> </mat-cell>
+        </ng-container>
+
+        <mat-header-row
+          *matHeaderRowDef="PatientList_columnHeader; sticky: true"
+        ></mat-header-row>
+        <!-- <mat-row *matRowDef="let row; columns: columnHeader;"></mat-row> -->
+        <mat-row
+          [style.minHeight.px]="35"
+          *matRowDef="let row; columns: PatientList_columnHeader"
+          [ngClass]="{
+            critical: row.Priority == 'Critical',
+            cautious: row.Priority == 'Cautious',
+            normal: row.Priority == 'Normal',
+            selectedrow: row.selected == true
+          }"
+        ></mat-row>
+        <!-- [ngClass]="{'selectedrow':row.selected == true}" -->
+        <!-- (click)="clickHandler(row)" -->
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell">No data Found</td>
+        </tr>
+      </mat-table>
+    </div>
+  </div>
+</ng-template>
+<ng-template #taskKPI>
+
+</ng-template>
+<ng-template #billingInfo>
+  <div class="billingInfoPage">
+    <!-- <div class="date_panel">
+
+      <button class="btn_date_item" (click)="billing_last_click()"  [ngStyle]="{'background-color':billing_duration_val== 1 ? '#164d61' : '#e1e6ed', 'color': billing_duration_val == 1 ? '#ffffff' :'#164d61'}"> Last 5 days</button>
+      <button class="btn_date_item" (click)="billing_today()" [ngStyle]="{'background-color':billing_duration_val== 0 ? '#164d61' : '#e1e6ed', 'color': billing_duration_val == 0 ? '#ffffff' :'#164d61'}">Today</button>
+      <button class="btn_date_item" (click)="billing_next_click()"  [ngStyle]="{'background-color':billing_duration_val== 2 ? '#164d61' : '#e1e6ed', 'color': billing_duration_val == 2 ? '#ffffff' :'#164d61'}"> Next 7 days</button>
+
+  </div> -->
+
+    <div class="upperoverviewpanel upperoverviewpanel_billing">
+      <div class="upperpanel_subBox_dropdown" style="padding-left: 0.4rem">
+        <p class="upperpanel_subtitle upperpanel_subtitle_dropdown">
+          Program Type
+        </p>
+        <div class="dropdown" appearance="outline">
+          <select
+            class="team_alert_dropdown"
+            name="program_type"
+            id="p_programType"
+            [(ngModel)]="programType"
+            (change)="programChange($event)"
+          >
+            <option
+              *ngFor="let data of billingTypeProgramArray; let i = index"
+              [value]="data.ProgramType"
+            >
+              {{ data.ProgramType }}
+            </option>
+            <!--
+            <option value="RPM" selected>RPM </option>
+            <option *ngIf="billingTypevariable == 'cycle'" value="CCM">CCM</option>
+            <option *ngIf="billingTypevariable == 'cycle'" value="PCM">PCM</option> -->
+          </select>
+        </div>
+      </div>
+
+      <div class="upperpanel_subBox_dropdown" style="padding-left: 0.4rem">
+        <p class="upperpanel_subtitle upperpanel_subtitle_dropdown">
+          Patient Type
+        </p>
+        <div class="dropdown" appearance="outline">
+          <select
+            class="team_alert_dropdown"
+            name="patient_type"
+            [(ngModel)]="patientTypebilling"
+            (change)="billingDataFilter()"
+            id="p_Billing_PatientType"
+          >
+            <option [value]="undefined" selected>All</option>
+            <option value="Active">Active</option>
+            <option value="OnHold">OnHold</option>
+            <option value="ReadyToDischarge">Ready To Discharge</option>
+            <option value="InActive">InActive</option>
+          </select>
+        </div>
+      </div>
+      <!--
+<div class="upperpanel_subBox_dropdown">
+  <p class="upperpanel_subtitle upperpanel_subtitle_dropdown">CPT Code</p>
+  <div class="dropdown" appearance="outline">
+    <select name="patient_type" [(ngModel)]="patientcptSelect" (change)="dropDownBillingSelect(true)">
+      <option [ngValue]="undefined">All CPT Codes</option>
+      <option *ngFor="let list of http_patient_data.billing_info ; let i = index;" value={{i}}>{{list.cpt}}</option>
+    </select>
+      </div>
+    </div> -->
+      <div
+        class="upperpanel_subBox_total upperpanel_subBox billing_sub_box"
+        [class.selected]="billingcontainer == 1"
+        id="p_Billing_Total1"
+        (click)="onClickTotal()"
+      >
+        <p
+          class="upperpanel_subtitle upperpanel_subBox_subtitle"
+          [class.selected]="billingcontainer == 1"
+        >
+          {{ billingTypevariable == "cycle" ? "Total" : "All" }}
+        </p>
+        <p
+          (click)="onClickTotal()"
+          *ngIf="!(loading && loading1)"
+          class="upperpanel_subBox_value"
+          [class.selected]="billingcontainer == 1"
+        >
+          {{
+            billingInfodata && billingInfodata.TotalCounts != undefined
+              ? billingInfodata && this.billingInfodata.TotalCounts.TotalCount
+              : 0
+          }}
+        </p>
+      </div>
+
+      <div
+        *ngIf="billingTypevariable == 'cycle'"
+        (click)="cycleOneClick()"
+        class="upperpanel_subBox billing_sub_box"
+        [class.selected]="billingcontainer == 2"
+      >
+        <p
+          class="upperpanel_subtitle upperpanel_subBox_subtitle"
+          [class.selected]="billingcontainer == 2"
+        >
+          Cycle 1
+        </p>
+
+        <p
+          *ngIf="!(loading && loading1)"
+          (click)="cycleOneClick()"
+          class="upperpanel_subBox_value"
+          [class.selected]="billingcontainer == 2"
+          id="p_Cycle1_2"
+        >
+          {{
+            billingInfodata && billingInfodata.TotalCounts != undefined
+              ? this.billingInfodata.TotalCounts.C1Total
+              : 0
+          }}
+        </p>
+      </div>
+      <div
+        *ngIf="billingTypevariable == '30days'"
+        (click)="cycleOneClick()"
+        class="upperpanel_subBox billing_sub_box"
+        [class.selected]="billingcontainer == 2"
+      >
+        <p
+          class="upperpanel_subtitle upperpanel_subBox_subtitle"
+          [class.selected]="billingcontainer == 2"
+        >
+          Today
+        </p>
+
+        <p
+          *ngIf="!(loading && loading1)"
+          (click)="cycleOneClick()"
+          class="upperpanel_subBox_value"
+          [class.selected]="billingcontainer == 2"
+        >
+          {{
+            billingInfodata && billingInfodata.TotalCounts != undefined
+              ? this.billingInfodata.TotalCounts.TodayCount
+              : 0
+          }}
+        </p>
+      </div>
+      <div
+        *ngIf="billingTypevariable == 'cycle'"
+        (click)="cycleTwoClick()"
+        class="upperpanel_subBox billing_sub_box"
+        [class.selected]="billingcontainer == 3"
+      >
+        <p
+          class="upperpanel_subtitle upperpanel_subBox_subtitle"
+          [class.selected]="billingcontainer == 3"
+        >
+          Cycle 2
+        </p>
+
+        <p
+          *ngIf="!(loading && loading1)"
+          (click)="cycleTwoClick()"
+          class="upperpanel_subBox_value"
+          [class.selected]="billingcontainer == 3"
+          id="p_Cycle2_2"
+        >
+          {{
+            billingInfodata && billingInfodata.TotalCounts != undefined
+              ? this.billingInfodata.TotalCounts.C2Total
+              : 0
+          }}
+        </p>
+      </div>
+      <div
+        *ngIf="billingTypevariable == '30days'"
+        (click)="cycleTwoClick()"
+        class="upperpanel_subBox billing_sub_box"
+        [class.selected]="billingcontainer == 3"
+      >
+        <p
+          class="upperpanel_subtitle upperpanel_subBox_subtitle"
+          [class.selected]="billingcontainer == 3"
+        >
+          Next 7 Days
+        </p>
+
+        <p
+          *ngIf="!(loading && loading1)"
+          (click)="cycleTwoClick()"
+          class="upperpanel_subBox_value"
+          [class.selected]="billingcontainer == 3"
+        >
+          {{
+            billingInfodata && billingInfodata.TotalCounts != undefined
+              ? this.billingInfodata.TotalCounts.Next7DaysCount
+              : 0
+          }}
+        </p>
+      </div>
+    </div>
+    <div class="patient_table_content" *ngIf="billingInfodata">
+      <div class="upperPanelbillingtable">
+        <mat-paginator
+          [length]="
+            billingInfodata && billingInfodata.TotalCounts != undefined
+              ? this.billingInfodata.TotalCounts.Total
+              : 0
+          "
+          [pageSize]="10"
+          [pageIndex]="pageIndxValue"
+          (page)="getNextBillingDetails($event)"
+        >
+        </mat-paginator>
+
+        <span class="refresh" (click)="refreshBillingData()"
+          ><img class="refreshIcon" src="../../../../../assets/refresh.png"
+        /></span>
+      </div>
+
+      <mat-table #table [dataSource]="dataSourceTableList">
+        <!-- <ng-container matColumnDef="selection">
+          <th><mat-header-cell style="border-radius: 16px 0px 0px 0px;" *matHeaderCellDef> </mat-header-cell></th>
+
+          <mat-cell *matCellDef="let element; let rowIndex = index;">
+            <mat-radio-button class="table_radio" color="primary" name="rhSelectionRadio" [value]="rowIndex"
+              (click)="selectRow($event, element)" [checked]="element.selected">
+            </mat-radio-button>
+          </mat-cell>
+        </ng-container> -->
+        <!--
+        <ng-container matColumnDef="PatientId">
+          <mat-header-cell *matHeaderCellDef>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element; let rowIndex = index;">
+            {{element.PatientId}}
+          </mat-cell>
+        </ng-container> -->
+        <ng-container matColumnDef="PatientNumberid">
+          <mat-header-cell *matHeaderCellDef>
+            <!-- <div class="search_input" *ngIf="searchValueId"><img  class="search_icon" src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              (click)="serachIdClick()"><input class="search_input input_panel"  >
+            </div> -->
+            <!-- <div class="search_heading_default" *ngIf="!searchValueId"> <img  class="search_icon_default" src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              (click)="serachIdClick()"> Patient ID</div> -->
+            <span class="billing_patientId">Patient ID</span>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element; let rowIndex = index">
+            {{ element.PatientNumber }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="PatientName">
+          <mat-header-cell *matHeaderCellDef>
+            <div class="search_input" *ngIf="searchValueName">
+              <img
+                class="search_icon"
+                src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                (click)="searchNameClose()"
+              /><input
+                class="search_input input_panel"
+                [(ngModel)]="SearchpatientBilling"
+                (keyup.enter)="billingDataFilter()"
+              />
+            </div>
+            <div class="search_heading_default" *ngIf="!searchValueName">
+              <img
+                class="search_icon_default"
+                src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                (click)="searchNameClick()"
+                id="p_BillingPnameSearch2"
+              />
+              Patient Name
+            </div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <span
+              class="patient_name_col"
+              (click)="navigatePatientDetail(element)"
+              >{{ element.PatientName }}
+            </span></mat-cell
+          >
+        </ng-container>
+
+        <ng-container matColumnDef="Program">
+          <mat-header-cell *matHeaderCellDef>
+            <div class="program_header_dropdown">
+              <select
+                dir="rtl"
+                [(ngModel)]="billingpgm"
+                id="p_BillingPgmFilter"
+                (ngModelChange)="billingDataFilter()"
+              >
+                <option [value]="undefined">Program</option>
+
+                <option
+                  *ngFor="let programdata of this.billingProgramNameArray"
+                  value="{{ programdata.Name }}"
+                >
+                  {{ programdata.Name }}
+                </option>
+                <!--
+                <option value="CarePlan-BP">CarePlan-BP</option>
+
+                <option value="CarePlan-BG">CarePlan-BG</option>
+
+                <option value="CarePlan-BW">CarePlan-BW</option>
+
+                <option value="CarePlan-BO">CarePlan-BO</option> -->
+              </select>
+            </div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{ element.Program }} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="TortalVitalCount">
+          <mat-header-cell
+            *matHeaderCellDef
+            [hidden]="programType == 'CCM' || programType == 'PCM'"
+          >
+            <div class="program_header_dropdown">
+              <select
+                dir="rtl"
+                [(ngModel)]="totalvitalfiltervalue"
+                id="p_BillingReadings_days"
+                (ngModelChange)="billingDataFilter()"
+              >
+                <option [value]="undefined">Reading / Days</option>
+                <option value="targetmet">Target Met</option>
+                <option value="nottargetmet">Target Not Met</option>
+                <option value="readytobill">Ready To Bill</option>
+              </select>
+            </div>
+          </mat-header-cell>
+          <mat-cell
+            *matCellDef="let element"
+            [hidden]="programType == 'CCM' || programType == 'PCM'"
+            ><span class="billing_assign"
+              >{{ element.TortalVitalCount }} /
+              {{ element.DaysCompleted }}</span
+            >
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="AssignedMemeber">
+          <mat-header-cell *matHeaderCellDef>
+            <div class="search_input" *ngIf="searchPatientList_assign">
+              <img
+                class="search_icon"
+                src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                (click)="searchAssigneeClose()"
+              /><input
+                class="search_input input_panel"
+                [(ngModel)]="billingAssigneeName"
+                (keyup.enter)="billingDataFilter()"
+              />
+            </div>
+            <div
+              class="search_heading_default"
+              *ngIf="!searchPatientList_assign"
+            >
+              <img
+                class="search_icon_default"
+                src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                (click)="searchBillingAssignMember()"
+              />
+              Assigned Member
+            </div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <span class="billing_assign"> {{ element.AssignedMemeber }} </span>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="CodeorNextBilling">
+          <div *ngIf="billingTypevariable == 'cycle'">
+            <mat-header-cell *matHeaderCellDef>Clinic Code </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              <span
+
+                class="billing_CodeorNextBilling"
+                >{{ element.Code }}</span
+              >
+            </mat-cell>
+          </div>
+          <div *ngIf="billingTypevariable == '30days'">
+            <mat-header-cell *matHeaderCellDef
+              >Next Billing Date
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              <span class="billing_assign">{{
+                datepipe.transform(element.NextBillingDate)
+              }}</span>
+            </mat-cell>
+          </div>
+        </ng-container>
+
+        <ng-container matColumnDef="DaysCompleted">
+          <mat-header-cell class="hidden-column" *matHeaderCellDef> </mat-header-cell>
+          <mat-cell class="hidden-column" *matCellDef="let element"
+            ><span [ngClass]="{ missingData: element.Status == 'onhold' }">
+              {{ element.DaysCompleted }}</span
+            >
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="patientId">
+          <mat-header-cell class="hidden-column" *matHeaderCellDef> </mat-header-cell>
+          <mat-cell class="hidden-column" *matCellDef="let element"> </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="PatientProgramId">
+          <mat-header-cell class="hidden-column" *matHeaderCellDef> </mat-header-cell>
+          <mat-cell class="hidden-column" *matCellDef="let element"> </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="interaction">
+          <mat-header-cell *matHeaderCellDef>
+            <div class="program_header_dropdown">
+              <select
+                dir="rtl"
+                [(ngModel)]="interactionFilterValue"
+                id="p_BillingInteraction_Days"
+                (ngModelChange)="billingDataFilter()"
+              >
+                <option [value]="undefined">Interaction / Days</option>
+                <option
+                  [hidden]="programType == 'CCM' || programType == 'PCM'"
+                  value="targetmet"
+                >
+                  Target Met
+                </option>
+                <option
+                  [hidden]="programType == 'CCM' || programType == 'PCM'"
+                  value="nottargetmet"
+                >
+                  Target Not Met
+                </option>
+                <option
+                  [hidden]="programType == 'CCM' || programType == 'PCM'"
+                  value="readytobill"
+                >
+                  Ready To Bill
+                </option>
+                <option [hidden]="programType == 'RPM'" value="0-19">
+                  0-19
+                </option>
+                <option [hidden]="programType == 'RPM'" value="20-39">
+                  20-39
+                </option>
+                <option [hidden]="programType == 'RPM'" value="40-59">
+                  40-59
+                </option>
+                <option [hidden]="programType == 'RPM'" value="60">60+</option>
+              </select>
+            </div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <span class="billing_assign"
+              >{{ ConvertMinute(element.interaction) }} /
+              {{ element.DaysCompleted }}</span
+            ></mat-cell
+          >
+        </ng-container>
+
+
+        <mat-header-row
+          *matHeaderRowDef="BillingList_columHeader; sticky: true"
+        ></mat-header-row>
+        <mat-row
+          [style.minHeight.px]="35"
+          [ngClass]="{
+            missing: row.Status == 'missing',
+            onholdData: row.Status == 'onhold'
+          }"
+          *matRowDef="let row; columns: BillingList_columHeader"
+        ></mat-row>
+      </mat-table>
+    </div>
+  </div>
+</ng-template>

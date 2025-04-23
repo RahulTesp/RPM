@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootframe"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_grey1"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.rpm.clynx.fragments.VitalHealthTrends">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_grey1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <android.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/profile_card_body_bg"
+            android:labelFor="@id/constraint2"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            android:navigationIcon="@drawable/ic_baseline_west_24"
+            app:layout_constraintTop_toTopOf="parent"
+            android:gravity="center_horizontal">
+            <TextView
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vitals"
+                android:textAlignment="center"
+                android:textColor="@color/Primary_dark"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!--            <ImageButton-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_gravity="end"-->
+            <!--                android:background="@color/transparent"-->
+            <!--                android:src="@drawable/ic_icons_phone_a"-->
+            <!--                android:layout_marginEnd="@dimen/margin_20dp"-->
+            <!--                />-->
+
+
+
+            <!--            <ImageButton-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_gravity="end"-->
+            <!--                android:background="@color/transparent"-->
+            <!--                android:src="@drawable/ic_icons_add"-->
+            <!--                android:layout_marginEnd="@dimen/margin_20dp"/>-->
+
+
+        </android.widget.Toolbar>
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:id="@+id/headerdateview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="80dp"
+        android:layout_marginLeft="@dimen/margin_20dp"
+        android:layout_marginRight="@dimen/margin_20dp">
+
+        <ImageButton
+            android:id="@+id/prevdateonvitalnew"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="end"
+            android:background="@color/transparent"
+            android:textColor="@color/todolist_color1"
+            android:src="@drawable/ic_outline_keyboard_arrow_left_24" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:layout_weight="4"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:id="@+id/VitalFragment_today_dt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text=""
+                android:textSize="16sp"
+                android:textColor="@color/todolist_color1"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/nextdateonvitalnew"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="end"
+            android:background="@color/transparent"
+            android:src="@drawable/ic_baseline_keyboard_arrow_right_24"
+            android:textColor="@color/todolist_color1"/>
+
+    </LinearLayout>
+
+
+
+
+
+
+    <LinearLayout
+        android:id="@+id/header7D30D"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="80dp"
+        android:layout_marginLeft="@dimen/margin_20dp"
+        android:layout_marginRight="@dimen/margin_20dp">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_viewvitals"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_margin="@dimen/margin_5dp"
+            app:cardCornerRadius="@dimen/margin_10dp"
+            app:cardBackgroundColor="@color/background_grey1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.476"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            app:layout_constraintVertical_bias="1.0">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tablayout7D30D"
+                style="@style/RoundedTabLayoutStyle"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:background="@color/background_grey1"
+                app:layout_constraintCircleRadius="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.476"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar"
+                app:layout_constraintVertical_bias="1.0"
+                app:tabTextAppearance="@style/CustomTextAppearanceTab"
+                app:tabBackground="@drawable/tab_layout_bg">
+
+                <com.google.android.material.tabs.TabItem
+                    android:id="@+id/tabitem7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+
+                    android:text="7 Days" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:id="@+id/tabitem30"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:text="30 Days" />
+
+
+
+            </com.google.android.material.tabs.TabLayout>
+
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+
+
+
+
+
+    <LinearLayout
+        android:id="@+id/headers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/headerval"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Vitals"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:textStyle="bold"
+            android:textColor="@color/Primary_dark"
+            android:textSize="20sp"/>
+
+
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            app:cardCornerRadius="30dp"
+
+
+
+
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/iconList"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:background = "@color/Primary_dark"
+                    android:padding= "5dp"
+
+                    app:tint="@color/white"
+                    android:src="@drawable/icons_list_view" />
+
+
+                <ImageView
+                    android:id="@+id/iconTrends"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:background = "@color/Primary_bg"
+                    android:padding= "5dp"
+                    app:tint="@color/Primary_dark"
+                    android:src="@drawable/icons_trends" />
+
+
+
+
+            </LinearLayout>
+
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+
+
+        <!--                    <com.google.android.material.radiobutton.MaterialRadioButton-->
+        <!--                        android:layout_width="wrap_content"-->
+        <!--                        android:layout_height="wrap_content"-->
+        <!--                        android:gravity="end"-->
+        <!--                        android:isScrollContainer="true"-->
+        <!--                        android:pointerIcon="arrow"-->
+        <!--                        android:buttonTint="@color/Primary_dark">-->
+
+
+        <!--                    </com.google.android.material.radiobutton.MaterialRadioButton>-->
+
+
+
+
+    </LinearLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <FrameLayout
+        android:id="@+id/fl_main"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="160dp"
+        android:background="@color/background_grey1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+        <LinearLayout
+            android:layout_marginTop="@dimen/margin_10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/background_grey1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginLeft="@dimen/margin_5dp"
+                android:layout_marginRight="@dimen/margin_5dp"
+                android:orientation="vertical">
+
+
+
+
+
+
+                <LinearLayout
+                    android:id="@+id/innerLay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/margin_10dp"
+
+                    >
+
+                    <!--                    <androidx.cardview.widget.CardView-->
+                    <!--                        android:layout_width="match_parent"-->
+                    <!--                        android:layout_height="wrap_content"-->
+                    <!--                        app:cardCornerRadius="@dimen/margin_10dp">-->
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:orientation="vertical">
+                        <!--                            <TextView-->
+                        <!--                                android:layout_width="match_parent"-->
+                        <!--                                android:layout_height="wrap_content"-->
+                        <!--                                android:text="Pulse"-->
+                        <!--                                android:textSize="18sp"-->
+                        <!--                                android:textStyle="normal"-->
+                        <!--                                android:padding="@dimen/margin_10dp"-->
+                        <!--                                android:textColor="@color/Primary_dark"-->
+                        <!--                                android:background="@color/Primary_bg"/>-->
+
+
+                        <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+                            xmlns:app="http://schemas.android.com/apk/res-auto"
+                            xmlns:tools="http://schemas.android.com/tools"
+                            android:id="@+id/recyclerview_newvitals"
+                            android:name="com.rpm.clynx.fragments.NewVitalFragment"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:background="@color/background_grey1"
+
+
+                            app:layoutManager="LinearLayoutManager"
+                            app:layout_constraintTop_toBottomOf="@+id/llo_goals"
+                            tools:context=".fragments.NewVitalFragment"
+                            tools:listitem="@layout/new_vital_item_list" />
+                        <TextView
+                            android:id="@+id/empty_viewnew"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_margin="@dimen/margin_10dp"
+                            android:gravity="center"
+                            android:visibility="gone"
+                            android:text="@string/no_data_available" />
+
+
+                        <TextView
+                            android:id = "@+id/viewMore"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/background1"
+                            android:padding="@dimen/margin_10dp"
+                            android:text="View More..."
+                            android:textColor="@color/Primary_dark"
+                            android:textSize="15sp"
+                            android:textStyle="normal" />
+
+
+
+
+                    </LinearLayout>
+
+                    <!--                    </androidx.cardview.widget.CardView>-->
+
+
+                    <!--                    <androidx.cardview.widget.CardView-->
+                    <!--                        android:layout_width="match_parent"-->
+                    <!--                        android:layout_height="wrap_content"-->
+                    <!--                        app:cardCornerRadius="@dimen/margin_10dp">-->
+                    <!--                        <LinearLayout-->
+                    <!--                            android:layout_width="match_parent"-->
+                    <!--                            android:layout_height="wrap_content"-->
+                    <!--                            android:orientation="vertical">-->
+                    <!--                            <TextView-->
+                    <!--                                android:layout_width="match_parent"-->
+                    <!--                                android:layout_height="wrap_content"-->
+                    <!--                                android:text="Pulse"-->
+                    <!--                                android:textSize="18sp"-->
+                    <!--                                android:textStyle="normal"-->
+                    <!--                                android:padding="@dimen/margin_10dp"-->
+                    <!--                                android:textColor="@color/Primary_dark"-->
+                    <!--                                android:background="@color/Primary_bg"/>-->
+
+                    <!--                            <LinearLayout-->
+                    <!--                                android:layout_width="match_parent"-->
+                    <!--                                android:layout_height="wrap_content"-->
+                    <!--                                android:orientation="horizontal"-->
+                    <!--                                android:background="@color/white">-->
+
+                    <!--                                <TextView-->
+                    <!--                                    android:layout_width="0dp"-->
+                    <!--                                    android:layout_height="wrap_content"-->
+                    <!--                                    android:layout_weight="1"-->
+                    <!--                                    android:text="138 bpm"-->
+                    <!--                                    android:textSize="18sp"-->
+                    <!--                                    android:textAlignment="textStart"-->
+                    <!--                                    android:textStyle="normal"-->
+                    <!--                                    android:padding="@dimen/margin_10dp"-->
+                    <!--                                    android:textColor="@color/Primary_dark" />-->
+
+                    <!--                                <TextView-->
+                    <!--                                    android:layout_width="wrap_content"-->
+                    <!--                                    android:layout_height="wrap_content"-->
+                    <!--                                    android:text="09:39AM"-->
+                    <!--                                    android:textSize="18sp"-->
+                    <!--                                    android:textStyle="normal"-->
+                    <!--                                    android:textAlignment="viewEnd"-->
+                    <!--                                    android:padding="@dimen/margin_10dp"-->
+                    <!--                                    android:textColor="@color/Primary_dark" />-->
+
+
+                    <!--                            </LinearLayout>-->
+
+                    <!--                            <TextView-->
+                    <!--                                android:layout_width="match_parent"-->
+                    <!--                                android:layout_height="wrap_content"-->
+                    <!--                                android:text="View More..."-->
+                    <!--                                android:textSize="15sp"-->
+                    <!--                                android:textStyle="normal"-->
+                    <!--                                android:padding="@dimen/margin_10dp"-->
+                    <!--                                android:textColor="@color/Primary_dark"-->
+                    <!--                                android:background="@color/background_grey"/>-->
+
+                    <!--                        </LinearLayout>-->
+
+                    <!--                    </androidx.cardview.widget.CardView>-->
+
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_sub7"
+        android:layout_width="match_parent"
+        android:layout_height="599dp"
+        android:layout_marginTop="160dp"
+        android:background="@color/background_grey1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+
+
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fillViewport="true"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="10dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/chartHealthTrends"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:orientation="horizontal">
+
+                <!-- CardViews will be added dynamically here -->
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+
+
+    </FrameLayout>
+
+
+
+
+
+
+
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/tooltip"-->
+    <!--        android:layout_width="100dp"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_weight="1"-->
+    <!--        android:text="Vitals"-->
+    <!--        android:layout_marginTop="10dp"-->
+    <!--        android:layout_marginLeft="10dp"-->
+    <!--        android:textStyle="bold"-->
+    <!--        android:textColor="@color/Primary_dark"-->
+    <!--        android:textSize="20sp"/>-->
+
+    <FrameLayout
+        android:id="@+id/fl_sub30"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="160dp"
+        android:background="@color/background_grey1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fillViewport="true"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="10dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/chartHealthTrends30"
+                android:layout_width="800dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:orientation="horizontal">
+
+                <!-- CardViews will be added dynamically here -->
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+
+
+
+
+<!--        <androidx.cardview.widget.CardView-->
+
+<!--            android:padding="20dp"-->
+<!--            android:layout_margin="@dimen/left_margin10dp"-->
+<!--            app:cardBackgroundColor="@color/white"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:cardCornerRadius="@dimen/margin_10dp"-->
+
+<!--            >-->
+
+
+<!--        <LinearLayout-->
+
+
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="35dp"-->
+<!--            android:background="@color/Primary1"-->
+<!--           >-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/vitalname30"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="35dp"-->
+<!--                android:paddingTop="2dp"-->
+<!--                android:layout_marginTop="@dimen/margin_5dp"-->
+<!--                android:paddingLeft="10dp"-->
+<!--                android:text=""-->
+<!--                android:textColor="@color/Primary_dark"-->
+<!--                android:textSize="18dp"-->
+<!--                android:textStyle="normal"-->
+<!--                app:fontFamily="@font/rubik_regular" />-->
+<!--        </LinearLayout>-->
+
+<!--        &lt;!&ndash;        <HorizontalScrollView&ndash;&gt;-->
+<!--        &lt;!&ndash;            android:layout_width="match_parent"&ndash;&gt;-->
+<!--        &lt;!&ndash;            android:layout_height="wrap_content">&ndash;&gt;-->
+
+
+
+
+
+<!--&lt;!&ndash;        <HorizontalScrollView&ndash;&gt;-->
+<!--&lt;!&ndash;            android:id="@+id/CHART30HS"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:layout_width="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:background="@color/orange_400"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:layout_height="wrap_content">&ndash;&gt;-->
+
+<!--            <LinearLayout-->
+<!--                android:id="@+id/chart30ll"-->
+<!--                android:layout_marginTop="@dimen/margin_50dp"-->
+<!--                android:layout_marginRight="@dimen/spacing_xmedium"-->
+<!--                android:layout_marginLeft="@dimen/spacing_xmedium"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="@color/white"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <com.github.mikephil.charting.charts.LineChart-->
+<!--                    android:id=-->
+<!--                        "@+id/linechartvitals30"-->
+
+<!--                    android:layout_width="match_parent"-->
+<!--                android:layout_height="400dp"-->
+<!--                android:layout_marginLeft="@dimen/left_margin10dp"-->
+<!--                android:background="@color/white" />-->
+
+<!--            </LinearLayout>-->
+
+<!--&lt;!&ndash;        </HorizontalScrollView>&ndash;&gt;-->
+
+<!--&lt;!&ndash;&lt;!&ndash;        <HorizontalScrollView&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;            android:id="@+id/chart30scroll"&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;            android:layout_width="match_parent"&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;            android:layout_height="wrap_content">&ndash;&gt;&ndash;&gt;-->
+
+<!--&lt;!&ndash;            <LinearLayout&ndash;&gt;-->
+<!--&lt;!&ndash;                android:id="@+id/chart30ll"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_marginTop="@dimen/margin_10dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_width="match_parent"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_height="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:orientation="horizontal">&ndash;&gt;-->
+
+<!--&lt;!&ndash;                <com.github.mikephil.charting.charts.LineChart&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:id="@+id/linechartvitals30"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_width="match_parent"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_height="400dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_margin="@dimen/left_margin10dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:background="@color/white" />&ndash;&gt;-->
+
+<!--&lt;!&ndash;            </LinearLayout>&ndash;&gt;-->
+
+<!--&lt;!&ndash;&lt;!&ndash;        </HorizontalScrollView>&ndash;&gt;&ndash;&gt;-->
+
+
+
+
+
+
+
+
+
+
+
+
+<!--        &lt;!&ndash;        <LinearLayout&ndash;&gt;-->
+<!--        &lt;!&ndash;            android:layout_marginTop="@dimen/margin_10dp"&ndash;&gt;-->
+<!--        &lt;!&ndash;            android:layout_width="match_parent"&ndash;&gt;-->
+<!--        &lt;!&ndash;            android:layout_height="wrap_content"&ndash;&gt;-->
+<!--        &lt;!&ndash;            android:background="@color/background_grey1"&ndash;&gt;-->
+<!--        &lt;!&ndash;            android:orientation="horizontal">&ndash;&gt;-->
+
+
+<!--        &lt;!&ndash;            <com.github.mikephil.charting.charts.LineChart&ndash;&gt;-->
+<!--        &lt;!&ndash;                android:id="@+id/linechartvitals30"&ndash;&gt;-->
+
+<!--        &lt;!&ndash;                android:layout_width="800dp"&ndash;&gt;-->
+<!--        &lt;!&ndash;                android:layout_height="350dp"&ndash;&gt;-->
+<!--        &lt;!&ndash;                android:layout_margin="@dimen/left_margin10dp"&ndash;&gt;-->
+
+<!--        &lt;!&ndash;                android:background="@color/white" />&ndash;&gt;-->
+
+
+
+<!--        &lt;!&ndash;        </LinearLayout>&ndash;&gt;-->
+
+
+
+
+<!--        &lt;!&ndash;        </HorizontalScrollView>&ndash;&gt;-->
+
+
+<!--        </androidx.cardview.widget.CardView>-->
+
+    </FrameLayout>
+
+</FrameLayout>

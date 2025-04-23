@@ -1,0 +1,155 @@
+<ng-container *ngIf="loading">
+  <div class="overlay"></div>
+  <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
+</ng-container>
+<div class="content">
+  <div class="main_content">
+    <div class="content-panel">
+      <div
+
+        fxLayout="column"
+        class="main-panel"
+
+      >
+        <div class="back_arrow">
+          <div class="back_arrow_container">
+            <img
+              class="arrow-img"
+              src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg"
+              (click)="backhome()"
+            />
+          </div>
+          <p class="main_title">Todo List</p>
+        </div>
+        <div class="menu-panel">
+          <p class="table_length">
+            {{ dataSource && dataSource.length }} Due Today
+          </p>
+          <!-- <div>
+            <mat-form-field appearance="outline">
+
+              <mat-date-range-input
+                [rangePicker]="picker"
+                [formGroup]="frmatodorange"
+              >
+                <input
+                  matStartDate
+                  placeholder="Start date"
+                  readonly
+                  formControlName="startdate"
+                />
+                <input
+                  matEndDate
+                  placeholder="End date"
+                  readonly
+                  formControlName="enddate"
+                  (dateChange)="rangetodoCalc()"
+                />
+              </mat-date-range-input>
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="picker"
+              ></mat-datepicker-toggle>
+              <mat-date-range-picker
+                maxRange="7"
+                #picker
+              ></mat-date-range-picker>
+            </mat-form-field>
+          </div> -->
+        </div>
+
+        <mat-table
+          *ngIf="!loading && getTodoList"
+          class="patient_detail_table"
+          #table
+          [dataSource]="dataSourceTable"
+        >
+          <ng-container matColumnDef="Date">
+            <mat-header-cell *matHeaderCellDef>
+              <div>Date</div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ datepipe.transform(element.Date, "MMM d, y") }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="Time">
+            <mat-header-cell *matHeaderCellDef> Interval </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              <div class="medication_interval_data">
+                <div
+                  class="{{
+                    element.Morning
+                      ? 'interval_data_active'
+                      : 'interval_data_disable'
+                  }}"
+                >
+                  <div class="interval_data_item">M</div>
+                </div>
+                <div
+                  class="{{
+                    element.AfterNoon
+                      ? 'interval_data_active'
+                      : 'interval_data_disable'
+                  }}"
+                >
+                  <div class="interval_data_item">A</div>
+                </div>
+                <div
+                  class="{{
+                    element.Evening
+                      ? 'interval_data_active'
+                      : 'interval_data_disable'
+                  }}"
+                >
+                  <div class="interval_data_item">E</div>
+                </div>
+                <div
+                  class="{{
+                    element.Night
+                      ? 'interval_data_active'
+                      : 'interval_data_disable'
+                  }}"
+                >
+                  <div class="interval_data_item">N</div>
+                </div>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="ScheduleType">
+            <mat-header-cell mat-header-cell *matHeaderCellDef>
+              Activity Name
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.ActivityName }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="Decription">
+            <mat-header-cell
+              *matHeaderCellDef
+              style="border-radius: 0px 0.8rem 0px 0px !important"
+            >
+              Description
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{ element.Description }}
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+
+          <mat-row
+            tabindex="1"
+            (click)="highlight(row)"
+            *matRowDef="let row; columns: displayedColumns"
+          >
+            <!-- [ngClass]="{ selectedrow: row.selected == true }" -->
+          </mat-row>
+        </mat-table>
+      </div>
+
+
+    </div>
+  </div>
+</div>

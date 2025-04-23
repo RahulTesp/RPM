@@ -69,12 +69,13 @@ namespace RPMWeb.Data.Common
     }
     public class GoalDetails
     {
-        public GoalDetails(int _id, string _goal, string _desc)
+        public GoalDetails(int id, string goal, string description)
         {
-            Id = _id;
-            Goal = _goal;
-            Description = _desc;
+            Id = id;
+            Goal = goal;
+            Description = description;
         }
+
         public int Id { get; set; }
         public string Goal { get; set; }
         public string Description { get; set; }
@@ -590,7 +591,7 @@ namespace RPMWeb.Data.Common
         public int ProgramId { get; set; }
         public List<int> VitalIds { get; set; }//ccm change
         public int PhysicianId { get; set; }
-        public string ConsultationDate { get; set; }
+        public string? ConsultationDate { get; set; }
         public int CareTeamUserId { get; set; }
         public string PatientStatus { get; set; }
         public DateTime PrescribedDate { get; set; }
@@ -1680,6 +1681,8 @@ namespace RPMWeb.Data.Common
         public string AuditCreatedBy { get; set; }
         public bool IsRead { get; set; }
         public bool IsNotify { get; set; }
+        public int PatientId { get; set; }
+        public int ProgramId { get; set; }
     }
     public class NotificationData : NotificationAuditData
     {
@@ -2400,6 +2403,7 @@ namespace RPMWeb.Data.Common
         public string LastMessage { get; set; }
         public string DateTime { get; set; }
         public string ConversationSid { get; set; }
+        public List<MessageHistoryItem> Messages { get; set; }
     }
     public class ConversationHeartBeat
     {
@@ -2413,5 +2417,17 @@ namespace RPMWeb.Data.Common
         public string ConversationSid { get; set; }
         public string ToUser { get; set; }
         public string FromUser { get; set; }
+        public string Message { get; set; }
+    }
+    public class PatientDetials
+    {
+        public int PatientId { get; set; }
+        public int ProgramId { get; set; }
+    }
+    public class MessageHistoryItem
+    {
+        public string Message { get; set; }
+        public string DateTime { get; set; }
+        public string Author { get; set; }
     }
 }

@@ -649,21 +649,21 @@ namespace RPMWeb.Dal
         public static int UpdateNotificationReadStatus(NotificationStatusUpdate info)
         {
             int rowid = 0;
-            if (info.NotificationAuditId==0)
-            {
-                NotificationAuditData nda =  new NotificationAuditData();
-                nda.NotificationAuditId = info.NotificationAuditId;
-                nda.NotificationId = info.NotificationId;
-                nda.IsRead = true;
-                nda.IsNotify = true;
-                nda.AuditCreatedBy = info.ModifiedBy;
+            //if (info.NotificationAuditId==0)
+            //{
+            //    NotificationAuditData nda =  new NotificationAuditData();
+            //    nda.NotificationAuditId = info.NotificationAuditId;
+            //    nda.NotificationId = info.NotificationId;
+            //    nda.IsRead = true;
+            //    nda.IsNotify = true;
+            //    nda.AuditCreatedBy = info.ModifiedBy;
 
-                rowid = new Notification().AddSystemNotificationAudit(nda, ConnectionString);
-            }
-            else
-            {
+            //    rowid = new Notification().AddSystemNotificationAudit(nda, ConnectionString);
+            //}
+            //else
+            //{
                 rowid = new Notification().UpdateSystemNotificationAuditReadStatus(info.NotificationId, true, ConnectionString);
-            }
+            //}
             return rowid;
         }
         public static SystemNotificationByUser GetSystemNotificationsByUser(string UserName, DateTime? StartDate,
@@ -998,9 +998,9 @@ namespace RPMWeb.Dal
         {
             return new User().UpdateUserConversationActivity(username, activeConversationSid, lastActiveAt, actor, ConnectionString);
         }
-        public static void NotifyConversation(string activeConversationSid, string FromUser, string ToUser)
+        public static void NotifyConversation(string activeConversationSid, string FromUser, string ToUser, string Message)
         {
-            new User().NotifyConversation(activeConversationSid, FromUser, ToUser, ConnectionString);
+            new User().NotifyConversation(activeConversationSid, FromUser, ToUser, Message, ConnectionString);
         }
 
     }

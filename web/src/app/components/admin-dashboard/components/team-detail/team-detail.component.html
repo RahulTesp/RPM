@@ -1,0 +1,495 @@
+<div class="content">
+  <div class="main_content">
+    <div class="content-panel">
+      <!-- Main Panel -->
+      <div class="main-panel"
+        fxLayoutGap.lt-lg="0px" fxLayoutAlign="start start">
+        <div class="task_upper_panel">
+          <div class="back_arrow">
+            <div>
+              <img class="arrow-img" src="../../../../../../assets/04-Icons/Icons_Arrow - Back.svg" />
+            </div>
+            <p class="page_title">Team ABCD</p>
+          </div>
+          <div class="team_menu_button_panel">
+            <div *ngFor="let item of menu">
+              <button class="btn-team-menu" id="teamD_ChangeScreen" (click)="ChangeScreen(item.menu_id)"
+                [class.selected]="CurrentMenu == item.menu_id">{{item.menu_title}}</button>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <ng-container [ngSwitch]="variable">
+          <ng-container *ngSwitchCase="1">
+            <ng-container *ngTemplateOutlet="teamdetailPatientPage"></ng-container>
+          </ng-container>
+          <ng-container *ngSwitchCase="2">
+            <ng-container *ngTemplateOutlet="teamdetailAlertPage"></ng-container>
+          </ng-container>
+          <ng-container *ngSwitchCase="3">
+            <ng-container *ngTemplateOutlet="teamdeatilTaskPage"></ng-container>
+          </ng-container>
+          <ng-container *ngSwitchCase="4">
+            <ng-container *ngTemplateOutlet="teamdetailSchedulePage"></ng-container>
+          </ng-container>
+
+          <ng-container *ngSwitchDefault>
+            <ng-container *ngTemplateOutlet="teamdetailPatientPage"></ng-container>
+          </ng-container>
+        </ng-container>
+      </div>
+      <div class="side-panel">
+
+
+       <!-- <div class="schedule_data_panel" *ngIf="schedule_data">
+        <ng-container [ngTemplateOutlet]="schedule_container"></ng-container>
+       </div> -->
+
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+<!-- Team DetailPatientPage -->
+<ng-template #teamdetailPatientPage>
+
+  <div class="patientListPage">
+    <div class="date_panel">
+      <button class="btn_date_item" id="teamD_PatientToday">Today</button>
+      <button class="btn_date_item" id="teamD_Patient7day"> &lt;7 days </button>
+       <button class="btn_date_item" id="teamD_Patient30day"> &lt;30 days </button>
+   </div>
+   <div class="patient_overview">
+    <div class="patient_overview_dropdown">
+      <p class="date_title dropdown_title">Patient Type</p>
+      <select class="patient_drop_down" name="patient_type" ng-model="userSelect" id="teamD_Patient_PatientType">
+
+        <option value="1">All Patients</option>
+
+        <option value="2">Critical</option>
+
+        <option value="3">Cautious</option>
+
+        </select>
+    </div>
+
+    <div class="patient_overview_dropdown">
+      <p  class="date_title dropdown_title">Vital</p>
+      <select class="patient_drop_down" name="patient_type" ng-model="userSelect" id="teamD_Patient_Vital">
+
+        <option value="1">All Vitals</option>
+
+        <option value="2">Critical</option>
+
+        <option value="3">Cautious</option>
+
+        </select>
+    </div>
+    <div  class="patient_overview_total" >
+      <p class="data_title" >Total</p>
+      <p class="data_value" > 10</p>
+    </div>
+    <div  class="patient_overview_critical" >
+      <p class="data_title" >Critical Vital Patients</p>
+      <p class="data_value" >78</p>
+    </div>
+    <div class="patient_overview_cautious">
+      <p class="data_title" >Cautious Vital Patients</p>
+      <p class="data_value" >67</p>
+    </div>
+    <div  class="patient_overview_normal"  >
+      <p class="data_title">Normal Vital Patients</p>
+      <p class="data_value">7</p>
+    </div>
+  </div>
+
+  <div  class="patient_table_content">
+    <mat-paginator  [length]="100"
+    [pageSize]="2"
+    [pageIndex]="0"
+    >
+     </mat-paginator>
+    <mat-table #table [dataSource]="dataSourcePatientDataList"  >
+      <ng-container matColumnDef="selection">
+        <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+        <mat-cell *matCellDef="let element; let rowIndex = index;">
+          <mat-radio-button color="primary" id="{{element.patientid}}" name="radioSelection" [value]="rowIndex"
+            (click)="selectRow($event)" id="teamD_Patient_SelectRow" >
+          </mat-radio-button>
+
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="patientid">
+        <mat-header-cell *matHeaderCellDef> Patient ID </mat-header-cell>
+        <mat-cell *matCellDef="let element; let rowIndex = index;">
+          {{element.patientid}}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="patient">
+        <mat-header-cell *matHeaderCellDef> Patient Name </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.patient}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="program">
+        <mat-header-cell *matHeaderCellDef> Program </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.program}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="weeks_remaining">
+        <mat-header-cell *matHeaderCellDef>Program Status </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.weeks_remaining}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="physician_name">
+        <mat-header-cell *matHeaderCellDef>Physician Name</mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.physician_name}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="assigned_member">
+        <mat-header-cell *matHeaderCellDef> Assigned Member </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.assigned_member}} </mat-cell>
+      </ng-container>
+      <div style="width: 0px;">
+        <ng-container matColumnDef="patient_vital_status">
+          <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+          <mat-cell *matCellDef="let element" let rowIndex=index;>
+            <div id="{{element.patientid}}" class="patient_rows" style="visibility: hidden;">
+              <button mat-icon-button  class="iconbutton"
+                (click)="rowCick(element.rowIndex)">
+                <img class="front_img" id="teamD_PatientPage" src="../../../../../../assets/04-Icons/Icons_Arrow - Front.svg" />
+              </button>
+
+            </div>
+          </mat-cell>
+        </ng-container>
+      </div>
+
+      <mat-header-row *matHeaderRowDef="PatientList_columnHeader"></mat-header-row>
+      <!-- <mat-row *matRowDef="let row; columns: columnHeader;"></mat-row> -->
+      <mat-row  [ngClass]="{'critical': row.patient_vital_status == 'critical','cautious':row.patient_vital_status == 'cautious'}"
+        *matRowDef="let row; columns: PatientList_columnHeader;" ></mat-row>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell">No data Found</td>
+        </tr>
+    </mat-table>
+
+</div>
+  </div>
+
+
+</ng-template>
+<ng-template #teamdetailAlertPage>
+
+  <div  class="teamdetailAlertPage">
+    <div class="teamdetailupperPanel">
+      <div class="teamdetailItem">
+        <p class="team_detail_alert_title">Patients Assigned</p>
+        <p class="team_detail_alert_value">72</p>
+      </div>
+      <div class="teamdetailItem">
+        <p class="team_detail_alert_title">Critical Alerts</p>
+        <p class="team_detail_alert_value">72</p>
+      </div>
+      <div class="teamdetailItem">
+        <p class="team_detail_alert_title">SLA Breached</p>
+        <p class="team_detail_alert_value">72</p>
+      </div>
+      <div class="teamdetailItem">
+        <p class="team_detail_alert_title">Open Alerts</p>
+        <p class="team_detail_alert_value">72</p>
+      </div>
+      <div class="teamdetailItem">
+        <p class="team_detail_alert_title">Completed Alerts</p>
+        <p class="team_detail_alert_value">72</p>
+      </div>
+    </div>
+    <div class="teamdetaillowerPanel">
+      <mat-paginator  [length]="100"
+      [pageSize]="2"
+      [pageIndex]="0"
+      >
+       </mat-paginator>
+      <mat-table #tableOne [dataSource]="alertdatasource">
+
+        <ng-container matColumnDef="alert_name">
+          <mat-header-cell *matHeaderCellDef> Alert </mat-header-cell>
+          <mat-cell *matCellDef="let element; let rowIndex = index;"
+            [ngClass]="{'due_date': element.Due_Date == 'Nov 27,2021'}">
+            {{element.alert_description}}
+          </mat-cell>
+        </ng-container>
+
+
+        <ng-container matColumnDef="priority">
+          <mat-header-cell *matHeaderCellDef>  <div class="task_priority">
+            <select>
+              <option value="1">Priority</option>
+              <option value="2">Urgent</option>
+              <option value="3">High</option>
+           </select>
+          </div> </mat-header-cell>
+          <mat-cell *matCellDef="let element;">
+            <div class="priority_content" [ngClass]="{'priority_low':element.priority == 'low' ,
+               'priority_high':element.priority == 'high',
+               'priority_medium': element.priority == 'medium',
+               'priority_urgent': element.priority == 'urgent'}">
+              {{element.priority}}</div>
+          </mat-cell>
+        </ng-container>
+
+
+        <ng-container matColumnDef="patient_name">
+
+          <mat-header-cell *matHeaderCellDef >
+            <div class="search_input" *ngIf="alertSearchValeName"><img  class="search_icon" src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              (click)="searchAlertNameClick()" id="teamD_AlertPatient1"><input class="search_input input_panel"(change)="applyAlertFilter($event)" id="teamD_AlertPatient" >
+            </div>
+            <div class="search_heading_default" *ngIf="!alertSearchValeName"> <img  class="search_icon_default" src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              (click)="searchAlertNameClick()" id="teamD_AlertPatient2">Patient Name</div>
+            </mat-header-cell>
+
+          <mat-cell *matCellDef="let element"> {{element.patient_name}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="assignee_name">
+
+          <mat-header-cell *matHeaderCellDef>
+            <div class="search_input" *ngIf="alertAssignedName"><img  class="search_icon" src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              (click)="serachAlertAssigned()" id="teamD_AlertAssigned1"><input class="search_input input_panel" id="teamD_AlertAssigned" (change)="applyAlertFilter($event)" >
+            </div>
+            <div class="search_heading_default" *ngIf="!alertAssignedName"> <img  class="search_icon_default" src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              (click)="serachAlertAssigned()" id="teamD_AlertAssigned2">Assigned </div>
+            </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element.assignedto}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="due_date">
+          <mat-header-cell *matHeaderCellDef>Due Date </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element.duedate}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <mat-header-cell *matHeaderCellDef>
+            <div class="task_priority">
+              <select>
+                <option value="1">Status</option>
+                <option value="2">To do</option>
+                <option value="3">In Progress</option>
+             </select>
+            </div> </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element.status}} </mat-cell>
+        </ng-container>
+
+        <div>
+          <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+            <mat-cell *matCellDef="let element" let rowIndex=index;>
+              <div>
+                <button mat-icon-button matTooltip="Click to Edit" class="iconbutton" color="primary"
+                  (click)="rowCick(element.rowIndex)" id="teamD_AlertSelect">
+                  <img class="front_img" src="../../../../../../assets/04-Icons/Icons_Arrow - Front.svg" />
+                </button>
+
+              </div>
+            </mat-cell>
+          </ng-container>
+        </div>
+
+        <mat-header-row *matHeaderRowDef="Alert_Header"></mat-header-row>
+        <!-- <mat-row *matRowDef="let row; columns: columnHeader;"></mat-row> -->
+        <mat-row [ngClass]="{'due_date': row.Due_Date == 'Nov 27,2021'}" [ngClass]="{'urgent': row.priority == 'urgent'}"
+          *matRowDef="let row; columns: Alert_Header;"></mat-row>
+      </mat-table>
+    </div>
+
+  </div>
+
+</ng-template>
+
+
+<!--  Team Detail task Page Start -->
+<ng-template #teamdeatilTaskPage>
+  <div  class="teamdetailAlertPage">
+    <div class="teamdetailupperPanel">
+      <div class="teamdetailItem">
+        <p class="team_detail_alert_title">Patients Assigned</p>
+        <p class="team_detail_alert_value">72</p>
+      </div>
+      <div class="teamdetailItem">
+        <p class="team_detail_alert_title">Tasks Due Today</p>
+        <p class="team_detail_alert_value">72</p>
+      </div>
+      <div class="teamdetailItem">
+        <p class="team_detail_alert_title">SLA Breached</p>
+        <p class="team_detail_alert_value">72</p>
+      </div>
+      <div class="teamdetailItem">
+        <p class="team_detail_alert_title">Pending Later</p>
+        <p class="team_detail_alert_value">72</p>
+      </div>
+      <div class="teamdetailItem">
+        <p class="team_detail_alert_title">Watcher Role</p>
+        <p class="team_detail_alert_value">72</p>
+      </div>
+      <div class="teamdetailItem">
+        <p class="team_detail_alert_title">Completed Tasks</p>
+        <p class="team_detail_alert_value">72</p>
+      </div>
+    </div>
+    <div class="teamdetaillowerPanel">
+      <div class="task_table_content">
+        <mat-paginator #taskPaginator="matPaginator">
+        </mat-paginator>
+        <mat-table #table [dataSource]="taskdataSource">
+
+          <ng-container matColumnDef="tasktype">
+            <mat-header-cell *matHeaderCellDef> Task Type </mat-header-cell>
+            <mat-cell *matCellDef="let element; let rowIndex = index;"
+              [ngClass]="{'due_date': element.Due_Date == 'Nov 27,2021'}">
+              {{element.tasktype}}
+            </mat-cell>
+          </ng-container>
+
+
+          <ng-container matColumnDef="priority">
+            <mat-header-cell *matHeaderCellDef>
+              <div class="task_priority">
+                <select>
+                  <option value="1">Priority</option>
+                  <option value="2">Urgent</option>
+                  <option value="3">High</option>
+               </select>
+              </div>
+
+          </mat-header-cell>
+            <mat-cell *matCellDef="let element;">
+              <div class="priority_content" [ngClass]="{'priority_low':element.priority == 'low' ,
+                 'priority_high':element.priority == 'high',
+                 'priority_medium': element.priority == 'medium',
+                 'priority_urgent': element.priority == 'urgent'}">
+                {{element.priority}}</div>
+            </mat-cell>
+          </ng-container>
+
+
+          <ng-container matColumnDef="patient_name">
+
+            <mat-header-cell *matHeaderCellDef>
+            <div class="search_input" *ngIf="searchValueName"><img  class="search_icon" src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              (click)="searchNameClick()" id="teamD_TaskPatient1"><input class="search_input input_panel"(change)="applyFilter($event)" id="teamD_TaskPatient" >
+            </div>
+            <div class="search_heading_default" *ngIf="!searchValueName"> <img  class="search_icon_default" src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              (click)="searchNameClick()" id="teamD_TaskPatient2">Patient/Contact Name</div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.patient_name}} </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="created_by">
+            <mat-header-cell *matHeaderCellDef>
+              <div class="search_input" *ngIf="searchAssigned"><img  class="search_icon" src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                (click)="serachAssigned()" id="teamD_taskCretedBy1"><input class="search_input input_panel"(change)="applyFilter($event)" id="teamD_taskCretedBy" >
+              </div>
+              <div class="search_heading_default" *ngIf="!searchAssigned"> <img  class="search_icon_default" src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                (click)="serachAssigned()" id="teamD_taskCretedBy2">Created By</div>
+              </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.created_by}} </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="due_date">
+            <mat-header-cell *matHeaderCellDef>Due Date </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.due_date}} </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef>
+              <div class="task_priority">
+                <select>
+                  <option value="1">Status</option>
+                  <option value="2">To do</option>
+                  <option value="3">In Progress</option>
+               </select>
+              </div> </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.status}} </mat-cell>
+          </ng-container>
+
+          <div>
+            <ng-container matColumnDef="action">
+              <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+              <mat-cell *matCellDef="let element" let rowIndex=index;>
+                <div>
+                  <button  class="iconbutton" color="primary"
+                    (click)="rowCick(element.rowIndex)">
+                    <img class="front_img" id="teamD_taskSelect" src="../../../../../../assets/04-Icons/Icons_Arrow - Front.svg" />
+                  </button>
+
+                </div>
+              </mat-cell>
+            </ng-container>
+          </div>
+
+          <mat-header-row *matHeaderRowDef="Tasks_columnHeader"></mat-header-row>
+          <!-- <mat-row *matRowDef="let row; columns: columnHeader;"></mat-row> -->
+          <mat-row [ngClass]="{'due_date': row.Due_Date == 'Nov 27,2021'}" [ngClass]="{'urgent': row.priority == 'urgent'}"
+            *matRowDef="let row; columns: Tasks_columnHeader;"></mat-row>
+        </mat-table>
+
+      </div>
+    </div>
+
+  </div>
+</ng-template>
+
+<!--  Team Detail task Page End -->
+<!--  details SchedulesPage Start -->
+<ng-template #teamdetailSchedulePage >
+   <table class="team_detail_schedule" >
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th> <div>Schedule Type <input [(ngModel)]="searchValue" id="teamD_SchTypeFilter" (ngModelChange)="applyFiltert()" /> </div></th>
+        <th>Description</th>
+
+      </tr>
+      <ng-container *ngFor="let schedule_item of schedule  ">
+        <ng-container *ngFor="let data_item of schedule_item.data; let index = index ">
+          <tr>
+            <td class="main_time" *ngIf="index===0;" [attr.rowspan]="schedule_item.data.length">{{ schedule_item.date }}</td>
+            <td [ngStyle]="{'border-radius':'8px 0px 0px 8px'}">
+              {{ data_item.time}}
+            </td>
+            <td class="schedule_type" [ngStyle]="{'min-width':'70px'}">
+              {{ data_item.schedule}}
+            </td>
+            <td>
+              {{ data_item.description}}
+            </td>
+          </tr>
+        </ng-container>
+      </ng-container>
+
+      <!-- <ng-container *ngFor="let schedule_item of schedule | searchFilter: searchValue ">
+          <tr>
+            <td class="main_time" >{{ schedule_item.date }}</td>
+            <td [ngStyle]="{'border-radius':'8px 0px 0px 8px'}">
+              {{ schedule_item.time}}
+            </td>
+            <td class="schedule_type" [ngStyle]="{'min-width':'70px'}">
+              {{ schedule_item.schedule}}
+            </td>
+            <td>
+              {{ schedule_item.description}}
+            </td>
+          </tr>
+        </ng-container> -->
+    </table>
+
+</ng-template>
+<!--  details SchedulesPage End -->

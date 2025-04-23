@@ -1,0 +1,583 @@
+.content
+{
+  // margin:  0px 40px;
+
+  width: 100%;
+  height: 100%;
+ position: relative;
+ .main_content
+{
+
+  padding:  0 40px 0px 40px;
+  .content-panel
+  {
+
+  height: 90vh;
+  overflow-y: hidden;
+     .main-panel
+     {
+
+    width: 100%;
+    height: 100%;
+    position: relative;
+    padding-top: 24px;
+
+      .upper-header-panel
+       {
+        padding-top: 60px;
+      }
+    // Back arrow
+    .arrow-img
+      {
+       width: 24px;
+       height: 24px;
+      padding-right: 24px;
+       }
+
+     }
+     .side-panel
+    {
+    background-color: #FFFFFF;
+  // position: relative;
+    overflow-y: hidden;
+
+    }
+
+  }
+}
+
+}
+
+
+// select { direction: rtl; }
+
+
+
+
+.page_title
+{
+  font-size: 24px;
+  line-height: 30px;
+  font-family: "Rubik";
+  font-weight: 600;
+  color: #164D61;
+}
+// Add Task
+.add_team_button
+{
+   position:  absolute;
+   top:24px;
+   right: 20px;
+
+}
+.add_team_button button{
+  border-radius: 20px;
+  color: #F2F2F2;
+  outline: none;
+  width: fit-content;
+  height: fit-content;
+  padding: 5px 10px;
+  margin-left: 2px;
+  border: none;
+  background-color: #8226DF !important;
+}
+
+// Back Arrow
+
+.back_arrow
+{
+  display: flex;
+}
+
+.back_arrow p{
+  font-size: 24px;
+  line-height: 30px;
+}
+
+// Button Panel
+
+.team_menu_button_panel
+{
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  margin-bottom: 40px;
+
+}
+.btn-team-menu
+{
+  width: 180px;
+  height: 40px;
+  background-color: #EDEFF5;
+  border-radius: 8px;
+  border: none;
+  font-size: 18px;
+  line-height: 22px;
+  color: #164D61;
+  margin-right: 8px;
+  outline: none;
+}
+
+.selected
+{
+  background-color: #164D61;
+  color: #FFFFFF;
+}
+
+.team_upper_panel
+{
+  padding-top: 60px
+
+
+}
+
+// PatientList Page
+
+.patient_upper_panel
+{
+  padding-top: 60px;
+}
+.patient_menu_button_panel
+{
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+
+
+}
+.btn-patient-menu
+{
+  width: 180px;
+  height: 40px;
+  background-color: #EDEFF5;
+  border-radius: 8px;
+  border: none;
+  font-size: 18px;
+  line-height: 22px;
+  color: #164D61;
+  margin-right: 8px;
+  outline: none;
+}
+// Patient upper Panel Overview
+.patientListPage
+{
+  position: relative;
+  width: 100%;
+}
+.date_panel
+{
+
+  padding: 5px;
+  float: right;
+   background-color: #EDEFF5;
+   border-radius: 8px;
+}
+.btn_date_item
+{
+  width:fit-content;
+  height: 17px;
+  font-size: 14px;
+  font-family: "Rubik";
+  color: #164D61;
+  background-color: #E1E6ED;
+  border: none;
+  border-radius: 8px;
+}
+.patient_overview
+{
+  display: flex;
+  width: 100%;
+  background-color: #8BE3D9;
+  border-radius: 16px;
+  justify-content: space-between;
+  padding: 8px;
+  margin-bottom: 30px;
+
+}
+.patient_drop_down
+{
+  width: 7vw;
+  min-width: 120px;
+  height: 40px;
+  border-radius: 20px ;
+  border: none;
+  background-color: #EDEFF5;
+  border: 2px solid #D8DCE5;
+}
+
+.patient_drop_down option
+{
+  color: #164D61;
+}
+
+.patient_overview_dropdown p{
+  padding-top: 8px;
+}
+.data_title
+{
+
+  font-size: 14px;
+  line-height: 18px;
+  color: #000000;
+  text-align: center;
+  font-family: "Rubik";
+
+
+}
+.dropdown_title
+{
+  color:#164D61;
+}
+.data_value
+{
+  font-size: 24px;
+  line-height: 30px;
+  color: #000000;
+  text-align: center;
+  font-size: "Rubik";
+}
+.patient_overview_critical
+{
+  background-color: #99E8E3;
+  position: relative;
+  padding: 8px 8px 8px 16px;
+  border-radius: 8px;
+  width: 16%;
+
+}
+
+.patient_overview_critical::before{
+
+  content: '';
+  display: block;
+  height: 60%;
+  width: 8px;
+  position: absolute;
+  top: 20px;
+  left: 0;
+  background-color: #FD5276;
+  border-radius: 0px 10px 10px 0px;
+}
+.patient_overview_total
+{
+  background-color: #99E8E3;
+  padding: 8px 8px 8px 8px;
+  width: 16%;
+  border-radius: 8px;
+}
+
+.patient_overview_cautious
+{
+  background-color: #99E8E3;
+  position: relative;
+  padding: 8px 8px 8px 16px;
+  border-radius: 8px;
+  width: 16%;
+}
+
+
+.patient_overview_cautious::before{
+
+  content: '';
+  display: block;
+  height: 60%;
+  width: 8px;
+  position: absolute;
+  top: 20px;
+  left: 0;
+  background-color: #FFBF77;
+  border-radius: 0px 10px 10px 0px;
+}
+
+.patient_overview_normal
+{
+  background-color: #99E8E3;
+  position: relative;
+  padding: 8px 8px 8px 16px;
+  border-radius: 8px;
+  width: 16%;
+}
+
+
+.patient_overview_normal::before{
+
+  content: '';
+  display: block;
+  height: 60%;
+  width: 8px;
+  position: absolute;
+  top: 20px;
+  left: 0;
+  background-color: #6DA86F;
+  border-radius: 0px 10px 10px 0px;
+}
+
+::ng-deep .mat-form-field-outline-start {
+  border-radius: 20px 0 0 20px !important;
+  min-width: 20px !important;
+}
+
+::ng-deep .mat-form-field-outline-end {
+  border-radius: 0 20px 20px 0 !important;
+}
+.cautious
+{
+  position: relative;
+}
+.cautious::before
+{
+  content: '';
+  display: block;
+  height: 80%;
+  width: 6px;
+  position: absolute;
+  top: 5px;
+  left: 0;
+  background-color: #FFBF77;
+  border-radius: 0px 8px 8px 0px;
+
+}
+.critical
+{
+
+  position: relative;
+}
+// Patient Table
+.patient_table_content
+{
+  width: 100%;
+
+}
+.critical::before
+{
+  content: '';
+  display: block;
+  height: 80%;
+  width: 6px;
+  position: absolute;
+  top: 5px;
+  left: 0;
+  background-color: #FD5276;
+  border-radius: 0px 8px 8px 0px;
+
+}
+::ng-deep .mat-paginator .mat-paginator-page-size
+{
+  display: none;
+}
+::ng-deep .mat-paginator
+{
+  background-color: #E1E6ED;
+}
+.mdc-data-table__table {
+  overflow: auto;
+  border-radius: 20px;  // this change
+  .mat-header-cell
+  {
+    background-color: #CFF4F5;
+  }
+}
+
+
+// Team Detail Alert Page
+.teamdetailAlertPage
+{
+  width: 100%;
+
+.teamdetailupperPanel
+{
+  width: 70%;
+  display: flex;
+  border-radius: 16px;
+  background-color: #8BE3D9;
+  padding: 8px;
+  .teamdetailItem
+  {
+    width: 20%;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #99E8E3;
+    margin-right: 8px;
+    .team_detail_alert_value
+    {
+      font-size: 24px;
+      font-family: "Rubik";
+      color: #000000;
+    }
+    .team_detail_alert_title
+    {
+      font-size: 14px;
+      font-family: "Rubik";
+      color: #000000;
+    }
+  }
+}
+}
+
+
+ .search_input
+{
+  background-color: #8BE3D9;
+  border-radius: 12px;
+  width: 80%;
+  border: none;
+  align-items: center;
+  outline: none;
+}
+.search_icon_default
+{
+
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) saturate(100%) invert(97%) sepia(42%) saturate(4666%) hue-rotate(131deg) brightness(87%) contrast(79%);
+}
+ .search_icon
+{
+
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) saturate(100%) invert(100%) sepia(1%) saturate(1151%) hue-rotate(52deg) brightness(109%) contrast(100%);
+}
+.task_table_content .task_priority select
+{
+  background-color: #CFF4F5;
+  outline: none;
+  border: none;
+  color: #164D61;
+
+  padding: 4px 24px 3px 5px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: "Rubik";
+}
+.task_priority select:focus
+{
+  background-color: #8BE3D9;
+
+}
+.task_priority select{
+  direction: rtl;
+}
+.task_priority select option{
+  direction:ltr;
+}
+.search_heading_default
+{
+  display: flex;
+  align-items: center;
+}
+
+.iconbutton
+{
+  border-radius: 50%;
+  border: none;
+}
+
+
+ .urgent
+ {
+   position: relative;
+ }
+
+.urgent::before
+{
+  content: '';
+  display: block;
+  height: 80%;
+  width: 6px;
+  position: absolute;
+  top: 5px;
+  left: 0;
+  background-color: #FD5276;
+  border-radius: 0px 8px 8px 0px;
+
+}
+.priority_urgent
+{
+color: #FFFFFF;
+background-color: #FD5276;
+}
+.priority_low
+{
+  background-color: #FFFFFF;
+  color: #155D16;
+  border: 1px solid #6DA86F;
+}
+.priority_high
+{
+  background-color: #FCD0CF;
+  border: 1px solid #FD5276;
+  color: #A20D0A;
+
+}
+.priority_medium
+{
+  background-color:#FFE0B5;
+  border: 1px solid #FFBF77;
+  color:#9B5D0C
+
+}
+.task_priority select
+{
+  background-color: #CFF4F5;
+  outline: none;
+  border: none;
+  color: #164D61;
+
+  padding: 4px 24px 3px 5px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: "Rubik";
+}
+select:focus
+{
+  background-color: #8BE3D9;
+
+}
+
+.priority_content
+{
+  width: 72px;
+  height: 24px;
+  border-radius: 12px;
+  text-align: center;
+  padding-top: 4px;
+  padding-bottom: 3px;
+}
+.team_detail_schedule
+{
+  width: 100%;
+  border-collapse:separate;
+  border-spacing: 0 3px;
+  // background-color: #EDEFF5;
+  border-radius: 20px;
+  padding-top: 0px;
+}
+
+
+.main_time
+{
+
+  min-width: 200px;
+  background-color: #EDEFF5;
+  text-align: start;
+}
+td{
+  background-color: #ffffff ;
+  }
+th{
+background-color: #CFF4F5;
+min-width: 150px;
+padding: 24px 8px 19px 3px;
+min-height: fit-content;
+color: #164D61;
+font-size: 14px;
+font-family: "Rubik-normal";
+
+}
+tr{
+  background-color: #EDEFF5;
+}

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/chatMain"
+    android:background="@color/ChatBG"
+    android:padding="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context="com.rpm.clynx.fragments.ChatMainFragment">
+
+    <!-- Toolbar -->
+    <android.widget.Toolbar
+
+        android:id="@+id/toolbarChat"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/ChatActivityBG"
+        android:theme="?attr/actionBarTheme"
+        android:navigationIcon="@drawable/ic_baseline_west_24"
+
+        app:titleTextColor="@color/Primary_dark">
+
+        <!-- Centered Title -->
+        <TextView
+            android:id="@+id/toolbarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Activity"
+            android:textColor="@color/ChatTimeBlack"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:gravity="center" />
+
+        <!-- Add Button in Toolbar -->
+        <ImageButton
+            android:id="@+id/chatAddBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_icons_add"
+            android:layout_gravity="end"
+            android:layout_marginEnd="@dimen/margin_20dp" />
+    </android.widget.Toolbar>
+
+
+    <!-- FrameLayout to Overlay ProgressBar -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1">
+
+        <!-- Left-aligned Chats Title -->
+        <TextView
+            android:id="@+id/chatsListTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chats"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="4dp"/>
+
+        <!-- RecyclerView for Chat List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/fragmentChat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingBottom="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="10dp"
+            app:layoutManager="LinearLayoutManager"
+            tools:listitem="@layout/chat_item_list" />
+
+        <!-- Progress Bar in the Center of the Screen -->
+        <ProgressBar
+            android:id="@+id/progressChatList"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:indeterminateTint="@android:color/holo_green_dark"
+            android:visibility="gone"
+            android:layout_gravity="center"/>
+    </FrameLayout>
+
+</LinearLayout>

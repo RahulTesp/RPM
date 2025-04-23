@@ -1,0 +1,2909 @@
+<!-- <ng-container *ngIf="loading">
+  <div class="overlay"></div>
+  <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
+</ng-container> -->
+<div class="Sidebar_container">
+  <div class="sidebar_content">
+    <ng-container [ngSwitch]="menu_choice">
+      <ng-container *ngSwitchCase="1">
+        <ng-container *ngTemplateOutlet="alert_menu"></ng-container>
+      </ng-container>
+      <ng-container *ngSwitchCase="2">
+        <ng-container *ngTemplateOutlet="notetemplate"></ng-container>
+      </ng-container>
+      <ng-container *ngSwitchCase="3">
+        <ng-container *ngTemplateOutlet="schedule"></ng-container>
+      </ng-container>
+      <ng-container *ngSwitchCase="4">
+        <ng-container *ngTemplateOutlet="task"></ng-container>
+      </ng-container>
+      <ng-container *ngSwitchCase="5">
+        <ng-container *ngTemplateOutlet="symptom"></ng-container>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="6">
+        <ng-container *ngTemplateOutlet="medication"></ng-container>
+      </ng-container>
+      <ng-container *ngSwitchCase="7">
+        <ng-container *ngTemplateOutlet="labReport"></ng-container>
+      </ng-container>
+      <ng-container *ngSwitchCase="8">
+        <ng-container *ngTemplateOutlet="acknowledgeAlert"></ng-container>
+      </ng-container>
+
+      <ng-container *ngSwitchDefault>
+        <ng-container *ngTemplateOutlet="alert_menu"></ng-container>
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <div class="btn_bg" *ngIf="display_tool_bar">
+    <button
+      class="btn_tool"
+      id="btn_sidePlus"
+      (click)="getMenuOpen()"
+      cdkOverlayOrigin
+      #trigger="cdkOverlayOrigin"
+      [ngClass]="isOpen ? 'click_effect' : ''"
+    >
+      <div class="plus_icon_container">
+        <img
+          class="plus_icon"
+          src="../../../../../assets/04-Icons/Icons_Plus.svg"
+        />
+      </div>
+    </button>
+
+    <ng-template
+      cdkConnectedOverlay
+      [cdkConnectedOverlayOrigin]="trigger"
+      [cdkConnectedOverlayOpen]="isOpen"
+      (overlayOutsideClick)="isOpen = false"
+    >
+      <div class="spinner_overlay">
+        <ul class="example-overlay">
+          <button
+            class="btn_tool_close"
+            id="btn_sideClose"
+            (click)="isOpen = false"
+          >
+            <div class="plus_icon_containerclose">
+              <img
+                class="close_icon"
+                src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+              />
+            </div>
+          </button>
+          <li>
+            <div
+              id="menuNoteimg"
+              class="side_menu_item_container"
+              (click)="getMenuChoice_main(2)"
+            >
+              <img
+                class="side_menu_item"
+                src="../../../../../assets/04-Icons/Icons_Notes.svg"
+              />
+              <div
+                id="menuNotelabel"
+                class="item-label"
+                (click)="getMenuChoice_main(2)"
+              >
+                <img
+                  class="plus_icon_side_bar"
+                  src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                />
+                <span>Notes</span>
+              </div>
+            </div>
+          </li>
+
+          <li *ngIf="roleId[0].Id != 6 && roleId[0].Id != 8">
+            <div class="side_menu_item_container">
+              <img
+                class="side_menu_item"
+                src="../../../../../assets/04-Icons/Icons_Add Schedule.svg"
+                id="menuScheduleimg"
+                (click)="getMenuChioce(3)"
+              />
+              <div
+                id="menuSchedulelabel"
+                class="item-label"
+                (click)="getMenuChioce(3)"
+              >
+                <img
+                  class="plus_icon_side_bar"
+                  src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                />
+                <span>Schedule</span>
+              </div>
+            </div>
+          </li>
+
+          <li *ngIf="roleId[0].Id != 6 && roleId[0].Id != 8">
+            <div class="side_menu_item_container">
+              <img
+                class="side_menu_item"
+                src="../../../../../assets/04-Icons/Icons_Tasks.svg"
+                id="menuTaskimg"
+                (click)="getMenuChioce(4)"
+              />
+              <div
+                id="menuTasklabel"
+                class="item-label"
+                (click)="getMenuChioce(4)"
+              >
+                <img
+                  class="plus_icon_side_bar"
+                  src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                />
+                <span>Task</span>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <div class="side_menu_item_container">
+              <img
+                id="menuSymptomImg"
+                class="side_menu_item"
+                src="../../../../../assets/04-Icons/Icons_Symptoms.svg"
+              />
+              <div
+                id="menuSymptomlabel"
+                class="item-label"
+                (click)="getMenuChioce(5)"
+              >
+                <img
+                  class="plus_icon_side_bar"
+                  src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                />
+                <span>Symptoms</span>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <div class="side_menu_item_container">
+              <img
+                class="side_menu_item"
+                src="../../../../../assets/04-Icons/Icons_Medication.svg"
+                id="menuMedicationimg"
+                (click)="getMenuChioce(6)"
+              />
+              <div
+                id="menuMedicationlabel"
+                class="item-label"
+                (click)="getMenuChioce(6)"
+              >
+                <img
+                  class="plus_icon_side_bar"
+                  src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                />
+                <span>Medication</span>
+              </div>
+            </div>
+          </li>
+
+          <!-- <li>
+            <div class="side_menu_item_container">
+              <img class="side_menu_item" src="../../../../../assets/04-Icons/Icons_Lab Report.svg"
+                (click)="getMenuChioce(7)">
+                <div class="item-label"  (click)="getMenuChioce(7)">
+
+                  <img  class="plus_icon_side_bar" src="../../../../../assets/04-Icons/Icons_Plus.svg" /><span >Report</span>
+                </div>
+            </div>
+          </li> -->
+        </ul>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<ng-template #alert_menu> </ng-template>
+
+<ng-template #notetemplate>
+  <!-- <div class="common_template"    [ngStyle]="toogle?minimize:maximize"> -->
+  <div *ngIf="QuestionArrayBase" class="common_template">
+    <!-- <img *ngIf="minimizeValue" class="maximizebutton" (click)="maximizeScreen()" src="../../../../../assets/04-Icons/Icons_Expand.svg">
+    <img *ngIf="!minimizeValue" class="minimizebutton" (click)="minimizeScreen()" src="../../../../../assets/04-Icons/Icons_Minimize.svg"> -->
+
+    <form [formGroup]="registernotes">
+      <div class="common_main_title">
+        {{ noteUpdationVariable ? "Update Note" : "Add Notes" }}
+      </div>
+      <div class="common_template_content">
+        <div class="common_content patient_container_2">
+          <p class="common_content_title">Patient / Contact Name</p>
+          <input
+            class="common_input_dropdown task_type_dropdown"
+            id="addNotePatientName"
+            [(ngModel)]="patientName"
+            [ngModelOptions]="{ standalone: true }"
+            readonly
+          />
+        </div>
+
+        <div class="common_content">
+          <p class="common_content_title">Note Type</p>
+          <select
+            class="common_input_dropdown"
+            id="addNote_Id"
+            name="noteId"
+            #noteId="ngModel"
+            required
+            [(ngModel)]="NoteTypeId"
+            [ngModelOptions]="{ standalone: true }"
+          >
+            <option [value]="undefined">Select Category</option>
+            <option
+              *ngFor="let data of noteTypeIdArray; let i = index"
+              [value]="data.Id"
+            >
+              {{ data.Name }}
+            </option>
+          </select>
+          <div class="warn">
+            <ng-container *ngIf="noteId?.invalid && noteId?.touched">
+              Note Type is required.
+            </ng-container>
+          </div>
+        </div>
+        <!-- <div class="common_content" *ngIf="!isManagerProvider">
+          <p class="common_content_title">Note Type</p>
+            <select class="common_input_dropdown" id="noteId" name="noteId" #noteId="ngModel" required  [(ngModel)]="NoteTypeId"   [ngModelOptions]="{standalone: true}" [attr.disabled]="true">
+             <option [value]="undefined" >Select Category</option>
+              <option *ngFor="let data of noteTypeIdArray; let i = index;" [value]="data.Id">{{data.Name}}
+              </option>
+            </select>
+            <div class="warn">
+              <ng-container  *ngIf="noteId?.invalid && noteId?.touched"> Note Type is required.
+              </ng-container>
+            </div>
+        </div> -->
+
+        <!-- <div class="common_content" *ngIf="!noteUpdationVariable || !isManagerProvider">
+          <p class="common_content_title">Time</p>
+
+            <input class="common_input_dropdown" type="text" step='1' min="00:00:00" max="24:00:00" placeholder="Select Time" [(ngModel)]="NoteTime" [ngModelOptions]="{standalone: true}" [disabled]="true">
+            <div class="warn">
+              <ng-container  *ngIf="NoteTime == undefined">Note Time is Required
+              </ng-container>
+            </div>
+        </div> -->
+
+        <div
+          *ngIf="noteUpdationVariable && isManagerProvider"
+          class="note_overview_dropdown common_content"
+        >
+          <p class="common_content_title">Time</p>
+          <div class="time_dropdown_panel">
+            <select
+              class="common_input_dropdown_time"
+              id="addNote_hour"
+              [(ngModel)]="NoteHours"
+              [ngModelOptions]="{ standalone: true }"
+            >
+              <option
+                *ngFor="let obj of hour; let i = index"
+                [value]="obj.id"
+                [selected]="i == 0"
+              >
+                {{ obj.value }}
+              </option>
+            </select>
+            <span class="display_time">HH</span>
+
+            <select
+              class="common_input_dropdown_time"
+              id="addNote_minute"
+              [(ngModel)]="NoteMinutes"
+              [ngModelOptions]="{ standalone: true }"
+            >
+              <option
+                *ngFor="let obj of minutes; let i = index"
+                [value]="obj.id"
+                [selected]="i == 0"
+              >
+                {{ obj.value }}
+              </option>
+            </select>
+            <span class="display_time">MM </span>
+
+            <select
+              class="common_input_dropdown_time"
+              id="addNote_sec"
+              [(ngModel)]="NoteSec"
+              [ngModelOptions]="{ standalone: true }"
+            >
+              <option
+                *ngFor="let obj of sec; let i = index"
+                [value]="obj.id"
+                [selected]="i == 0"
+              >
+                {{ obj.value }}
+              </option>
+            </select>
+            <span class="display_time">SS</span>
+          </div>
+        </div>
+
+        <div
+          *ngIf="noteUpdationVariable && !isManagerProvider"
+          class="note_overview_dropdown common_content"
+        >
+          <p class="common_content_title">Time</p>
+          <div class="time_dropdown_panel">
+            <select
+              class="common_input_dropdown_time"
+              id="addNote_hour"
+              [(ngModel)]="NoteHours"
+              [disabled]="true"
+              [ngModelOptions]="{ standalone: true }"
+            >
+              <option
+                *ngFor="let obj of hour; let i = index"
+                [value]="obj.id"
+                [selected]="i == 0"
+              >
+                {{ obj.value }}
+              </option>
+            </select>
+            <span class="display_time">HH</span>
+
+            <select
+              class="common_input_dropdown_time"
+              id="addNote_Minute"
+              [(ngModel)]="NoteMinutes"
+              [disabled]="true"
+              [ngModelOptions]="{ standalone: true }"
+            >
+              <option
+                *ngFor="let obj of minutes; let i = index"
+                [value]="obj.id"
+                [selected]="i == 0"
+              >
+                {{ obj.value }}
+              </option>
+            </select>
+            <span class="display_time">MM </span>
+
+            <select
+              class="common_input_dropdown_time"
+              id="addNote_Sec"
+              [(ngModel)]="NoteSec"
+              [disabled]="true"
+              [ngModelOptions]="{ standalone: true }"
+            >
+              <option
+                *ngFor="let obj of sec; let i = index"
+                [value]="obj.id"
+                [selected]="i == 0"
+              >
+                {{ obj.value }}
+              </option>
+            </select>
+            <span class="display_time">SS</span>
+          </div>
+        </div>
+
+        <!--  Test Note Template Start -->
+
+        <div
+          class="questionpanel"
+          *ngFor="
+            let note of QuestionArrayBase;
+            let i = index;
+            let first = first
+          "
+        >
+          <div
+            *ngIf="
+              note.AnswerTypes &&
+              note.AnswerTypes.length > 0 &&
+              note.Question != 'Additional Notes'
+            "
+          >
+            <details>
+              <summary class="common_content_title common_content_data_title">
+                {{ note.Question }}
+              </summary>
+              <div class="answer_panel" *ngIf="note.AnswerTypes.length > 0">
+                <div
+                  *ngFor="
+                    let ans of note.AnswerTypes;
+                    let i = index;
+                    let first = first
+                  "
+                >
+                  <div class="answer_sub">
+                    <input
+                      class="answer_check"
+                      type="checkbox"
+                      id="addNote_1"
+                      [(ngModel)]="ans.Checked"
+                      [ngModelOptions]="{ standalone: true }"
+                    />
+                    <p class="answer_descr">{{ ans.Answer }}</p>
+                  </div>
+                </div>
+                <div>
+                  <textarea
+                    class="extra_note_data"
+                    id="addNote_extra1"
+                    [(ngModel)]="note.Notes"
+                    [ngModelOptions]="{ standalone: true }"
+                  ></textarea>
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <div
+            *ngIf="
+              note.SubQuestions.length > 0 &&
+              note.Question != 'Additional Notes'
+            "
+          >
+            <details>
+              <summary class="common_content_title common_content_data_title">
+                {{ note.Question }}
+              </summary>
+              <div
+                class="Sub_question_panel"
+                *ngIf="note.SubQuestions.length > 0"
+              >
+                <div
+                  *ngFor="
+                    let question of note.SubQuestions;
+                    let i = index;
+                    let first = first
+                  "
+                >
+                  <details [open]="first ? true : false">
+                    <summary
+                      class="common_content_title common_content_data_title"
+                    >
+                      {{ question.Question }}
+                    </summary>
+                    <div class="answer_panel">
+                      <div
+                        *ngFor="
+                          let ans of question.AnswerTypes;
+                          let i = index;
+                          let first = first
+                        "
+                      >
+                        <div class="answer_sub">
+                          <input
+                            class="answer_check"
+                            type="checkbox"
+                            id="addNote_2"
+                            [(ngModel)]="ans.Checked"
+                            [ngModelOptions]="{ standalone: true }"
+                          />
+                          <p class="answer_descr">{{ ans.Answer }}</p>
+                        </div>
+                      </div>
+                      <div>
+                        <textarea
+                          class="extra_note_data"
+                          id="addNote_extra2"
+                          [(ngModel)]="question.Notes"
+                          [ngModelOptions]="{ standalone: true }"
+                        ></textarea>
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Test Note template end -->
+
+        <p class="common_content_title">Additional Notes</p>
+        <div>
+          <textarea
+            [(ngModel)]="additionaNotes"
+            id="addNote_Additional"
+            [ngModelOptions]="{ standalone: true }"
+          ></textarea>
+        </div>
+      </div>
+
+      <div *ngIf="QuestionArrayBase.length > 0" class="lower_container">
+        <div>
+          <button
+            class="btn_note"
+            id="previewCancelmainpanel"
+            class="btn_cancel"
+            (mousedown)="previewCancel()"
+          >
+            CANCEL
+          </button>
+        </div>
+        <div>
+          <button
+            class="btn_note"
+            id="previewConfirmmainpanel"
+            class="btn_save"
+            (click)="getDataforquestions()"
+          >
+            SUMMARY
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="QuestionArrayBase.length == 0" class="lower_container">
+        <div>
+          <button
+            class="btn_cancel"
+            id="previewMedCancelmainpanel"
+            (click)="previewCancel()"
+
+          >
+            CANCEL
+          </button>
+        </div>
+        <div>
+          <button
+            class="btn_save"
+            id="previewMedCancelmainpanel"
+            mat-raised-button
+            [class.spinner]="loading_note"
+            [disabled]="loading_note"
+            (click)="previewConfirm()"
+          >
+            CONFIRM
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- Task Template Start -->
+<ng-template #task>
+  <div class="common_template">
+    <!-- <div class="add_watcher_container">
+      <p class="add_watcer_title">Add Watcher</p>
+      <div class="add_watcher_img">
+        <img class="add_watcher_icon" src="../../../../../assets/04-Icons/Icons_Watcher A.svg">
+
+      </div>
+
+    </div> -->
+    <form [formGroup]="registerTask">
+      <div class="add_task_container">
+        <div class="common_main_title">
+          {{ task_updation_variable ? "Update Task" : "Add Task" }}
+        </div>
+        <div class="add_task_content common_template_content">
+          <div class="common_content patient_container_2">
+            <p class="common_content_title">Patient / Contact Name</p>
+            <input
+              class="common_input_dropdown task_type_dropdown"
+              id="task_patientName"
+              readonly
+              formControlName="frmpatientName"
+            />
+          </div>
+
+          <div class="common_content">
+            <p class="common_content_title">Task Type</p>
+            <select
+              class="common_input_dropdown task_type_dropdown"
+              id="task_Type"
+              formControlName="tasktype"
+            >
+              <option [ngValue]="undefined" hidden>Select Task Type</option>
+              <option
+                *ngFor="let data of taskTypeIdArray; let i = index"
+                [value]="data.Id"
+              >
+                {{ data.Name }}
+              </option>
+            </select>
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  registerTask.get('tasktype')?.invalid &&
+                  registerTask.get('tasktype')?.touched
+                "
+                >Tasktype is Required
+              </ng-container>
+            </div>
+          </div>
+          <div class="common_content common_content_description">
+            <p class="common_content_title">Task Description</p>
+            <textarea
+              formControlName="description"
+              id="task_Decription"
+              placeholder="Describe your Task"
+            >
+            </textarea>
+
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  registerTask.get('description')?.invalid &&
+                  registerTask.get('description')?.touched
+                "
+                >Description is Required
+              </ng-container>
+            </div>
+          </div>
+          <!-- Tak Content date Start -->
+          <div class="common_content task_content_date">
+            <div class="task_date_picker_container">
+              <p class="common_content_title">Due Date</p>
+              <input
+                class="common_input_dropdown"
+                type="text"
+                min="{{ todaty_date }}"
+                onfocus="(this.type='date')"
+                id="task_Date"
+                name="scheduleStart"
+                formControlName="duedate"
+              />
+            </div>
+            <div class="task_priority">
+              <p class="common_content_title">Priority</p>
+              <select
+                class="common_input_dropdown priority_task_dropdown"
+                formControlName="priority"
+                id="task_Priority"
+              >
+                <option [ngValue]="undefined" hidden>
+                  Select Priority Type
+                </option>
+                <option
+                  *ngFor="let data of priorityArray; let i = index"
+                  [value]="data.Id"
+                >
+                  {{ data.Name }}
+                </option>
+              </select>
+
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    registerTask.get('priority')?.invalid &&
+                    registerTask.get('priority')?.touched
+                  "
+                  >Priority is Required
+                </ng-container>
+              </div>
+            </div>
+          </div>
+          <div class="common_content">
+            <p class="common_content_title">Task Status</p>
+            <select
+              class="common_input_dropdown task_content_dropdown_self"
+              id="task_Status"
+              formControlName="task_status"
+              [(ngModel)]="selectedValue"
+            >
+              <!-- <option [ngValue]="undefined" hidden>Select Task Status</option> -->
+              <!-- <option  *ngFor="let data of taskStatusIdArray; let i = index;" [value]="data.Id">{{data.Name}} </option> -->
+              <option [ngValue]="undefined" hidden>Select Task Status</option>
+              <ng-container
+                *ngFor="let data of taskStatusIdArray; let i = index"
+              >
+                <ng-container *ngIf="!task_updation_variable">
+                  <option *ngIf="data.Name == 'ToDo'" [value]="data.Name">
+                    {{ data.Name }}
+                  </option>
+                </ng-container>
+                <ng-container *ngIf="task_updation_variable">
+                  <option [value]="data.Name">{{ data.Name }}</option>
+                </ng-container>
+              </ng-container>
+            </select>
+
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  registerTask.get('task_status')?.invalid &&
+                  registerTask.get('task_status')?.touched
+                "
+                >Task status is Required
+              </ng-container>
+            </div>
+          </div>
+
+          <div class="common_content" *ngIf="!task_updation_variable">
+            <p class="common_content_title">Assignee Name</p>
+            <div class="Self_assign">
+              <div class="self_assign_input_panel">
+                <ng-autocomplete
+                  id="task_CareTeam"
+                  [data]="http_taskAssigneeList"
+                  [searchKeyword]="keyword_task_careteam"
+                  [initialValue]="task_careteam_name"
+                  placeholder="Select CareTeam"
+                  (selected)="selectEvent_task_careteam($event)"
+                  (inputChanged)="onChangeSearch_task_careteam($event)"
+                  (inputFocused)="onFocused_task_careteam($event)"
+                  (inputCleared)="clearTaskEvent($event)"
+                  [itemTemplate]="itemTemplate"
+                  [notFoundTemplate]="notFoundTemplate"
+                >
+                </ng-autocomplete>
+
+                <ng-template #itemTemplate let-item>
+                  <a [innerHTML]="item.UserName"></a>
+                </ng-template>
+
+                <ng-template #notFoundTemplate let-notFound>
+                  <div [innerHTML]="notFound"></div>
+                </ng-template>
+              </div>
+
+              <div class="self_assign_icon">
+                <div
+                  [ngClass]="
+                    self_assignee_variable
+                      ? 'self_assign_icon_cont_active'
+                      : 'self_assign_icon_cont_inactive'
+                  "
+                  id="task_SelfAssign"
+                  class="self_assign_icon_cont"
+                  (click)="selfAssign()"
+                >
+                  <img
+                    class="add_check_icon"
+                    src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                  />
+                </div>
+                <p class="common_content_title">Self Assign</p>
+              </div>
+            </div>
+
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  registerTask.get('assignee_name')?.invalid &&
+                  registerTask.get('assignee_name')?.touched
+                "
+                >Assignee Name Required
+              </ng-container>
+            </div>
+          </div>
+          <div class="common_content" *ngIf="task_updation_variable">
+            <p class="common_content_title">Assignee Name</p>
+            <div class="Self_assign">
+              <div class="self_assign_input_panel">
+                <ng-autocomplete
+                  id="task_CareTeam"
+                  [data]="TaskAssigneeMemberList"
+                  [searchKeyword]="keyword_task_careteamupdate"
+                  [initialValue]="task_careteam_name"
+                  placeholder="Select CareTeam"
+                  (selected)="selectEvent_task_update_careteam($event)"
+                  (inputChanged)="onChangeSearch_task_careteam($event)"
+                  (inputFocused)="onFocused_task_careteam($event)"
+                  (inputCleared)="clearTaskEvent($event)"
+                  [itemTemplate]="itemTemplate"
+                  [notFoundTemplate]="notFoundTemplate"
+                >
+                </ng-autocomplete>
+
+                <ng-template #itemTemplate let-item>
+                  <a [innerHTML]="item.Member"></a>
+                </ng-template>
+
+                <ng-template #notFoundTemplate let-notFound>
+                  <div [innerHTML]="notFound"></div>
+                </ng-template>
+              </div>
+
+              <div class="self_assign_icon">
+                <div
+                  [ngClass]="
+                    self_assignee_variable
+                      ? 'self_assign_icon_cont_active'
+                      : 'self_assign_icon_cont_inactive'
+                  "
+                  id="task_SelfAssign"
+                  class="self_assign_icon_cont"
+                  (click)="selfAssign()"
+                >
+                  <img
+                    class="add_check_icon"
+                    src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                  />
+                </div>
+                <p class="common_content_title">Self Assign</p>
+              </div>
+            </div>
+
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  registerTask.get('assignee_name')?.invalid &&
+                  registerTask.get('assignee_name')?.touched
+                "
+                >Assignee Name Required
+              </ng-container>
+            </div>
+          </div>
+
+          <!-- Task Content self End -->
+          <div class="common_content">
+            <p class="common_content_title">Comments</p>
+            <textarea
+              placeholder="Comment"
+              id="task_Comments"
+              formControlName="task_comment"
+            >
+            </textarea>
+          </div>
+        </div>
+        <div class="lower_container">
+          <div>
+            <button
+              id="taskCancelPatientdetailPage"
+              class="btn_note"
+              class="btn_cancel"
+              (mousedown)="OnClickTaskCancel()"
+            >
+              CANCEL
+            </button>
+          </div>
+          <div
+            *ngIf="
+              (patientStatus && patientStatus == 'Discharged') ||
+              (roleId[0].Id != 6 && roleId[0].Id != 8)
+            "
+          >
+            <button
+              mat-raised-button
+              id="taskConfirmPatientdetailPage"
+              [class.spinner]="loading"
+              [disabled]="loading"
+              class="btn_note"
+              class="btn_save"
+              (click)="AddTask()"
+            >
+              SAVE
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>
+<!-- Task Template End -->
+
+<!-- Schedule Template Start -->
+<ng-template #schedule>
+  <div class="common_template">
+    <div *ngIf="!update_schedule_variable">
+      <form [formGroup]="registerSchedule">
+        <div class="common_main_title">
+          <!-- {{update_schedule_variable ? 'Update Schedule' :'Add Schedule'}} -->
+          Add Schedule
+        </div>
+        <div class="add_schedule_content common_template_content">
+          <div class="common_content patient_container_2">
+            <p class="common_content_title">Patient / Contact Name</p>
+            <input
+              class="common_input_dropdown task_type_dropdown"
+              id="Sch_PatientName"
+              readonly
+              formControlName="frmpatientName"
+            />
+          </div>
+
+          <div class="common_content">
+            <p class="common_content_title">Schedule Type</p>
+            <select
+              class="common_input_dropdown"
+              formControlName="scheduleType"
+              id="Sch_Type"
+              required
+            >
+              <option [ngValue]="undefined" hidden>Select Schedule Type</option>
+              <option
+                *ngFor="let data of ScheduleTypeIdArray; let i = index"
+                [value]="data.ScheduleTypeId"
+              >
+                {{ data.ScheduleName }}
+              </option>
+            </select>
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  registerSchedule.get('scheduleType')?.invalid &&
+                  registerSchedule.get('scheduleType')?.touched
+                "
+                >Schedule Type is Required
+              </ng-container>
+            </div>
+          </div>
+          <div class="common_content common_content_description">
+            <p class="common_content_title">Schedule Description</p>
+            <textarea
+              placeholder="Describe Schedule"
+              id="Sch_Description"
+              formControlName="scheduleDescription"
+              required
+            >
+            </textarea>
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  registerSchedule.get('scheduleDescription')?.invalid &&
+                  registerSchedule.get('scheduleDescription')?.touched
+                "
+                >Schedule Description is Required
+              </ng-container>
+            </div>
+          </div>
+          <!-- Date Panel Start -->
+          <div class="schedule_date_panel common_content">
+            <div class="start_date">
+              <p class="common_content_title">Start Date</p>
+              <input
+                class="common_input_dropdown"
+                type="date"
+                min="{{ todaty_date }}"
+                id="schedule_start"
+                name="scheduleStart"
+                formControlName="startDate"
+              />
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    registerSchedule.get('startDate')?.invalid &&
+                    registerSchedule.get('startDate')?.touched
+                  "
+                  >Start date is Required
+                </ng-container>
+              </div>
+            </div>
+            <div class="end_date">
+              <p class="common_content_title">End Date</p>
+
+              <input
+                class="common_input_dropdown"
+                type="date"
+                min="{{ todaty_date }}"
+                id="schedule_end"
+                name="scheduleEnd"
+                formControlName="endDate"
+              />
+
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    registerSchedule.get('endDate')?.invalid &&
+                    registerSchedule.get('endDate')?.touched
+                  "
+                  >End date is Required
+                </ng-container>
+              </div>
+            </div>
+          </div>
+          <!-- Date Panel End -->
+          <!-- Time Panel -->
+          <div class="schedule_timer_content common_content">
+            <div class="start_date_timer">
+              <p class="common_content_title">Start Time</p>
+              <input
+                class="time_input common_input_dropdown"
+                placeholder="00:00"
+                type="text"
+                onfocus="(this.type='time')"
+                formControlName="startTime"
+                id="Sch_StartTime"
+              />
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    registerSchedule.get('startTime')?.invalid &&
+                    registerSchedule.get('startTime')?.touched
+                  "
+                >
+                  Start time is Required
+                </ng-container>
+              </div>
+            </div>
+            <div class="duration_time">
+              <p class="common_content_title">Duration</p>
+              <div class="duration_main_cont">
+                <div class="duration_content_panel">
+                  <div class="btn_common_cont">
+                    <img
+                      (click)="increment()"
+                      id="Sch_durationIncrease"
+                      class="btn-common"
+                      src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                    />
+                  </div>
+                  <!-- <span class="duration_value">{{durationValue}}</span> -->
+                  <input
+                    class="duration_value SmallFormlabel"
+                    id="Sch_Duration"
+                    [(ngModel)]="durationValue"
+                    [ngModelOptions]="{ standalone: true }"
+                  />
+
+                  <div class="btn_common_cont">
+                    <img
+                      (click)="decrement()"
+                      id="Sch_durationDecrease"
+                      class="btn-common"
+                      src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                    />
+                  </div>
+                </div>
+
+                <span class="duration_text"> Mins </span>
+              </div>
+            </div>
+          </div>
+          <!-- Time Panel End -->
+
+          <div class="common_content">
+            <p class="common_content_title">Frequency</p>
+
+            <select
+              class="frequency_content_dropdown common_input_dropdown task_content_dropdown_self"
+              [(ngModel)]="frequencyValue"
+              id="Sch_Frequency"
+              formControlName="frequency"
+            >
+              <option [ngValue]="undefined" hidden>
+                Select Frequency Type
+              </option>
+              <option value="Daily">Daily</option>
+              <option value="Weekly">Weekly</option>
+              <option value="Monthly">Monthly</option>
+            </select>
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  registerSchedule.get('frequency')?.invalid &&
+                  registerSchedule.get('frequency')?.touched
+                "
+              >
+                Frequency is Required
+              </ng-container>
+            </div>
+
+            <div *ngIf="frequencyValue == 'Weekly'" class="frequency_week">
+              <div class="frequency_sub_panel">
+                <div class="schedule_week_item">
+                  <input
+                    class="schedule_checkbox"
+                    type="checkbox"
+                    formControlName="scheduleMonday"
+                    id="mon"
+                    name="monday"
+                    value="mon"
+                  />
+                  <label for="mon" class="common_content_title"> Mon </label>
+                </div>
+
+                <div class="schedule_week_item">
+                  <input
+                    class="schedule_checkbox"
+                    type="checkbox"
+                    formControlName="scheduleTuesday"
+                    id="tues"
+                    name="tuesday"
+                    value="tues"
+                  />
+                  <label for="tues" class="common_content_title"> Tue </label>
+                </div>
+
+                <div class="schedule_week_item">
+                  <input
+                    class="schedule_checkbox"
+                    type="checkbox"
+                    formControlName="scheduleWednesday"
+                    id="wed"
+                    name="wednesday"
+                    value="wed"
+                  />
+                  <label for="wed" class="common_content_title"> Wed </label>
+                </div>
+              </div>
+
+              <div class="frequency_sub_panel">
+                <div class="schedule_week_item">
+                  <input
+                    class="schedule_checkbox"
+                    type="checkbox"
+                    formControlName="scheduleThursday"
+                    id="thurs"
+                    name="thurseday"
+                    value="thurs"
+                  />
+                  <label for="thurs" class="common_content_title"> Thu </label>
+                </div>
+                <div class="schedule_week_item">
+                  <input
+                    class="schedule_checkbox"
+                    type="checkbox"
+                    formControlName="scheduleFriday"
+                    id="fri"
+                    name="friday"
+                    value="fri"
+                  />
+                  <label for="fri" class="common_content_title"> Fri </label>
+                </div>
+                <div class="schedule_week_item">
+                  <input
+                    class="schedule_checkbox"
+                    type="checkbox"
+                    formControlName="scheduleSaturday"
+                    id="sat"
+                    name="saturday"
+                    value="sat"
+                  />
+                  <label for="sat" class="common_content_title"> Sat </label>
+                </div>
+              </div>
+              <div class="schedule_week_item">
+                <input
+                  class="schedule_checkbox"
+                  type="checkbox"
+                  formControlName="scheduleSunday"
+                  id="sun"
+                  name="sunday"
+                  value="sun"
+                />
+                <label for="sun" class="common_content_title"> Sun </label>
+              </div>
+            </div>
+            <div *ngIf="frequencyValue == 'Monthly'" class="frequency_monthly">
+              <div class="frequency_monthly_panel">
+                <p class="common_content_title">Week Selection</p>
+                <select
+                  class="schedule_monthy_dropdown"
+                  formControlName="weekSelectionFrequency"
+                  id="Sch_MonthFrequency"
+                >
+                  <option [ngValue]="undefined" hidden>
+                    Select Frequency Type
+                  </option>
+                  <option *ngFor="let freq of weekFrequency" [value]="freq.id">
+                    {{ freq.weekPeriod }}
+                  </option>
+                </select>
+
+                <div class="frequency_week">
+                  <div class="frequency_sub_panel">
+                    <div class="schedule_week_item">
+                      <input
+                        class="schedule_checkbox"
+                        type="checkbox"
+                        formControlName="scheduleSubMonday"
+                        id="mon"
+                        name="monday"
+                        value="mon"
+                      />
+                      <label for="mon" class="common_content_title">
+                        Mon
+                      </label>
+                    </div>
+
+                    <div class="schedule_week_item">
+                      <input
+                        class="schedule_checkbox"
+                        type="checkbox"
+                        formControlName="scheduleSubTuesday"
+                        id="tues"
+                        name="tuesday"
+                        value="tues"
+                      />
+                      <label for="tues" class="common_content_title">
+                        Tue
+                      </label>
+                    </div>
+
+                    <div class="schedule_week_item">
+                      <input
+                        class="schedule_checkbox"
+                        type="checkbox"
+                        formControlName="scheduleSubWednesday"
+                        id="wed"
+                        name="wednesday"
+                        value="wed"
+                      />
+                      <label for="wed" class="common_content_title">
+                        Wed
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="frequency_sub_panel">
+                    <div class="schedule_week_item">
+                      <input
+                        class="schedule_checkbox"
+                        type="checkbox"
+                        formControlName="scheduleSubThursday"
+                        id="thurs"
+                        name="thurseday"
+                        value="thurs"
+                      />
+                      <label for="thurs" class="common_content_title">
+                        Thu
+                      </label>
+                    </div>
+                    <div class="schedule_week_item">
+                      <input
+                        class="schedule_checkbox"
+                        type="checkbox"
+                        formControlName="scheduleSubFriday"
+                        id="fri"
+                        name="friday"
+                        value="fri"
+                      />
+                      <label for="fri" class="common_content_title">
+                        Fri
+                      </label>
+                    </div>
+                    <div class="schedule_week_item">
+                      <input
+                        class="schedule_checkbox"
+                        type="checkbox"
+                        formControlName="scheduleSubSaturday"
+                        id="sat"
+                        name="saturday"
+                        value="sat"
+                      />
+                      <label for="sat" class="common_content_title">
+                        Sat
+                      </label>
+                    </div>
+                  </div>
+                  <div class="schedule_week_item">
+                    <input
+                      class="schedule_checkbox"
+                      type="checkbox"
+                      formControlName="scheduleSubSunday"
+                      id="sun"
+                      name="sunday"
+                      value="sun"
+                    />
+                    <label for="sun" class="common_content_title"> Sun </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="common_content">
+            <p class="common_content_title">Assignee Name</p>
+            <div class="Self_assign">
+              <!-- <input class="common_input_dropdown task_content_dropdown_self" [attr.disabled]="true" formControlName="assigneeName"/>
+              <div class="self_assign_icon">
+
+                <p class="common_content_title">Self Assign</p>
+              </div> -->
+
+              <div class="self_assign_input_panel">
+                <ng-autocomplete
+                  id="Sch_CareTeam"
+                  [data]="http_AssigneeListSchedule"
+                  [searchKeyword]="keyword_schedule_careteam"
+                  [initialValue]="schedule_careteam_name"
+                  placeholder="Select CareTeam"
+                  (selected)="selectEvent_schedule_careteam($event)"
+                  (inputChanged)="onChangeSearch_schedule_careteam($event)"
+                  (inputFocused)="onFocused_schedule_careteam($event)"
+                  (inputCleared)="onClearSchedule($event)"
+                  [itemTemplate]="itemTemplate"
+                  [notFoundTemplate]="notFoundTemplate"
+                >
+                </ng-autocomplete>
+
+                <ng-template #itemTemplate let-item>
+                  <a [innerHTML]="item.UserName"></a>
+                </ng-template>
+
+                <ng-template #notFoundTemplate let-notFound>
+                  <div [innerHTML]="notFound"></div>
+                </ng-template>
+              </div>
+
+              <div class="self_assign_icon">
+                <div
+                  [ngClass]="
+                    self_assignee_variable
+                      ? 'self_assign_icon_cont_active'
+                      : 'self_assign_icon_cont_inactive'
+                  "
+                  class="self_assign_icon_cont"
+                  id="Sch_SelfAssign"
+                  (click)="selfAssignSchedule()"
+                >
+                  <img
+                    class="add_check_icon"
+                    src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                  />
+                </div>
+                <p class="common_content_title">Self Assigned</p>
+              </div>
+            </div>
+            <!-- <div class="warn">
+              <ng-container *ngIf="registerSchedule.get('assigneeName')?.invalid && registerSchedule.get('assigneeName')?.touched"> AssigneeName is Required
+              </ng-container>
+            </div> -->
+          </div>
+        </div>
+        <!-- schedule_lower_container -->
+        <div class="lower_container">
+          <div>
+            <button
+              class="btn_note"
+              class="btn_cancel"
+              id="Sch_Cancel"
+              (mousedown)="OnClickScheduleCancel()"
+            >
+              CANCEL
+            </button>
+          </div>
+          <div>
+            <button
+              class="btn_note"
+              mat-raised-button
+              [class.spinner]="loading"
+              [disabled]="loading"
+              class="btn_save"
+              id="Sch_Save"
+              (click)="AddSchedule()"
+            >
+              SAVE
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div *ngIf="update_schedule_variable">
+      <form [formGroup]="registerSchedule">
+        <div class="common_main_title">Update Schedule</div>
+        <div class="add_schedule_content common_template_content">
+          <div class="common_content patient_container_2">
+            <p class="common_content_title">Patient / Contact Name</p>
+            <input
+              class="common_input_dropdown task_type_dropdown"
+              id="Sch_UpdatePName"
+              readonly
+              formControlName="frmpatientName"
+            />
+          </div>
+
+          <div class="common_content">
+            <p class="common_content_title">Schedule Type</p>
+            <select
+              class="common_input_dropdown"
+              id="Sch_UpdateType"
+              [attr.disabled]="checkedSingle || AssigneeMemberStatus ? true : null"
+              formControlName="scheduleType"
+              required
+            >
+              <option [ngValue]="undefined" hidden>Select Schedule Type</option>
+              <option
+                *ngFor="let data of ScheduleTypeIdArray; let i = index"
+                [value]="data.ScheduleTypeId"
+              >
+                {{ data.ScheduleName }}
+              </option>
+            </select>
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  registerSchedule.get('scheduleType')?.invalid &&
+                  registerSchedule.get('scheduleType')?.touched
+                "
+                >Schedule Type is Required
+              </ng-container>
+            </div>
+          </div>
+          <div class="common_content common_content_description">
+            <p class="common_content_title">Schedule Description</p>
+            <textarea
+              [attr.disabled]="AssigneeMemberStatus ? true : null"
+              id="Sch_UpdateDescription"
+              placeholder="Describe Schedule"
+              formControlName="scheduleDescription"
+              required
+            >
+            </textarea>
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  registerSchedule.get('scheduleDescription')?.invalid &&
+                  registerSchedule.get('scheduleDescription')?.touched
+                "
+                >Schedule Description is Required
+              </ng-container>
+            </div>
+          </div>
+
+          <div class="occurancetemplate">
+            <div class="schedule_occurance_item schedule_occurance_left">
+              <input
+                class="schedule_checkbox"
+                type="checkbox"
+                id="single"
+                name="singleOccurance"
+                [(ngModel)]="checkedSingle"
+                (change)="CheckSingOrSeriesValue($event)"
+                [ngModelOptions]="{ standalone: true }"
+              />
+              <label for="single" class="common_content_title"
+                >This Occurance
+              </label>
+            </div>
+
+            <div class="schedule_occurance_item">
+              <input
+                class="schedule_checkbox"
+                type="checkbox"
+                name="seriesOccurance"
+                (change)="CheckSingOrSeriesValue($event)"
+                [(ngModel)]="checkedSeries"
+                id="series"
+                [ngModelOptions]="{ standalone: true }"
+              />
+              <label for="single" class="common_content_title"
+                >Complete Series</label
+              >
+            </div>
+          </div>
+
+          <div *ngIf="checkedSeries" class="schedule_date_panel common_content">
+            <div class="start_date">
+              <p class="common_content_title">Start Date</p>
+              <input
+                class="common_input_dropdown"
+                [attr.disabled]="AssigneeMemberStatus ? true : null"
+                id="schedule_start"
+                type="text"
+                min="{{ todaty_date }}"
+                onfocus="(this.type='date')"
+                name="scheduleStart"
+                min="{{ todaty_date }}"
+                formControlName="startDate"
+              />
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    registerSchedule.get('startDate')?.invalid &&
+                    registerSchedule.get('startDate')?.touched
+                  "
+                  >Start date is Required
+                </ng-container>
+              </div>
+            </div>
+            <div class="end_date">
+              <p class="common_content_title">End Date</p>
+
+              <input
+                class="common_input_dropdown"
+                [attr.disabled]="AssigneeMemberStatus ? true : null"
+                type="text"
+                min="{{ todaty_date }}"
+                onfocus="(this.type='date')"
+                id="schedule_end"
+                name="scheduleEnd"
+                formControlName="endDate"
+              />
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    registerSchedule.get('endDate')?.invalid &&
+                    registerSchedule.get('endDate')?.touched
+                  "
+                  >End date is Required
+                </ng-container>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="checkedSingle" class="schedule_date_panel common_content">
+            <div class="start_date">
+              <p class="common_content_title">Start Date</p>
+              <input
+                class="common_input_dropdown"
+                [attr.disabled]="AssigneeMemberStatus ? true : null"
+                type="text"
+                onfocus="(this.type='date')"
+                id="schedule_start"
+                name="scheduleStart"
+                min="{{ todaty_date }}"
+                formControlName="startDate"
+              />
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    registerSchedule.get('startDate')?.invalid &&
+                    registerSchedule.get('startDate')?.touched
+                  "
+                  >Start date is Required
+                </ng-container>
+              </div>
+            </div>
+          </div>
+
+          <div class="schedule_timer_content common_content">
+            <div class="start_date_timer">
+              <p class="common_content_title">Start Time</p>
+              <input
+                class="time_input common_input_dropdown"
+                placeholder="00:00"
+                type="text"
+                onfocus="(this.type='time')"
+                formControlName="startTime"
+                id="Sch_StartTime"
+                [attr.disabled]="AssigneeMemberStatus ? true : null"
+              />
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    registerSchedule.get('startTime')?.invalid &&
+                    registerSchedule.get('startTime')?.touched
+                  "
+                >
+                  Start time is Required
+                </ng-container>
+              </div>
+            </div>
+            <div class="duration_time">
+              <p class="common_content_title">Duration</p>
+              <div class="duration_main_cont">
+                <div class="duration_content_panel">
+                  <div class="btn_common_cont">
+                    <img
+                      (click)="!AssigneeMemberStatus ? increment() : null"
+                      id="Sch_updateDurationIncrease"
+                      class="btn-common"
+                      src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                    />
+                  </div>
+                  <input
+                    class="duration_value SmallFormlabel"
+                    [(ngModel)]="durationValue"
+                    [ngModelOptions]="{ standalone: true }"
+                  />
+
+                  <div class="btn_common_cont">
+                    <img
+                      (click)="!AssigneeMemberStatus ? decrement() : null"
+                      id="Sch_updateDurationDecrease"
+                      class="btn-common"
+                      src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                    />
+                  </div>
+                </div>
+
+                <span class="duration_text"> Mins </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="common_content" *ngIf="checkedSeries">
+            <p class="common_content_title">Frequency</p>
+
+            <select
+              [attr.disabled]="AssigneeMemberStatus ? true : null"
+              id="Sch_UpdateFrequency"
+              class="frequency_content_dropdown common_input_dropdown task_content_dropdown_self"
+              [(ngModel)]="frequencyValue"
+              formControlName="frequency"
+            >
+              <option [ngValue]="undefined" hidden>
+                Select Frequency Type
+              </option>
+              <option value="Daily">Daily</option>
+              <option value="Weekly">Weekly</option>
+              <option value="Monthly">Monthly</option>
+            </select>
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  registerSchedule.get('frequency')?.invalid &&
+                  registerSchedule.get('frequency')?.touched
+                "
+              >
+                Frequency is Required
+              </ng-container>
+            </div>
+
+            <div *ngIf="frequencyValue == 'Weekly'" class="frequency_week">
+              <div class="frequency_sub_panel">
+                <div class="schedule_week_item">
+                  <input
+                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    class="schedule_checkbox"
+                    type="checkbox"
+                    formControlName="scheduleMonday"
+                    id="mon"
+                    name="monday"
+                    value="mon"
+                  />
+                  <label for="mon" class="common_content_title"> Mon </label>
+                </div>
+
+                <div class="schedule_week_item">
+                  <input
+                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    class="schedule_checkbox"
+                    type="checkbox"
+                    formControlName="scheduleTuesday"
+                    id="tues"
+                    name="tuesday"
+                    value="tues"
+                  />
+                  <label for="tues" class="common_content_title"> Tue </label>
+                </div>
+
+                <div class="schedule_week_item">
+                  <input
+                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    class="schedule_checkbox"
+                    type="checkbox"
+                    formControlName="scheduleWednesday"
+                    id="wed"
+                    name="wednesday"
+                    value="wed"
+                  />
+                  <label for="wed" class="common_content_title"> Wed </label>
+                </div>
+              </div>
+
+              <div class="frequency_sub_panel">
+                <div class="schedule_week_item">
+                  <input
+                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    class="schedule_checkbox"
+                    type="checkbox"
+                    formControlName="scheduleThursday"
+                    id="thurs"
+                    name="thurseday"
+                    value="thurs"
+                  />
+                  <label for="thurs" class="common_content_title"> Thu </label>
+                </div>
+                <div class="schedule_week_item">
+                  <input
+                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    class="schedule_checkbox"
+                    type="checkbox"
+                    formControlName="scheduleFriday"
+                    id="fri"
+                    name="friday"
+                    value="fri"
+                  />
+                  <label for="fri" class="common_content_title"> Fri </label>
+                </div>
+                <div class="schedule_week_item">
+                  <input
+                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    class="schedule_checkbox"
+                    type="checkbox"
+                    formControlName="scheduleSaturday"
+                    id="sat"
+                    name="saturday"
+                    value="sat"
+                  />
+                  <label for="sat" class="common_content_title"> Sat </label>
+                </div>
+              </div>
+              <div class="schedule_week_item">
+                <input
+                  [attr.disabled]="AssigneeMemberStatus ? true : null"
+                  class="schedule_checkbox"
+                  type="checkbox"
+                  formControlName="scheduleSunday"
+                  id="sun"
+                  name="sunday"
+                  value="sun"
+                />
+                <label for="sun" class="common_content_title"> Sun </label>
+              </div>
+            </div>
+            <div *ngIf="frequencyValue == 'Monthly'" class="frequency_monthly">
+              <div class="frequency_monthly_panel">
+                <p class="common_content_title">Week Selection</p>
+                <select
+                  [attr.disabled]="AssigneeMemberStatus ? true : null"
+                  class="schedule_monthy_dropdown"
+                  formControlName="weekSelectionFrequency"
+                  id="Sch_updateMonthFrequency"
+                >
+                  <option [ngValue]="undefined" hidden>
+                    Select Frequency Type
+                  </option>
+                  <option *ngFor="let freq of weekFrequency" [value]="freq.id">
+                    {{ freq.weekPeriod }}
+                  </option>
+                </select>
+
+                <div class="frequency_week">
+                  <div class="frequency_sub_panel">
+                    <div class="schedule_week_item">
+                      <input
+                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        class="schedule_checkbox"
+                        type="checkbox"
+                        formControlName="scheduleSubMonday"
+                        id="mon"
+                        name="monday"
+                        value="mon"
+                      />
+                      <label for="mon" class="common_content_title">
+                        Mon
+                      </label>
+                    </div>
+
+                    <div class="schedule_week_item">
+                      <input
+                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        class="schedule_checkbox"
+                        type="checkbox"
+                        formControlName="scheduleSubTuesday"
+                        id="tues"
+                        name="tuesday"
+                        value="tues"
+                      />
+                      <label for="tues" class="common_content_title">
+                        Tue
+                      </label>
+                    </div>
+
+                    <div class="schedule_week_item">
+                      <input
+                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        class="schedule_checkbox"
+                        type="checkbox"
+                        formControlName="scheduleSubWednesday"
+                        id="wed"
+                        name="wednesday"
+                        value="wed"
+                      />
+                      <label for="wed" class="common_content_title">
+                        Wed
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="frequency_sub_panel">
+                    <div class="schedule_week_item">
+                      <input
+                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        class="schedule_checkbox"
+                        type="checkbox"
+                        formControlName="scheduleSubThursday"
+                        id="thurs"
+                        name="thurseday"
+                        value="thurs"
+                      />
+                      <label for="thurs" class="common_content_title">
+                        Thu
+                      </label>
+                    </div>
+                    <div class="schedule_week_item">
+                      <input
+                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        class="schedule_checkbox"
+                        type="checkbox"
+                        formControlName="scheduleSubFriday"
+                        id="fri"
+                        name="friday"
+                        value="fri"
+                      />
+                      <label for="fri" class="common_content_title">
+                        Fri
+                      </label>
+                    </div>
+                    <div class="schedule_week_item">
+                      <input
+                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        class="schedule_checkbox"
+                        type="checkbox"
+                        formControlName="scheduleSubSaturday"
+                        id="sat"
+                        name="saturday"
+                        value="sat"
+                      />
+                      <label for="sat" class="common_content_title">
+                        Sat
+                      </label>
+                    </div>
+                  </div>
+                  <div class="schedule_week_item">
+                    <input
+                      [attr.disabled]="AssigneeMemberStatus ? true : null"
+                      class="schedule_checkbox"
+                      type="checkbox"
+                      formControlName="scheduleSubSunday"
+                      id="sun"
+                      name="sunday"
+                      value="sun"
+                    />
+                    <label for="sun" class="common_content_title"> Sun </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="common_content">
+            <p class="common_content_title">Assignee Name</p>
+            <div class="Self_assign">
+              <div class="self_assign_input_panel">
+                <ng-autocomplete
+                  id="Sch_UpdateCareTeam"
+                  [disabled]="AssigneeMemberStatus || checkedSingle"
+                  [data]="http_AssigneeListSchedule"
+                  [searchKeyword]="keyword_schedule_careteam"
+                  [initialValue]="schedule_careteam_name"
+                  placeholder="Select CareTeam"
+                  (selected)="selectEvent_schedule_careteam($event)"
+                  (inputChanged)="onChangeSearch_schedule_careteam($event)"
+                  (inputFocused)="onFocused_schedule_careteam($event)"
+                  (inputCleared)="clearscheduleEvent($event)"
+                  [itemTemplate]="itemTemplate"
+                  [notFoundTemplate]="notFoundTemplate"
+                >
+                </ng-autocomplete>
+
+                <ng-template #itemTemplate let-item>
+                  <a [innerHTML]="item.UserName"></a>
+                </ng-template>
+
+                <ng-template #notFoundTemplate let-notFound>
+                  <div [innerHTML]="notFound"></div>
+                </ng-template>
+              </div>
+
+              <div class="self_assign_icon">
+                <div
+                  [ngClass]="
+                    self_assignee_variable
+                      ? 'self_assign_icon_cont_active'
+                      : 'self_assign_icon_cont_inactive'
+                  "
+                  class="self_assign_icon_cont"
+                  id="Sch_UpdateSelfAssign"
+                  (click)="selfAssignSchedule()"
+                >
+                  <img
+                    class="add_check_icon"
+                    src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                  />
+                </div>
+                <p class="common_content_title">Self Assign</p>
+              </div>
+            </div>
+            <!-- <div class="warn">
+              <ng-container *ngIf="registerSchedule.get('assigneeName')?.invalid && registerSchedule.get('assigneeName')?.touched"> AssigneeName is Required
+              </ng-container>
+            </div> -->
+          </div>
+        </div>
+        <div class="lower_container">
+          <div>
+            <button
+              id="scheduleCancelPatientdetailPage"
+              class="btn_note"
+              class="btn_cancel"
+              (mousedown)="OnClickScheduleCancel()"
+            >
+              CANCEL
+            </button>
+          </div>
+          <div *ngIf="roleId[0].Id != 6 && roleId[0].Id != 8">
+            <button
+              id="scheduleConfirmPatientdetailPage"
+              class="btn_note"
+              class="btn_save"
+              (click)="AddSchedule()"
+            >
+              SAVE
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Schedule Template Ends -->
+<!-- Symptom Template -->
+<ng-template #symptom>
+  <div class="common_template">
+    <form [formGroup]="registerSymptoms">
+      <div class="common_main_title">
+        {{ symptom_update_variable ? "Update Symptoms" : "Add Symptoms" }}
+      </div>
+      <div class="add_symptom_container common_template_content">
+        <div class="common_content patient_container_2">
+          <p class="common_content_title">Patient / Contact Name</p>
+          <input
+            class="common_input_dropdown task_type_dropdown"
+            id="Sym_Pname"
+            readonly
+            formControlName="frmpatientName"
+          />
+        </div>
+
+        <div class="common_content">
+          <p class="common_content_title">Symptom type</p>
+          <div *ngIf="!symptom_update_variable">
+            <!-- <mat-form-field class="add_team_input" >
+            <input type="text" class="patient_detail_content_dropdown "
+                   aria-label="Name"
+                   matInput
+                   formControlName="symptomsType"
+                   [matAutocomplete]="auto"
+                  >
+              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedSymptom($event)" [displayWith]="getOptionText">
+                <mat-option *ngFor="let option of (filteredOptions | async)" [value]="option">
+                    {{ option.Symptoms}}
+                  </mat-option>
+                </mat-autocomplete>
+          </mat-form-field> -->
+            <ng-autocomplete
+              id="Sym_Type"
+              [data]="optionData"
+              [searchKeyword]="keyword_symptoms"
+              placeholder="Select Symptoms"
+              (selected)="selectEvent_symptoms($event)"
+              (inputChanged)="onChangeSearch_symptoms($event)"
+              (inputFocused)="onFocused_schedule($event)"
+              (inputCleared)="clearEventschedule($event)"
+              [itemTemplate]="itemTemplate"
+              [notFoundTemplate]="notFoundTemplate"
+            >
+            </ng-autocomplete>
+
+            <ng-template #itemTemplate let-item>
+              <a [innerHTML]="item.Symptoms"></a>
+            </ng-template>
+
+            <ng-template #notFoundTemplate let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+            <!-- <div class="warn">
+            <ng-container  *ngIf="registerSymptoms.get('symptomsType')?.invalid && registerSymptoms.get('symptomsType')?.touched">Symptom Type is Required
+            </ng-container>
+          </div> -->
+          </div>
+          <div *ngIf="symptom_update_variable">
+            <!-- <mat-form-field class="add_team_input" >
+            <input type="text" class="patient_detail_content_dropdown"
+
+                   aria-label="Name"
+                   matInput
+                   formControlName="symptomsType"
+                   [matAutocomplete]="auto"
+                  >
+              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedSymptom($event)" [displayWith]="getSymtomOptionText" [autoActiveFirstOption]="true">
+                <mat-option *ngFor="let option of (filteredOptions | async)" [value]="option">
+                    {{ option.Symptom}}
+                  </mat-option>
+                </mat-autocomplete>
+          </mat-form-field> -->
+            <ng-autocomplete
+              id="Sym_Type"
+              [data]="optionData"
+              [searchKeyword]="keyword_symptoms"
+              [initialValue]="this.Symptoms_List"
+              placeholder="Select Symptoms"
+              (selected)="selectEvent_symptoms($event)"
+              (inputChanged)="onChangeSearch_symptoms($event)"
+              (inputFocused)="onFocused_schedule($event)"
+              (inputCleared)="clearEventschedule($event)"
+              [itemTemplate]="itemTemplate"
+              [notFoundTemplate]="notFoundTemplate"
+            >
+            </ng-autocomplete>
+
+            <ng-template #itemTemplate let-item>
+              <a [innerHTML]="item.Symptoms"></a>
+            </ng-template>
+
+            <ng-template #notFoundTemplate let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  registerSymptoms.get('symptomsType')?.invalid &&
+                  registerSymptoms.get('symptomsType')?.touched
+                "
+                >Symptom Type is Required
+              </ng-container>
+            </div>
+          </div>
+        </div>
+
+        <div class="common_content">
+          <p class="common_content_title">Symptom Description</p>
+          <textarea
+            placeholder="Symptom Description"
+            id="Sym_Description"
+            formControlName="symptomsDescription"
+          >
+          </textarea>
+          <div class="warn">
+            <ng-container
+              *ngIf="
+                registerSymptoms.get('symptomsDescription')?.invalid &&
+                registerSymptoms.get('symptomsDescription')?.touched
+              "
+              >Symptom Description is Required
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="lower_container">
+        <div>
+          <button
+            id="symptomCancelPatientdetailPage"
+            class="btn_note"
+            class="btn_cancel"
+            (mousedown)="OnClickSymptomCancel()"
+          >
+            CANCEL
+          </button>
+        </div>
+        <div *ngIf="patientStatus && patientStatus != 'Discharged'">
+          <button
+            mat-raised-button
+            id="symptomConfirmPatientdetailPage"
+            [class.spinner]="loading"
+            [disabled]="loading"
+            class="btn_note"
+            class="btn_save"
+            (click)="SaveSymptoms()"
+          >
+            SAVE
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- Medication Template -->
+<ng-template #medication>
+  <div class="common_template">
+    <form [formGroup]="addMedicationForm">
+      <div class="common_main_title">
+        {{
+          medication_update_variable ? "Update Medication" : "Add Medication"
+        }}
+      </div>
+      <div class="common_template_content">
+        <div class="common_content patient_container_2">
+          <p class="common_content_title">Patient / Contact Name</p>
+          <input
+            class="common_input_dropdown task_type_dropdown"
+            id="Med_Pname"
+            readonly
+            formControlName="frmpatientName"
+          />
+        </div>
+        <div class="common_content">
+          <p class="common_content_title">Medicine Name</p>
+          <input
+            placeholder="Medicine Name"
+            class="common_input_dropdown"
+            id="Med_MedName"
+            formControlName="medicineName"
+          />
+          <div class="warn">
+            <ng-container
+              *ngIf="
+                addMedicationForm.get('medicineName')?.invalid &&
+                addMedicationForm.get('medicineName')?.touched
+              "
+              >Medicine is Required
+            </ng-container>
+          </div>
+        </div>
+        <!-- Medication Schedule -->
+        <div class="common_content">
+          <p class="common_content_title">Schedule</p>
+          <div class="medication_schedule">
+            <div class="medication_schedule_sub_cont medicine_name_left">
+              <select
+                class="common_input_dropdown medicine_name"
+                id="Med_Schedule"
+                formControlName="scheduleInterval"
+                [(ngModel)]="SelectedMedicalScheduleInterval"
+                (ngModelChange)="calculatedurationtext($event)"
+              >
+                <option [ngValue]="undefined" hidden>Select Interval</option>
+                <option
+                  *ngFor="let interval of IntervalArray"
+                  [value]="interval"
+                >
+                  {{ interval }}
+                </option>
+              </select>
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    addMedicationForm.get('scheduleInterval')?.invalid &&
+                    addMedicationForm.get('scheduleInterval')?.touched
+                  "
+                  >Schedule is Required
+                </ng-container>
+              </div>
+            </div>
+            <div class="medication_schedule_sub_cont">
+              <select
+                class="common_input_dropdown medicine_name"
+                formControlName="scheduleTime"
+                id="Med_ScheduleTime"
+                [(ngModel)]="SelectedMedicalScheduleTime"
+              >
+                <option [ngValue]="undefined" hidden>Select Interval</option>
+                <option
+                  *ngFor="let interval of IntervalTime"
+                  [value]="interval"
+                >
+                  {{ interval }}
+                </option>
+              </select>
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    addMedicationForm.get('scheduleTime')?.invalid &&
+                    addMedicationForm.get('scheduleTime')?.touched
+                  "
+                  >Interval is Required
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Medication  Intervel -->
+        <div class="medication_interval_panel common_content">
+          <p class="common_content_title">*Intervals</p>
+          <div class="medication_intervel">
+            <div class="medication_interval_item">
+              <p class="common_content_title">Morning</p>
+              <input
+                type="checkbox"
+                formControlName="scheduleMorning"
+                id="Med_Morning"
+              />
+            </div>
+            <div class="medication_interval_item">
+              <p class="common_content_title">AfterNoon</p>
+              <input
+                type="checkbox"
+                formControlName="scheduleAfterNoon"
+                id="Med_AN"
+              />
+            </div>
+            <div class="medication_interval_item">
+              <p class="common_content_title">Evening</p>
+              <input
+                type="checkbox"
+                formControlName="scheduleEvening"
+                id="Med_Evening"
+              />
+            </div>
+            <div class="medication_interval_item">
+              <p class="common_content_title">Night</p>
+              <input
+                type="checkbox"
+                formControlName="scheduleNight"
+                id="Med_Night"
+              />
+            </div>
+          </div>
+          <!-- <div class="warn">
+                  <ng-container  *ngIf="!(addMedicationForm.get('scheduleMorning')?.value || addMedicationForm.get('scheduleAfterNoon')?.value ||addMedicationForm.get('scheduleEvening')?.value ||addMedicationForm.get('scheduleNight')?.value )">Medication Interval is Required
+                  </ng-container>
+                </div> -->
+        </div>
+
+        <!-- Medication Duration  -->
+        <div class="medication_duration_panel common_content">
+          <div class="start_date">
+            <p class="common_content_title">Start Date</p>
+            <input
+              type="text"
+              id="Med_StartDate"
+              onfocus="(this.type='date')"
+              placeholder="Date"
+              class="common_input_dropdown"
+              formControlName="medicationstartDate"
+            />
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  addMedicationForm.get('medicationstartDate')?.invalid &&
+                  addMedicationForm.get('medicationstartDate')?.touched
+                "
+                >Start date is Required
+              </ng-container>
+            </div>
+          </div>
+          <div class="duration_time common_content">
+            <p class="common_content_title">Duration</p>
+            <div class="medication_duration">
+              <div class="duration_content_panel">
+                <img
+                  (click)="medicationDurtaionincrement()"
+                  id="Med_Duration_Increase"
+                  class="btn-common"
+                  src="../../../../../assets/04-Icons/Icons_Plus.svg"
+                />
+                <span class="duration_value">{{
+                  medication_durationValue
+                }}</span>
+                <img
+                  (click)="medicationDurtaiondecrement()"
+                  id="Med_Duration_Decrease"
+                  class="btn-common"
+                  src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                />
+              </div>
+
+              <span class="medication_week_text">{{ durationText }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="common_content_title">Comment</p>
+          <textarea
+            placeholder="Comments"
+            id="Med_Comments"
+            formControlName="medicationcomment"
+          >
+          </textarea>
+        </div>
+        <div class="warn">
+          <ng-container
+            *ngIf="
+              addMedicationForm.get('medicationcomment')?.invalid &&
+              addMedicationForm.get('medicationcomment')?.touched
+            "
+            >Comment is Required
+          </ng-container>
+        </div>
+      </div>
+      <div class="lower_container">
+        <div>
+          <button
+            id="medicationCancelPatientdetailPage"
+            class="btn_note"
+            class="btn_cancel"
+            (mousedown)="OnClickMedicationCancel()"
+          >
+            CANCEL
+          </button>
+        </div>
+        <div *ngIf="patientStatus && patientStatus != 'Discharged'">
+          <button
+            id="medicationConfirmPatientdetailPage"
+            mat-raised-button
+            [class.spinner]="loading"
+            [disabled]="loading"
+            class="btn_note"
+            class="btn_save"
+            (click)="postMedication()"
+          >
+            SAVE
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>
+<!-- Lab Report -->
+<ng-template #labReport>
+  <div class="common_template">
+    <div class="common_main_title">Add Document</div>
+    <div class="common_template_content">
+      <div class="common_content patient_container_2">
+        <p class="common_content_title">Patient / Contact Name</p>
+        <input
+          class="common_input_dropdown task_type_dropdown"
+          id="labReport_Pname"
+          readonly
+          formControlName="frmpatientName"
+        />
+      </div>
+
+      <div class="common_content">
+        <p class="common_content_title">Document Type</p>
+        <select class="common_input_dropdown">
+          <option value="one">First option</option>
+          <option value="two">Second option</option>
+        </select>
+      </div>
+      <div class="common_content">
+        <p class="common_content_title">Description</p>
+        <textarea> </textarea>
+      </div>
+      <div class="common_content">
+        <p class="common_content_title">Attachment</p>
+        <div class="document_attachment">
+          <input class="common_input_dropdown" />
+          <img
+            class="attachment_icon"
+            src="../../../../../assets/04-Icons/Icons_Add A.svg"
+          />
+        </div>
+      </div>
+      <div></div>
+    </div>
+    <div class="lower_container">
+      <div>
+        <button
+          id="documentCancel"
+          class="btn_note"
+          class="btn_cancel"
+          (mousedown)="onClickCancel()"
+        >
+          CANCEL
+        </button>
+      </div>
+      <div>
+        <button id="documentSave" class="btn_note" class="btn_save">
+          SAVE
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #acknowledgeAlert>
+  <div class="common_template">
+    <!-- <div class="add_watcher_container">
+        <p class="add_watcer_title">Add Watcher</p>
+        <div class="add_watcher_img">
+          <img class="add_watcher_icon" src="../../../../../assets/04-Icons/Icons_Watcher A.svg">
+        </div>
+     </div> -->
+    <form [formGroup]="viewAlertform">
+      <div class="add_schedule_content">
+        <div class="common_main_title">View Alert</div>
+        <div class="add_alert_content">
+          <!-- <div class="common_content">
+            <p class="common_content_title">Patient Name</p>
+            <input class="common_input_dropdown" [attr.disabled]="true" formControlName="Name" readonly />
+            <p class="text-danger" *ngIf="viewAlertform.get('Name')?.invalid && viewAlertform.get('Name')?.touched">Patient Name is Required</p>
+
+          </div> -->
+
+          <div class="common_content patient_container_2">
+            <p class="common_content_title">Patient / Contact Name</p>
+            <input
+              class="common_input_dropdown task_type_dropdown"
+              id="viewAlert_Pname"
+              readonly
+              formControlName="frmpatientName"
+            />
+          </div>
+
+          <div class="common_content">
+            <p class="common_content_title">Alert Type</p>
+            <input
+              class="common_input_dropdown"
+              id="viewAlert_Type"
+              [attr.disabled]="true"
+              formControlName="alertType"
+              readonly
+            />
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  viewAlertform.get('alertType')?.invalid &&
+                  viewAlertform.get('alertType')?.touched
+                "
+                >Alert Type is Required
+              </ng-container>
+            </div>
+          </div>
+          <div class="common_content">
+            <p class="common_content_title">Description</p>
+            <textarea
+              class="SmallFormTextArea"
+              id="viewAlert_Description"
+              [attr.disabled]="true"
+              placeholder="Describe your Alert"
+              formControlName="alertdescription"
+              readonly
+            >
+            </textarea>
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  viewAlertform.get('alertdescription')?.invalid &&
+                  viewAlertform.get('alertdescription')?.touched
+                "
+                >Description is Required
+              </ng-container>
+            </div>
+          </div>
+
+          <div class="alert_content_date">
+            <div class="common_content alert_left">
+              <div class="alert_left">
+                <p class="common_content_title">Due Date</p>
+                <input
+                  class="common_input_dropdown"
+                  [attr.disabled]="true"
+                  formControlName="dueDate"
+                  readonly
+                  type="text"
+                  id="task_date"
+                  name="scheduleStart"
+                />
+              </div>
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    viewAlertform.get('dueDate')?.invalid &&
+                    viewAlertform.get('dueDate')?.touched
+                  "
+                  >Due Date is Required
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="common_content">
+              <div class="alert_right">
+                <p class="common_content_title">Priority</p>
+                <input
+                  class="common_input_dropdown"
+                  id="viewAlert_Priority"
+                  [attr.disabled]="true"
+                  formControlName="alertPriority"
+                  readonly
+                />
+              </div>
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    viewAlertform.get('alertPriority')?.invalid &&
+                    viewAlertform.get('alertPriority')?.touched
+                  "
+                  >Priority is Required
+                </ng-container>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class=" alert_content_date">
+            <div class="alert_date_picker_container common_content">
+              <p class="common_content_title">Due Date</p>
+              <input class="common_input_dropdown" [attr.disabled]="true" formControlName="dueDate" readonly type="text" id="task_date"
+                name="scheduleStart">
+            </div>
+            <div class="warn">
+              <ng-container  *ngIf="viewAlertform.get('dueDate')?.invalid && viewAlertform.get('dueDate')?.touched">Due Date is Required
+              </ng-container>
+            </div>
+            <div class="common_content">
+              <p class="common_content_title">Priority</p>
+              <input class="common_input_dropdown alert_priority" [attr.disabled]="true" formControlName="alertPriority" readonly />
+            </div>
+            <div class="warn">
+              <ng-container  *ngIf="viewAlertform.get('alertPriority')?.invalid && viewAlertform.get('alertPriority')?.touched">Priority is Required
+              </ng-container>
+            </div>
+
+          </div> -->
+
+          <div class="common_content">
+            <p class="common_content_title">Status</p>
+            <select
+              class="common_input_dropdown"
+              formControlName="alertstatus"
+              id="viewAlert_Status"
+            >
+              <!-- <option [ngValue]="undefined" hidden>Select Alert Type</option> -->
+              <option
+                *ngFor="let alertStatus of alertStatusArray; let i = index"
+                [value]="alertStatus.name"
+              >
+                {{ alertStatus.name }}
+              </option>
+            </select>
+            <div class="warn">
+              <ng-container
+                *ngIf="
+                  viewAlertform.get('alertstatus')?.invalid &&
+                  viewAlertform.get('alertstatus')?.touched
+                "
+                >Status is Required
+              </ng-container>
+            </div>
+          </div>
+          <!--
+          <div>
+            <p class="common_content_title">Assignee Name</p>
+            <div class="common_content Self_assign">
+              <div class="self_assign_input_panel">
+                <select
+                  class="common_input_dropdown task_content_dropdown_self"
+                  id="viewAlertAssigneeName"
+                  formControlName="assignee_name"
+                >
+                  <option
+                    *ngFor="let data of http_AlertAssigneeList; let i = index"
+                    [value]="data.Userid"
+                  >
+                    {{ data.Member }}
+                  </option>
+                </select>
+              </div>
+
+
+              <div class="self_assign_icon">
+                <div
+                  [ngClass]="
+                    self_alert_assignee_variable
+                      ? 'self_assign_icon_cont_active'
+                      : 'self_assign_icon_cont_inactive'
+                  "
+                  class="self_assign_icon_cont"
+                >
+                  <img
+                    class="add_check_icon"
+                    id="viewAlert_SelfAssign"
+                    src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                    (click)="selfAssignAlert()"
+                  />
+                </div>
+                <p class="common_content_title">Self Assign</p>
+              </div>
+
+              <div class="warn">
+                <ng-container
+                  *ngIf="
+                    viewAlertform.get('assignee_name')?.invalid &&
+                    viewAlertform.get('assignee_name')?.touched
+                  "
+                  >Assignee Name is Required
+                </ng-container>
+              </div>
+            </div>
+          </div> -->
+          <div class="common_content">
+            <p class="common_content_title">Assignee Name</p>
+            <div class="Self_assign">
+              <div class="assignedMemberinputPanel">
+                <ng-autocomplete
+                  id="Task_Assignee"
+                  [data]="http_AlertAssigneeList"
+                  [searchKeyword]="keyword_alert_careteam"
+                  [initialValue]="alert_careteam_name"
+                  placeholder="Select CareTeam"
+                  (selected)="selectEvent_alert_careteam($event)"
+                  (inputChanged)="onChangeSearch_alert_careteam($event)"
+                  (inputFocused)="onFocused_alert_careteam($event)"
+                  [itemTemplate]="itemTemplate"
+                  [notFoundTemplate]="notFoundTemplate"
+                  (inputCleared)="onClear_alertAssign($event)"
+                >
+                </ng-autocomplete>
+              </div>
+
+              <ng-template #itemTemplate let-item>
+                <a [innerHTML]="item.Member"></a>
+              </ng-template>
+
+              <ng-template #notFoundTemplate let-notFound>
+                <div [innerHTML]="notFound"></div>
+              </ng-template>
+
+              <div class="self_assign_icon">
+                <div
+                  [ngClass]="
+                    self_alert_assignee_variable
+                      ? 'self_assign_icon_cont_active'
+                      : 'self_assign_icon_cont_inactive'
+                  "
+                  class="self_assign_icon_cont"
+                >
+                  <img
+                    class="add_check_icon"
+                    id="Task_SelfAssign"
+                    (click)="selfAssignAlert()"
+                    src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                  />
+                </div>
+                <p class="common_content_title">Self Assigned</p>
+              </div>
+            </div>
+          </div>
+          <div class="common_content">
+            <p class="common_content_title">Comments</p>
+            <textarea
+              placeholder="Comment"
+              id="viewAlert_Comments"
+              formControlName="comments"
+            >
+            </textarea>
+          </div>
+        </div>
+        <div class="lower_container">
+          <button
+            id="patientdetailPageAlertCancel"
+            class="btn_cancel"
+            (mousedown)="OnClickAlertCancel()"
+          >
+            CANCEL
+          </button>
+          <button
+            mat-raised-button
+            [class.spinner]="loading"
+            [disabled]="loading"
+            id="patientdetailPageAlertConfirm"
+            class="btn_save"
+            (click)="savealert()"
+            *ngIf="
+              (patientStatus && patientStatus != 'Discharged') ||
+              roleId[0].Id != 6 ||
+              roleId[0].Id != 8
+            "
+          >
+            SAVE
+          </button>
+        </div>
+        <!-- <div
+          class="lower_container"
+          *ngIf="
+            (patientStatus && patientStatus == 'Discharged') ||
+            roleId[0].Id == 6
+          "
+        >
+          <button
+            id="patientdetailPageAlertCancel"
+            class="btn_cancel"
+            (mousedown)="OnClickAlertCancel()"
+          >
+            CANCEL
+          </button>
+        </div> -->
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #myPreviewTemp>
+  <div class="dialog">
+    <div>
+      <p class="summary_heading">Summary</p>
+    </div>
+    <div class="change_password_container">
+      <div
+        class="questionpanel preview_questionpanel"
+        *ngFor="let note of QuestionArrayBase; let i = index; let first = first"
+      >
+        <div *ngIf="note.Question != 'Additional Notes'">
+          <div class="common_content_title preview_question_title">
+            {{ note.Question }}
+          </div>
+
+          <div
+            class="answer_panel"
+            *ngIf="note.AnswerTypes && note.AnswerTypes.length > 0"
+          >
+            <div
+              *ngFor="
+                let ans of note.AnswerTypes;
+                let i = index;
+                let first = first
+              "
+            >
+              <div class="answer_sub">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="ans.Checked"
+                  [ngModelOptions]="{ standalone: true }"
+                  id="summary_NoteView1"
+                />
+                <p class="answer_descr">{{ ans.Answer }}</p>
+              </div>
+            </div>
+            <div>
+              <textarea
+                class="extra_note_data"
+                [(ngModel)]="note.Notes"
+                [ngModelOptions]="{ standalone: true }"
+                id="summary_extraNoteView1"
+              >
+              </textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="subquestion_panel" *ngIf="note.SubQuestions.length > 0">
+          <div
+            *ngFor="
+              let question of note.SubQuestions;
+              let i = index;
+              let first = first
+            "
+          >
+            <div *ngIf="question.Question != 'Additional Notes'">
+              <p class="common_content_title preview_question_title">
+                {{ i + 1 }} : {{ question.Question }}
+              </p>
+              <div class="answer_panel">
+                <div
+                  *ngFor="
+                    let ans of question.AnswerTypes;
+                    let i = index;
+                    let first = first
+                  "
+                >
+                  <div class="answer_sub">
+                    <input
+                      type="checkbox"
+                      [(ngModel)]="ans.Checked"
+                      id="summary_NoteView2"
+                    />
+                    <p class="answer_descr">{{ ans.Answer }}</p>
+                  </div>
+                </div>
+                <div>
+                  <textarea
+                    class="extra_note_data"
+                    [(ngModel)]="question.Notes"
+                    [ngModelOptions]="{ standalone: true }"
+                    id="summary_extraNoteView2"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="note.Question == 'Readings Summary Report'">
+          <details>
+            <summary class="common_content_title common_content_data_title">
+              {{ note.Question }}
+            </summary>
+            <div class="answer_panel" *ngIf="note.AnswerTypes.length > 0">
+              <p class="vital_descr">{{ this.vitals[0].Vital }}</p>
+
+              <div
+                *ngFor="
+                  let ans of note.AnswerTypes;
+                  let i = index;
+                  let first = first
+                "
+              >
+                <div class="answer_sub">
+                  <input
+                    class="answer_check"
+                    type="checkbox"
+                    id="{{ i }}"
+                    [(ngModel)]="ans.Checked"
+                    [checked]="ans.Checked"
+                    [name]="note.Question"
+                    [value]="ans.AnswerId"
+                    (click)="isAllSelected($event)"
+                    [ngModelOptions]="{ standalone: true }"
+                    id="summary_NoteView3"
+                  />
+
+                  <p class="answer_descr">{{ ans.Answer }}</p>
+                </div>
+              </div>
+              <div>
+                <textarea
+                  class="extra_note_data"
+                  id="summary_extraNoteView3"
+                  [(ngModel)]="note.Notes"
+                  [ngModelOptions]="{ standalone: true }"
+                ></textarea>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div *ngIf="note.Question == 'Readings Summary Report'">
+          <details>
+            <summary class="common_content_title common_content_data_title">
+              {{ note.Question }}
+            </summary>
+            <div class="answer_panel" *ngIf="note.AnswerTypes.length > 0">
+              <p class="vital_descr">{{ this.vitals[0].Vital }}</p>
+
+              <div
+                *ngFor="
+                  let ans of note.AnswerTypes;
+                  let i = index;
+                  let first = first
+                "
+              >
+                <div class="answer_sub">
+                  <input
+                    class="answer_check"
+                    type="checkbox"
+                    id="{{ i }}"
+                    [(ngModel)]="ans.Checked"
+                    [checked]="ans.Checked"
+                    [name]="note.Question"
+                    [value]="ans.AnswerId"
+                    (click)="isAllSelected($event)"
+                    [ngModelOptions]="{ standalone: true }"
+                    id="summary_NoteView4"
+                  />
+
+                  <p class="answer_descr">{{ ans.Answer }}</p>
+                </div>
+              </div>
+              <div>
+                <textarea
+                  class="extra_note_data"
+                  id="summary_extraNoteView4"
+                  [(ngModel)]="note.Notes"
+                  [ngModelOptions]="{ standalone: true }"
+                ></textarea>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <p class="common_content_title">Additional Notes</p>
+      <div>
+        <textarea
+          class="additionalNotes"
+          id="summary_AdditionalNote"
+          [(ngModel)]="additionaNotes"
+          [ngModelOptions]="{ standalone: true }"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="button_panel note_preview_button_panel">
+      <button
+        class="btn_cancel"
+        id="patientdetailNoteSubCancel"
+        (click)="previewCancel()"
+
+      >
+        CANCEL
+      </button>
+
+      <button
+        *ngIf="patientStatus && patientStatus != 'Discharged'"
+        class="btn_save"
+        id="patientdetailNoteSubConfirm"
+        mat-raised-button
+        [class.spinner]="loading_note"
+        [disabled]="loading_note"
+        (click)="previewConfirm()"
+      >
+        CONFIRM
+      </button>
+    </div>
+  </div>
+</ng-template>
+<app-confirm-dialog-panel>
+</app-confirm-dialog-panel>
+<div class="custom-modal" *ngIf="showNoteModal" (click)="closenoterDialogModal()" >
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+
+    <!-- Your preview content (template or component) -->
+    <ng-template [ngTemplateOutlet]="myPreviewTemp"></ng-template>
+  </div>
+</div>

@@ -1,0 +1,167 @@
+<div class="content-panel">
+
+    <div class="toolbar_left_panel">
+      <div class="toolbar_sub_left_panel">
+        <div
+          *ngIf="screensmall"
+          class="logo_panel"
+          id="screenSmallToggle"
+          (click)="toggleMenu()"
+        >
+          <img
+            class="hamburgIcon"
+            src="../../../../../assets/04-Icons/Icons_Menu.svg"
+          />
+          <img
+            *ngIf="host == 'rpmwebapp.azurewebsites.net'"
+            class="logoImg"
+            src="../../../../../assets/04-Icons/A01-Header Logo.svg"
+          />
+          <img
+            *ngIf="host == 'c-lynxapi.azurewebsites.net'"
+            class="logoImg"
+            src="../../../../../assets/clynxlogo.png"
+          />
+          <img
+            *ngIf="host == 'meditprodapi.azurewebsites.net'"
+            class="logoImg"
+            src="../../../../../assets/meditLogo.png"
+          />
+        </div>
+        <div *ngIf="!screensmall && user_name">
+          <p class="toolbar-welcome">
+            Welcome Back,
+            <span class="toolbar_username">{{ user_name }}</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="tool-icon">
+        <div *ngIf="roles[0].Id != 7">
+          <ng-autocomplete
+            #auto
+            [data]="http_getPatientList"
+            [searchKeyword]="keyword"
+            placeholder="Select Patient"
+            id="header_Select_patient"
+            (selected)="selectEvent($event)"
+            (inputChanged)="onChangeSearch($event)"
+            (inputFocused)="onFocused($event)"
+            [itemTemplate]="itemTemplate"
+            [notFoundTemplate]="notFoundTemplate"
+          >
+          </ng-autocomplete>
+
+          <ng-template #itemTemplate let-item>
+            <a [innerHTML]="item.searchField"></a>
+          </ng-template>
+
+          <ng-template #notFoundTemplate let-notFound>
+            <div [innerHTML]="notFound"></div>
+          </ng-template>
+        </div>
+        <img
+          *ngIf="roles[0].Id != 7"
+          class="toolbar_icons searchIcon commonIcon"
+          id="header_SearchPatient"
+          (click)="searchPatient()"
+          src="../../../../../assets/04-Icons/Icons_Search-20.svg"
+        />
+
+        <div class="notification">
+          <img
+            class="toolbar_icons commonIcon"
+            src="../../../../../assets/04-Icons/Icons_Notification.svg"
+            (click)="notification_click()"
+          />
+          <div *ngIf="unread">
+            <span
+              class="badge"
+              id="header_Notification"
+              (click)="notification_click()"
+              >{{ unread }}</span
+            >
+          </div>
+          <div class="notification_container" *ngIf="notification_active">
+            <div class="notification_heading">
+              <p class="notification_text">{{ unread }} Notifications</p>
+              <div class="expand_icon_container">
+                <img
+                  class="expand_icon"
+                  src="../../../../../assets/04-Icons/Icons_Expand.svg"
+                  id="expandOpenNotification"
+                  (click)="open_notifications()"
+                />
+              </div>
+            </div>
+            <div class="notification_content_panel">
+              <div *ngFor="let notification of notifications.Data">
+                <div class="notification_description_panel">
+                  <div
+                    *ngFor="
+                      let notification_item of notification.NotificationList
+                    "
+                  >
+                    <div *ngIf="notification_item.IsRead == false">
+                      <div class="notification_content notification_list">
+                        <p
+                          class="notification_title notification_fixed_length"
+                          title="{{ notification_item.Description }}"
+                        >
+                          {{ notification_item.Description }}
+                        </p>
+
+                        <div class="notification_right">
+                          <div class="notification_time">
+                            <p class="notification_title">
+                              {{
+                                notificationtime(notification_item.CreatedOn)
+                              }}
+                            </p>
+                          </div>
+                          <img
+                            class="deleteIcon"
+                            src="../../../../../../assets/04-Icons/Icons_Unread.svg"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+<div class="side-panel">
+    <div class="toolbar_right_panel">
+      <div class="DatePanel_container_before"></div>
+      <div class="DatePanel">
+        <div class="DatePanel_container">
+          <!-- <div
+            *ngIf="notificationBody != null"
+            class="notification-notify-panel"
+          >
+            {{ notificationBody }}
+          </div> -->
+          <div class="date-left">
+            <p class="day">{{ datepipe.transform(currentDate, "EEEE") }}</p>
+
+            <p class="date">
+              {{ datepipe.transform(currentDate, "MMM d, yyyy") }}
+            </p>
+
+            <span class="example-spacer"></span>
+          </div>
+
+          <div>
+            <p class="time">
+              {{ datepipe.transform(currentDate, "h: mm a") }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

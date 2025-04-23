@@ -1,0 +1,128 @@
+.menu-panel-web li:hover {
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.menu-items {
+  max-width: 5rem;
+  height: fit-content;
+  min-height: 3.5rem;
+  max-height: 3.5rem;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.8rem;
+  padding: 1.8rem 0rem 0.6rem 0rem;
+  padding: 20px;
+  white-space: nowrap;
+  margin-bottom: 1rem;
+}
+.menu-title {
+  color: #164d61;
+  font-size: 0.8rem;
+  line-height: 20px;
+  font-family: "Rubik";
+  margin-bottom: 0px;
+}
+.home_icon {
+  width: 18px;
+  height: 20px;
+}
+.active-item:hover:not(.active) {
+  background-color: #e1e6ed;
+  border-radius: 8px;
+  width: 5rem;
+}
+.active h3 {
+  text-transform: uppercase;
+  font-weight: 800;
+}
+.active-item:hover .home-icon {
+  filter: brightness(0.8) sepia(1) hue-rotate(140deg) saturate(6);
+}
+
+.active {
+  background-color: #ffffff;
+  max-width: 5rem;
+  border-radius: 8px;
+}
+.menu-panel-tab {
+  display: none;
+}
+.menu-panel-web {
+  display: block;
+}
+
+@media only screen and (max-width: 1280px) {
+  .menu-panel-tab {
+    display: block;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  .menu-panel-web {
+    display: none;
+  }
+  .menu-panel-tab li:hover {
+    background-color: #c9b7e9;
+    border-radius: 8px;
+  }
+
+  .menu-items-tab {
+    width: 100%;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    border-radius: 0.8rem;
+    padding: 1.2rem 0rem 0.6rem 1rem;
+    outline: none;
+  }
+  .menu-item-tab {
+    width: 100%;
+  }
+  .active {
+    background-color: #c9b7e9;
+    max-width: 100%;
+    border-radius: 16px;
+  }
+  .active h3 {
+    text-transform: uppercase;
+    color: #590ca7;
+    font-weight: 800;
+  }
+  .menu-title {
+    color: #ffffff;
+    font-size: 0.8rem;
+    line-height: 20px;
+    font-family: "Rubik";
+    margin-bottom: 0px;
+  }
+  .menu-items-tab img {
+    color: #c9b7e9;
+    filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(114deg)
+      brightness(107%) contrast(101%);
+    margin-right: 1rem;
+  }
+  .active img {
+    filter: invert(0%) sepia(2%) saturate(5%) hue-rotate(339deg)
+      brightness(102%) contrast(100%);
+  }
+
+  .active-item-tab:hover:not(.active) {
+    background-color: #c9b7e9;
+    border-radius: 16px;
+    width: 100%;
+    h3 {
+      text-transform: uppercase;
+      color: #590ca7;
+      font-weight: 800;
+    }
+    img {
+      // filter: brightness(0.8) sepia(1) hue-rotate(140deg) saturate(6);
+      filter: invert(0%) sepia(2%) saturate(5%) hue-rotate(339deg)
+        brightness(102%) contrast(100%);
+      outline: none;
+    }
+  }
+}

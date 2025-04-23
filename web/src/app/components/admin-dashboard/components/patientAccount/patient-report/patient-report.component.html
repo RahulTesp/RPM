@@ -1,0 +1,339 @@
+<div class="content">
+  <div class="main_content">
+    <div class="main-panel">
+      <div class="back_arrow">
+        <div
+          class="back_arrow_container"
+          id="reports_backHome"
+          (click)="backtohome()"
+        >
+          <img
+            class="arrow-img"
+            src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg"
+            alt=""
+          />
+        </div>
+        <p class="main_title">Reports</p>
+      </div>
+      <div class="uppermenubtnpanel">
+        <!-- <div *ngFor="let item of menu">
+				<button class="btn-patient-menu" (click)="ChangeScreen(item.menu_id)"
+				   [class.selected]="CurrentMenu == item.menu_id">{{item.menu_title}}</button>
+			 </div> -->
+        <button
+          *ngIf="
+            accessRights && accessRights.UserAccessRights[26].AccessRight == 'F'
+          "
+          class="uppermenubtn"
+          [class.selected]="CurrentMenu == 1"
+          (click)="ChangeScreen(1)"
+        >
+          Patient Health
+        </button>
+      </div>
+
+      <ng-container [ngSwitch]="variable">
+        <ng-container *ngSwitchCase="1">
+          <ng-container *ngTemplateOutlet="patientpage"></ng-container>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>
+          <ng-container *ngTemplateOutlet="patientpage"></ng-container>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+  <!--Main Content-->
+</div>
+<!-- Content-->
+<ng-template #patientpage>
+  <div class="patientPageTemplaate">
+    <div class="box">
+      <!-- Upper Panel Start -->
+
+      <!-- Upper Panel End -->
+      <div class="panel_content">
+        <div class="panel_content_item">
+          <div class="radio">
+            <div
+              class="radio_label"
+              [ngClass]="{ disableDiv: patientIsMonth == true }"
+            >
+              <mat-radio-button
+                value="1 "
+                (change)="radioChangePatient($event)"
+                id="report_ByMonth"
+                ><span class="fileformatTitle">By Month</span></mat-radio-button
+              >
+            </div>
+            <div
+              class="task_content task_contnent_date"
+              [ngClass]="{ disableDiv: patientIsMonth == false }"
+            >
+              <div class="task_date_picker_container">
+                <input
+                  class="task_date_picker"
+                  type="month"
+                  id="report_MonthPicker"
+                  [(ngModel)]="month1"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="radio second_panel">
+            <div class="radio_label">
+              <mat-radio-button
+                value="0 "
+                (change)="radioChangePatient($event)"
+                checked="true"
+              >
+                <span class="fileformatTitle"
+                  >By Duration</span
+                ></mat-radio-button
+              >
+            </div>
+            <div
+              class="task_content task_contnent_date"
+              [ngClass]="{ disableDiv: patientIsMonth == true }"
+            >
+              <div class="task_date_picker_container">
+                <!-- class="task_date_range_picker"  -->
+                <mat-form-field
+                  class="task_date_range_picker"
+
+                >
+                  <mat-date-range-input
+                    [formGroup]="range"
+                    [rangePicker]="picker1"
+                    [max]="maxDate"
+                  >
+                    <input
+                      matStartDate
+                      formControlName="start"
+                      placeholder="Start date"
+                      id="report_StartDate"
+                      readonly
+                      #dateStartactivity1
+                      (dateChange)="setMaxDate(dateStartactivity1)"
+                    />
+                    <input
+                      matEndDate
+                      formControlName="end"
+                      placeholder="End date"
+                      id="report_EndDate"
+                      readonly
+                      #dateEndactivity2
+                    />
+                  </mat-date-range-input>
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="picker1"
+                  ></mat-datepicker-toggle>
+                  <mat-date-range-picker
+                    (closed)="resetMaxDate()"
+                    (opened)="openDatepicker()"
+                    disabled="false"
+                    #picker1
+                  ></mat-date-range-picker>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="button_panel">
+      <button
+        class="button_item_download"
+        mat-raised-button
+        color="primary"
+        [class.spinner]="!buttonclick1"
+        [disabled]="!buttonclick1"
+        (click)="dateRangeSet(dateStartactivity1, dateEndactivity2)"
+      >
+        DOWNLOAD REPORT
+      </button>
+    </div>
+  </div>
+  <div
+    class="summary_graph_container"
+    style="overflow: hidden; visibility: hidden"
+  >
+    <div
+      id="pdfGraph"
+      style="display: block; width: 100%; height: 98%; visibility: hidden"
+      *ngIf="http_healthtrends"
+    >
+      <canvas
+        class="charttrends"
+        baseChart
+        width="1"
+        height="1"
+        [datasets]="lineChartData"
+        [labels]="lineChartLabels"
+        [options]="lineChartOptions"
+        [legend]="lineChartLegend"
+        [type]="lineChartType"
+        id="pd_healthTrends"
+      >
+      </canvas>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #teampage>
+  <div class="patientPageTemplaate">
+    <div class="box">
+      <!-- Upper Panel Start -->
+      <div class="upper_container">
+        <!-- First Item -->
+        <div class="upper_container_item container_item_patient">
+          <p class="upper_item_title">Member Name</p>
+          <input
+            class="upper_item_input"
+            placeholder="All Members"
+            id="report_MemberSearch"
+          />
+          <img
+            class="search_icon"
+            src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+          />
+        </div>
+        <!-- Second Item -->
+
+        <!-- Third Item -->
+        <div class="upper_container_item">
+          <p class="upper_item_title">Team Name</p>
+          <div class="upper_item_dropdown">
+            <select
+              class="select-form-text"
+              id="report_TeamName"
+              placeholder="Team Name ABCD"
+            >
+              <option value="Link1">Team Name ABCD</option>
+              <option value="Link2">Team Name EFG</option>
+              <option value="Link3">CPT Code HIJ</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <!-- Upper Panel End -->
+      <div class="panel_content">
+        <div class="panel_content_item">
+          <div class="radio">
+            <div class="radio_label">
+              <mat-radio-button
+                value="1 "
+                checked="true"
+                id="report_teamByMonth"
+                >By Month</mat-radio-button
+              >
+            </div>
+            <div class="task_content task_contnent_date">
+              <div class="task_date_picker_container">
+                <mat-form-field class="task_date_picker">
+                  <!-- <mat-label>December, 2021</mat-label> -->
+                  <input
+                    matInput
+                    [matDatepicker]="picker"
+                    id="report_teamMonthPicker"
+                  />
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="picker"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+          <div class="radio1">
+            <div class="radio1_label">
+              <mat-radio-button value="0 " id="report_TeamByDuration">
+                By Duration</mat-radio-button
+              >
+            </div>
+            <div class="task_content task_contnent_date">
+              <div class="task_date_picker_container">
+                <mat-form-field
+                  class="task_date_range_picker"
+
+                >
+                  <mat-date-range-input [rangePicker]="picker1">
+                    <input
+                      matStartDate
+                      placeholder="DD Mmm,YYYY"
+                      id="report_TeamStart"
+                    />
+                    <input
+                      matEndDate
+                      placeholder="DD Mmm,YYYY"
+                      id="report_TeamEnd"
+                    />
+                  </mat-date-range-input>
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="picker1"
+                  ></mat-datepicker-toggle>
+                  <mat-date-range-picker #picker1></mat-date-range-picker>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="button_panel">
+      <button class="button_item_cancel" id="report_TeamCancel">CANCEL</button>
+      <button
+        class="button_item_download"
+        (click)="openDialog(myDialog)"
+        id="report_TeamDownlaod"
+      >
+        DOWNLOAD REPORT
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #myDialog>
+  <div class="dialog">
+    <div class="container">
+      <div class="Patient_Health">
+        <div class="header">
+          <h3 *ngIf="this.variable == 1">
+            Are You Sure to Download Patient Report?
+          </h3>
+          <h3 *ngIf="this.variable == 2">
+            Are You Sure to Download Billing Report?
+          </h3>
+          <h3 *ngIf="this.variable == 3">
+            Are You Sure to Download Team Performance Report?
+          </h3>
+          <h3 *ngIf="this.variable == 4">
+            Are You Sure to Download Device Complaint Report?
+          </h3>
+        </div>
+        <div class="body">
+          <h4 *ngIf="this.variable == 1">Patient Health Report!</h4>
+        </div>
+        <div class="download">
+          <p *ngIf="this.variable == 1">December,2021</p>
+        </div>
+      </div>
+      <div class="button">
+        <button
+          class="cancel"
+          [mat-dialog-close]="true"
+          id="report_DialogCancel"
+        >
+          Cancel
+        </button>
+        <button class="download_button" id="report_DialogDownload">
+          Download
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>

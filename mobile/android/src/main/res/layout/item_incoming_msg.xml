@@ -1,0 +1,175 @@
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:layout_width="wrap_content"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:orientation="horizontal">-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/incomingMessageText"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:textColor="@android:color/black"-->
+<!--        android:textSize="16sp" />-->
+
+<!--    &lt;!&ndash; Other views for additional incoming message details &ndash;&gt;-->
+
+<!--</LinearLayout>-->
+
+
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:orientation="horizontal"-->
+<!--   >-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/outgoingMessageText"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_alignParentEnd="true"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:textColor="@android:color/black"-->
+<!--        android:textSize="16sp" />-->
+
+<!--    &lt;!&ndash; Other views for additional outgoing message details &ndash;&gt;-->
+
+<!--</LinearLayout>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:layout_width="wrap_content"-->
+<!--    android:layout_height="wrap_content"-->
+
+<!--   >-->
+<!--&lt;!&ndash;    android:background="@color/red_A700"&ndash;&gt;-->
+<!--    &lt;!&ndash; Other views in the LinearLayout &ndash;&gt;-->
+
+<!--    <RelativeLayout-->
+<!--        android:layout_width="170dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background="@drawable/incoming_msg_bubble"-->
+<!--        android:padding = "5dp"-->
+<!--        android:layout_margin = "5dp"-->
+<!--        >-->
+
+<!--        &lt;!&ndash; Other views within the RelativeLayout &ndash;&gt;-->
+
+
+
+
+
+
+
+<!--        &lt;!&ndash; This is the layout for incoming chat messages &ndash;&gt;-->
+<!--        <TextView-->
+<!--            android:id="@+id/incomingMessageText"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_alignParentStart="true"-->
+
+
+
+<!--            android:text="Incoming Message" />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/incomingTime"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+
+
+
+<!--            android:padding="4dp"-->
+<!--            android:layout_below="@id/incomingMessageText"-->
+<!--            android:layout_alignStart="@id/incomingMessageText"-->
+<!--            android:text="Incoming Time" />-->
+
+
+
+
+<!--&lt;!&ndash;        android:background="@drawable/incoming_message_background"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_alignParentStart="true"&ndash;&gt;-->
+
+
+
+<!--    </RelativeLayout>-->
+
+<!--</LinearLayout>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+   >
+
+    <!-- Incoming Message Layout -->
+    <RelativeLayout
+        android:id="@+id/incomingLayout"
+        android:layout_width="170dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="4dp"
+        android:padding="8dp"
+        android:background="@drawable/incoming_msg_bubble">
+
+        <TextView
+            android:id="@+id/incomingTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:textSize="12sp"
+            android:textColor="@color/ChatMsgTimeClr"
+            android:text="Incoming Time"/>
+        <TextView
+            android:id="@+id/incomingMessageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textIsSelectable="true"
+            android:textColor="@color/ChatTimeBlack"
+            android:layout_below="@id/incomingTime"
+            android:layout_alignStart="@id/incomingTime"
+            android:layout_marginTop="2dp"
+            android:text="Incoming Message"/>
+
+
+    </RelativeLayout>
+
+</RelativeLayout>

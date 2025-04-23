@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_marginLeft = "10dp"
+    android:layout_marginRight = "10dp"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/new_vitelname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pulse"
+            android:textSize="18sp"
+            android:textStyle="normal"
+            android:padding="@dimen/margin_10dp"
+            android:textColor="@color/Primary_dark"
+            android:background="@drawable/top_card_border"/>
+
+
+
+
+        <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/newListVitals"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background_grey1"
+
+            android:name="com.rpm.clynx.fragments.NewVitalsFragment"
+
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            app:layoutManager="LinearLayoutManager"
+            tools:context="com.rpm.clynx.fragments.NewVitalsFragment"
+            tools:listitem="@layout/new_vitals_item"
+
+
+            />
+
+<!--        <TextView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="View More..."-->
+<!--            android:textSize="15sp"-->
+<!--            android:textStyle="normal"-->
+<!--            android:padding="@dimen/margin_10dp"-->
+<!--            android:textColor="@color/Primary_dark"-->
+<!--            android:background="@drawable/bottom_card_border"/>-->
+
+    </LinearLayout>
+</LinearLayout>

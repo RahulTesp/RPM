@@ -1,0 +1,44 @@
+<div class="side_panel">
+  <div class="logo_placeholder">
+    <img
+      *ngIf="host == 'rpmwebapp.azurewebsites.net'"
+      class="logoImg"
+      src="../../../../../assets/04-Icons/A01-Header Logo.svg"
+    />
+    <img
+      *ngIf="host == 'rpmappservicepreprod.azurewebsites.net'"
+      class="logoImg"
+      src="../../../../../assets/04-Icons/A01-Header Logo.svg"
+    />
+    <img
+      *ngIf="host == 'c-lynxapi.azurewebsites.net'"
+      class="logoImg"
+      src="../../../../../assets/clynxlogo.png"
+    />
+    <img
+      *ngIf="host == 'meditprodapi.azurewebsites.net'"
+      class="logoImg"
+      src="../../../../../assets/meditLogo.png"
+    />
+  </div>
+
+  <div class="arrow_img_sidepanel">
+    <img
+      class="arrow_img"
+      src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg"
+    />
+  </div>
+
+  <ul class="menu-list">
+    <div class="menu-item-container">
+      <app-menu-item
+        *ngFor="let item of filteredMenuItems"
+        [menuItem]="item"
+        [customClass]="item.id"
+        [backgroundImage]="item.icon"
+      ></app-menu-item>
+    </div>
+    <app-profile-menu-button></app-profile-menu-button>
+  </ul>
+
+</div>

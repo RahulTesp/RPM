@@ -1,0 +1,36 @@
+<div class="menu-panel-web">
+  <li
+    [id]="menuItem.id"
+    class="menu-item active_item"
+    [routerLink]="menuItem.route"
+    [ngClass]="{ active_item: isActiveMenu(menuItem.route) }"
+    routerLinkActive="active"
+  >
+    <div class="menu-items" (click)="checkActiveRoute(menuItem.route)">
+      <img
+        class="home_icon home-icon"
+        [src]="
+          isActiveMenu(menuItem.route) ? menuItem.activeIcon : menuItem.icon
+        "
+      />
+
+      <h3 class="menu-title">{{ menuItem.title }}</h3>
+    </div>
+  </li>
+</div>
+
+<div class="menu-panel-tab">
+  <li
+    [id]="menuItem.id"
+    class="menu-item-tab active-item-tab"
+    [routerLink]="menuItem.route"
+    [ngClass]="{ active_item: isActiveMenu(menuItem.route) }"
+    routerLinkActive="active"
+  >
+    <div class="menu-items-tab" (click)="checkActiveRoute(menuItem.route)">
+      <img class="home_icon home-icon" [src]="menuItem.icon" />
+
+      <h3 class="menu-title">{{ menuItem.title }}</h3>
+    </div>
+  </li>
+</div>

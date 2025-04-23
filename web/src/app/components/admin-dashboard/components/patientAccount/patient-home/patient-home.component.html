@@ -1,0 +1,978 @@
+<ng-container *ngIf="loading && loading2">
+  <div class="overlay"></div>
+  <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
+</ng-container>
+
+<div class="content" id="desktop_view">
+  <div class="main_content">
+    <div class="content-panel">
+      <div class="main_page_lower_panel">
+        <div class="Profile_container">
+          <div class="patient_info_panel">
+            <div class="upper_container">
+              <div class="img_container mat-card-avatar">
+                <img
+                  class="profileimg"
+                  src="{{ myprofile && myprofile.PatientDetails.Picture }}"
+                />
+              </div>
+              <div class="patient_detail_container">
+                <p class="patient_main_data">{{ patientName }}</p>
+                <p class="patient_main_data">
+                  Patient ID:
+                  {{ myprofile && myprofile.PatientDetails.UserName }}
+                </p>
+                <p class="patient_sub_data patient_info_sub_container">
+                  {{ patientdob }}
+                </p>
+                <p class="patient_sub_data">{{ patient_address }}</p>
+              </div>
+            </div>
+            <div class="bottom_container">
+              <div class="patient_communication_container">
+                <div class="device_icon device_icon_left">
+                  <!-- <img
+                    class="device_img"
+                    src="../../../../../assets/04-Icons/Icons_Phone A.svg"
+                    (click)="makeCallReady()"
+                  /> -->
+                </div>
+                <div class="device_icon">
+                  <!-- <img
+                    class="device_img"
+                    src="../../../../../assets/04-Icons/Icons_Chat A.svg"
+                    (click)="makeChat()"
+                  /> -->
+                </div>
+              </div>
+              <div class="plan_data">
+                <div class="plan_data_upperpanel">
+                  <div class="plan_data_upperpanel_left">
+                    <span>
+                      {{ myprofile && myprofile.ProfileSummary.ProgramName }}
+                    </span>
+                  </div>
+                  <div class="plan_data_upperpanel_right">
+                    <span
+                      class="status_display"
+                      [ngClass]="{
+                        patient_active: careplanStatus == 'Active',
+                        patient_prescribed:
+                          careplanStatus == 'Prescribed' ||
+                          careplanStatus == 'Enrolled',
+                        patient_discharge:
+                          careplanStatus == 'Discharged' ||
+                          careplanStatus == 'ReadyToDischarge',
+                        patient_onhold: careplanStatus == 'OnHold'
+                      }"
+                      >{{ careplanStatus }}</span
+                    >
+                  </div>
+                </div>
+                <!-- <div class="plan_data_lowerpanel">
+                  <div class="profile_care_paln_duration">
+                    <span class="care_paln_duration_text">
+                      {{
+                        myprofile && myprofile.ProfileSummary.CompletedDuration
+                      }}
+                    </span>
+                  </div>
+                  <div
+                    class="progress"
+                    style="height: 10px; border-radius: 25px"
+                  >
+                    <div
+                      class="progress-bar"
+                      role="progressbar"
+                      aria-valuenow="100"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                      [style.width.%]="CompleteionPercentage"
+                      [ngStyle]="{
+                        'background-color':
+                          CompleteionPercentage > 100 ? '#155d16' : '#ffbf77'
+                      }"
+                    >
+
+                      <span></span>
+                    </div>
+                  </div>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <!-- Profile Container End-->
+          <p *ngIf="rolelist[0].ProgramName == 'RPM'" class="main_title_sub">
+            Vital Reading Status
+          </p>
+
+          <div
+            class="summary_billing_content"
+            *ngIf="rolelist[0].ProgramName == 'RPM'"
+          >
+            <div class="billing_cont_sub">
+              <p class="billing_cont_sub_heading">
+                {{ billingInfo && billingInfo.PatientVital }}
+              </p>
+
+              <div class="progress" style="height: 28px; border-radius: 25px">
+                <div
+                  class="progress-bar"
+                  role="progressbar"
+                  aria-valuenow="70"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  [style.width.%]="billingratio"
+                  style="background-color: #e1e6ed"
+                >
+                  <p class="billing-progressvalue">
+                    {{ billingInfo && billingInfo.TotalReadings }}/{{
+                      billingInfo && billingInfo.DaysCompleted
+                    }}
+                    Days
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!--
+            <div class="billing_cont_sub">
+              <p class="billing_cont_sub_heading">Billing Code - 99458</p>
+
+              <div class="progress" style="height: 28px; border-radius: 25px">
+                <div
+                  class="progress-bar"
+                  role="progressbar"
+                  aria-valuenow="70"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  style="width: 65%; background-color: #ffbf77"
+                >
+                  <p class="billing-progressvalue">23/28 Days</p>
+                </div>
+              </div>
+            </div> -->
+          </div>
+        </div>
+        <div class="recent_vital_panel_container">
+          <div class="right_upper_panel">
+            <!-- Start Program Overview test -->
+            <div class="summary-upper-panel">
+              <div class="summary_program_overview">
+                <div class="summary_program_overview_container">
+                  <p class="main_title">Program Overview</p>
+                  <div class="program_overview_container">
+                    <div class="program_overview_title">
+                      <div class="program_name">
+                        <p>
+                          {{
+                            myprofile && myprofile.ProfileSummary.ProgramName
+                          }}
+                        </p>
+                      </div>
+                      <div class="duration">
+                        <!-- <p>
+                          <span class="duration_value_month">{{
+                            myprofile &&
+                              myprofile["PatientProgramdetails"].ProgramStatus
+                          }}</span>
+                        </p> -->
+                      </div>
+                    </div>
+                    <div class="program_overview_data">
+                      <div class="program_overview_item">
+                        <p class="program_overview_header">Start Date</p>
+                        <p class="program_overview_value">
+                          {{ programStart | date : "mediumDate" }}
+                        </p>
+                      </div>
+                      <div class="program_overview_item">
+                        <p class="program_overview_header">Duration</p>
+                        <p class="program_overview_value">
+                          {{
+                            myprofile &&
+                              myprofile["PatientProgramdetails"].Duration
+                          }}
+                          Months
+                        </p>
+                      </div>
+                      <div class="program_overview_item program_overview_vital">
+                        <p class="program_overview_header">
+                          {{
+                            program_name != "CCM" && program_name != "PCM"
+                              ? "Vitals Monitored"
+                              : "Condition Monitored"
+                          }}
+                        </p>
+                        <div *ngFor="let vital of patiantVital">
+                          <p class="program_overview_value">
+                            {{ vital.Vital }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="summary_critical_event">
+                <p class="main_title">Critical Event</p>
+                <div class="critical_event_container" *ngIf="http_get_symptoms">
+                  <div
+                    *ngIf="
+                      PatientCriticalAlerts && PatientCriticalAlerts.length == 0
+                    "
+                    class="default_no_date"
+                  >
+                    No data
+                  </div>
+                  <div
+                    *ngFor="
+                      let alert of PatientCriticalAlerts;
+                      let i = index;
+                      let first = first;
+                      let last = last
+                    "
+                  >
+                    <div
+                      class="summary_alert_item_data"
+                      [ngStyle]="{
+                        'border-radius': first
+                          ? '0.5rem 0.5rem 0 0'
+                          : last
+                          ? '0 0 0.5rem 0.5rem'
+                          : ''
+                      }"
+                      [ngClass]="{
+                        priority_low: alert.Priority == 'Low',
+                        priority_high: alert.Priority == 'Critical',
+                        priority_missing: alert.Priority == 'Moderate'
+                      }"
+                    >
+                      <p
+                        class="summary_alert_item summary_alert_item_title"
+                        title="{{ alert.VitalAlert }}"
+                      >
+                        {{ alert.VitalAlert }}
+                      </p>
+                      <p class="summary_alert_item" *ngIf="alert.Time">
+                        {{
+                          datepipe.transform(
+                            convertToLocalTime(alert.Time),
+                            "MMM d, yyyy"
+                          )
+                        }}
+                        -
+                        {{
+                          datepipe.transform(
+                            convertToLocalTime(alert.Time),
+                            "h: mm a"
+                          )
+                        }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End Program OverView  Test -->
+          </div>
+          <div
+            class="right_middile_panel"
+            *ngIf="rolelist[0].ProgramName == 'RPM'"
+          >
+            <p class="main_title">Recent Vitals</p>
+            <div class="recent_vital_panel">
+              <!-- <div
+                class="patient_vital_bp_graph_container"
+                *ngIf="!loading && http_healthtrends"
+              > -->
+              <div
+                class="patient_vital_bp_graph_container"
+                *ngIf="!loading && http_healthtrends"
+              >
+                <div class="patient_vital_graph_container">
+                  <div>
+                    <p class="patient_vital_graph_bp_title">
+                      {{ patient_vital_name }}
+                    </p>
+                    <div>
+                      <span class="patient_vital_graph_bp_value"
+                        >{{ patient_bp_value }} </span
+                      ><span class="patient_vital_graph_bp_value_mmhg">{{
+                        vital_unit
+                      }}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span class="patient_vital_graph_bp_duration">{{
+                      notificationtime(patient_bp_duration)
+                    }}</span>
+                  </div>
+                </div>
+                <!-- <div style="display: block; width: 90%; height: 70%"> -->
+                <div style="display: block; width: 90%; min-height: 470px">
+                  <canvas
+                    class="charttrends"
+                    baseChart
+                    width="1"
+                    height="1"
+                    [datasets]="lineChartData"
+                    [labels]="lineChartLabels"
+                    [options]="lineChartOptions"
+                    [legend]="lineChartLegend"
+                  >
+                  </canvas>
+                </div>
+              </div>
+              <div class="patient_vital_bp_graph_container" *ngIf="pulseplan">
+                <div class="patient_vital_graph_container">
+                  <div>
+                    <p class="patient_vital_graph_bp_title">
+                      {{ patient_vital_name }}
+                    </p>
+                    <div>
+                      <span class="patient_vital_graph_bp_value"
+                        >{{ patient_pulse_value }} </span
+                      ><span class="patient_vital_graph_bp_value_mmhg">{{
+                        vital_unit
+                      }}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span class="patient_vital_graph_bp_duration">{{
+                      patient_bp_duration
+                    }}</span>
+                  </div>
+                </div>
+                <div
+                  style="
+                    display: block;
+                    width: 90%;
+                    height: 70%;
+                    margin-left: 5%;
+                  "
+                >
+                  <canvas
+                    class="charttrends"
+                    baseChart
+                    width="1"
+                    height="1"
+                    [datasets]="lineChartData"
+                    [labels]="lineChartLabels"
+                    [options]="lineChartOptions"
+                    [legend]="lineChartLegend"
+                  >
+                  </canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="right_lower_panel">
+            <div class="summary_core_team">
+              <p class="main_title">Care Team</p>
+              <div class="summary_core_team_content">
+                <div class="core_panel_left">
+                  <p class="data_title">Physician</p>
+                  <p class="data_value">
+                    {{ currentPhysician }}
+                  </p>
+                </div>
+                <div class="core_panel_middle">
+                  <div>
+                    <p class="data_title">Care Team Personal</p>
+                    <p class="data_value">{{ assignedMember }}</p>
+                  </div>
+                </div>
+                <div class="core_panel_middle">
+                  <div>
+                    <p class="data_title">Care Team Manager</p>
+                    <p class="data_value">
+                      {{ myprofile && myprofile.PatientProgramdetails.Manager }}
+                    </p>
+                  </div>
+                </div>
+                <!-- <div class="core_panel_right">
+                  <div>
+                    <p class="data_title">Delegation</p>
+                    <p class="data_value"></p>
+                  </div>
+                  <div>
+                    <p class="data_title">Duration</p>
+                    <p class="data_value"></p>
+                  </div>
+                </div> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side Panel -->
+      <div
+        class="side-panel"
+      >
+        <ng-container [ngSwitch]="switchvariable">
+          <ng-container *ngSwitchCase="1">
+            <ng-container *ngTemplateOutlet="todolist"></ng-container>
+          </ng-container>
+        </ng-container>
+        <!-- <ng-container [ngSwitch]="switchvariable">
+          <ng-container *ngSwitchCase="2">
+            <ng-container *ngTemplateOutlet="addtodo"></ng-container>
+          </ng-container>
+        </ng-container>
+
+        <ng-container [ngSwitch]="switchvariable">
+          <ng-container *ngSwitchCase="3">
+            <ng-container *ngTemplateOutlet="todo"></ng-container>
+          </ng-container>
+        </ng-container> -->
+      </div>
+
+      <ng-template #todolist>
+        <div class="patient_todo_container">
+          <p class="main_title main_title_side">Todo List</p>
+
+          <div class="todo_list_container">
+            <ng-container *ngFor="let list of getTodoList; let index = index">
+              <div class="todo_list_medicine_panel">
+                <div class="todo_left">
+                  <p class="todo_medicine_tag1">
+                    {{ list.ActivityName }}
+                  </p>
+                  <span class="todo_medicine_tag2">{{ list.Description }}</span>
+                </div>
+                <div class="todo_right_panel">
+                  <!-- <span class="todo_medicine_tag2">{{ list.Description }}</span> -->
+
+                  <!-- <p class="todo_time_span" title="{{ list.Date }}"> -->
+                  <!-- <p class="todo_time_span">
+                    {{
+                      datepipe.transform(
+                        convertToLocalTime(list.Date),
+                        "h:mm a"
+                      )
+                    }}
+                  </p> -->
+                  <div class="todo_right_panel_sub">
+                    <!-- <img
+                      class="front_img"
+                      src="../../assets/04-Icons/Icons_Arrow - Front.svg"
+                    /> -->
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </ng-template>
+      <!-- </div> -->
+
+      <div
+        class="chat_box_modal"
+        *ngIf="chat_panel_visible"
+        (click)="close_chat_window()"
+      ></div>
+      <div class="chat_modal" *ngIf="chat_panel_visible">
+        <img
+          class="minimize-img"
+          src="../../../../../assets/04-Icons/Icons_Minimize A.svg"
+          (click)="close_chat_window()"
+        />
+        <div class="Chat_main_title">Chat/{{ patientName }}</div>
+        <div style="height: 77%; margin-top: 5px; overflow-y: scroll">
+          <div>
+            <h2 class="chat_h2_line">
+              <span class="chat_h2_span">Nov 4,2022</span>
+            </h2>
+          </div>
+          <div style="height: auto" *ngFor="let data of chatMessage">
+            <div
+              class="chat_window_settings"
+              *ngIf="
+                data.chat != 'receiver';
+                then senderTemplate;
+                else receiverTemplate
+              "
+            ></div>
+            <ng-template #senderTemplate>
+              <div class="sender_content">
+                <div class="sender_content_text">{{ data.text }}</div>
+              </div>
+            </ng-template>
+            <ng-template #receiverTemplate>
+              <br />
+              <div class="receiver_content">
+                <div class="receiver_content_text">{{ data.text }}</div>
+              </div>
+              <br />
+            </ng-template>
+            <!-- <div class="block">
+							Block
+						</div>
+						<div class="error-label">This field is required.</div> -->
+          </div>
+        </div>
+        <input class="message_input_field" placeholder="Type your Message..." />
+
+        <img
+          class="sms-send-img"
+          src="../../../../../assets/04-Icons/Icons_Send.svg"
+        />
+      </div>
+
+      <div class="box-modal" *ngIf="call_panel_visible" (click)="close_modal()">
+        <!--<div class="overlay"></div>-->
+      </div>
+      <div class="callpanel" *ngIf="call_panel_visible">
+        <!--<div class="call_leftpanel">
+           <div class="call_counter">
+              <p>00:02</p>
+           </div>
+        </div>-->
+        <div class="call_timer_panel">
+          <p class="call_timer">{{ Duration }}</p>
+        </div>
+        <div class="call_centerpanel">
+          <div class="callIcon_panel">
+            <img
+              class="micIcon"
+              src="../../../../../assets/04-Icons/Icons_Mic.svg"
+            />
+            <div class="callIcon_phone">
+              <img
+                class="phoneIcon"
+                src="../../../../../assets/04-Icons/Icons_Phone End.svg"
+              />
+            </div>
+            <img
+              class="micIcon"
+              src="../../../../../assets/04-Icons/Icons_Video.svg"
+            />
+
+            <!-- <div class="callIcon_container">
+            <img class="callIcon" src="../../../../../assets/04-Icons/Icons_Chat List.svg"/>
+            </div> -->
+
+            <!-- <div class="selectNumber"> -->
+            <!--  <select [(ngModel)]="phoneno" name="contactnumber" id="contactnumber">
+                <option [value]="phoneNumberPrimary">{{phoneNumberPrimary}}</option>
+                <option [value]="phoneNumberSecondary">{{phoneNumberSecondary}}</option>
+              </select> -->
+
+            <!--  <img class="phoneIcon"  src= "../../../../../assets/04-Icons/Icons_Phone End.svg"/>
+
+            </div> -->
+          </div>
+        </div>
+        <div class="call_rightpanel">
+          <img
+            class="call_close_icon"
+            src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+            (click)="onclickcancel()"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content" id="tablet_view">
+  <div class="main_content main_content_small">
+    <div class="content-panel">
+      <div class="main_page_lower_panel_tab">
+        <div class="profile_container">
+          <div class="patient_info_panel">
+            <div class="upper_container">
+              <div class="img_container mat-card-avatar">
+                <img
+                  class="profileimg"
+                  src="{{ myprofile && myprofile.PatientDetails.Picture }}"
+                />
+              </div>
+
+              <div class="patient_detail_container">
+                <p class="patient_main_data">
+                  {{ patientName }}
+                </p>
+                <p class="patient_main_data">
+                  Patient ID:
+                  {{ myprofile && myprofile.PatientDetails.UserName }}
+                </p>
+                <p class="patient_sub_data patient_info_sub_container">
+                  {{ patientdob }}
+                </p>
+                <p class="patient_sub_data">
+                  {{ patient_address }}
+                </p>
+              </div>
+            </div>
+            <div class="bottom_container">
+              <div class="patient_communication_container">
+                <div class="device_icon">
+                  <!-- <img
+                    class="device_img"
+                    src="../../../../../assets/04-Icons/Icons_Phone A.svg"
+                    (click)="makeCallReady()"
+                  /> -->
+                </div>
+                <div class="device_icon">
+                  <!-- <img
+                    class="device_img"
+                    src="../../../../../assets/04-Icons/Icons_Chat A.svg"
+                    (click)="makeChat()"
+                  /> -->
+                </div>
+              </div>
+              <div class="plan_data">
+                <div class="plan_data_upperpanel">
+                  <div class="plan_data_upperpanel_left">
+                    <span>
+                      {{ myprofile && myprofile.ProfileSummary.ProgramName }}
+                    </span>
+                  </div>
+                  <div class="plan_data_upperpanel_right">
+                    <span
+                      class="status_display"
+                      [ngClass]="{
+                        patient_active: careplanStatus == 'Active',
+                        patient_prescribed:
+                          careplanStatus == 'Prescribed' ||
+                          careplanStatus == 'Enrolled',
+                        patient_discharge:
+                          careplanStatus == 'Discharged' ||
+                          careplanStatus == 'ReadyToDischarge',
+                        patient_onhold: careplanStatus == 'OnHold'
+                      }"
+                      >{{ careplanStatus }}</span
+                    >
+                  </div>
+                </div>
+                <!-- <div class="plan_data_lowerpanel">
+
+                  <div class="profile_care_paln_duration">
+                    <span class="care_paln_duration_text">
+                      {{
+                        myprofile && myprofile.ProfileSummary.CompletedDuration
+                      }}
+                    </span>
+                  </div>
+                  <div
+                    class="progress"
+                    style="height: 10px; border-radius: 25px"
+                  >
+                    <div
+                      class="progress-bar"
+                      role="progressbar"
+                      aria-valuenow="100"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                      [style.width.%]="CompleteionPercentage"
+                      style="background-color: #ffbf77"
+                    >
+                      <span class="sr-only">
+                        {{ CompleteionPercentage }} %</span
+                      >
+                    </div>
+                  </div>
+                </div> -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <p class="patient_vital_reading_title">Vital Reading Status</p>						 -->
+        <div class="patient_vital_reading_panel">
+          <div>
+            <p *ngIf="rolelist[0].ProgramName == 'RPM'" class="main_title_sub">
+              Vital Reading Status
+            </p>
+          </div>
+          <div
+            *ngIf="rolelist[0].ProgramName == 'RPM'"
+            class="summary_billing_content"
+          >
+            <div class="billing_cont_sub">
+              <p class="billing_cont_sub_heading">
+                {{ billingInfo && billingInfo.PatientVital }}
+              </p>
+
+              <div class="progress" style="height: 28px; border-radius: 25px">
+                <div
+                  class="progress-bar"
+                  role="progressbar"
+                  aria-valuenow="70"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  [style.width.%]="billingratio"
+                  style="background-color: #ffbf77"
+                >
+                  <p class="billing-progressvalue">
+                    {{ billingInfo && this.billingInfo.TotalReadings }}/{{
+                      billingInfo && this.billingInfo.DaysCompleted
+                    }}
+                    Days
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+
+      class="side-panel"
+      fxLayout="column"
+
+      *ngIf="tab_todo_list_view"
+    >
+      <ng-container [ngSwitch]="switchvariable">
+        <ng-container *ngSwitchCase="1">
+          <ng-container *ngTemplateOutlet="todolist"></ng-container>
+        </ng-container>
+      </ng-container>
+    </div>
+    <!-- <ng-template #todolist> -->
+    <div class="patient_todo_container">
+      <p class="main_title main_title_todo">
+        Todo List
+        <img
+          class="front_img_add_button"
+          src="../../assets/04-Icons/Icons_Add Main.svg"
+          (click)="tab_navigatetodolist()"
+        />
+      </p>
+      <div class="todo_list_container_tab">
+        <ng-container *ngFor="let list of getTodoList; let index = index">
+          <div class="todo_list_medicine_panel_tab">
+            <div class="todo_left">
+              <p class="todo_medicine_tag1">
+                {{ list.ActivityName }}
+              </p>
+              <span class="todo_medicine_tag2">{{ list.Description }}</span>
+            </div>
+            <div class="todo_right">
+              <!-- <p class="todo_time_span" title="{{ list.Date }}"> -->
+              <!-- <p class="todo_time_span">
+                {{
+                  datepipe.transform(convertToLocalTime(list.Date), "h:mm a")
+                }}
+              </p> -->
+
+              <!-- <img
+                class="front_img"
+                src="../../assets/04-Icons/Icons_Arrow - Front.svg"
+              /> -->
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+    <!-- </ng-template> -->
+
+    <!-- <ng-template #addtodo> -->
+
+    <!-- </ng-template> -->
+
+    <div>
+      <div class="right_upper_panel">
+        <!-- Start Program Overview test -->
+        <div class="summary-upper-panel">
+          <div class="summary_program_overview">
+            <div class="summary_program_overview_container">
+              <p class="main_title">Program Overview</p>
+              <div class="program_overview_container">
+                <div class="program_overview_title">
+                  <div class="program_name">
+                    <p>{{ program_name }}</p>
+                  </div>
+                  <div class="duration">
+                    <!-- <p>
+                      <span class="duration_value_month">{{
+                        myprofile &&
+                          myprofile["PatientProgramdetails"].ProgramStatus
+                      }}</span>
+                    </p> -->
+                  </div>
+                </div>
+                <div class="program_overview_data">
+                  <div class="program_overview_item">
+                    <p class="program_overview_header">Start Date</p>
+                    <p class="program_overview_value">
+                      {{ programStart | date : "mediumDate" }}
+                    </p>
+                  </div>
+                  <div class="program_overview_item">
+                    <p class="program_overview_header">Duration</p>
+                    <p class="program_overview_value">
+                      {{
+                        myprofile && myprofile["PatientProgramdetails"].Duration
+                      }}
+                      Months
+                    </p>
+                  </div>
+                  <div class="program_overview_item program_overview_vital">
+                    <p class="program_overview_header">
+                      {{
+                        program_name != "CCM" && program_name != "PCM"
+                          ? "Vitals Monitored"
+                          : "Condition Monitored"
+                      }}
+                    </p>
+                    <div *ngFor="let vital of patiantVital">
+                      <p class="program_overview_value">
+                        {{ vital.Vital }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="summary_critical_event">
+            <p class="main_title">Critical Event</p>
+            <div class="critical_event_container" *ngIf="http_get_symptoms">
+              <div
+                *ngIf="
+                  PatientCriticalAlerts && PatientCriticalAlerts.length == 0
+                "
+                class="default_no_date"
+              >
+                No data
+              </div>
+              <div
+                *ngFor="
+                  let alert of PatientCriticalAlerts;
+                  let i = index;
+                  let first = first;
+                  let last = last
+                "
+              >
+                <div
+                  class="summary_alert_item_data"
+                  [ngStyle]="{
+                    'border-radius': first
+                      ? '0.5rem 0.5rem 0 0'
+                      : last
+                      ? '0 0 0.5rem 0.5rem'
+                      : ''
+                  }"
+                  [ngClass]="{
+                    priority_low: alert.Priority == 'Low',
+                    priority_high: alert.Priority == 'Critical',
+                    priority_missing: alert.Priority == 'Moderate'
+                  }"
+                >
+                  <p
+                    class="summary_alert_item summary_alert_item_title"
+                    title="{{ alert.VitalAlert }}"
+                  >
+                    {{ alert.VitalAlert }}
+                  </p>
+                  <p class="summary_alert_item" *ngIf="alert.Time">
+                    {{
+                      datepipe.transform(
+                        convertToLocalTime(alert.Time),
+                        "MMM d, yyyy"
+                      )
+                    }}
+                    -
+                    {{
+                      datepipe.transform(
+                        convertToLocalTime(alert.Time),
+                        "h: mm a"
+                      )
+                    }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Program OverView  Test -->
+      </div>
+
+      <div
+        class="recent_vital_panel_container"
+        *ngIf="rolelist[0].ProgramName == 'RPM'"
+      >
+        <p class="main_title">Recent Vitals</p>
+        <div class="recent_vital_panel">
+          <div class="patient_vital_bp_graph_container">
+            <div class="patient_vital_graph_container">
+              <div>
+                <p class="patient_vital_graph_bp_title">
+                  {{ patient_vital_name }}
+                </p>
+                <div>
+                  <span class="patient_vital_graph_bp_value"
+                    >{{ patient_bp_value }} </span
+                  ><span class="patient_vital_graph_bp_value_mmhg">{{
+                    vital_unit
+                  }}</span>
+                </div>
+              </div>
+
+              <div>
+                <span class="patient_vital_graph_bp_duration">{{
+                  notificationtime(patient_bp_duration)
+                }}</span>
+              </div>
+            </div>
+            <div style="display: block; width: 100%; min-height: 470px">
+              <canvas
+                class="charttrends"
+                baseChart
+                width="1"
+                height="1"
+                [datasets]="lineChartData"
+                [labels]="lineChartLabels"
+                [options]="lineChartOptions"
+                [legend]="lineChartLegend"
+              >
+              </canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="right_lower_panel">
+        <div class="summary_core_team">
+          <p class="main_title">Care Team</p>
+          <div class="summary_core_team_content">
+            <div class="core_panel_left">
+              <p class="data_title">Physician</p>
+              <p class="data_value">
+                {{ currentPhysician }}
+              </p>
+            </div>
+            <div class="core_panel_middle">
+              <div>
+                <p class="data_title">Care Team Personal</p>
+                <p class="data_value">{{ assignedMember }}</p>
+              </div>
+            </div>
+            <div class="core_panel_middle">
+              <div>
+                <p class="data_title">Care Team Manager</p>
+                <p class="data_value">
+                  {{ myprofile && myprofile.PatientProgramdetails.Manager }}
+                </p>
+              </div>
+            </div>
+            <div class="core_panel_right">
+              <div>
+                <p class="data_title">Delegation</p>
+                <p class="data_value"></p>
+              </div>
+              <div>
+                <p class="data_title">Duration</p>
+                <p class="data_value"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

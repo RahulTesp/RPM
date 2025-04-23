@@ -1,0 +1,1214 @@
+<ng-container *ngIf="loading || loading3 || loading2">
+  <div class="overlay"></div>
+  <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
+</ng-container>
+
+<div class="content">
+
+    <div
+      class="content-panel">
+      <!-- Main Panel -->
+      <div
+        class="main-panel" >
+        <div>
+          <div
+            class="right-menu-panel"
+            *ngIf="roleId[0].Id != 6 && roleId[0].Id != 8"
+          >
+            <button
+              *ngIf="variable == 2"
+              class="addCommonBtn"
+              (click)="add_task()"
+              id="task_AddTask"
+            >
+              ADD TASK
+            </button>
+          </div>
+          <div class="back_arrow">
+            <div
+              class="back_arrow_container"
+              (click)="backtohome()"
+              id="task_BackHome"
+            >
+              <img
+                class="arrow-img"
+                src="../../../../../../assets/04-Icons/Icons_Arrow - Back.svg"
+              />
+            </div>
+            <p class="main_title">Work List</p>
+          </div>
+          <div class="uppermenubtnpanel">
+            <button
+              *ngIf="roleId[0].Id != 1"
+              class="uppermenubtn"
+              id="task_ChangeScreen1"
+              (mouseup)="ChangeScreen(1)"
+              [class.selected]="CurrentMenu == 1"
+            >
+              Alerts
+            </button>
+
+            <button
+              class="uppermenubtn"
+              (mouseup)="ChangeScreen(2)"
+              [class.selected]="CurrentMenu == 2"
+              id="task_ChangeScreen2"
+            >
+              Tasks
+            </button>
+            <button
+              class="uppermenubtn"
+              (mouseup)="ChangeScreen(3)"
+              [class.selected]="CurrentMenu == 3"
+              id="task_ChangeScreen3"
+            >
+              Schedules
+            </button>
+            <button
+              class="uppermenubtn"
+              (mouseup)="ChangeScreen(4)"
+              [class.selected]="CurrentMenu == 4"
+              id="task_ChangeScreen3"
+            >
+              SMS List
+            </button>
+          </div>
+        </div>
+
+        <div class="main_content_display">
+          <ng-container [ngSwitch]="variable">
+            <ng-container *ngSwitchCase="1">
+              <ng-container *ngTemplateOutlet="taskAlertPage"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="2">
+              <ng-container *ngTemplateOutlet="taskMainPage"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="3">
+              <ng-container *ngTemplateOutlet="taskSchedule"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="4">
+              <ng-container *ngTemplateOutlet="smsData"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+              <ng-container *ngTemplateOutlet="taskAlertPage"></ng-container>
+            </ng-container>
+            <!-- <ng-container *ngSwitchDefault>
+            <div *ngIf="accessRights&&accessRights.UserAccessRights[17].AccessRight =='F'">
+              <ng-container *ngTemplateOutlet="taskAlertPage"></ng-container>
+            </div>
+             <div *ngIf="accessRights&&accessRights.UserAccessRights[17].AccessRight =='N'">
+              <ng-container *ngTemplateOutlet="taskMainPage"></ng-container>
+              </div>
+            </ng-container> -->
+          </ng-container>
+        </div>
+      </div>
+      <div
+        class="side-panel">
+        <div *ngIf="alert_data" class="side-data-default">
+          <app-right-sidebar
+            #child
+            [sidepaneldisplay]="1"
+            [task_update_variable]="task_variable_update"
+            (TaskTablereload)="getReloadDataTask()"
+            (AlertTablereload)="getReloadDataAlert()"
+            (ScheduleTablereload)="getTaskScheduleList()"
+          ></app-right-sidebar>
+        </div>
+
+        <!-- <div class="schedule_data_panel" *ngIf="schedule_data">
+        <ng-container [ngTemplateOutlet]="schedule_container"></ng-container>
+       </div> -->
+      </div>
+    </div>
+</div>
+
+
+<!--  Task alert Page Start -->
+
+<ng-template #taskAlertPage>
+  <div class="alert_upperPanel">
+    <div class="upperoverviewpanel">
+      <div
+        class="upperpanel_subBox alert_overview_data_first"
+        id="task_PatientAlert"
+        [class.selected_cont_first]="containerSelectionpanel == 1"
+      >
+        <p class="upperpanel_subtitle upperpanel_subBox_subtitle">
+          Patients Assigned
+        </p>
+
+        <p class="upperpanel_subBox_value">
+          {{
+            httpGetAlertData && httpGetAlertData.Summary.length > 0
+              ? httpGetAlertData.Summary[0].TotalPatients
+              : 0
+          }}
+        </p>
+      </div>
+      <div
+        class="upperpanel_subBox"
+        (click)="onClickCriticalAlert()"
+        id="task_CriticalAlert"
+        [class.selected_cont]="containerSelectionpanel == 2"
+      >
+        <p class="upperpanel_subtitle upperpanel_subBox_subtitle">
+          Critical Alerts
+        </p>
+        <p class="upperpanel_subBox_value">
+          {{ httpGetAlertData ? critical_alertData.length : 0 }}
+        </p>
+      </div>
+      <div
+        class="upperpanel_subBox"
+        (click)="onClickSlaBreach()"
+        id="task_SlAalert"
+        [class.selected_cont]="containerSelectionpanel == 3"
+      >
+        <p class="upperpanel_subtitle upperpanel_subBox_subtitle">
+          SLA Breached
+        </p>
+        <p class="upperpanel_subBox_value">
+          {{ httpGetAlertData ? slaBreachData.length : 0 }}
+        </p>
+      </div>
+
+      <div
+        class="upperpanel_subBox"
+        (click)="onClickOpenalert()"
+        id="task_OpenAlert"
+        [class.selected_cont]="containerSelectionpanel == 4"
+      >
+        <p class="upperpanel_subtitle upperpanel_subBox_subtitle">
+          Open Alerts
+        </p>
+        <p class="upperpanel_subBox_value">
+          {{ httpGetAlertData ? openAlertData.length : 0 }}
+        </p>
+      </div>
+      <div
+        class="upperpanel_subBox upper_last_box"
+        (click)="onClickCompletedalert()"
+        id="task_CompleteAlert"
+        [class.selected_cont]="containerSelectionpanel == 5"
+      >
+        <p class="upperpanel_subtitle upperpanel_subBox_subtitle">
+          Completed Alerts
+        </p>
+        <p class="upperpanel_subBox_value">
+          {{ httpGetAlertData ? completeStatusData.length : 0 }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="task_table_content">
+    <mat-paginator
+      [length]="httpGetAlertData ? total_number : 0"
+      [pageSize]="8"
+      [pageIndex]="pageIndex"
+      (page)="pageChange($event)"
+    >
+    </mat-paginator>
+    <mat-table
+      class="task_table_display"
+      #tableOne
+      [dataSource]="tableDataSource"
+      matSort
+    >
+      <ng-container matColumnDef="VitalAlert">
+        <mat-header-cell
+          style="border-radius: 0.8rem 0px 0px 0px"
+          *matHeaderCellDef
+        >
+          Alert
+        </mat-header-cell>
+        <!-- <mat-cell *matCellDef="let element; let rowIndex = index;"
+          [ngClass]="{'due_date': element.DueDate == 'Nov 27,2021'}">
+          {{element.alert_description}}
+        </mat-cell> -->
+        <mat-cell
+          *matCellDef="let element; let rowIndex = index"
+          [ngClass]="{
+            Critical_text: element.Prioriy == 'Critical',
+            Missing_text: element.Prioriy == 'Cautious'
+          }"
+        >
+          {{ element.VitalAlert }}
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="PatientId">
+        <mat-header-cell *matHeaderCellDef class="hidden-column"> </mat-header-cell>
+
+        <mat-cell class="hidden-column" *matCellDef="let element; let rowIndex = index"> </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="PatientProgramID">
+        <mat-header-cell *matHeaderCellDef class="hidden-column"> </mat-header-cell>
+
+        <mat-cell *matCellDef="let element; let rowIndex = index" class="hidden-column"> </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="Prioriy">
+        <mat-header-cell *matHeaderCellDef>
+          <div class="task_priority">
+            <select
+              [(ngModel)]="priorityFilterValue"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="dropdownFilter()"
+            >
+              <option [ngValue]="undefined" id="task_AlertType">
+                Alert Types
+              </option>
+              <option
+                *ngFor="let data of AlertTypeArray; let i = index"
+                [value]="data.Type"
+              >
+                {{ data.Type }}
+              </option>
+            </select>
+          </div>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <div
+            class="priority_content"
+            [ngClass]="{
+              priority_low: element.Prioriy == 'Low',
+              priority_high: element.Prioriy == 'Severe',
+              priority_medium: element.Prioriy == 'Cautious',
+              priority_urgent: element.Prioriy == 'Critical',
+              priority_missing: element.Prioriy == 'Missing'
+            }"
+          >
+            {{ element.Prioriy }}
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="PatientName">
+        <mat-header-cell *matHeaderCellDef>
+          <div class="search_input" *ngIf="alertSearchValeName">
+            <img
+              class="search_icon"
+              src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+              (click)="searchAlertNameclose()"
+              id="task_PatientAlertSearch1"
+            /><input
+              class="input_panel"
+              id="task_patientAlertSearch"
+              (keyup)="applyDataFilter($event)"
+              (focus)="setupFilter('PatientName')"
+              [value]="alertPatientSearch"
+            />
+          </div>
+          <div class="search_heading_default" *ngIf="!alertSearchValeName">
+            <img
+              class="search_icon_default"
+              src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              (click)="searchAlertNameClick()"
+              id="task_PatientAlertSearch2"
+            />
+            Patient Name
+          </div>
+        </mat-header-cell>
+
+        <mat-cell
+          *matCellDef="let element"
+
+        >
+          <span
+            class="patient_name_col"
+            id="task_NavigatePatient"
+            (click)="navigatePatientdetail(element)"
+            >{{ element.PatientName }}
+          </span>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="ProgramName">
+        <mat-header-cell *matHeaderCellDef>
+          <div>Program Name</div>
+        </mat-header-cell>
+
+        <mat-cell *matCellDef="let element">
+          <span>{{ element.ProgramName }} </span>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="AssignedMember">
+        <mat-header-cell *matHeaderCellDef>
+          <div class="search_input" *ngIf="alertAssignedName">
+            <img
+              class="search_icon"
+              src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+              (click)="seachAssignedclose()"
+              id="task_AlertAssignedSearch1"
+            /><input
+              class="input_panel"
+              id="task_AlertAssignSearch"
+              (keyup)="applyDataFilter($event)"
+              (focus)="setupFilter('AssignedMember')"
+              [value]="alertAssigneeSearch"
+            />
+          </div>
+          <div class="search_heading_default" *ngIf="!alertAssignedName">
+            <img
+              class="search_icon_default"
+              src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              id="task_AlertAssignedSearch2"
+              (click)="serachAlertAssigned()"
+            />Assigned To
+          </div>
+        </mat-header-cell>
+        <mat-cell
+          *matCellDef="let element"
+
+        >
+          {{ element.AssignedMember }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="DueDate">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="hide-arrow">
+          <!-- <img class="sort_icon_default" src="../../../../../assets/04-Icons/Icons_Sort.svg"> -->
+          Due Date
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element"
+          ><span>{{
+            datepipe.transform(convertToLocalTime(element.DueDate), "MMM d, y")
+          }}</span>
+        </mat-cell>
+        <!-- <mat-cell *matCellDef="let element">{{element.DueDate}}   </mat-cell> -->
+      </ng-container>
+
+      <ng-container matColumnDef="Status">
+        <mat-header-cell *matHeaderCellDef>
+          <div class="task_priority">
+            <select
+              id="task_AlertStatus"
+              [(ngModel)]="statusFilterValue"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="dropdownFilter()"
+            >
+              <option value="status">Status</option>
+              <option
+                value="todo"
+                [ngStyle]="{
+                  display: containerSelectionpanel == 5 ? 'none' : 'block'
+                }"
+              >
+                To do
+              </option>
+              <option
+                [ngStyle]="{
+                  display: containerSelectionpanel == 5 ? 'none' : 'block'
+                }"
+                value="inprogress"
+              >
+                In Progress
+              </option>
+              <option
+                value="complete"
+                [ngStyle]="{
+                  display:
+                    containerSelectionpanel == 4 || containerSelectionpanel == 1
+                      ? 'none'
+                      : 'block'
+                }"
+              >
+                Complete
+              </option>
+            </select>
+          </div>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          {{ element.Status }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <mat-header-cell
+        class="action-column"
+          *matHeaderCellDef
+        >
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element" let rowIndex="index;" class="action-column">
+          <div class="action_panel">
+            <div class="front_img_container">
+              <img
+                (click)="navigateAcknowldge(element)"
+                id="task_UpdateAlert"
+                class="front_img"
+                src="../../../../../../assets/04-Icons/Icons_Arrow - Front.svg"
+              />
+            </div>
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row
+        *matHeaderRowDef="Alert_Header; sticky: true"
+      ></mat-header-row>
+
+      <mat-row
+        [style.minHeight.px]="40"
+        [ngClass]="{
+          urgent: row.Prioriy == 'Critical',
+          missing: row.Prioriy == 'Cautious'
+        }"
+        *matRowDef="let row; columns: Alert_Header"
+      ></mat-row>
+    </mat-table>
+  </div>
+</ng-template>
+
+<!--  Task alert Page End -->
+
+<ng-template #taskMainPage>
+  <div class="date_panel_cont_task">
+    <mat-form-field appearance="outline">
+      <mat-label>Enter a date range</mat-label>
+      <mat-date-range-input [formGroup]="rangeTask" [rangePicker]="picker">
+        <input
+          matStartDate
+          formControlName="start"
+          placeholder="Start date"
+          id="task_Sch_Start"
+        />
+        <input
+          matEndDate
+          formControlName="end"
+          placeholder="End date"
+          id="task_Sch_End"
+          (dateChange)="getReloadDataTask()"
+        />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+    </mat-form-field>
+    <!-- <app-date-range-control
+      (DateRangeSelected)="GetDateRange($event)"
+      #dateRange
+    ></app-date-range-control> -->
+  </div>
+  <div class="upperoverviewpanel">
+    <div
+      class="upperpanel_subBox task_overview_data_first"
+      id="task_TaskPatinetAssigned"
+    >
+      <p class="upperpanel_subtitle upperpanel_subBox_subtitle">
+        Patients Assigned
+      </p>
+
+      <p class="upperpanel_subBox_value">
+        {{
+          httpGetAllTask && httpGetAllTask.Summary.length > 0
+            ? httpGetAllTask.Summary[0].TotalPatients
+            : 0
+        }}
+      </p>
+    </div>
+    <div
+      class="upperpanel_subBox task_overview_data"
+      id="task_TaskDueTdy"
+      (click)="onClickTaskdue()"
+      [class.selected_cont]="taskcontainerSelection == 1"
+    >
+      <p class="upperpanel_subtitle upperpanel_subBox_subtitle">
+        Tasks Due Today
+      </p>
+      <p class="upperpanel_subBox_value">
+        {{ httpGetAllTask ? taskDueToday.length : 0 }}
+      </p>
+    </div>
+    <div
+      class="upperpanel_subBox task_overview_data"
+      id="task_SLATask"
+      (click)="onClickTaskSlaBreach()"
+      [class.selected_cont]="taskcontainerSelection == 2"
+    >
+      <p class="upperpanel_subtitle upperpanel_subBox_subtitle">SLA Breached</p>
+      <p class="upperpanel_subBox_value">
+        {{ httpGetAllTask ? taskSlaBreached.length : 0 }}
+      </p>
+    </div>
+
+    <div
+      class="upperpanel_subBox task_overview_data"
+      id="task_PendingLaterTask"
+      (click)="onClickTaskPendingLater()"
+      [class.selected_cont]="taskcontainerSelection == 3"
+    >
+      <p class="upperpanel_subtitle upperpanel_subBox_subtitle">
+        Pending Later
+      </p>
+      <p class="upperpanel_subBox_value">
+        {{ httpGetAllTask ? taskPendingLater.length : 0 }}
+      </p>
+    </div>
+    <!-- <div class="task_overview_data">
+      <p class="upperpanel_subtitle upperpanel_subBox_subtitle">Watcher Role</p>
+      <p class="upperpanel_subBox_value">0</p>
+    </div> -->
+    <div
+      class="upperpanel_subBox task_overview_data"
+      id="task_CompletedTask"
+      (click)="onClickCompletedTask()"
+      [class.selected_cont]="taskcontainerSelection == 4"
+    >
+      <p class="upperpanel_subtitle upperpanel_subBox_subtitle">
+        Completed Tasks
+      </p>
+      <p class="upperpanel_subBox_value">
+        {{ httpGetAllTask ? taskComplete.length : 0 }}
+      </p>
+    </div>
+  </div>
+  <div class="task_table_content">
+    <mat-paginator
+      #taskPaginator="matPaginator"
+      [length]="httpGetAllTask ? total_number : 0"
+      [pageSize]="8"
+      [pageIndex]="pageIndex"
+      (page)="pageChange($event)"
+    >
+    </mat-paginator>
+    <mat-table
+      class="task_table_display"
+      #table
+      [dataSource]="tableDataSource"
+      matSort
+    >
+      <ng-container matColumnDef="TaskID">
+        <mat-header-cell
+          *matHeaderCellDef class="hidden-column"
+          style="border-radius: 0.8rem 0px 0px 0px"
+        >
+        </mat-header-cell>
+        <mat-cell class="hidden-column" *matCellDef="let element; let rowIndex = index">
+          {{ element.TaskID }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="TaskType">
+        <mat-header-cell *matHeaderCellDef> Task Type </mat-header-cell>
+        <mat-cell
+          *matCellDef="let element; let rowIndex = index"
+          [ngClass]="{ due_date: dueDatePass(element.DueDate, element.Status) }"
+        >
+          {{ element.TaskType }}
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="PatientId">
+        <mat-header-cell *matHeaderCellDef class="hidden-column"> </mat-header-cell>
+
+        <mat-cell *matCellDef="let element; let rowIndex = index" class="hidden-column"> </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="PatientProgramId">
+        <mat-header-cell class="hidden-column" *matHeaderCellDef> </mat-header-cell>
+
+        <mat-cell class="hidden-column" *matCellDef="let element; let rowIndex = index"> </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="Priority">
+        <mat-header-cell *matHeaderCellDef>
+          <div class="task_priority">
+            <select
+              [(ngModel)]="priorityTaskFilterValue"
+              id="task_PriorityTask"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="dropdownTaskFilter()"
+            >
+              <option [ngValue]="1">Priority</option>
+              <!-- <option value="2">Urgent</option> -->
+              <option [ngValue]="3">High</option>
+              <option [ngValue]="4">Medium</option>
+              <option [ngValue]="5">Low</option>
+            </select>
+          </div>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <div
+            class="priority_content"
+            [ngClass]="{
+              priority_low: element.Priority == 'Low',
+              priority_high: element.Priority == 'High',
+              priority_medium: element.Priority == 'Medium',
+              priority_urgent: element.Priority == 'Urgent'
+            }"
+          >
+            {{ element.Priority }}
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="Patient">
+        <mat-header-cell *matHeaderCellDef>
+          <!-- <div class="search_input" *ngIf="searchTaskValueName"><img  class="search_icon" src="../../../../../assets/04-Icons/Icons_Cancel.svg" (click)="onFocusOutEvent($event)"
+          (click)="searchTaskNameClick()"><input class="search_input input_panel"(change)="applyFilterTask($event)" (focusout)="onFocusOutEvent($event)"  >
+        </div> -->
+          <div class="search_input" *ngIf="searchTaskValueName">
+            <img
+              class="search_icon"
+              src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+              (click)="searchTaskNameClose()"
+              id="task_PatientTaskSearch1"
+            /><input
+              class="search_input input_panel"
+              (keyup)="applyDataFilter($event)"
+              (focus)="setupFilter('Patient')"
+              id="task_TaskPatientSearch"
+              [value]="taskpatientSearch"
+            />
+          </div>
+          <div class="search_heading_default" *ngIf="!searchTaskValueName">
+            <img
+              class="search_icon_default"
+              src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              (click)="searchTaskNameClick()"
+              id="task_PatientTaskSearch2"
+            />Patient
+          </div>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <span
+            class="patient_name_col"
+            (click)="navigatePatientdetailfromTask(element)"
+            >{{ element.Patient }}</span
+          ></mat-cell
+        >
+      </ng-container>
+
+      <ng-container matColumnDef="CreatedBy">
+        <mat-header-cell *matHeaderCellDef>
+          <div class="search_input" *ngIf="searchCreated">
+            <img
+              class="search_icon"
+              src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+              (click)="serachTaskAssignedClose()"
+              id="task_TaskCreatedBy1"
+            /><input
+              class="search_input input_panel"
+              (keyup)="applyDataFilter($event)"
+              (focus)="setupFilter('CreatedBy')"
+              id="task_TaskCretedBy"
+              [value]="taskAssigneeSearch"
+            />
+          </div>
+          <div class="search_heading_default" *ngIf="!searchCreated">
+            <img
+              class="search_icon_default"
+              src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              (click)="serachTaskAssigned()"
+              id="task_TaskCreatedBy2"
+            />Created By
+          </div>
+        </mat-header-cell>
+        <mat-cell style="padding-left: 0.7rem" *matCellDef="let element">
+          {{ element.CreatedBy }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="DueDate">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="hide-arrow">
+          <!-- <img class="sort_icon_default" src="../../../../../assets/04-Icons/Icons_Sort.svg"> -->
+          Due Date
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <span
+            [ngClass]="{
+              due_date: dueDatePass(element.DueDate, element.Status)
+            }"
+            >{{
+              datepipe.transform(
+                convertToLocalTime(element.DueDate),
+                "MMM d, y"
+              )
+            }}</span
+          ></mat-cell
+        >
+      </ng-container>
+
+      <ng-container matColumnDef="Status">
+        <mat-header-cell *matHeaderCellDef>
+          <div class="task_priority">
+            <select
+              id="task_TaskStatus"
+              [(ngModel)]="statusFilterTaskValue"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="dropdownTaskFilter()"
+            >
+              <option value="status">Status</option>
+              <option
+                value="todo"
+                [ngStyle]="{
+                  display: taskcontainerSelection == 4 ? 'none' : 'block'
+                }"
+              >
+                To do
+              </option>
+              <option
+                value="inprogress"
+                [ngStyle]="{
+                  display: taskcontainerSelection == 4 ? 'none' : 'block'
+                }"
+              >
+                In Progress
+              </option>
+              <option
+                value="complete"
+                [ngStyle]="{
+                  display:
+                    taskcontainerSelection == 0 || taskcontainerSelection == 1
+                      ? 'none'
+                      : 'block'
+                }"
+              >
+                Complete
+              </option>
+            </select>
+          </div>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{ element.Status }} </mat-cell>
+      </ng-container>
+
+      <div>
+        <ng-container matColumnDef="action">
+          <mat-header-cell
+          class="action-column"
+            *matHeaderCellDef
+
+          >
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element" let rowIndex="index;" class="action-column">
+            <div>
+              <button class="iconbutton" color="primary">
+                <img
+                  class="front_img"
+                  id="task_UpdateTask"
+                  src="../../../../../../assets/04-Icons/Icons_Arrow - Front.svg"
+                  (click)="navigateupdatetask(element)"
+                />
+              </button>
+            </div>
+          </mat-cell>
+        </ng-container>
+      </div>
+
+      <mat-header-row
+        *matHeaderRowDef="Tasks_columnHeader; sticky: true"
+      ></mat-header-row>
+      <!-- <mat-row *matRowDef="let row; columns: columnHeader;"></mat-row> -->
+      <mat-row
+        [style.minHeight.px]="38"
+        [ngClass]="{
+          urgent: row.Priority == 'Critical',
+          due_datepending: dueDatePass(row.DueDate, row.Status)
+        }"
+        *matRowDef="let row; columns: Tasks_columnHeader"
+      ></mat-row>
+    </mat-table>
+  </div>
+</ng-template>
+<ng-template #taskSchedule>
+  <div>
+    <div class="task_date_panel">
+      <div style="visibility: hidden">
+        <button class="complete_schedule" id="task_Sch_Save">Save</button>
+      </div>
+      <div class="date_panel_cont">
+        <mat-form-field appearance="outline">
+          <mat-label>Enter a date range</mat-label>
+          <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+            <input
+              matStartDate
+              formControlName="start"
+              placeholder="Start date"
+              id="task_Sch_Start"
+            />
+            <input
+              matEndDate
+              formControlName="end"
+              placeholder="End date"
+              id="task_Sch_End"
+              (dateChange)="rangeScheduleCalc()"
+            />
+          </mat-date-range-input>
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+
+        <div
+          class="table_add_container"
+          *ngIf="roleId[0].Id != 6 && roleId[0].Id != 8"
+        >
+          <img
+            class="img_table_add"
+            src="../../../../../../assets/04-Icons/Icons_Plus.svg"
+            id="task_add_Sch"
+            (click)="addSchedule()"
+            alt=""
+          />
+        </div>
+      </div>
+    </div>
+    <div class="shedule_table_container">
+      <table class="team_detail_schedule task_schedule_table">
+        <tr style="position: sticky">
+          <th [ngStyle]="{ 'border-radius': '16px 0px 0px 0px' }">
+            <img
+              class="sort_icon_default"
+              id="task_Sch_sort"
+              (click)="ScheduleSort()"
+              src="../../../../../assets/04-Icons/Icons_Sort.svg"
+            />
+            Date
+          </th>
+          <th>Time</th>
+          <th><div>Schedule Type</div></th>
+          <th>Description</th>
+          <th>Patient/ Contact Name</th>
+          <th [ngStyle]="{ 'border-radius': '0px 16px 0px 0px' }"></th>
+        </tr>
+        <ng-container *ngFor="let scheduleItem of ScheduleDataSource">
+          <ng-container
+            *ngFor="
+              let data_item of scheduleItem.SchedueInfos;
+              let index = index
+            "
+          >
+            <tr>
+              <td
+                class="main_time"
+                *ngIf="index === 0"
+                [attr.rowspan]="scheduleItem.SchedueInfos.length"
+              >
+                {{ datepipe.transform(scheduleItem.ScheduleDate, "MMM d, y") }}
+              </td>
+              <td [ngStyle]="{ 'border-radius': '0.5rem 0px 0px 0.5rem' }">
+                {{ data_item.ScheduleTime }}
+              </td>
+              <td class="schedule_type" [ngStyle]="{ 'min-width': '30px' }">
+                {{ data_item.ScheduleType }}
+              </td>
+              <td [ngStyle]="{ 'max-width': '250px' }">
+                {{ data_item.Description }}
+              </td>
+              <!-- <td *ngIf="userid==data_item.AssignedBy">
+            {{ data_item.ContactName}}
+          </td> -->
+
+              <td>
+                {{ data_item.ContactName }}
+              </td>
+              <!--
+          <td *ngIf="userid!=data_item.AssignedBy">
+
+            {{ data_item.AssignedByName}}
+          </td> -->
+              <td [ngStyle]="{ 'border-radius': '0px 0.5rem 0.5rem 0px' }">
+                <div class="schedule_action_panel">
+                  <button
+                    class="iconbutton"
+                    (click)="navigateEditSchedule(data_item.CurrentScheduleId)"
+                    id="task_Update_Sch"
+                  >
+                    <img
+                      class="front_img"
+                      src="../../../../../../assets/04-Icons/Icons_Arrow - Front.svg"
+                    />
+                  </button>
+                  <input
+                    type="checkbox"
+                    id="task_Sch_Complete"
+                    [attr.disabled]="data_item.IsCompleted ? true : null"
+                    [checked]="data_item.IsCompleted"
+                    (change)="
+                      scheduleComplete($event, data_item.CurrentScheduleId)
+                    "
+                  />
+                  <!-- <input type="checkbox" (change)="scheduleComplete($event,data_item.CurrentScheduleId)" /> -->
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </ng-container>
+      </table>
+    </div>
+    <div class="complete_schedule" *ngIf="ScheduleDataSource.length > 0">
+      <!-- btn_save -->
+      <button
+        class="addCommonBtn"
+        id="task_Sch_Save"
+        (click)="saveCompleteTask()"
+      >
+        Save
+      </button>
+    </div>
+  </div>
+</ng-template>
+<!-- Schedule Container -->
+
+<ng-template #taskKPI>
+  <div class="kpi_performance">
+    <div *ngIf="Alert_KPI" class="graph_panel">
+      <div class="graph_title_bar">
+        <p>Alerts KPI Status</p>
+        <div class="button_panel">
+          <div class="button_panel">
+            <button class="btn-week">Week</button>
+            <button class="btn-month">Month</button>
+            <button class="btn-year">Year</button>
+          </div>
+        </div>
+      </div>
+      <div class="graph_content_container">
+        <div class="graph_content_date_panel">
+          <p class="graph_container_date">{{ date_data }}</p>
+        </div>
+
+        <div style="display: block">
+          <canvas
+            baseChart
+            [data]="Alert_KPI"
+            [labels]="doughnutChartLabels"
+            [options]="doughnutChartOptions"
+            [plugins]="doughnutChartPlugins"
+          >
+          </canvas>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="Tasks_KPI" class="graph_panel">
+      <div class="graph_title_bar">
+        <p>Tasks KPI Status</p>
+        <div class="button_panel">
+          <button class="btn-week">Week</button>
+          <button class="btn-month">Month</button>
+          <button class="btn-year">Year</button>
+        </div>
+      </div>
+      <div class="graph_content_container">
+        <div class="graph_content_date_panel">
+          <p class="graph_container_date">{{ date_data }}</p>
+        </div>
+
+        <div style="display: block">
+          <canvas
+            class="canvas_graph"
+            baseChart
+            [data]="Tasks_KPI"
+            [labels]="doughnutChartLabelsOne"
+            [options]="doughnutChartOptionsOne"
+            [plugins]="doughnutChartPluginsOne"
+          >
+          </canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- SMS Data Template Start  -->
+<ng-template #smsData>
+  <div class="task_table_content">
+    <mat-paginator
+      [length]="httpGetPatientSMSData ? total_number : 0"
+      [pageSize]="8"
+      [pageIndex]="pageIndex"
+      (page)="pageChange($event)"
+    >
+    </mat-paginator>
+    <mat-table
+      class="task_table_display"
+      #tableOne
+      [dataSource]="tableDataSource"
+      matSort
+    >
+      <ng-container matColumnDef="PatientId">
+        <mat-header-cell class="hidden-column"
+          style="border-radius: 0.8rem 0px 0px 0px"
+          *matHeaderCellDef
+        >
+        </mat-header-cell>
+
+        <mat-cell class="hidden-column" *matCellDef="let element; let rowIndex = index"> </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="PatientProgramID">
+        <mat-header-cell class="hidden-column" *matHeaderCellDef> </mat-header-cell>
+
+        <mat-cell class="hidden-column" *matCellDef="let element; let rowIndex = index"> </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="PatientName">
+        <mat-header-cell *matHeaderCellDef>
+          <div class="search_input" *ngIf="alertSearchValeName">
+            <img
+              class="search_icon"
+              src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+              (click)="searchPatietNameSmsClose()"
+              id="task_PatientAlertSearch1"
+            /><input
+              class="input_panel"
+              id="task_patientAlertSearch"
+              (keyup)="applyDataFilter($event)"
+              (focus)="setupFilter('PatientName')"
+              [value]="alertPatientSearch"
+            />
+          </div>
+          <div class="search_heading_default" *ngIf="!alertSearchValeName">
+            <img
+              class="search_icon_default"
+              src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              (click)="searchAlertNameClick()"
+              id="task_PatientAlertSearch2"
+            />
+            Patient Name
+          </div>
+        </mat-header-cell>
+
+        <mat-cell
+          *matCellDef="let element"
+
+        >
+          <span id="task_NavigatePatient">{{ element.PatientName }} </span>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="ProgramName">
+        <mat-header-cell *matHeaderCellDef>
+          <div>Program Name</div>
+        </mat-header-cell>
+
+        <mat-cell *matCellDef="let element">
+          <span>{{ element.ProgramName }} </span>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="Message">
+        <mat-header-cell *matHeaderCellDef>
+          <div>Message</div>
+        </mat-header-cell>
+
+        <mat-cell *matCellDef="let element">
+          <div class="messagedescr">{{ element.Message }}</div>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="FromNumber">
+        <mat-header-cell *matHeaderCellDef> From Number </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          {{ element.FromNumber }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="Senddate">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="hide-arrow">
+
+          Date
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <span>{{
+            datepipe.transform(
+              convertToLocalTime(convertISOFormat(element.Senddate)),
+              "MMM d, y"
+            )
+          }}</span>
+        </mat-cell>
+
+      </ng-container>
+      <ng-container matColumnDef="SendTime">
+        <mat-header-cell *matHeaderCellDef>
+
+          Time
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <span>{{
+            datepipe.transform(
+              convertToLocalTime(convertISOFormat(element.Senddate)),
+              "h:mm a"
+            )
+          }}</span>
+        </mat-cell>
+
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <mat-header-cell
+        class="action-column"
+
+          *matHeaderCellDef
+        >
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element" let rowIndex="index;" class="action-column">
+          <div class="action_panel">
+            <div class="front_img_container">
+              <img
+                (click)="getSMSData(element, messageDialog)"
+                id="task_UpdateAlert"
+                class="front_img"
+                src="../../../../../../assets/04-Icons/Icons_Arrow - Front.svg"
+              />
+            </div>
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row
+        *matHeaderRowDef="SMS_Header; sticky: true"
+      ></mat-header-row>
+
+      <mat-row
+        [style.minHeight.px]="40"
+        [ngClass]="{
+          urgent: row.Prioriy == 'Critical',
+          missing: row.Prioriy == 'Cautious'
+        }"
+        *matRowDef="let row; columns: SMS_Header"
+      ></mat-row>
+    </mat-table>
+  </div>
+</ng-template>
+
+<!-- SMS Data Template End -->
+
+<ng-template #date>
+  <mat-form-field panelClass="date-range-box" appearance="fill">
+    <mat-date-range-input
+      [formGroup]="campaignOne"
+      [rangePicker]="campaignOnePicker"
+      [comparisonStart]="campaignOne.value.start"
+      [comparisonEnd]="campaignOne.value.end"
+    >
+      <input matStartDate placeholder="Start date" formControlName="start" />
+      <input matEndDate placeholder="End date" formControlName="end" />
+    </mat-date-range-input>
+    <mat-datepicker-toggle
+      matSuffix
+      [for]="campaignOnePicker"
+    ></mat-datepicker-toggle>
+    <mat-date-range-picker #campaignOnePicker></mat-date-range-picker>
+  </mat-form-field>
+</ng-template>
+<ng-template #month> </ng-template>
+<ng-template #year> </ng-template>
+<ng-template #messageDialog>
+  <div class="dialogContainer">
+    <h2 matDialogTitle>Message</h2>
+  </div>
+
+  <mat-dialog-content>
+    <div class="messagetemplate">
+      <div class="messageContainer">
+        <div class="message_panel">{{ message }}</div>
+      </div>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <div class="message_btn_action_panel">
+      <div class="btn_subPanel">
+        <button class="btn_cancel" id="pd_MsgCancel" matDialogClose>
+          Close
+        </button>
+      </div>
+    </div>
+  </mat-dialog-actions>
+</ng-template>

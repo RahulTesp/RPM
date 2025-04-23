@@ -1,0 +1,391 @@
+<ng-container *ngIf="loading1">
+  <div class="overlay"></div>
+  <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
+</ng-container>
+
+<div class="content">
+      <!-- Main Panel -->
+      <div class="main-panel">
+        <div class="right-menu-panel" *ngIf="roles[0].Id == 1">
+          <button class="addCommonBtn" (click)="add_vendor()">
+            ADD VENDOR
+          </button>
+          <!-- <button class="addCommonBtn" (click)="add_device()">ADD DEVICE</button> -->
+        </div>
+
+        <div class="back_arrow">
+          <div class="back_arrow_container" (click)="backtohome()">
+            <img
+              class="arrow-img"
+              src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg"
+              alt=""
+            />
+          </div>
+          <p class="main_title">Devices</p>
+        </div>
+
+        <ng-container *ngTemplateOutlet="deviceListPage"></ng-container>
+      </div>
+
+      <div class="side-panel">
+        <app-right-sidebar
+          sidepaneldisplay="1"
+          (DeviceTablereload)="getdeviceList()"
+        ></app-right-sidebar>
+      </div>
+</div>
+
+
+<ng-template #deviceListPage>
+  <div class="deviceListPage">
+    <div class="upperoverviewpanel">
+      <div class="upperpanel_subBox_dropdown" style="padding-left: 0.4rem">
+        <p class="upperpanel_subtitle upperpanel_subtitle_dropdown">Device</p>
+        <div class="dropdown" appearance="outline">
+          <select
+            class="team_alert_dropdown"
+            name="device_type"
+            [(ngModel)]="deviceSelect"
+            (change)="DeviceStatusFilter(filterDeviceStatus, 'dropdown')"
+          >
+            <option
+              *ngFor="let device of DeviceListarray; let i = index"
+              [value]="device.Name"
+            >
+              {{ device.Name }}
+            </option>
+            <option [ngValue]="undefined" selected>All Devices</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- <div class="upperpanel_subBox_dropdown">
+      <p  class="upperpanel_subtitle upperpanel_subtitle_dropdown">Location</p>
+      <div class="dropdown" appearance="outline">
+      <select  name="device_type"  [(ngModel)]="patientVitalSelect" (change)="dropDownSelect(true)">
+        <option [ngValue]="undefined" selected>All Locations</option>
+    </select>
+    </div>
+    </div> -->
+
+      <div
+        class="upperpanel_subBox"
+        [class.selected]="containerSelection == 1"
+        (click)="DeviceStatusFilter('Active', 'panel')"
+      >
+        <p
+          class="upperpanel_subtitle upperpanel_subBox_subtitle"
+          [class.selected]="containerSelection == 1"
+        >
+          Active Devices
+        </p>
+        <p
+          class="upperpanel_subBox_value"
+          [class.selected]="containerSelection == 1"
+        >
+          {{
+            deviceListSource && activeDeviceCountArray
+              ? activeDeviceCountArray.length
+              : 0
+          }}
+        </p>
+      </div>
+
+      <div
+        class="upperpanel_subBox"
+        [class.selected]="containerSelection == 2"
+        (click)="DeviceStatusFilter('Available', 'panel')"
+      >
+        <p
+          class="upperpanel_subtitle upperpanel_subBox_subtitle"
+          [class.selected]="containerSelection == 2"
+        >
+          Available Devices
+        </p>
+        <p
+          class="upperpanel_subBox_value"
+          [class.selected]="containerSelection == 2"
+        >
+          {{
+            deviceListSource && availableDeviceCountArray
+              ? availableDeviceCountArray.length
+              : 0
+          }}
+        </p>
+      </div>
+      <div
+        class="upperpanel_subBox"
+        [class.selected]="containerSelection == 3"
+        (click)="DeviceStatusFilter('Error', 'panel')"
+      >
+        <p
+          class="upperpanel_subtitle upperpanel_subBox_subtitle"
+          [class.selected]="containerSelection == 3"
+        >
+          Error Devices
+        </p>
+        <p
+          class="upperpanel_subBox_value"
+          [class.selected]="containerSelection == 3"
+        >
+          {{
+            deviceListSource && errorDeviceCountArray
+              ? errorDeviceCountArray.length
+              : 0
+          }}
+        </p>
+      </div>
+      <div
+        class="upperpanel_subBox upper_last_box"
+        [class.selected]="containerSelection == 4"
+        (click)="DeviceStatusFilter('Used', 'panel')"
+      >
+        <p
+          class="upperpanel_subtitle upperpanel_subBox_subtitle"
+          [class.selected]="containerSelection == 4"
+        >
+          Used Devices
+        </p>
+        <p
+          class="upperpanel_subBox_value"
+          [class.selected]="containerSelection == 4"
+        >
+          {{
+            deviceListSource && usedDeviceCountArray
+              ? usedDeviceCountArray.length
+              : 0
+          }}
+        </p>
+      </div>
+    </div>
+
+    <div class="upperPanelbillingtable">
+      <mat-paginator
+        [length]="deviceListSource && tempDeviceList.length"
+        [pageSize]="9"
+        [pageIndex]="0"
+      >
+      </mat-paginator>
+
+      <span class="refresh" (click)="getdeviceList()"
+        ><img class="refreshIcon" src="../../../../../assets/refresh.png"
+      /></span>
+    </div>
+
+    <div class="device_table_content">
+      <mat-table
+        #table
+        [dataSource]="deviceListSource"
+        class="device_detail_table"
+        matSort
+      >
+        <ng-container matColumnDef="DeviceID">
+          <mat-header-cell
+          class="hidden-column"
+            *matHeaderCellDef
+            style="
+              border-radius: 0.8rem 0px 0px 0px !important; " >
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element; let rowIndex = index" class="hidden-column"
+            >{{ element.Id }}
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="DeviceNumber">
+          <mat-header-cell *matHeaderCellDef>
+            <div class="search_input" *ngIf="searchDeviceNumber">
+              <img
+                class="search_icon"
+                src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                (click)="searchDeviceNumberDataClose()"
+              /><input
+                class="search_input input_panel"
+                (keyup)="applyDataFilter($event)"
+                (focus)="setupFilter('DeviceNumber')"
+              />
+            </div>
+
+            <div class="search_heading_default" *ngIf="!searchDeviceNumber">
+              <img
+                (click)="searchDeviceNumberData()"
+                class="search_icon_default"
+                src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              />Device ID
+            </div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element; let rowIndex = index">
+            <span
+              [ngClass]="{
+                device_error_style: element.DeviceStatus == 'Error'
+              }"
+              >{{ element.DeviceNumber }}</span
+            >
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="DeviceType">
+          <mat-header-cell *matHeaderCellDef>
+            <div class="task_priority">
+              <select
+                [(ngModel)]="deviceTypeSelect"
+                id="deviceTypeSelection"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="
+                  DeviceStatusFilter(filterDeviceStatus, 'panel')
+                "
+              >
+                <option [ngValue]="undefined">Device Type</option>
+                <option
+                  *ngFor="let devicetype of DeviceTypeList"
+                  [value]="devicetype.Name"
+                >
+                  {{ devicetype.Name }}
+                </option>
+              </select>
+            </div>
+          </mat-header-cell>
+          <mat-cell
+
+            *matCellDef="let element; let rowIndex = index"
+          >
+            <span
+              [ngClass]="{
+                device_error_style: element.DeviceStatus == 'Error'
+              }"
+              >{{ element.DeviceType }}
+            </span>
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="Device">
+          <mat-header-cell
+            *matHeaderCellDef
+            style="
+              border-radius: 0.8rem 0px 0px 0px !important;
+
+            "
+          >
+            <div>Device</div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element; let rowIndex = index">
+            <span
+              [ngClass]="{
+                device_error_style: element.DeviceStatus == 'Error'
+              }"
+              >{{ element.Device }}</span
+            >
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="PatientName">
+          <mat-header-cell *matHeaderCellDef>
+            <div class="search_input" *ngIf="PatientNameSearch">
+              <img
+                class="search_icon"
+                src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                (click)="PatientNameSearchData()"
+              /><input
+                class="search_input input_panel"
+                (keyup)="applyDataFilter($event)"
+                (focus)="setupFilter('PatientName')"
+              />
+            </div>
+
+            <div class="search_heading_default" *ngIf="!PatientNameSearch">
+              <img
+                (click)="PatientNameSearchData()"
+                class="search_icon_default"
+                src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+              />Patient Name
+            </div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element; let rowIndex = index">
+            <span>
+              {{
+                element.PatientName == "" ? "Not Assigned" : element.PatientName
+              }}</span
+            >
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="ActiveDate">
+          <mat-header-cell *matHeaderCellDef>Updated Date</mat-header-cell>
+          <mat-cell
+
+            *matCellDef="let element"
+            ><span
+              [ngClass]="{
+                device_error_style: element.DeviceStatus == 'Error'
+              }"
+              >{{
+                datepipe.transform(element.DeviceActivatedDateTime, "MMM d, y")
+              }}</span
+            ></mat-cell
+          >
+        </ng-container>
+
+        <ng-container matColumnDef="DeviceStatus">
+          <mat-header-cell
+            *matHeaderCellDef
+
+            >Current Status</mat-header-cell
+          >
+          <mat-cell
+
+            *matCellDef="let element"
+          >
+            <span
+
+              [ngClass]="{
+                device_error_style: element.DeviceStatus == 'Error'
+              }"
+              >{{ element.DeviceStatus }}</span
+            >
+            <span
+              (click)="DeviceAvailbleConfirm(element)"
+              class="availablebtn"
+              *ngIf="element.DeviceStatus == 'Used'"
+            >
+              Make Available
+            </span>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row
+          *matHeaderRowDef="DeviceList_columnHeader; sticky: true"
+        ></mat-header-row>
+        <mat-row
+          [style.minHeight.px]="35"
+          *matRowDef="let row; columns: DeviceList_columnHeader"
+        ></mat-row>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell">No data Found</td>
+        </tr>
+      </mat-table>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #DeviceAvailable>
+  <div class="dialogBoxPanel">
+    <div class="dialogBoxPanelHeader">
+      <h3>
+        Removes device from patient {{ patiantName }}. Do you want to continue?
+      </h3>
+    </div>
+
+    <div class="dialogBoxPanelButton">
+      <button class="dialogBoxPanelBtnCancel" (click)="Cancel()">CANCEL</button>
+
+      <button class="dialogBoxPanelBtnSave" (click)="makeDeviceAvailable()">
+        Submit
+      </button>
+    </div>
+  </div>
+</ng-template>
+<div class="custom-modal" *ngIf="deviceavailabledialog" (click)="Cancel()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+
+    <!-- Your dialog content -->
+    <ng-template [ngTemplateOutlet]="dialogDeviceAvailable"></ng-template>
+  </div>
+</div>

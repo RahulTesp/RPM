@@ -1,0 +1,571 @@
+<div class="content">
+  <div class="login_panel">
+    <div class="logo_panel">
+      <div class="logo" *ngIf="host">
+        <!-- <h2>Logo</h2> -->
+        <img
+          *ngIf="host == 'rpmwebapp.azurewebsites.net'"
+          src="../../../assets/04-Icons/A01-Header Logo.svg"
+        />
+        <img
+          *ngIf="host == 'rpmappservicepreprod.azurewebsites.net'"
+          src="../../../assets/04-Icons/A01-Header Logo.svg"
+        />
+        <img
+          *ngIf="host == 'c-lynxapi.azurewebsites.net'"
+          class="image"
+          src="../../../assets/clynxlogo.png"
+        />
+        <img
+          *ngIf="host == 'meditprodapi.azurewebsites.net'"
+          class="image"
+          src="../../../assets/meditLogo.png"
+        />
+        <img
+          *ngIf="host == 'rpm-demo-api.azurewebsites.net'"
+          class="image demoimg"
+          src="../../../assets/demo.png"
+        />
+      </div>
+      <div class="title">
+        <h1>REMOTE <br />PATIENT <br />MONITORING</h1>
+      </div>
+    </div>
+    <div class="action_panel">
+      <!-- <div>
+    <ng-container *ngTemplateOutlet="loginPage"></ng-container>
+
+   </div> -->
+      <ng-container [ngSwitch]="variable">
+        <ng-container *ngSwitchCase="1">
+          <ng-container *ngTemplateOutlet="loginPage"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="2">
+          <ng-container *ngTemplateOutlet="VerificationPage"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="3">
+          <ng-container *ngTemplateOutlet="ResetPasswordInit"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="4">
+          <ng-container *ngTemplateOutlet="ResetPasswordConfirm"></ng-container>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<!-- <ng-template #username_page>
+  <div>
+    <form [formGroup]="loginForm" class="form">
+      <div class="form-group">
+        <mat-label class="label">Enter Username</mat-label>
+          <input  type="username" id="username" placeholder="Enter Username" class="form-control"
+            formControlName="username" name="username" />
+          <mat-error *ngIf="!IsUsername">Invalid Username....!</mat-error>
+      </div>
+      <div class="btn_panel action_panel_content">
+        <button [disabled]="UserButtonDisabled" type="submit" mat-button class="btn_action_panel" (click)="isUserValid()">CONTINUE</button>
+      </div>
+    </form>
+  </div>
+</ng-template> -->
+
+<ng-template #loginPage>
+  <div>
+    <form [formGroup]="loginForm" class="form">
+      <div class="form-group">
+        <mat-label class="label">User Name</mat-label>
+        <input
+          type="username"
+          id="username"
+          placeholder="Enter User Name"
+          class="form-control"
+          formControlName="username"
+          id="login_username"
+          name="username"
+        />
+        <div class="warn">
+          <ng-container
+            *ngIf="
+              loginForm.get('username')?.invalid &&
+              loginForm.get('username')?.touched
+            "
+            >User Name is Required
+          </ng-container>
+        </div>
+      </div>
+      <div class="form-group">
+        <mat-label class="label">Password</mat-label>
+        <div class="password_block">
+          <input
+            class="form-control"
+            [type]="show ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            id="login_password"
+            name="password"
+            placeholder="Enter Password"
+            (paste)="onPastePassword($event)"
+          />
+          <div class="password_img_cont" *ngIf="!show">
+            <img
+              class="password_img"
+              src="../../../assets/04-Icons/visible.png"
+              (click)="showpassword()"
+            />
+          </div>
+          <div class="password_img_cont" *ngIf="show">
+            <img
+              class="password_img"
+              src="../../../assets/04-Icons/hide.png"
+              (click)="showpassword()"
+            />
+          </div>
+        </div>
+
+        <!-- <div *ngIf="!IsPassword" class="InvalidLogin label">Login Failed, Please Check Your Credentails..!</div> -->
+        <div class="warn">
+          <ng-container
+            *ngIf="
+              loginForm.get('password')?.invalid &&
+              loginForm.get('password')?.touched &&
+              IsPassword
+            "
+            >Password is Required
+          </ng-container>
+        </div>
+        <div class="warn">
+          <ng-container *ngIf="!IsPassword">
+            <p class="loginWarning">
+              Login Failed, Please Check Your Credentails..!
+            </p>
+            <p class="loginWarning">
+              Your Account will be locked after 5 invalid attempts
+            </p>
+          </ng-container>
+        </div>
+      </div>
+      <div class="form-group"></div>
+      <div class="btn_panel action_panel_content">
+        <!-- <button [disabled]="LoginButtonDisabled" type="submit" class="btn_action_panel" [ngClass]="LoginButtonDisabled ?'btn_disable' :'btn_active'"  (click)="login()">LOGIN</button> -->
+        <button
+          mat-raised-button
+          color="primary"
+          [class.spinner]="loading"
+          [disabled]="LoginButtonDisabled"
+          type="submit"
+          class="btn_action_panel"
+          [ngClass]="LoginButtonDisabled ? 'btn_disable' : 'btn_active'"
+          id="btn_login"
+          (click)="login()"
+        >
+          LOGIN
+        </button>
+      </div>
+      <p (click)="goResetPassWordInit()" class="forget_password_label">
+        Forgot Password ?
+      </p>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #VerificationPage>
+  <div>
+    <p class="verification_title">Verification code</p>
+    <p
+      class="verificationSub"
+      *ngIf="validMobileNum == true && validEmail == false"
+    >
+      Enter the Code received on your Mobile number {{ mobileNum }}
+    </p>
+    <p
+      class="verificationSub"
+      *ngIf="validEmail == true && validMobileNum == false"
+    >
+      Enter the Code received on your Email {{ maildrecived }}
+    </p>
+    <p
+      class="verificationSub"
+      *ngIf="validMobileNum == true && validEmail == true"
+    >
+      Enter the Code received on your Mobile number {{ mobileNum }} or Email
+      {{ maildrecived }}
+    </p>
+    <form [formGroup]="verificationForm">
+      <div class="formverification">
+        <input
+          maxlength="1"
+          #focusFirstbox
+          class="codeinput"
+          type="text"
+          [(ngModel)]="txtFirstDigit"
+          (ngModelChange)="onTextChange()"
+          (keyup)="OnNextFunction(1)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <input
+          maxlength="1"
+          #focusSecondbox
+          class="codeinput"
+          type="text"
+          [(ngModel)]="txtSecondDigit"
+          (ngModelChange)="onTextChange()"
+          (keyup)="OnNextFunction(2)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <input
+          maxlength="1"
+          #focusThirdbox
+          class="codeinput"
+          type="text"
+          [(ngModel)]="txtThirdDigit"
+          (ngModelChange)="onTextChange()"
+          (keyup)="OnNextFunction(3)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <input
+          maxlength="1"
+          #focusFourthbox
+          class="codeinput"
+          type="text"
+          [(ngModel)]="txtFourthDigit"
+          (ngModelChange)="onTextChange()"
+          (keyup)="OnNextFunction(4)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <input
+          maxlength="1"
+          #focusFifthbox
+          class="codeinput"
+          type="text"
+          [(ngModel)]="txtFifthDigit"
+          (ngModelChange)="onTextChange()"
+          (keyup)="OnNextFunction(5)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <input
+          maxlength="1"
+          #focusSixthbox
+          class="codeinput"
+          type="text"
+          [(ngModel)]="txtSixthDigit"
+          (ngModelChange)="onTextChange()"
+          (keyup)="OnNextFunction(6)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <input
+          maxlength="1"
+          #focusSeventhbox
+          class="codeinput"
+          type="text"
+          [(ngModel)]="txtSevenDigit"
+          (ngModelChange)="onTextChange()"
+          (keyup)="OnNextFunction(7)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <input
+          maxlength="1"
+          #focusEightbox
+          class="codeinput"
+          type="text"
+          [(ngModel)]="txtEightDigit"
+          (ngModelChange)="onTextChange()"
+          (keyup)="OnNextFunction(8)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </div>
+      <p class="warn warning_container" *ngIf="invalidOtp == true">
+        Please Enter Valid OTP
+      </p>
+
+      <div class="btn_panel action_panel_content">
+        <div class="otptimeContainer">
+          <span class="otptime">{{ countDownVal }}</span> Sec
+        </div>
+
+        <button
+          mat-raised-button
+          [class.spinner]="loading"
+          type="submit"
+          class="resend_action_panel"
+          id="btn_login"
+          (click)="ResentOTP()"
+          type="button"
+          *ngIf="countDownVal == 0"
+        >
+          Resend OTP
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+<ng-template #ResetPasswordInit>
+  <div>
+    <form [formGroup]="resetInitloginForm" class="form">
+      <div class="form-group">
+        <mat-label class="label">User Name</mat-label>
+        <input
+          type="username"
+          id="username"
+          placeholder="Enter User Name"
+          class="form-control"
+          formControlName="username"
+          id="login_username"
+          name="username"
+        />
+        <div class="warn">
+          <ng-container
+            *ngIf="
+              resetInitloginForm.get('username')?.invalid &&
+              resetInitloginForm.get('username')?.touched
+            "
+            >User Name is Required
+          </ng-container>
+        </div>
+      </div>
+
+      <div class="form-group"></div>
+      <div class="btn_panel action_panel_content">
+        <button
+          mat-raised-button
+          [class.spinner]="loading_otp"
+          [disabled]="loading_otp"
+          type="button"
+          class="generate_otp"
+          id="btn_login"
+          (click)="getResetPasswordOtp()"
+        >
+          Generate OTP
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+<ng-template #ResetPasswordConfirm>
+  <div class="reset_main_panel">
+    <p class="verification_title_reset">Verification code</p>
+    <p
+      class="verificationSubreset"
+      *ngIf="validMobile == true && validMail == false"
+    >
+      Enter the Code received on your Mobile number {{ restMobileNum }}
+    </p>
+    <p
+      class="verificationSubreset"
+      *ngIf="validMail == true && validMobile == false"
+    >
+      Enter the Code received on your Email {{ resetMailId }}
+    </p>
+    <p
+      class="verificationSubreset"
+      *ngIf="validMobile == true && validMail == true"
+    >
+      Enter the Code received on your Mobile number {{ restMobileNum }} or Email
+      {{ resetMailId }}
+    </p>
+
+    <div class="formverification formresetsubpanel">
+      <div class="code_panel_sub">
+        <input
+          maxlength="1"
+          #focusFirstbox
+          class="codeinput_reset"
+          type="text"
+          [(ngModel)]="txtResetFirstDigit"
+          (ngModelChange)="onTextChange()"
+          (keyup)="OnResetNextFunction(1)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <input
+          maxlength="1"
+          #focusSecondbox
+          class="codeinput_reset"
+          type="text"
+          [(ngModel)]="txtResetSecondDigit"
+          (ngModelChange)="onTextChange()"
+          (keyup)="OnResetNextFunction(2)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <input
+          maxlength="1"
+          #focusThirdbox
+          class="codeinput_reset"
+          type="text"
+          [(ngModel)]="txtResetThirdDigit"
+          (ngModelChange)="onTextChange()"
+          (keyup)="OnResetNextFunction(3)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <input
+          maxlength="1"
+          #focusFourthbox
+          class="codeinput_reset"
+          type="text"
+          [(ngModel)]="txtResetFourthDigit"
+          (ngModelChange)="onTextChange()"
+          (keyup)="OnResetNextFunction(4)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <input
+          maxlength="1"
+          #focusFifthbox
+          class="codeinput_reset"
+          type="text"
+          [(ngModel)]="txtResetFifthDigit"
+          (ngModelChange)="onTextChange()"
+          (keyup)="OnResetNextFunction(5)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <input
+          maxlength="1"
+          #focusSixthbox
+          class="codeinput_reset"
+          type="text"
+          [(ngModel)]="txtResetSixthDigit"
+          (keyup)="OnResetNextFunction(6)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <input
+          maxlength="1"
+          #focusSeventhbox
+          class="codeinput_reset"
+          type="text"
+          [(ngModel)]="txtResetSevenDigit"
+          (keyup)="OnResetNextFunction(7)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+
+        <input
+          maxlength="1"
+          #focusEightbox
+          class="codeinput_reset"
+          type="text"
+          [(ngModel)]="txtResetEightDigit"
+          (keyup)="OnResetNextFunction(8)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </div>
+      <div class="reset_action_panel_content">
+        <div class="otptimeContainer">
+          <span class="otptime">{{ countDownVal }} </span
+          ><span class="content_timer"> Sec </span>
+        </div>
+      </div>
+    </div>
+    <p class="warn warning_container" *ngIf="invalidOtp == true">
+      {{ errMessage }}
+    </p>
+  </div>
+  <div class="lowerblock">
+    <form [formGroup]="restPasswordloginForm" class="form">
+      <div class="form-group-reset">
+        <mat-label class="label">New Password</mat-label>
+        <input
+          class="form-control"
+          type="password"
+          id="password"
+          formControlName="newpassword"
+          id="reset_password"
+          name="newpassword"
+          placeholder="Enter New Password"
+          (input)="resetPasswordNewPassword()"
+          oncopy="return false"
+          onpaste="return false"
+          oncut="return false"
+        />
+        <!-- <div class="warn">
+          <ng-container
+            class="warningtest"
+            *ngIf="
+              restPasswordloginForm.get('newpassword')?.invalid &&
+              restPasswordloginForm.get('newpassword')?.touched
+            "
+            >Password is Required
+          </ng-container>
+        </div> -->
+        <div class="warn">
+          <ng-container
+            class="warningtest"
+            *ngIf="
+              restPasswordloginForm.controls['newpassword']?.getError(
+                'pattern'
+              ) != null
+            "
+          >
+            Min 2 uppercase, 2 numbers & 1 special character required
+          </ng-container>
+        </div>
+        <br />
+        <div class="warn">
+          <ng-container
+            class="warningtest"
+            *ngIf="
+              restPasswordloginForm.controls['newpassword']?.getError(
+                'minlength'
+              ) != null
+            "
+            >Minimum 8 characters required
+          </ng-container>
+        </div>
+      </div>
+      <div class="form-group-reset form-lower-group">
+        <mat-label class="label">Confirm Password</mat-label>
+        <input
+          type="password"
+          placeholder="Confirm PassWord "
+          class="form-control"
+          formControlName="confirmpassword"
+          id="confirmpassword"
+          name="confirmpassword"
+          oncopy="return false"
+          onpaste="return false"
+          oncut="return false"
+          (input)="resetPasswordNewPassword()"
+        />
+        <div class="warn">
+          <ng-container
+            *ngIf="
+              restPasswordloginForm.controls['confirmpassword']?.getError(
+                'MustMatch'
+              ) != null || confirmStatus == false
+            "
+            >Password Mismatch
+          </ng-container>
+        </div>
+      </div>
+      <div class="form-group-reset form-lower-group"></div>
+      <div class="action_panel_content">
+        <!-- <button [disabled]="LoginButtonDisabled" type="submit" class="btn_action_panel" [ngClass]="LoginButtonDisabled ?'btn_disable' :'btn_active'"  (click)="login()">LOGIN</button> -->
+        <button
+          *ngIf="countDownVal > 0"
+          mat-raised-button
+          color="primary"
+          [class.spinner]="loading"
+          type="submit"
+          class="btn_action_panel"
+          id="btn_login"
+          (click)="confirmPassword()"
+          [disabled]="confirmBtnStatus()"
+          [ngClass]="confirmStatuscheck ? 'btn_disable' : 'btn_active'"
+        >
+          CONFIRM
+        </button>
+        <button
+          *ngIf="countDownVal == 0"
+          mat-raised-button
+          color="primary"
+          [class.spinner]="loading_otp"
+          type="submit"
+          class="btn_action_panel"
+          id="btn_login"
+          (click)="getResetPasswordOtp()"
+        >
+          Resend OTP
+        </button>
+      </div>
+      <p class="warn password_status" *ngIf="confirmPasswordError">
+        Password Cannot be Blank
+      </p>
+    </form>
+  </div>
+</ng-template>

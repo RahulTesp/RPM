@@ -1,0 +1,431 @@
+.content {
+  width: 100%;
+  height: 100%;
+  padding-top: 2rem;
+  padding-left: 2rem;
+  min-height: 85vh;
+}
+.main_content {
+  // margin:30px;
+
+  height: 90vh;
+}
+
+.content-panel {
+  margin-right: 0px !important;
+  padding-right: 0px !important;
+
+
+}
+.main-panel {
+  width: 100%;
+  height: 100%;
+  padding-top: 0px !important;
+  padding-right: 2rem !important;
+
+}
+.main_sub_panel{
+  width: 100%;
+  display: flex;
+
+
+
+}
+
+
+// .profile_text {
+//   color: #164d61;
+//   font: normal normal 600 24px/30px Rubik;
+//   margin-bottom: 42px;
+// }
+.userInfo {
+  width: 70%;
+  margin-right: 2rem;
+}
+
+.userRole{
+  width: 100%;
+}
+.panel_title {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.panel_title h2 {
+  font-size: 0.9rem;
+  line-height: 1.2rem;
+  color: #164d61;
+  font-family: "Rubik";
+  margin-bottom: 12px;
+  margin-left: 16px;
+  display: flex;
+  justify-content: flex-start;
+}
+.userInfoContent {
+  padding: 16px;
+  background-color: #ffffff;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  border-radius: 16px;
+}
+.userInfoContLeft {
+  width: 50%;
+  padding-right: 2rem;
+  // padding-bottom: 70px;
+}
+
+.userInfoContRight {
+  width: 50%;
+  padding-top: 16px;
+}
+
+.uploadPhoto {
+  width: 100%;
+  height: 250px;
+  background-color: #edeff5;
+  position: relative;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+.icon_edit {
+  width: 1.2rem;
+  height: 1.2rem;
+  background: #edeff5;
+  border-radius: 20px;
+  align-items: flex-end;
+  display: flex;
+}
+
+.icon_camera {
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  top: 16px;
+  right: 14px;
+}
+.userInfovalue {
+  border: none;
+  width: 100%;
+  background-color: #edeff5;
+  height: 1.5rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-family: "Rubik";
+  padding-left: 0.8rem;
+}
+
+::ng-deep .userInfovalue .mat-form-field-infix {
+  font-size: 12px; // example
+  background-color: #edeff5;
+  padding: 0px !important;
+  height: 32px !important;
+
+  padding: 10px 0px 0px 0px !important;
+  border-radius: 8px;
+  border: none;
+}
+.userInfovalueRole
+{
+  border: none;
+  width: 100%;
+  background-color: #edeff5;
+  // max-height: 2rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-family: "Rubik";
+  padding-left: 0.8rem;
+}
+.userInfoTitle {
+  color: #164d61;
+  font-size: 0.7rem;
+  font-family: "Rubik";
+  margin-bottom: 4px;
+  // margin-left: 0.8rem;
+  padding-left: 0.8rem;
+}
+.userInfoItem {
+  padding-bottom: 16px;
+}
+.userRoleContent {
+  padding: 16px;
+  background-color: #ffffff;
+  width: 100%;
+  border-radius: 16px;
+  display: flex;
+  justify-content: space-between;
+}
+.userRoleContLeft {
+  width: 40%;
+  padding-right: 40px;
+}
+.userRoleContRight {
+  width: 60%;
+}
+.accessright {
+  display: flex;
+  background-color: #edeff5;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  height: 32px;
+}
+.accessright p {
+  color: #000000;
+  font: normal normal normal 16px/30px Rubik;
+  margin-top: 2px;
+}
+.check_icon {
+  width: 24px;
+  height: 24px;
+  margin-top: 5px;
+  margin-left: 4px;
+}
+.icon_edit {
+  width: 1.2rem;
+  height: 1.2rem;
+  align-items: flex-end;
+}
+
+input{
+  outline: none !important;
+  padding-left: 16px;
+
+}
+
+select{
+  padding-left: 16px;
+}
+.text-danger {
+  color: rgb(212, 17, 17);
+}
+
+input.ng-invalid.ng-touched {
+  border: red 1px solid;
+}
+.registerprofile{
+  width: 100%;
+
+}
+.upper_panel {
+  height: 2.4rem;
+  width: 100% !important;
+  background-color: #8226df;
+  border-radius: 1.2rem;
+  padding: 0px;
+  margin-bottom: 2rem;
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
+
+}
+
+.page_title  {
+  color: #ffffff;
+  font-size: 1.2rem !important;
+  text-align: left;
+  margin-left: 1rem !important;
+
+  display: flex;
+  float: left;
+  font-family: "Rubik" !important;
+}
+h3{
+  margin-bottom: 0px !important;
+}
+.icon_edit:hover{
+  background-color: #D8DCE5;
+}
+.button-group {
+  float: right;
+  align-items: flex-end;
+  display: flex;;
+}
+
+.btn_discard {
+  width: 116px;
+  height: 40px;
+  background-color: #8226DF;
+  border: 1px solid #C9B7E9;
+  border-radius: 20px;
+  text-align: center;
+  font: normal normal normal 16px/20px Rubik;
+  color: #FFFFFF;
+  margin-right: 10px;
+  margin-top: 4px;
+  outline: none;
+}
+.btn_discard:hover{
+  background-color: #590CA7 ;
+  border: 1px solid #590CA7;
+  color: #ffffff;
+}
+.btn_confirm:hover{
+  background-color: #590CA7;
+  border: 1px solid #590CA7;
+  color: #ffffff;
+}
+
+.btn_confirm {
+//   width: 116px;
+//   height: 40px;
+  // background-color: #FFFFFF;
+  border: 1px solid #FFFFFF;
+//   text-align: center;
+//   font: normal normal normal 16px/20px Rubik;
+//   color: #590CA7;
+//   border-radius: 20px;
+//   margin-right: 4px;
+//   margin-top: 4px;
+//   outline: none;
+}
+.button:focus{
+outline: none !important;
+}
+
+.dialog {
+  height: 300px;
+}
+
+.container {
+  width: 584px;
+  height: 228px;
+  background: #e1e6ed;
+  border-radius: 16px;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.header {
+  width: 568px;
+  height: 60px;
+  background-color: #8be3d9;
+  border-radius: 8px;
+  color: #164d61;
+  margin-bottom: 40px;
+  box-sizing: border-box;
+  padding: 19px 77px 19px 77px;
+  text-align: center;
+}
+
+.h3 {
+  color: #000000;
+  font: normal normal normal 18px/24px Rubik;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.body {
+  text-align: center;
+}
+
+.download {
+  width: 272px;
+  height: 40px;
+  background: #164d61;
+  border-radius: 8px;
+  margin-bottom: 57px;
+  text-align: center;
+  box-sizing: border-box;
+  padding-top: 11px;
+  margin-left: 150px;
+}
+
+.download p {
+  color: #ffffff;
+}
+
+.button_dialog_panel {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn_cancel {
+  width: 120px;
+  height: 40px;
+  background-color: #edeff5;
+  border-radius: 20px;
+  border: 1px solid #3BCBC4;
+  color: #164d61;
+  font: normal normal normal 16px/30px Rubik;
+  //border: none !important;
+  outline: none;
+}
+
+
+
+.confirm_button {
+  width: 116px;
+  height: 40px;
+  border-radius: 20px;
+  border: 1px solid #3bcbc4;
+  background-color: #99e8e3;
+  color: #164d61;
+ // margin-left: 316px;
+  outline: none;
+}
+
+
+::ng-deep .userInfovalue .mat-form-field-infix {
+  font-size: 0.8rem; // example
+  background-color: #EDEFF5;
+  // padding: 0px !important;
+  // height: 32px !important;
+  // padding: 10px 0px 0px 0px !important;
+  border-radius: 8px;
+  border: none;
+  // margin-left: 16px;
+
+}
+::ng-deep .mat-form-field-underline {
+  display: none;
+}
+mat-progress-spinner {
+  position: absolute;
+  top: 40%;
+  left: 40%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+
+.overlay {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  z-index: 2;
+  backdrop-filter: blur(2px);
+}
+@media only screen and (max-width: 1280px) {
+  .main-panel {
+    padding-top: 60px 16px 16px 16px;
+  }
+  .content-panel {
+    padding: 16px;
+  }
+
+  .main_sub_panel {
+    padding-top: 30px;
+  }
+  .content-panel {
+    margin-right: 30px !important;
+  }
+  .userInfo {
+    width: 80% !important;
+  }
+}
+ .userRole {
+    position: column !important;
+    width: 80%;
+
+  }
+
+@media only screen and (max-width: 1145px) {
+
+  .main_sub_panel{
+    display: block;
+  }
+}
+
+

@@ -1,0 +1,669 @@
+//common button
+
+.side-panel {
+  background-color: #8226df !important;
+}
+.background {
+  background-color: brown;
+  width: 300px;
+  height: 600px;
+}
+input[type="checkbox"] {
+  accent-color: #164d61;
+}
+
+.spinner_overlay {
+  position: absolute;
+  right: -48px;
+  top: -53px;
+  background-color: #590ca7;
+  opacity: 1;
+  z-index: 2000;
+}
+
+.example-overlay {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  background-color: #590ca7;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 2000;
+  border-radius: 16px 0px 0px 16px;
+  width: 3rem;
+  padding-left: 0.5rem;
+}
+
+ul.example-overlay {
+  margin: 0 auto;
+  padding: 0;
+  z-index: 2000;
+}
+
+.example-overlay li {
+  cursor: pointer;
+  list-style: none;
+  margin-top: 2px;
+  color: #f2f2f2;
+  z-index: 2000;
+}
+
+.item-label {
+  color: #ffffff;
+  position: absolute;
+  background-color: #8226df;
+  -webkit-transition: all 1s ease-in-out;
+  -moz-transition: all 1s ease-in-out;
+  -o-transition: all 1s ease-in-out;
+  -ms-transition: all 1s ease-in-out;
+  position: absolute;
+  opacity: 0;
+  padding: 4px;
+  border-radius: 8px;
+  width: 100px;
+  font-size: 12px;
+}
+
+.item-label:hover {
+  -webkit-transform: translate(-40px, 0px);
+  -moz-transform: translate(-40px, 0);
+  -o-transform: translate(-40px, 0);
+  -ms-transform: translate(-40px, 0);
+}
+
+.side_menu_item_container:hover .item-label {
+  opacity: 1;
+}
+
+.item-label:hover {
+  background-position: left bottom;
+}
+// ::ng-deep .mat-tooltip {
+
+//   color: #ffffff;
+//   background-color: #8226DF;
+//   position: absolute;
+//   top: -30px;
+//   left: -58px;
+
+// }
+
+// Note Template
+
+// .add_icon
+// {
+//   position: absolute;
+//   right: 0px;
+//   top: 0px;
+//   width: 20px;
+//   height: 20px;
+//   filter: brightness(0) saturate(100%) invert(96%) sepia(16%) saturate(452%) hue-rotate(75deg) brightness(117%) contrast(91%);
+// }
+
+::ng-deep .noteTextArea {
+  background-color: #edeff5 !important;
+  height: 100%;
+  border-radius: 8px !important;
+  width: 100%;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 0.7rem;
+  font-family: "Rubik";
+}
+
+// ::ng-deep .note_dropdown .mat-form-field-infix{
+//   font-size: 12px; // example
+//   background-color: #EDEFF5;
+//   padding: 0px !important;
+//   height: 25px !important;
+
+//   padding: 0px !important;
+//   border-radius: 8px;
+// }
+
+::ng-deep .mat-label {
+  padding: 0px !important;
+}
+::ng-deep .mat-form-field {
+  padding: 0px;
+}
+::ng-deep .mat-form-field-wrapper {
+  margin-bottom: -1.25em;
+  padding: 0px;
+}
+
+.self_assign_icon {
+  margin-left: 0.5rem;
+  // justify-content: flex-end;
+}
+
+// Schedule Template
+
+// Symptoms Template
+
+// Medication Template
+
+.medication_schedule {
+  display: flex;
+  width: 100%;
+}
+
+.medication_time_input {
+  width: 100%;
+}
+.medicine_name {
+  width: 100%;
+}
+.medicine_name_left {
+  margin-right: 1.2rem;
+}
+.medication_date {
+  border-radius: 8px;
+  padding: 6px 6px 5px 16px;
+  width: 100%;
+}
+.medication_week_text {
+  color: #c1c7d5;
+  font-size: 0.8rem;
+  font-family: "Rubik";
+  margin-left: 3px;
+}
+.medication_duration {
+  display: flex;
+}
+// .medication_schedule_panel
+// {
+//   padding-top: 40px;
+//   width: 95%;
+//   background-color: #A20D0A;
+// }
+.medication_intervel {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding-bottom: 0.8rem;
+}
+// .medication_intervel_input
+// {
+//   width: 96px;
+//   height: 32px;
+//   border-radius: 16px;
+//   margin-right: 8px;
+// }
+.medication_duration_panel {
+  display: flex;
+  width: 100%;
+}
+
+// .medication_date_picker
+// {
+//   margin-right: 5px;
+// }
+
+// Lab Report
+
+.attachment_icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+.document_attachment {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+// .lab_report_dropdown_input
+// {
+//   width: 90%;
+//   height: 32px;
+//   border-radius: 8px;
+
+// }
+.document_type_container {
+  width: 100%;
+}
+.sidebar_content {
+  position: absolute;
+  right: 0px;
+  width: 27%;
+  background-color: #164d61;
+  top: 0px;
+}
+.activity_goal_list {
+  width: 100%;
+  background-color: #c1c7d5;
+}
+
+.activity_goal_list .common_input_dropdown {
+  width: 95%;
+  background-color: #edeff5;
+}
+.goals_note_container {
+  width: 100%;
+}
+.goal_icon {
+  width: 10%;
+}
+.patient_detail_content_dropdown {
+  height: 1.2rem;
+  width: 100%;
+}
+
+.text-danger {
+  color: #a20d0a;
+}
+
+input {
+  outline: none;
+}
+
+// input.ng-invalid.ng-touched {
+//   border: red 1px solid;
+// }
+@media only screen and (max-width: 1700px) {
+}
+
+.input_task {
+  border-radius: 8px;
+  width: 50%;
+  height: 32px;
+}
+
+.text-danger {
+  color: #a20d0a;
+}
+input {
+  outline: none;
+}
+// input.ng-invalid.ng-touched {
+//   border: red 1px solid;
+// }
+button {
+  outline: none;
+}
+.add_team_input {
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  width: 100%;
+  height: 32px;
+  background-color: #edeff5 !important;
+}
+.medication_interval_item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+//  Note Template
+.update_note_container {
+  background-color: #c1c7d5;
+  width: 100%;
+  border-radius: 16px;
+  padding: 8px;
+
+  position: relative;
+}
+
+.autocomplete-container .input-container input {
+  font-size: 0.8rem;
+  font-family: "Rubik";
+}
+// .note_dropdown_update_select
+// {
+//  background-color: #fff;
+//  min-height: 32px;
+//  border-radius: 8px;
+//  width:90%;
+//  outline: none;
+// }
+.add_icon {
+  position: absolute;
+  right: 5px;
+  top: 10px;
+  width: 16px;
+  height: 20px;
+  filter: brightness(0) saturate(100%) invert(96%) sepia(16%) saturate(452%)
+    hue-rotate(75deg) brightness(117%) contrast(91%);
+}
+.note_add_dropdown {
+  width: 16vw;
+  background-color: #fff;
+  min-height: 1.6rem;
+  border-radius: 0.5rem;
+}
+
+// ::-webkit-scrollbar {
+//   display: none;
+// }
+
+.assignedMemberInput {
+  width: 70%;
+
+  border-radius: 8px;
+  outline: none;
+  padding: 3px 0.375 3px 0.5rem;
+}
+// ::ng-deep  .mat-form-field-appearance-legacy .mat-form-field-infix {
+//   padding: 0px !important;
+
+// }
+::ng-deep .mat-form-field-underline {
+  display: none !important;
+}
+
+::ng-deep .add_team_input input {
+  width: 60% !important;
+}
+
+@media only screen and (max-width: 1280px) {
+  // .sidebar_content
+  // {
+  //   position: absolute;
+  // }
+  // .Sidebar_container
+  // {
+  //   position: absolute;
+  // }
+  .sidebar_content {
+    position: absolute;
+    width: 350px;
+  }
+}
+.self_assign_input_panel {
+  width: 60%;
+  margin-right: 1.2rem;
+}
+.alert_content_date {
+  display: flex;
+  width: 100%;
+}
+
+.alert_date_picker_container {
+  margin-right: 2rem;
+}
+.alert_left {
+  width: 100%;
+  margin-right: 2rem;
+}
+.alert_right {
+  width: 100%;
+}
+::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  // background-color: rgb(230, 223, 223);
+  background-color: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  min-height: 5px !important;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}
+// input[type=time]::-webkit-datetime-edit-ampm-field {
+
+//   display: none;
+
+//   }
+.occurancetemplate {
+  display: flex;
+  width: 100%;
+  padding: 0px 0px 1rem 0px;
+}
+
+.schedule_occurance_item {
+  width: 100%;
+}
+.schedule_occurance_left {
+  margin-right: 2rem;
+}
+.call_vital_cont_upper {
+  margin-bottom: 3px;
+}
+
+textarea:focus {
+  border: 0 none #fff;
+
+  outline: none;
+}
+.ng-autocomplete {
+  width: 14vw !important;
+  font-size: 0.7rem;
+  overflow-x: auto;
+}
+::ng-deep
+  .autocomplete-container
+  .suggestions-container
+  ul
+  li
+  a
+  .ng-star-inserted {
+  overflow-x: auto !important;
+}
+
+::ng-deep
+  .autocomplete-container
+  .suggestions-container
+  ul
+  ::-webkit-scrollbar {
+  width: 4px !important;
+}
+
+::ng-deep
+  .autocomplete-container
+  .suggestions-container
+  ul
+  ::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background-color: #fff;
+}
+.answer_panel {
+  background-color: #edeff5;
+  width: 95%;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 1.438rem;
+}
+.Sub_question_panel {
+  background-color: #164d61;
+  width: 100%;
+  border-radius: 16px;
+
+  padding-left: 0.8rem;
+}
+.answer_check {
+  margin-top: 0.2rem;
+}
+.answer_sub {
+  border-radius: 0.4rem;
+  padding: 0.2rem;
+  font-size: 0.7rem;
+  display: flex;
+
+  align-items: flex-start;
+}
+.answer_descr {
+  margin-bottom: 0px !important;
+  padding-left: 3px;
+
+  color: #164d61;
+  font-family: "Rubik";
+  font-size: 0.8rem;
+  display: flex;
+  justify-content: flex-start;
+}
+.answer_sub input {
+  margin-top: 4px !important;
+}
+input[type="checkbox"] {
+  accent-color: #164d61;
+}
+
+.questionpanel {
+  margin-bottom: 0.8rem;
+}
+.dialog {
+  height: 600px;
+  overflow-y: auto;
+  width: 600px;
+}
+
+::ng-deep .mat-dialog-container {
+  border-radius: 16px !important;
+  padding: 0.8rem !important;
+}
+
+.button_panel {
+  display: flex;
+  justify-content: space-between;
+}
+.subquestion_panel {
+  padding: 0.6rem;
+}
+.answer_descr {
+  color: #164d61;
+}
+.extra_note {
+  font-size: 0.7rem;
+  color: #164d61;
+  font-family: "Rubik";
+  padding-top: 0.4rem;
+  margin-bottom: 4px !important;
+}
+.dialog {
+  position: relative;
+}
+.note_preview_button_panel {
+  width: 98%;
+  padding-top: 0.8rem;
+}
+
+.preview_questionpanel {
+  padding: 0.8rem;
+}
+.time_dropdown_panel {
+  display: flex;
+  background-color: #d8dce5;
+  border-radius: 8px;
+  padding: 0.2rem;
+  width: 100%;
+}
+.common_input_dropdown_time {
+  width: 100%;
+  min-width: 40px;
+  outline: none;
+  border: none;
+  border-radius: 4px;
+}
+.display_time {
+  display: flex;
+  width: 100%;
+  padding: 0px 5px;
+  background-color: #e4e8eb;
+  color: #164d61;
+}
+
+.extra_note_data {
+  background-color: #ffffff;
+  border-radius: 8px;
+  //  padding:  0.5rem 0.4rem 0.8rem 0.5rem;
+  height: 40px;
+  max-height: 40px;
+  border: none;
+  font-size: 0.7rem;
+  font-family: "Rubik";
+  color: #164d61;
+  width: 100%;
+  resize: none;
+}
+.common_content_data_title {
+  font-size: 0.8rem !important;
+  line-height: 30px;
+  font-family: "Rubik-normal";
+}
+.summary_heading {
+  font-size: 1.5rem;
+  line-height: 1.8rem;
+  font-family: "Rubik";
+  font-weight: 600;
+  color: #3bcbc4;
+}
+.preview_question_title {
+  color: #3bcbc4;
+  font-family: "Rubik";
+  font-size: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+.additionalNotes {
+  width: 95%;
+  border-radius: 0.5rem;
+  min-height: 100px;
+  padding: 0.8rem;
+  font-size: 0.8rem;
+  font-family: "Rubik";
+}
+
+.minimizebutton {
+  width: 1.5rem;
+  height: 1.5rem;
+  filter: brightness(0) saturate(100%) invert(65%) sepia(91%) saturate(311%)
+    hue-rotate(126deg) brightness(90%) contrast(91%);
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+.maximizebutton {
+  width: 1.5rem;
+  height: 1.5rem;
+  filter: brightness(0) saturate(100%) invert(65%) sepia(91%) saturate(311%)
+    hue-rotate(126deg) brightness(90%) contrast(91%);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
+.overlay {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  z-index: 2;
+  backdrop-filter: blur(2px);
+}
+.custom-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+
+  background-color: #164d61;
+  padding: 20px;
+  border-radius: 10px;
+  position: relative;
+  max-width: 620px;
+}
+
+.note-dialog-panel {
+  height: 600px;
+  overflow-y: auto;
+
+  background-color: #164d61;
+
+}

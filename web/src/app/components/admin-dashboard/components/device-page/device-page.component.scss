@@ -1,0 +1,732 @@
+// Basic Container
+
+.content {
+  // margin:  0px 40px;
+
+  width: 100%;
+  height: 100%;
+  overflow-y: hidden;
+  position: relative;
+  display: flex;
+}
+
+.device_btn {
+  position: absolute;
+  width: 230px;
+  top: 24px;
+  right: 10px;
+  display: flex;
+  padding: 0%;
+  margin: 0%;
+}
+.device_button {
+  margin-right: 16px;
+}
+.side-panel {
+  background-color: #ffffff;
+  width: 27%;
+  // position: relative;
+  overflow-y: hidden;
+}
+.main-panel {
+  width: 73%;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+
+.displayIcon {
+  display: flex;
+}
+
+.hideIcon {
+  display: none;
+}
+
+.selected {
+  background-color: #164d61 !important;
+  color: #ffffff !important;
+}
+
+.deviceListPage {
+  position: relative;
+  width: 100%;
+}
+.date_panel {
+  padding: 2px;
+  float: right;
+  background-color: #edeff5;
+  border-radius: 12px;
+}
+.btn_date_item {
+  width: fit-content;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-family: "Rubik-normal";
+  color: #164d61;
+  background-color: #e1e6ed;
+  border: none;
+  border-radius: 12px;
+}
+.patient_overview {
+  display: flex;
+  width: 100%;
+  background-color: #8be3d9;
+  border-radius: 16px;
+  justify-content: space-between;
+  padding: 8px;
+  margin-bottom: 15px;
+  margin-top: 15px;
+  height: 100px;
+}
+
+.dropdown {
+  padding-top: 0px !important;
+  width: 100% !important;
+  min-width: 100% !important;
+}
+
+.patient_overview_dropdown p {
+  // padding-top: 8px;
+  min-width: 150px;
+}
+.data_title {
+  font-size: 14px;
+  // line-height: 18px;
+  color: #000000;
+  text-align: center;
+  font-family: "Rubik";
+
+  // min-height: 40px;
+}
+.dropdown_title {
+  color: #164d61;
+  padding-left: 16px;
+}
+.data_value {
+  font-size: 18px;
+  // line-height: 30px;
+  color: #000000;
+  text-align: center;
+  font-size: "Rubik";
+}
+
+.upperpanel_subBox {
+}
+
+// Device Table
+.device_table_content {
+  width: 100%;
+  // background-color: #F2F2F2;
+  padding-bottom: 1.2rem;
+}
+// .mat-cell
+// {
+//   background-color: #ffffff;
+//   padding-left: 10px !important;
+// }
+.mat-table {
+  background-color: transparent;
+}
+
+// Billing Information
+
+.missing_info {
+  position: relative;
+}
+.missing_info::before {
+  content: "";
+  display: block;
+  height: 60%;
+  width: 8px;
+  position: absolute;
+  top: 20px;
+  left: 0;
+  background-color: #ffbf77;
+  border-radius: 0px 10px 10px 0px;
+}
+
+// .mat-column-DeviceID {
+//   flex: 0 0 0;
+// }
+
+.mat-cell:first-of-type {
+  padding-left: 0.8rem !important;
+}
+.mat-header-cell:first-of-type {
+  padding-left: 0px !important;
+}
+.search_icon_default {
+  width: 1.2rem;
+  height: 1.2rem;
+  filter: brightness(0) saturate(100%) invert(97%) sepia(42%) saturate(4666%)
+    hue-rotate(131deg) brightness(87%) contrast(79%);
+}
+.search_icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  filter: brightness(0) saturate(100%) invert(100%) sepia(1%) saturate(1151%)
+    hue-rotate(52deg) brightness(109%) contrast(100%);
+  margin-right: 5px;
+}
+.mat-header-cell {
+  color: #164d61;
+  background-color: #cff4f5 !important;
+  font-size: 12px;
+  font-family: "Rubik";
+  margin-left: -3px !important;
+  padding-left: 0px !important;
+  padding-right: 5px !important;
+}
+.search_input {
+  background-color: #8be3d9;
+  border-radius: 12px;
+  width: 80%;
+  border: none;
+  align-items: center;
+  min-height: 1.5rem;
+  max-height: 1.5rem;
+  display: flex;
+}
+
+.input_panel {
+  border-radius: 12px;
+  width: 100%;
+  border: none;
+  align-items: center;
+  min-height: 1.5rem;
+  max-height: 1.5rem;
+  background-color: #8be3d9;
+}
+.search_heading_default {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.search_input input:focus {
+  border: none;
+  outline: none;
+}
+
+::ng-deep .mat-paginator {
+  background-color: #e1e6ed;
+}
+.kpi_performance {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+.graph_panel {
+  width: 100%;
+  height: 100%;
+  min-width: 850px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  margin-top: 16px;
+  margin-bottom: 32px;
+}
+.graph_panel_billing {
+  width: 100%;
+  height: 100%;
+  min-width: 850px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  margin-top: 16px;
+  margin-bottom: 32px;
+}
+.graph_title_bar {
+  display: flex;
+  justify-content: space-between;
+}
+.button_panel {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 1px;
+}
+.btn-year {
+  width: 84px;
+  font-size: 12px;
+  line-height: 30px;
+
+  height: 32px;
+  border-radius: 16px;
+  padding: 2px 4px 2px 4px;
+  border: none;
+  background-color: #e1e6ed;
+  color: #164d61;
+}
+
+.btn-week {
+  width: 84px;
+  background-color: #e1e6ed;
+  color: #164d61;
+  height: 32px;
+  border-radius: 16px;
+  padding: 2px 4px 2px 4px;
+  font-size: 12px;
+  line-height: 30px;
+  border: none;
+}
+
+.btn-month {
+  width: 84px;
+  height: 32px;
+  border-radius: 16px;
+  padding: 2px 4px 2px 4px;
+  font-size: 12px;
+  line-height: 30px;
+  background-color: #164d61;
+  color: #ffffff;
+  border: none;
+}
+.graph_content_container {
+  background-color: #ffffff;
+
+  height: 80%;
+  border-radius: 16px;
+  margin-top: 12px;
+  padding: 30px;
+}
+.graph_title_name {
+  align-items: center;
+  font-size: 18px;
+  color: #164d61;
+}
+
+// Patient overview Panel Dropdown
+
+.patient_trends {
+  font-size: medium;
+  font-weight: normal;
+  text-align: left;
+  padding-left: 10%;
+  background-color: #edeff5;
+  border: #d8dce5;
+}
+.duration_content_panel {
+  display: flex;
+  padding: 2px;
+  border-radius: 8px;
+  background-color: transparent;
+  width: fit-content;
+  vertical-align: middle;
+}
+.btn-common {
+  width: 30px;
+  height: 30px;
+  background-color: #e1e6ed;
+  border-radius: 50%;
+}
+.duration_value {
+  background-color: transparent;
+  width: 100px;
+  // height: 24px;
+  // color: #C1C7D5;
+  text-align: center;
+  align-items: center;
+  // vertical-align: text-bottom !important;
+  display: inline-flex;
+  align-items: center;
+  padding-left: 20%;
+  padding-right: 20%;
+}
+.graph_data {
+  padding-top: 5%;
+}
+.mat-paginator-navigation-previous {
+  display: none !important;
+}
+
+.mat-paginator-navigation-next {
+  display: none !important;
+}
+::ng-deep body .cdk-overlay-container {
+  .mat-tooltip-panel {
+    display: none !important;
+  }
+}
+
+// .device_detail_table{
+
+//   // height:50vh;
+//   // overflow-y: scroll;
+//   // border-top-left-radius: 16px !important;
+//   // border-top-right-radius: 16px !important;
+
+// }
+::-webkit-scrollbar {
+  display: none;
+}
+
+.device_table_content {
+  // overflow-y: scroll !important;
+  // height: 50vh;
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
+  height: 48vh;
+  overflow-y: scroll;
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /*Firefox*/
+}
+.device_detail_table::-webkit-scrollbar {
+  display: none; /*Safari and Chrome*/
+  border-radius: 25px;
+}
+@media only screen and (max-width: 1280px) {
+  .content {
+      flex-direction: column;
+    }
+  .main-panel {
+    position: relative;
+    width: 100%;
+  }
+  .side-panel {
+    background-color: #e1e6ed;
+    z-index: 1000;
+    width: 0%;
+  }
+  .right-menu-panel {
+    position: absolute;
+    right: 30px;
+    top: 20px;
+  }
+}
+
+@media only screen and (max-width: 1720px) {
+  .data_title {
+    font-size: 12px;
+  }
+  .billing_dropdown_title {
+    font-size: 12px;
+  }
+}
+
+@media only screen and (max-width: 1533px) {
+  .main-panel {
+    margin-right: 16px !important;
+  }
+  .main-content {
+    padding-left: 30px !important;
+  }
+}
+@media only screen and (max-width: 1500px) {
+  .main_content {
+    // margin-right: 16px;
+    padding-left: 16px;
+  }
+}
+
+@media only screen and (max-width: 1000px) {
+  .data_title {
+    font-size: 10px !important;
+  }
+
+  // .main-panel
+  // {
+  //   margin-right:0px !important;
+  // }
+  .dropdown_title {
+    font-size: 10px;
+  }
+
+  .billing_dropdown_title {
+    font-size: 12px;
+  }
+}
+
+@media only screen and (max-width: 824px) {
+  .data_title {
+    font-size: 8px !important;
+  }
+}
+// .mat-column-selection {
+//   flex: 0 0 1%;
+//   padding-right: 0.8rem !important ;
+//   padding-left: 0.9rem !important;
+// }
+
+// .mat-column-Priority {
+//   flex: 0 0 0 !important;
+// }
+// .mat-column-action {
+//   flex: 0 0 8% !important;
+// }
+// .mat-column-ProgramDuration {
+//   flex: 0 0 12% !important;
+// }
+// .mat-column-Device {
+//   flex: 0 0 14% !important;
+// }
+// .mat-column-PatientId {
+//   flex: 0 0 0 !important;
+// }
+// .mat-column-PatientProgramId {
+//   flex: 0 0 0 !important;
+// }
+
+.mat-radio-button {
+  width: 16px;
+  height: 16px;
+}
+.mat-radio-container {
+  transform: scale(0.5);
+}
+
+button {
+  outline: none;
+}
+
+.btn_date_item {
+  margin-right: 3px;
+}
+
+.program_header_dropdown select {
+  background-color: #cff4f5;
+  outline: none;
+  border: none;
+  color: #164d61;
+  padding: 4px 4px 3px 4px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: "Rubik";
+}
+.program_header_dropdown select option {
+  direction: ltr !important;
+}
+
+.task_priority {
+  background-color: #cff4f5;
+  outline: none;
+  border: none;
+  color: #164d61 !important;
+
+  padding: 4px 0px 3px 4px;
+  border-radius: 12px;
+  // font-size: 14px;
+  font-family: "Rubik";
+}
+.task_priority select:focus {
+  background-color: #8be3d9;
+}
+
+.task_priority option {
+  direction: ltr;
+}
+.make-gold {
+  background-color: #8226df;
+}
+mat-progress-spinner {
+  position: absolute;
+  top: 40%;
+  left: 40%;
+  transform: translate(-50%, -50%);
+  z-index: 113;
+}
+
+.overlay {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  z-index: 112;
+  backdrop-filter: blur(2px);
+}
+
+:host ::ng-deep .mat-radio-container {
+  height: 10px;
+  width: 10px;
+}
+:host ::ng-deep .mat-radio-outer-circle {
+  height: 10px;
+  width: 10px;
+}
+:host ::ng-deep .mat-radio-inner-circle {
+  height: 10px;
+  width: 10px;
+}
+:host ::ng-deep .mat-radio-button .mat-radio-ripple {
+  height: 20px; /*double of your required circle radius*/
+  width: 20px; /*double of your required circle radius*/
+  left: calc(50% - 10px); /*'10px'-same as your required circle radius*/
+  top: calc(50% - 10px); /*'10px'-same as your required circle radius*/
+}
+
+::ng-deep .hide-arrow .mat-sort-header-arrow {
+  color: #3bcbc4;
+}
+::ng-deep
+  .mat-sort-header-container:not(.mat-sort-header-sorted)
+  .mat-sort-header-arrow {
+  // opacity: 0.54 !important;
+  transform: translateY(0px) !important;
+}
+
+.patient_name_col:hover {
+  cursor: pointer;
+  color: #c1c7d5;
+}
+
+.date_selected_ {
+  background-color: #164d61;
+  color: #ffffff;
+  outline: none;
+}
+.date_not_selected {
+  background-color: #e1e6ed;
+  color: #164d61;
+  outline: none;
+}
+.date_not_selected:hover {
+  background-color: #d8dce5;
+}
+.date_btn_panel {
+  background-color: #edeff5;
+  border-radius: 20px;
+  display: flex;
+  padding: 2px;
+  height: 1.6rem;
+  float: right;
+  margin-bottom: 0.8rem;
+}
+.right-menu-panel {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  display: flex;
+}
+.task_priority select {
+  background-color: #cff4f5;
+  outline: none;
+  border: none;
+  color: #164d61 !important;
+
+  padding: 4px 24px 3px 5px;
+  border-radius: 12px;
+  // font-size: 14px;
+  font-family: "Rubik";
+}
+.task_priority select:focus {
+  background-color: #8be3d9;
+}
+.task_priority select {
+  direction: rtl;
+}
+
+.task_priority select option {
+  direction: ltr;
+}
+.device_error_style {
+  color: #a20d0a;
+}
+.upperPanelbillingtable {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.refresh {
+  font-family: "Rubik-normal";
+  cursor: pointer;
+}
+
+.refreshIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.availablebtn {
+  font-size: 0.6rem;
+  border-radius: 8px;
+  background-color: #8be3d9;
+  margin-left: 2rem;
+  border: 2px solid #ffffff;
+  color: #164d61;
+  font-family: "Rubik";
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 2rem;
+  width: fit-content;
+  cursor: pointer;
+  padding: 2px;
+  min-width: 90px;
+}
+
+.dialogBoxPanelButton {
+  display: flex;
+  justify-content: space-between;
+  padding: 1.5rem;
+}
+
+.dialogBoxPanelBtnSave {
+  width: 90px;
+  height: 28px;
+  border-radius: 20px;
+  border: 2px solid #3bcbc4;
+  background-color: #99e8e3;
+  color: #164d61;
+  font-family: 'Rubik-normal';
+  font-size: 0.8rem;
+}
+.dialogBoxPanelBtnCancel {
+  width: 90px;
+  height: 28px;
+  background-color: #edeff5;
+  border-radius: 20px;
+  border: 2px solid #3bcbc4;
+  color: #164d61;
+  font-family: 'Rubik';
+  font-size: 0.8rem;
+}
+
+.dialogBoxPanel {
+  background-color: #edeff5;
+  height: 200px;
+}
+.dialogBoxPanelHeader {
+  width: 100%;
+  height: 60px;
+  background-color: #edeff5;
+  border-radius: 8px;
+  margin-bottom: 40px;
+  box-sizing: border-box;
+  padding: 19px 10px 19px 10px;
+  text-align: center;
+
+  text-align: center;
+
+}
+.dialogBoxPanelHeader h3
+{
+  font-family: 'Rubik';
+  font-size: 0.8rem;
+  color: #164d61;
+}
+
+::ng-deep .hidden-column {
+  display: none !important;
+}
+.custom-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background-color: #164d61;
+  padding: 16px;
+  border-radius: 10px;
+  min-width: 300px;
+  max-width: 400px;
+  position: relative;
+}
+

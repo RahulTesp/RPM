@@ -1,0 +1,274 @@
+.content {
+  width: 100%;
+  height: 100%;
+}
+form {
+  width: 100%;
+}
+.main_content {
+  // margin:30px;
+  padding: 0px 0px 0px 0px;
+  height: 90vh;
+}
+input {
+  outline: none;
+}
+input.ng-invalid.ng-touched {
+  border: red 1px solid;
+}
+.text-danger {
+  color: rgb(212, 17, 17);
+}
+.text-success {
+  color: rgb(52, 129, 69);
+}
+.content-panel {
+padding-right: 2rem;
+  padding-left: 2rem;
+  padding-top: 1.2rem;
+}
+.main-panel {
+  width: 100%;
+  height: 100%;
+  padding: 0px 0px 0px 0px;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+}
+
+.upper_panel {
+  height: 2.3rem;
+  width: 100% !important;
+  background-color: #8226df;
+  border-radius: 1.2rem;
+  padding: 0.2rem;
+  margin-bottom: 0px;
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
+}
+.page_title h3 {
+  color: #ffffff;
+  font-size: 1.2rem;
+  text-align: left;
+  display: flex;
+  float: left;
+  font-family: "Rubik";
+  padding-left: 0.8rem;
+  margin-bottom: 0px !important;
+}
+
+.panel_title p {
+  font-size: 0.9rem;
+  line-height: 1.2rem;
+  color: #164d61;
+  font-family: "Rubik";
+}
+
+.button-group {
+  float: right;
+  align-items: center;
+  display: flex;
+}
+.btn_discard {
+  color: #ffffff;
+}
+.btn_draft {
+  margin-right: 40px;
+}
+
+.btn_confirm:hover {
+  background-color: #ffffff;
+  color: #8226df;
+}
+
+.userInfo {
+  width: 50%;
+  margin-right: 2rem;
+}
+.userRole {
+  width: 50%;
+}
+.userRoleContent {
+  padding: 16px;
+  background-color: #ffffff;
+  width: 100%;
+  border-radius: 16px;
+  display: flex;
+  justify-content: space-between;
+}
+.userInfoContent {
+  padding: 1rem;
+  background-color: #ffffff;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  border-radius: 1rem;
+}
+.uploadPhoto {
+  width: 90%;
+  height: 14.25rem;
+  background-color: #edeff5;
+  position: relative;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+.icon_camera {
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  top: 16px;
+  right: 14px;
+}
+.userInfoTitle {
+  line-height: 1.25rem;
+  font-family: "Rubik";
+  color: #164d61;
+  margin-bottom: 0.25rem;
+  padding-left: 0.8rem;
+}
+.userInfovalue {
+  border: none;
+  width: 100%;
+  background-color: #edeff5;
+  height: 1.6rem;
+  border-radius: 8px;
+  font-family: "Rubik";
+  font-size: 0.8rem;
+}
+select .userInfovalue {
+  border: none;
+  width: 100%;
+  background-color: #edeff5;
+  height: 1.6rem;
+  border-radius: 8px;
+  outline: none;
+}
+.userInfoItem {
+  padding-bottom: 0.9rem;
+}
+::placeholder {
+  color: #c1c7d5;
+  padding-left: 0.7rem;
+}
+.userInfoContLeft {
+  width: 50%;
+  padding-right: 1rem;
+  padding-bottom: 1rem;
+}
+.userInfoContRight {
+  width: 50%;
+  padding-top: 3.2rem;
+}
+::ng-deep .userInfovalue .mat-form-field-infix {
+  font-size: 12px; // example
+  background-color: #edeff5;
+  padding: 0px !important;
+  height: 32px !important;
+
+  padding: 10px 0px 0px 0px !important;
+  border-radius: 8px;
+  border: none;
+}
+
+// .mat-option.mat-active {
+//   background: #E1E6ED !important;
+// }
+
+.mat-option {
+  color: mat-color(#8226df, text);
+  &:hover:not(.mat-option-disabled),
+  &:focus:not(.mat-option-disabled) {
+    background: #e1e6ed;
+    color: #164d61;
+  }
+}
+::ng-deep .mat-form-field-underline {
+  display: none;
+}
+.accessright {
+  display: flex;
+  background-color: #edeff5;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+.userRoleContLeft {
+  width: 55%;
+  padding-right: 40px;
+
+}
+.userRoleContRight {
+  width: 60%;
+  position: relative;
+}
+.check_icon {
+  width: 24px;
+  height: 24px;
+}
+.side-panel {
+  width: 100%;
+}
+@media only screen and (max-width: 1280px) {
+  .main-panel {
+    padding-top: 60px 16px 16px 16px;
+  }
+  .content-panel {
+    padding: 16px;
+  }
+
+  .main_sub_panel {
+    padding-top: 30px;
+  }
+  .content-panel {
+    margin-right: 30px !important;
+  }
+}
+.main_sub_panel {
+  display: flex;
+  padding-top: 2rem;
+}
+.btnverify {
+  position: absolute;
+  font-size: 0.6rem;
+  border-radius: 8px;
+  background-color: #8be3d9;
+  right: 10px;
+  border: 2px solid #ffffff;
+  color: #164d61;
+  font-family: "Rubik";
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 1.5rem;
+}
+.usernamevalue {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.userheading {
+  margin-bottom: 0px !important;
+}
+.unlock {
+  position: absolute;
+  font-size: 0.7rem;
+  border-radius: 8px;
+  background-color: #8be3d9;
+  // background-color: #edeff5;
+
+  right: 0px;
+  border: 2px solid #ffffff;
+  color: #164d61;
+  font-family: "Rubik";
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 1.2rem;
+}
+.isDisabled {
+  pointer-events: none;
+  opacity: 0.7;
+}

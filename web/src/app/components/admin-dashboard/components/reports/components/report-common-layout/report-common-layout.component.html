@@ -1,0 +1,19 @@
+<div class="report-common-layout">
+  <ng-content select="[report-header-button-actions]"></ng-content>
+  <div class="report-body-section">
+    <div class="upper_container">
+      <ng-content select="[report-selection-actions]"></ng-content>
+    </div>
+
+    <ng-content></ng-content>
+  </div>
+  <div class="report-download-action">
+    <button
+      [class.spinner]="!loadingstatus"
+      [disabled]="!loadingstatus"
+      (click)="downloadClicked.emit()"
+    >
+      DOWNLOAD REPORT
+    </button>
+  </div>
+</div>

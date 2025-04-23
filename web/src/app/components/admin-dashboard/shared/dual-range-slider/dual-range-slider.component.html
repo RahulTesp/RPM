@@ -1,0 +1,20 @@
+<div class="slider-container">
+  <div class="slider-values">
+    <span>{{ lowerValue }}</span> — <span>{{ upperValue }}</span>
+  </div>
+
+  <div #rangeTrack class="slider-track">
+    <input
+      type="range"
+      [min]="min"
+      [max]="max"
+      [(ngModel)]="lowerValue"
+      (input)="onValueChange()" />
+    <input
+      type="range"
+      [min]="min"
+      [max]="max"
+      [(ngModel)]="upperValue"
+      (input)="onValueChange()" />
+  </div>
+</div>

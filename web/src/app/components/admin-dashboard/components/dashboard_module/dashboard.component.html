@@ -1,0 +1,11 @@
+<mat-drawer-container class="app-container">
+  <ng-container *ngIf="loading">
+    <div class="overlay"></div>
+    <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
+  </ng-container>
+  <app-header (emitter)="toggleMenu($event)"></app-header>
+  <mat-drawer mode="side" [opened]="true">
+    <app-side-bar class="sidebar"></app-side-bar>
+  </mat-drawer>
+  <router-outlet></router-outlet>
+</mat-drawer-container>

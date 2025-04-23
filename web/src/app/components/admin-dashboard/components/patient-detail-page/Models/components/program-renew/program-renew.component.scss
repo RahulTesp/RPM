@@ -1,0 +1,68 @@
+.dialogrenewDatePanel {
+  width: 100%;
+  height: 100%;
+  background: #e1e6ed;
+  border-radius: 16px;
+  padding: 8px;
+  box-sizing: border-box;
+  color: #164d61;
+}
+.renew_date {
+  color: #164d61;
+  font-size: 0.8rem;
+  font-family: "Rubik";
+}
+
+.header {
+  width: 100%;
+  height: 60px;
+  background-color: #8be3d9;
+  border-radius: 8px;
+  color: #164d61;
+  margin-bottom: 40px;
+  box-sizing: border-box;
+  padding: 1.2rem 0.8rem;
+  text-align: center;
+}
+.renewForm {
+  width: 100%;
+}
+.renewDatePanel {
+  width: 100%;
+  display: flex;
+  // justify-content: space-between;
+  padding: 1.2rem 0.8rem 0.8rem 0.8rem;
+}
+.btn_panel {
+  padding-left: 0.8rem;
+  padding-top: 1.2rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.renew_pgm_heading {
+  font-size: 1.2rem;
+  line-height: 1.8rem;
+  font-family: "Rubik";
+  font-weight: 600;
+  color: #3bcbc4;
+}
+.left_panel {
+  width: 100%;
+  margin-right: 0.8rem;
+}
+.right_panel {
+  width: 100%;
+}
+.common_input_dropdown {
+  min-width: 100px;
+}
+.renewForm {
+  width: 100%;
+}
+.left_panel {
+  margin-right: 1.2rem;
+}
+.program_duration_content_panel {
+  display: flex;
+}
