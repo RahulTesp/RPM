@@ -19,7 +19,7 @@ namespace RpmCloud.Controllers
 
         [Route("adddevice")]
         [HttpPost]
-        public IActionResult AddDevice(AddDevicePro info)
+        public IActionResult AddDevice([FromBody] AddDevicePro info)
         {
             if (info is null)
             {
@@ -33,17 +33,17 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     info.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     ReturnMsg resp = RpmDalFacade.AddDeviceProc(info);
                     if (resp.Val == 1)
@@ -54,7 +54,7 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -64,7 +64,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updatedevice")]
         [HttpPost]
-        public IActionResult UpdateDevice(UpdateDevice info)
+        public IActionResult UpdateDevice([FromBody] UpdateDevice info)
         {
             if (info is null)
             {
@@ -78,17 +78,17 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     info.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     int resp = RpmDalFacade.UpdateDeviceProc(info);
                     if (resp != 0)
@@ -99,7 +99,7 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -120,16 +120,16 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     DataSet Device = RpmDalFacade.GetDeviceMasterData(UserName);
@@ -141,21 +141,21 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("Lifetime validation failed"))
                 {
-                    return BadRequest("Invalid session.");
+                    return BadRequest(new { message = "Invalid session." });;
                 }
-                return BadRequest("Unexpected Error.");
+                return BadRequest(new { message = "Unexpected Error." });
             }
         }
         [Route("adddevicevendor")]
         [HttpPost]
-        public IActionResult AddDeviceVendor(AddDeviceVendor info)
+        public IActionResult AddDeviceVendor([FromBody] AddDeviceVendor info)
         {
             if (info is null)
             {
@@ -169,17 +169,17 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     info.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     ReturnMsg resp = RpmDalFacade.AddDeviceVendor(info);
                     if (resp.Val == 1)
@@ -194,7 +194,7 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -204,7 +204,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updatedevicevendor")]
         [HttpPost]
-        public IActionResult UpdateDeviceVendor(UpdateDeviceVendor info)
+        public IActionResult UpdateDeviceVendor([FromBody] UpdateDeviceVendor info)
         {
             if (info is null)
             {
@@ -218,17 +218,17 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     info.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     int resp = RpmDalFacade.UpdateDeviceVendor(info);
                     if (resp != 0)
@@ -243,7 +243,7 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -264,16 +264,16 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     List<DeviceInfo> Device = RpmDalFacade.GetDeviceInfo(UserName);
                     if (!(Device == null))
@@ -288,21 +288,21 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("Lifetime validation failed"))
                 {
-                    return BadRequest("Invalid session.");
+                    return BadRequest(new { message = "Invalid session." });;
                 }
-                return BadRequest("Unexpected Error.");
+                return BadRequest(new { message = "Unexpected Error." });
             }
         }
         [Route("isvalidvendorcode/{Code}")]
         [HttpPost]
-        public IActionResult IsValidVendorCode(string Code)
+        public IActionResult IsValidVendorCode([FromQuery] string Code)
         {
             if (Code is null)
             {
@@ -316,32 +316,32 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                    
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     bool resp = RpmDalFacade.IsValidVendorCode(Code,UserName);
                     if (resp == true)
                     {
-                        return Ok( resp);
+                        return Ok(new { message = resp });
                     }
                     else
                     {
-                        return BadRequest(resp);
+                        return BadRequest(new { message = resp });
                     }
                     
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)

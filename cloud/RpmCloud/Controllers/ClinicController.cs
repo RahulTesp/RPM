@@ -1,6 +1,7 @@
 ﻿using RPMWeb.Dal;
 using RPMWeb.Data.Common;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace RpmCloud.Controllers
 {
@@ -24,17 +25,17 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     var id = RpmDalFacade.AddClinic(Info, UserName);
                     if (!id.Equals(0))
@@ -45,7 +46,7 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -55,7 +56,7 @@ namespace RpmCloud.Controllers
         }
         [Route("updateclinic")]
         [HttpPost]
-        public IActionResult UpdateClinic(UpdClinicInfo Info)
+        public IActionResult UpdateClinic([FromBody]UpdClinicInfo Info)
         {
             try
             {
@@ -65,27 +66,27 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     //Info.UserName = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (RpmDalFacade.UpdateClinic(Info,UserName))
                     {
-                        return Ok("clinic details updated");
+                        return Ok(new { message = "clinic details updated" });
                     }
-                    return BadRequest("Could not update clinic details");
+                    return BadRequest(new { message = "Could not update clinic details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -106,28 +107,28 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     ClinicInfo clinicInfo = RpmDalFacade.GetClinic(clinicid);
                     if (!(clinicInfo == null))
                     {
-                        return Ok(clinicInfo);
+                        return Ok(JsonConvert.SerializeObject(clinicInfo, Formatting.Indented));
                     }
                     return NotFound("Could not find clinic details");
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -148,28 +149,28 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     List<ClinicAllInfo> clinicList = RpmDalFacade.GetAllClinic();
                     if (!clinicList.Equals(null))
                     {
-                        return Ok(clinicList);
+                        return Ok(JsonConvert.SerializeObject(clinicList, Formatting.Indented));
                     }
                     return NotFound("Could not find patient details");
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)

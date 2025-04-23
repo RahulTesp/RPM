@@ -1,6 +1,7 @@
 ﻿using RPMWeb.Dal;
 using RPMWeb.Data.Common;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace RpmCloud.Controllers
 {
@@ -26,29 +27,29 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     PatientData data = RpmDalFacade.IsPatientSessionValid(s);
                     if (string.IsNullOrEmpty(data.UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     PatientNProgramDetails PatientList = RpmDalFacade.GetPatient(data.PatientId, data.PatientProgramId, data.UserName);
                     ProileSummary userProfiles = RpmDalFacade.GetMyProfileAndProgram(data.UserName);
                     PatientList.ProfileSummary = userProfiles;
                     if (!(PatientList == null))
                     {
-                        return Ok(PatientList);
+                        return Ok(JsonConvert.SerializeObject(PatientList, Formatting.Indented));
                     }
-                    return NotFound("Could not find patient details");
+                    return NotFound(new { message = "Could not find patient details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -69,29 +70,29 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
 
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     List<PatientToDoListResponse> todolist = RpmDalFacade.GetPatientToDoList(UserName, StartDate, EndDate);
                     if (todolist != null)
                     {
-                        return Ok(todolist);
+                        return Ok(JsonConvert.SerializeObject(todolist, Formatting.Indented));
                     }
-                    return NotFound("Could not find To do list details");
+                    return NotFound(new { message = "Could not find To do list details" });
 
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -113,29 +114,29 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     PatientData data = RpmDalFacade.IsPatientSessionValid(s);
 
                     if (string.IsNullOrEmpty(data.UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     PatientCurrentReading datas = RpmDalFacade.GetCurrentCycleReading(data.PatientId);
                     if (datas != null)
                     {
-                        return Ok(datas);
+                        return Ok(JsonConvert.SerializeObject(datas, Formatting.Indented));
                     }
-                    return NotFound("Could not find Data");
+                    return NotFound(new { message = "Could not find Data" });
 
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -156,28 +157,28 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     PatientData data = RpmDalFacade.IsPatientSessionValid(s);
                     if (string.IsNullOrEmpty(data.UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     PatientVitalReadings List = RpmDalFacade.GetPatientVitalReadingswithDateTime(data.PatientId, data.PatientProgramId, StartDate, EndDate, data.UserName);
 
                     if (!List.Equals(null))
                     {
-                        return Ok(List);
+                        return Ok(JsonConvert.SerializeObject(List, Formatting.Indented));
                     }
-                    return NotFound("Could not find patient details");
+                    return NotFound(new { message = "Could not find patient details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -198,32 +199,32 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     PatientData data = RpmDalFacade.IsPatientSessionValid(s);
                     if (string.IsNullOrEmpty(data.UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     HealthTrends List = RpmDalFacade.GetPatientHealthTrends(data.UserName, data.PatientId, data.PatientProgramId, StartDate, EndDate, data.UserName);
 
                     if (!(List == null))
                     {
-                        return Ok(List);
+                        return Ok(JsonConvert.SerializeObject(List, Formatting.Indented));
                     }
                     HealthTrends healthTrends = new HealthTrends();
                     healthTrends.Time = new List<DateTime>();
                     healthTrends.Values = new List<Values>();
-                    return NotFound(healthTrends);
+                    return NotFound(JsonConvert.SerializeObject(healthTrends, Formatting.Indented));
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -244,28 +245,28 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     PatientData data = RpmDalFacade.IsPatientSessionValid(s);
                     if (string.IsNullOrEmpty(data.UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     List<GetPatientMedication> List = RpmDalFacade.GetPatientMedication(data.PatientId, data.PatientProgramId, data.UserName);
                     if (!List.Equals(null))
                     {
-                        return Ok(List);
+                        return Ok(JsonConvert.SerializeObject(List, Formatting.Indented));
                     }
-                    return NotFound("Could not find patient details");
+                    return NotFound(new { message = "Could not find patient details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -286,28 +287,28 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     PatientData data = RpmDalFacade.IsPatientSessionValid(s);
                     if (string.IsNullOrEmpty(data.UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     List<GetPatientSymptom> symptomList = RpmDalFacade.GetPatientSymptoms(data.PatientId, data.PatientProgramId, data.UserName);
                     if (!symptomList.Equals(null))
                     {
-                        return Ok(symptomList);
+                        return Ok(JsonConvert.SerializeObject(symptomList, Formatting.Indented));
                     }
-                    return NotFound("Could not find patient details");
+                    return NotFound(new { message = "Could not find patient details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -328,28 +329,28 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     PatientData data = RpmDalFacade.IsPatientSessionValid(s);
                     if (string.IsNullOrEmpty(data.UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     List<GetSchedules> List = RpmDalFacade.GetPatientSchedule(data.PatientId, StartDate, EndDate, data.UserName);
                     if (!List.Equals(null))
                     {
-                        return Ok(List);
+                        return Ok(JsonConvert.SerializeObject(List, Formatting.Indented));
                     }
-                    return NotFound("Could not find patient schedule details");
+                    return NotFound(new { message = "Could not find patient schedule details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -369,27 +370,27 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     PatientData data = RpmDalFacade.IsPatientSessionValid(s);
                     if (string.IsNullOrEmpty(data.UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     List<PatientDocuments> ListId = RpmDalFacade.PatientDocuments(data.PatientId, data.UserName);
                     if (!ListId.Equals(null))
                     {
-                        return Ok(ListId);
+                        return Ok(JsonConvert.SerializeObject(ListId, Formatting.Indented));
                     }
-                    return NotFound("Could not find patient uploads");
+                    return NotFound(new { message = "Could not find patient uploads" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -410,16 +411,16 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     PatientData data = RpmDalFacade.IsPatientSessionValid(s);
                     if (string.IsNullOrEmpty(data.UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     List<SystemConfigInfo> igc = DalCommon.GetSystemConfig(CONN_STRING, "Storage", "User");
@@ -457,12 +458,12 @@ namespace RpmCloud.Controllers
                     }
                     else
                     {
-                        return BadRequest("Not a valid image file(support jpg and png) or size (100KB)");
+                        return BadRequest(new { message = "Not a valid image file(support jpg and png) or size (100KB)" });
                     }
                 }
                 else
                 {
-                    return Unauthorized("Invalid sessoin.");
+                    return Unauthorized(new { message = "Invalid sessoin." });
                 }
 
             }
@@ -470,9 +471,9 @@ namespace RpmCloud.Controllers
             {
                 if (ex.Message.Contains("Lifetime validation failed"))
                 {
-                    return BadRequest("Invalid session.");
+                    return BadRequest(new { message = "Invalid session." });;
                 }
-                return BadRequest("Unexpected Error.");
+                return BadRequest(new { message = "Unexpected Error." });
             }
         }
         [Route("addpatientmedication")]
@@ -487,17 +488,17 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     PatientData data = RpmDalFacade.IsPatientSessionValid(s);
                     Info.CreatedBy = data.UserName;
                     if (string.IsNullOrEmpty(data.UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     Info.PatientId = data.PatientId;
                     Info.PatientProgramId = data.PatientProgramId;
@@ -508,13 +509,13 @@ namespace RpmCloud.Controllers
                         //RpmDalFacade.AddPatientNotification();
                         //MsgQueueWrapper.PushToQueue();
                         //MsgQueueWrapper.SendMessage();
-                        return Ok(id);
+                        return Ok(new { message = id });
                     }
-                    return BadRequest("Could not add patient medication.");
+                    return BadRequest(new { message = "Could not add patient medication." });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -534,17 +535,17 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     PatientData data = RpmDalFacade.IsPatientSessionValid(s);
                     Info.CreatedBy = data.UserName;
                     if (string.IsNullOrEmpty(data.UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     Info.PatientId = data.PatientId;
                     Info.PatientProgramId = data.PatientProgramId;
@@ -552,11 +553,11 @@ namespace RpmCloud.Controllers
                     {
                         return Ok();
                     }
-                    return BadRequest("Could not update patient medication details");
+                    return BadRequest(new { message = "Could not update patient medication details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -578,29 +579,29 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     PatientData data = RpmDalFacade.IsPatientSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     List<GetAllNotes> List = RpmDalFacade.GetPatientNotes(data.PatientId, data.PatientProgramId, NoteType, StartDate, EndDate, UserName);
                     if (!List.Equals(null))
                     {
-                        return Ok(List);
+                        return Ok(JsonConvert.SerializeObject(List, Formatting.Indented));
                     }
-                    return NotFound("Could not find patient details");
+                    return NotFound(new { message = "Could not find patient details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -622,28 +623,28 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     GetPatientNotesQA GetPatientNotes = RpmDalFacade.GetPatientNotes(ProgramName, Type, PatientNoteId, UserName);
                     // List<NotesProgramMaster> GetMasterDataNotes = RpmDalFacade.GetMasterDataNotes(UserName);
                     if (!GetPatientNotes.Equals(null))
                     {
-                        return Ok(GetPatientNotes);
+                        return Ok(JsonConvert.SerializeObject(GetPatientNotes, Formatting.Indented));
                     }
-                    return NotFound("Could not find patient details");
+                    return NotFound(new { message = "Could not find patient details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -665,30 +666,30 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     PatientData data = RpmDalFacade.IsPatientSessionValid(s);
                     if (string.IsNullOrEmpty(data.UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     PatientDocuments PatientDocument = RpmDalFacade.GetMyPatientDocuments(data.UserName, data.PatientId, data.PatientProgramId, DocumentId);
 
                     if (!(PatientDocument == null))
                     {
-                        return Ok(PatientDocument);
+                        return Ok(JsonConvert.SerializeObject(PatientDocument, Formatting.Indented));
                     }
                     
-                    return NotFound(PatientDocument);
+                    return NotFound(JsonConvert.SerializeObject(PatientDocument, Formatting.Indented));
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)

@@ -24,16 +24,16 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     List<WorldTimeZone> tz = RpmDalFacade.GetWorldTimeZone();
@@ -45,7 +45,7 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -56,7 +56,7 @@ namespace RpmCloud.Controllers
 
         [Route("account/create/iglucose")]
         [HttpPost]
-        public IActionResult CreateDeviceAccount(DeviceRegister devreg)
+        public IActionResult CreateDeviceAccount([FromBody] DeviceRegister devreg)
         {
             if (devreg is null)
             {
@@ -70,16 +70,16 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     RegisterDeviceResponse resp = RpmDalFacade.RegisterPatientDevice(devreg);
                     if (resp!=null)
@@ -90,7 +90,7 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -101,7 +101,7 @@ namespace RpmCloud.Controllers
 
         [Route("validatedevice/iglucose/{deviceid}")]
         [HttpPost]
-        public IActionResult ValidateDevice(string deviceid)
+        public IActionResult ValidateDevice([FromQuery] string deviceid)
         {
             if (string.IsNullOrEmpty(deviceid))
             {
@@ -115,23 +115,23 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     bool result = RpmDalFacade.ValidateDevice(deviceid);
                     return Ok( result);
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -142,7 +142,7 @@ namespace RpmCloud.Controllers
 
         [Route("removedevice/iglucose")]
         [HttpPost]
-        public IActionResult RemoveDevice(DeviceRegister devreg)
+        public IActionResult RemoveDevice([FromBody] DeviceRegister devreg)
         {
             if (devreg is null)
             {
@@ -156,16 +156,16 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     RegisterDeviceResponse resp = RpmDalFacade.RemoveDevice(devreg);
                     if (resp != null)
@@ -176,7 +176,7 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -187,7 +187,7 @@ namespace RpmCloud.Controllers
 
         [Route("resetdevice")]
         [HttpPost]
-        public IActionResult ResetDevice(DeviceRegister devreg)
+        public IActionResult ResetDevice([FromBody] DeviceRegister devreg)
         {
             if (devreg is null)
             {
@@ -201,16 +201,16 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     RegisterDeviceResponse resp = RpmDalFacade.ResetDevice(devreg);
                     if (resp != null)
@@ -221,7 +221,7 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -232,7 +232,7 @@ namespace RpmCloud.Controllers
 
         [Route("updatedevicestatus")]
         [HttpPost]
-        public IActionResult UpdateDeviceStatus(UpdateDeviceStatus devstat)
+        public IActionResult UpdateDeviceStatus([FromBody] UpdateDeviceStatus devstat)
         {
             if (devstat is null)
             {
@@ -246,17 +246,17 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     devstat.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     bool resp = RpmDalFacade.UpdateDeviceStatus(devstat);
                     if (resp == true)
@@ -267,7 +267,7 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -278,7 +278,7 @@ namespace RpmCloud.Controllers
         
         [Route("isdeviceavailable")]
         [HttpPost]
-        public IActionResult RemoveDevice(DeviceValidate info)
+        public IActionResult RemoveDevice([FromBody] DeviceValidate info)
         {
             if (info is null)
             {
@@ -292,17 +292,17 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     info.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     bool resp = RpmDalFacade.IsDeviceAvailable(info);
                     if (resp == true)
@@ -313,7 +313,7 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -324,7 +324,7 @@ namespace RpmCloud.Controllers
 
         [Route("isdevicemodelavailable")]
         [HttpPost]
-        public IActionResult DeviceModelCheck(DeviceValidate info)
+        public IActionResult DeviceModelCheck([FromBody] DeviceValidate info)
         {
             if (info is null)
             {
@@ -338,17 +338,17 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     info.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     //bool resp = RpmDalFacade.IsDeviceAvailable(info);
                     bool resp = RpmDalFacade.IsDeviceModelAvailable(info);
@@ -360,7 +360,7 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -370,7 +370,7 @@ namespace RpmCloud.Controllers
         }
         [Route("AddDevice")]
         [HttpPost]
-        public IActionResult AddDevice(AddDevice info)
+        public IActionResult AddDevice([FromBody] AddDevice info)
         {
             if (info is null)
             {
@@ -384,17 +384,17 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     info.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     int resp = RpmDalFacade.AddDevice(info);
                     if (resp >0)
@@ -405,7 +405,7 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
@@ -415,7 +415,7 @@ namespace RpmCloud.Controllers
         }
         [Route("account/forwardtelemetry")]
         [HttpPost]
-        public IActionResult ForwardTelemetry(DeviceTelemetry dev)
+        public IActionResult ForwardTelemetry([FromBody] DeviceTelemetry dev)
         {
             if (Request.Headers.ContainsKey("tesplab"))
             {
@@ -440,7 +440,7 @@ namespace RpmCloud.Controllers
         //InsertPatienVendorConnectivity
         [Route("addpatientvendorconnectivity")]
         [HttpPost]
-        public IActionResult BodyTraceData(AddPatientVendorConn dev)
+        public IActionResult BodyTraceData([FromBody] AddPatientVendorConn dev)
         {
             RpmDalFacade.ConnectionString = CONN_STRING;           
             if (!RpmDalFacade.InsertPatienVendorConnectivity(dev))
@@ -452,7 +452,7 @@ namespace RpmCloud.Controllers
         //bodytracedataInsert
         [Route("bodytrace")]
         [HttpPost]
-        public IActionResult BodyTraceData(bodytracedata dev)
+        public IActionResult BodyTraceData([FromBody] bodytracedata dev)
         {           
             RpmDalFacade.ConnectionString = CONN_STRING;
             //string output = JsonConvert.SerializeObject(dev.values);
@@ -466,7 +466,7 @@ namespace RpmCloud.Controllers
 
         [Route("account/forwardstatus")]
         [HttpPost]
-        public IActionResult ForwardStatus(DeviceTelemetryStatus dev)
+        public IActionResult ForwardStatus([FromBody] DeviceTelemetryStatus dev)
         {
             if (Request.Headers.ContainsKey("tesplab"))
             {
@@ -481,7 +481,7 @@ namespace RpmCloud.Controllers
         }
         [Route("validatedevice/{deviceid}")]
         [HttpPost]
-        public IActionResult ValidateDevices(string deviceid)
+        public IActionResult ValidateDevices([FromQuery] string deviceid)
         {
             if (string.IsNullOrEmpty(deviceid))
             {
@@ -495,23 +495,23 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     bool result = RpmDalFacade.ValidateDevice(deviceid);
                     return Ok( result);
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)

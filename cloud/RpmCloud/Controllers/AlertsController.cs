@@ -27,37 +27,37 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     DataSet alert = RpmDalFacade.GetAlerts(RoleId, UserName);
                     if (alert != null)
                     {
-                        return Ok(alert);
+                        return Ok(JsonConvert.SerializeObject(alert, Formatting.Indented));
                     }
-                    return NotFound("Could not find alert details");
+                    return NotFound(new { message = "Could not find alert details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("Lifetime validation failed"))
                 {
-                    return BadRequest("Invalid session.");
+                    return BadRequest(new { message = "Invalid session." });
                 }
-                return BadRequest("Unexpected Error.");
+                return BadRequest(new { message = "Unexpected Error." });
             }
         }
 
@@ -72,16 +72,16 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     DataSet alert = RpmDalFacade.GetTeamAlertsById(AlertType, CareTeamId, RoleId, UserName);
@@ -89,20 +89,20 @@ namespace RpmCloud.Controllers
                     {
                         return Ok(JsonConvert.SerializeObject(alert, Formatting.Indented));
                     }
-                    return NotFound("Could not find alert details");
+                    return NotFound(new { message = "Could not find alert details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("Lifetime validation failed"))
                 {
-                    return BadRequest("Invalid session.");
+                    return BadRequest(new { message = "Invalid session." });;
                 }
-                return BadRequest("Unexpected Error.");
+                return BadRequest(new { message = "Unexpected Error." });
             }
         }
 
@@ -117,37 +117,37 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     GetAlert alert = RpmDalFacade.GetAlertById(Id);
                     if (alert != null)
                     {
-                        return Ok(alert);
+                        return Ok(JsonConvert.SerializeObject(alert, Formatting.Indented));
                     }
-                    return NotFound("Could not find alert details");
+                    return NotFound(new { message = "Could not find alert details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("Lifetime validation failed"))
                 {
-                    return BadRequest("Invalid session.");
+                    return BadRequest(new { message = "Invalid session." });
                 }
-                return BadRequest("Unexpected Error.");
+                return BadRequest(new { message = "Unexpected Error." });
             }
         }
 
@@ -162,37 +162,37 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     GetAlert alert = RpmDalFacade.GetAlertByIdPatient(Id);
                     if (alert != null)
                     {
-                        return Ok(alert);
+                        return Ok(JsonConvert.SerializeObject(alert, Formatting.Indented));
                     }
-                    return NotFound("Could not find alert details");
+                    return NotFound(new { message = "Could not find alert details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("Lifetime validation failed"))
                 {
-                    return BadRequest("Invalid session.");
+                    return BadRequest(new { message = "Invalid session." });;
                 }
-                return BadRequest("Unexpected Error.");
+                return BadRequest(new { message = "Unexpected Error." });
             }
         }
 
@@ -207,37 +207,37 @@ namespace RpmCloud.Controllers
                     string? s = Request.Headers["Bearer"].FirstOrDefault();
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     Info.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     var id = RpmDalFacade.AlertResponse(Info);
                     if (!id.Equals(0))
                     {
-                        return Ok(id);
+                        return Ok(new { message = id });
                     }
-                    return BadRequest("Could not save alert details");
+                    return BadRequest(new { message = "Could not save alert details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("Lifetime validation failed"))
                 {
-                    return BadRequest("Invalid session.");
+                    return BadRequest(new { message = "Invalid session." });;
                 }
-                return BadRequest("Unexpected Error.");
+                return BadRequest(new { message = "Unexpected Error." });
             }
         }
 
@@ -252,37 +252,37 @@ namespace RpmCloud.Controllers
                     string? s = Request.Headers["Bearer"].FirstOrDefault();
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     Info.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     var id = RpmDalFacade.AlertResponseFromPatient(Info);
                     if (!id.Equals(0))
                     {
-                        return Ok(id);
+                        return Ok(new { message = id });
                     }
-                    return BadRequest("Could not save alert details");
+                    return BadRequest(new { message = "Could not save alert details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("Lifetime validation failed"))
                 {
-                    return BadRequest("Invalid session.");
+                    return BadRequest(new { message = "Invalid session." });;
                 }
-                return BadRequest("Unexpected Error.");
+                return BadRequest(new { message = "Unexpected Error." });
             }
         }
     }

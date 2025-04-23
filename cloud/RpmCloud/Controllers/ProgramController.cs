@@ -1,6 +1,7 @@
 ﻿using RPMWeb.Dal;
 using RPMWeb.Data.Common;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace RpmCloud.Controllers
 {
@@ -24,42 +25,43 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     List<GetPgmGoals> ProgramGoalList = RpmDalFacade.GetAllPgmandGoals(UserName);
                     if (!ProgramGoalList.Equals(null))
                     {
-                        return Ok(ProgramGoalList);
+                        return Ok(JsonConvert.SerializeObject(ProgramGoalList, Formatting.Indented));
                     }
-                    return NotFound("Could not find patient details");
+                    return NotFound(new { message = "Could not find patient details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("Lifetime validation failed"))
                 {
-                    return BadRequest( "Invalid session.");
+                    return BadRequest(new { message = "Invalid session." });
                 }
-                return BadRequest( "Unexpected Error.");
+                return BadRequest(new { message = "Unexpected Error." });
             }
         }
         [Route("getprogramgoals")]
         [HttpGet]
-        public IActionResult GetProgramGoals(int ProgramId)
+        public IActionResult GetProgramGoals([FromQuery]int ProgramId)
+
         {
             try
             {
@@ -69,37 +71,37 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     List<GetPgmGoals> ProgramGoalList = RpmDalFacade.GetPgmandGoals(ProgramId,UserName);
                     if (!ProgramGoalList.Equals(null))
                     {
-                        return Ok(ProgramGoalList);
+                        return Ok(JsonConvert.SerializeObject(ProgramGoalList, Formatting.Indented));
                     }
-                    return NotFound("Could not find patient details");
+                    return NotFound(new { message = "Could not find patient details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("Lifetime validation failed"))
                 {
-                    return BadRequest( "Invalid session.");
+                    return BadRequest(new { message = "Invalid session." });
                 }
-                return BadRequest( "Unexpected Error.");
+                return BadRequest(new { message = "Unexpected Error." });
             }
         }
         [Route("addprogramgoals")]
@@ -114,36 +116,36 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     Info.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (RpmDalFacade.AddPgmandGoals(Info))
                     {
-                        return Ok("Programgoal details saved");
+                        return Ok(new { message = "Programgoal details saved" });
                     }           
-                    return BadRequest( "Could not save ProgramGoals details");
+                    return BadRequest(new { message = "Could not save ProgramGoals details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("Lifetime validation failed"))
                 {
-                    return BadRequest( "Invalid session.");
+                    return BadRequest(new { message = "Invalid session." });
                 }
-                return BadRequest( "Unexpected Error.");
+                return BadRequest(new { message = "Unexpected Error." });
             }
         }
         [Route("updateprogramgoals")]
@@ -158,32 +160,32 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     Info.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (RpmDalFacade.UpdatePgmandGoals(Info))
                     {
-                        return Ok("Programgoal details updated");
+                        return Ok(new { message = "Programgoal details updated" });
                     }
-                    return BadRequest( "Could not update programgoal details");
+                    return BadRequest(new { message = "Could not update programgoal details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
             {
-                return BadRequest( ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
         [Route("UpdateBillingPeriodsMedIT")]
@@ -198,36 +200,36 @@ namespace RpmCloud.Controllers
                     RpmDalFacade.ConnectionString = CONN_STRING;
                     if (string.IsNullOrEmpty(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
                     if (string.IsNullOrEmpty(UserName))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized("Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
                     var id = RpmDalFacade.UpdateBillDates(Info);
                     if (!id.Equals(0))
                     {
-                        return Ok(id);
+                        return Ok(new { message = id });
                     }
-                    return BadRequest( "Could not save patient details");
+                    return BadRequest(new { message = "Could not save patient details" });
                 }
                 else
                 {
-                    return Unauthorized("Invalid session.");
+                    return Unauthorized(new { message = "Invalid session." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("Lifetime validation failed"))
                 {
-                    return BadRequest( "Invalid session.");
+                    return BadRequest(new { message = "Invalid session." });
                 }
-                return BadRequest( "Unexpected Error.");
+                return BadRequest(new { message = "Unexpected Error." });
             }
         }
 
