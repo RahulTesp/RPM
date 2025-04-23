@@ -91,18 +91,8 @@ export class HeaderComponent implements OnInit {
   timeZoneOffset: any;
   onDestroy() {
     sessionStorage.clear();
-    sessionStorage.clear();
   }
-  time24To12(a: any) {
-    //below date doesn't matter.
-    a = '18:04';
-    return new Date('1955-11-05T' + a + 'Z').toLocaleTimeString('bestfit', {
-      timeZone: 'UTC',
-      hour12: !0,
-      hour: 'numeric',
-      minute: 'numeric',
-    });
-  }
+
   convertToLocalTime(stillUtc: any) {
     stillUtc = stillUtc + 'Z';
     var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
@@ -222,10 +212,13 @@ export class HeaderComponent implements OnInit {
   notification_click() {
     // New Change 11/05/2023
     if (this.unread > 0) {
-      this.notification_active = !this.notification_active;
+      this.notification_active = true;
     } else {
       this.router.navigate(['/admin/notification']);
     }
+  }
+  notification_leave(){
+    this.notification_active = false;
   }
   open_notifications() {
     this.notification_active = false;
@@ -349,15 +342,22 @@ export class HeaderComponent implements OnInit {
       });
     });
   }
-  notificationtime(date: any) {
-    let today = new Date();
-    let notification_date = new Date(date);
-    let msgInfo: string = '';
+  notificationTime(date: any) {
+    const today = new Date(); // Current time in local timezone
 
-    let diff_min = Math.round(
+    // Convert the UTC date to local time string
+    const localTimeString = this.convertToLocalTime(date);
+
+    // Parse the local time string into a Date object
+    const notification_date = new Date(localTimeString);
+
+    // Calculate time difference in minutes
+    const diff_min = Math.round(
       (today.getTime() - notification_date.getTime()) / 60000
     );
-    //return(diff_min)
+
+    let msgInfo = '';
+
     if (diff_min == 0) {
       msgInfo = 'Few Seconds Ago';
     } else if (diff_min < 60) {
@@ -366,57 +366,41 @@ export class HeaderComponent implements OnInit {
       var hr = Math.round(diff_min / 60);
       msgInfo = hr + ' Hrs';
     } else if (diff_min > 1440 && diff_min < 2880) {
-      var day = Math.round(diff_min / 1400);
-      msgInfo = ' YesterDay';
+      msgInfo = 'Yesterday';
     } else if (diff_min > 2880 && diff_min < 10080) {
-      // var day = Math.round(diff_min/(1400))
+      // Get day of week from the date object
       let dayofweek = notification_date.getDay();
       let dayval = '';
       switch (dayofweek) {
-        case 0:
-          dayval = 'Sunday';
-          break;
-        case 1:
-          dayval = 'Monday';
-          break;
-        case 2:
-          dayval = 'Tuesday';
-          break;
-        case 3:
-          dayval = 'Wednesday';
-          break;
-        case 4:
-          dayval = 'Thursday';
-          break;
-        case 5:
-          dayval = 'Friday';
-          break;
-        case 6:
-          dayval = 'Saturday';
-          break;
+        case 0: dayval = 'Sunday'; break;
+        case 1: dayval = 'Monday'; break;
+        case 2: dayval = 'Tuesday'; break;
+        case 3: dayval = 'Wednesday'; break;
+        case 4: dayval = 'Thursday'; break;
+        case 5: dayval = 'Friday'; break;
+        case 6: dayval = 'Saturday'; break;
       }
-
       msgInfo = dayval;
     } else if (diff_min > 10080 && diff_min < 20160) {
       msgInfo = '1 Week Ago';
-    } else if (diff_min > 20161 && diff_min < 30240) {
-      msgInfo = '2 week Ago';
-    } else if (diff_min > 30241 && diff_min < 40320) {
-      msgInfo = '3 week Ago';
-    } else if (diff_min > 40321 && diff_min < 86400) {
-      msgInfo = '1 month Ago';
-    } else if (diff_min > 86401 && diff_min < 172800) {
-      msgInfo = '2 month Ago';
-    } else if (diff_min > 172801 && diff_min < 216000) {
-      msgInfo = '3 month Ago';
-    } else if (diff_min > 216001 && diff_min < 259200) {
-      msgInfo = '4 month Ago';
-    } else if (diff_min > 259201 && diff_min < 302400) {
-      msgInfo = '5 month Ago';
-    } else if (diff_min > 302401 && diff_min < 345600) {
-      msgInfo = '6 month Ago';
+    } else if (diff_min > 20160 && diff_min < 30240) {
+      msgInfo = '2 Weeks Ago';
+    } else if (diff_min > 30240 && diff_min < 40320) {
+      msgInfo = '3 Weeks Ago';
+    } else if (diff_min > 40320 && diff_min < 86400) {
+      msgInfo = '1 Month Ago';
+    } else if (diff_min > 86400 && diff_min < 172800) {
+      msgInfo = '2 Months Ago';
+    } else if (diff_min > 172800 && diff_min < 216000) {
+      msgInfo = '3 Months Ago';
+    } else if (diff_min > 216000 && diff_min < 259200) {
+      msgInfo = '4 Months Ago';
+    } else if (diff_min > 259200 && diff_min < 302400) {
+      msgInfo = '5 Months Ago';
+    } else if (diff_min > 302400 && diff_min < 345600) {
+      msgInfo = '6 Months Ago';
     } else {
-      msgInfo = 'more Than 6 months';
+      msgInfo = 'More Than 6 Months';
     }
 
     return msgInfo;
