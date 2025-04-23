@@ -1054,12 +1054,17 @@ export class AddpatientComponent implements OnInit {
       if (this.programForm.valid && this.PatientInfoForm.valid) {
         this.loading = true;
         req_body['PatientId'] = this.pid;
-        req_body['ProgramId'] = this.programForm.controls.programname.value;
-        req_body['PhysicianId'] = this.programForm.controls.physician.value;
+        req_body['ProgramId'] = parseInt(this.programForm.controls.programname.value);
+        if(this.programForm.controls.physician.value == null){
+          req_body['PhysicianId'] = 0;
+        }
+        else{
+          req_body['PhysicianId'] = parseInt(this.programForm.controls.physician.value);
+        }
         req_body['ConsultationDate'] =
           this.programForm.controls.consultdate.value;
         req_body['CareTeamUserId'] =
-          this.programForm.controls.assignedMember.value;
+          parseInt(this.programForm.controls.assignedMember.value);
         req_body['PatientStatus'] =
           this.programForm.controls.patientstatus.value;
         // req_body['PrescribedDate'] =  this.convertDate(this.programForm.controls.PrescribedDate.value);
@@ -1080,7 +1085,7 @@ export class AddpatientComponent implements OnInit {
             this.loading = false;
             this.dialog.open(templateRef);
             this.responseData = data;
-            that.patientprogramid = this.responseData;
+            that.patientprogramid = this.responseData.message;
 
             this.Auth.reloadPatientList('PatientList Updated');
 

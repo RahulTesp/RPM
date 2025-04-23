@@ -3331,7 +3331,8 @@ ned-dialog {
 }
 .btn_subPanel {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  width: 97%;
   padding-right: 0.8rem;
 }
 

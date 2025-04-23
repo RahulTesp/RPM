@@ -72,13 +72,14 @@
           <img
             class="toolbar_icons commonIcon"
             src="../../../../../assets/04-Icons/Icons_Notification.svg"
-            (click)="notification_click()"
+            (click)="open_notifications()"
           />
+          <!-- (click)="notification_click()" -->
           <div *ngIf="unread">
             <span
               class="badge"
               id="header_Notification"
-              (click)="notification_click()"
+             (click)="open_notifications()"
               >{{ unread }}</span
             >
           </div>
@@ -95,11 +96,11 @@
               </div>
             </div>
             <div class="notification_content_panel">
-              <div *ngFor="let notification of notifications.Data">
+              <div *ngFor="let notification of notifications&&notifications.Data">
                 <div class="notification_description_panel">
                   <div
                     *ngFor="
-                      let notification_item of notification.NotificationList
+                      let notification_item of notifications&&notifications.Data.NotificationList
                     "
                   >
                     <div *ngIf="notification_item.IsRead == false">
