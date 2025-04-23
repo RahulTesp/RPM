@@ -64,18 +64,7 @@ export class NotificationComponent implements OnInit {
     that.rpm.rpm_get('/api/notification/user').then((data) => {
       that.notifications = data;
       that.unread = that.notifications.TotalUnRead;
-      // that.unreadlist = that.notifications.Data.map((element: { NotificationList: any[]; }) => {
-      //   return {...element, NotificationList: element.NotificationList.filter((data) => data.IsRead == false)}
-      // })
 
-      // console.log(that.unreadlist);
-      // that.unreadlist = that.notifications.Data.filter((data: { IsRead: boolean; })=>{
-      //   return data.IsRead==false
-      // })
-
-      // that.readlist = that.notifications.Data.filter((data: { IsRead: boolean; })=>{
-      //   return data.IsRead==true
-      // })
       console.log(that.readlist);
     });
   }
@@ -87,7 +76,7 @@ export class NotificationComponent implements OnInit {
     };
     that.rpm.rpm_put('/api/notification/readstatus', reqBody).then(
       (data) => {
-        alert('Notification marked as read.');
+
         this.GetNotifications();
         this.Auth.reloadnotification('Notification Upadted');
       },

@@ -482,7 +482,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.patient_id,
         this.program_id
       );
-
+      this.getchatData(this.http_rpm_patientList.PatientDetails.UserName)
       this.setPatientData();
       this.loading = false;
     } catch (error) {
@@ -498,6 +498,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.initializeTimers();
     this.fetchProgramDetails();
     this.initializeSidePanel();
+    
   }
 
   /**
@@ -1375,10 +1376,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       console.error('❌ Error fetching alerts and tasks:', error);
     }
   }
-  async getchatData() {
+  async getchatData(patientusername:any) {
     try {
-      // var patientusername = await this.http_rpm_patientList.PatientDetails.UserName;
-      var patientusername = '123400033';
+      var patientusername = await this.http_rpm_patientList.PatientDetails.UserName;
+      // var patientusername = '123400033';
       console.log("Patient UserName");
       console.log(patientusername)
       this.activityInfoMenuSelect(5);
@@ -1451,7 +1452,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.getCallNotes();
     this.getScheduleData();
     this.getSMSData();
-    this.getchatData();
+    
   }
 
   getClinicMenuLoadData() {

@@ -1568,4 +1568,16 @@ export class TeamPageComponent implements OnInit {
       return;
     }
   }
+
+  backtohome() {
+    this.rolelist = sessionStorage.getItem('Roles');
+    this.rolelist = JSON.parse(this.rolelist);
+    if (this.rolelist[0].Id == 7) {
+      this.router.navigate(['/admin/patient-home']);
+    } else {
+      this.router.navigate(['/admin/home']);
+    }
+    // let route = '/admin/home';
+    // this.router.navigate([route]);
+    }
 }

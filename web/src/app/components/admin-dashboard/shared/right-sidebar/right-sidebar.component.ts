@@ -1910,7 +1910,7 @@ export class RightSidebarComponent implements OnInit {
       this.rpmservice.rpm_post('/api/tasks/updatetask', req_body).then(
         (data) => {
           alert(`Task Updated Successfully!! `);
-          alert('Update Successfully');
+          
           this.getMenuChioce(1);
           this.taskReload();
         },

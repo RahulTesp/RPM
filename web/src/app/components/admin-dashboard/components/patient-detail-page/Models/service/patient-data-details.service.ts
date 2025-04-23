@@ -211,7 +211,7 @@ export class PatientDataDetailsService {
     startDate: string,
     endDate: string
   ): Promise<any> {
-    const apiUrl = '/api/patient/getpatientnotesbyprogram';
+    const apiUrl = '/api/patient/getpatientnotes';
     try {
       const url = `${apiUrl}?PatientId=${patientId}&PatientProgramId=${programId}&&NoteType=REVIEW&StartDate=${startDate}&EndDate=${endDate}`;
       return await this.rpmService.rpm_get(url);
@@ -327,7 +327,7 @@ export class PatientDataDetailsService {
   ): Promise<any> {
     try {
       return await this.rpmService.rpm_get(
-        `/api/patient/getpatientnotes?ProgramName=${programName}&Type=CALL&PatientNoteId=${noteId}`
+        `/api/patient/getpatientnotesbyprogram?ProgramName=${programName}&Type=CALL&PatientNoteId=${noteId}`
       );
     } catch (error) {
       console.error('Error fetching patient call note by ID:', error);

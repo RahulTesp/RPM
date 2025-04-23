@@ -216,12 +216,7 @@ export class HeaderComponent implements OnInit {
     }
   }
 
-  notificationList = [
-    {
-      notification_title: 'John Abraham added as Watcher',
-      notification_time: '8 minutes',
-    },
-  ];
+
   roles: any;
   http_getPatientList: any;
   notification_click() {
@@ -345,6 +340,8 @@ export class HeaderComponent implements OnInit {
     that.rolelist = JSON.parse(this.rolelist);
     that.rpm.rpm_get('/api/notification/user').then((data) => {
       that.notifications = data;
+      console.log('Notifications')
+      console.log(that.notifications)
       that.unread = that.notifications.TotalUnRead;
       that.list = that.notifications.Data;
       that.unreadlist = that.list.filter((data: { IsRead: boolean }) => {
