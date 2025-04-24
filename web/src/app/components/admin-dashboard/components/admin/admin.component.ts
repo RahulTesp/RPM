@@ -667,7 +667,6 @@ export class AdminComponent implements OnInit {
         }
       );
     } else {
-      alert('Please complete Clinic Details.');
       this.confirmDialog.showConfirmDialog(
         `Please complete Clinic Details.`,
         'Warning',
@@ -1138,38 +1137,58 @@ export class AdminComponent implements OnInit {
     // return arr.filter((item: any, index: any) => arr.indexOf(item) === index);
   }
 
-  openDeactivateDialog(documnetId: any) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      maxWidth: '400px',
-      data: {
-        title: 'Are you sure?',
-        message: 'Do You Want to Deactivate the User ? ',
-      },
-    });
-    dialogRef.afterClosed().subscribe((dialogResult: any) => {
-      // if user pressed yes dialogResult will be true,
-      // if he pressed no - it will be false
+  // openDeactivateDialog(documnetId: any) {
+  //   const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+  //     maxWidth: '400px',
+  //     data: {
+  //       title: 'Are you sure?',
+  //       message: 'Do You Want to Deactivate the User ? ',
+  //     },
+  //   });
+  //   dialogRef.afterClosed().subscribe((dialogResult: any) => {
 
-      if (dialogResult) {
-        this.deactivateUser(documnetId);
-      } else {
-        return;
-      }
-    });
-  }
-  deactivateUser(data: any) {
-    this.rpm
-      .rpm_post(`/api/users/deactivateuser?userid=${data.UserId}`, {})
-      .then(
-        (data) => {
-          alert('User Deactivate Successfully');
-          this.getAllUser();
+
+  //     if (dialogResult) {
+  //       this.deactivateUser(documnetId);
+  //     } else {
+  //       return;
+  //     }
+  //   });
+  // }
+  openDeactivateDialog(documentId: any) {
+    this.confirmDialog.showConfirmDialog(
+      'Do You Want to Deactivate the User? ',
+      'Are you sure?',
+      () => {
+      this.deactivateUser(documentId);
+      },
+      true  // showCancel = true enables Confirm/Cancel options
+    );
+    }
+       deactivateUser(data: any) {
+      this.rpm
+        .rpm_post(`/api/users/deactivateuser?userid=${data.UserId}`, {})
+        .then(
+        (res) => {
+          this.confirmDialog.showConfirmDialog(
+          'User Deactivated Successfully',
+          'Message',
+          () => {
+            this.getAllUser();
+          },
+          false
+          );
         },
         (err) => {
-          alert(err.error);
+          this.confirmDialog.showConfirmDialog(
+          err.error || 'Could not deactivate user.',
+          'Error',
+          null,
+          false
+          );
         }
-      );
-  }
+        );
+      }
   inactivestatus: any;
   getUserstatus(data: any) {
     if (data == true) {

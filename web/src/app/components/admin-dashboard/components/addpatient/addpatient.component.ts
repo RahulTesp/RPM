@@ -1093,8 +1093,6 @@ export class AddpatientComponent implements OnInit {
           },
           (err) => {
             this.loading = false;
-            this.Auth.reloadPatientList('PatientList Updated');
-
             alert('Could not Add Patient Program');
             this.Auth.reloadPatientList('PatientList Updated');
             //  show error could not create patient program
