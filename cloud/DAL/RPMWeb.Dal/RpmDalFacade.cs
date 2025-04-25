@@ -892,7 +892,11 @@ namespace RPMWeb.Dal
         {
             return new Notification().DeleteSystemNotificationsByUser(notificationId, UserName, ConnectionString);
         }
+        public static bool DeleteSystemNotificationsReadUnRead(int notificationId, string UserName)
 
+        {
+            return new Notification().DeleteSystemNotificationsReadUnRead(notificationId, UserName, ConnectionString);
+        }
         public static bool InsertFirebaseToken(string UserName, string Bearer, string Token)
 
         {
@@ -933,9 +937,9 @@ namespace RPMWeb.Dal
         {
             new Notification().GetFirebaseNotificationCallRejection(UserName, ReceiverId, notify, category, ConnectionString, tokenid);
         }
-        public static ChatDetails GetChatDetails(string UserName)
+        public static ChatDetails GetChatDetails(string UserName, string App)
         {
-            return new User().GetChatDetails(UserName, ConnectionString);
+            return new User().GetChatDetails(UserName, App, ConnectionString);
         }
         public static void UpdateChatDetails(string UserName, ChatDetails chatdetails)
         {

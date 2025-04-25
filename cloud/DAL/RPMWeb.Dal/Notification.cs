@@ -94,9 +94,9 @@ namespace RPMWeb.Dal
                     {
                         string username = (!DBNull.Value.Equals(reader["UserName"])) ? reader["UserName"].ToString() : string.Empty;
                         string CreatedBy = (!DBNull.Value.Equals(reader["CreatedBy"])) ? reader["CreatedBy"].ToString() : string.Empty;
-                        if (!string.IsNullOrEmpty(username))
+                        if (!string.IsNullOrEmpty(CreatedBy))
                         {
-                            pdt = GetPatientAndProgramByUserName(UserName, ConnectionString);
+                            pdt = GetPatientAndProgramByUserName(CreatedBy, ConnectionString);
 
                         }
                         string userrole = (!DBNull.Value.Equals(reader["RoleName"])) ? reader["RoleName"].ToString() : string.Empty;
@@ -401,7 +401,28 @@ namespace RPMWeb.Dal
             }
 
         }
+        public bool DeleteSystemNotificationsReadUnRead(int notificationId, string UserName, string ConnectionString)
+        {
+            bool response = false;
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                SqlCommand command = new SqlCommand("usp_DeleteNotificationsReadUnread", con);
 
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("NotificationId", notificationId);
+                command.Parameters.AddWithValue("CreatedBy", UserName);
+                con.Open();
+                SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
+                returnParameter.Direction = ParameterDirection.ReturnValue;
+                command.ExecuteNonQuery();
+                int r = (int)returnParameter.Value;
+                if (!r.Equals(0))
+                { response = true; }
+                con.Close();
+                return response;
+            }
+
+        }
 
         public void GetFirebaseNotificationByUser(string UserName, string ReceiverId, firebasenotificationmessage notify, string category, string ConnectionString)
         {

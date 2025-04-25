@@ -156,7 +156,7 @@ namespace RpmCloud.Controllers
         
         [Route("notification/deletenotifications")]
         [HttpPost]
-        public IActionResult DeleteNotification([FromBody] int notificationId)
+        public IActionResult DeleteNotification([FromQuery] int notificationId)
         {
             try
             {
@@ -200,7 +200,52 @@ namespace RpmCloud.Controllers
                 return BadRequest(new { message = "Unexpected Error." });
             }
         }
+        [Route("notification/delete/unread")]
+        [HttpPost]
+        public IActionResult DeletePatientNotification([FromQuery] int notificationId)
+        {
+            try
+            {
 
+                if (Request.Headers.ContainsKey("Bearer"))
+                {
+                    string? s = Request.Headers["Bearer"].FirstOrDefault();
+                    RpmDalFacade.ConnectionString = CONN_STRING;
+                    if (string.IsNullOrEmpty(s))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    string UserName = RpmDalFacade.IsSessionValid(s);
+                    if (string.IsNullOrEmpty(UserName))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    if (!RpmDalFacade.ValidateTkn(s))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+
+                    bool isdelete = RpmDalFacade.DeleteSystemNotificationsReadUnRead(notificationId, UserName);
+                    if (isdelete)
+                    {
+                        return Ok(new { message = isdelete });
+                    }
+                    return NotFound(new { message = "Could not find notification details" });
+                }
+                else
+                {
+                    return Unauthorized(new { message = "Invalid session." });
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("Lifetime validation failed"))
+                {
+                    return BadRequest(new { message = "Invalid session." }); ;
+                }
+                return BadRequest(new { message = "Unexpected Error." });
+            }
+        }
         [Route("notification/insertfirebasetoken")]
         [HttpPost]
         public IActionResult InsertFirebaseToken([FromQuery] string Token)

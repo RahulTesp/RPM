@@ -623,7 +623,7 @@ namespace RPMWeb.Dal
             
         }
 
-        public ChatDetails GetChatDetails(string UserName, string ConnectionString) 
+        public ChatDetails GetChatDetails(string UserName, string App, string ConnectionString) 
         {
             ChatDetails chatdetails = new ChatDetails();
             try
@@ -633,6 +633,7 @@ namespace RPMWeb.Dal
                     SqlCommand command = new SqlCommand("usp_Getchatdetails", con);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@CreatedBy", UserName);
+                    command.Parameters.AddWithValue("@Application", App);
                     SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
                     returnParameter.Direction = ParameterDirection.ReturnValue;
                     con.Open();
@@ -662,6 +663,7 @@ namespace RPMWeb.Dal
                     command.Parameters.AddWithValue("CreatedBy", UserName);
                     command.Parameters.AddWithValue("Token", chatdetails.token);
                     command.Parameters.AddWithValue("MakeIsactiveZero", chatdetails.makeisactivezero);
+                    command.Parameters.AddWithValue("Application", chatdetails.Application);
                     con.Open();
                     SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
                     returnParameter.Direction = ParameterDirection.ReturnValue;
