@@ -402,7 +402,7 @@ namespace RpmCloud.Controllers
                     }
                     ChatDetails chatdetails = new ChatDetails();
                     chatdetails.istoken = false;
-                    chatdetails = RpmDalFacade.GetChatDetails(UserName);
+                    chatdetails = RpmDalFacade.GetChatDetails(UserName,app);
 
                     if (!chatdetails.istoken)
                     {
@@ -422,7 +422,74 @@ namespace RpmCloud.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost]
+        [Route("InitPatientChat")]
+        public IActionResult InitPatientChat(string PatientNumber)
+        {
+            try
+            {
+                if (Request.Headers.ContainsKey("Bearer"))
+                {
+                    string? s = Request.Headers["Bearer"].FirstOrDefault();
+                    RpmDalFacade.ConnectionString = CONN_STRING;
+                    if (string.IsNullOrEmpty(s))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    string UserName = RpmDalFacade.IsSessionValid(s);
 
+                    if (string.IsNullOrEmpty(UserName))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    if (!RpmDalFacade.ValidateTkn(s))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    ChatDetails chatdetailsAndroid = new ChatDetails();
+                    chatdetailsAndroid.istoken = false;
+                    chatdetailsAndroid = RpmDalFacade.GetChatDetails(PatientNumber, "android");
+
+                    if (!chatdetailsAndroid.istoken)
+                    {
+                        chatdetailsAndroid.makeisactivezero = false;
+                        chatdetailsAndroid = RpmDalFacade.GenerateChatToken(chatdetailsAndroid, PatientNumber, "android");
+                        
+
+                    }
+                    ChatDetails chatdetailsIOS = new ChatDetails();
+                    chatdetailsIOS.istoken = false;
+                    chatdetailsIOS = RpmDalFacade.GetChatDetails(PatientNumber, "ios");
+
+                    if (!chatdetailsIOS.istoken)
+                    {
+                        chatdetailsIOS.makeisactivezero = false;
+                        chatdetailsIOS = RpmDalFacade.GenerateChatToken(chatdetailsIOS, PatientNumber, "ios");
+
+                    }
+
+                    ChatDetails chatdetailsWeb = new ChatDetails();
+                    chatdetailsWeb.istoken = false;
+                    chatdetailsWeb = RpmDalFacade.GetChatDetails(PatientNumber, "web");
+
+                    if (!chatdetailsWeb.istoken)
+                    {
+                        chatdetailsWeb.makeisactivezero = false;
+                        chatdetailsWeb = RpmDalFacade.GenerateChatToken(chatdetailsWeb, PatientNumber, "web");
+
+                    }
+                    return Ok(new { message = "Initiated Patient Chat" });
+                }
+                else
+                {
+                    return Unauthorized(new { message = "Invalid session." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         [HttpGet]
         [Route("regeneratechattoken")]
@@ -449,7 +516,7 @@ namespace RpmCloud.Controllers
                         return Unauthorized(new { message = "Invalid session." });
                     }
                     ChatDetails chatdetails = new ChatDetails();
-                    chatdetails = RpmDalFacade.GetChatDetails(UserName);
+                    chatdetails = RpmDalFacade.GetChatDetails(UserName, app);
                     chatdetails.makeisactivezero = true;
                     chatdetails = RpmDalFacade.GenerateChatToken(chatdetails, UserName, app);
                     return Ok(new { message = chatdetails.token });
@@ -763,7 +830,7 @@ namespace RpmCloud.Controllers
                         return Unauthorized(new { message = "Invalid session." });
                     }
 
-                    RpmDalFacade.NotifyConversation(conv.ConversationSid, conv.FromUser, conv.ToUser,conv.Message);
+                    RpmDalFacade.NotifyConversation(conv.ConversationSid, UserName, conv.ToUser,conv.Message);
                     return Ok();
                 }
                 else

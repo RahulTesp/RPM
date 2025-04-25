@@ -57,6 +57,7 @@ namespace RPMWeb.Dal
             var grants = new HashSet<IGrant> { grant };
             var token = new Token(Accountsid.Value, ApiKey.Value, ApiSecret.Value, UserName, grants: grants);
             chatdetails.token = token.ToJwt();
+            chatdetails.Application = Application;
             RpmDalFacade.UpdateChatDetails(UserName, chatdetails);
             return chatdetails;
 

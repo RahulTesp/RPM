@@ -2322,6 +2322,7 @@ namespace RPMWeb.Data.Common
         public bool istoken { get; set; }
 
         public bool makeisactivezero { get; set; }
+        public string Application { get; set; }
     }
     public class ChatResourceDetails
     {
