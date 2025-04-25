@@ -149,23 +149,6 @@ export class TwilioVideoServiceService {
             }
           });
 
-          // participant.on('trackDisabled', (track) => {
-          //   if(track.kind == "video"){
-          //     console.log("remote trackDisabled")
-          //     let element = this.remoteVideo.nativeElement;
-          //     while (element.firstChild) {
-          //       element.removeChild(element.firstChild);
-          //     }
-          //     const newChild = document.createElement('div');
-          //   newChild.id = 'newly_content';
-          //   newChild.innerHTML = `
-          //    <div style="background-color: black;height: 430px;width: 320px;">
-          //    </div>
-          //     `;
-          //   this.renderer.appendChild(this.remoteVideo.nativeElement, newChild);
-          //   }
-
-          // });
           participant.on('trackDisabled', (track) => {
             if (track.kind == "video") {
               console.log("remote trackDisabled");
@@ -175,16 +158,43 @@ export class TwilioVideoServiceService {
               videoElements.forEach((videoElement: any) => {
                 element.removeChild(videoElement);
               });
-              // Add the placeholder div
+
+              // Calculate 40% of viewport height for the placeholder
+              const viewportHeight = window.innerHeight;
+              const videoHeight = Math.round(viewportHeight * 0.4);
+              const videoWidth = Math.round(videoHeight * (21/9));
+
+              // Add the placeholder div with dynamic dimensions
               const newChild = document.createElement('div');
               newChild.id = 'newly_content';
               newChild.innerHTML = `
-          <div style="background-color: black; height: 430px; width: 320px;">
-          </div>
+                <div style="background-color: black; height: ${videoHeight}px; width: ${videoWidth}px; max-width: 100%; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                  <span style="color: white; font-size: 16px;">Video Off</span>
+                </div>
               `;
               this.renderer.appendChild(this.remoteVideo.nativeElement, newChild);
             }
           });
+
+          // participant.on('trackDisabled', (track) => {
+          //   if (track.kind == "video") {
+          //     console.log("remote trackDisabled");
+          //     let element = this.remoteVideo.nativeElement;
+          //     // Find and remove only video elements
+          //     const videoElements = element.querySelectorAll('video');
+          //     videoElements.forEach((videoElement: any) => {
+          //       element.removeChild(videoElement);
+          //     });
+          //     // Add the placeholder div
+          //     const newChild = document.createElement('div');
+          //     newChild.id = 'newly_content';
+          //     newChild.innerHTML = `
+          // <div style="background-color: black; height: 430px; width: 320px;">
+          // </div>
+          //     `;
+          //     this.renderer.appendChild(this.remoteVideo.nativeElement, newChild);
+          //   }
+          // });
           participant.on('trackEnabled', track => {
             //this.remoteVideoDisable=false
 
@@ -324,15 +334,35 @@ export class TwilioVideoServiceService {
   }
 
   attachTracks(tracks: any) {
-    console.log('tracks');
-    console.log(tracks);
-    const element = tracks.attach();
-    this.renderer.data.id = tracks.sid;
-    this.renderer.setStyle(element, 'height', '90%');
-    this.renderer.setStyle(element, 'min-width', '100%');
-    // this.renderer.setStyle(element, 'object-fit:', 'contain');
+    // console.log('tracks');
+    // console.log(tracks);
+    // const element = tracks.attach();
+    // this.renderer.data.id = tracks.sid;
+    // this.renderer.setStyle(element, 'height', '90%');
+    // this.renderer.setStyle(element, 'min-width', '100%');
+    //  this.renderer.setStyle(element, 'object-fit:', 'contain');
 
-    this.renderer.appendChild(this.remoteVideo.nativeElement, element);
+    // this.renderer.appendChild(this.remoteVideo.nativeElement, element);
+    console.log('tracks');
+  console.log(tracks);
+  const element = tracks.attach();
+  this.renderer.data.id = tracks.sid;
+
+  // Calculate 40% of viewport height for a shorter video
+  const viewportHeight = window.innerHeight;
+  const videoHeight = Math.round(viewportHeight * 0.9);
+
+  // Use a wider aspect ratio (21:9)
+  const videoWidth = Math.round(videoHeight * (21/9));
+
+  // Apply the new dimensions
+  this.renderer.setStyle(element, 'height', `${videoHeight}px`);
+  this.renderer.setStyle(element, 'min-width', '100%');
+  this.renderer.setStyle(element, 'max-width', '100%');
+  this.renderer.setStyle(element, 'object-fit', 'cover'); // Use cover to maintain aspect ratio
+  this.renderer.setStyle(element, 'border-radius', '8px'); // Optional: rounded corners
+
+  this.renderer.appendChild(this.remoteVideo.nativeElement, element);
   }
 
   startLocalVideo(): void {
