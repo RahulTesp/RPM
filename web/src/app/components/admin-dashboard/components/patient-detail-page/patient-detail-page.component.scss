@@ -2037,6 +2037,10 @@ td.mat-cell:last-child {
   justify-content: space-between;
 
 }
+.dialogContainer h2 {
+
+  color: #ffffff;
+}
 .btn-sent {
   width: 200px;
   height: fit-content;
@@ -2686,8 +2690,7 @@ button {
   align-items: flex-end;
   padding-bottom: 0.7rem;
 }
-.vitalReading_rangeSelector {
-}
+
 .mat-calendar-body-preview-end > .mat-calendar-body-cell-content {
   background-color: rgba(0, 0, 0, 0.04) !important;
 }
@@ -3449,14 +3452,7 @@ ned-dialog {
   z-index: 500;
 }
 
-.CallVideoMainPanel {
-  // position: absolute;
-  // top: 40px;
-  // left: 60px;
-  // height: 90%;
-  // z-index: 500;
-  // min-height: 500px;
-}
+
 video {
   width: {
     ideal: 195;

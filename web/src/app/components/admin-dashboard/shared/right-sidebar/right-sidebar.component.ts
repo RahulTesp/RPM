@@ -726,12 +726,20 @@ export class RightSidebarComponent implements OnInit {
 
         this.rpmservice.rpm_post('/api/tasks/addtask', req_body).then(
           (data) => {
-            alert('New Task Added Successfully!!');
-            this.registerTask.reset();
-            this.onClickCancel();
-            this.taskReload();
-            this.teamtaskReload();
-            this.loading = false;
+
+
+             this.confirmDialog.showConfirmDialog(
+              'New Task Added Successfully!!',
+              'Message',
+              () => {
+                this.registerTask.reset();
+                this.onClickCancel();
+                this.taskReload();
+                this.teamtaskReload();
+                this.loading = false;
+              },
+              false
+            );
           },
           (err) => {
             //show error patient id creation failed
@@ -1910,7 +1918,7 @@ export class RightSidebarComponent implements OnInit {
       this.rpmservice.rpm_post('/api/tasks/updatetask', req_body).then(
         (data) => {
           alert(`Task Updated Successfully!! `);
-          
+
           this.getMenuChioce(1);
           this.taskReload();
         },

@@ -194,7 +194,7 @@ export class PatientChatService {
     });
 
     this.client.on('conversationJoined', (conversation) => {
-      console.log('Joined Conversation:', conversation.sid);
+     // console.log('Joined Conversation:', conversation.sid);
     });
 
     // TOKEN EVENTS
@@ -214,7 +214,7 @@ export class PatientChatService {
 
     // CONVERSATION EVENTS
     this.client.on('conversationAdded', async (conv: Conversation) => {
-      console.log('📢 New Conversation Added:', conv);
+     // console.log('📢 New Conversation Added:', conv);
 
       const currentConversationId = await this.getExistingConversation(
         this.client,
@@ -319,100 +319,205 @@ export class PatientChatService {
     }
   };
 
-  async fetchUserChats(conversationSid: string): Promise<void> {
-    this.setLoading(true);
+// Optimized version of the chat service methods
+async fetchUserChats(conversationSid: string): Promise<void> {
+  this.setLoading(true);
 
-    try {
-      if (!this.client) throw new Error('Client not initialized');
+  try {
+    if (!this.client) throw new Error('Client not initialized');
 
-      //  Clear previous chat list and messages
-      this.chatListSubject.next([]);
-      this.currentConversationSubject.next(null);
-      this.messagesSubject.next([]);
+    this.resetState();
+    console.time('conversation-fetch');
+    const conversation = await this.client.getConversationBySid(conversationSid);
+    console.timeEnd('conversation-fetch');
 
-      //  Fetch conversation directly by SID
-      const conversation = await this.client.getConversationBySid(
-        conversationSid
-      );
-      console.log(' Fetched conversation:', conversation);
-
-      //  Create a single chat entry
-      const chatList = [
-        {
-          chat: conversation,
-          unreadCount: 0,
-          lastMessage: '',
-        },
-      ];
-
-      //  Update the chat list
-      this.chatListSubject.next(chatList);
-
-      //  Open the conversation
-      await this.openChat(conversation);
-
-      console.log(' Chat opened successfully');
-    } catch (error) {
-      console.error(' Error fetching conversation:', error);
-      this.setError('Failed to load chat');
-    } finally {
-      this.setLoading(false);
+    if (!conversation) {
+      throw new Error(`Conversation with SID ${conversationSid} not found`);
     }
+    this.chatListSubject.next([{
+      chat: conversation,
+      unreadCount: 0,
+      lastMessage: '',
+    }]);
+
+    this.openChat(conversation);
+
+  } catch (error) {
+    console.error('Error fetching conversation:', error);
+    this.setError('Failed to load chat');
+  } finally {
+    this.setLoading(false);
   }
+}
+private resetState(): void {
+  this.chatListSubject.next([]);
+  this.currentConversationSubject.next(null);
+  this.messagesSubject.next([]);
+}
 
+async openChat(conversation: Conversation): Promise<void> {
+  this.currentConversationSubject.next(conversation);
+  this.fetchMessages().catch(error => {
+    console.error('Error in background message fetching:', error);
+  });
+}
 
-  // Add this helper method
+async fetchMessages(skip?: number): Promise<void> {
+  const startTime = performance.now();
+  const pageSize = 50; // Adjust based on your needs
 
+  try {
+    const currentConversation = this.currentConversationSubject.getValue();
+    if (!currentConversation) throw new Error('No active conversation.');
 
+    const currentMessages = skip ? this.messagesSubject.getValue() : [];
 
+    // Add pagination parameters
+    const options = {
+      pageSize,
+      page: skip ? Math.floor(currentMessages.length / pageSize) : 0
+    };
 
-  async openChat(conversation: Conversation): Promise<void> {
-    this.currentConversationSubject.next(conversation);
-    await this.fetchMessages();
+    console.time('messages-fetch');
+    const result = await currentConversation.getMessages(pageSize);
+    console.timeEnd('messages-fetch');
+
+    // Process messages in batches to avoid UI freezes
+    const allMessages = skip
+      ? [...result.items, ...currentMessages]
+      : result.items;
+
+    // Update messages
+    this.messagesSubject.next(allMessages);
+
+    // Update read status only if we're loading the first batch and have messages
+    if (!skip && allMessages.length > 0) {
+      this.updateReadStatus(currentConversation, allMessages);
+    }
+
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    this.setError('Failed to load messages');
+  } finally {
+    const endTime = performance.now();
+    console.log(`fetchMessages took ${(endTime - startTime).toFixed(2)} ms`);
+    this.setLoading(false);
   }
+}
 
-  async fetchMessages(skip?: number): Promise<void> {
-    this.setLoading(true);
+private async updateReadStatus(conversation: Conversation, messages: any[]): Promise<void> {
+  try {
+    const lastMessage = messages[messages.length - 1];
 
-    try {
-      const currentConversation = this.currentConversationSubject.getValue();
-      if (!currentConversation) throw new Error('No active conversation.');
+    // Only update if we have a valid index
+    if (lastMessage && typeof lastMessage.index === 'number') {
+      await conversation.updateLastReadMessageIndex(lastMessage.index);
 
-      const currentMessages = skip ? this.messagesSubject.getValue() : [];
-      const result = await currentConversation.getMessages(30, skip);
-
-      const allMessages = skip
-        ? [...result.items, ...currentMessages]
-        : result.items;
-
-      this.messagesSubject.next(allMessages);
-
-      if (!skip) {
-        let resetTo =
-          allMessages.length >= 1
-            ? allMessages[allMessages.length - 1].index
-            : 0;
-        await currentConversation.updateLastReadMessageIndex(resetTo);
-
-        const chatList = this.chatListSubject.getValue();
-        const updatedChatList = chatList.map((el) =>
-          el.chat.sid === currentConversation.sid
+      // Update unread counts
+      const chatList = this.chatListSubject.getValue();
+      this.chatListSubject.next(
+        chatList.map((el) =>
+          el.chat.sid === conversation.sid
             ? { ...el, unreadCount: 0 }
             : el
-        );
+        )
+      );
 
-        this.chatListSubject.next(updatedChatList);
-        console.log('Fetch Messages :');
-        this.updateTotalUnreadCount();
-      }
-    } catch (error) {
-      console.error(' Error fetching messages:', error);
-      this.setError('Failed to load messages');
-    } finally {
-      this.setLoading(false);
+      this.updateTotalUnreadCount();
     }
+  } catch (error) {
+    console.error('Error updating read status:', error);
+    // Don't throw - this is a non-critical operation
   }
+}
+//     async fetchUserChats(conversationSid: string): Promise<void> {
+//     this.setLoading(true);
 
+//     try {
+//       if (!this.client) throw new Error('Client not initialized');
+
+//       //  Clear previous chat list and messages
+//       this.chatListSubject.next([]);
+//       this.currentConversationSubject.next(null);
+//       this.messagesSubject.next([]);
+
+//       //  Fetch conversation directly by SID
+//       const conversation = await this.client.getConversationBySid(
+//         conversationSid
+//       );
+//       console.log(' Fetched conversation:', conversation);
+
+//       //  Create a single chat entry
+//       const chatList = [
+//         {
+//           chat: conversation,
+//           unreadCount: 0,
+//           lastMessage: '',
+//         },
+//       ];
+
+//       //  Update the chat list
+//       this.chatListSubject.next(chatList);
+
+//       //  Open the conversation
+//       await this.openChat(conversation);
+
+//       console.log(' Chat opened successfully');
+//     } catch (error) {
+//       console.error(' Error fetching conversation:', error);
+//       this.setError('Failed to load chat');
+//     } finally {
+//       this.setLoading(false);
+//     }
+//   }
+
+//   async openChat(conversation: Conversation): Promise<void> {
+//     this.currentConversationSubject.next(conversation);
+//     await this.fetchMessages();
+//   }
+
+
+//  async fetchMessages(skip?: number): Promise<void> {
+//     this.setLoading(true);
+
+//     try {
+//       const currentConversation = this.currentConversationSubject.getValue();
+//       if (!currentConversation) throw new Error('No active conversation.');
+
+//       const currentMessages = skip ? this.messagesSubject.getValue() : [];
+//       const result = await currentConversation.getMessages(30, skip);
+
+//       const allMessages = skip
+//         ? [...result.items, ...currentMessages]
+//         : result.items;
+
+//       this.messagesSubject.next(allMessages);
+
+//       if (!skip) {
+//         let resetTo =
+//           allMessages.length >= 1
+//             ? allMessages[allMessages.length - 1].index
+//             : 0;
+//         await currentConversation.updateLastReadMessageIndex(resetTo);
+
+//         const chatList = this.chatListSubject.getValue();
+//         const updatedChatList = chatList.map((el) =>
+//           el.chat.sid === currentConversation.sid
+//             ? { ...el, unreadCount: 0 }
+//             : el
+//         );
+
+//         this.chatListSubject.next(updatedChatList);
+//         console.log('Fetch Messages :');
+//         this.updateTotalUnreadCount();
+//       }
+//     } catch (error) {
+//       console.error(' Error fetching messages:', error);
+//       this.setError('Failed to load messages');
+//     } finally {
+//       this.setLoading(false);
+//     }
+//   }
   async sendMessage(message: string): Promise<void> {
     console.log('Message');
     console.log(message);
@@ -465,6 +570,51 @@ export class PatientChatService {
     }
   }
 
+  // async createNewChat(
+  //   currentUserName: string,
+  //   userName: string
+  // ): Promise<void> {
+  //   this.setLoading(true);
+
+  //   try {
+  //     if (!this.client) throw new Error('Client not initialized');
+
+  //   //  const user = await this.client.getUser(currentUserName);
+  //     console.log('username'+userName);
+  //     console.log('currentUserName'+currentUserName)
+  //     const channel = await this.client.createConversation({
+  //       friendlyName: `${userName}-${currentUserName}`,
+  //     });
+
+  //     console.log('channel'+channel)
+  //     await channel.join();
+  //     await channel.setAllMessagesUnread();
+
+  //     if (userName !== currentUserName) {
+  //       await channel.add(userName);
+
+  //       console.log('Added other user to conversation:', userName);
+  //     }
+  //     //await channel.add(currentUserName);
+
+  //     this.currentConversationSubject.next(channel);
+
+  //     // Update chat list
+  //     const chatList = this.chatListSubject.getValue();
+  //     this.chatListSubject.next([
+  //       { chat: channel, unreadCount: 0, lastMessage: '' },
+  //       ...chatList,
+  //     ]);
+
+  //     await this.updateChatResource(channel, currentUserName);
+  //     await this.openChat(channel);
+  //   } catch (error) {
+  //     console.error(' Error creating new chat:', error);
+  //     this.setError('User not found or chat creation failed.');
+  //   } finally {
+  //     this.setLoading(false);
+  //   }
+  // }
   async createNewChat(
     currentUserName: string,
     userName: string
@@ -474,36 +624,102 @@ export class PatientChatService {
     try {
       if (!this.client) throw new Error('Client not initialized');
 
-      const user = await this.client.getUser(currentUserName);
-      console.log('username'+userName);
-      console.log('currentUserName'+currentUserName)
+      // Better logging with consistent format
+      console.log(`Creating new chat: currentUser=${currentUserName}, otherUser=${userName}`);
+
+      // Generate a unique, readable conversation name
+      const friendlyName = `${userName}-${currentUserName}-${new Date().getTime()}`;
+
+      // Create the conversation
+      console.time('create-conversation');
       const channel = await this.client.createConversation({
-        friendlyName: `${userName}-${currentUserName}`,
+        friendlyName,
       });
+      console.timeEnd('create-conversation');
 
-      await channel.join();
-      await channel.setAllMessagesUnread();
-      await channel.add(currentUserName);
+      if (!channel) {
+        throw new Error('Failed to create conversation');
+      }
 
+      console.log(`Created conversation with SID: ${channel.sid}`);
+
+      // Execute these operations in parallel for better performance
+      const joinPromise = channel.join();
+      const setUnreadPromise = channel.setAllMessagesUnread();
+      await Promise.all([joinPromise, setUnreadPromise]);
+
+      if (userName !== currentUserName) {
+        console.time('add-participant');
+        try {
+          let isAlreadyParticipant = false;
+          if (typeof channel.getParticipants === 'function') {
+            try {
+              const participants = await channel.getParticipants();
+              isAlreadyParticipant = participants.some(
+                (p: any) => p.identity === userName || p.sid === userName
+              );
+              console.log(`Checked participants: ${isAlreadyParticipant ? 'User already exists' : 'User needs to be added'}`);
+            } catch (checkError) {
+              console.log('Could not check participants, proceeding with add attempt:', checkError);
+            }
+          }
+          if (!isAlreadyParticipant) {
+
+            try {
+              await channel.add(userName);
+              console.log(`Successfully added participant ${userName} using channel.add`);
+            } catch (addError: unknown) {
+
+              if (
+                addError &&
+                typeof addError === 'object' &&
+                'message' in addError &&
+                typeof addError.message === 'string' &&
+                addError.message.includes('Conflict')
+              ) {
+                console.log(`User ${userName} appears to already be in the conversation`);
+              } else {
+                // If it's not a conflict error, rethrow
+                throw addError;
+              }
+            }
+          } else {
+            console.log(`User ${userName} is already a participant, skipping add`);
+          }
+        } catch (participantError) {
+          console.error(`Failed to add participant ${userName}:`, participantError);
+          // Log available methods for debugging
+          console.log(`Available methods:`, Object.getOwnPropertyNames(Object.getPrototypeOf(channel)));
+          // Continue even if adding participant fails
+        }
+        console.timeEnd('add-participant');
+      }
+
+      // Update the UI state immediately - don't wait for resource update
       this.currentConversationSubject.next(channel);
 
-      // Update chat list
+      // Update chat list with the new conversation at the top
       const chatList = this.chatListSubject.getValue();
       this.chatListSubject.next([
         { chat: channel, unreadCount: 0, lastMessage: '' },
         ...chatList,
       ]);
 
-      await this.updateChatResource(channel, currentUserName);
-      await this.openChat(channel);
+      // Start these operations in parallel but don't block the UI
+      Promise.all([
+        this.updateChatResource(channel, currentUserName),
+        this.openChat(channel)
+      ]).catch(error => {
+        console.error('Error in post-creation setup:', error);
+      });
+
     } catch (error) {
-      console.error(' Error creating new chat:', error);
+      console.error('Error creating new chat:', error);
       this.setError('User not found or chat creation failed.');
     } finally {
       this.setLoading(false);
     }
   }
-
   async updateChatResource(
     channel: Conversation,
     patientUsername: string
@@ -542,10 +758,10 @@ export class PatientChatService {
 
       if (!this.client) return 0;
       if (!conversationId) return 0;
-      console.log('getExisting Conversation ');
+     // console.log('getExisting Conversation ');
 
-      console.log('conservation id');
-      console.log(conversationId);
+     // console.log('conservation id');
+     // console.log(conversationId);
       // Get the specific conversation by SID
       const conversation = await this.client.getConversationBySid(
         conversationId
@@ -691,7 +907,7 @@ export class PatientChatService {
 
   private async getExistingConversation(client: any, user1: any, user2: any) {
     const conversations = await client.getSubscribedConversations();
-    console.log('getExisting Conversation ');
+   // console.log('getExisting Conversation ');
 
     for (let conversation of conversations.items) {
       const participants = await conversation.getParticipants();
@@ -708,7 +924,7 @@ export class PatientChatService {
       }
     }
 
-    console.log('No existing conversation found');
+   // console.log('No existing conversation found');
     return null;
   }
 

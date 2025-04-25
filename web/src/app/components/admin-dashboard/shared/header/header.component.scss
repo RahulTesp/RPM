@@ -208,8 +208,8 @@
   border-radius: 0.5rem;
 }
 .notification_content_panel {
-  overflow-y: scroll;
-  height: 150px;
+  overflow-y: auto;
+  max-height: 200px;
 }
 
 .notification_title {

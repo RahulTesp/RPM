@@ -483,6 +483,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.program_id
       );
       this.getchatData(this.http_rpm_patientList.PatientDetails.UserName)
+      this.patientService.initPatientChat(this.http_rpm_patientList.PatientDetails.UserName)
       this.setPatientData();
       this.loading = false;
     } catch (error) {
@@ -498,7 +499,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.initializeTimers();
     this.fetchProgramDetails();
     this.initializeSidePanel();
-    
+
   }
 
   /**
@@ -1388,7 +1389,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         await this.patientService.getPatientChat(
           patientusername
         );
-     console.log(this.http_chatData)
       this.dataSourceChange(5, 5);
     } catch (error) {
       console.error('❌ Error fetching chat data:', error);
@@ -1452,7 +1452,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.getCallNotes();
     this.getScheduleData();
     this.getSMSData();
-    
+
   }
 
   getClinicMenuLoadData() {

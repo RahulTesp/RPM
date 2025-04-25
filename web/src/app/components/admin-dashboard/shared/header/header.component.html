@@ -72,14 +72,14 @@
           <img
             class="toolbar_icons commonIcon"
             src="../../../../../assets/04-Icons/Icons_Notification.svg"
-            (click)="open_notifications()"
+            (click)="notification_click()"
           />
           <!-- (click)="notification_click()" -->
           <div *ngIf="unread">
             <span
               class="badge"
               id="header_Notification"
-             (click)="open_notifications()"
+              (click)="notification_click()"
               >{{ unread }}</span
             >
           </div>
@@ -100,7 +100,7 @@
                 <div class="notification_description_panel">
                   <div
                     *ngFor="
-                      let notification_item of notifications&&notifications.Data.NotificationList
+                      let notification_item of notification.NotificationList
                     "
                   >
                     <div *ngIf="notification_item.IsRead == false">
@@ -116,7 +116,7 @@
                           <div class="notification_time">
                             <p class="notification_title">
                               {{
-                                notificationtime(notification_item.CreatedOn)
+                                notificationTime(notification_item.CreatedOn)
                               }}
                             </p>
                           </div>

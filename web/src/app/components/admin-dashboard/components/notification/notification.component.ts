@@ -1,12 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-
-import { HttpService } from '../../sevices/http.service';
 import { RPMService } from '../../sevices/rpm.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import {  Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
-import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
 import moment from 'moment';
+import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
 
 @Component({
   selector: 'app-notification',
@@ -18,11 +15,10 @@ export class NotificationComponent implements OnInit {
   read: boolean;
   notification_value: any;
   constructor(
-    private http: HttpService,
     private rpm: RPMService,
     private router: Router,
     private Auth: AuthService,
-    public dialog: MatDialog
+    private confirmDialog: ConfirmDialogServiceService
   ) {
     var that = this;
   }
@@ -97,14 +93,8 @@ export class NotificationComponent implements OnInit {
 
   notificationTime(date: any) {
     const today = new Date(); // Current time in local timezone
-
-    // Convert the UTC date to local time string
     const localTimeString = this.convertToLocalTime(date);
-
-    // Parse the local time string into a Date object
     const notification_date = new Date(localTimeString);
-
-    // Calculate time difference in minutes
     const diff_min = Math.round(
       (today.getTime() - notification_date.getTime()) / 60000
     );
@@ -163,8 +153,7 @@ export class NotificationComponent implements OnInit {
     this.isShown = !this.isShown;
   }
   backtohome() {
-    // let route = '/admin/home';
-    // this.router.navigate([route])
+
     this.rolelist = sessionStorage.getItem('Roles');
     this.rolelist = JSON.parse(this.rolelist);
     if (this.rolelist[0].Id == 7) {
@@ -181,62 +170,74 @@ export class NotificationComponent implements OnInit {
       )
       .then(
         (data) => {
-          alert('Notification Deleted Successfully');
-          this.GetNotifications();
+          this.confirmDialog.showConfirmDialog(
+            'Notification Deleted Successfully',
+            'Message',
+            () => {
+              this.GetNotifications();
+            },
+            false
+          );
         },
         (err) => {
-          alert(err.error);
+          this.confirmDialog.showConfirmDialog(
+            err.error || 'Could not delete notification.',
+            'Error',
+            null,
+            false
+          );;
         }
       );
   }
 
   openDeleteNotificationDialog(documnetId: any) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      maxWidth: '400px',
-      data: {
-        title: 'Are you sure?',
-        message: 'Do You Want to Delete the Notification ? ',
+
+    this.confirmDialog.showConfirmDialog(
+      'Do You Want to Delete the Notification?',
+      'Are you sure?',
+      () => {
+      this.deleteNotification(documnetId);
       },
-    });
-    dialogRef.afterClosed().subscribe((dialogResult: any) => {
-      if (dialogResult) {
-        this.deleteNotification(documnetId);
-      } else {
-        return;
-      }
-    });
+      true
+    );
   }
 
   openClearAllDialog() {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      maxWidth: '400px',
-      data: {
-        title: 'Are you sure?',
-        message: 'Do You Want to Delete all Notifications ? ',
-      },
-    });
-    dialogRef.afterClosed().subscribe((dialogResult: any) => {
-      // if user pressed yes dialogResult will be true,
-      // if he pressed no - it will be false
 
-      if (dialogResult) {
-        this.clearAll();
-      } else {
-        return;
-      }
-    });
+     this.confirmDialog.showConfirmDialog(
+      'Do You Want to Delete all Notifications?',
+      'Are you sure?',
+      () => {
+      this.clearAll();
+      },
+      true  // Enable Cancel button for confirmation
+    );
   }
-  clearAll() {
-    this.rpm
-      .rpm_post(`/api/notification/deletenotifications?notificationId=0`, {})
-      .then(
-        (data) => {
-          this.GetNotifications();
-          alert('Notification Deleted Successfully');
-        },
-        (err) => {
-          alert(err.error);
-        }
-      );
-  }
+
+
+   clearAll()
+		{
+			this.rpm
+			  .rpm_post(`/api/notification/deletenotifications?notificationId=0`, {})
+			  .then(
+				(data) => {
+				  this.confirmDialog.showConfirmDialog(
+					'All Notifications Deleted Successfully',
+					'Message',
+					() => {
+					  this.GetNotifications();
+					},
+					false  // No cancel button needed for success message
+				  );
+				},
+				(err) => {
+				  this.confirmDialog.showConfirmDialog(
+					err.error || 'Could not delete notifications.',
+					'Error',
+					null,
+					false  // No cancel button needed for error message
+				  );
+				}
+			  );
+		 }
 }
