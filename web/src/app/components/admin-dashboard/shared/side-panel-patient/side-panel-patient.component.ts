@@ -2522,7 +2522,7 @@ export class SidePanelPatientComponent implements OnInit {
 
     this.rpm
       .rpm_get(
-        `/api/patient/getpatientnotes?ProgramName=${this.patientProgramName}&Type=REVIEW&PatientNoteId=${this.noteId}`
+        `/api/patient/getpatientnotesbyprogram?ProgramName=${this.patientProgramName}&Type=REVIEW&PatientNoteId=${this.noteId}`
       )
       .then((data) => {
         if (data) {

@@ -4581,6 +4581,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   }
   videoCallConnected = false;
   videovar: any;
+
   connect() {
     let accessToken = this.access_tokan;
     this.videoCallConnected = true;
@@ -4589,8 +4590,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.twilioService.connectToRoom(accessToken, {
       name: this.room_name,
       audio: true,
-      // video: { height: 720, frameRate: 24, width: 1280 },
-      // video: { height: 700, frameRate: 24, width: 1300 },
       video: {
         width: { ideal: 1300, max: 1920 },
         height: { ideal: 700, max: 1080 },
@@ -4605,10 +4604,13 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
             standard: { height: 720, width: 1280 },
             low: { height: 176, width: 144 },
           },
+
         },
       },
     });
     this.twilioService.isVideoOn = false;
+    this.twilioService.microphone = true;
+
   }
 
   mute() {

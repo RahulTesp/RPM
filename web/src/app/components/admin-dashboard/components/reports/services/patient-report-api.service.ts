@@ -106,7 +106,7 @@ export class PatientReportApiService {
     noteType: string,
     noteId: string
   ): Promise<any> {
-    const apiUrl = `/api/patient/getpatientnotes?ProgramName=${programName}&Type=${noteType}&PatientNoteId=${noteId}`;
+    const apiUrl = `/api/patient/getpatientnotesbyprogram?ProgramName=${programName}&Type=${noteType}&PatientNoteId=${noteId}`;
 
     try {
       return await this.rpmService.rpm_get(apiUrl);
