@@ -170,9 +170,11 @@ export class PatientChatService {
 
     if (!this.messageListenerRegistered) {
       this.client.on('messageAdded', this.handleMessageAdded);
+      this.client.on('messageRemoved', this.handleMessageRemoved);
+      this.client.on('messageUpdated', this.handleMessageUpdated);
       this.messageListenerRegistered = true;
     }
-    this.client.on('messageRemoved', this.handleMessageRemoved);
+
     // CLIENT INITIALIZATION EVENTS
     this.client.on('initialized', () => {
       console.log('Twilio Chat Client Initialized');
@@ -999,5 +1001,26 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
       });
     }
   }
+  private handleMessageUpdated = (event: { message: Message }): void => {
+    try {
+      const message = event.message;
+      console.log('Message Updated:', message.sid);
+      const currentConversation = this.currentConversationSubject.getValue();
 
+      // Only update if the message belongs to the current conversation
+      if (currentConversation?.sid === message.conversation.sid) {
+        const currentMessages = this.messagesSubject.getValue();
+
+        // Replace the updated message in the array
+        const updatedMessages = currentMessages.map((msg) =>
+          msg.sid === message.sid ? message : msg
+        );
+
+        // Update the messages subject
+        this.messagesSubject.next(updatedMessages);
+      }
+    } catch (error) {
+      console.error('Error handling updated message:', error);
+    }
+  };
 }
