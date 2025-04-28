@@ -4016,7 +4016,13 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   }
   OnCancelNotesTimer() {
     clearInterval(this.interval);
+    console.log('Timer Value before');
+    console.log(this.timerValue);
     this.timerValue = this.timerValue + this.calltimerValue;
+    console.log('Timer Value');
+    console.log(this.timerValue);
+    console.log('calltimer Value');
+    console.log(this.calltimerValue);
     this.interval = setInterval(() => {
       if (!this.callTimerEnabled) {
         this.timerValue = this.timerValue + 1;
@@ -4578,6 +4584,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.callType = null;
     this.disconnect();
     this.showNoteModal=false;
+    //this.OnCancelNotesTimer();
   }
   videoCallConnected = false;
   videovar: any;

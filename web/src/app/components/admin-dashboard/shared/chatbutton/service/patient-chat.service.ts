@@ -172,7 +172,7 @@ export class PatientChatService {
       this.client.on('messageAdded', this.handleMessageAdded);
       this.messageListenerRegistered = true;
     }
-
+    this.client.on('messageRemoved', this.handleMessageRemoved);
     // CLIENT INITIALIZATION EVENTS
     this.client.on('initialized', () => {
       console.log('Twilio Chat Client Initialized');
@@ -947,4 +947,57 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
         console.error('Error Notification Sent', err);
       });
   }
+
+  private handleMessageRemoved = (message: Message): void => {
+    try {
+      console.log('Message Removed:', message.sid);
+      const currentConversation = this.currentConversationSubject.getValue();
+
+      // Only update messages if the message belongs to the current conversation
+      if (currentConversation?.sid === message.conversation.sid) {
+        const currentMessages = this.messagesSubject.getValue();
+
+        // Filter out the removed message by SID
+        const updatedMessages = currentMessages.filter(
+          (msg) => msg.sid !== message.sid
+        );
+
+        // Update the messages subject with the filtered array
+        this.messagesSubject.next(updatedMessages);
+      }
+
+      // Also update chat list if needed
+      this.updateChatListAfterMessageRemoval(message);
+    } catch (error) {
+      console.error('Error handling removed message:', error);
+    }
+  };
+  private updateChatListAfterMessageRemoval(message: Message): void {
+    const chatList = this.chatListSubject.getValue();
+
+    // Find the chat in the list
+    const conversation = chatList.find(
+      (chatItem) => chatItem.chat.sid === message.conversation.sid
+    );
+
+    if (conversation) {
+      // If the removed message was the last message, we need to update
+      // Get the new last message
+      message.conversation.getMessages(1).then((result) => {
+        const updatedChatList = chatList.map((chatItem) => {
+          if (chatItem.chat.sid === message.conversation.sid) {
+            const lastMsg = result.items[0];
+            return {
+              ...chatItem,
+              lastMessage: lastMsg ? lastMsg.body || '(Media message)' : ''
+            };
+          }
+          return chatItem;
+        });
+
+        this.chatListSubject.next(updatedChatList);
+      });
+    }
+  }
+
 }

@@ -633,8 +633,18 @@
    {
      font-size: 8px !important;
     }
-  }
 
+  }
+  @media only screen and (max-width: 924px) {
+
+    .mat-mdc-header-cell
+    {
+      font-size: 0.6rem !important;
+    }
+    .mat-mdc-cell {
+      font-size: 0.6rem !important;
+    }
+  }
 
 ::ng-deep .mat-column-selection {
   width: 40px !important;
@@ -800,7 +810,7 @@ mat-progress-spinner {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 140px;
+  // max-width: 140px;
 }
 
 
@@ -808,22 +818,18 @@ mat-progress-spinner {
   white-space: normal;
   overflow: visible;
   z-index: 1;
-  position: relative;
-  background-color: #edeff5;
+  // position: relative;
+  // background-color: #edeff5;
 }
 
 .mat-mdc-header-cell {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 140px; /* Adjust based on your design needs */
-  padding: 0 8px; /* Add some padding for better spacing */
+  // max-width: 140px;
+  // padding: 0 8px;
 }
-.mat-mdc-header-cell:hover {
-  overflow: visible;
-  z-index: 2; /* Higher than regular cells */
-  position: relative;
-}
+
 .upperPanelPatientTable{
   display:flex;
   width: 100%;
@@ -865,9 +871,9 @@ mat-progress-spinner {
 }
 
 ::ng-deep .patient-number-column {
-  width: 140px;
-  max-width: 140px;
-  min-width: 140px;
+  width: 130px;
+  max-width: 130px;
+  min-width: 130px;
 
 }
 

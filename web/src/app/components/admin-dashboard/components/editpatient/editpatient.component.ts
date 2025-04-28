@@ -9,20 +9,14 @@ import {
   FormControl,
 } from '@angular/forms';
 import { RPMService } from '../../sevices/rpm.service';
-// import { Options } from '@angular-slider/ngx-slider';
 import { ActivatedRoute, Router } from '@angular/router';
 import _ from 'lodash';
 import { StatusMessageComponent } from '../../shared/status-message/status-message.component';
-import { any } from 'lodash/fp';
 import { DatePipe } from '@angular/common';
 import * as uuid from 'uuid';
-import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import moment from 'moment';
 import { AuthService } from 'src/app/services/auth.service';
-import * as FileSaver from 'file-saver';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
-
-
 
 
 export interface document {

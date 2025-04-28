@@ -253,16 +253,9 @@ export class PatientDataReportComponent implements OnInit {
   }
 
   dateRangeSet() {
-    const StartDate = this.range.value.start;
-    const EndDate = this.range.value.end;
-    // if (new Date(EndDate) > new Date()) {
-    //   alert('Cannot Download report for future date.');
-    //   return;
-    // }
+
     this.downloadstatus = false;
     if (this.selectedPatient == null || this.selectedPatient == undefined) {
-      //alert('Please select a Patient.');
-
       this.confirmDialog.showConfirmDialog(
         'Please select a Patient.',
         'Message',
@@ -280,25 +273,22 @@ export class PatientDataReportComponent implements OnInit {
         this.downloadstatus = true;
         return;
       }
-      // var dateofmonth = this.month1.toString();
-      // var dt = dateofmonth.split('-');
-      // var year = parseInt(dt[0]);
-      // var month = parseInt(dt[1]);
-      // var firstDay = new Date(year, month - 1, 1);
-      // var lastDay = new Date(year, month, 0);
-      // this.RptStartDate = this.patientreportService.convertDate(firstDay);
-      // this.RptEndDate = this.patientreportService.convertDate(lastDay);
-      // if (new Date(this.RptEndDate) > new Date()) {
-      //   alert('Report is not available for the month.');
-      //   this.downloadstatus = true;
-      //   return;
-      // }
+
+      var dateofmonth = this.month1.toString();
+      var dt = dateofmonth.split('-');
+      var year = parseInt(dt[0]);
+      var month = parseInt(dt[1]);
+      var firstDay = new Date(year, month - 1, 1);
+      var lastDay = new Date(year, month, 0);
+      this.RptStartDate = this.patientreportService.convertDate(firstDay);
+      this.RptEndDate = this.patientreportService.convertDate(lastDay);
+      if (new Date(this.RptEndDate) > new Date()) {
+        alert('Report is not available for the month.');
+        this.downloadstatus = true;
+        return;
+      }
     } else {
-      // if (StartDate == null || EndDate == null) {
-      //   alert('Please select a valid Date Range.');
-      //   this.downloadstatus = true;
-      //   return;
-      // }
+
       this.RptStartDate = this.patientreportService.convertDate(
         this.RptStartDate
       );
@@ -412,4 +402,7 @@ export class PatientDataReportComponent implements OnInit {
       console.log('Cancelled.');
     }
   }
+
+
+
 }
