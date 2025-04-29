@@ -2158,9 +2158,9 @@ td.mat-cell:last-child {
   }
 }
 @media only screen and (max-width: 1280px) {
-  .middle_panel {
-    width: 100% !important;
-  }
+  // .middle_panel {
+  //   width: 100% !important;
+  // }
   .Program_billing_data_right {
     margin-left: 0px !important;
   }
@@ -2242,8 +2242,8 @@ td.mat-cell:last-child {
 }
 
 .uppermenubtn_detail {
-  min-width: 139px;
-  max-width: 139px;
+  min-width: 130px;
+  max-width: 130px;
   height: 2.2rem;
   font-family: "Rubik";
   border-radius: 0.4rem;
@@ -2273,20 +2273,23 @@ td.mat-cell:last-child {
 }
 @media only screen and (min-width: 1630) and (max-width: 1620) {
   .programInfo_menu_item button {
-    padding-right: 0px !important;
+    padding-right: 0px ;
     font-size: 12px;
   }
 }
 
 @media only screen and (max-width: 980px) {
+   .middle_panel {
+    width: 100% ;
+  }
   .programInfo_menu_item button {
-    padding-right: 0px !important;
+    padding-right: 0px ;
     font-size: 12px;
   }
   .centeral_panel {
-    min-width: 100% !important;
-    max-width: 100% !important;
-    padding-left: 16px !important;
+    min-width: 100% ;
+    max-width: 100% ;
+    padding-left: 16px ;
   }
 
   .summary_alert_item_data {
@@ -2294,16 +2297,16 @@ td.mat-cell:last-child {
   }
 
   .profile_container_potrait {
-    display: block !important;
+    display: block ;
     padding-bottom: 1.87rem;
   }
   .profile_container {
-    display: none !important;
+    display: none ;
   }
   .summary-upper-panel {
     display: flex;
 
-    flex-direction: column !important;
+    flex-direction: column ;
   }
   .summary_program_overview {
     width: 100%;
@@ -3429,9 +3432,9 @@ ned-dialog {
   background-color: #8226df;
   padding: 0.8rem;
   border-radius: 0.8rem;
-  min-width: 500px;
+
   min-height: 90vh;
-  min-width: 60vw;
+  min-width: 64vw;
   max-height: auto;
   //max-height: 90vh;
   z-index: 1000;
@@ -3701,7 +3704,7 @@ li + li {
   color:#3bcbc4
 }
 #remote {
-  max-width: 59vw; /* or any fixed size like 600px */
+  max-width: 59vw;
   min-width: 59vw;
   height: auto;
   display: flex;

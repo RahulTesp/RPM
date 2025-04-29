@@ -119,25 +119,13 @@ export class TwilioVideoServiceService {
           this.attachParticipantTracks(participant);
           console.log('Room On Participant');
           console.log(participant);
-          // participant.on('trackPublished', (track) => {
-          //   console.log('Room Track Participant');
-          //   const element = (track as any).attach();
 
-          //   this.renderer.data.id = (track as any).sid;
-          //   this.renderer.setStyle(element, 'height', '100%');
-
-          //   this.renderer.setStyle(element, 'min-width', '100%');
-          //   this.renderer.appendChild(this.remoteVideo.nativeElement, element);
-          // });
           participant.on('trackPublished', track => {
-            //this.remoteVideoDisable=false
+
 
             if(track.kind == "video"){
               console.log("Room Track Participant")
-              //remove 'newly_content' --> (how to remove element from javascript)
               const newlyContentElement = document.getElementById('newly_content');
-
-              // Check if the element exists
               if (newlyContentElement) {
                   // Remove the element from its parent node
                   const parentNode = newlyContentElement.parentNode;
@@ -150,51 +138,37 @@ export class TwilioVideoServiceService {
           });
 
           participant.on('trackDisabled', (track) => {
+
             if (track.kind == "video") {
               console.log("remote trackDisabled");
               let element = this.remoteVideo.nativeElement;
+
               // Find and remove only video elements
               const videoElements = element.querySelectorAll('video');
               videoElements.forEach((videoElement: any) => {
                 element.removeChild(videoElement);
               });
 
-              // Calculate 40% of viewport height for the placeholder
-              const viewportHeight = window.innerHeight;
-              const videoHeight = Math.round(viewportHeight * 0.4);
-              const videoWidth = Math.round(videoHeight * (21/9));
+              // Create placeholder that will respect parent width
+              const screenHeight = window.innerHeight;
+              const minHeight = Math.round(screenHeight * 0.9);
 
-              // Add the placeholder div with dynamic dimensions
               const newChild = document.createElement('div');
               newChild.id = 'newly_content';
+              newChild.style.width = '100%';
+              newChild.style.display = 'flex';
+              newChild.style.justifyContent = 'center';
               newChild.innerHTML = `
-                <div style="background-color: black; height: ${videoHeight}px; width: ${videoWidth}px; max-width: 100%; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                <div style="background-color: black; width: 100%; max-width: 100%; height: ${minHeight}px; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                   <span style="color: white; font-size: 16px;">Video Off</span>
                 </div>
               `;
+
               this.renderer.appendChild(this.remoteVideo.nativeElement, newChild);
             }
           });
 
-          // participant.on('trackDisabled', (track) => {
-          //   if (track.kind == "video") {
-          //     console.log("remote trackDisabled");
-          //     let element = this.remoteVideo.nativeElement;
-          //     // Find and remove only video elements
-          //     const videoElements = element.querySelectorAll('video');
-          //     videoElements.forEach((videoElement: any) => {
-          //       element.removeChild(videoElement);
-          //     });
-          //     // Add the placeholder div
-          //     const newChild = document.createElement('div');
-          //     newChild.id = 'newly_content';
-          //     newChild.innerHTML = `
-          // <div style="background-color: black; height: 430px; width: 320px;">
-          // </div>
-          //     `;
-          //     this.renderer.appendChild(this.remoteVideo.nativeElement, newChild);
-          //   }
-          // });
+
           participant.on('trackEnabled', track => {
             //this.remoteVideoDisable=false
 
@@ -247,22 +221,8 @@ export class TwilioVideoServiceService {
             }
             this.attachParticipantTracks(participant);
           }
-
-
-
-          // this.attachParticipantTracks(track);
         });
-        //this.roomObj.remoteParticipant.on('trackDisabled', (track: any) => {
-          //console.log("hoi hoi")
-        //});
-        // When a Participant removes a Track, detach it from the DOM.
 
-        // room.on('trackRemoved', (track :any, participant:any) => {
-          // this.detachTracks([track]);
-        // });
-
-        // amitha - rangeeth
-        // Listen for the 'trackUnpublished' event
         room.on('trackUnpublished', (track, participant) => {
           console.log('Room Track trackUnpublished');
 
@@ -334,15 +294,7 @@ export class TwilioVideoServiceService {
   }
 
   attachTracks(tracks: any) {
-    // console.log('tracks');
-    // console.log(tracks);
-    // const element = tracks.attach();
-    // this.renderer.data.id = tracks.sid;
-    // this.renderer.setStyle(element, 'height', '90%');
-    // this.renderer.setStyle(element, 'min-width', '100%');
-    //  this.renderer.setStyle(element, 'object-fit:', 'contain');
 
-    // this.renderer.appendChild(this.remoteVideo.nativeElement, element);
     console.log('tracks');
   console.log(tracks);
   const element = tracks.attach();

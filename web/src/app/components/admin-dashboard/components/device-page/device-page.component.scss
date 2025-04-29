@@ -111,20 +111,13 @@
   font-size: "Rubik";
 }
 
-.upperpanel_subBox {
-}
 
 // Device Table
 .device_table_content {
-  width: 100%;
-  // background-color: #F2F2F2;
+ // width: 100%;
   padding-bottom: 1.2rem;
 }
-// .mat-cell
-// {
-//   background-color: #ffffff;
-//   padding-left: 10px !important;
-// }
+
 .mat-table {
   background-color: transparent;
 }
@@ -169,14 +162,28 @@
     hue-rotate(52deg) brightness(109%) contrast(100%);
   margin-right: 5px;
 }
-.mat-header-cell {
-  color: #164d61;
-  background-color: #cff4f5 !important;
-  font-size: 12px;
-  font-family: "Rubik";
-  margin-left: -3px !important;
-  padding-left: 0px !important;
-  padding-right: 5px !important;
+.mat-mdc-cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+
+.mat-mdc-cell:hover {
+  white-space: normal;
+  overflow: visible;
+  z-index: 1;
+  position: relative;
+  background-color: #edeff5;
+}
+
+.mat-mdc-header-cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px; /* Adjust based on your design needs */
+  padding: 0 8px; /* Add some padding for better spacing */
 }
 .search_input {
   background-color: #8be3d9;
@@ -361,14 +368,13 @@
 }
 
 .device_table_content {
-  // overflow-y: scroll !important;
-  // height: 50vh;
+
   border-top-left-radius: 20px !important;
   border-top-right-radius: 20px !important;
   height: 48vh;
   overflow-y: scroll;
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
-  scrollbar-width: none; /*Firefox*/
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 .device_detail_table::-webkit-scrollbar {
   display: none; /*Safari and Chrome*/
@@ -405,10 +411,10 @@
 
 @media only screen and (max-width: 1533px) {
   .main-panel {
-    margin-right: 16px !important;
+    margin-right: 16px ;
   }
   .main-content {
-    padding-left: 30px !important;
+    padding-left: 30px ;
   }
 }
 @media only screen and (max-width: 1500px) {
@@ -420,7 +426,7 @@
 
 @media only screen and (max-width: 1000px) {
   .data_title {
-    font-size: 10px !important;
+    font-size: 10px ;
   }
 
   // .main-panel

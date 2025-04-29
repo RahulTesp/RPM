@@ -180,6 +180,8 @@ export class MyprofileComponent implements OnInit {
     this.registerprofile.get('timezone')?.disable();
     this.registerprofile.get('state')?.disable();
     this.registerprofile.get('city')?.disable();
+    this.registerprofile?.get('userrole')?.disable();
+
     this.display_edit = true;
   }
 
@@ -194,6 +196,8 @@ export class MyprofileComponent implements OnInit {
     this.registerprofile.get('timezone')?.enable();
     this.registerprofile.get('state')?.enable();
     this.registerprofile.get('city')?.enable();
+    this.registerprofile?.get('userrole')?.enable();
+
     this.display_edit = false;
     this.isedit = false;
   }

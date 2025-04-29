@@ -1175,3 +1175,26 @@ mat-progress-spinner {
 .username-field {
   margin-left: 0.7rem
 }
+.mat-mdc-cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+
+.mat-mdc-cell:hover {
+  white-space: normal;
+  overflow: visible;
+  z-index: 1;
+  position: relative;
+  background-color: #edeff5;
+}
+
+.mat-mdc-header-cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px; /* Adjust based on your design needs */
+  padding: 0 8px; /* Add some padding for better spacing */
+}
