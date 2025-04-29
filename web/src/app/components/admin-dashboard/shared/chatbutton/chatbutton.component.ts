@@ -251,10 +251,10 @@ chatHeartBeat(currentSid: string, username: string) {
     // Set up interval for every 15 seconds (15000 milliseconds)
     const heartbeatInterval = setInterval(() => {
       this.chatHeartBeat(currentSid, username);
-    }, 15 * 1000); // Changed from 15 * 60 * 1000 to 15 * 1000
+    }, 10 * 1000);
 
     this.heartbeatIntervalId = heartbeatInterval;
-    console.log('Heartbeat started at 15-second intervals');
+    console.log('Heartbeat started at 10-second intervals');
 
     return heartbeatInterval;
   }

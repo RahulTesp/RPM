@@ -85,7 +85,7 @@ export class CallinfoDataReportComponent implements OnInit {
     that.rpmservice.rpm_post(`/api/notes/CallLogByCareTeam`, req_body).then(
       (data) => {
         this.url = data;
-        this.downloadFile(this.url);
+        this.downloadFile(this.url.message);
         this.buttonclick = true;
       },
       (err) => {

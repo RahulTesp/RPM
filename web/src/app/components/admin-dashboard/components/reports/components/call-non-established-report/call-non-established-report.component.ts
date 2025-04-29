@@ -43,7 +43,7 @@ export class CallNonEstablishedReportComponent implements OnInit {
       .downloadNonEstablishedCallInfo(startValue, endValue, roleId)
       .then((url) => {
         this.url = url;
-        this.downloadFile(this.url);
+        this.downloadFile(this.url.message);
         this.buttonclick = true;
       })
       .catch((err) => {
