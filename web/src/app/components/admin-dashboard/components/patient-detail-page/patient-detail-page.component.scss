@@ -2151,18 +2151,18 @@ td.mat-cell:last-child {
 }
 @media only screen and (max-width: 1390px) {
   .centeral_panel {
-    padding-left: 1rem !important;
+    padding-left: 1rem ;
   }
   .main-content-panel01 {
-    padding-left: 1.25rem !important;
+    padding-left: 1.25rem ;
   }
 }
 @media only screen and (max-width: 1280px) {
-  // .middle_panel {
-  //   width: 100% !important;
-  // }
+  .middle_panel {
+    width: 100% ;
+  }
   .Program_billing_data_right {
-    margin-left: 0px !important;
+    margin-left: 0px ;
   }
 
   .personalInfo_base_panel {
@@ -2223,6 +2223,7 @@ td.mat-cell:last-child {
 }
 .main-content-panel01 {
   width: 100%;
+
 }
 .side-content-panel {
   z-index: 1000;
@@ -2231,6 +2232,7 @@ td.mat-cell:last-child {
   width: 100%;
   height: fit-content;
   display: flex;
+
 }
 .profile_container {
   // max-width: 270px;
@@ -3686,7 +3688,7 @@ li + li {
   padding: 20px;
   border-radius: 10px;
   position: relative;
-  max-width: 600px;
+  max-width: 620px;
 }
 
 .note-dialog-panel {

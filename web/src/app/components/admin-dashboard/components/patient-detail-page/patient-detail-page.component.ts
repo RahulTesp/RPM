@@ -3972,9 +3972,14 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     // this.callTimerEnabled=false;
     this.notes_update_panel = false;
   }
+  onPreviewSummaryCancel()
+  {
+    this.showNoteupdateModal = false;
+  }
 
   OnpreviewUpdateCancel() {
     this.notes_update_panel = false;
+
 
     if (this.EditcallNotes) {
       clearInterval(this.interval);
