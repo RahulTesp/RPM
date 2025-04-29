@@ -154,7 +154,7 @@ export class BillingDataReportComponent implements OnInit {
         this.fileformatvariable
       );
 
-      this.downloadFile(this.url);
+      this.downloadFile(this.url.message);
     } catch (error: any) {
       alert(error.message);
     } finally {
