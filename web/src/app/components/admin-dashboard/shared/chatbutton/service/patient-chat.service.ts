@@ -75,10 +75,8 @@ export class PatientChatService {
       console.log(token)
       await this.initializeClient(token);
 
-      this.setupPushNotifications();
+     // this.setupPushNotifications();
       this.initialized = true;
-
-      // await this.getTotalUnreadMessages(); // Get initial counts
     } catch (error) {
       console.error('Failed to initialize Twilio service:', error);
     }
@@ -89,10 +87,6 @@ export class PatientChatService {
     this.setLoading(true);
     try {
        const token = await this.rpm.rpm_get(`/api/comm/getchattoken?app=web`) as { message: string };
-     // const token = await this.rpm.rpm_get(`/api/comm/getchattoken?app=web`) as string;
-      console.log('Token');
-      console.log(token);
-     // return token;
        return token.message as string;
     } catch (error) {
       console.error('❌ Error getting chat token:', error);
