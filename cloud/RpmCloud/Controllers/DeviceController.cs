@@ -415,7 +415,7 @@ namespace RpmCloud.Controllers
         }
         [Route("account/forwardtelemetry")]
         [HttpPost]
-        public IActionResult ForwardTelemetry([FromBody] DeviceTelemetry dev)
+        public IActionResult ForwardTelemetry([FromBody] TranstekDeviceTelemetry dev)
         {
             if (Request.Headers.ContainsKey("tesplab"))
             {

@@ -39,4 +39,11 @@ namespace RPMWeb.Data.Common
         public string PhoneNo { get; set; }
         public string Message { get; set; }
     }
+    public enum AlertType
+    {
+        Normal = 0,
+        Missing,
+        Cautious,
+        Critical
+    }
 }

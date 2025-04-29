@@ -731,6 +731,7 @@ namespace RPMWeb.Data.Common
         public List<ProgramVitals> Vitals { get; set; }
         public List<GoalDetails> goalDetails { get; set; }
         public int Duration { get; set; }
+        public string Name { get; set; }
 
     }
     public class PatientProgramDetails
@@ -937,8 +938,18 @@ namespace RPMWeb.Data.Common
         public string PhysicianName { get; set; }
         public string AssignedMember { get; set; }
         public string PatientType { get; set; }
-        public string Vital { get; set; }
+        public List<VitalInfo> VitalInfo { get; set; }
         public string Priority { get; set; }
+        public GetAllPatientInfo()
+        {
+            VitalInfo = new List<VitalInfo>();
+        }
+    }
+    public class VitalInfo
+    {
+        public string Vital { get; set; }
+        public string VitalPriority { get; set; }
+        public int AlertTypeId { get; set; }
     }
     public class GetAllPatientSmsInfo
     {
@@ -1398,6 +1409,10 @@ namespace RPMWeb.Data.Common
 
 
     }
+    public class PatientHealthTrends
+    {
+        public List<HealthTrends> Values { get; set; }
+    }
     public class Values
     {
         public List<string> data { get; set; }
@@ -1541,6 +1556,17 @@ namespace RPMWeb.Data.Common
         public object data { get; set; }
         public bool isTest { get; set; }
     }
+
+    public class TranstekDeviceTelemetry
+    {
+        public string deviceId { get; set; }
+        public long createdAt { get; set; }
+        public object data { get; set; }
+        public object deviceData { get; set; }
+        public bool isTest { get; set; }
+        public string modelNumber { get; set; }
+    }
+
     public class DeviceTelemetryStatus
     {
         public string deviceId { get; set; }
@@ -2431,4 +2457,15 @@ namespace RPMWeb.Data.Common
         public string DateTime { get; set; }
         public string Author { get; set; }
     }
+	 public class PatientProgramDetailsInsertActivePatients
+    {
+        public int PatientId { get; set; }
+        public int PatientProgramId { get; set; }
+        public int ProgramId { get; set; }
+        public List<int> VitalIds { get; set; }
+        public string CreatedBy { get; set; }
+        public GoalDetails[] GoalDetails { get; set; }
+        public ProgramDiagnostics[] ProgramDiagnosis { get; set; }
+    }
+	
 }

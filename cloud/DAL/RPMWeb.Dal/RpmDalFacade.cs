@@ -99,9 +99,13 @@ namespace RPMWeb.Dal
         {
             return new PatientDevice().AddDevice(info, ConnectionString);
         }
-        public static bool StagingTableInsert(DeviceTelemetry dev, string DeviceType)
+        public static bool StagingTableInsert(TranstekDeviceTelemetry dev, string DeviceType)
         {
             return new PatientDevice().StagingTableInsert(dev, DeviceType, ConnectionString);
+        }
+        public static void GetVitalUnits()
+        {
+            new PatientDevice().GetVitalUnits(ConnectionString);
         }
         public static  bool InsertPatienVendorConnectivity(AddPatientVendorConn data)
         {
@@ -270,7 +274,7 @@ namespace RPMWeb.Dal
         {
             return new Patient().GetPatientVitalReadingswithDateTime(PatientId, PatientProgramId, StartDate, EndDate, CreatedBy, ConnectionString);
         }
-        public static  HealthTrends GetPatientHealthTrends(string username, int PatientId,int PatientProgramId, DateTime StartDate, DateTime EndDate, string CreatedBy)
+        public static List<HealthTrends> GetPatientHealthTrends(string username, int PatientId,int PatientProgramId, DateTime StartDate, DateTime EndDate, string CreatedBy)
         {
             return new Patient().GetPatientHealthTrends(username,PatientId, PatientProgramId, StartDate, EndDate, CreatedBy, ConnectionString);
         }
@@ -310,6 +314,10 @@ namespace RPMWeb.Dal
         public static int SavePatientProgram(PatientProgramDetailsInsert Info)
         {
             return new PatientProgram().SavePatientProgram(Info,ConnectionString);
+        }
+        public static int ActivePatientsProgramVitalAddition(PatientProgramDetailsInsertActivePatients Info)
+        {
+            return new PatientProgram().ActivePatientsProgramVitalAddition(Info, ConnectionString);
         }
         public static bool UpdatePatientProgram(PatientProgramDetailsUpdate Info)
         {

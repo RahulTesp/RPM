@@ -1770,12 +1770,10 @@ namespace RpmCloud.Controllers
                         return Unauthorized(new { message = "Invalid session." });
                     }
 
-                    HealthTrends List = RpmDalFacade.GetPatientHealthTrends(UserName, PatientId, PatientProgramId, StartDate, EndDate, UserName);
+                    List<HealthTrends> List = RpmDalFacade.GetPatientHealthTrends(UserName,PatientId, PatientProgramId, StartDate, EndDate, UserName);
 
-                    if (List != null)
+                    if (!(List == null))
                     {
-                        // Remove 'Z' from DateTime values in the response  
-                        List.Time = List.Time.Select(t => DateTime.SpecifyKind(t, DateTimeKind.Unspecified)).ToList();
                         return Ok(JsonConvert.SerializeObject(List, Formatting.Indented));
                     }
 

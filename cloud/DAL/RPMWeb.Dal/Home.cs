@@ -179,9 +179,6 @@ namespace RPMWeb.Dal
                                 DashboardVitalsList vitalListall = new DashboardVitalsList();
                                 Priority priorityall = new Priority();
                                 vitalListall.VitalName = "All Vitals";
-                                int TotalCritical = 0;
-                                int TotalCautious = 0;
-                                int TotalNormal = 0;
                                 foreach (string na in listNames)
                                 {
                                     DashboardVitalsList vitalList = new DashboardVitalsList();
@@ -196,18 +193,15 @@ namespace RPMWeb.Dal
                                             if (dr["Priority"].ToString() == "Critical")
                                             {
                                                 priority.Critical = (!DBNull.Value.Equals(dr["Total"])) ? Convert.ToInt32(dr["Total"]) : 0;
-                                                TotalCritical = TotalCritical + priority.Critical;
                                             }
                                             if (dr["Priority"].ToString() == "Cautious")
                                             {
                                                 priority.Cautious = (!DBNull.Value.Equals(dr["Total"])) ? Convert.ToInt32(dr["Total"]) : 0;
-                                                TotalCautious = TotalCautious + priority.Cautious;
                                             }
 
                                             if (dr["Priority"].ToString() == "Normal")
                                             {
                                                 priority.Normal = (!DBNull.Value.Equals(dr["Total"])) ? Convert.ToInt32(dr["Total"]) : 0;
-                                                TotalNormal = TotalNormal + priority.Normal;
                                             }                                        
                                         }
                                         else
@@ -219,11 +213,6 @@ namespace RPMWeb.Dal
                                     list.Add(vitalList);
                                     
                                 }
-                                priorityall.Critical = TotalCritical;
-                                priorityall.Cautious = TotalCautious;
-                                priorityall.Normal = TotalNormal;
-                                vitalListall.Priorities = priorityall;
-                                listAll.Add(vitalListall);
                                 foreach(DashboardVitalsList listv in list)
                                 {
                                     listAll.Add(listv);
