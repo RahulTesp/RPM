@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:background="@color/ChatBG"
+    android:padding="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context="com.rpm.clynx.fragments.ChatAddActivity">
+
+
+
+    <android.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/profile_card_body_bg"
+        android:labelFor="@id/constraint2"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+
+        android:navigationIcon="@drawable/ic_baseline_west_24"
+
+        android:gravity="center_horizontal">
+        <TextView
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Contact"
+            android:textAlignment="center"
+            android:textColor="@color/Primary_dark"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center"
+     />
+
+<!--        <ImageButton-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="end"-->
+<!--            android:background="@color/transparent"-->
+<!--            android:src="@drawable/ic_icons_phone_a"-->
+<!--            android:layout_marginEnd="@dimen/margin_20dp"-->
+<!--            />-->
+
+    </android.widget.Toolbar>
+
+
+
+<!--            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
+<!--                android:id="@+id/refreshLayout"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_above="@+id/buttonAddChannel"-->
+
+<!--                android:padding="0dp">-->
+
+
+    <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/fragmentChatAdd"
+        android:name="com.rpm.clynx.fragments.ChatMainActivity"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:layout_marginBottom="@dimen/margin_20dp"
+
+        app:layoutManager="LinearLayoutManager"
+        tools:context="com.rpm.clynx.fragments.ChatMainActivity"
+        tools:listitem="@layout/channel_item_list"
+
+        />
+
+
+
+    <ProgressBar
+        android:id="@+id/progressChatAdd"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_centerInParent="true"
+
+        android:visibility="visible" />
+
+
+
+
+
+
+
+
+<!--                <ListView-->
+<!--                    android:id="@+id/listViewChannels"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:divider="@null"-->
+<!--                    android:dividerHeight="0dp"-->
+<!--                    android:padding="0dp"-->
+<!--                    android:scrollbars="none"-->
+<!--                    tools:listitem="@layout/channel">-->
+
+<!--                </ListView>-->
+
+<!--           </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
+
+<!--            <Button-->
+<!--                android:id="@+id/buttonAddChannel"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_alignParentBottom="true"-->
+<!--                android:layout_centerHorizontal="true"-->
+<!--                android:layout_marginBottom="15dp"-->
+<!--                android:layout_marginTop="15dp"-->
+<!--                android:background="@drawable/eye_button"/>-->
+
+
+
+
+
+</LinearLayout>

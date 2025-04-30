@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_grey1"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.rpm.clynx.fragments.VitalReadingsFragment">
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llo_sy">
+
+        <!--        <CalendarView-->
+        <!--            android:id="@+id/simpleCalendarView"-->
+        <!--            android:layout_width="fill_parent"-->
+        <!--            android:layout_height="fill_parent" />-->
+
+
+        <!--        <NumberPicker-->
+        <!--            android:id="@+id/picker_month"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginEnd="20dp"-->
+        <!--            android:layout_marginRight="20dp">-->
+
+        <!--        </NumberPicker>-->
+
+        <!--        <NumberPicker-->
+        <!--            android:id="@+id/picker_year"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content">-->
+
+        <!--        </NumberPicker>-->
+
+
+        <!--        <devs.mulham.horizontalcalendar.HorizontalCalendarView-->
+        <!--            android:id="@+id/calendarView"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:background="#FAFAFA"-->
+        <!--            app:selectedDateBackground="#00ffffff"-->
+        <!--            app:selectorColor="#c62828"-->
+        <!--            app:textColorNormal="#bababa"-->
+        <!--            app:textColorSelected="@color/colorAccent"-->
+
+        <!--          />-->
+
+
+
+
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/margin_20dp"
+                android:orientation="vertical"
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="@dimen/margin_20dp"
+                    android:layout_marginRight="@dimen/margin_20dp">
+                    <ImageButton
+                        android:id="@+id/prevdateonvtlR"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_gravity="end"
+                        android:background="@color/transparent"
+                        android:textColor="@color/todolist_color1"
+                        android:src="@drawable/ic_outline_keyboard_arrow_left_24" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center_horizontal"
+                        android:layout_weight="4"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:orientation="horizontal">
+
+
+                        <TextView
+                            android:id="@+id/VtlRdngsFragment_today_date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textStyle="bold"
+                            android:text=""
+                            android:textSize="16sp"
+                            android:textColor="@color/todolist_color1"/>
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/nextdateonavtlR"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_gravity="end"
+                        android:background="@color/transparent"
+                        android:src="@drawable/ic_baseline_keyboard_arrow_right_24"
+                        android:textColor="@color/todolist_color1"
+                        tools:ignore="Suspicious0dp" />
+                </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Vital Readings"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="15dp"
+                    android:textColor="@color/text_dark"
+                    android:textSize="25sp"
+                    android:textStyle="bold" />
+
+
+
+
+                <ScrollView
+
+                    android:layout_width="fill_parent" android:layout_height="fill_parent"
+                    android:scrollbars="horizontal">
+
+                <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:id="@+id/fragmentVitalReadings"
+                    android:name="com.rpm.clynx.fragments.VitalReadingsFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="16dp"
+                    app:layoutManager="LinearLayoutManager"
+                    tools:context="com.rpm.clynx.fragments.VitalReadingsFragment"
+                    tools:listitem="@layout/vital_readings_item_list"
+                    app:layout_constraintTop_toBottomOf="@+id/llo_notification" />
+                </ScrollView>
+                <TextView
+                    android:id="@+id/empty_viewvtlR"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:visibility="gone"
+                    android:text="@string/no_data_available" />
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"/>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="100dp"/>
+</FrameLayout>

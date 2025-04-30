@@ -1,0 +1,461 @@
+{
+	"info": {
+		"_postman_id": "f1509bc2-23c0-4ad3-b3d2-9f6bdff5e6b7",
+		"name": "Android_APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13373728"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"UserName\": \"CLI300065\", \"Password\": \"Welcome123\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{server}}/api/authorization/Userlogin",
+					"protocol": "http",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"api",
+						"authorization",
+						"Userlogin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "{{Bearer_Patient}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{server}}/api/authorization/logout",
+					"protocol": "http",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"api",
+						"authorization",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ResetPassword",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "{{Bearer_Patient}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"UserName\":\"user20\",//need to remove username and check password history\r\n    \"OldPassword\":\"Welcome1234\",\r\n    \"NewPassword\":\"Tesplabs123\"\r\n    \r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{server}}/api/authorization/updatepassword",
+					"protocol": "http",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"api",
+						"authorization",
+						"updatepassword"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetVitalSummary",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "{{Bearer_Patient}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{server}}/api/patient/getVitalSummaryDetails?StartDate=2022-03-20&EndDate=2022-03-20",
+					"protocol": "https",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"api",
+						"patient",
+						"getVitalSummaryDetails"
+					],
+					"query": [
+						{
+							"key": "StartDate",
+							"value": "2022-03-20"
+						},
+						{
+							"key": "EndDate",
+							"value": "2022-03-20"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetVitalSummary&Graphs_Dashboard",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "{{Bearer_Patient}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{server}}/api/patient/getRecentPatientVitalSummary",
+					"protocol": "https",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"api",
+						"patient",
+						"getRecentPatientVitalSummary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetVitalSummaryGraphs",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "{{Bearer_Patient}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{server}}/api/patient/getPatientVitalSummary?dayCount=7",
+					"protocol": "https",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"api",
+						"patient",
+						"getPatientVitalSummary"
+					],
+					"query": [
+						{
+							"key": "dayCount",
+							"value": "7"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ProfileAndProgram",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "{{Bearer_Patient}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{server}}/api/users/getmyprofileandprogram",
+					"protocol": "https",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"getmyprofileandprogram"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ToDoList",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "{{Bearer_Patient}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{server}}/api/schedules/gettodolist?day=2022-06-23",
+					"protocol": "https",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"api",
+						"schedules",
+						"gettodolist"
+					],
+					"query": [
+						{
+							"key": "day",
+							"value": "2022-06-23"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetPatientProfile",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "{{Bearer_Patient}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{server}}/api/patient/getpatientprofile",
+					"protocol": "https",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"api",
+						"patient",
+						"getpatientprofile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Notification_ConnectHub",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "{{Bearer_Patient}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{server}}/api/authorization/connecthub",
+					"protocol": "http",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"api",
+						"authorization",
+						"connecthub"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get_Notification",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "{{Bearer_Patient}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{server}}/api/notification/user",
+					"protocol": "http",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"api",
+						"notification",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateNotificationReadStatus",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "{{Bearer_Patient}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{           \r\n    \"NotificationId\":7,\r\n    \"NotificationAuditId\":0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{server}}/api/notification/readstatus",
+					"protocol": "http",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"api",
+						"notification",
+						"readstatus"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

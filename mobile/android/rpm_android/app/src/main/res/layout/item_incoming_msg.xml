@@ -1,0 +1,44 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+   >
+
+    <!-- Incoming Message Layout -->
+    <RelativeLayout
+        android:id="@+id/incomingLayout"
+        android:layout_width="170dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="12dp"
+        android:padding="8dp"
+        android:background="@drawable/incoming_msg_bubble">
+
+        <TextView
+            android:id="@+id/incomingTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:textSize="12sp"
+            android:layout_marginLeft="12dp"
+            android:textColor="@color/ChatMsgTimeClr"
+            android:text="Incoming Time"/>
+        <TextView
+            android:id="@+id/incomingMessageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textIsSelectable="true"
+            android:textColor="@color/ChatTimeBlack"
+            android:layout_below="@id/incomingTime"
+            android:layout_alignStart="@id/incomingTime"
+            android:layout_marginTop="2dp"
+            android:layout_marginLeft="6dp"
+            android:text="Incoming Message"/>
+
+
+    </RelativeLayout>
+
+</RelativeLayout>

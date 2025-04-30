@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.rpm.clynx.fragments.VitalSchedulesFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+
+
+
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_20dp"
+                android:text="Vital Monitoring"
+                android:textColor="@color/Primary_dark"
+                android:textSize="14sp"
+                app:fontFamily="@font/rubik_regular" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="@dimen/spacing_xmedium"
+                android:background="@drawable/myinfo_card_bg_radius"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/itemVitalMonitoring"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/margin_10dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/text_light"
+                    android:textSize="16sp"
+                    app:fontFamily="@font/rubik_regular" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_20dp"
+                android:text="Schedule"
+                android:textColor="@color/Primary_dark"
+                android:textSize="14sp"
+                app:fontFamily="@font/rubik_regular" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="@dimen/spacing_xmedium"
+                android:background="@drawable/myinfo_card_bg_radius"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/itemSchedule1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/margin_10dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/text_light"
+                    android:textSize="16sp"
+                    app:fontFamily="@font/rubik_regular" />
+
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="@dimen/spacing_middle"
+                android:background="@drawable/myinfo_card_bg_radius"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/itemSchedule2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/margin_10dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/text_light"
+                    android:textSize="16sp"
+                    app:fontFamily="@font/rubik_regular" />
+
+
+
+            </LinearLayout>
+
+
+
+            <TextView
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_10dp"
+                android:text="Intervals"
+                android:textColor="@color/Primary_dark"
+                android:textSize="14sp"
+                app:fontFamily="@font/rubik_regular" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xmedium"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+
+
+                    <LinearLayout
+                        android:id="@+id/cardvitalsched"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="@dimen/spacing_middle"
+                        android:background="@drawable/myinfo_card_bg_radius"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/itemMorning"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/margin_5dp"
+                            android:layout_marginRight="@dimen/margin_5dp"
+                            android:backgroundTint="@android:color/transparent"
+                            android:maxLines="1"
+                            android:text="Morning"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/text_light"
+                            android:textSize="16sp"
+                            app:fontFamily="@font/rubik_regular" />
+
+
+
+
+                        <!--                <TextView-->
+                        <!--                    android:id="@+id/itemMorning"-->
+                        <!--                    android:layout_width="match_parent"-->
+                        <!--                    android:layout_height="wrap_content"-->
+                        <!--                    android:layout_marginLeft="@dimen/margin_10dp"-->
+                        <!--                    android:backgroundTint="@android:color/transparent"-->
+                        <!--                    android:maxLines="1"-->
+
+                        <!--                    android:singleLine="true"-->
+                        <!--                    android:textColor="@color/text_dark"-->
+                        <!--                    android:textColorHint="@color/text_light"-->
+                        <!--                    android:textSize="18sp"-->
+                        <!--                    android:textStyle="bold" />-->
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="@dimen/margin_10dp"
+                    android:layout_height="0dp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xmedium"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/myinfo_card_bg_radius"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/itemAfternoon"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/margin_5dp"
+                            android:layout_marginRight="@dimen/margin_5dp"
+                            android:backgroundTint="@android:color/transparent"
+                            android:maxLines="1"
+                            android:text="Afternoon"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/text_light"
+                            android:textSize="16sp"
+                            app:fontFamily="@font/rubik_regular" />
+
+
+
+                        <!--                <TextView-->
+                        <!--                    android:id="@+id/itemAfternoon"-->
+                        <!--                    android:layout_width="wrap_content"-->
+                        <!--                    android:layout_height="wrap_content"-->
+                        <!--                    android:layout_marginLeft="@dimen/margin_10dp"-->
+                        <!--                    android:backgroundTint="@android:color/transparent"-->
+                        <!--                    android:maxLines="1"-->
+                        <!--                    android:singleLine="true"-->
+                        <!--                    android:textColor="@color/text_dark"-->
+                        <!--                    android:textColorHint="@color/text_light"-->
+                        <!--                    android:textSize="18sp"-->
+                        <!--                    android:textStyle="bold" />-->
+
+
+                    </LinearLayout>
+
+
+
+
+                </LinearLayout>
+                <View
+                    android:layout_width="@dimen/margin_10dp"
+                    android:layout_height="0dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xmedium"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="@dimen/spacing_middle"
+                    android:background="@drawable/myinfo_card_bg_radius"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/itemEvening"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/margin_5dp"
+                        android:layout_marginRight="@dimen/margin_5dp"
+                        android:backgroundTint="@android:color/transparent"
+                        android:maxLines="1"
+                        android:text="Evening"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/text_light"
+                        android:textSize="16sp"
+                        app:fontFamily="@font/rubik_regular" />
+
+
+
+
+                    <!--                <TextView-->
+                    <!--                    android:id="@+id/itemMorning"-->
+                    <!--                    android:layout_width="match_parent"-->
+                    <!--                    android:layout_height="wrap_content"-->
+                    <!--                    android:layout_marginLeft="@dimen/margin_10dp"-->
+                    <!--                    android:backgroundTint="@android:color/transparent"-->
+                    <!--                    android:maxLines="1"-->
+
+                    <!--                    android:singleLine="true"-->
+                    <!--                    android:textColor="@color/text_dark"-->
+                    <!--                    android:textColorHint="@color/text_light"-->
+                    <!--                    android:textSize="18sp"-->
+                    <!--                    android:textStyle="bold" />-->
+
+
+                </LinearLayout>
+                </LinearLayout>
+                <View
+                    android:layout_width="@dimen/margin_10dp"
+                    android:layout_height="0dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xmedium"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="@dimen/spacing_middle"
+                    android:background="@drawable/myinfo_card_bg_radius"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/itemNight"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/margin_5dp"
+                        android:layout_marginRight="@dimen/margin_5dp"
+                        android:backgroundTint="@android:color/transparent"
+                        android:maxLines="1"
+                        android:text="Night"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/text_light"
+                        android:textSize="16sp"
+                        app:fontFamily="@font/rubik_regular" />
+
+
+
+
+                    <!--                <TextView-->
+                    <!--                    android:id="@+id/itemMorning"-->
+                    <!--                    android:layout_width="match_parent"-->
+                    <!--                    android:layout_height="wrap_content"-->
+                    <!--                    android:layout_marginLeft="@dimen/margin_10dp"-->
+                    <!--                    android:backgroundTint="@android:color/transparent"-->
+                    <!--                    android:maxLines="1"-->
+
+                    <!--                    android:singleLine="true"-->
+                    <!--                    android:textColor="@color/text_dark"-->
+                    <!--                    android:textColorHint="@color/text_light"-->
+                    <!--                    android:textSize="18sp"-->
+                    <!--                    android:textStyle="bold" />-->
+
+
+                </LinearLayout>
+
+                </LinearLayout>
+
+
+
+
+
+                <View
+                    android:layout_width="@dimen/margin_10dp"
+                    android:layout_height="0dp" />
+
+
+
+
+
+            </LinearLayout>
+
+
+
+
+                <View
+                    android:layout_width="@dimen/margin_10dp"
+                    android:layout_height="0dp" />
+
+
+
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_20dp"
+                android:text="Normal Range"
+                android:textColor="@color/Primary_dark"
+                android:textSize="14sp"
+                app:fontFamily="@font/rubik_regular" />
+
+
+
+
+            <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/listVitalSchedules"
+                android:name="com.rpm.clynx.fragments.VitalSchedulesFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                app:layoutManager="LinearLayoutManager"
+                tools:context="com.rpm.clynx.fragments.VitalSchedulesFragment"
+                tools:listitem="@layout/vital_schedules_item"
+
+
+                />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>
