@@ -83,6 +83,7 @@ li + li {
 .outgoing_msg {
   margin-left: 1rem;
 }
+
 .messge_left p {
   margin-bottom: 0.5rem;
 }
@@ -103,6 +104,8 @@ li + li {
   word-wrap: break-word;
   overflow-wrap: break-word;
   white-space: normal;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
 }
 .chat-date {
   display: flex;
@@ -121,6 +124,7 @@ li + li {
   z-index: 10;
   border-radius: 12px;
   text-align: center;
+
 }
 .timeblock::before {
   content: "";

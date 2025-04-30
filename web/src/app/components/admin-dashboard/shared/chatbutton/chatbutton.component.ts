@@ -166,10 +166,13 @@ export class ChatbuttonComponent implements OnInit, OnDestroy {
 
   // Initialization methods
   getUserName() {
-    this.rpm.rpm_get('/api/users/getmyprofiles').then((data) => {
-      this.myprofile = data;
-      this.userName = this.myprofile.UserName;
-      this.patientChatService.setUserName(this.userName);
+    return new Promise((resolve) => {
+      this.rpm.rpm_get('/api/users/getmyprofiles').then((data) => {
+        this.myprofile = data;
+        this.userName = this.myprofile.UserName;
+        this.patientChatService.setUserName(this.userName);
+        resolve(this.userName);
+      });
     });
   }
 
@@ -203,7 +206,8 @@ export class ChatbuttonComponent implements OnInit, OnDestroy {
         this.startChatHeartBeat( this.currentSid,this.userName);
       } catch (error: any) {
         if (error.status === 404) {
-          await this.newChat();
+          //console.error('this Patient is not logged in to Mobile App yet, please ask him to Login for Establishing a conversation.');
+           await this.newChat();
         }
       }
     } catch (error) {
@@ -268,12 +272,15 @@ chatHeartBeat(currentSid: string, username: string) {
     }
   }
   async newChat() {
+    // Wait for getUserName to complete
+    await this.getUserName();
+    console.log('Username');
+    console.log(this.userName);
     await this.patientChatService.createNewChat(
       this.currentuserName,
       this.userName
     );
   }
-
   closeChatPanelEmitter() {
     this.stopChatHeartBeat();
     this.CloseChatPanlBlock.emit();

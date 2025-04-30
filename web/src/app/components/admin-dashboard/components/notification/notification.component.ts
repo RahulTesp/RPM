@@ -4,6 +4,8 @@ import {  Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import moment from 'moment';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
+import { MessagingService } from '../../sevices/messaging.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-notification',
@@ -14,18 +16,28 @@ export class NotificationComponent implements OnInit {
   listener_dataSource: any;
   read: boolean;
   notification_value: any;
+  private notificationSubscription: Subscription | null = null;
   constructor(
     private rpm: RPMService,
     private router: Router,
     private Auth: AuthService,
-    private confirmDialog: ConfirmDialogServiceService
+    private confirmDialog: ConfirmDialogServiceService,
+    private messageservice:MessagingService
   ) {
     var that = this;
   }
 
   ngOnInit(): void {
-    this.GetNotifications();
+    this.refreshNotifications();
 
+    this.notificationSubscription = this.messageservice.notificationData$.subscribe(data => {
+      if (data && data !== 'notificationcount' && data.type === 'update') {
+        // Update local properties when notifications change
+        this.unread = this.messageservice.unread;
+        this.list = this.messageservice.list || [];
+        this.unreadlist = this.list.filter((data: { IsRead: any; }) => !data.IsRead);
+      }
+    });
     this.notificationlist = [
       {
         description: '',
@@ -64,23 +76,18 @@ export class NotificationComponent implements OnInit {
       console.log(that.readlist);
     });
   }
-  readNotification(NotificationId: any, NotificationAuditId: any) {
-    var that = this;
-    var reqBody = {
-      NotificationId: NotificationId,
-      NotificationAuditId: NotificationAuditId,
-    };
-    that.rpm.rpm_put('/api/notification/readstatus', reqBody).then(
-      (data) => {
+  readNotification(NotificationId: number, NotificationAuditId: number) {
+    this.messageservice.markNotificationAsRead(NotificationId, NotificationAuditId)
+    .then(() => {
+      console.log('Notification marked as read and data refreshed');
+    })
+    .catch(err => {
+      console.error('Failed to update notification:', err);
+      alert('Failed to update Notification.');
+    });
 
-        this.GetNotifications();
-        this.Auth.reloadnotification('Notification Upadted');
-      },
-      (err) => {
-        alert('Failed to update Notification.');
-      }
-    );
   }
+
   convertToLocalTime(stillUtc: any) {
     if (stillUtc.includes('+')) {
       var temp = stillUtc.split('+');
@@ -174,7 +181,8 @@ export class NotificationComponent implements OnInit {
             'Notification Deleted Successfully',
             'Message',
             () => {
-              this.GetNotifications();
+              //this.GetNotifications();
+              this.refreshNotifications();
             },
             false
           );
@@ -225,7 +233,8 @@ export class NotificationComponent implements OnInit {
 					'All Notifications Deleted Successfully',
 					'Message',
 					() => {
-					  this.GetNotifications();
+					  //this.GetNotifications();
+            this.refreshNotifications();
 					},
 					false  // No cancel button needed for success message
 				  );
@@ -240,4 +249,27 @@ export class NotificationComponent implements OnInit {
 				}
 			  );
 		 }
+     refreshNotifications() {
+      this.messageservice.GetNotifications()
+        .then(() => {
+          // Update local properties with data from service
+          this.unread = this.messageservice.unread;
+          this.list = this.messageservice.list || [];
+          console.log('List');
+          console.log(this.list)
+          this.unreadlist = this.list.filter((data: { IsRead: boolean }) => {
+                  return data.IsRead == false;
+                });
+
+        })
+        .catch(error => {
+          console.error('Error refreshing notifications:', error);
+        });
+    }
+    ngOnDestroy(): void {
+      // Clean up subscription to prevent memory leaks
+      if (this.notificationSubscription) {
+        this.notificationSubscription.unsubscribe();
+      }
+    }
 }

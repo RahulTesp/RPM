@@ -5227,7 +5227,7 @@
 <!-- Activity 5 th Main Menu - Sub Menu  Chat Template Start -->
 <ng-template #activityInfoChat>
 
-  <app-activityinfo-chat [dataSourceTable]="dataSourceTable" [http_chat_data]="http_chatData"></app-activityinfo-chat>
+  <app-activityinfo-chat [dataSourceTable]="dataSourceTable" [http_chat_data]="http_chatData" [patientname]="http_rpm_patientList&&http_rpm_patientList.PatientDetails.UserName"></app-activityinfo-chat>
 </ng-template>
 <!-- Activity 5 th Main Menu - Sub Menu  Chat Template End -->
 <!-- Activity 5 th Main Menu - Sub Menu  SMS Template Start -->

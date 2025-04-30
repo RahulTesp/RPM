@@ -99,8 +99,7 @@ export class LoginComponent implements OnInit {
     private auth: AuthService,
     private router: Router,
     private http: HttpClient,
-    private rpm: RPMService,
-    private httpservice: HttpService,
+
     private formBuilder: UntypedFormBuilder
   ) {
     this.SERVER_URL = environment.protocol + '://' + environment.host;

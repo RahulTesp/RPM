@@ -11,13 +11,10 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-// import { Options } from '@angular-slider/ngx-slider';
-
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { RPMService } from '../../sevices/rpm.service';
-
 import { AuthService } from 'src/app/services/auth.service';
 import { DatePipe } from '@angular/common';
 import { webSocket } from 'rxjs/webSocket';
@@ -27,11 +24,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { StatusMessageComponent } from '../../shared/status-message/status-message.component';
 import moment from 'moment';
 import { MatSort } from '@angular/material/sort';
-import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
-
 import { ChatbuttonComponent } from '../../shared/chatbutton/chatbutton.component';
 import { PatientDataDetailsService } from './Models/service/patient-data-details.service';
 import { skip, take, takeUntil } from 'rxjs/operators';
@@ -48,7 +42,7 @@ import {
 import { DownloadPatientReportService } from '../reports/services/download-patient-report.service';
 import { PatientReportApiService } from '../reports/services/patient-report-api.service';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
-import { Message } from '@twilio/conversations';
+
 
 export interface Symptoms {
   Symptom: string;
@@ -180,19 +174,14 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   @ViewChild('myVideotemp', { static: true }) myVideotemp: TemplateRef<any>;
 
   total_number: any;
-  // Symptoms Data Variable Declaration start
-  // symtoms_update_panel = false;
   http_get_symptoms: any;
   temp_symptoms: any;
   filteredOptions: any;
-  // Symptoms Data Variable Declaration End
   symptom_update_variable: any;
-  // Medication  Template variable Declaration Start
-
   http_medication_data: any;
   temp_medication: any;
   medication_durationValue = 0;
-  // medication_update_panel = false;
+
 
   // Vital Reading Template
   http_vitalData: any;
@@ -296,6 +285,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   QuestionArrayBase: any;
   patientProgramName: any;
   ProgramHistory: any;
+  private chatHistoryDataSubscription: Subscription;
 
   constructor(
     private router: Router,
@@ -407,6 +397,14 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.unreadCount = count;
       }
     );
+
+    this.chatHistoryDataSubscription = this.patientchatservice.chatHistoryData$.subscribe(data => {
+      if (data) {
+        this.http_chatData = data;
+        this.dataSourceChange(5, 5);
+        console.log('Chat data updated:', this.http_chatData);
+      }
+    });
   }
 
   getCallTokenMethod() {
@@ -483,7 +481,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.program_id
       );
       this.getchatData(this.http_rpm_patientList.PatientDetails.UserName)
-      this.patientService.initPatientChat(this.http_rpm_patientList.PatientDetails.UserName)
+
       this.setPatientData();
       this.loading = false;
     } catch (error) {
@@ -1377,18 +1375,19 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       console.error('❌ Error fetching alerts and tasks:', error);
     }
   }
-  async getchatData(patientusername:any) {
+
+  async getchatData(patientusername: any) {
     try {
-      var patientusername = await this.http_rpm_patientList.PatientDetails.UserName;
-      // var patientusername = '123400033';
-      console.log("Patient UserName");
-      console.log(patientusername)
+      // Use patient username from the parameter or from patient details
+      var username = patientusername || this.http_rpm_patientList.PatientDetails.UserName;
+
+      // Call the activity info method (kept from your original code)
       this.activityInfoMenuSelect(5);
 
-      this.http_chatData =
-        await this.patientService.getPatientChat(
-          patientusername
-        );
+      // Get chat data through the service
+      this.http_chatData = await this.patientchatservice.getPatientChat(username);
+
+      // Call data source change method (kept from your original code)
       this.dataSourceChange(5, 5);
     } catch (error) {
       console.error('❌ Error fetching chat data:', error);
@@ -5000,6 +4999,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.patientchatservice.initialized = false;
     if (this.unreadSubscription) {
       this.unreadSubscription.unsubscribe();
+    }
+    if (this.chatHistoryDataSubscription) {
+      this.chatHistoryDataSubscription.unsubscribe();
     }
   }
 
