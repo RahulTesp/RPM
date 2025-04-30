@@ -123,14 +123,12 @@ export class PatientHomeComponent implements OnInit {
   }
   constructor(
     private rpmservice: RPMService,
-    private http: HttpClient,
     private rpm: RPMService,
-    private route: Router,
     private auth: AuthService,
     private _route: ActivatedRoute,
     public datepipe: DatePipe
   ) {
-    var that = this;
+
 
     this.getPatientData();
     this.getBillingInfo();

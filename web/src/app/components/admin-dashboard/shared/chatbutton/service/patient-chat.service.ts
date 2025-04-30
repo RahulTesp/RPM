@@ -10,6 +10,7 @@ import {
 } from '@twilio/conversations';
 import { RPMService } from '../../../sevices/rpm.service';
 import { getMessaging, onMessage } from 'firebase/messaging';
+import {PatientDataDetailsService} from '../../../../admin-dashboard/components/patient-detail-page/Models/service/patient-data-details.service'
 interface TempMessage extends Partial<Message> {
   sending: boolean;
   failed?: boolean;
@@ -18,9 +19,14 @@ interface TempMessage extends Partial<Message> {
 
 @Injectable({
   providedIn: 'root',
+
 })
 export class PatientChatService {
   public client: Client | null = null;
+  private chatHistoryDataSubject = new BehaviorSubject<any>(null);
+
+  // Observable that components can subscribe to
+  public chatHistoryData$: Observable<any> = this.chatHistoryDataSubject.asObservable();
   public chatListSubject = new BehaviorSubject<
     Array<{
       chat: Conversation;
@@ -120,9 +126,11 @@ export class PatientChatService {
   async initializeClient(token: string): Promise<void> {
     this.setLoading(true);
     try {
+      console.log('New Client Creation');
       this.client = new Client(token);
       // Wait until the client is ready
       this.client.on('stateChanged', async (state) => {
+
         console.log(' Client state changed:', state);
         if (state === 'failed') {
           console.error(' Twilio Client Initialization Failed!');
@@ -161,7 +169,8 @@ export class PatientChatService {
   // Event listeners
   private setupEventListeners(): void {
     if (!this.client) return;
-
+     console.log('message Listener');
+     console.log(this.messageListenerRegistered)
     if (!this.messageListenerRegistered) {
       this.client.on('messageAdded', this.handleMessageAdded);
       this.client.on('messageRemoved', this.handleMessageRemoved);
@@ -236,28 +245,7 @@ export class PatientChatService {
       }
     });
 
-    // TYPING EVENTS
-    // this.client.on('typingStarted', (user: Participant) => {
-    //   try {
-    //     const currentConversation = this.currentConversationSubject.getValue();
-    //     if (user.conversation.sid === currentConversation?.sid) {
-    //       this.isTypingSubject.next(true);
-    //     }
-    //   } catch (error) {
-    //     console.error(' Error handling typing event:', error);
-    //   }
-    // });
 
-    // this.client.on('typingEnded', (user: Participant) => {
-    //   try {
-    //     const currentConversation = this.currentConversationSubject.getValue();
-    //     if (user.conversation.sid === currentConversation?.sid) {
-    //       this.isTypingSubject.next(false);
-    //     }
-    //   } catch (error) {
-    //     console.error(' Error handling typing event:', error);
-    //   }
-    // });
   }
 
   private handleMessageAdded = async (msg: Message) => {
@@ -313,6 +301,7 @@ export class PatientChatService {
       );
       this.chatListSubject.next(updatedChatList);
     }
+    this.getPatientChat(this.currentPatientUser)
   };
 
 // Optimized version of the chat service methods
@@ -325,6 +314,7 @@ async fetchUserChats(conversationSid: string): Promise<void> {
     this.resetState();
     console.time('conversation-fetch');
     const conversation = await this.client.getConversationBySid(conversationSid);
+    console.log(conversation)
     console.timeEnd('conversation-fetch');
 
     if (!conversation) {
@@ -566,51 +556,6 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
     }
   }
 
-  // async createNewChat(
-  //   currentUserName: string,
-  //   userName: string
-  // ): Promise<void> {
-  //   this.setLoading(true);
-
-  //   try {
-  //     if (!this.client) throw new Error('Client not initialized');
-
-  //   //  const user = await this.client.getUser(currentUserName);
-  //     console.log('username'+userName);
-  //     console.log('currentUserName'+currentUserName)
-  //     const channel = await this.client.createConversation({
-  //       friendlyName: `${userName}-${currentUserName}`,
-  //     });
-
-  //     console.log('channel'+channel)
-  //     await channel.join();
-  //     await channel.setAllMessagesUnread();
-
-  //     if (userName !== currentUserName) {
-  //       await channel.add(userName);
-
-  //       console.log('Added other user to conversation:', userName);
-  //     }
-  //     //await channel.add(currentUserName);
-
-  //     this.currentConversationSubject.next(channel);
-
-  //     // Update chat list
-  //     const chatList = this.chatListSubject.getValue();
-  //     this.chatListSubject.next([
-  //       { chat: channel, unreadCount: 0, lastMessage: '' },
-  //       ...chatList,
-  //     ]);
-
-  //     await this.updateChatResource(channel, currentUserName);
-  //     await this.openChat(channel);
-  //   } catch (error) {
-  //     console.error(' Error creating new chat:', error);
-  //     this.setError('User not found or chat creation failed.');
-  //   } finally {
-  //     this.setLoading(false);
-  //   }
-  // }
   async createNewChat(
     currentUserName: string,
     userName: string
@@ -620,102 +565,50 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
     try {
       if (!this.client) throw new Error('Client not initialized');
 
-      // Better logging with consistent format
-      console.log(`Creating new chat: currentUser=${currentUserName}, otherUser=${userName}`);
+      // Verify both users exist before creating the conversation
+      //const currentUser = await this.client.getUser(currentUserName);
 
-      // Generate a unique, readable conversation name
-      const friendlyName = `${userName}-${currentUserName}-${new Date().getTime()}`;
-
-      // Create the conversation
-      console.time('create-conversation');
+      // Create the conversation channel
       const channel = await this.client.createConversation({
-        friendlyName,
+        friendlyName: `${userName}-${currentUserName}`,
       });
-      console.timeEnd('create-conversation');
 
-      if (!channel) {
-        throw new Error('Failed to create conversation');
-      }
+      // Join the channel
+      await channel.join();
+      await channel.setAllMessagesUnread();
 
-      console.log(`Created conversation with SID: ${channel.sid}`);
-
-      // Execute these operations in parallel for better performance
-      const joinPromise = channel.join();
-      const setUnreadPromise = channel.setAllMessagesUnread();
-      await Promise.all([joinPromise, setUnreadPromise]);
-
+      // Add the other user if it's a different user
       if (userName !== currentUserName) {
-        console.time('add-participant');
-        try {
-          let isAlreadyParticipant = false;
-          if (typeof channel.getParticipants === 'function') {
-            try {
-              const participants = await channel.getParticipants();
-              isAlreadyParticipant = participants.some(
-                (p: any) => p.identity === userName || p.sid === userName
-              );
-              console.log(`Checked participants: ${isAlreadyParticipant ? 'User already exists' : 'User needs to be added'}`);
-            } catch (checkError) {
-              console.log('Could not check participants, proceeding with add attempt:', checkError);
-            }
-          }
-          if (!isAlreadyParticipant) {
-
-            try {
-              await channel.add(userName);
-              console.log(`Successfully added participant ${userName} using channel.add`);
-            } catch (addError: unknown) {
-
-              if (
-                addError &&
-                typeof addError === 'object' &&
-                'message' in addError &&
-                typeof addError.message === 'string' &&
-                addError.message.includes('Conflict')
-              ) {
-                console.log(`User ${userName} appears to already be in the conversation`);
-              } else {
-                // If it's not a conflict error, rethrow
-                throw addError;
-              }
-            }
-          } else {
-            console.log(`User ${userName} is already a participant, skipping add`);
-          }
-        } catch (participantError) {
-          console.error(`Failed to add participant ${userName}:`, participantError);
-          // Log available methods for debugging
-          console.log(`Available methods:`, Object.getOwnPropertyNames(Object.getPrototypeOf(channel)));
-          // Continue even if adding participant fails
-        }
-        console.timeEnd('add-participant');
+        await channel.add(currentUserName);
+        console.log('Added other user to conversation:', currentUserName);
       }
 
-      // Update the UI state immediately - don't wait for resource update
+      // Make sure current user is added (this might be redundant if join() adds the user)
+      // await channel.add(currentUserName);
+
+      // Update UI state
       this.currentConversationSubject.next(channel);
 
-      // Update chat list with the new conversation at the top
+      // Update chat list
       const chatList = this.chatListSubject.getValue();
       this.chatListSubject.next([
         { chat: channel, unreadCount: 0, lastMessage: '' },
         ...chatList,
       ]);
 
-      // Start these operations in parallel but don't block the UI
-      Promise.all([
-        this.updateChatResource(channel, currentUserName),
-        this.openChat(channel)
-      ]).catch(error => {
-        console.error('Error in post-creation setup:', error);
-      });
-
+      await this.updateChatResource(channel, currentUserName);
+      await this.openChat(channel);
     } catch (error) {
       console.error('Error creating new chat:', error);
-      this.setError('User not found or chat creation failed.');
+      this.setError('Patient login required. Please have the patient sign in to the mobile app to begin the conversation.')
+
+      this.setError(error instanceof Error ? error.message : 'Chat creation failed.');
     } finally {
       this.setLoading(false);
     }
   }
+
+
   async updateChatResource(
     channel: Conversation,
     patientUsername: string
@@ -813,9 +706,9 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
     this.loadingSubject.next(isLoading);
   }
 
-  private setError(error: string): void {
+  public setError(error: string): void {
     this.errorSubject.next(error);
-    setTimeout(() => this.errorSubject.next(''), 3000);
+   // setTimeout(() => this.errorSubject.next(''), 3000);
   }
 
   cleanup(): void {
@@ -964,6 +857,7 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
 
       // Also update chat list if needed
       this.updateChatListAfterMessageRemoval(message);
+      this.getPatientChat(this.currentPatientUser)
     } catch (error) {
       console.error('Error handling removed message:', error);
     }
@@ -992,10 +886,12 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
         });
 
         this.chatListSubject.next(updatedChatList);
+
       });
     }
   }
   private handleMessageUpdated = (event: { message: Message }): void => {
+    console.log('Message Edited')
     try {
       const message = event.message;
       console.log('Message Updated:', message.sid);
@@ -1012,9 +908,37 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
 
         // Update the messages subject
         this.messagesSubject.next(updatedMessages);
+        this.getPatientChat(this.currentPatientUser)
       }
     } catch (error) {
       console.error('Error handling updated message:', error);
     }
   };
+  async getPatientChat(patientUsername: string): Promise<any> {
+    try {
+      // Make the API call to get chat data
+      // Replace this with your actual API call
+      // const url = `${apiUrl}?ToUser=${patientId}`;
+      //     return await this.rpmService.rpm_get(url);
+      const response = await this.rpm.rpm_get(`/api/comm/getallchats?ToUser=${patientUsername}`);
+
+      // Update the BehaviorSubject with new data
+      this.updateChatData(response);
+
+      return response;
+    } catch (error) {
+      console.error('❌ Error in PatientChatService.getPatientChat:', error);
+      throw error;
+    }
+  }
+
+
+  updateChatData(newChatData: any): void {
+    this.chatHistoryDataSubject.next(newChatData);
+  }
+
+
+  getCurrentChatData(): any {
+    return this.chatHistoryDataSubject.getValue();
+  }
 }

@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
 import { AngularFireMessaging } from '@angular/fire/compat/messaging';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { takeUntil } from 'rxjs/operators';
-import { initializeApp } from 'firebase/app';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { RPMService } from './rpm.service';
-import {environment} from '../../../../environments/environment'
+
 @Injectable()
 export class MessagingService {
   public notificationData = new BehaviorSubject<any>('notificationcount');
   notificationData$ = this.notificationData.asObservable();
   firebase_token: any;
+  notifications: any;
+  unread: number = 0;
+  list: any[] = [];
+  unreadlist: any[] = [];
 
   constructor(
     private afm: AngularFireMessaging,
@@ -66,26 +67,50 @@ export class MessagingService {
     this.afm.messages.subscribe((message) => {
       console.log('Foreground message received:', message.data);
       this.notificationData.next(message);
-      this.snackBar.open(
-        message?.data?.Title || 'New message',
-        message?.data?.Body || 'Check your notifications',
-        { duration: 5000 }
-      );
+      // this.snackBar.open(
+      //   message?.data?.Title || 'New message',
+      //   message?.data?.Body || 'Check your notifications',
+      //   { duration: 5000 }
+      // );
     });
   }
 
+  // registerMessageEventListener() {
+  //   const channel = new BroadcastChannel('notification-channel');
+  //   channel.addEventListener('message', (event) => {
+  //     const payload = event.data;
+  //     console.log('Background notification received:', payload.data.body);
+  //     this.notificationData.next(payload.data.body);
+  //     if (payload.data && payload.data.Body) {
+  //       this.snackBar.open(
+  //         payload.notification?.title || 'New message',
+  //         '',
+  //         { duration: 5000 }
+  //       );
+  //     }
+
+  //   });
+  //   return channel;
+  // }
   registerMessageEventListener() {
     const channel = new BroadcastChannel('notification-channel');
     channel.addEventListener('message', (event) => {
       const payload = event.data;
       console.log('Background notification received:', payload.data.body);
       this.notificationData.next(payload.data.body);
+
       if (payload.data && payload.data.Body) {
         this.snackBar.open(
-          payload.notification?.title || 'New message',
-          payload.data.Body,
+         payload.notification?.title || 'New message',
+          '',
+         // payload.data.Body,
           { duration: 5000 }
         );
+
+        // Call GetNotifications to refresh notification data after receiving a notification
+        this.GetNotifications()
+          .then(() => console.log('Notifications refreshed after background message'))
+          .catch(err => console.error('Failed to refresh notifications:', err));
       }
     });
     return channel;
@@ -107,5 +132,43 @@ export class MessagingService {
           console.error('Error saving token:', err);
         }
       );
+  }
+  GetNotifications() {
+
+    return this.rpmService.rpm_get('/api/notification/user')
+      .then((data) => {
+        this.notifications = data;
+        this.unread = this.notifications.TotalUnRead;
+        this.list = this.notifications.Data;
+        this.unreadlist = this.list.filter((item: { IsRead: boolean }) => {
+          return item.IsRead === false;
+        });
+        this.notificationData.next({
+          type: 'update',
+          count: this.unread,
+          data: this.list
+        });
+        // You can also update your BehaviorSubject with the notification count if needed
+        // this.notificationData.next({ type: 'count', count: this.unread });
+
+        return data;
+      })
+      .catch((error) => {
+        console.error('Error fetching notifications:', error);
+        throw error;
+      });
+  }
+
+  markNotificationAsRead(notificationId: number, notificationAuditId: number): Promise<any> {
+    const reqBody = {
+      NotificationId: notificationId,
+      NotificationAuditId: notificationAuditId
+    };
+
+    return this.rpmService.rpm_put('/api/notification/readstatus', reqBody)
+      .then((response) => {
+        // Refresh notification data
+        return this.GetNotifications();
+      });
   }
 }

@@ -7,14 +7,12 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { MatDrawer } from '@angular/material/sidenav';
+
 import { HttpService } from '../../sevices/http.service';
 import {
-  Event,
+
   Router,
-  NavigationStart,
-  NavigationEnd,
-  RouterEvent,
+
 } from '@angular/router';
 import { RPMService } from '../../sevices/rpm.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
@@ -22,8 +20,8 @@ import { StatusMessageComponent } from '../status-message/status-message.compone
 import { webSocket } from 'rxjs/webSocket';
 import { AuthService } from 'src/app/services/auth.service';
 import { MessagingService } from '../../sevices/messaging.service';
-import { Subject } from 'rxjs';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { Subject, Subscription } from 'rxjs';
+
 import moment from 'moment';
 import { DatePipe } from '@angular/common';
 @Component({
@@ -52,6 +50,7 @@ export class HeaderComponent implements OnInit {
   myprofile: any;
   current_time: string;
   host: any;
+  private subscription: Subscription | null = null;
   private unsubscribe$ = new Subject<void>();
   message: Subject<any> = new Subject<any>();
   constructor(
@@ -72,9 +71,9 @@ export class HeaderComponent implements OnInit {
       this.getPatientList();
     });
 
-    this.Auth.notificationdata$.subscribe((res) => {
-      this.GetNotifications();
-    });
+    // this.Auth.notificationdata$.subscribe((res) => {
+    //   this.GetNotifications();
+    // });
     this.user_name = sessionStorage.getItem('user_name');
     if (!this.user_name || this.user_name == 'undefined undefined') {
       var that = this;
@@ -101,14 +100,24 @@ export class HeaderComponent implements OnInit {
   data_patient: any;
   message1: any;
   ngOnInit(): void {
-    this.ms.notificationData$.subscribe((notification) => {
-      if (notification) {
-        this.notificationBody = notification;
+    // this.ms.notificationData$.subscribe((notification) => {
+    //   if (notification) {
+    //     this.notificationBody = notification;
 
-        setTimeout(() => (this.notificationBody = null), 5000);
+    //     setTimeout(() => (this.notificationBody = null), 5000);
+    //   }
+
+    // });
+    this.subscription = this.ms.notificationData$.subscribe(data => {
+      if (data && data !== 'notificationcount') {
+        console.log('Notification received in component:', data);
+        // Refresh notifications when we receive a new one
+        this.refreshNotifications();
       }
-
     });
+
+    this.refreshNotifications();
+
     if (this.Auth.firstLogin == true) {
       this.ms.requestPermission();
       this.ms.requestToken();
@@ -179,7 +188,7 @@ export class HeaderComponent implements OnInit {
     } else if (zn1 == 'Central Standard Time') {
       this.tz = 'CDT';
     }
-    this.GetNotifications();
+    //this.GetNotifications();
 
 
     this.getPatientList();
@@ -297,51 +306,40 @@ export class HeaderComponent implements OnInit {
     this.dialog.open(StatusMessageComponent, dialogConfig);
   }
 
-  subject: any;
-  pubsuburl: any;
-  msg: any;
-  subscribePubsub() {
-    this.subject = webSocket(this.pubsuburl);
-    this.subject.subscribe(
-      (msg: any) => {
-        this.msg = msg;
-        if (this.msg.EventType == 'NotificationRead') {
-          this.GetNotifications();
-        }
-      },
-      (err: any) => {
-        // alert(err)
-        // this.rpmservice.rpm_get("/api/home/getdashboardalerts?RoleId="+this.roles[0].Id).then((data)=>{
-        //   this.alertsArray=data;
-        // });
-        // this.subscribePubsub();
-        console.log(err);
-      },
-      () => {
-        console.log('completed');
-      }
-    );
-  }
   rolelist: any;
   notifications: any;
   unread: any;
   list: any;
   unreadlist: any;
-  GetNotifications() {
-    var that = this;
-    that.rolelist = sessionStorage.getItem('Roles');
-    that.rolelist = JSON.parse(this.rolelist);
-    that.rpm.rpm_get('/api/notification/user').then((data) => {
-      that.notifications = data;
-      console.log('Notifications')
-      console.log(that.notifications)
-      that.unread = that.notifications.TotalUnRead;
-      that.list = that.notifications.Data;
-      that.unreadlist = that.list.filter((data: { IsRead: boolean }) => {
-        return data.IsRead == false;
+  refreshNotifications() {
+    this.ms.GetNotifications()
+      .then(() => {
+        // Update local properties with data from service
+        this.unread = this.ms.unread;
+        this.list = this.ms.list || [];
+        this.unreadlist = this.list.filter((data: { IsRead: boolean }) => {
+                return data.IsRead == false;
+              });
+        console.log('Notifications refreshed in component');
+      })
+      .catch(error => {
+        console.error('Error refreshing notifications:', error);
       });
-    });
   }
+  // GetNotifications() {
+  //   var that = this;
+
+  //   that.rpm.rpm_get('/api/notification/user').then((data) => {
+  //     that.notifications = data;
+  //     console.log('Notifications')
+  //     console.log(that.notifications)
+  //     that.unread = that.notifications.TotalUnRead;
+  //     that.list = that.notifications.Data;
+  //     that.unreadlist = that.list.filter((data: { IsRead: boolean }) => {
+  //       return data.IsRead == false;
+  //     });
+  //   });
+  // }
   notificationTime(date: any) {
     const today = new Date(); // Current time in local timezone
 

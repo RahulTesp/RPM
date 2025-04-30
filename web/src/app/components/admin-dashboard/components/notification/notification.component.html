@@ -42,10 +42,10 @@
                 <p *ngIf="unread > 0">{{ unread }} Unread</p>
                 <p *ngIf="unread == 0">No Notification For Today</p>
               </div>
-              <div *ngIf="notifications">
+              <div *ngIf="list">
                 <div
                   class="today_content"
-                  *ngFor="let notification of notifications.Data"
+                  *ngFor="let notification of list"
                 >
                   <div class="notification_description_panel">
                     <div
@@ -103,10 +103,10 @@
               <div class="history-header">
                 <p>Read Notifications</p>
               </div>
-              <div *ngIf="notifications">
+              <div *ngIf="list">
                 <div
                   class="today_content"
-                  *ngFor="let notification of notifications.Data"
+                  *ngFor="let notification of list&&list"
                 >
                   <div class="notification_description_panel">
                     <div
