@@ -1,8 +1,8 @@
-<div class="content">
+<!-- <div class="content">
   <div class="main_content">
-    <!-- Main Panel -->
+
     <div class="main-panel">
-      <!-- <div class="Notification_upper_panel"> -->
+
       <div class="back_arrow">
         <div class="back_arrow_container">
           <img
@@ -16,19 +16,7 @@
         <p class="main_title">Notifications</p>
       </div>
 
-      <!-- <div class="back_arrow">
-                    <img class="arrow-img" src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg" />
-                    <p class="notification_text">Notifications</p>
-                </div> -->
-      <!-- </div> -->
 
-      <!-- <div class="back_arrow">
-
-              <div class="back_arrow_container">
-                <img class ="arrow-img" src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg" alt="">
-              </div>
-              <p class="main_title"> Notifications</p>
-            </div> -->
 
       <div class="notification_content">
         <div class="main-row">
@@ -36,13 +24,12 @@
             <div class="today_notification">
               <div class="today_header">
                 <p>Open Notifications</p>
-                <!-- <button class="btn_read" (click)="after()">Read All</button> -->
               </div>
               <div class="notification_header">
                 <p *ngIf="unread > 0">{{ unread }} Unread</p>
                 <p *ngIf="unread == 0">No Notification For Today</p>
               </div>
-              <div *ngIf="list">
+              <div *ngIf="list" class="notification-panel-data-content">
                 <div
                   class="today_content"
                   *ngFor="let notification of list"
@@ -144,6 +131,138 @@
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<app-confirm-dialog-panel></app-confirm-dialog-panel>
+ -->
+ <div class="content">
+  <div class="main_content">
+
+    <div class="main-panel">
+
+      <div class="back_arrow">
+        <div class="back_arrow_container">
+          <img
+            class="arrow-img"
+            id="notfBackHome"
+            src="../../../../../assets/04-Icons/Icons_Arrow - Back.svg"
+            alt=""
+            (click)="backtohome()"
+          />
+        </div>
+        <p class="main_title">Notifications</p>
+      </div>
+
+      <div class="notification_content">
+        <div class="main-row">
+          <div class="notification_subpanel">
+            <div class="today_notification">
+              <div class="today_header">
+                <p>Open Notifications</p>
+              </div>
+              <div class="notification_header">
+                <p *ngIf="totalUnread > 0">{{ totalUnread }} Unread</p>
+                <p *ngIf="totalUnread == 0">No Notification For Today</p>
+              </div>
+              <div *ngIf="displayedUnread && displayedUnread.length > 0" class="notification-panel-data-content">
+                <div class="notification_description_panel">
+                  <!-- Display paginated unread notifications -->
+                  <div *ngFor="let notification_item of displayedUnread">
+                    <div class="notification_item_panel">
+                      <p class="notification_data">
+                        {{ notification_item.Description }}
+                      </p>
+
+                      <div class="notification_right">
+                        <div class="notification_time">
+                          <p class="notification_data_time">
+                            {{ notificationTime(notification_item.CreatedOn) }}
+                          </p>
+                        </div>
+                        <div class="img_panel">
+                          <img
+                            class="delete-img"
+                            id="notification"
+                            src="../../../../../../assets/04-Icons/Icons_Unread.svg"
+                            (click)="
+                              readNotification(
+                                notification_item.NotificationId,
+                                notification_item.NotificationAuditId
+                              )
+                            "
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- View More button for unread notifications -->
+                <div *ngIf="hasMoreUnread()" class="view-more-container">
+                  <button class="btn_view_more" (click)="loadMoreUnread()">
+                    View More
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="notification_subpanel">
+            <div class="history_notification">
+              <div class="today_header">
+                <p>History</p>
+                <button
+                  class="btn_read clear_all"
+                  (click)="openClearAllDialog()"
+                >
+                  Clear All
+                </button>
+              </div>
+              <div class="history-header">
+                <p>Read Notifications</p>
+              </div>
+              <div *ngIf="displayedHistory && displayedHistory.length > 0">
+                <div class="notification_description_panel">
+                  <!-- Display paginated history notifications -->
+                  <div *ngFor="let notification_item of displayedHistory">
+                    <div class="notification_item_panel">
+                      <p class="notification_data">
+                        {{ notification_item.Description }}
+                      </p>
+
+                      <div class="notification_right">
+                        <div class="notification_time">
+                          <p class="notification_data_time">
+                            {{ notificationTime(notification_item.CreatedOn) }}
+                          </p>
+                        </div>
+                        <div class="img_panel">
+                          <img
+                            class="delete-img"
+                            src="../../../../../../assets/04-Icons/Icons_Delete.svg"
+                            (click)="
+                              openDeleteNotificationDialog(
+                                notification_item.NotificationId
+                              )
+                            "
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- View More button for history notifications -->
+                <div *ngIf="hasMoreHistory()" class="view-more-container">
+                  <button class="btn_view_more" (click)="loadMoreHistory()">
+                    View More
+                  </button>
                 </div>
               </div>
             </div>

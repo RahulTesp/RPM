@@ -8,6 +8,8 @@ import { RPMService } from './rpm.service';
 export class MessagingService {
   public notificationData = new BehaviorSubject<any>('notificationcount');
   notificationData$ = this.notificationData.asObservable();
+  private unreadCountSubject = new BehaviorSubject<number>(0);
+  public unreadCount$ = this.unreadCountSubject.asObservable();
   firebase_token: any;
   notifications: any;
   unread: number = 0;
@@ -148,6 +150,7 @@ export class MessagingService {
           count: this.unread,
           data: this.list
         });
+       // this.updateUnreadCountFromList(this.list);
         // You can also update your BehaviorSubject with the notification count if needed
         // this.notificationData.next({ type: 'count', count: this.unread });
 
@@ -157,6 +160,10 @@ export class MessagingService {
         console.error('Error fetching notifications:', error);
         throw error;
       });
+  }
+
+  getCurrentUnreadCount(): number {
+    return this.notificationData.getValue().count;
   }
 
   markNotificationAsRead(notificationId: number, notificationAuditId: number): Promise<any> {

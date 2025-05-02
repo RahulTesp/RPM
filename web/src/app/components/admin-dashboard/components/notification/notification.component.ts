@@ -1,7 +1,7 @@
+
 import { Component, OnInit } from '@angular/core';
 import { RPMService } from '../../sevices/rpm.service';
-import {  Router } from '@angular/router';
-import { AuthService } from 'src/app/services/auth.service';
+import { Router } from '@angular/router';
 import moment from 'moment';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
 import { MessagingService } from '../../sevices/messaging.service';
@@ -17,27 +17,39 @@ export class NotificationComponent implements OnInit {
   read: boolean;
   notification_value: any;
   private notificationSubscription: Subscription | null = null;
+
+  // Pagination variables
+  unreadPageSize: number = 8;
+  unreadCurrentPage: number = 1;
+  historyPageSize: number = 8;
+  historyCurrentPage: number = 1;
+
+  // Display variables
+  displayedUnread: any[] = [];
+  displayedHistory: any[] = [];
+
+  // Total counts
+  totalUnread: number = 0;
+  totalHistory: number = 0;
+
   constructor(
     private rpm: RPMService,
     private router: Router,
-    private Auth: AuthService,
     private confirmDialog: ConfirmDialogServiceService,
-    private messageservice:MessagingService
-  ) {
-    var that = this;
-  }
+    private messageservice: MessagingService
+  ) {}
 
   ngOnInit(): void {
     this.refreshNotifications();
 
     this.notificationSubscription = this.messageservice.notificationData$.subscribe(data => {
       if (data && data !== 'notificationcount' && data.type === 'update') {
-        // Update local properties when notifications change
         this.unread = this.messageservice.unread;
         this.list = this.messageservice.list || [];
-        this.unreadlist = this.list.filter((data: { IsRead: any; }) => !data.IsRead);
+        this.processNotifications();
       }
     });
+
     this.notificationlist = [
       {
         description: '',
@@ -53,29 +65,111 @@ export class NotificationComponent implements OnInit {
     ];
   }
 
-  //this.notificationlist=[];
-
   notificationlist: any[] = [];
-
   historylist: any[] = [];
-
   rolelist: any;
   notifications: any;
   unread: any;
   list: any;
   unreadlist: any;
   readlist: any;
-  GetNotifications() {
-    var that = this;
-    that.rolelist = sessionStorage.getItem('Roles');
-    that.rolelist = JSON.parse(this.rolelist);
-    that.rpm.rpm_get('/api/notification/user').then((data) => {
-      that.notifications = data;
-      that.unread = that.notifications.TotalUnRead;
 
-      console.log(that.readlist);
+  // Process notifications and set up pagination
+  processNotifications() {
+    if (!this.list || this.list.length === 0) return;
+
+    // Extract all notification items from the list
+    let allUnreadItems: any[] = [];
+    let allHistoryItems: any[] = [];
+
+    this.list.forEach((notification: any) => {
+      if (notification.NotificationList && notification.NotificationList.length > 0) {
+        notification.NotificationList.forEach((item: any) => {
+          if (item.IsRead === false) {
+            allUnreadItems.push(item);
+          } else {
+            allHistoryItems.push(item);
+          }
+        });
+      }
     });
+
+    this.totalUnread = allUnreadItems.length;
+    this.totalHistory = allHistoryItems.length;
+
+    // Set initial display
+    this.updateDisplayedUnread();
+    this.updateDisplayedHistory();
   }
+
+  // Load more unread notifications
+  loadMoreUnread() {
+    this.unreadCurrentPage++;
+    this.updateDisplayedUnread();
+  }
+
+  // Load more history notifications
+  loadMoreHistory() {
+    this.historyCurrentPage++;
+    this.updateDisplayedHistory();
+  }
+
+  // Update displayed unread items based on current page
+  updateDisplayedUnread() {
+    if (!this.list) return;
+
+    let allUnreadItems: any[] = [];
+
+    this.list.forEach((notification: any) => {
+      if (notification.NotificationList && notification.NotificationList.length > 0) {
+        notification.NotificationList.forEach((item: any) => {
+          if (item.IsRead === false) {
+            allUnreadItems.push(item);
+          }
+        });
+      }
+    });
+
+    // Get items for current page
+    const startIndex = 0;
+    const endIndex = this.unreadCurrentPage * this.unreadPageSize;
+    this.displayedUnread = allUnreadItems.slice(startIndex, endIndex);
+  }
+
+  // Update displayed history items based on current page
+  updateDisplayedHistory() {
+    if (!this.list) return;
+
+    let allHistoryItems: any[] = [];
+
+    this.list.forEach((notification: any) => {
+      if (notification.NotificationList && notification.NotificationList.length > 0) {
+        notification.NotificationList.forEach((item: any) => {
+          if (item.IsRead === true) {
+            allHistoryItems.push(item);
+          }
+        });
+      }
+    });
+
+    // Get items for current page
+    const startIndex = 0;
+    const endIndex = this.historyCurrentPage * this.historyPageSize;
+    this.displayedHistory = allHistoryItems.slice(startIndex, endIndex);
+  }
+
+  // Check if there are more unread items to load
+  hasMoreUnread(): boolean {
+    return this.displayedUnread.length < this.totalUnread;
+  }
+
+  // Check if there are more history items to load
+  hasMoreHistory(): boolean {
+    return this.displayedHistory.length < this.totalHistory;
+  }
+
+
+
   readNotification(NotificationId: number, NotificationAuditId: number) {
     this.messageservice.markNotificationAsRead(NotificationId, NotificationAuditId)
     .then(() => {
@@ -85,7 +179,6 @@ export class NotificationComponent implements OnInit {
       console.error('Failed to update notification:', err);
       alert('Failed to update Notification.');
     });
-
   }
 
   convertToLocalTime(stillUtc: any) {
@@ -99,7 +192,7 @@ export class NotificationComponent implements OnInit {
   }
 
   notificationTime(date: any) {
-    const today = new Date(); // Current time in local timezone
+    const today = new Date();
     const localTimeString = this.convertToLocalTime(date);
     const notification_date = new Date(localTimeString);
     const diff_min = Math.round(
@@ -155,12 +248,13 @@ export class NotificationComponent implements OnInit {
 
     return msgInfo;
   }
+
   isShown: boolean = true;
   after() {
     this.isShown = !this.isShown;
   }
-  backtohome() {
 
+  backtohome() {
     this.rolelist = sessionStorage.getItem('Roles');
     this.rolelist = JSON.parse(this.rolelist);
     if (this.rolelist[0].Id == 7) {
@@ -169,6 +263,7 @@ export class NotificationComponent implements OnInit {
       this.router.navigate(['/admin/home']);
     }
   }
+
   deleteNotification(notificationId: any) {
     this.rpm
       .rpm_post(
@@ -181,7 +276,6 @@ export class NotificationComponent implements OnInit {
             'Notification Deleted Successfully',
             'Message',
             () => {
-              //this.GetNotifications();
               this.refreshNotifications();
             },
             false
@@ -193,83 +287,74 @@ export class NotificationComponent implements OnInit {
             'Error',
             null,
             false
-          );;
+          );
         }
       );
   }
 
   openDeleteNotificationDialog(documnetId: any) {
-
     this.confirmDialog.showConfirmDialog(
       'Do You Want to Delete the Notification?',
       'Are you sure?',
       () => {
-      this.deleteNotification(documnetId);
+        this.deleteNotification(documnetId);
       },
       true
     );
   }
 
   openClearAllDialog() {
-
-     this.confirmDialog.showConfirmDialog(
+    this.confirmDialog.showConfirmDialog(
       'Do You Want to Delete all Notifications?',
       'Are you sure?',
       () => {
-      this.clearAll();
+        this.clearAll();
       },
-      true  // Enable Cancel button for confirmation
+      true
     );
   }
 
+  clearAll() {
+    this.rpm
+      .rpm_post(`/api/notification/deletenotifications?notificationId=0`, {})
+      .then(
+        (data) => {
+          this.confirmDialog.showConfirmDialog(
+            'All Notifications Deleted Successfully',
+            'Message',
+            () => {
+              this.refreshNotifications();
+            },
+            false
+          );
+        },
+        (err) => {
+          this.confirmDialog.showConfirmDialog(
+            err.error || 'Could not delete notifications.',
+            'Error',
+            null,
+            false
+          );
+        }
+      );
+  }
 
-   clearAll()
-		{
-			this.rpm
-			  .rpm_post(`/api/notification/deletenotifications?notificationId=0`, {})
-			  .then(
-				(data) => {
-				  this.confirmDialog.showConfirmDialog(
-					'All Notifications Deleted Successfully',
-					'Message',
-					() => {
-					  //this.GetNotifications();
-            this.refreshNotifications();
-					},
-					false  // No cancel button needed for success message
-				  );
-				},
-				(err) => {
-				  this.confirmDialog.showConfirmDialog(
-					err.error || 'Could not delete notifications.',
-					'Error',
-					null,
-					false  // No cancel button needed for error message
-				  );
-				}
-			  );
-		 }
-     refreshNotifications() {
-      this.messageservice.GetNotifications()
-        .then(() => {
-          // Update local properties with data from service
-          this.unread = this.messageservice.unread;
-          this.list = this.messageservice.list || [];
-          console.log('List');
-          console.log(this.list)
-          this.unreadlist = this.list.filter((data: { IsRead: boolean }) => {
-                  return data.IsRead == false;
-                });
 
-        })
-        .catch(error => {
-          console.error('Error refreshing notifications:', error);
-        });
+  refreshNotifications() {
+    this.messageservice.GetNotifications()
+      .then(() => {
+        this.unread = this.messageservice.unread;
+        this.list = this.messageservice.list || [];
+        this.processNotifications();
+      })
+      .catch(error => {
+        console.error('Error refreshing notifications:', error);
+      });
+  }
+
+  ngOnDestroy(): void {
+    if (this.notificationSubscription) {
+      this.notificationSubscription.unsubscribe();
     }
-    ngOnDestroy(): void {
-      // Clean up subscription to prevent memory leaks
-      if (this.notificationSubscription) {
-        this.notificationSubscription.unsubscribe();
-      }
-    }
+  }
 }
