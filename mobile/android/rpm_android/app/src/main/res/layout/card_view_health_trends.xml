@@ -1,24 +1,17 @@
 <androidx.cardview.widget.CardView
     android:id="@+id/cardVitalHealthTrends"
-
     android:layout_margin="@dimen/left_margin10dp"
     app:cardBackgroundColor="@color/white"
     android:layout_width="300dp"
     android:layout_height="wrap_content"
     app:cardCornerRadius="@dimen/margin_10dp"
-
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
-
     <LinearLayout
-
-
         android:layout_width="300dp"
         android:layout_height="35dp"
-        android:background="@color/Primary1"
-        >
+        android:background="@color/Primary1">
         <TextView
             android:id="@+id/vitalname7"
             android:layout_width="match_parent"
@@ -39,19 +32,12 @@
         android:background="@color/white"
         android:orientation="horizontal">
 
-
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/linechart7"
-
             android:layout_width="300dp"
             android:background="@color/white"
             android:layout_height="350dp"
             android_layout_marginTop="10dp"
             android:layout_margin="@dimen/left_margin10dp" />
-
-
-
     </LinearLayout>
-
-
 </androidx.cardview.widget.CardView>

@@ -30,7 +30,5 @@
                 android:scaleType="fitXY"/>
 
         </LinearLayout>
-
     </androidx.cardview.widget.CardView>
-
 </LinearLayout>

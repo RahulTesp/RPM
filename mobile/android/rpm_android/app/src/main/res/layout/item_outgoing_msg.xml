@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="8dp"
-    android:layout_marginBottom="12dp"
-    >
+    android:layout_marginBottom="12dp">
 
     <!-- Outgoing Message Layout -->
     <RelativeLayout
@@ -42,8 +41,6 @@
             android:layout_marginEnd="5dp"
             android:text="Outgoing Message" />
 
-
-
         <!-- Edit and Delete Buttons at Top-Right -->
         <LinearLayout
             android:id="@+id/buttonContainer"
@@ -54,7 +51,7 @@
             android:orientation="horizontal"
             android:layout_marginBottom="10dp"
             android:layout_marginEnd="10dp"
-            android:padding="4dp"
+            android:padding="2dp"
             android:visibility="gone">
 
             <!-- Edit Button -->
@@ -89,11 +86,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/outgoingTime"
             android:layout_alignParentEnd="true"
-
             android:text="Edited"
             android:textSize="12sp"
             android:textColor="@android:color/darker_gray"
             android:visibility="gone"/> <!-- Initially Hidden -->
-
     </RelativeLayout>
 </RelativeLayout>

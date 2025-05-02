@@ -5,19 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="40dp"
-
     tools:context="com.rpm.clynx.fragments.Login">
-
-
-    <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
-    <!--        android:id="@+id/constraint2"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent"-->
-
-    <!--        android:background="@color/background_grey1"-->
-    <!--        tools:layout_editor_absoluteX="0dp"-->
-    <!--        tools:layout_editor_absoluteY="96dp">-->
-
 
     <RelativeLayout
         android:id="@+id/relRP"
@@ -27,7 +15,6 @@
         android:padding="10dp"
         android:paddingTop="40dp"
         android:paddingBottom="20dp"
-
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -59,10 +46,7 @@
             android:textSize="16sp"
             android:textStyle="bold"
             app:fontFamily="@font/rubik_regular" />
-
-
     </RelativeLayout>
-
 
     <TextView
         android:id="@+id/FPtxtvwVerif"
@@ -76,7 +60,6 @@
         android:textSize="16sp"
         android:textStyle="bold"
         app:fontFamily="@font/rubik_regular"
-
         app:layout_constraintBottom_toTopOf="@+id/pinlayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -96,7 +79,6 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <com.poovam.pinedittextfield.SquarePinField
-
             android:id="@+id/squareFieldFP"
             android:layout_width="403dp"
             android:layout_height="56dp"
@@ -111,9 +93,7 @@
             app:fieldColor="@color/green"
             app:highlightColor="@color/green"
             app:layout_constraintEnd_toEndOf="parent"
-
             app:layout_constraintStart_toStartOf="parent"
-
             app:noOfFields="8"
             tools:layout_editor_absoluteY="221dp" />
     </LinearLayout>
@@ -126,13 +106,10 @@
         android:layout_marginRight="15dp"
         android:layout_marginTop="20dp"
         android:orientation="vertical"
-
-
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.449"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pinlayout">
-
 
         <LinearLayout
             android:id="@+id/cv1"
@@ -141,11 +118,8 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/input_type_heading"
             android:orientation="vertical"
-
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
-
-
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -158,13 +132,11 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:backgroundTint="@android:color/transparent"
-
                     android:hint="New Password"
                     android:inputType="textPassword"
                     android:maxLines="1"
                     android:singleLine="true"
                     android:longClickable="false"
-
                     android:textColor="@color/text_dark"
                     android:textColorHint="@color/text_light"
                     android:textSize="20sp"
@@ -180,8 +152,7 @@
                     android:contentDescription="Toggle password visibility"
                     android:layout_gravity="end|center_vertical"
                     android:padding="12dp"
-                    android:layout_marginRight="20dp"
-                    />
+                    android:layout_marginRight="20dp" />
 
             </FrameLayout>
         </LinearLayout>
@@ -212,13 +183,11 @@
                     android:maxLines="1"
                     android:singleLine="true"
                     android:textColor="@color/text_dark"
-
                     android:textColorHint="@color/text_light"
                     android:textSize="20sp"
                     app:boxStrokeWidth="0dp"
                     app:boxStrokeWidthFocused="0dp"
                     app:endIconTint="@color/text_dark"
-
                     app:hintTextColor="@color/text_dark"
                     app:passwordToggleEnabled="true" />
                 <ImageView
@@ -229,8 +198,7 @@
                     android:contentDescription="Toggle password visibility"
                     android:layout_gravity="end|center_vertical"
                     android:padding="12dp"
-                    android:layout_marginRight="20dp"
-                    />
+                    android:layout_marginRight="20dp" />
             </FrameLayout>
 
         </LinearLayout>
@@ -260,68 +228,4 @@
             android:visibility="invisible" />
 
     </LinearLayout>
-
-
-    <!--    <LinearLayout-->
-    <!--        android:id="@+id/linrp"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-
-    <!--        android:layout_centerHorizontal="true"-->
-    <!--        android:layout_marginLeft="6dp"-->
-    <!--        android:layout_marginTop="6dp"-->
-    <!--        android:layout_marginRight="6dp"-->
-    <!--        android:orientation="vertical"-->
-    <!--        app:layout_constraintBottom_toTopOf="@+id/relativeLayout"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@+id/linrtctvw">-->
-
-
-    <!--        <com.poovam.pinedittextfield.SquarePinField-->
-
-    <!--            android:id="@+id/squareFieldFP"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-
-    <!--            android:layout_centerHorizontal="true"-->
-
-    <!--            android:layout_marginTop="10dp"-->
-    <!--            android:layout_marginBottom="10dp"-->
-    <!--            android:inputType="number"-->
-    <!--            android:textSelectHandle="@drawable/text_handle"-->
-    <!--            android:textSize="14sp"-->
-    <!--            app:cornerRadius="8dp"-->
-    <!--            app:distanceInBetween="@dimen/margin_5dp"-->
-    <!--            app:fieldBgColor="@color/white"-->
-    <!--            app:fieldColor="@color/green"-->
-    <!--            app:highlightColor="@color/green"-->
-    <!--            app:noOfFields="8"-->
-    <!--            tools:ignore="MissingClass" />-->
-
-
-    <!--    </LinearLayout>-->
-
-
-    <!--        <RelativeLayout-->
-    <!--            android:id="@+id/relativeLayout"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-
-    <!--            app:layout_constraintTop_toBottomOf="@+id/linrtctvw"-->
-    <!--            android:layout_marginStart="10dp"-->
-    <!--            android:layout_marginTop="10dp"-->
-    <!--            android:layout_marginEnd="10dp"-->
-    <!--            android:layout_marginBottom="280dp"-->
-    <!--            app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--            app:layout_constraintEnd_toEndOf="parent"-->
-    <!--            app:layout_constraintHorizontal_bias="0.0"-->
-    <!--            app:layout_constraintStart_toStartOf="parent"-->
-
-    <!--            tools:ignore="MissingConstraints">-->
-
-
-    <!--        </RelativeLayout>-->
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

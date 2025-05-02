@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
     android:orientation="vertical"
     android:padding="10dp">
-
 
     <TextView
         android:id="@+id/itemPrimSec"
@@ -21,13 +17,11 @@
         android:textSize="14sp"
         app:fontFamily="@font/rubik_regular" />
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginTop="@dimen/spacing_xmedium"
-        android:background="@drawable/myinfo_card_bg_radius"
-       >
+        android:background="@drawable/myinfo_card_bg_radius">
 
         <TextView
             android:id="@+id/itemInsurance"
@@ -39,15 +33,10 @@
             android:maxLines="2"
             android:singleLine="false"
             android:padding = "10sp"
-android:textAlignment = "textStart"
+            android:textAlignment = "textStart"
             android:textColor="@color/black"
             android:textColorHint="@color/text_light"
             android:textSize="16sp"
             app:fontFamily="@font/rubik_regular" />
-
-
-
     </LinearLayout>
-
-
 </LinearLayout>

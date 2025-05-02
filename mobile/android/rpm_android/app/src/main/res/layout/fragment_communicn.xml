@@ -4,9 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_grey1"
-  >
-
+    android:background="@color/background_grey1">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -30,8 +28,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
-
-
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -76,9 +72,6 @@
                                     android:textColorHint="@color/text_light"
                                     android:textSize="16sp"
                                     app:fontFamily="@font/rubik_regular" />
-
-
-
                             </LinearLayout>
 
                             <TextView
@@ -110,9 +103,6 @@
                                     android:textColorHint="@color/text_light"
                                     android:textSize="16sp"
                                     app:fontFamily="@font/rubik_regular" />
-
-
-
                             </LinearLayout>
 
                             <LinearLayout
@@ -155,9 +145,6 @@
                                             android:textColorHint="@color/text_light"
                                             android:textSize="16sp"
                                             app:fontFamily="@font/rubik_regular" />
-
-
-
                                     </LinearLayout>
 
                                 </LinearLayout>
@@ -201,14 +188,8 @@
                                             android:textColorHint="@color/text_light"
                                             android:textSize="16sp"
                                             app:fontFamily="@font/rubik_regular" />
-
-
-
                                     </LinearLayout>
-
                                 </LinearLayout>
-
-
                             </LinearLayout>
 
                             <TextView
@@ -240,9 +221,6 @@
                                     android:textColorHint="@color/text_light"
                                     android:textSize="16sp"
                                     app:fontFamily="@font/rubik_regular" />
-
-
-
                             </LinearLayout>
 
                             <TextView
@@ -274,16 +252,8 @@
                                     android:textColorHint="@color/text_light"
                                     android:textSize="16sp"
                                     app:fontFamily="@font/rubik_regular" />
-
-
-
                             </LinearLayout>
-
                         </LinearLayout>
-
-
-
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -325,9 +295,6 @@
                                     android:textColorHint="@color/text_light"
                                     android:textSize="16sp"
                                     app:fontFamily="@font/rubik_regular" />
-
-
-
                             </LinearLayout>
 
                             <TextView
@@ -359,9 +326,6 @@
                                     android:textColorHint="@color/text_light"
                                     android:textSize="16sp"
                                     app:fontFamily="@font/rubik_regular" />
-
-
-
                             </LinearLayout>
 
                             <TextView
@@ -393,9 +357,6 @@
                                     android:textColorHint="@color/text_light"
                                     android:textSize="16sp"
                                     app:fontFamily="@font/rubik_regular" />
-
-
-
                             </LinearLayout>
 
                             <View
@@ -433,9 +394,6 @@
                                     android:textColorHint="@color/text_light"
                                     android:textSize="16sp"
                                     app:fontFamily="@font/rubik_regular" />
-
-
-
                             </LinearLayout>
 
                             <TextView
@@ -467,8 +425,6 @@
                                     android:textColorHint="@color/text_light"
                                     android:textSize="16sp"
                                     app:fontFamily="@font/rubik_regular" />
-
-
                             </LinearLayout>
 
                             <TextView
@@ -501,27 +457,15 @@
                                     android:textColorHint="@color/text_light"
                                     android:textSize="16sp"
                                     app:fontFamily="@font/rubik_regular" />
-
-
-
-
                             </LinearLayout>
 
                             <View
                                 android:layout_width="match_parent"
                                 android:layout_height="100dp"/>
                         </LinearLayout>
-
                     </LinearLayout>
-
                 </LinearLayout>
-
-
             </androidx.core.widget.NestedScrollView>
-
         </ScrollView>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 </FrameLayout>

@@ -48,32 +48,7 @@
                 app:layout_constraintHorizontal_bias="0.498"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <!--            <ImageButton-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_gravity="end"-->
-            <!--                android:background="@color/transparent"-->
-            <!--                android:src="@drawable/ic_icons_phone_a"-->
-            <!--                android:layout_marginEnd="@dimen/margin_20dp"-->
-            <!--                />-->
-
-
-
-            <!--            <ImageButton-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_gravity="end"-->
-            <!--                android:background="@color/transparent"-->
-            <!--                android:src="@drawable/ic_icons_add"-->
-            <!--                android:layout_marginEnd="@dimen/margin_20dp"/>-->
-
-
         </android.widget.Toolbar>
-
-
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
     <LinearLayout
         android:id="@+id/headerdateview"
@@ -104,7 +79,6 @@
             android:layout_marginRight="5dp"
             android:orientation="horizontal">
 
-
             <TextView
                 android:id="@+id/VitalFragment_today_dt"
                 android:layout_width="wrap_content"
@@ -126,11 +100,6 @@
             android:textColor="@color/todolist_color1"/>
 
     </LinearLayout>
-
-
-
-
-
 
     <LinearLayout
         android:id="@+id/header7D30D"
@@ -175,7 +144,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
-
                     android:text="7 Days" />
 
                 <com.google.android.material.tabs.TabItem
@@ -184,18 +152,9 @@
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
                     android:text="30 Days" />
-
-
-
             </com.google.android.material.tabs.TabLayout>
-
         </androidx.cardview.widget.CardView>
     </LinearLayout>
-
-
-
-
-
 
     <LinearLayout
         android:id="@+id/headers"
@@ -216,18 +175,11 @@
             android:textColor="@color/Primary_dark"
             android:textSize="20sp"/>
 
-
-
-
         <com.google.android.material.card.MaterialCardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             app:cardCornerRadius="30dp"
-
-
-
-
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -236,7 +188,6 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:orientation="horizontal">
 
                 <ImageView
@@ -245,10 +196,8 @@
                     android:layout_height="30dp"
                     android:background = "@color/Primary_dark"
                     android:padding= "5dp"
-
                     app:tint="@color/white"
                     android:src="@drawable/icons_list_view" />
-
 
                 <ImageView
                     android:id="@+id/iconTrends"
@@ -258,61 +207,9 @@
                     android:padding= "5dp"
                     app:tint="@color/Primary_dark"
                     android:src="@drawable/icons_trends" />
-
-
-
-
             </LinearLayout>
-
-
         </com.google.android.material.card.MaterialCardView>
-
-
-
-
-        <!--                    <com.google.android.material.radiobutton.MaterialRadioButton-->
-        <!--                        android:layout_width="wrap_content"-->
-        <!--                        android:layout_height="wrap_content"-->
-        <!--                        android:gravity="end"-->
-        <!--                        android:isScrollContainer="true"-->
-        <!--                        android:pointerIcon="arrow"-->
-        <!--                        android:buttonTint="@color/Primary_dark">-->
-
-
-        <!--                    </com.google.android.material.radiobutton.MaterialRadioButton>-->
-
-
-
-
     </LinearLayout>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     <FrameLayout
         android:id="@+id/fl_main"
@@ -336,45 +233,21 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:layout_marginLeft="@dimen/margin_5dp"
                 android:layout_marginRight="@dimen/margin_5dp"
                 android:orientation="vertical">
-
-
-
-
-
 
                 <LinearLayout
                     android:id="@+id/innerLay"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="@dimen/margin_10dp"
-
-                    >
-
-                    <!--                    <androidx.cardview.widget.CardView-->
-                    <!--                        android:layout_width="match_parent"-->
-                    <!--                        android:layout_height="wrap_content"-->
-                    <!--                        app:cardCornerRadius="@dimen/margin_10dp">-->
+                    android:layout_marginTop="@dimen/margin_10dp">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-
                         android:orientation="vertical">
-                        <!--                            <TextView-->
-                        <!--                                android:layout_width="match_parent"-->
-                        <!--                                android:layout_height="wrap_content"-->
-                        <!--                                android:text="Pulse"-->
-                        <!--                                android:textSize="18sp"-->
-                        <!--                                android:textStyle="normal"-->
-                        <!--                                android:padding="@dimen/margin_10dp"-->
-                        <!--                                android:textColor="@color/Primary_dark"-->
-                        <!--                                android:background="@color/Primary_bg"/>-->
-
 
                         <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
                             xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -383,10 +256,7 @@
                             android:name="com.rpm.clynx.fragments.NewVitalFragment"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-
                             android:background="@color/background_grey1"
-
-
                             app:layoutManager="LinearLayoutManager"
                             app:layout_constraintTop_toBottomOf="@+id/llo_goals"
                             tools:context=".fragments.NewVitalFragment"
@@ -400,7 +270,6 @@
                             android:visibility="gone"
                             android:text="@string/no_data_available" />
 
-
                         <TextView
                             android:id = "@+id/viewMore"
                             android:layout_width="match_parent"
@@ -411,78 +280,7 @@
                             android:textColor="@color/Primary_dark"
                             android:textSize="15sp"
                             android:textStyle="normal" />
-
-
-
-
                     </LinearLayout>
-
-                    <!--                    </androidx.cardview.widget.CardView>-->
-
-
-                    <!--                    <androidx.cardview.widget.CardView-->
-                    <!--                        android:layout_width="match_parent"-->
-                    <!--                        android:layout_height="wrap_content"-->
-                    <!--                        app:cardCornerRadius="@dimen/margin_10dp">-->
-                    <!--                        <LinearLayout-->
-                    <!--                            android:layout_width="match_parent"-->
-                    <!--                            android:layout_height="wrap_content"-->
-                    <!--                            android:orientation="vertical">-->
-                    <!--                            <TextView-->
-                    <!--                                android:layout_width="match_parent"-->
-                    <!--                                android:layout_height="wrap_content"-->
-                    <!--                                android:text="Pulse"-->
-                    <!--                                android:textSize="18sp"-->
-                    <!--                                android:textStyle="normal"-->
-                    <!--                                android:padding="@dimen/margin_10dp"-->
-                    <!--                                android:textColor="@color/Primary_dark"-->
-                    <!--                                android:background="@color/Primary_bg"/>-->
-
-                    <!--                            <LinearLayout-->
-                    <!--                                android:layout_width="match_parent"-->
-                    <!--                                android:layout_height="wrap_content"-->
-                    <!--                                android:orientation="horizontal"-->
-                    <!--                                android:background="@color/white">-->
-
-                    <!--                                <TextView-->
-                    <!--                                    android:layout_width="0dp"-->
-                    <!--                                    android:layout_height="wrap_content"-->
-                    <!--                                    android:layout_weight="1"-->
-                    <!--                                    android:text="138 bpm"-->
-                    <!--                                    android:textSize="18sp"-->
-                    <!--                                    android:textAlignment="textStart"-->
-                    <!--                                    android:textStyle="normal"-->
-                    <!--                                    android:padding="@dimen/margin_10dp"-->
-                    <!--                                    android:textColor="@color/Primary_dark" />-->
-
-                    <!--                                <TextView-->
-                    <!--                                    android:layout_width="wrap_content"-->
-                    <!--                                    android:layout_height="wrap_content"-->
-                    <!--                                    android:text="09:39AM"-->
-                    <!--                                    android:textSize="18sp"-->
-                    <!--                                    android:textStyle="normal"-->
-                    <!--                                    android:textAlignment="viewEnd"-->
-                    <!--                                    android:padding="@dimen/margin_10dp"-->
-                    <!--                                    android:textColor="@color/Primary_dark" />-->
-
-
-                    <!--                            </LinearLayout>-->
-
-                    <!--                            <TextView-->
-                    <!--                                android:layout_width="match_parent"-->
-                    <!--                                android:layout_height="wrap_content"-->
-                    <!--                                android:text="View More..."-->
-                    <!--                                android:textSize="15sp"-->
-                    <!--                                android:textStyle="normal"-->
-                    <!--                                android:padding="@dimen/margin_10dp"-->
-                    <!--                                android:textColor="@color/Primary_dark"-->
-                    <!--                                android:background="@color/background_grey"/>-->
-
-                    <!--                        </LinearLayout>-->
-
-                    <!--                    </androidx.cardview.widget.CardView>-->
-
-
 
                 </LinearLayout>
 
@@ -505,8 +303,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0">
 
-
-
         <HorizontalScrollView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -528,29 +324,7 @@
 
             </LinearLayout>
         </HorizontalScrollView>
-
-
-
     </FrameLayout>
-
-
-
-
-
-
-
-
-    <!--    <TextView-->
-    <!--        android:id="@+id/tooltip"-->
-    <!--        android:layout_width="100dp"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_weight="1"-->
-    <!--        android:text="Vitals"-->
-    <!--        android:layout_marginTop="10dp"-->
-    <!--        android:layout_marginLeft="10dp"-->
-    <!--        android:textStyle="bold"-->
-    <!--        android:textColor="@color/Primary_dark"-->
-    <!--        android:textSize="20sp"/>-->
 
     <FrameLayout
         android:id="@+id/fl_sub30"
@@ -564,7 +338,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0">
-
 
         <HorizontalScrollView
             android:layout_width="wrap_content"
@@ -587,145 +360,5 @@
 
             </LinearLayout>
         </HorizontalScrollView>
-
-
-
-
-
-<!--        <androidx.cardview.widget.CardView-->
-
-<!--            android:padding="20dp"-->
-<!--            android:layout_margin="@dimen/left_margin10dp"-->
-<!--            app:cardBackgroundColor="@color/white"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:cardCornerRadius="@dimen/margin_10dp"-->
-
-<!--            >-->
-
-
-<!--        <LinearLayout-->
-
-
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="35dp"-->
-<!--            android:background="@color/Primary1"-->
-<!--           >-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/vitalname30"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="35dp"-->
-<!--                android:paddingTop="2dp"-->
-<!--                android:layout_marginTop="@dimen/margin_5dp"-->
-<!--                android:paddingLeft="10dp"-->
-<!--                android:text=""-->
-<!--                android:textColor="@color/Primary_dark"-->
-<!--                android:textSize="18dp"-->
-<!--                android:textStyle="normal"-->
-<!--                app:fontFamily="@font/rubik_regular" />-->
-<!--        </LinearLayout>-->
-
-<!--        &lt;!&ndash;        <HorizontalScrollView&ndash;&gt;-->
-<!--        &lt;!&ndash;            android:layout_width="match_parent"&ndash;&gt;-->
-<!--        &lt;!&ndash;            android:layout_height="wrap_content">&ndash;&gt;-->
-
-
-
-
-
-<!--&lt;!&ndash;        <HorizontalScrollView&ndash;&gt;-->
-<!--&lt;!&ndash;            android:id="@+id/CHART30HS"&ndash;&gt;-->
-<!--&lt;!&ndash;            android:layout_width="wrap_content"&ndash;&gt;-->
-<!--&lt;!&ndash;            android:background="@color/orange_400"&ndash;&gt;-->
-<!--&lt;!&ndash;            android:layout_height="wrap_content">&ndash;&gt;-->
-
-<!--            <LinearLayout-->
-<!--                android:id="@+id/chart30ll"-->
-<!--                android:layout_marginTop="@dimen/margin_50dp"-->
-<!--                android:layout_marginRight="@dimen/spacing_xmedium"-->
-<!--                android:layout_marginLeft="@dimen/spacing_xmedium"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:background="@color/white"-->
-<!--                android:orientation="horizontal">-->
-
-<!--                <com.github.mikephil.charting.charts.LineChart-->
-<!--                    android:id=-->
-<!--                        "@+id/linechartvitals30"-->
-
-<!--                    android:layout_width="match_parent"-->
-<!--                android:layout_height="400dp"-->
-<!--                android:layout_marginLeft="@dimen/left_margin10dp"-->
-<!--                android:background="@color/white" />-->
-
-<!--            </LinearLayout>-->
-
-<!--&lt;!&ndash;        </HorizontalScrollView>&ndash;&gt;-->
-
-<!--&lt;!&ndash;&lt;!&ndash;        <HorizontalScrollView&ndash;&gt;&ndash;&gt;-->
-<!--&lt;!&ndash;&lt;!&ndash;            android:id="@+id/chart30scroll"&ndash;&gt;&ndash;&gt;-->
-<!--&lt;!&ndash;&lt;!&ndash;            android:layout_width="match_parent"&ndash;&gt;&ndash;&gt;-->
-<!--&lt;!&ndash;&lt;!&ndash;            android:layout_height="wrap_content">&ndash;&gt;&ndash;&gt;-->
-
-<!--&lt;!&ndash;            <LinearLayout&ndash;&gt;-->
-<!--&lt;!&ndash;                android:id="@+id/chart30ll"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:layout_marginTop="@dimen/margin_10dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:layout_width="match_parent"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:layout_height="wrap_content"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:orientation="horizontal">&ndash;&gt;-->
-
-<!--&lt;!&ndash;                <com.github.mikephil.charting.charts.LineChart&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:id="@+id/linechartvitals30"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_width="match_parent"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_height="400dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_margin="@dimen/left_margin10dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:background="@color/white" />&ndash;&gt;-->
-
-<!--&lt;!&ndash;            </LinearLayout>&ndash;&gt;-->
-
-<!--&lt;!&ndash;&lt;!&ndash;        </HorizontalScrollView>&ndash;&gt;&ndash;&gt;-->
-
-
-
-
-
-
-
-
-
-
-
-
-<!--        &lt;!&ndash;        <LinearLayout&ndash;&gt;-->
-<!--        &lt;!&ndash;            android:layout_marginTop="@dimen/margin_10dp"&ndash;&gt;-->
-<!--        &lt;!&ndash;            android:layout_width="match_parent"&ndash;&gt;-->
-<!--        &lt;!&ndash;            android:layout_height="wrap_content"&ndash;&gt;-->
-<!--        &lt;!&ndash;            android:background="@color/background_grey1"&ndash;&gt;-->
-<!--        &lt;!&ndash;            android:orientation="horizontal">&ndash;&gt;-->
-
-
-<!--        &lt;!&ndash;            <com.github.mikephil.charting.charts.LineChart&ndash;&gt;-->
-<!--        &lt;!&ndash;                android:id="@+id/linechartvitals30"&ndash;&gt;-->
-
-<!--        &lt;!&ndash;                android:layout_width="800dp"&ndash;&gt;-->
-<!--        &lt;!&ndash;                android:layout_height="350dp"&ndash;&gt;-->
-<!--        &lt;!&ndash;                android:layout_margin="@dimen/left_margin10dp"&ndash;&gt;-->
-
-<!--        &lt;!&ndash;                android:background="@color/white" />&ndash;&gt;-->
-
-
-
-<!--        &lt;!&ndash;        </LinearLayout>&ndash;&gt;-->
-
-
-
-
-<!--        &lt;!&ndash;        </HorizontalScrollView>&ndash;&gt;-->
-
-
-<!--        </androidx.cardview.widget.CardView>-->
-
     </FrameLayout>
-
 </FrameLayout>

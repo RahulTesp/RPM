@@ -927,14 +927,14 @@ public class VideoCallTwilio extends AppCompatActivity {
                 remoteParticipantval =  room.getRemoteParticipants();
                 Log.d("remotepartys", String.valueOf(remoteParticipantval));
 
-                if(remoteParticipantval.size() == 0)
-                {
-                    Log.d("size", String.valueOf(remoteParticipantval.size()));
-                    room.disconnect();
-                    finish();
-                    Toast.makeText(((MyApplication) getApplication()).getLatestActivity(), "Video Call Expired", Toast.LENGTH_LONG).show();
-                }
-                else {
+//                if(remoteParticipantval.size() == 0)
+//                {
+//                    Log.d("size", String.valueOf(remoteParticipantval.size()));
+//                    room.disconnect();
+//                    finish();
+//                    Toast.makeText(((MyApplication) getApplication()).getLatestActivity(), "Video Call Expired", Toast.LENGTH_LONG).show();
+//                }
+//                else {
                     System.out.println(localParticipant);
                     setTitle(room.getName());
 
@@ -946,7 +946,7 @@ public class VideoCallTwilio extends AppCompatActivity {
                 }
                     editor.putBoolean("onCall", true);
                     editor.apply();
-                }
+               // }
             }
 
             @Override

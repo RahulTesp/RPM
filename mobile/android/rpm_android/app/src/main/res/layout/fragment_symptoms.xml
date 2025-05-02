@@ -7,7 +7,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.rpm.clynx.fragments.SymptomsFragment">
 
-
     <LinearLayout
         android:id="@+id/llo_sym"
         android:layout_width="match_parent"
@@ -16,9 +15,7 @@
         android:background="@color/background_grey"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-
-        >
+        app:layout_constraintStart_toStartOf="parent">
     </LinearLayout>
 
     <LinearLayout
@@ -30,8 +27,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/llo_sym">
 
-
-
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -41,7 +36,6 @@
             android:layout_height="match_parent"
             android:layout_margin="@dimen/margin_20dp"
             android:orientation="vertical">
-
 
             <TextView
                 android:layout_width="match_parent"
@@ -82,5 +76,4 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="100dp"/>
-
 </FrameLayout>

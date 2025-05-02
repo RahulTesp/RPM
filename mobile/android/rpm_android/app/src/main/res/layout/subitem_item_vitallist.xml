@@ -11,8 +11,7 @@
             android:padding="10dp"
             android:layout_marginTop="1dp"
             android:background="@drawable/card_background_white_flatside"
-           android:weightSum="12"
-            >
+            android:weightSum="12">
                 <TextView
                     android:id="@+id/subitemvital_value"
                     android:layout_width="wrap_content"
@@ -20,10 +19,9 @@
                     android:text="121"
                     android:textSize="22sp"
                     android:textStyle="normal"
-                        android:layout_weight="8"
+                    android:layout_weight="8"
                     android:textColor="@color/black"
-                    android:layout_marginStart="10dp"
-                    />
+                    android:layout_marginStart="10dp" />
 
                 <TextView
                     android:id="@+id/subitemvital_time"
@@ -32,17 +30,9 @@
                     android:text="10.26 AM"
                     android:textSize="22sp"
                     android:textStyle="normal"
-
                     android:gravity="right"
                     android:layout_marginRight="10dp"
                     android:layout_weight="4"
-
-                    android:textColor="@color/black"
-                    />
-
-
+                    android:textColor="@color/black" />
         </LinearLayout>
-
-
-
 </LinearLayout>

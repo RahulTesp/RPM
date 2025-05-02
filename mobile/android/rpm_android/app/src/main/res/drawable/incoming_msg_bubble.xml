@@ -125,30 +125,6 @@
 
 
 
-<!--<shape xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    android:shape="rectangle">-->
-
-<!--    &lt;!&ndash; Set the background color for incoming messages &ndash;&gt;-->
-<!--    <solid android:color="@color/Primary_light" />-->
-
-<!--    &lt;!&ndash; Set the corner radius to make it look like a bubble &ndash;&gt;-->
-<!--    <corners android:radius="12dp" />-->
-
-<!--    &lt;!&ndash; Create the arrow on the top-left side &ndash;&gt;-->
-<!--    <path-->
-<!--        android:fillColor="@color/Primary_light"-->
-<!--        android:pathData="M0,10 L10,0 L10,20 Z" /> &lt;!&ndash; Left-pointing arrow &ndash;&gt;-->
-<!--</shape>-->
-
-
-
-
-
-
-
-
-
-
 
 
 

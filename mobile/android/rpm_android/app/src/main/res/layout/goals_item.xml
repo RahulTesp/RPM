@@ -22,11 +22,9 @@ android:layout_height="wrap_content">
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-
             android:text="09:48 AM"
             android:textColor="@color/black"
             android:textSize="16sp"
-
             app:fontFamily="@font/rubik_semibold" />
     </LinearLayout>
 
@@ -40,7 +38,6 @@ android:layout_height="wrap_content">
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Dear, this is a test notification placeholder and will be replaced with notifications out of API result."
-
             android:textColor="@color/black"
             android:textSize="16sp"
             app:fontFamily="@font/rubik_regular" />

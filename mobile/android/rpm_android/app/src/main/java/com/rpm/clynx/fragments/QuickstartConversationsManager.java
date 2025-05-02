@@ -21,10 +21,12 @@ import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -53,6 +55,8 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.File;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -463,6 +467,7 @@ class QuickstartConversationsManager extends  AppCompatActivity {
             jsonBody.put("Message", messageBody);
 
             Log.d("jsonBodyNotifyConversation",  jsonBody.toString());
+            FileLogger.d("jsonBodyNotifyConversation",  jsonBody.toString());
         } catch (JSONException e) {
             e.printStackTrace();
             return;
@@ -472,10 +477,17 @@ class QuickstartConversationsManager extends  AppCompatActivity {
                 Request.Method.POST,
                 API_URL,
                 response -> {
-                    Log.d("NotifyConversationStatus", "Response: " + response); // even if empty
+                    Log.d("NotifyConversationStatus", "Response received (may be empty): " + response);
+                    FileLogger.d("NotifyConversationStatus", "Response received (may be empty): " + response);
                 },
                 error -> {
                     Log.e("NotifyConversationStatus", "Error: " + error.toString());
+                    if (error.networkResponse != null) {
+                        Log.e("NotifyConversationStatus", "Status code: " + error.networkResponse.statusCode);
+                        String responseData = new String(error.networkResponse.data != null ? error.networkResponse.data : new byte[0]);
+                        Log.e("NotifyConversationStatus", "Error body: " + responseData);
+                        FileLogger.d("NotifyConversationStatus", "Error body: " + responseData);
+                    }
                 }
         ) {
             @Override
@@ -485,16 +497,58 @@ class QuickstartConversationsManager extends  AppCompatActivity {
 
             @Override
             public String getBodyContentType() {
-                return "application/json;";
+                return "application/json";
             }
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
-                headers.put("Bearer", token);
+                headers.put("Bearer", token);  // Your custom header
                 return headers;
             }
+
+            @Override
+            protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                // Even if response is empty, treat it as success
+                String responseString = "";
+                if (response != null && response.data != null) {
+                    responseString = new String(response.data);
+                }
+                Log.d("NotifyConversationStatus", "Raw status code: " + response.statusCode);
+                FileLogger.d("NotifyConversationStatus", "Raw status code: " + response.statusCode);
+                return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
+            }
         };
+
+
+//        StringRequest stringRequest = new StringRequest(
+//                Request.Method.POST,
+//                API_URL,
+//                response -> {
+//                    Log.d("NotifyConversationStatus", "Response: " + response); // even if empty
+//                    FileLogger.d("NotifyConversationStatus", "Response: " + response);
+//                },
+//                error -> {
+//                    Log.e("NotifyConversationStatus", "Error: " + error.toString());
+//                }
+//        ) {
+//            @Override
+//            public byte[] getBody() throws AuthFailureError {
+//                return jsonBody.toString().getBytes();
+//            }
+//
+//            @Override
+//            public String getBodyContentType() {
+//                return "application/json";
+//            }
+//
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                Map<String, String> headers = new HashMap<>();
+//                headers.put("Bearer", token);
+//                return headers;
+//            }
+//        };
 
         // Creating a request queue and adding the request to the queue
         RequestQueue requestQueue = Volley.newRequestQueue(context);

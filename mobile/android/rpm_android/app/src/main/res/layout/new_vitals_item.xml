@@ -12,8 +12,7 @@
         android:padding="10dp"
         android:layout_marginTop="1dp"
         android:background="@drawable/card_background_white_flatside"
-        android:weightSum="12"
-        >
+        android:weightSum="12">
 
         <TextView
             android:id="@+id/itemNewVitalValue"
@@ -36,42 +35,33 @@
             android:layout_marginRight="10dp"
             android:layout_weight="3"
             android:text=""
-
             android:textAlignment="viewStart"
             android:textColor="@color/black"
             android:textSize="18sp"
-
             android:textStyle="normal"
             app:fontFamily="@font/rubik_regular" />
 
         <TextView
             android:id="@+id/itemNewVitaltm"
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="3dp"
             android:layout_weight="5"
             android:text=""
             android:textAlignment="viewEnd"
-
             android:textColor="@color/black"
             android:textSize="16sp"
-
             android:textStyle="normal"
             app:fontFamily="@font/rubik_regular" />
-
-
     </LinearLayout>
 
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/card_background_white_flatside"
-    >
+    android:background="@drawable/card_background_white_flatside">
 
     <TextView
         android:id="@+id/itemNewVitalsched"
-
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
@@ -81,10 +71,7 @@
         android:paddingBottom="@dimen/margin_10dp"
         android:textColor="@color/black"
         android:textSize="16sp"
-
         android:textStyle="normal"
         app:fontFamily="@font/rubik_regular" />
-
 </LinearLayout>
-
 </LinearLayout>

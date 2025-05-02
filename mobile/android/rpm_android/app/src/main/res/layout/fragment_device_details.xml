@@ -7,7 +7,6 @@ android:layout_height="match_parent"
 android:background="@color/background3"
 tools:context="com.rpm.clynx.fragments.DeviceDetailsFragment">
 
-
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -33,34 +32,11 @@ tools:context="com.rpm.clynx.fragments.DeviceDetailsFragment">
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="@dimen/margin_20dp"
                     android:orientation="vertical">
-
-
-
-
-
-
-
-<!--                    <TextView-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:id="@+id/devno"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:layout_marginTop="@dimen/margin_20dp"-->
-<!--                        android:text=""-->
-<!--                        android:textColor="@color/accent2"-->
-<!--                        android:textSize="18sp"-->
-<!--                        android:textStyle="bold" />-->
-
-
-
-
-
-
 
                     <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
                         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -69,7 +45,6 @@ tools:context="com.rpm.clynx.fragments.DeviceDetailsFragment">
                         android:name="com.rpm.clynx.fragments.DeviceDetailsFragment"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-
                         app:layoutManager="LinearLayoutManager"
                         tools:context="com.rpm.clynx.fragments.DeviceDetailsFragment"
                         tools:listitem="@layout/device_item_list"
@@ -86,21 +61,8 @@ tools:context="com.rpm.clynx.fragments.DeviceDetailsFragment">
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="300dp"/>
-
-
-
                 </LinearLayout>
-
-
-
-
-
         </androidx.core.widget.NestedScrollView>
-
-
     </ScrollView>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
-
 </FrameLayout>

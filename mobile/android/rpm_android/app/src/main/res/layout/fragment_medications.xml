@@ -7,10 +7,6 @@ android:background="@color/background_grey1"
 xmlns:app="http://schemas.android.com/apk/res-auto"
 tools:context="com.rpm.clynx.fragments.MedicationFragment">
 
-
-
-
-
     <LinearLayout
         android:id="@+id/llo_med"
         android:layout_width="match_parent"
@@ -19,9 +15,7 @@ tools:context="com.rpm.clynx.fragments.MedicationFragment">
         android:background="@color/background_grey"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-
-        >
+        app:layout_constraintStart_toStartOf="parent">
     </LinearLayout>
 
     <LinearLayout
@@ -35,19 +29,17 @@ tools:context="com.rpm.clynx.fragments.MedicationFragment">
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="@dimen/margin_20dp"
         android:orientation="vertical">
 
-
     <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Medications"
-        android:layout_marginBottom="@dimen/margin_10dp"
+            android:layout_marginBottom="@dimen/margin_10dp"
             android:textColor="@color/text_dark"
             android:textSize="25sp"
             android:textStyle="bold" />
@@ -59,7 +51,6 @@ tools:context="com.rpm.clynx.fragments.MedicationFragment">
             android:name="com.rpm.clynx.fragments.MedicationFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-
             app:layoutManager="LinearLayoutManager"
             tools:context="com.rpm.clynx.fragments.MedicationFragment"
             tools:listitem="@layout/medication_item_list"

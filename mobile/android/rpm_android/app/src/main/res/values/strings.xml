@@ -10,7 +10,6 @@
     <string name="previous">Previous</string>
     <string name="msgtokenfmt">Welcome</string>
     <string name="default_notification_channel_id">NOTIFICATION</string>
-
     <string name="room_screen_select_device">Select Device</string>
     <string name="permissions_needed">Camera and Microphone permissions needed. Please allow in App Settings for additional functionality.</string>
     <string name="hello_first_fragment">Hello first fragment</string>
@@ -18,10 +17,6 @@
     <string name="title_activity_demo">DemoActivity</string>
     <string name="no_data_available">No Data Available!</string>
     <string name="error_retrieving_access_token">Error retrieving access token from the server.</string>
-<!--    <string name="chat_token_url">https://cx-dev-server.azurewebsites.net/api/comm/getchattoken</string>-->
-<!--    <string name="chatreg_token_url">https://cx-dev-server.azurewebsites.net/api/comm/regeneratechattoken</string>-->
-<!--    <string name="chat_token_url">https://cx-preprod-server.azurewebsites.net/api/comm/getchattoken</string>-->
-<!--    <string name="chatreg_token_url">https://cx-preprod-server.azurewebsites.net/api/comm/regeneratechattoken</string>-->
     <string name="write_message">Type your message</string>
     <string name="send">Send</string>
 </resources>

@@ -6,9 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/profile_card_body_bg"
     tools:context="com.rpm.clynx.fragments.ToDoListFragment">
-
     <!-- TODO: Update blank fragment layout -->
-
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint"
@@ -20,7 +18,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0">
-
 
     <android.widget.Toolbar
         android:id="@+id/toolbar"
@@ -51,15 +48,6 @@
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-<!--        <ImageButton-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_gravity="end"-->
-<!--            android:background="@color/transparent"-->
-<!--            android:src="@drawable/ic_icons_add"-->
-<!--            android:layout_marginEnd="@dimen/margin_20dp"/>-->
-
     </android.widget.Toolbar>
 
         <LinearLayout
@@ -101,7 +89,6 @@
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:gravity="center"
-
                         android:onClick="changedateoftextviewanddate"
                         android:textColor="@color/todolist_color1"
                         android:textAlignment="center"/>
@@ -205,7 +192,6 @@
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:gravity="center"
-
                         android:textColor="@color/todolist_color1"
                         android:textAlignment="center"/>
                 </LinearLayout>
@@ -255,7 +241,6 @@
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:gravity="center"
-
                         android:textColor="@color/todolist_color1"
                         android:textAlignment="center"/>
                 </LinearLayout>
@@ -314,15 +299,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_gravity="end"
-
                     android:background="@color/transparent"
                     android:src="@drawable/ic_baseline_keyboard_arrow_right_24"
                     android:textColor="@color/todolist_color1"/>
-
-
             </LinearLayout>
-
-
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -330,8 +310,7 @@
                     android:background="@color/background_grey1"
                     android:orientation="vertical"
                     android:layout_marginTop="20dp"
-                    android:layout_marginBottom="20dp"
-                    >
+                    android:layout_marginBottom="20dp">
 
                     <TextView
                         android:id="@+id/todo_nofoactivites"
@@ -343,12 +322,10 @@
                         android:textColor="@color/todolist_color1"
                         android:textStyle="bold"/>
 
-
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recyclerview_todolist_vertical"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-
                         android:layout_marginBottom="100dp"
                         android:background="@color/background_grey1"
                         app:layout_constraintTop_toBottomOf="@+id/todo_nextdate"
@@ -360,16 +337,7 @@
                         android:gravity="center"
                         android:visibility="gone"
                         android:text="@string/no_data_available" />
-
                 </LinearLayout>
-
-
-
-
         </LinearLayout>
-
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </FrameLayout>

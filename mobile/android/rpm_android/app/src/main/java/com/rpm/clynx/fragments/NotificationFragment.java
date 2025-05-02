@@ -5,11 +5,16 @@ import static com.rpm.clynx.utility.Links.BASE_URL;
 import static com.rpm.clynx.utility.Links.NOTI_DELETE;
 import static com.rpm.clynx.utility.Links.NOTI_DELETE_ALL;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,6 +38,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.rpm.clynx.adapter.NotificationListAdapter;
 import com.rpm.clynx.model.NotificationItemModel;
 import com.rpm.clynx.model.NotificationsModel;
+import com.rpm.clynx.service.NotificationReceiver;
 import com.rpm.clynx.utility.BooleanRequest;
 import com.rpm.clynx.utility.DataBaseHelper;
 import com.rpm.clynx.utility.Links;
@@ -76,6 +82,8 @@ public class NotificationFragment extends Fragment{
     private TextView tvHistory;
     private JSONArray jsonArrayData; // Store the full response to filter on toggle
 
+    public static boolean NotificationFragmentIsVisible = false;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -92,6 +100,18 @@ public class NotificationFragment extends Fragment{
         fragment.setArguments(args);
         return fragment;
     }
+
+    private BroadcastReceiver notificationReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // This method is called when notification/broadcast is received
+            //  Call your API here
+            Log.d("getNotificationsCount", "getNotificationsCount");
+            checkNotifications(); // (your API method)
+        }
+    };
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -154,6 +174,33 @@ public class NotificationFragment extends Fragment{
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        NotificationFragmentIsVisible = true;
+        checkNotifications();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        NotificationFragmentIsVisible = false;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED); // Use your app's broadcast action
+        ContextCompat.registerReceiver(requireContext(), notificationReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        requireActivity().unregisterReceiver(notificationReceiver);
+    }
     private void initPerformBackClick() {
         Toolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_west_24);

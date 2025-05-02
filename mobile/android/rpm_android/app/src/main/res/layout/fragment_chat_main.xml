@@ -12,14 +12,12 @@
 
     <!-- Toolbar -->
     <android.widget.Toolbar
-
         android:id="@+id/toolbarChat"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/ChatActivityBG"
         android:theme="?attr/actionBarTheme"
         android:navigationIcon="@drawable/ic_baseline_west_24"
-
         app:titleTextColor="@color/Primary_dark">
 
         <!-- Centered Title -->
@@ -44,7 +42,6 @@
             android:layout_gravity="end"
             android:layout_marginEnd="@dimen/margin_20dp" />
     </android.widget.Toolbar>
-
 
     <!-- FrameLayout to Overlay ProgressBar -->
     <FrameLayout
@@ -89,5 +86,4 @@
             android:visibility="gone"
             android:layout_gravity="center"/>
     </FrameLayout>
-
 </LinearLayout>

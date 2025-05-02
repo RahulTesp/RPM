@@ -10,7 +10,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
-
         android:background="@drawable/myinfo_card_bg_radius"
         android:orientation="vertical"
         android:padding="10dp">
@@ -19,7 +18,6 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
             <!-- Chat Member Name (Left Side) -->
             <TextView
                 android:id="@+id/itemChatMemNm"
@@ -34,7 +32,6 @@
                 android:layout_alignParentStart="true"/>
 
             <!-- Typing Indicator (Below Chat Member Name) -->
-
             <!-- Typing Indicator (Next to Chat Member Name with 5dp Spacing) -->
             <TextView
                 android:id="@+id/itemTypingIndicator"
@@ -49,19 +46,6 @@
                 android:layout_marginStart="5dp"
                 android:gravity="center_vertical"/>
 
-
-            <!--            <TextView-->
-<!--                android:id="@+id/itemTypingIndicator"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Typing..."-->
-<!--                android:textSize="14sp"-->
-<!--                android:textColor="@color/purple_400"-->
-<!--                android:fontFamily="sans-serif"-->
-<!--                android:visibility="gone"-->
-
-<!--                android:layout_marginStart="10dp"-->
-<!--                android:layout_marginTop="4dp"/>-->
             <!-- Message Time (Right Side) -->
             <TextView
                 android:id="@+id/itemMsgTime"
@@ -82,12 +66,9 @@
                 android:textSize="14sp"
                 android:textColor="@color/ChatTimeBlack"
                 android:fontFamily="sans-serif"
-
                 android:layout_below="@id/itemChatMemNm"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="4dp"/>
-
-
 
             <!-- Message Count (Below Time) -->
             <TextView

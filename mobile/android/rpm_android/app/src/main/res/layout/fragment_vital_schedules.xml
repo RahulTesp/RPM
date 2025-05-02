@@ -1,21 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
 xmlns:android="http://schemas.android.com/apk/res/android"
-
 xmlns:app="http://schemas.android.com/apk/res-auto"
 xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
 android:background="@color/background3"
 tools:context="com.rpm.clynx.fragments.VitalSchedulesFragment">
-
-
-
-
-
-
-
-
 
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
@@ -62,10 +53,6 @@ tools:context="com.rpm.clynx.fragments.VitalSchedulesFragment">
                         android:textSize="16sp"
                         app:fontFamily="@font/rubik_semibold" />
 
-
-
-
-
                     <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
                         xmlns:app="http://schemas.android.com/apk/res-auto"
                         xmlns:tools="http://schemas.android.com/tools"
@@ -73,13 +60,10 @@ tools:context="com.rpm.clynx.fragments.VitalSchedulesFragment">
                         android:name="com.rpm.clynx.fragments.VitalSchedulesFragment"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-
                         app:layoutManager="LinearLayoutManager"
                         tools:context="com.rpm.clynx.fragments.VitalSchedulesFragment"
                         tools:listitem="@layout/vital_schedules_item_list"
                         app:layout_constraintTop_toBottomOf="@+id/schedno" />
-
-
 
                     <TextView
                         android:id="@+id/empty_viewVS"
@@ -89,35 +73,17 @@ tools:context="com.rpm.clynx.fragments.VitalSchedulesFragment">
                         android:visibility="gone"
                         android:text="@string/no_data_available" />
 
-
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="300dp"/>
 
-
-
-
-
-
-
-
-
                 </LinearLayout>
-
-
-
-
-
-
 
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
 
-
     </ScrollView>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

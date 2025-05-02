@@ -24,9 +24,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"/>
 
-
-
-
     <FrameLayout
         android:id="@+id/local_placeholder"
         android:layout_width="196dp"
@@ -67,36 +64,6 @@
             android:layout_gravity="center"/>
     </FrameLayout>
 
-
-
-    <!--    <FrameLayout-->
-<!--        android:id="@+id/placeholderImage"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:background="@color/grey_100"-->
-<!--        android:visibility="gone">-->
-
-<!--        <TextView-->
-<!--            android:id="@+id/videoOffText"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Video is Paused"-->
-<!--            android:textColor="@android:color/holo_red_light"-->
-<!--            android:textSize="18sp"-->
-<!--            android:textStyle="bold"-->
-<!--            android:gravity="center"-->
-<!--            android:layout_gravity="center"/>-->
-<!--    </FrameLayout>-->
-
-
-    <!--        <ImageView-->
-<!--        android:id="@+id/placeholderImage"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:src="@drawable/ic_videocam_off_black_24dp"-->
-<!--        android:visibility="gone"-->
-<!--        android:scaleType="centerCrop"/>-->
-
     <ProgressBar
         android:id="@+id/reconnecting_progress_bar"
         android:layout_width="wrap_content"
@@ -105,5 +72,4 @@
         android:indeterminate="true"
         style="?android:attr/progressBarStyleLarge"
         android:visibility="gone" />
-
 </FrameLayout>

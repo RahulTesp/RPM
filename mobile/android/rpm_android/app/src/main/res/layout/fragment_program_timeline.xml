@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
 xmlns:android="http://schemas.android.com/apk/res/android"
-
 xmlns:app="http://schemas.android.com/apk/res-auto"
 xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
 android:background="@color/background3"
 tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
-
-
 
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
@@ -82,16 +79,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                             android:textColorHint="@color/text_light"
                             android:textSize="16sp"
                             app:fontFamily="@font/rubik_regular" />
-
-
-
                     </LinearLayout>
-
-
-
-
-
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -120,13 +108,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                             android:textColorHint="@color/text_light"
                             android:textSize="16sp"
                             app:fontFamily="@font/rubik_regular" />
-
-
-
                     </LinearLayout>
-
-
-
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -156,9 +138,6 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                             android:textColorHint="@color/text_light"
                             android:textSize="16sp"
                             app:fontFamily="@font/rubik_regular" />
-
-
-
                     </LinearLayout>
                     <TextView
                         android:layout_width="wrap_content"
@@ -188,43 +167,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                             android:textColorHint="@color/text_light"
                             android:textSize="16sp"
                             app:fontFamily="@font/rubik_regular" />
-
-
-
                     </LinearLayout>
-
-<!--                    <TextView-->
-<!--                        android:layout_width="102dp"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:layout_marginTop="@dimen/margin_20dp"-->
-<!--                        android:text="Clinic Code"-->
-<!--                        android:textColor="@color/Primary_text"-->
-<!--                        android:textSize="18sp"-->
-<!--                        android:textStyle="bold" />-->
-
-<!--                    <LinearLayout-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="40dp"-->
-<!--                        android:layout_marginTop="@dimen/spacing_xmedium"-->
-<!--                        android:background="@drawable/myinfo_card_bg_radius"-->
-<!--                        android:gravity="center">-->
-
-<!--                        <TextView-->
-<!--                            android:id="@+id/frag_timeline_branch"-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:layout_marginLeft="@dimen/margin_10dp"-->
-<!--                            android:backgroundTint="@android:color/transparent"-->
-<!--                            android:maxLines="1"-->
-<!--                            android:singleLine="true"-->
-<!--                            android:textColor="@color/text_dark"-->
-<!--                            android:textColorHint="@color/text_light"-->
-<!--                            android:textSize="18sp"-->
-<!--                            android:textStyle="bold" />-->
-
-
-<!--                    </LinearLayout>-->
-
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -254,9 +197,6 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                             android:textColorHint="@color/text_light"
                             android:textSize="16sp"
                             app:fontFamily="@font/rubik_regular" />
-
-
-
                     </LinearLayout>
 
                     <TextView
@@ -268,13 +208,11 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:textSize="14sp"
                         app:fontFamily="@font/rubik_regular" />
 
-
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/fragmentDiagnosis"
                         android:name="com.rpm.clynx.fragments.ProgramTimelineFragment"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-
                         app:layoutManager="LinearLayoutManager"
                         app:layout_constraintTop_toBottomOf="@+id/llo_diag"
                         tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment"
@@ -297,10 +235,6 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:textColor="@color/Primary_dark"
                         android:textSize="14sp"
                         app:fontFamily="@font/rubik_regular" />
-
-
-
-
                     <LinearLayout
                         android:id="@+id/llo_goals"
                         android:layout_width="match_parent"
@@ -321,12 +255,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                             android:textColorHint="@color/text_light"
                             android:textSize="16sp"
                             app:fontFamily="@font/rubik_regular" />
-
-
-
                     </LinearLayout>
-
-
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -336,10 +265,6 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:textColor="@color/Primary_dark"
                         android:textSize="14sp"
                         app:fontFamily="@font/rubik_regular" />
-
-
-
-
                     <LinearLayout
                         android:id="@+id/llo_pers"
                         android:layout_width="match_parent"
@@ -360,8 +285,6 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                             android:textColorHint="@color/text_light"
                             android:textSize="16sp"
                             app:fontFamily="@font/rubik_regular" />
-
-
 
                     </LinearLayout>
                     <LinearLayout
@@ -407,11 +330,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                             android:textColorHint="@color/text_light"
                             android:textSize="16sp"
                             app:fontFamily="@font/rubik_regular" />
-
-
-
                     </LinearLayout>
-
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -421,8 +340,6 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:textColor="@color/Primary_dark"
                         android:textSize="14sp"
                         app:fontFamily="@font/rubik_regular" />
-
-
 
                     <LinearLayout
                         android:id="@+id/llo_pers11"
@@ -444,13 +361,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                             android:textColorHint="@color/text_light"
                             android:textSize="16sp"
                             app:fontFamily="@font/rubik_regular" />
-
-
                     </LinearLayout>
-
-
-
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -459,9 +370,6 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:textColor="@color/Primary_dark"
                         android:textSize="14sp"
                         app:fontFamily="@font/rubik_regular" />
-
-
-
                     <LinearLayout
                         android:id="@+id/llo_mngr1"
                         android:layout_width="match_parent"
@@ -482,8 +390,6 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                             android:textColorHint="@color/text_light"
                             android:textSize="16sp"
                             app:fontFamily="@font/rubik_regular" />
-
-
                     </LinearLayout>
 
                     </LinearLayout>
@@ -491,30 +397,13 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="100dp"/>
-
-
-
-
-
-
-
-
-
                 </LinearLayout>
-
-
-
-
-
-
 
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
 
-
     </ScrollView>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

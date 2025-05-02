@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -11,19 +9,10 @@
     android:layout_marginVertical="@dimen/spacing_medium"
     android:padding="10dp">
 
-
-
-
-
-
-
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/MeasureName"
@@ -36,7 +25,6 @@
             android:textSize="16sp"
             app:fontFamily="@font/rubik_regular" />
         <TextView
-
             android:layout_width="wrap_content"
             android:layout_height="25dp"
             android:layout_marginTop="@dimen/margin_10dp"
@@ -56,7 +44,6 @@
             android:textSize="16sp"
             app:fontFamily="@font/rubik_regular" />
         <TextView
-
             android:layout_width="wrap_content"
             android:layout_height="25dp"
             android:layout_marginTop="@dimen/margin_10dp"
@@ -76,15 +63,10 @@
         android:layout_height="30dp"
         android:layout_marginTop="@dimen/spacing_xmedium"
         android:orientation="horizontal"
-
-
-        android:background="@drawable/myinfo_card_bg_radius"
-
-        >
+        android:background="@drawable/myinfo_card_bg_radius">
 
         <TextView
             android:id="@+id/Range1"
-
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/spacing_medium"
@@ -95,11 +77,7 @@
             android:textColorHint="@color/text_light"
             android:textSize="16sp"
             app:fontFamily="@font/rubik_regular" />
-
-
-
         <TextView
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/spacing_medium"
@@ -111,9 +89,6 @@
             android:textColorHint="@color/text_light"
             android:textSize="16sp"
             app:fontFamily="@font/rubik_regular" />
-
-
-
 
             <TextView
                 android:id="@+id/Range2"
@@ -127,13 +102,7 @@
                 android:textColorHint="@color/text_light"
                 android:textSize="16sp"
                 app:fontFamily="@font/rubik_regular" />
-
-
-
     </LinearLayout>
-
-
-
 
 </LinearLayout>
 

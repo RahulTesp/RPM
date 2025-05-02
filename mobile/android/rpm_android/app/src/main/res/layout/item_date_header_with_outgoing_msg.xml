@@ -55,7 +55,6 @@
         android:layout_marginTop="8dp"
         android:layout_marginStart="100dp"
         android:padding="8dp"
-
         android:background="@drawable/outgoing_msg_bubble">
 
         <TextView
@@ -78,8 +77,6 @@
             android:layout_marginTop="2dp"
             android:text="Outgoing Message" />
 
-
-
         <!-- Edit and Delete Buttons at Bottom-Right -->
         <LinearLayout
             android:id="@+id/buttonContainer"
@@ -91,9 +88,8 @@
             android:layout_marginBottom="10dp"
             android:paddingBottom="12dp"
             android:layout_marginEnd="10dp"
-            android:padding="4dp"
-            android:visibility="gone"
-            >
+            android:padding="2dp"
+            android:visibility="gone">
 
             <!-- Edit Button -->
             <ImageButton

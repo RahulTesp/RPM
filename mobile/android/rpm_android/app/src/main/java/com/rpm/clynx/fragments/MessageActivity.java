@@ -72,7 +72,7 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
     private final QuickstartConversationsManager quickstartConversationsManager = new QuickstartConversationsManager(this);
     SharedPreferences pref;
     SharedPreferences.Editor editor;
-    private String Token, Username, UserId;
+    private String Token, Username, UserId, ToUser, FriendlyUsername ;
     ProgressBar progressBarMsg;
     TextView chatMemberName;
     String CONVERSATION_SID = "";
@@ -104,8 +104,8 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
         Username = pref.getString("UserName", null);
         UserId = pref.getString("Patent_id", null);
 
-        String ToUser = getIntent().getStringExtra("memberUsername") != null ? getIntent().getStringExtra("memberUsername") : "";
-        String FriendlyUsername = getIntent().getStringExtra("FriendlyUsername") != null ? getIntent().getStringExtra("FriendlyUsername") : "";
+        ToUser = getIntent().getStringExtra("memberUsername") != null ? getIntent().getStringExtra("memberUsername") : "";
+        FriendlyUsername = getIntent().getStringExtra("FriendlyUsername") != null ? getIntent().getStringExtra("FriendlyUsername") : "";
 
         if (FriendlyUsername.contains("-")) {
             FriendlyUsername = FriendlyUsername.split("-")[0];  // Take the part before "-"
@@ -121,6 +121,9 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
 
         Log.d("ToUservalue:--", ToUser);
         Log.d("FriendlyUsernamevalue:-", FriendlyUsername);
+
+        FileLogger.d("ToUservalue:--", ToUser);
+        FileLogger.d("FriendlyUsernamevalue:-", FriendlyUsername);
 
         getChatSid(FriendlyUsername, Token);
 
@@ -196,9 +199,12 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
                             if (quickstartConversationsManager.isConversationParticipating(CONVERSATION_SID)) {
                                 Log.d("Already Participating", "Sending message to existing conversation.");
                                 FileLogger.d("Already Participating", "Sending message to existing conversation.");
+                                Log.d("ChatDebug", "Sending message. FromUser: " + UserId + ", ToUser: " + ToUser);
+                                FileLogger.d("ChatDebug", "Sending message. FromUser: " + UserId + ", ToUser: " + ToUser);
+
 
                                 // Send message to the existing conversation
-                                quickstartConversationsManager.sendMessage(messageBody, MessageActivity.this, CONVERSATION_SID, Token, UserId, ToUser, messagesAdapter);
+                                quickstartConversationsManager.sendMessage(messageBody, MessageActivity.this, CONVERSATION_SID, Token, UserId, FriendlyUsername, messagesAdapter);
                             } else {
                                 Log.d("Not Participating", "Joining conversation and sending message.");
                                 FileLogger.d("Not Participating", "Joining conversation and sending message.");
@@ -554,6 +560,8 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
         private List<Message> messagesS;
         private List<String> dates;
 
+        private int expandedPosition = -1;
+
         MessagesAdapter() {
             messagesS = new ArrayList<>();
             // dates = new ArrayList<>();
@@ -640,14 +648,32 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
                     holder.editedLabel.setVisibility(View.GONE); // Default to hide "Edited" on error
                 }
 
+                // ADD THIS BLOCK HERE to control visibility
+                if (holder.getAdapterPosition() == expandedPosition) {
+                    holder.editDeleteContainer.setVisibility(View.VISIBLE);
+                } else {
+                    holder.editDeleteContainer.setVisibility(View.GONE);
+                }
+
+
                 holder.outgoingMessageLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (holder.editDeleteContainer.getVisibility() == View.VISIBLE) {
-                            holder.editDeleteContainer.setVisibility(View.GONE);
+                        int adapterPosition = holder.getAdapterPosition();
+                        if (adapterPosition == RecyclerView.NO_POSITION) return;
+
+                        if (expandedPosition == adapterPosition) {
+                            expandedPosition = -1;
                         } else {
-                            holder.editDeleteContainer.setVisibility(View.VISIBLE);
+                            expandedPosition = adapterPosition;
                         }
+                        notifyDataSetChanged();
+
+//                        if (holder.editDeleteContainer.getVisibility() == View.VISIBLE) {
+//                            holder.editDeleteContainer.setVisibility(View.GONE);
+//                        } else {
+//                            holder.editDeleteContainer.setVisibility(View.VISIBLE);
+//                        }
                     }
                 });
 
@@ -670,14 +696,33 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
                 }
                 holder.outgoingMessageText.setText(messageText);
                 holder.outgoingTime.setText(localTime);
+
+                // ADD THIS BLOCK HERE to control visibility
+                if (holder.getAdapterPosition() == expandedPosition) {
+                    holder.editDeleteContainer.setVisibility(View.VISIBLE);
+                } else {
+                    holder.editDeleteContainer.setVisibility(View.GONE);
+                }
+
+
                 holder.outgoingMessageLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (holder.editDeleteContainer.getVisibility() == View.VISIBLE) {
-                            holder.editDeleteContainer.setVisibility(View.GONE);
+                        int adapterPosition = holder.getAdapterPosition();
+                        if (adapterPosition == RecyclerView.NO_POSITION) return;
+
+                        if (expandedPosition == adapterPosition) {
+                            expandedPosition = -1;
                         } else {
-                            holder.editDeleteContainer.setVisibility(View.VISIBLE);
+                            expandedPosition = adapterPosition;
                         }
+                        notifyDataSetChanged();
+
+//                        if (holder.editDeleteContainer.getVisibility() == View.VISIBLE) {
+//                            holder.editDeleteContainer.setVisibility(View.GONE);
+//                        } else {
+//                            holder.editDeleteContainer.setVisibility(View.VISIBLE);
+//                        }
                     }
                 });
 
@@ -828,7 +873,13 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
 
             builder.setPositiveButton("Save", (dialog, which) -> {
                 String editedText = input.getText().toString().trim();
-                if (!editedText.isEmpty()) {
+
+                // Check if the text is empty or just whitespace
+                if (editedText.isEmpty()) {
+                    input.setError("Message cannot be empty or just spaces");  // Show error
+                    return;  // Don't proceed with saving, just show the error
+                }
+              //  if (!editedText.isEmpty()) {
 
                     message.updateBody(editedText, new StatusListener() {
                         @Override
@@ -851,7 +902,7 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
                             );
                         }
                     });
-                }
+              //  }
             });
 
             builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());

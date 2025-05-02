@@ -2,7 +2,6 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-
     android:padding="10dp"
     android:layout_height="wrap_content">
     <LinearLayout
@@ -11,7 +10,6 @@
         android:background="@drawable/card_background_white"
         android:orientation="vertical"
         android:padding="10dp">
-
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -47,45 +45,22 @@
                 android:textStyle="bold"
                 android:textColor="@color/Primary_dark"
                 android:textSize="17sp" />
-
-
-
         </LinearLayout>
-
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-
             android:orientation="horizontal">
 
-
-
-
             <View
                 android:layout_width="@dimen/margin_10dp"
                 android:layout_height="0dp" />
-
-
             <View
                 android:layout_width="@dimen/margin_10dp"
                 android:layout_height="0dp" />
-
-
-
-
-
-
             <View
                 android:layout_width="@dimen/margin_10dp"
                 android:layout_height="0dp" />
-
-
-
-
-
         </LinearLayout>
-
-
     </LinearLayout>
 </LinearLayout>

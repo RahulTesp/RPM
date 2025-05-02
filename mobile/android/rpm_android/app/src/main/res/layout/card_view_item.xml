@@ -1,6 +1,5 @@
 <androidx.cardview.widget.CardView android:id="@+id/cardDB"
     android:padding="20dp"
-
     app:cardBackgroundColor="@color/white"
     android:layout_width="300dp"
     android:layout_height="wrap_content"
@@ -122,12 +121,10 @@
 
                     <com.github.mikephil.charting.charts.LineChart
                         android:id="@+id/linechartDashboard"
-
                         android:layout_width="match_parent"
                         android:background="@color/white"
                         android:layout_height="350dp"
                         android:layout_margin="@dimen/left_margin10dp" />
 
                 </LinearLayout>
-
             </androidx.cardview.widget.CardView>

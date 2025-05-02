@@ -7,20 +7,12 @@
     android:layout_height="match_parent"
     tools:context="com.rpm.clynx.fragments.Login">
 
-
-
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
-
         android:background="@color/background_grey1">
-
-
-
-
 
         <RelativeLayout
             android:id="@+id/relativeLayout"
@@ -67,9 +59,7 @@
                         android:backgroundTint="@android:color/transparent"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-
             </LinearLayout>
-
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/fp_btn"
@@ -80,14 +70,6 @@
                 android:background="@drawable/button_inactive"
                 android:text="Generate OTP"
                 android:textColor="@color/white" />
-
-
         </RelativeLayout>
-
-
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

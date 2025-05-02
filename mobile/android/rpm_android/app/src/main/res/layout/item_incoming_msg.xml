@@ -2,8 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-   >
+    android:layout_marginBottom="12dp">
 
     <!-- Incoming Message Layout -->
     <RelativeLayout
@@ -37,8 +36,5 @@
             android:layout_marginTop="2dp"
             android:layout_marginLeft="6dp"
             android:text="Incoming Message"/>
-
-
     </RelativeLayout>
-
 </RelativeLayout>

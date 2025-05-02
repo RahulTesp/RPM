@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -9,7 +8,6 @@
     tools:context="com.rpm.clynx.activity.MoreActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-
         android:id="@+id/constraintMore"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -50,11 +48,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar">
-
-            <!--            <androidx.cardview.widget.CardView-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                app:cardCornerRadius="20dp">-->
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -146,17 +139,12 @@
                     android:gravity="center"
                     android:orientation="vertical">
 
-
-
-
                     <ImageView
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:background="@drawable/card_background_icon"
                         android:padding="10dp"
                         android:src="@drawable/icons_feedback" />
-
-
 
                     <TextView
                         android:layout_width="match_parent"
@@ -221,14 +209,6 @@
 
         </LinearLayout>
 
-
-
-
-
-
-
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ScrollView
@@ -242,8 +222,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintMore">
-
-        >
 
         <LinearLayout
             android:id="@+id/linearLayout"
@@ -267,23 +245,11 @@
                 android:onClick="pgminfo"
                 android:orientation="horizontal">
 
-
-                <!--                <com.google.android.material.imageview.ShapeableImageView-->
-                <!--                    style="@style/Style.App.circleImageView"-->
-                <!--                    android:layout_width="70dp"-->
-                <!--                    android:layout_height="70dp"-->
-                <!--                    android:paddingStart="20dp"-->
-                <!--                    android:paddingTop="20dp"-->
-                <!--                    android:paddingBottom="20dp"-->
-                <!--                    android:src="@drawable/ic_outline_spa_24" />-->
-
                 <ImageView
                     android:layout_width="60dp"
                     android:layout_height="70dp"
-
                     android:padding="10dp"
                     android:src="@drawable/icons_program" />
-
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -350,125 +316,6 @@
                 </LinearLayout>
             </LinearLayout>
 
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="10dp"-->
-<!--                android:background="@drawable/card_background_light"-->
-<!--                android:onClick="activityinfo"-->
-<!--                android:orientation="horizontal">-->
-
-<!--                <ImageView-->
-<!--                    android:layout_width="60dp"-->
-<!--                    android:layout_height="70dp"-->
-
-<!--                    android:padding="10dp"-->
-<!--                    android:src="@drawable/icons_activity" />-->
-
-<!--                <LinearLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:orientation="vertical"-->
-<!--                    android:padding="10dp">-->
-
-<!--                    <TextView-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="Activity"-->
-<!--                        android:textColor="@color/black"-->
-<!--                        android:textSize="16sp"-->
-<!--                        app:fontFamily="@font/rubik_regular" />-->
-
-<!--                    <TextView-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:layout_marginTop="5dp"-->
-<!--                        android:text="Your Program activity records"-->
-<!--                        android:textColor="@color/Primary_dark"-->
-<!--                        android:textSize="12sp"-->
-<!--                        app:fontFamily="@font/rubik_regular" />-->
-<!--                </LinearLayout>-->
-<!--            </LinearLayout>-->
-
-
-            <!--            <LinearLayout-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_marginTop="10dp"-->
-            <!--                android:background="@drawable/card_background_light"-->
-            <!--                android:orientation="horizontal">-->
-
-            <!--                <ImageView-->
-            <!--                    android:layout_width="60dp"-->
-            <!--                    android:layout_height="70dp"-->
-
-            <!--                    android:padding="10dp"-->
-            <!--                    android:src="@drawable/icons_devices" />-->
-
-            <!--                <LinearLayout-->
-            <!--                    android:layout_width="match_parent"-->
-            <!--                    android:layout_height="match_parent"-->
-            <!--                    android:orientation="vertical"-->
-            <!--                    android:padding="10dp">-->
-
-            <!--                    <TextView-->
-            <!--                        android:layout_width="match_parent"-->
-            <!--                        android:layout_height="wrap_content"-->
-            <!--                        android:text="Device Connection"-->
-            <!--                        android:textColor="@color/black"-->
-            <!--                        android:textSize="18sp"-->
-            <!--                        android:textStyle="bold" />-->
-
-            <!--                    <TextView-->
-            <!--                        android:layout_width="match_parent"-->
-            <!--                        android:layout_height="wrap_content"-->
-            <!--                        android:layout_marginTop="5dp"-->
-            <!--                        android:text="Bluetooth Pairing"-->
-            <!--                        android:textColor="@color/text_light"-->
-            <!--                        android:textSize="15sp"-->
-            <!--                        android:textStyle="bold" />-->
-            <!--                </LinearLayout>-->
-            <!--            </LinearLayout>-->
-
-            <!--            <LinearLayout-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_marginTop="10dp"-->
-            <!--                android:background="@drawable/card_background_light"-->
-            <!--                android:orientation="horizontal">-->
-
-            <!--                <ImageView-->
-            <!--                    android:layout_width="60dp"-->
-            <!--                    android:layout_height="70dp"-->
-
-            <!--                    android:padding="10dp"-->
-            <!--                    android:src="@drawable/icons_reports" />-->
-
-            <!--                <LinearLayout-->
-            <!--                    android:layout_width="match_parent"-->
-            <!--                    android:layout_height="match_parent"-->
-            <!--                    android:orientation="vertical"-->
-            <!--                    android:padding="10dp">-->
-
-            <!--                    <TextView-->
-            <!--                        android:layout_width="match_parent"-->
-            <!--                        android:layout_height="wrap_content"-->
-            <!--                        android:text="Reports"-->
-            <!--                        android:textColor="@color/black"-->
-            <!--                        android:textSize="18sp"-->
-            <!--                        android:textStyle="bold" />-->
-
-            <!--                    <TextView-->
-            <!--                        android:layout_width="match_parent"-->
-            <!--                        android:layout_height="wrap_content"-->
-            <!--                        android:layout_marginTop="5dp"-->
-            <!--                        android:text="Download your Program reports"-->
-            <!--                        android:textColor="@color/text_light"-->
-            <!--                        android:textSize="15sp"-->
-            <!--                        android:textStyle="bold" />-->
-            <!--                </LinearLayout>-->
-            <!--            </LinearLayout>-->
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -480,7 +327,6 @@
                 <ImageView
                     android:layout_width="60dp"
                     android:layout_height="70dp"
-
                     android:padding="10dp"
                     android:src="@drawable/icons_myinfo" />
 
@@ -529,8 +375,6 @@
 
         </LinearLayout>
     </ScrollView>
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

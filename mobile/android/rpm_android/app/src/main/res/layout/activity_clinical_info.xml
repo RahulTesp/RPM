@@ -32,16 +32,11 @@ tools:context="com.rpm.clynx.activity.ClinicalInfoActivity">
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginRight="50dp"
-
         android:text="Clinical Info"
         android:textAlignment="center"
         android:textColor="@color/Primary_dark"
         android:textSize="18sp"
         android:textStyle="bold" />
-
-
-
-
 </androidx.appcompat.widget.Toolbar>
 
 <androidx.cardview.widget.CardView
@@ -70,18 +65,11 @@ tools:context="com.rpm.clynx.activity.ClinicalInfoActivity">
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
         app:layout_constraintVertical_bias="1.0"
         app:tabBackground="@drawable/tab_layout_bg"
-
-
         app:tabIconTint="@color/tab_icon"
         app:tabIndicatorColor="@color/colorPrimary"
         app:tabInlineLabel="true"
         app:tabSelectedTextColor="@color/colorPrimary"
-
-
         app:tabTextAppearance="@style/CustomTextAppearanceTab">
-
-
-
 
 <!--        app:tabIconTint="@color/unselected_color"-->
 <!--        app:tabSelectedIconColor="@color/blue_A40"-->
@@ -98,7 +86,6 @@ tools:context="com.rpm.clynx.activity.ClinicalInfoActivity">
             android:id="@+id/tab1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:icon="@drawable/icons_settings"
 
             />
@@ -123,10 +110,8 @@ tools:context="com.rpm.clynx.activity.ClinicalInfoActivity">
             android:id="@+id/tab3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:icon="@drawable/icons_settings" />
         <!--            android:text="Preference"-->
-
 
 
     </com.google.android.material.tabs.TabLayout>
@@ -148,7 +133,4 @@ tools:context="com.rpm.clynx.activity.ClinicalInfoActivity">
         android:background="@color/background2" />
 
 </LinearLayout>
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

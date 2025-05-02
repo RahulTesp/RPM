@@ -21,6 +21,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.rpm.clynx.R;
 import com.rpm.clynx.fragments.DashboardFragment;
+import com.rpm.clynx.fragments.NotificationFragment;
 import com.rpm.clynx.utility.ConversationsClientManager;
 import com.rpm.clynx.utility.MyApplication;
 import com.twilio.conversations.ConversationsClient;
@@ -86,14 +87,23 @@ SharedPreferences pref;
         Log.d("remoteMessageRCVD", remoteMessage.toString());
         super.onMessageReceived(remoteMessage);
 
-        if (DashboardFragment.DashboardFragmentIsVisible) { //  Only if visible
-
-        Intent intent = new Intent(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED); // Same ACTION you listen for
-        intent.putExtra("data", remoteMessage.getData().toString()); // If you want to pass any extra data
-        sendBroadcast(intent);  // 🚀 This sends the broadcast!
+        if (DashboardFragment.DashboardFragmentIsVisible || NotificationFragment.NotificationFragmentIsVisible) {
+            Intent intent = new Intent(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED);
+            intent.putExtra("data", remoteMessage.getData().toString());
+            sendBroadcast(intent);
         } else {
-            Log.d("remoteMessageRCVD", "Dashboard Fragment not visible, not sending broadcast");
+            Log.d("remoteMessageRCVD", "Dashboard or Notification Fragment not visible, not sending broadcast");
         }
+
+
+//        if (DashboardFragment.DashboardFragmentIsVisible) { //  Only if visible
+//
+//        Intent intent = new Intent(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED); // Same ACTION you listen for
+//        intent.putExtra("data", remoteMessage.getData().toString()); // If you want to pass any extra data
+//        sendBroadcast(intent);  // 🚀 This sends the broadcast!
+//        } else {
+//            Log.d("remoteMessageRCVD", "Dashboard Fragment not visible, not sending broadcast");
+//        }
         //  Check if message contains a notification payload
         if (remoteMessage.getNotification() != null) {
             Log.d("Notification", "Notification Payload Received");

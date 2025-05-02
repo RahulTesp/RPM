@@ -58,24 +58,17 @@
             app:layout_constraintTop_toBottomOf="@+id/toolbar"
             app:layout_constraintVertical_bias="1.0"
             app:tabBackground="@drawable/tab_layout_bg"
-
-
             app:tabIconTint="@color/tab_icon"
             app:tabIndicatorColor="@color/colorPrimary"
             app:tabInlineLabel="true"
             app:tabSelectedTextColor="@color/colorPrimary"
-
-
             app:tabTextAppearance="@style/CustomTextAppearanceTab">
 
-
-            app:tabInlineLabel="true"
-
-            app:tabIconTint="@color/unselected_color"
-            app:tabSelectedIconColor="@color/blue_A40"
-
-            app:tabSelectedTextColor="@color/colorAccent"
-            app:tabTextColor="@color/green_800"
+<!--            app:tabInlineLabel="true"-->
+<!--            app:tabIconTint="@color/unselected_color"-->
+<!--            app:tabSelectedIconColor="@color/blue_A40"-->
+<!--            app:tabSelectedTextColor="@color/colorAccent"-->
+<!--            app:tabTextColor="@color/green_800"-->
 
             <!--            app:tabIndicatorColor="@color/indigo_A700"-->
 
@@ -112,12 +105,10 @@
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:icon="@drawable/icons_settings" />
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:icon="@drawable/icons_settings" />
 
         </com.google.android.material.tabs.TabLayout>
@@ -137,9 +128,5 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/background2" />
-
     </LinearLayout>
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -123,7 +123,7 @@ public class DashboardFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             // This method is called when notification/broadcast is received
-            // 👉 Call your API here
+            //  Call your API here
             Log.d("getNotificationsCount", "getNotificationsCount");
             getNotificationsCount(); // (your API method)
         }
@@ -152,6 +152,7 @@ public class DashboardFragment extends Fragment {
     public void onResume() {
         super.onResume();
         DashboardFragmentIsVisible = true;
+        getNotificationsCount();
         if (pref.getBoolean("loginstatus", false) == false){
             Log.d("loginstsfrmdashboard", String.valueOf(pref.getBoolean("loginstatus", false)));
             editor.clear();

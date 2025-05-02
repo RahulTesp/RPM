@@ -10,16 +10,14 @@
         android:id="@+id/constraint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/background_grey1"
-        >
+        android:background="@color/background_grey1">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            >
+            app:layout_constraintTop_toTopOf="parent">
             <TextView
                 android:id="@+id/notification_date"
                 android:layout_width="wrap_content"
@@ -29,6 +27,7 @@
                 android:textStyle="bold"
                 android:textColor="@color/Primary_dark"
                 android:textSize="15sp" />
+
             <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
@@ -44,5 +43,4 @@
             app:layout_constraintTop_toBottomOf="@+id/llo_notification" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </FrameLayout>

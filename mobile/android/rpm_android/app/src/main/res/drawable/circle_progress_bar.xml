@@ -13,9 +13,5 @@
         android:startColor="@color/Primary_bg"
         android:type="sweep"
         android:useLevel="false"/>
-
-
 </shape>
-
-
 </rotate>

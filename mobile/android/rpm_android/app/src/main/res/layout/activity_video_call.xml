@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     android:id="@+id/coordinator_layout"
     android:fitsSystemWindows="true"
     tools:context="com.rpm.clynx.activity.VideoCallTwilio"
@@ -15,8 +14,6 @@
 
     <LinearLayout
         android:layout_width="wrap_content"
-
-
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:orientation="vertical" >
@@ -51,21 +48,6 @@
             android:layout_gravity="center"
             android:src="@drawable/ic_mic_white_24dp" />
 
-
-<!--        <Button-->
-<!--            android:id="@+id/fab_button"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="JOIN"-->
-<!--            android:background="@color/Primary_dark"-->
-<!--            android:textSize="16sp"-->
-<!--            android:textColor="@android:color/white"-->
-
-<!--            android:elevation="6dp"-->
-<!--            android:layout_gravity="bottom|end"-->
-<!--            android:layout_margin="6dp" />-->
-
-
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/connect_action_fab"
             style="@style/RedFloatingActionButtonStyle"
@@ -79,22 +61,6 @@
             android:src="@drawable/ic_video_call_white_24dp"
             app:fabSize="normal"
             app:tint="#EEE" />
-
-
-
-
-<!--        <Button-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="My Text"-->
-<!--            app:tint="#EEE"-->
-<!--            android:drawableStart="@drawable/ic_icons_notification" />-->
-
-        <!--        app:fabSize="normal"-->
-<!--        app:tint="#EEE"-->
-<!--            android:src="@drawable/ic_video_call_white_24dp" -->
-<!--            />-->
-
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
