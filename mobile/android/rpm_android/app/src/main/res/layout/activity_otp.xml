@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    tools:context="com.rpm.clynx.auth.Login">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/profile_card_body_bg"
+        android:labelFor="@id/constraint2"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Log In"
+            android:textAlignment="center"
+            android:textColor="@color/Primary_dark"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:background="@color/background_grey1"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/login_logo"
+            style="@style/Style.App.circleImageView"
+            android:layout_width="180dp"
+            android:layout_height="111dp"
+            android:layout_above="@id/rel"
+            android:padding="10dp"
+            android:src="@drawable/clynxlogo"
+            app:layout_constraintBottom_toTopOf="@+id/rel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.536"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RelativeLayout
+            android:id="@+id/rel"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_above="@id/login_logo"
+            android:layout_margin="40dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/login_logo"
+            tools:ignore="MissingConstraints">
+
+            <ProgressBar
+                android:id="@+id/progressBarToday"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/circle_shape"
+                android:indeterminate="false"
+                android:progressDrawable="@drawable/circle_progress_bar"
+                android:rotation="-90"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/txtprogress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:text="-"
+                android:textColor="@color/Primary_dark"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:fontFamily="@font/rubik_regular" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_centerHorizontal = "true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rel">
+
+            <TextView
+                android:id="@+id/txtvwVerif"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Enter Verification Code"
+                android:textAlignment="center"
+                android:textColor="@color/Primary_dark"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:fontFamily="@font/rubik_regular"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/cv2" />
+
+            <LinearLayout
+                android:id="@+id/cv2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtvwVerif"
+                android:layout_marginLeft="6dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginRight="6dp"
+                android:orientation="vertical"
+                android:layout_centerHorizontal = "true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <com.poovam.pinedittextfield.SquarePinField
+                    android:id="@+id/squareField"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:inputType="number"
+                    android:layout_centerHorizontal = "true"
+                    android:textSelectHandle="@drawable/text_handle"
+                    android:textSize="14sp"
+                    app:cornerRadius="8dp"
+                    app:distanceInBetween="@dimen/margin_5dp"
+                    app:fieldBgColor="@color/white"
+                    app:fieldColor="@color/green"
+                    app:highlightColor="@color/green"
+                    app:noOfFields="8"
+                    tools:ignore="MissingClass" />
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relativeverif"
+            android:layout_width="348dp"
+            android:layout_height="112dp"
+            android:layout_below="@+id/relativeLayout"
+            android:gravity="center_vertical"
+            android:paddingTop="@dimen/spacing_medium"
+            android:paddingBottom="@dimen/spacing_medium"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/relativeLayout"
+            tools:ignore="MissingConstraints,NotSibling">
+
+            <TextView
+                android:id="@+id/txtVerifTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="Not Received a Verification code?"
+                android:textAlignment="center"
+                android:textColor="@color/Primary_dark"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:fontFamily="@font/rubik_regular"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/login_otp_resend" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/login_otp_resend"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtVerifTxt"
+                android:layout_marginLeft="25dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="25dp"
+                android:background="@drawable/button_active"
+                android:text="Resend OTP"
+                android:textColor="@color/Primary_dark"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtVerifTxt"
+                tools:ignore="MissingConstraints"
+                tools:layout_editor_absoluteX="0dp" />
+        </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

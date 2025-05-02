@@ -398,3 +398,39 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Android specific
+.gradle/
+.idea/
+*.iml
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+*.log
+
+# Android Studio Navigation Editor temp files
+.navigation/
+
+# Keystore files (DO NOT commit keys!)
+*.jks
+*.keystore
+
+# Google Services (used for Firebase etc.)
+google-services.json
+fabric.properties
+
+# Crashlytics / Firebase
+crashlytics-build.properties
+
+# Other potentially generated or local files
+*.apk
+*.ap_
+output.json
+
+# IntelliJ
+out/
+
+# NDK
+obj/

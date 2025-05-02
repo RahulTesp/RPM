@@ -1,0 +1,5 @@
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="?android:attr/colorControlHighlight">
+    <!--  Optional: Change ripple color  -->
+    <item android:drawable="@drawable/card_bg_round_white"/>
+    <!--  Your existing background  -->
+</ripple>

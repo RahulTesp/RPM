@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.rpm.clynx.fragments.DashboardFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/Primary_bg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_lower_background"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <RelativeLayout
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:minHeight="?attr/actionBarSize"
+                android:orientation="horizontal"
+                android:background="@color/profilecard_bg"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/dashboard_notification_bell"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="15dp"
+                    android:minHeight="?attr/actionBarSize"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_icons_notification"
+                    app:tint="@color/black" />
+
+                <TextView
+                    android:id="@+id/dashboard_notification_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="51dp"
+                    android:background="@drawable/text_background_circel"
+                    android:drawableTint="@color/text_dark"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/linear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/margin_20dp"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/dashboard_profile_photo"
+                        style="@style/Style.App.circleImageView"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:padding="10dp"
+                        android:src="@drawable/avatar5" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:id="@+id/dashboard_user_full_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/rubik_regular"
+                            android:text=""
+                            android:textColor="@color/Primary_dark"
+                            android:textSize="24sp" />
+
+                        <TextView
+                            android:id="@+id/dashboard_patent_id"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="@font/rubik_semibold"
+                            android:text=""
+                            android:textColor="@color/black"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/card_lower_background"
+                    android:orientation="horizontal"
+                    android:paddingBottom="20dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <ImageView
+                                android:id="@+id/dashboard_chat"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:background="@drawable/card_background_max_radious"
+                                android:padding="5dp"
+                                android:src="@drawable/ic_icons_chat_a" />
+
+                            <TextView
+                                android:id="@+id/chatMessageCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="top|end"
+                                android:background="@drawable/badge_background"
+                                android:padding="4dp"
+                                android:text="0"
+                                android:textColor="#FFFFFF" />
+                        </FrameLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="20dp"
+                        android:layout_height="0dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/dashboard_call"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:background="@drawable/card_background_max_radious"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_icons_phone_a" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:labelFor="@id/linear"
+        android:background="@color/profile_body_bg"
+        android:layout_marginTop="230dp"
+        app:layout_constraintTop_toBottomOf="@+id/constraint">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="-15dp"
+            android:background="@color/profile_body_bg">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_lower_background"
+                android:padding="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="@dimen/margin_20dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/account_header_background"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/frag_dash_prog_name"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Care Plan-BG+BP"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:fontFamily="@font/rubik_regular" />
+
+                        <TextView
+                            android:id="@+id/frag_dash_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/active_background_radious"
+                            android:drawableTint="@color/green"
+                            android:gravity="right"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp"
+                            android:text="Active"
+                            android:textSize="14sp"
+                            android:textColor="@color/white"
+                            android:fontFamily="@font/rubik_regular" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/frag_dash_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:text="FRIDAY, Jan 28, 2022"
+                android:textColor="@color/accent2"
+                android:textSize="16sp"
+                android:fontFamily="@font/rubik_regular" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TODO LIST - "
+                    android:textColor="@color/Primary_dark"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:fontFamily="@font/rubik_regular" />
+                <TextView
+                    android:id="@+id/todo_nofoactivitesda_dash"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 Activities"
+                    android:textStyle="normal"
+                    android:textColor="@color/Primary_dark"
+                    android:textSize="15sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerview_todolist_vertical_dash"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:background="@color/background2"
+                    android:orientation="horizontal" />
+
+                <!-- Add any other views or widgets you want to place next to the RecyclerView here -->
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/empty_viewDB"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/margin_10dp"
+                android:gravity="center"
+                android:visibility="gone"
+                android:text="@string/no_data_available" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/recentvt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="RECENT VITALS"
+                    android:textColor="@color/Primary_dark"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/rubik_semibold"
+                    android:visibility="invisible" />
+            </LinearLayout>
+
+            <HorizontalScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fillViewport="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/chartContainer"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:orientation="horizontal">
+
+                    <!-- CardViews will be added dynamically here -->
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <View
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"/>
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
