@@ -339,6 +339,7 @@ export class NotificationComponent implements OnInit {
       );
   }
 
+
   refreshNotifications() {
     this.messageservice.GetNotifications()
       .then(() => {
