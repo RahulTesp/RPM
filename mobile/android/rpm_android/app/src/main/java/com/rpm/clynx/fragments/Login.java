@@ -59,6 +59,7 @@ import com.rpm.clynx.home.Home;
 import com.rpm.clynx.service.NotificationReceiver;
 import com.rpm.clynx.utility.ConversationsClientManager;
 import com.rpm.clynx.utility.DataBaseHelper;
+import com.rpm.clynx.utility.FileLogger;
 import com.rpm.clynx.utility.Loader;
 import com.rpm.clynx.utility.MyApplication;
 import com.rpm.clynx.utility.SystemBarColor;
@@ -97,7 +98,7 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
     private BroadcastReceiver notificationReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-Log.d("loginnotialert","loginnotialert");
+            Log.d("loginnotialert","loginnotialert");
             if (intent.getAction().equals(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED)) {
                 // Handle the received notification data
                 Bundle notificationData = intent.getBundleExtra(NotificationReceiver.EXTRA_NOTIFICATION_DATA);
@@ -111,33 +112,33 @@ Log.d("loginnotialert","loginnotialert");
 
                     if (atSymbolIndex != -1 && hashIndex != -1 && atSymbolIndex < hashIndex)
                     {
-                    // Extract the username, room name, and token ID
-                    roomnameVal = body.substring(0, atSymbolIndex);
-                    tokenid = body.substring(atSymbolIndex + 1, hashIndex);
-                    // Extract the value after '#'
-                    callStatus = body.substring(hashIndex + 1);
-                    Log.d("callbody", body); // It will be either "True" or "False"
-                    Log.d("CallStatusfrombody", callStatus); // It will be either "True" or "False"
-                    Log.d("roomnameVal", roomnameVal);
-                    Log.d("TokenID", tokenid);
+                        // Extract the username, room name, and token ID
+                        roomnameVal = body.substring(0, atSymbolIndex);
+                        tokenid = body.substring(atSymbolIndex + 1, hashIndex);
+                        // Extract the value after '#'
+                        callStatus = body.substring(hashIndex + 1);
+                        Log.d("callbody", body); // It will be either "True" or "False"
+                        Log.d("CallStatusfrombody", callStatus); // It will be either "True" or "False"
+                        Log.d("roomnameVal", roomnameVal);
+                        Log.d("TokenID", tokenid);
 
-                    int firstUnderscoreIndex = body.indexOf('_');
-                    if (firstUnderscoreIndex != -1) {
-                        int secondUnderscoreIndex = body.indexOf('_', firstUnderscoreIndex + 1);
-                        if (secondUnderscoreIndex != -1) {
-                            toUsername = body.substring(0, secondUnderscoreIndex);
-                            // Use the toUsername as desired
-                            Log.d("toUsername", toUsername);
+                        int firstUnderscoreIndex = body.indexOf('_');
+                        if (firstUnderscoreIndex != -1) {
+                            int secondUnderscoreIndex = body.indexOf('_', firstUnderscoreIndex + 1);
+                            if (secondUnderscoreIndex != -1) {
+                                toUsername = body.substring(0, secondUnderscoreIndex);
+                                // Use the toUsername as desired
+                                Log.d("toUsername", toUsername);
+                            } else {
+                                // Only one underscore found in the string
+                                Log.d("CutString", "Only one underscore found");
+                            }
                         } else {
-                            // Only one underscore found in the string
-                            Log.d("CutString", "Only one underscore found");
+                            // No underscore found in the string
+                            Log.d("CutString", "No underscore found");
                         }
-                    } else {
-                        // No underscore found in the string
-                        Log.d("CutString", "No underscore found");
+                        startAlertTimer(callStatus);
                     }
-                    startAlertTimer(callStatus);
-                }
                 }
             }
         }
@@ -198,6 +199,8 @@ Log.d("loginnotialert","loginnotialert");
 
         createNotificationChannel(); // Ensure channel exists
 
+        FileLogger.init(getApplicationContext());
+
         // Check if the activity was started from a notification tap
         if (getIntent().getExtras() != null) {
             // Handle the data here
@@ -231,13 +234,13 @@ Log.d("loginnotialert","loginnotialert");
         Log.d("loginstate", String.valueOf(loginstatus));
 
         if (loginstatus ){
-        Log.d("loginstatsTorF", String.valueOf(loginstatus));
+            Log.d("loginstatsTorF", String.valueOf(loginstatus));
 
-          ConversationsClient ccc =   ConversationsClientManager.getInstance().getConvClient();
-          Log.d("cccLOGIN", String.valueOf(ccc));
-          if(pref.getString("Token", null) != null) {
-              Log.d("chatclientrecreate","chatclientrecreate");
-          }
+            ConversationsClient ccc =   ConversationsClientManager.getInstance().getConvClient();
+            Log.d("cccLOGIN", String.valueOf(ccc));
+            if(pref.getString("Token", null) != null) {
+                Log.d("chatclientrecreate","chatclientrecreate");
+            }
             Log.d("ostatus", String.valueOf(otpstatus));
             Log.d("loginstatus", String.valueOf(loginstatus));
 
@@ -322,18 +325,23 @@ Log.d("loginnotialert","loginnotialert");
     };
 
     private void startAlertTimer(String callStatus) {
-        Log.d("callStatus",callStatus);
+        Log.d("callStatus", callStatus);
         latestActivity = ((MyApplication) getApplication()).getLatestActivity();
         System.out.println("latestActivity: " + latestActivity);
 
-        // If callStatus is "False" and alert is displayed, dismiss it
+        // If callStatus is "False", dismiss alert if it's showing
         if ("False".equalsIgnoreCase(callStatus)) {
             if (alertDialog != null && alertDialog.isShowing()) {
                 alertDialog.dismiss();
+                alertDialog = null;
                 System.out.println("Call status is False, alert dismissed.");
             }
+            return;
+        }
 
-            return; // Exit the function early
+        // If already showing, don't recreate it
+        if (alertDialog != null && alertDialog.isShowing()) {
+            return;
         }
 
         // If callStatus is "True", show the alert
@@ -342,22 +350,24 @@ Log.d("loginnotialert","loginnotialert");
         alertDialogBuilder.setMessage("Do you want to join?");
         alertDialogBuilder.setCancelable(false);
 
-        // Set the positive button
+        // Set positive button
         alertDialogBuilder.setPositiveButton("Yes", (dialog, which) -> {
             System.out.println("VIDEO activity: " + latestActivity);
-            isCallJoined = true; // Mark as joined
+            isCallJoined = true;
             videoCall(roomnameVal, title, latestActivity);
             dialog.dismiss();
+            alertDialog = null;
         });
 
-        // Set the negative button
+        // Set negative button
         alertDialogBuilder.setNegativeButton("No", (dialog, which) -> {
             Toast.makeText(latestActivity, "No clicked", Toast.LENGTH_SHORT).show();
             callReject(latestActivity);
             dialog.dismiss();
+            alertDialog = null;
         });
 
-        // Create and show the AlertDialog
+        // Show alert
         alertDialog = alertDialogBuilder.create();
         alertDialog.show();
 
@@ -365,8 +375,9 @@ Log.d("loginnotialert","loginnotialert");
         new Handler().postDelayed(() -> {
             if (alertDialog != null && alertDialog.isShowing()) {
                 alertDialog.dismiss();
+                alertDialog = null;
             }
-        }, 120000); // 2 minutes (120,000 milliseconds)
+        }, 120000);
     }
 
     private void videoCall(String roomname, String caller, Activity latstActvty)  {
@@ -497,7 +508,7 @@ Log.d("loginnotialert","loginnotialert");
         IntentFilter intentFilterTok = new IntentFilter("com.example.NEW_TOKEN_RECEIVED");
         LocalBroadcastManager.getInstance(this).registerReceiver(newTokenReceiver, intentFilterTok);
         Log.d("loginonResststus", String.valueOf(pref.getBoolean("loginstatus", false) ));
-        }
+    }
 
     @Override
     protected void onPause() {
@@ -729,14 +740,14 @@ Log.d("loginnotialert","loginnotialert");
             editor.apply();
         }
     }
-private boolean isNetworkAvailable() {
-    ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-    if (connectivityManager != null) {
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        }
+        return false;
     }
-    return false;
-}
     public void logoutOnExpiry(String tokenVALUE) {
         Log.d("logouttimerends", "logouttimerends");
         Log.d("context", String.valueOf((((MyApplication) getApplication()).getLatestActivity())));
@@ -753,51 +764,51 @@ private boolean isNetworkAvailable() {
             // Display a toast message indicating poor or no network connectivity
             unsubscribeFromTopicsOnLogout((((MyApplication) getApplication()).getLatestActivity()));
         }
-else
+        else
         {
             Log.d("notisNetworkAvailable", "notisNetworkAvailable");
             String LOGOUT_URL = BASE_URL + LOGOUT.toString();
             JSONObject parameters = new JSONObject();
-        try {
-            parameters.put("Bearer", tokenVALUE);
-        } catch (Exception e) {
-        }
-        StringRequest request = new StringRequest(Request.Method.POST, LOGOUT_URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d("loginstsfrmlogn1", String.valueOf(pref.getBoolean("loginstatus", false)));
-                Log.i("onResponse", response.toString());
-                editor.putBoolean("loginstatus", false);
-                editor.apply();
-                Log.d("loginstsfrmlogn2", String.valueOf(pref.getBoolean("loginstatus", false)));
+            try {
+                parameters.put("Bearer", tokenVALUE);
+            } catch (Exception e) {
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("onErrorResponse", error.toString());
-                if ( error.networkResponse.statusCode == 401) {
-                    Log.d("JSONE statusCoden", String.valueOf(error.networkResponse.statusCode));
-                    error.printStackTrace();
-                    Log.d("e", error.toString());
+            StringRequest request = new StringRequest(Request.Method.POST, LOGOUT_URL, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.d("loginstsfrmlogn1", String.valueOf(pref.getBoolean("loginstatus", false)));
+                    Log.i("onResponse", response.toString());
                     editor.putBoolean("loginstatus", false);
                     editor.apply();
+                    Log.d("loginstsfrmlogn2", String.valueOf(pref.getBoolean("loginstatus", false)));
                 }
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Bearer", tokenVALUE);
-                headers.put("Content-Type", "application/json");
-                Log.d("headers", headers.toString());
-                return headers;
-            }
-        };
-        Log.d("contextgetApplicationContext", String.valueOf(((MyApplication) getApplication()).getLatestActivity()));
-        RequestQueue requestQueue = Volley.newRequestQueue(((MyApplication) getApplication()).getLatestActivity());
-        request.setRetryPolicy(new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        requestQueue.add(request);
-    }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("onErrorResponse", error.toString());
+                    if ( error.networkResponse.statusCode == 401) {
+                        Log.d("JSONE statusCoden", String.valueOf(error.networkResponse.statusCode));
+                        error.printStackTrace();
+                        Log.d("e", error.toString());
+                        editor.putBoolean("loginstatus", false);
+                        editor.apply();
+                    }
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("Bearer", tokenVALUE);
+                    headers.put("Content-Type", "application/json");
+                    Log.d("headers", headers.toString());
+                    return headers;
+                }
+            };
+            Log.d("contextgetApplicationContext", String.valueOf(((MyApplication) getApplication()).getLatestActivity()));
+            RequestQueue requestQueue = Volley.newRequestQueue(((MyApplication) getApplication()).getLatestActivity());
+            request.setRetryPolicy(new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            requestQueue.add(request);
+        }
     }
     public static synchronized Login getInstance() {
         if (logininstance == null) {

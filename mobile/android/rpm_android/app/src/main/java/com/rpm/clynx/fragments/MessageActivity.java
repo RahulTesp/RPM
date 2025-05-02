@@ -9,8 +9,12 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -38,6 +42,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.rpm.clynx.R;
 import com.rpm.clynx.utility.ConversationsClientManager;
+import com.rpm.clynx.utility.FileLogger;
 import com.twilio.conversations.Attributes;
 import com.twilio.conversations.CallbackListener;
 import com.twilio.conversations.Conversation;
@@ -110,14 +115,14 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
         memberusername = ToUser;
         messagesAdapter = new MessagesAdapter();
 
-           Log.d("memberusername", memberusername);
-            chatMemberName = findViewById(R.id.chatMemName);
-            chatMemberName.setText(memberusername);
+        Log.d("memberusername", memberusername);
+        chatMemberName = findViewById(R.id.chatMemName);
+        chatMemberName.setText(memberusername);
 
         Log.d("ToUservalue:--", ToUser);
         Log.d("FriendlyUsernamevalue:-", FriendlyUsername);
 
-            getChatSid(FriendlyUsername, Token);
+        getChatSid(FriendlyUsername, Token);
 
         recyclerView = findViewById(R.id.messagesRecyclerView);
         progressBarMsg = findViewById(R.id.progressMessage); // Replace with your progress indicator view ID
@@ -128,24 +133,81 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(messagesAdapter);
         writeMessageEditText = findViewById(R.id.writeMessageEditText);
+
+        writeMessageEditText.setMovementMethod(new ScrollingMovementMethod());
+
+        writeMessageEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Nothing
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Nothing
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Enable scrolling after 5 lines
+                if (writeMessageEditText.getLineCount() > 4) {
+                    writeMessageEditText.setVerticalScrollBarEnabled(true);
+                    writeMessageEditText.setMovementMethod(new ScrollingMovementMethod());
+                } else {
+                    writeMessageEditText.setVerticalScrollBarEnabled(false);
+                    writeMessageEditText.setMovementMethod(null);
+                }
+            }
+        });
+
+
         sendChatMessageButton = findViewById(R.id.sendChatMessageButton);
 
         sendChatMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String messageBody = writeMessageEditText.getText().toString();
-                Log.d("messageBody", messageBody);
-                if (messageBody.length() > 0) {
-                                     if (CONVERSATION_SID != null && !CONVERSATION_SID.isEmpty()) {
-                                         Log.d("CONVERSATION_SID not null", CONVERSATION_SID);
-                                         quickstartConversationsManager.sendMessage(messageBody, MessageActivity.this, CONVERSATION_SID,Token,UserId,ToUser,messagesAdapter);
-                                     }
-                                     else
-                    {
-                        Log.d("CONVERSATION_SID is null", CONVERSATION_SID);
-                        ConversationsClient convClientVal = ConversationsClientManager.getInstance().getConvClient();
-                        // If CONVERSATION_SID is null, create and join a new conversation first
-                        quickstartConversationsManager.createAndJoinConversation(ToUser, convClientVal,MessageActivity.this,Token,messagesAdapter, messageBody, Token, UserId);
+                // Check if the message is empty
+                if (messageBody.isEmpty()) {
+                    // Show a Toast message if the input is empty
+                    Toast.makeText(MessageActivity.this, "Message is empty. Please enter a message.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.d("messageBody", messageBody);
+                    FileLogger.d("messageBody", messageBody);
+
+
+                    if (messageBody.length() > 0) {
+                        // Case 1: When CONVERSATION_SID is null or empty, create and join a new conversation.
+                        if (CONVERSATION_SID == null || CONVERSATION_SID.isEmpty()) {
+                            Log.d("CONVERSATION_SID is null or empty", CONVERSATION_SID);
+                            FileLogger.d("CONVERSATION_SID is null or empty", CONVERSATION_SID);
+                            ConversationsClient convClientVal = ConversationsClientManager.getInstance().getConvClient();
+
+                            // Create and join a new conversation, then send the message
+                            quickstartConversationsManager.createAndJoinConversation(ToUser, convClientVal, MessageActivity.this, Token, messagesAdapter, messageBody, Token, UserId);
+
+                        }
+                        // Case 2: If CONVERSATION_SID is not null, check if we are already part of the conversation.
+                        else {
+                            Log.d("CONVERSATION_SID not null", CONVERSATION_SID);
+                            FileLogger.d("CONVERSATION_SID not null", CONVERSATION_SID);
+
+                            // Check if the conversation is already joined or the user is already participating.
+                            if (quickstartConversationsManager.isConversationParticipating(CONVERSATION_SID)) {
+                                Log.d("Already Participating", "Sending message to existing conversation.");
+                                FileLogger.d("Already Participating", "Sending message to existing conversation.");
+
+                                // Send message to the existing conversation
+                                quickstartConversationsManager.sendMessage(messageBody, MessageActivity.this, CONVERSATION_SID, Token, UserId, ToUser, messagesAdapter);
+                            } else {
+                                Log.d("Not Participating", "Joining conversation and sending message.");
+                                FileLogger.d("Not Participating", "Joining conversation and sending message.");
+
+                                // If not yet participating, create, join, and send the message.
+                                ConversationsClient convClientVal = ConversationsClientManager.getInstance().getConvClient();
+                                quickstartConversationsManager.createAndJoinConversation(ToUser, convClientVal, MessageActivity.this, Token, messagesAdapter, messageBody, Token, UserId);
+                            }
+                        }
                     }
                 }
             }
@@ -241,7 +303,14 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
             activityStatusHandler.removeCallbacks(activityStatusRunnable);
         }
     }
+    // Method to update CONVERSATION_SID
+    public void updateConversationSid(String conversationSid) {
+        this.CONVERSATION_SID = conversationSid;
+        Log.d("Updated CONVERSATION_SID", conversationSid);
 
+        // Optionally, update the UI or perform actions based on the new SID
+        // For example, you can enable sending messages now that SID is available
+    }
     public static MessageActivity getInstance() {
         return instance;
     }
@@ -285,27 +354,18 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
                             String getchatsid = response.getString("message");
                             String stringWithoutQuotes = getchatsid.replace("\"", "");
                             Log.d("CONNECT stringWithoutQuotes chat sid", stringWithoutQuotes);
+                            FileLogger.d("CONNECT stringWithoutQuotes chat sid", stringWithoutQuotes);
                             CONVERSATION_SID = stringWithoutQuotes;
                             // Call to fetch the conversation using the new CONVERSATION_SID
                             if (CONVERSATION_SID != null && !CONVERSATION_SID.isEmpty()) {
+
                                 quickstartConversationsManager.getConv(messagesAdapter, CONVERSATION_SID, ToUser, MessageActivity.this, Token, progressBarMsg);
                                 // Start periodic user activity update
                                 startUserActivityUpdate(); // Add this
                             } else {
                                 Log.e("getChatSid", "Invalid conversation SID returned.");
                             }
-                            // Save the conversation SID in shared preferences
-                            SharedPreferences pref = getApplicationContext().getSharedPreferences("RPMUserApp", Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor = pref.edit();
-                            // Retrieve existing SIDs (if any)
-                            Set<String> conversationSIDs = pref.getStringSet("ConversationSIDs", new HashSet<>());
 
-                            // Add new SID to the set
-                            conversationSIDs.add(CONVERSATION_SID);
-                            // Save updated set of SIDs
-                            editor.putStringSet("ConversationSIDs", conversationSIDs);
-                            editor.apply();
-                            Log.d("getChatSid", "Saved new conversation SID.");
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
@@ -316,6 +376,7 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e("getChatSid error", error.toString());
+                        FileLogger.d("getChatSid error", error.toString());
                         // You may want to show a Toast or Snackbar to inform the user about the error
                         progressBarMsg.setVisibility(View.GONE);
                         Toast.makeText(MessageActivity.this, "Send Message to start Conversation.", Toast.LENGTH_SHORT).show();
@@ -413,6 +474,8 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                quickstartConversationsManager.setLastReadIndex(CONVERSATION_SID, MessageActivity.this);
+
                 finish();
             }
         });
@@ -567,7 +630,7 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
                     boolean isEdited = attributesJson.optBoolean("edited", false);
                     if (isEdited) {
                         Log.d("isEdited", String.valueOf(isEdited));
-                                holder.editedLabel.setVisibility(View.VISIBLE); // Show "Edited"
+                        holder.editedLabel.setVisibility(View.VISIBLE); // Show "Edited"
                     } else {
                         Log.d("isEdited", String.valueOf(isEdited));
                         holder.editedLabel.setVisibility(View.GONE); // Hide "Edited"
@@ -737,7 +800,7 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
                     editDeleteContainer = itemView.findViewById(R.id.buttonContainer);
                 }
                 else if (
-                    viewType == VIEW_TYPE_DATE_HEADER_WITH_INCOMING_MESSAGE) {
+                        viewType == VIEW_TYPE_DATE_HEADER_WITH_INCOMING_MESSAGE) {
                     dateTextView = itemView.findViewById(R.id.dateTextView);
                     incomingTime = itemView.findViewById(R.id.incomingTime);
                     outgoingTime = itemView.findViewById(R.id.outgoingTime);

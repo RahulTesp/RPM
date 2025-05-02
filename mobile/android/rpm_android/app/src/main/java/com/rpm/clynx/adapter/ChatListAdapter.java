@@ -79,11 +79,16 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
             context.startActivity(intent);
         });
     }
+
     public void updateChatList(List<Chat> newChatList) {
+        Log.d("updateChatList", "New list size: " + (newChatList != null ? newChatList.size() : "null"));
         this.chatList.clear();
-        this.chatList.addAll(newChatList);
-        notifyDataSetChanged(); //  Notify adapter about changes
+        if (newChatList != null) {
+            this.chatList.addAll(newChatList);
+        }
+        notifyDataSetChanged();
     }
+
 
     @Override
     public int getItemCount() {

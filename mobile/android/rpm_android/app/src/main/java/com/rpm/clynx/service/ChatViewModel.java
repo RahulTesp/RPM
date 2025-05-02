@@ -12,11 +12,6 @@ public class ChatViewModel extends ViewModel {
     private MutableLiveData<List<Chat>> chatListLiveData = new MutableLiveData<>(new ArrayList<>());
     private ChatListAdapter chatListAdapter;
 
-    public ChatViewModel() {
-        List<Chat> chatList = new ArrayList<>();
-        chatListLiveData.setValue(chatList);
-    }
-
     public ChatListAdapter getChatListAdapter(Context context) {
         if (chatListAdapter == null) {
             chatListAdapter = new ChatListAdapter(chatListLiveData.getValue(), context, "");
