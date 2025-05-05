@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -868,46 +869,64 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
 
             final EditText input = new EditText(MessageActivity.this);
             input.setText(message.getBody());
-
+            input.setPadding(62, 40, 40, 40); // left, top, right, bottom padding in pixels
             builder.setView(input);
 
-            builder.setPositiveButton("Save", (dialog, which) -> {
-                String editedText = input.getText().toString().trim();
+            builder.setPositiveButton("Save", null); // <-- Set to null first
+            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
 
-                // Check if the text is empty or just whitespace
-                if (editedText.isEmpty()) {
-                    input.setError("Message cannot be empty or just spaces");  // Show error
-                    return;  // Don't proceed with saving, just show the error
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            final Button saveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+
+            // Disable save if initial text is empty or spaces
+            saveButton.setEnabled(!input.getText().toString().trim().isEmpty());
+
+            input.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    saveButton.setEnabled(!s.toString().trim().isEmpty());
                 }
-              //  if (!editedText.isEmpty()) {
 
-                    message.updateBody(editedText, new StatusListener() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d("Twilio", "Message updated successfully");
-                            markMessageAsEdited(message);
-                            // Fetch the latest message object from the conversation
-                            runOnUiThread(() -> {
-                                messagesS.set(position, message); // This ensures the list has the updated message
-                                notifyItemChanged(position); // Refresh UI for the edited message
-                                Toast.makeText(MessageActivity.this, "Message edited", Toast.LENGTH_SHORT).show();
-                            });
-                        }
-
-                        @Override
-                        public void onError(ErrorInfo errorInfo) {
-                            Log.e("Twilio", "Failed to update message: " + errorInfo.getMessage());
-                            runOnUiThread(() ->
-                                    Toast.makeText(MessageActivity.this, "Failed to edit message", Toast.LENGTH_SHORT).show()
-                            );
-                        }
-                    });
-              //  }
+                @Override
+                public void afterTextChanged(Editable s) { }
             });
 
-            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-            builder.show();
+            saveButton.setOnClickListener(v -> {
+                String editedText = " "+ input.getText().toString().trim();
+                if (editedText.isEmpty()) {
+                    input.setError("Message cannot be empty or just spaces");
+                    return;
+                }
+
+                message.updateBody(editedText, new StatusListener() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d("Twilio", "Message updated successfully");
+                        markMessageAsEdited(message);
+                        runOnUiThread(() -> {
+                            messagesS.set(position, message);
+                            notifyItemChanged(position);
+                            Toast.makeText(MessageActivity.this, "Message edited", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss(); // Dismiss only on success
+                        });
+                    }
+
+                    @Override
+                    public void onError(ErrorInfo errorInfo) {
+                        Log.e("Twilio", "Failed to update message: " + errorInfo.getMessage());
+                        runOnUiThread(() ->
+                                Toast.makeText(MessageActivity.this, "Failed to edit message", Toast.LENGTH_SHORT).show()
+                        );
+                    }
+                });
+            });
         }
+
 
         private void markMessageAsEdited(Message message) {
             if (message != null) {

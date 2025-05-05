@@ -99,6 +99,7 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("loginnotialert","loginnotialert");
+            FileLogger.d("videologinnotialert","videologinnotialert");
             if (intent.getAction().equals(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED)) {
                 // Handle the received notification data
                 Bundle notificationData = intent.getBundleExtra(NotificationReceiver.EXTRA_NOTIFICATION_DATA);
@@ -137,6 +138,7 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
                             // No underscore found in the string
                             Log.d("CutString", "No underscore found");
                         }
+
                         startAlertTimer(callStatus);
                     }
                 }
@@ -327,57 +329,55 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
     private void startAlertTimer(String callStatus) {
         Log.d("callStatus", callStatus);
         latestActivity = ((MyApplication) getApplication()).getLatestActivity();
-        System.out.println("latestActivity: " + latestActivity);
+        FileLogger.d("videocalllatestActivity: ", String.valueOf(latestActivity));
 
-        // If callStatus is "False", dismiss alert if it's showing
+        // If callStatus is "False", dismiss any existing alert
         if ("False".equalsIgnoreCase(callStatus)) {
             if (alertDialog != null && alertDialog.isShowing()) {
                 alertDialog.dismiss();
                 alertDialog = null;
+                FileLogger.d("Call status is False,", "alert dismissed");
                 System.out.println("Call status is False, alert dismissed.");
             }
             return;
         }
 
-        // If already showing, don't recreate it
+        // If alert already showing, don't show it again
         if (alertDialog != null && alertDialog.isShowing()) {
             return;
         }
 
-        // If callStatus is "True", show the alert
+        // callStatus is "True" – show alert dialog
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(latestActivity);
         alertDialogBuilder.setTitle(title);
         alertDialogBuilder.setMessage("Do you want to join?");
         alertDialogBuilder.setCancelable(false);
 
-        // Set positive button
         alertDialogBuilder.setPositiveButton("Yes", (dialog, which) -> {
-            System.out.println("VIDEO activity: " + latestActivity);
+            dialog.dismiss();
+            alertDialog = null;
             isCallJoined = true;
             videoCall(roomnameVal, title, latestActivity);
-            dialog.dismiss();
-            alertDialog = null;
         });
 
-        // Set negative button
         alertDialogBuilder.setNegativeButton("No", (dialog, which) -> {
+            dialog.dismiss();
+            alertDialog = null;
             Toast.makeText(latestActivity, "No clicked", Toast.LENGTH_SHORT).show();
             callReject(latestActivity);
-            dialog.dismiss();
-            alertDialog = null;
         });
 
-        // Show alert
         alertDialog = alertDialogBuilder.create();
         alertDialog.show();
 
-        // Auto-dismiss after 2 minutes
-        new Handler().postDelayed(() -> {
+        // Auto-dismiss after 2 minutes IF still showing
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (alertDialog != null && alertDialog.isShowing()) {
                 alertDialog.dismiss();
                 alertDialog = null;
+                Log.d("AutoDismiss", "Alert dismissed after timeout.");
             }
-        }, 120000);
+        }, 120000); // 2 minutes = 120000 ms
     }
 
     private void videoCall(String roomname, String caller, Activity latstActvty)  {

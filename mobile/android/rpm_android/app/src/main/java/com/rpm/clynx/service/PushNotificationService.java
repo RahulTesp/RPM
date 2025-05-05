@@ -23,6 +23,7 @@ import com.rpm.clynx.R;
 import com.rpm.clynx.fragments.DashboardFragment;
 import com.rpm.clynx.fragments.NotificationFragment;
 import com.rpm.clynx.utility.ConversationsClientManager;
+import com.rpm.clynx.utility.FileLogger;
 import com.rpm.clynx.utility.MyApplication;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.util.ErrorInfo;
@@ -85,25 +86,17 @@ SharedPreferences pref;
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         Log.d("remoteMessageRCVD", remoteMessage.toString());
+        FileLogger.d("remoteMessageRCVD", remoteMessage.toString());
         super.onMessageReceived(remoteMessage);
 
         if (DashboardFragment.DashboardFragmentIsVisible || NotificationFragment.NotificationFragmentIsVisible) {
             Intent intent = new Intent(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED);
-            intent.putExtra("data", remoteMessage.getData().toString());
+            intent.putExtra(NotificationReceiver.EXTRA_NOTIFICATION_DATA, remoteMessage.getData().toString());
             sendBroadcast(intent);
         } else {
             Log.d("remoteMessageRCVD", "Dashboard or Notification Fragment not visible, not sending broadcast");
         }
 
-
-//        if (DashboardFragment.DashboardFragmentIsVisible) { //  Only if visible
-//
-//        Intent intent = new Intent(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED); // Same ACTION you listen for
-//        intent.putExtra("data", remoteMessage.getData().toString()); // If you want to pass any extra data
-//        sendBroadcast(intent);  // 🚀 This sends the broadcast!
-//        } else {
-//            Log.d("remoteMessageRCVD", "Dashboard Fragment not visible, not sending broadcast");
-//        }
         //  Check if message contains a notification payload
         if (remoteMessage.getNotification() != null) {
             Log.d("Notification", "Notification Payload Received");
@@ -172,11 +165,13 @@ SharedPreferences pref;
                     Log.d("NotificationonCall", String.valueOf(pref.getBoolean("onCall", false)));
 
                     onCallstatus = pref.getBoolean("onCall", false);
-
+                    FileLogger.d("onCallstatus1", String.valueOf(onCallstatus));
                     if (onCallstatus == false) {
                         Log.d("onCallstatus", String.valueOf(onCallstatus));
+                        FileLogger.d("onCallstatus2", String.valueOf(onCallstatus));
                         Log.d("latestActivity", String.valueOf(latestActivity));
                         Log.d("notificationData", String.valueOf(notificationData));
+                        FileLogger.d("notificationData", String.valueOf(notificationData));
                         Intent intentnew = new Intent(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED);
                         intentnew.putExtra(NotificationReceiver.EXTRA_NOTIFICATION_DATA, notificationData);
                         Log.d("sendingvdbroadcast","sendingvdbroadcast");
