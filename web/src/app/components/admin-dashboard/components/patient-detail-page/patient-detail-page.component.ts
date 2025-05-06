@@ -296,6 +296,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   QuestionArrayBase: any;
   patientProgramName: any;
   ProgramHistory: any;
+  patientProgramId: any;
 
   constructor(
     private router: Router,
@@ -1226,10 +1227,11 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   getMasterDataQuestions(patientProgramName: any) {
     this.patientProgramName =
       this.http_rpm_patientList['PatientProgramdetails'].ProgramName;
+    this.patientProgramId = this.http_rpm_patientList['PatientProgramdetails'].ProgramId;
 
     this.rpm
       .rpm_get(
-        `/api/patient/getmasterdatanotes?ProgramName=${patientProgramName}&Type=CALL`
+        `/api/patient/getmasterdatanotes?ProgramId=${this.patientProgramId}&Type=CALL`
       )
       .then(
         (data) => {

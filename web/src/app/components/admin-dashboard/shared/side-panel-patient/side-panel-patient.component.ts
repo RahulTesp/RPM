@@ -310,6 +310,7 @@ export class SidePanelPatientComponent implements OnInit {
   previewArray: any;
 
   patientProgramName: any;
+  patientProgramId: any;
   noteMasterData: any;
   registerSchedule = new UntypedFormGroup({
     frmpatientName: new UntypedFormControl(null, [Validators.required]),
@@ -2578,9 +2579,11 @@ export class SidePanelPatientComponent implements OnInit {
   }
   MasterDataQuestionTemp: any;
   getMasterDataQuestions(patientProgramName: any) {
+    this.patientProgramId = this.http_rpm_patientList['PatientProgramdetails'].ProgramId;
+
     this.rpm
       .rpm_get(
-        `/api/patient/getmasterdatanotes?ProgramName=${patientProgramName}&Type=REVIEW`
+        `/api/patient/getmasterdatanotes?ProgramName=${this.patientProgramId}&Type=REVIEW`
       )
       .then(
         (data) => {
