@@ -359,7 +359,7 @@ namespace RPMWeb.Dal
             }
             return patientNotesQA;
         }
-        public NotesTypeMasterData GetMasterDataNotes(string ProgramName,string Type,  string CreatedBy,string connectionString)
+        public NotesTypeMasterData GetMasterDataNotes(int Programid,string Type,  string CreatedBy,string connectionString)
         {
             DataSet ds;
            
@@ -374,7 +374,7 @@ namespace RPMWeb.Dal
                     using (SqlCommand command = new SqlCommand("usp_GetMasterDataNotesQuestionsAnswer", con))
                     {
                         command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.AddWithValue("@ProgramName", ProgramName);
+                        command.Parameters.AddWithValue("@ProgramId", Programid);
                         command.Parameters.AddWithValue("@Type", Type);
                         command.Parameters.AddWithValue("@CreatedBy", CreatedBy);
 

@@ -1409,7 +1409,7 @@ namespace RpmCloud.Controllers
 
         [Route("getmasterdatanotes")]
         [HttpGet]
-        public IActionResult GetMasterDataNotes(string ProgramName, string Type)
+        public IActionResult GetMasterDataNotes(int ProgramId, string Type)
         {
 
             try
@@ -1432,7 +1432,7 @@ namespace RpmCloud.Controllers
                         return Unauthorized(new { message = "Invalid session." });
                     }
 
-                    NotesTypeMasterData GetMasterDataNotes = RpmDalFacade.GetMasterDataNotes(ProgramName, Type, UserName);
+                    NotesTypeMasterData GetMasterDataNotes = RpmDalFacade.GetMasterDataNotes(ProgramId, Type, UserName);
                     if (!GetMasterDataNotes.Equals(null))
                     {
                         return Ok(JsonConvert.SerializeObject(GetMasterDataNotes, Formatting.Indented));
