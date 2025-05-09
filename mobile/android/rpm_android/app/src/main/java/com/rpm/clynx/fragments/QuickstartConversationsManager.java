@@ -856,6 +856,20 @@ class QuickstartConversationsManager extends  AppCompatActivity {
                             Log.d("msgdelete", "msgdelete");
                             ((MessageActivity) activityLatest).deleteMessageFromList(message.getSid());
                         }
+
+                        // Recalculate unread messages after deletion
+                        conversation.getUnreadMessagesCount(new CallbackListener<Long>() {
+                            @Override
+                            public void onSuccess(Long unreadMsgCount) {
+                                Log.d("UnreadCountAfterDelete", "Unread count: " + unreadMsgCount);
+                                handleUnreadMessages(conversation, unreadMsgCount, contx, chatRs, null); // You can pass null or previous sender
+                            }
+
+                            @Override
+                            public void onError(ErrorInfo errorInfo) {
+                                Log.d("ErrorFetchingUnreadAfterDelete", errorInfo.toString());
+                            }
+                        });
                     }
 
                     @Override
@@ -1089,75 +1103,73 @@ class QuickstartConversationsManager extends  AppCompatActivity {
     }
 
     private void handleUnreadMessages(Conversation conversation, Long unreadMsgCount, Context context, RecyclerView chatRs, String sender) {
-        Log.d("handleUnreadMessagesONMSGADD", "Conversation is null");
         if (conversation == null) {
             Log.d("handleUnreadMessagesONMSGADD", "Conversation is null");
             return;
         }
 
         if (chatList == null) {
-            Log.d("chatListNULL", "chatList is null");
-            chatList = new ArrayList<>(); // Initialize if null
+            chatList = new ArrayList<>();
         }
 
         if (chatListAdapter == null) {
-            Log.e("chatListAdapter", "chatListAdapter is null");
             chatListAdapter = new ChatListAdapter(chatList, context, conversation.getSid());
             chatRs.setAdapter(chatListAdapter);
         }
 
-        String friendlyName = conversation.getFriendlyName().split("-")[0];
-        String friendlyUserName = conversation.getFriendlyName().split("-")[0];
-        // Replace friendlyName with MemberName if found in the list
-        friendlyName = getMemberNameFromList(friendlyName,context);
-        Log.d("friendlyUserName:-", friendlyUserName);
-        Log.d("friendlyName2new:-", friendlyName);
+        String[] nameParts = conversation.getFriendlyName().split("-");
+        String friendlyUserName = nameParts[0];
+        String friendlyName = getMemberNameFromList(friendlyUserName, context);
+
         Date lastMessageDate = conversation.getLastMessageDate();
         long timestamp = (lastMessageDate != null) ? lastMessageDate.getTime() : System.currentTimeMillis();
-        String formattedTime = (lastMessageDate != null) ? TimeFormatter.formatTimestampFromLog(lastMessageDate.toString()) : "No Messages";
+        String formattedTime = (lastMessageDate != null)
+                ? TimeFormatter.formatTimestampFromLog(lastMessageDate.toString())
+                : "No Messages";
         int unreadMessages = (unreadMsgCount != null) ? unreadMsgCount.intValue() : 0;
-        Log.d("ConversationInfo", "Friendly Name: " + friendlyName + ", Last Message Time: " + formattedTime + ", Unread Messages: " + unreadMessages);
         String convSid = conversation.getSid();
-        boolean chatUpdated = false;
-        ConversationsClient conversationsClient = ConversationsClientManager.getInstance().getConvClient();
 
-        String loggedInUser = conversationsClient.getMyIdentity();
-        for (Chat chat : chatList) {
-            if (chat.getChatMemberName().equals(friendlyName)) {
-                Log.d("sender",sender);
-                Log.d("loggedInUser",loggedInUser);
-                chat.setUnreadCount(unreadMessages); // Update unread count
-                chat.setTimeStamp(formattedTime); // Update time
-                chat.setTimeStampMillis(timestamp);
-                chat.setFriendlyUsername(friendlyUserName);
-                chat.setLastMsgText(chat.getLastMsgText());
-                chat.setSID(convSid);
-                chatUpdated = true;
-                break;
+        conversation.getLastMessages(1, new CallbackListener<List<Message>>() {
+            @Override
+            public void onSuccess(List<Message> messages) {
+                String lastMessageText = (!messages.isEmpty()) ? messages.get(0).getBody() : "";
+
+                boolean chatUpdated = false;
+                ConversationsClient conversationsClient = ConversationsClientManager.getInstance().getConvClient();
+                String loggedInUser = conversationsClient.getMyIdentity();
+
+                for (Chat chat : chatList) {
+                    if (chat.getChatMemberName().equals(friendlyName)) {
+                        Log.d("sender", sender != null ? sender : "null");
+                        Log.d("loggedInUser", loggedInUser);
+                        chat.setUnreadCount(unreadMessages);
+                        chat.setTimeStamp(formattedTime);
+                        chat.setTimeStampMillis(timestamp);
+                        chat.setFriendlyUsername(friendlyUserName);
+                        chat.setLastMsgText(lastMessageText); //  updated
+                        chat.setSID(convSid);
+                        chatUpdated = true;
+                        break;
+                    }
+                }
+
+                if (!chatUpdated) {
+                    chatList.add(new Chat(friendlyUserName, friendlyName, formattedTime, unreadMessages, timestamp, false, lastMessageText, convSid));
+                    Log.d("AddedtoChatModel", friendlyName + formattedTime + unreadMessages + timestamp + lastMessageText);
+                }
+
+                Collections.sort(chatList, (chat1, chat2) -> Long.compare(chat2.getTimestampMillis(), chat1.getTimestampMillis()));
+
+                ((Activity) context).runOnUiThread(() -> {
+                    chatListAdapter.updateChatList(chatList);
+                    progressBarChat.setVisibility(View.GONE);
+                });
             }
-        }
 
-        if (!chatUpdated) {
-            Log.d("chatUpdated", String.valueOf(chatUpdated));
-            // Add new chat entry if not found
-            chatList.add(new Chat(friendlyUserName,friendlyName, formattedTime, unreadMessages, timestamp, false, lastMessageText, convSid));
-            Log.d("AddedtoChatModel:--",friendlyName+formattedTime+unreadMessages+timestamp+ lastMessageText);
-        }
-
-// Print sorted chat names to confirm sorting
-        Log.d("SortedChatList", "Chats in sorted order:");
-        for (Chat chat : chatList) {
-            Log.d("SortedChat", "Chat Name: " + chat.getChatMemberName() + ", Timestamp: " + chat.getTimestampMillis());
-        }
-
-        Collections.sort(chatList, (chat1, chat2) -> Long.compare(chat2.getTimestampMillis(), chat1.getTimestampMillis()));
-
-        ((Activity) context).runOnUiThread(() -> {
-            Log.d("GETTINGINSIDETHREAD ", String.valueOf(chatListAdapter));
-            Log.d("updateChatListCaller2", "Calling updateChatList from handleUnreadMessages with " + chatList.size());
-
-            chatListAdapter.updateChatList(chatList);
-            progressBarChat.setVisibility(View.GONE);
+            @Override
+            public void onError(ErrorInfo errorInfo) {
+                Log.e("LastMessageError", "Failed to fetch last message: " + errorInfo);
+            }
         });
     }
 

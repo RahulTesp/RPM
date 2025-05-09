@@ -49,7 +49,7 @@ public class ChangePassword extends AppCompatActivity {
     TextView tvact_tvcp_cancle;
     SharedPreferences pref;
     SharedPreferences.Editor editor;
-    String Token,username;
+    String Token,username,oldPassword;
     DataBaseHelper db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +65,7 @@ public class ChangePassword extends AppCompatActivity {
         editor = pref.edit();
         Token = pref.getString("Token", null);
         username = pref.getString("UserName", null);
+        oldPassword = pref.getString("Password", null);
 
         ImageView showCurrPassword = findViewById(R.id.showcurrPassword);
         ImageView showNewPswrd = findViewById(R.id.shownewPswrd);

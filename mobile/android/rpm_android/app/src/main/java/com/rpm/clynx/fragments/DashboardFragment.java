@@ -56,6 +56,7 @@ import com.rpm.clynx.utility.CustomMarkerView;
 import com.rpm.clynx.utility.DashboardViewModel;
 import com.rpm.clynx.utility.DataBaseHelper;
 import com.rpm.clynx.utility.DateUtils;
+import com.rpm.clynx.utility.FileLogger;
 import com.rpm.clynx.utility.Links;
 import com.rpm.clynx.utility.Loader;
 import com.rpm.clynx.R;
@@ -478,7 +479,11 @@ public class DashboardFragment extends Fragment {
                     public void onMessageUpdated(Message message, Message.UpdateReason reason) {}
 
                     @Override
-                    public void onMessageDeleted(Message message) {}
+                    public void onMessageDeleted(Message message) {
+                        Log.d("homeonMessageDeleted", "homeonMessageDeleted");
+                        FileLogger.d("homeonMessageDeleted", "homeonMessageDeleted");
+                        updateUnreadCount(conversation);
+                    }
 
                     @Override
                     public void onParticipantAdded(Participant participant) {}

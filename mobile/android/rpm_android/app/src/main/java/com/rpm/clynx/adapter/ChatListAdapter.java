@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.rpm.clynx.R;
 import com.rpm.clynx.fragments.MessageActivity;
 import com.rpm.clynx.model.Chat;
+import com.rpm.clynx.utility.FileLogger;
+
 import java.util.List;
 
 public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatViewHolder> {
@@ -72,6 +74,11 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
         // Handle click event
         holder.itemView.setOnClickListener(v -> {
             chatList.get(position).setUnreadCount(0);  // Reset unread count
+
+            String memberUsername = chat.getChatMemberName();
+            String friendlyUsername = chat.getFriendlyUsername();
+            String sid = conversationSid;
+
             Intent intent = new Intent(context, MessageActivity.class);
             intent.putExtra("memberUsername", chat.getChatMemberName());  // Pass memberUsername
             intent.putExtra("FriendlyUsername", chat.getFriendlyUsername());
