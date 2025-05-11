@@ -171,7 +171,7 @@
                 <p *ngIf="totalUnread > 0">{{ totalUnread }} Unread</p>
                 <p *ngIf="totalUnread == 0">No Notification For Today</p>
               </div>
-              <div *ngIf="displayedUnread && displayedUnread.length > 0" class="notification-panel-data-content">
+              <div class="subpanel-unread" *ngIf="displayedUnread && displayedUnread.length > 0" class="notification-panel-data-content">
                 <div class="notification_description_panel">
                   <!-- Display paginated unread notifications -->
                   <div *ngFor="let notification_item of displayedUnread">

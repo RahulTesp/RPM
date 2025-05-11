@@ -2435,7 +2435,7 @@ export class EditpatientComponent implements OnInit {
                 this.ErrorFlag = false;
               },
               false
-            ); 
+            );
           }
           // this.reloadMasterData();
           this.ReloadDeviceList(1);
@@ -2494,7 +2494,7 @@ export class EditpatientComponent implements OnInit {
               this.ReloadDeviceList(4);
             },
             false
-          ); 
+          );
         },
         (err) => {
           // this.openDialogWindow('Error',`Device not removed from user assets.`);
@@ -2508,7 +2508,7 @@ export class EditpatientComponent implements OnInit {
               this.ReloadDeviceList(4);
             },
             false
-          );         
+          );
         }
       );
     }

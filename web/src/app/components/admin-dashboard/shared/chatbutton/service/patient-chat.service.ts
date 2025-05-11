@@ -763,7 +763,7 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
       console.error('Error creating new chat:', error);
       this.setError('Patient login required. Please have the patient sign in to the mobile app to begin the conversation.')
 
-      this.setError(error instanceof Error ? error.message : 'Chat creation failed.');
+    //  this.setError(error instanceof Error ? error.message : 'Chat creation failed.');
     } finally {
       this.setLoading(false);
     }

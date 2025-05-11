@@ -1292,9 +1292,10 @@
                 class="goals_note_container"
                 *ngFor="let goal of Goals_Selected; let i = index"
               >
-                <form class="goal_list" [name]="i">
+              <!-- class="goal_list" -->
+                <form  [name]="i">
                   <div class="goal-details" *ngIf="goal.Goal != null">
-                    <div class="note_dropdown">
+                    <!-- <div class="note_dropdown"> -->
                       <div class="userInfoItem" style="width: 50%">
                         <p class="main_input_title">Goals</p>
                         <input
@@ -1305,8 +1306,8 @@
                           [disabled]="true"
                         />
                       </div>
-                      <br />
-                    </div>
+
+                    <!-- </div> -->
                     <div>
                       <textarea
                         class="userInfovalue"
@@ -1586,6 +1587,7 @@
                     <div class="program_timeline_data">
                       <div class="userInfoItem program_timeline_data_left">
                         <p class="main_input_title">*Diagnosis</p>
+                        <!---->
                         <ng-autocomplete
                           id="patientReport"
                           [initialValue]="Diagnosis.DiagnosisName"
@@ -1596,7 +1598,7 @@
                           (inputCleared)="cleared($event, i)"
                           [itemTemplate]="itemTemplate"
                           [notFoundTemplate]="notFoundTemplate"
-                        >
+
                           >
                         </ng-autocomplete>
                         <ng-template #itemTemplate let-item>
