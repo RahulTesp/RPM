@@ -1889,6 +1889,15 @@ table {
   height: 1.2rem;
 }
 
+.mydialogBox{
+  height: auto;
+  min-height: 450px;
+  max-height: 80vh;
+  padding: 20px;
+  background-color: #164d61;
+  overflow-y: auto;
+}
+
 @media only screen and (max-width: 1300px) {
   .patient_menu_item {
     font-size: 14px !important;
