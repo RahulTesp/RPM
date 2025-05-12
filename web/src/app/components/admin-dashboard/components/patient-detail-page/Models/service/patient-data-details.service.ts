@@ -220,33 +220,19 @@ export class PatientDataDetailsService {
       return [];
     }
   }
-  async getPatientChat(
-    patientId: string
-  ): Promise<any> {
-    const apiUrl = '/api/comm/getallchats';
-    try {
-      const url = `${apiUrl}?ToUser=${patientId}`;
-      return await this.rpmService.rpm_get(url);
-    } catch (error) {
-      console.error('❌ Error fetching alerts and tasks:', error);
-      return [];
-    }
-  }
+  // async getPatientChat(
+  //   patientId: string
+  // ): Promise<any> {
+  //   const apiUrl = '/api/comm/getallchats';
+  //   try {
+  //     const url = `${apiUrl}?ToUser=${patientId}`;
+  //     return await this.rpmService.rpm_get(url);
+  //   } catch (error) {
+  //     console.error('❌ Error fetching alerts and tasks:', error);
+  //     return [];
+  //   }
+  // }
 
-  async initPatientChat(
-    patientId: string
-  ): Promise<any> {
-    var req_body: any = {};
-
-    const apiUrl = `/api/comm/InitPatientChat?PatientNumber=${patientId}`;
-    try {
-      const url = `${apiUrl}`;
-      return await this.rpmService.rpm_post(url,req_body);
-    } catch (error) {
-      console.error('❌ Error fetching alerts and tasks:', error);
-      return [];
-    }
-  }
 
 
   async getPatientCallNotes(

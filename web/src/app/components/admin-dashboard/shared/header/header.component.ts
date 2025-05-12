@@ -1,3 +1,4 @@
+import { Notification } from './../notification-panel/notification';
 import { MasterDataService } from './../../sevices/master-data.service';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import {
@@ -7,14 +8,12 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { MatDrawer } from '@angular/material/sidenav';
+
 import { HttpService } from '../../sevices/http.service';
 import {
-  Event,
+
   Router,
-  NavigationStart,
-  NavigationEnd,
-  RouterEvent,
+
 } from '@angular/router';
 import { RPMService } from '../../sevices/rpm.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
@@ -22,8 +21,8 @@ import { StatusMessageComponent } from '../status-message/status-message.compone
 import { webSocket } from 'rxjs/webSocket';
 import { AuthService } from 'src/app/services/auth.service';
 import { MessagingService } from '../../sevices/messaging.service';
-import { Subject } from 'rxjs';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { Subject, Subscription } from 'rxjs';
+
 import moment from 'moment';
 import { DatePipe } from '@angular/common';
 @Component({
@@ -52,10 +51,11 @@ export class HeaderComponent implements OnInit {
   myprofile: any;
   current_time: string;
   host: any;
+  private subscription: Subscription | null = null;
   private unsubscribe$ = new Subject<void>();
   message: Subject<any> = new Subject<any>();
   constructor(
-    private ms: MessagingService,
+    public ms: MessagingService,
     private observer: BreakpointObserver,
     public model: HttpService,
     private router: Router,
@@ -72,9 +72,10 @@ export class HeaderComponent implements OnInit {
       this.getPatientList();
     });
 
-    this.Auth.notificationdata$.subscribe((res) => {
-      this.GetNotifications();
-    });
+    // this.Auth.notificationdata$.subscribe((res) => {
+    //   this.GetNotifications();
+    // });
+
     this.user_name = sessionStorage.getItem('user_name');
     if (!this.user_name || this.user_name == 'undefined undefined') {
       var that = this;
@@ -101,14 +102,21 @@ export class HeaderComponent implements OnInit {
   data_patient: any;
   message1: any;
   ngOnInit(): void {
-    this.ms.notificationData$.subscribe((notification) => {
-      if (notification) {
-        this.notificationBody = notification;
 
-        setTimeout(() => (this.notificationBody = null), 5000);
+  //  this.subscription = this.ms.notificationData$.subscribe(data => {
+  //   if (data && data.type === 'update') {
+  //     this.unread = data.count;
+  //   }
+  // });
+    this.subscription = this.ms.notificationData$.subscribe(data => {
+      if (data && data.notification) {
+        // Refresh notifications when we receive a new one
+        this.refreshNotifications();
       }
-
     });
+
+    this.refreshNotifications();
+
     if (this.Auth.firstLogin == true) {
       this.ms.requestPermission();
       this.ms.requestToken();
@@ -145,43 +153,7 @@ export class HeaderComponent implements OnInit {
     this.current_day = days[this.today.getDay()];
     this.current_month = months[this.today.getMonth()];
     this.dateval = this.today.getDate();
-
-    var hr = this.today.getHours();
-    var mn = this.today.getMinutes();
-
     this.current_time = this.masterdataservice.formatAMPM(this.today);
-    var interval2 = setInterval(() => {
-      this.today = new Date();
-      hr = this.today.getHours();
-      mn = this.today.getMinutes();
-
-      this.current_time = this.masterdataservice.formatAMPM(this.today);
-    }, 60000);
-    var strDate = this.today.toString();
-    var zn = strDate.split('(');
-    var zn1 = zn[1].replace(')', '');
-    if (zn1 == 'India Standard Time') {
-      this.tz = 'IST';
-    } else if (zn1 == 'Hawaii Standard Time') {
-      this.tz = 'HST';
-    } else if (zn1 == 'Hawaii-Aleutian Daylight Time') {
-      this.tz = 'HDT';
-    } else if (zn1 == 'Alaska Daylight Time') {
-      this.tz = 'AKDT';
-    } else if (zn1 == 'Pacific Daylight Time') {
-      this.tz = 'PDT';
-    } else if (zn1 == 'Mountain Standard Time') {
-      this.tz = 'MST';
-    } else if (zn1 == 'Mountain Daylight Time') {
-      this.tz = 'MDT';
-    } else if (zn1 == 'Eastern Daylight Time') {
-      this.tz = 'EDT';
-    } else if (zn1 == 'Central Standard Time') {
-      this.tz = 'CDT';
-    }
-    this.GetNotifications();
-
-
     this.getPatientList();
   }
 
@@ -206,23 +178,11 @@ export class HeaderComponent implements OnInit {
     }
   }
 
-
   roles: any;
   http_getPatientList: any;
   notification_click() {
-    // New Change 11/05/2023
-    if (this.unread > 0) {
-      this.notification_active = true;
-    } else {
       this.router.navigate(['/admin/notification']);
-    }
-  }
-  notification_leave(){
-    this.notification_active = false;
-  }
-  open_notifications() {
-    this.notification_active = false;
-    this.router.navigate(['/admin/notification']);
+
   }
   ngAfterViewInit() {
     this.observer.observe(['(max-width: 1500px)']).subscribe((res) => {
@@ -285,126 +245,38 @@ export class HeaderComponent implements OnInit {
   openDialogWindow(title: any, item: any) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = '400px';
-
-    // dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-
     dialogConfig.data = {
       title: title,
       item: item,
     };
-
     this.dialog.open(StatusMessageComponent, dialogConfig);
   }
 
-  subject: any;
-  pubsuburl: any;
-  msg: any;
-  subscribePubsub() {
-    this.subject = webSocket(this.pubsuburl);
-    this.subject.subscribe(
-      (msg: any) => {
-        this.msg = msg;
-        if (this.msg.EventType == 'NotificationRead') {
-          this.GetNotifications();
-        }
-      },
-      (err: any) => {
-        // alert(err)
-        // this.rpmservice.rpm_get("/api/home/getdashboardalerts?RoleId="+this.roles[0].Id).then((data)=>{
-        //   this.alertsArray=data;
-        // });
-        // this.subscribePubsub();
-        console.log(err);
-      },
-      () => {
-        console.log('completed');
-      }
-    );
-  }
   rolelist: any;
   notifications: any;
   unread: any;
   list: any;
   unreadlist: any;
-  GetNotifications() {
-    var that = this;
-    that.rolelist = sessionStorage.getItem('Roles');
-    that.rolelist = JSON.parse(this.rolelist);
-    that.rpm.rpm_get('/api/notification/user').then((data) => {
-      that.notifications = data;
-      console.log('Notifications')
-      console.log(that.notifications)
-      that.unread = that.notifications.TotalUnRead;
-      that.list = that.notifications.Data;
-      that.unreadlist = that.list.filter((data: { IsRead: boolean }) => {
-        return data.IsRead == false;
+  refreshNotifications() {
+    this.ms.GetNotifications()
+      .then(() => {
+        // Update local properties with data from service
+        this.unread = this.ms.unread;
+        this.list = this.ms.list || [];
+        this.unreadlist = this.list.filter((data: { IsRead: boolean }) => {
+                return data.IsRead == false;
+              });
+              console.log('List');
+              console.log(this.list)
+       console.log('Notifications refreshed in component');
+      })
+      .catch(error => {
+        console.error('Error refreshing notifications:', error);
       });
-    });
   }
-  notificationTime(date: any) {
-    const today = new Date(); // Current time in local timezone
 
-    // Convert the UTC date to local time string
-    const localTimeString = this.convertToLocalTime(date);
 
-    // Parse the local time string into a Date object
-    const notification_date = new Date(localTimeString);
-
-    // Calculate time difference in minutes
-    const diff_min = Math.round(
-      (today.getTime() - notification_date.getTime()) / 60000
-    );
-
-    let msgInfo = '';
-
-    if (diff_min == 0) {
-      msgInfo = 'Few Seconds Ago';
-    } else if (diff_min < 60) {
-      msgInfo = diff_min + ' Min';
-    } else if (diff_min < 1440) {
-      var hr = Math.round(diff_min / 60);
-      msgInfo = hr + ' Hrs';
-    } else if (diff_min > 1440 && diff_min < 2880) {
-      msgInfo = 'Yesterday';
-    } else if (diff_min > 2880 && diff_min < 10080) {
-      // Get day of week from the date object
-      let dayofweek = notification_date.getDay();
-      let dayval = '';
-      switch (dayofweek) {
-        case 0: dayval = 'Sunday'; break;
-        case 1: dayval = 'Monday'; break;
-        case 2: dayval = 'Tuesday'; break;
-        case 3: dayval = 'Wednesday'; break;
-        case 4: dayval = 'Thursday'; break;
-        case 5: dayval = 'Friday'; break;
-        case 6: dayval = 'Saturday'; break;
-      }
-      msgInfo = dayval;
-    } else if (diff_min > 10080 && diff_min < 20160) {
-      msgInfo = '1 Week Ago';
-    } else if (diff_min > 20160 && diff_min < 30240) {
-      msgInfo = '2 Weeks Ago';
-    } else if (diff_min > 30240 && diff_min < 40320) {
-      msgInfo = '3 Weeks Ago';
-    } else if (diff_min > 40320 && diff_min < 86400) {
-      msgInfo = '1 Month Ago';
-    } else if (diff_min > 86400 && diff_min < 172800) {
-      msgInfo = '2 Months Ago';
-    } else if (diff_min > 172800 && diff_min < 216000) {
-      msgInfo = '3 Months Ago';
-    } else if (diff_min > 216000 && diff_min < 259200) {
-      msgInfo = '4 Months Ago';
-    } else if (diff_min > 259200 && diff_min < 302400) {
-      msgInfo = '5 Months Ago';
-    } else if (diff_min > 302400 && diff_min < 345600) {
-      msgInfo = '6 Months Ago';
-    } else {
-      msgInfo = 'More Than 6 Months';
-    }
-
-    return msgInfo;
-  }
   keyword = 'searchField';
   data = [
     {
@@ -450,11 +322,7 @@ export class HeaderComponent implements OnInit {
   }
 
   onChangeSearch(val: string) {
-    // fetch remote data from here
-    // And reassign the 'data' which is binded to 'data' property.
   }
-
   onFocused(e: any) {
-    // do something when input is focused
   }
 }

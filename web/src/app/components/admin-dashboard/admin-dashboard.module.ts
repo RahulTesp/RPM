@@ -39,14 +39,12 @@ import { StatusMessageComponent } from './shared/status-message/status-message.c
 import { MatSortModule } from '@angular/material/sort';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { ConfirmDialogComponent } from './shared/confirm-dialog/confirm-dialog.component';
-import 'hammerjs';
+// import 'hammerjs';
 import 'chartjs-plugin-zoom';
 import { MenuItemComponent } from './shared/side-bar/models/menu-item/menu-item.component';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { DevicePageComponent } from './components/device-page/device-page.component';
 import { AmIVisibleDirective } from './directives/am-ivisible.directive';
-import { MessagingService } from './sevices/messaging.service';
-import { environment } from 'src/environments/environment';
 import { AsyncPipe } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { StatusDialogBoxComponent } from './shared/side-bar/models/status-dialog-box/status-dialog-box.component';

@@ -162,7 +162,7 @@ export class BillingSummaryReportComponent implements OnInit {
         this.programType
       );
 
-      this.downloadFile(this.url);
+      this.downloadFile(this.url.message);
     } catch (error: any) {
       alert(error.message);
     } finally {

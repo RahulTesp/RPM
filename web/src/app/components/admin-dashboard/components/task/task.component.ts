@@ -4,10 +4,6 @@ import { MatSort, Sort } from '@angular/material/sort';
 import { ChartType } from 'chart.js';
 import { AuthService } from 'src/app/services/auth.service';
 import {
-  // MultiDataSet,
-  // Label,
-} from 'ng2-charts';
-import {
   Component,
   OnInit,
   ViewChild,
@@ -22,8 +18,6 @@ import * as _moment from 'moment';
 import { default as _rollupMoment } from 'moment';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { StatusMessageComponent } from '../../shared/status-message/status-message.component';
-import { HttpService } from '../../sevices/http.service';
-import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DateRangeControlComponent } from '../../shared/date-range-control/date-range-control.component';
 import { MasterDataService } from '../../sevices/master-data.service';

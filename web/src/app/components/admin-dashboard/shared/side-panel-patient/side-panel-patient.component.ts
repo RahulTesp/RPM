@@ -942,7 +942,7 @@ export class SidePanelPatientComponent implements OnInit {
       this.currentProgramId = JSON.parse(this.currentProgramId);
       if (!this.Symptoms_List) {
         this.confirmDialog.showConfirmDialog(
-          'Please enter Symptom.',
+          'Please enter Symptom Type.',
           'Warning',
           () => {
            null
@@ -1056,7 +1056,7 @@ export class SidePanelPatientComponent implements OnInit {
 
     this.registerTask.controls.frmpatientName.setValue(this.patientName);
 
-    if (this.registerSymptoms.valid) {
+    if (this.registerSymptoms.valid && this.Symptoms_List != null) {
       req_body['Id'] = parseInt(this.symptomId);
       req_body['PatientId'] = parseInt(this.currentpPatientId);
       req_body['PatientProgramId'] = parseInt(this.currentProgramId);
@@ -2523,7 +2523,7 @@ export class SidePanelPatientComponent implements OnInit {
 
     this.rpm
       .rpm_get(
-        `/api/patient/getpatientnotes?ProgramName=${this.patientProgramName}&Type=REVIEW&PatientNoteId=${this.noteId}`
+        `/api/patient/getpatientnotesbyprogram?ProgramName=${this.patientProgramName}&Type=REVIEW&PatientNoteId=${this.noteId}`
       )
       .then((data) => {
         if (data) {

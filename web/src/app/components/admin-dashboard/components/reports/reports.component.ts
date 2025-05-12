@@ -12,13 +12,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { RPMService } from '../../sevices/rpm.service';
 import { Router } from '@angular/router';
 import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import { HttpClient } from '@angular/common/http';
 import { AuthService } from 'src/app/services/auth.service';
 import { DatePipe } from '@angular/common';
 import moment from 'moment';
-import html2canvas from 'html2canvas';
-// import { PatientDataDetailsService } from '../patient-detail-page/Models/service/patient-data-details.service';
 import { Subscription } from 'rxjs';
 import { ReportDataService } from './services/report-data.service';
 import { DownloadPatientReportService } from './services/download-patient-report.service';
@@ -28,11 +24,7 @@ import {
   CHART_LEGEND,
   CHART_TYPE,
 } from './interfaces/chart-config-interface';
-// import { PatientUtilService } from '../patient-detail-page/Models/service/patient-util.service';
 import { PatientReportApiService } from './services/patient-report-api.service';
-import { PatientDataDetailsService } from '../patient-detail-page/Models/service/patient-data-details.service';
-import { PatientUtilService } from '../patient-detail-page/Models/service/patient-util.service';
-
 import * as FileSaver from 'file-saver';
 
 
@@ -153,12 +145,9 @@ export class ReportsComponent implements OnInit {
     public rpmservice: RPMService,
     private _router: Router,
     public datepipe: DatePipe,
-    private httpobj: HttpClient,
     private auth: AuthService,
-    private patientService: PatientDataDetailsService,
     private patientreportService: ReportDataService,
     private patientdownloadService: DownloadPatientReportService,
-    private patientUtilService: PatientUtilService,
     private PatientReportapi: PatientReportApiService
   ) {}
   range = new FormGroup({

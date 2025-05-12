@@ -74,64 +74,14 @@
             src="../../../../../assets/04-Icons/Icons_Notification.svg"
             (click)="notification_click()"
           />
-          <!-- (click)="notification_click()" -->
-          <div *ngIf="unread">
+          <div *ngIf="ms.getCurrentUnreadCount() != 0">
             <span
               class="badge"
               id="header_Notification"
               (click)="notification_click()"
-              >{{ unread }}</span
-            >
+              >   {{ ms.getCurrentUnreadCount() > 99 ? '99+' : ms.getCurrentUnreadCount() }} </span>
           </div>
-          <div class="notification_container" *ngIf="notification_active">
-            <div class="notification_heading">
-              <p class="notification_text">{{ unread }} Notifications</p>
-              <div class="expand_icon_container">
-                <img
-                  class="expand_icon"
-                  src="../../../../../assets/04-Icons/Icons_Expand.svg"
-                  id="expandOpenNotification"
-                  (click)="open_notifications()"
-                />
-              </div>
-            </div>
-            <div class="notification_content_panel">
-              <div *ngFor="let notification of notifications&&notifications.Data">
-                <div class="notification_description_panel">
-                  <div
-                    *ngFor="
-                      let notification_item of notification.NotificationList
-                    "
-                  >
-                    <div *ngIf="notification_item.IsRead == false">
-                      <div class="notification_content notification_list">
-                        <p
-                          class="notification_title notification_fixed_length"
-                          title="{{ notification_item.Description }}"
-                        >
-                          {{ notification_item.Description }}
-                        </p>
 
-                        <div class="notification_right">
-                          <div class="notification_time">
-                            <p class="notification_title">
-                              {{
-                                notificationTime(notification_item.CreatedOn)
-                              }}
-                            </p>
-                          </div>
-                          <img
-                            class="deleteIcon"
-                            src="../../../../../../assets/04-Icons/Icons_Unread.svg"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

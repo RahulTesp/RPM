@@ -25,7 +25,7 @@
             <mat-header-cell *matHeaderCellDef> Date </mat-header-cell>
             <mat-cell *matCellDef="let element">
               <span >{{
-                datepipe.transform(element.DateTime, "MMM d, y")
+                convertToLocalTime(element.DateTime,'date')
               }}</span>
 
             </mat-cell>
@@ -34,7 +34,8 @@
           <ng-container matColumnDef="Time">
             <mat-header-cell *matHeaderCellDef> Time </mat-header-cell>
             <mat-cell *matCellDef="let element">
-              {{ datepipe.transform(element.DateTime, "h:mm a") }}
+
+              {{   convertToLocalTime(element.DateTime,'time')}}
             </mat-cell>
           </ng-container>
           <ng-container matColumnDef="ConversationSid" >
@@ -76,8 +77,7 @@
 
   <!-- ChatInfoTemplate  Table End-->
   <!-- ChatInfoTemplate  side Chat Start-->
-          <div class="activity_chatInfo_panel"  *ngIf="showMessagePanel">
-           <div class="activity_chatInfo_data">
+          <div class="activity_chatInfo_panel1"  *ngIf="showMessagePanel">
             <div class="chat_panel_upper">
               <p>Chats</p>
               <img
@@ -86,29 +86,32 @@
                 (click)="closeChatPanel()"
               />
             </div>
+           <div class="activity_chatInfo_data">
+
             <div
             class="messanger-chat-row"
             *ngFor="let message of dataSourceChatPaneldata&&dataSourceChatPaneldata.Messages; let i = index"
           >
-            <div class="chat-date" >
+            <div class="chat-date" *ngIf="shouldShowDate(message.DateTime, i)" >
               <div class="beforeTime"></div>
               <div class="timeblock">
-                {{  datepipe.transform(message.DateTime, "MMM d, y") }}
+                {{  convertToLocalTime(message.DateTime,'date') }}
               </div>
               <div class="afterTime"></div>
             </div>
             <div>
               <div
                 class="right-chat"
-                *ngIf="userName != message?.Author"
+                *ngIf="patientname != message?.Author"
               >
                 <div class="user-message-content">
                   <div class="user-message-bg">
                     <div class="incoming_msg">
                       <div class="messge_right">
                         <p>{{ message?.Message }}</p>
+
                         <div class="message_time">
-                          {{ datepipe.transform(message.DateTime, "h:mm a") }}
+                          {{  convertToLocalTime(message.DateTime,'time') }}
                         </div>
                       </div>
                     </div>
@@ -118,7 +121,7 @@
 
               <div
                 class="left-chat"
-                *ngIf="userName == message?.author"
+                *ngIf="patientname == message?.Author"
               >
                 <div class="user-message-content">
                   <div class="user-message-bg">
@@ -127,10 +130,12 @@
                         class="messge_left">
                         <p>
                           {{ message?.Message }}
+
                         </p>
+
                         <div class="message_lower_panel">
                           <div class="message_time">
-                            {{ datepipe.transform(message.DateTime, "h:mm a") }}
+                            {{   convertToLocalTime(message.DateTime,'time')  }}
                           </div>
                         </div>
                       </div>

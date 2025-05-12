@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:layout_marginTop="1dp"
+            android:background="@drawable/card_background_white_flatside"
+            android:weightSum="12">
+                <TextView
+                    android:id="@+id/subitemvital_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="121"
+                    android:textSize="22sp"
+                    android:textStyle="normal"
+                    android:layout_weight="8"
+                    android:textColor="@color/black"
+                    android:layout_marginStart="10dp" />
+
+                <TextView
+                    android:id="@+id/subitemvital_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="10.26 AM"
+                    android:textSize="22sp"
+                    android:textStyle="normal"
+                    android:gravity="right"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="4"
+                    android:textColor="@color/black" />
+        </LinearLayout>
+</LinearLayout>

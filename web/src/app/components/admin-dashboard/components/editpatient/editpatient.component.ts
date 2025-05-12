@@ -9,20 +9,14 @@ import {
   FormControl,
 } from '@angular/forms';
 import { RPMService } from '../../sevices/rpm.service';
-// import { Options } from '@angular-slider/ngx-slider';
 import { ActivatedRoute, Router } from '@angular/router';
 import _ from 'lodash';
 import { StatusMessageComponent } from '../../shared/status-message/status-message.component';
-import { any } from 'lodash/fp';
 import { DatePipe } from '@angular/common';
 import * as uuid from 'uuid';
-import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import moment from 'moment';
 import { AuthService } from 'src/app/services/auth.service';
-import * as FileSaver from 'file-saver';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
-
-
 
 
 export interface document {
@@ -2340,21 +2334,32 @@ export class EditpatientComponent implements OnInit {
 
       this.rpm.rpm_post('/api/device/account/create/iglucose', req_body).then(
         (data) => {
-          this.openDialogWindow('Success', `Device Added Successfully!!!`);
-          // this.reloadMasterData();
-          this.ReloadDeviceList(1);
-          this.ReloadDeviceList(2);
-          this.ReloadDeviceList(3);
-          this.ReloadDeviceList(4);
-          //show success popup patient is updated
+          // this.openDialogWindow('Success', `Device Added Successfully!!!`);
+          this.showconfirmDialog.showConfirmDialog(
+            'Device Added Successfully!!!',
+            'Success',
+            () => {
+              this.ReloadDeviceList(1);
+              this.ReloadDeviceList(2);
+              this.ReloadDeviceList(3);
+              this.ReloadDeviceList(4);
+            },
+            false
+          );
         },
         (err) => {
-          this.openDialogWindow('Error', `Device not added to user assets!!!`);
-          this.ReloadDeviceList(1);
-          this.ReloadDeviceList(2);
-          this.ReloadDeviceList(3);
-          this.ReloadDeviceList(4);
-          // this.reloadMasterData();
+          // this.openDialogWindow('Error', `Device not added to user assets!!!`);
+          this.showconfirmDialog.showConfirmDialog(
+            'Device not added to user assets!!!',
+            'Error',
+            () => {
+              this.ReloadDeviceList(1);
+              this.ReloadDeviceList(2);
+              this.ReloadDeviceList(3);
+              this.ReloadDeviceList(4);
+            },
+            false
+          );
           //show error pop up, could not update patient
         }
       );
@@ -2373,23 +2378,31 @@ export class EditpatientComponent implements OnInit {
 
       this.rpm.rpm_post('/api/device/updatedevicestatus', req_body).then(
         (data) => {
-          this.openDialogWindow(
+          this.showconfirmDialog.showConfirmDialog(
+            'Device Error Updated Successfully.',
             'Success',
-            `Device Error Updated Successfully.`
+            () => {
+              this.ReloadDeviceList(1);
+              this.ReloadDeviceList(2);
+              this.ReloadDeviceList(3);
+              this.ReloadDeviceList(4);
+            },
+            false
           );
-          //show success popup patient is updated
-          this.RemoveDevice(index);
-          this.ReloadDeviceList(1);
-          this.ReloadDeviceList(2);
-          this.ReloadDeviceList(3);
-          this.ReloadDeviceList(4);
         },
         (err) => {
-          this.openDialogWindow('Error', `Failed to Update Device Error.`);
-          this.ReloadDeviceList(1);
-          this.ReloadDeviceList(2);
-          this.ReloadDeviceList(3);
-          this.ReloadDeviceList(4);
+          this.showconfirmDialog.showConfirmDialog(
+            'Failed to Update Device Error',
+            'Error',
+            () => {
+              this.ReloadDeviceList(1);
+              this.ReloadDeviceList(2);
+              this.ReloadDeviceList(3);
+              this.ReloadDeviceList(4);
+            },
+            false
+          );
+          // this.openDialogWindow('Error', `Failed to Update Device Error.`);
           //show error pop up, could not update patient
         }
       );
@@ -2414,10 +2427,16 @@ export class EditpatientComponent implements OnInit {
       this.rpm.rpm_post('/api/device/removedevice/iglucose', req_body).then(
         (data) => {
           if (!this.ErrorFlag) {
-            this.openDialogWindow('Success', `Device Removed Successfully.`);
-            this.ErrorFlag = false;
+            // this.openDialogWindow('Success', `Device Removed Successfully.`);
+            this.showconfirmDialog.showConfirmDialog(
+              'Device Removed Successfully.',
+              'Success',
+              () => {
+                this.ErrorFlag = false;
+              },
+              false
+            ); 
           }
-
           // this.reloadMasterData();
           this.ReloadDeviceList(1);
           this.ReloadDeviceList(2);
@@ -2427,11 +2446,14 @@ export class EditpatientComponent implements OnInit {
         },
         (err) => {
           if (!this.ErrorFlag) {
-            this.openDialogWindow(
+            this.showconfirmDialog.showConfirmDialog(
+              'Device not removed from user assets.',
               'Error',
-              `Device not removed from user assets.`
+              () => {
+                this.ErrorFlag = false;
+              },
+              false
             );
-            this.ErrorFlag = false;
           }
           this.ReloadDeviceList(1);
           this.ReloadDeviceList(2);
@@ -2461,25 +2483,32 @@ export class EditpatientComponent implements OnInit {
 
       this.rpm.rpm_post('/api/device/resetdevice', req_body).then(
         (data) => {
-          this.openDialogWindow('Success', `Device Removed Successfully.`);
-          this.ReloadDeviceList(1);
-          this.ReloadDeviceList(2);
-          this.ReloadDeviceList(3);
-          this.ReloadDeviceList(4);
-          // this.reloadMasterData();
-          //show success popup patient is updated
+          // this.openDialogWindow('Success', `Device Removed Successfully.`);
+          this.showconfirmDialog.showConfirmDialog(
+            'Device Removed Successfully.',
+            'Success',
+            () => {
+              this.ReloadDeviceList(1);
+              this.ReloadDeviceList(2);
+              this.ReloadDeviceList(3);
+              this.ReloadDeviceList(4);
+            },
+            false
+          ); 
         },
         (err) => {
-          this.openDialogWindow(
+          // this.openDialogWindow('Error',`Device not removed from user assets.`);
+          this.showconfirmDialog.showConfirmDialog(
+            'Device not removed from user assets.',
             'Error',
-            `Device not removed from user assets.`
-          );
-          this.ReloadDeviceList(1);
-          this.ReloadDeviceList(2);
-          this.ReloadDeviceList(3);
-          this.ReloadDeviceList(4);
-          // this.reloadMasterData();
-          //show error pop up, could not update patient
+            () => {
+              this.ReloadDeviceList(1);
+              this.ReloadDeviceList(2);
+              this.ReloadDeviceList(3);
+              this.ReloadDeviceList(4);
+            },
+            false
+          );         
         }
       );
     }
@@ -2494,11 +2523,25 @@ export class EditpatientComponent implements OnInit {
       )
       .then(
         (data) => {
-          this.openDialogWindow('Success', `Device Tested Successfully.`);
+          // this.openDialogWindow('Success', `Device Tested Successfully.`);
+          this.showconfirmDialog.showConfirmDialog(
+            'Device Tested Successfully.',
+            'Success',
+            () => {
+            },
+            false
+          );
           //show success popup patient is updated
         },
         (err) => {
-          this.openDialogWindow('Error', `Device Test Failed.`);
+          // this.openDialogWindow('Error', `Device Test Failed.`);
+          this.showconfirmDialog.showConfirmDialog(
+            'Device Test Failed.',
+            'Error',
+            () => {
+            },
+            false
+          );
           //show error pop up, could not update patient
         }
       );

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_marginTop="10dp"
+android:layout_marginBottom="10dp"
+android:layout_height="wrap_content">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/myinfo_card_bg_radius"
+    android:orientation="vertical"
+    android:padding="10dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/itemMemNm"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_vertical"
+            android:paddingLeft="@dimen/margin_10dp"
+            android:text="Channel"
+            android:textColor="@color/Primary_dark"
+            android:textSize="20sp"/>
+        <TextView
+            android:id="@+id/itemMemUsrNm"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_vertical"
+            android:paddingLeft="@dimen/margin_10dp"
+            android:text="Channel"
+            android:textColor="@color/accent1"
+            android:textSize="20sp"/>
+    </LinearLayout>
+</LinearLayout>
+</LinearLayout>

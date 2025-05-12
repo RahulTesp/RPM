@@ -1,0 +1,94 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:layout_marginBottom="12dp">
+
+    <!-- Outgoing Message Layout -->
+    <RelativeLayout
+        android:id="@+id/outgoingLayout"
+        android:layout_width="170dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginStart="100dp"
+        android:padding="8dp"
+        android:background="@drawable/outgoing_msg_bubble">
+
+        <!-- Message Time -->
+        <TextView
+            android:id="@+id/outgoingTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:textIsSelectable="true"
+            android:textSize="12sp"
+            android:textColor="@color/ChatMsgTimeClr"
+            android:layout_marginEnd="2dp"
+            android:text="Outgoing Time" />
+        <!-- Message Text -->
+        <TextView
+            android:id="@+id/outgoingMessageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/ChatTimeBlack"
+            android:textSize="16sp"
+            android:layout_below="@id/outgoingTime"
+            android:layout_marginTop="2dp"
+            android:layout_alignStart="@id/outgoingTime"
+            android:layout_marginEnd="5dp"
+            android:text="Outgoing Message" />
+
+        <!-- Edit and Delete Buttons at Top-Right -->
+        <LinearLayout
+            android:id="@+id/buttonContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="10dp"
+            android:padding="2dp"
+            android:visibility="gone">
+
+            <!-- Edit Button -->
+            <ImageButton
+                android:id="@+id/editMessageButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="4dp"
+                android:padding="2dp"
+                android:src="@drawable/icons_edit"
+                android:scaleType="centerInside"
+                android:adjustViewBounds="true"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+
+            <!-- Delete Button -->
+            <ImageButton
+                android:id="@+id/deleteMessageButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:padding="2dp"
+                android:layout_marginEnd="2dp"
+                android:src="@drawable/icons_delete"
+                android:scaleType="centerInside"
+                android:adjustViewBounds="true"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+        </LinearLayout>
+
+        <!-- "Edited" Label at Bottom-Right -->
+        <TextView
+            android:id="@+id/editedLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/outgoingTime"
+            android:layout_alignParentEnd="true"
+            android:text="Edited"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            android:visibility="gone"/> <!-- Initially Hidden -->
+    </RelativeLayout>
+</RelativeLayout>

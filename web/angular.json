@@ -34,9 +34,8 @@
                 "dompurify",
                  "stackblur-canvas"
             ],
-            "outputPath": {
-              "base": "dist/rpm-app"
-            },
+
+            "outputPath":"dist/rpm-app" ,
             "index": "src/index.html",
             "polyfills": [
               "src/polyfills.ts"

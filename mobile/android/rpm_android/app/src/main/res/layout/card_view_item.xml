@@ -1,0 +1,130 @@
+<androidx.cardview.widget.CardView android:id="@+id/cardDB"
+    android:padding="20dp"
+    app:cardBackgroundColor="@color/white"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="@dimen/margin_10dp"
+    android:visibility="gone"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+                <LinearLayout
+                    android:background="@color/white"
+                    android:layout_width="300dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="3dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/vital_card_layout"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/card_background_green"
+                        android:orientation="vertical"
+                        app:cardCornerRadius="@dimen/margin_10dp"
+                        android:padding="10dp">
+                        <TextView
+                            android:id="@+id/vital_card_header"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="10dp"
+                            android:text=""
+                            android:textColor="@color/Primary_dark"
+                            android:textSize="18sp"
+                            android:textStyle="normal" />
+
+                        <TextView
+                            android:id="@+id/vital_card_header_label"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="10dp"
+                            android:text="No Readings"
+                            android:textColor="@color/Primary_dark"
+                            android:textSize="16sp"
+                            android:visibility="gone"
+                            android:textStyle="normal" />
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal" >
+                            <TextView
+                                android:id="@+id/vital_card_value"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingLeft="10dp"
+                                android:text=""
+                                android:textColor="@color/Primary_dark"
+                                android:textSize="25dp"
+                                android:textStyle="normal" />
+
+                            <TextView
+                                android:id="@+id/vital_card_unit"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingLeft="10dp"
+                                android:text=""
+                                android:textColor="@color/Primary_dark"
+                                android:textSize="12dp"
+                                android:textStyle="normal" /> `
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal" >
+                            <TextView
+                                android:id="@+id/vital_pulse_value"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingLeft="10dp"
+                                android:text=""
+                                android:textColor="@color/Primary_dark"
+                                android:textSize="25dp"
+                                android:textStyle="normal" />
+
+                            <TextView
+                                android:id="@+id/vital_pulse_unit"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingLeft="10dp"
+                                android:text=""
+                                android:textColor="@color/Primary_dark"
+                                android:textSize="12dp"
+                                android:textStyle="normal" /> `
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/vital_card_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="10dp"
+                            android:text=""
+                            android:textColor="@color/black"
+                            android:textSize="12dp"
+                            android:textStyle="normal" />
+                    </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingBottom="2dp"
+                        android:text="&lt; 7 days"
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/white"
+                        android:layout_gravity="right"
+                        android:background="@drawable/card_background_7days_gray"
+                        android:textSize="12dp"
+                        android:textStyle="normal" />
+
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/linechartDashboard"
+                        android:layout_width="match_parent"
+                        android:background="@color/white"
+                        android:layout_height="350dp"
+                        android:layout_margin="@dimen/left_margin10dp" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>

@@ -233,63 +233,37 @@
     [pageIndex]="0"
     >
      </mat-paginator> -->
-    <div class="upperPanelPatientTable">
-      <mat-paginator
-        [length]="totalPatientCount && totalPatientCount"
-        [pageSize]="10"
-        [pageIndex]="pageIndxValue"
-        (page)="getNextBillingDetails($event)"
-      >
-      </mat-paginator>
-      <span class="dwnld" (click)="downloadCsv()"
-        ><img class="dwnldIcon" src="../../../../../assets/down-arrow.png"
-      /></span>
-    </div>
-    <div class="patient_table_content">
-      <!-- <mat-table *ngIf="http_patient_data&&http_patients_with_device" #table [dataSource]="dataSourceTableList" class="patient_detail_table" matSort > -->
-      <mat-table
-        #table
-        [dataSource]="dataSourceTableList"
-        class="patient_detail_table"
-        matSort
-      >
-        <ng-container matColumnDef="selection">
-          <mat-header-cell
-            *matHeaderCellDef
-            class="hidden-column"
-            style="border-radius: 0.8rem 0px 0px 0px !important"
-          >
-          </mat-header-cell>
-          <mat-cell  *matCellDef="let element; let rowIndex = index"  class="hidden-column">
 
-            <input
-            type="radio"
-            name="rhSelectionRadio"
-            [value]="rowIndex"
-            [checked]="element.selected"
-            (click)="selectRow($event, element)"
-            id="selectdraftRow-{{ rowIndex }}"
-          />
-          <label [for]="'selectdraftRow-' + rowIndex"></label>
+      <div class="upperPanelPatientTable">
+        <mat-paginator
+          [length]="totalPatientCount && totalPatientCount"
+          [pageSize]="10"
+          [pageIndex]="pageIndxValue"
+          (page)="getNextBillingDetails($event)"
+        >
+        </mat-paginator>
+        <span class="dwnld" (click)="downloadCsv()"
+          ><img class="dwnldIcon" src="../../../../../assets/down-arrow.png"
+        /></span>
+      </div>
+      <div class="table-layout">
+      <div class="patient_table_content">
+        <!-- <mat-table *ngIf="http_patient_data&&http_patients_with_device" #table [dataSource]="dataSourceTableList" class="patient_detail_table" matSort > -->
+        <mat-table
+          #table
+          [dataSource]="dataSourceTableList"
+          class="patient_detail_table"
+          matSort
+        >
+          <ng-container matColumnDef="selection">
+            <mat-header-cell
+              *matHeaderCellDef
+              class="hidden-column"
+              style="border-radius: 0.8rem 0px 0px 0px !important"
+            >
+            </mat-header-cell>
+            <mat-cell  *matCellDef="let element; let rowIndex = index"  class="hidden-column">
 
-          </mat-cell>
-        </ng-container>
-
-        <ng-container matColumnDef="PatientId">
-          <mat-header-cell *matHeaderCellDef class="hidden-column"></mat-header-cell>
-          <mat-cell class="hidden-column" *matCellDef="let element; let rowIndex = index">
-
-          </mat-cell>
-        </ng-container>
-        <ng-container matColumnDef="PatientNumber">
-          <mat-header-cell *matHeaderCellDef class="patient-number-column">
-
-            Patient Number
-          </mat-header-cell>
-          <mat-cell
-            *matCellDef="let element; let rowIndex = index"
-           class="patient-number-column"
-              >
               <input
               type="radio"
               name="rhSelectionRadio"
@@ -299,271 +273,295 @@
               id="selectdraftRow-{{ rowIndex }}"
             />
             <label [for]="'selectdraftRow-' + rowIndex"></label>
-              <span class="patient-number">{{ element.PatientNumber }}</span>
 
             </mat-cell>
-            <!-- <mat-cell
-                                                        class="patient-number-column"
+          </ng-container>
 
-                                                          *matCellDef="let element; let rowIndex = index"
-                                                        >
-                      {{ element.PatientNumber }}
-                    </mat-cell> -->
-        </ng-container>
-        <ng-container matColumnDef="PatientName">
-          <mat-header-cell
+          <ng-container matColumnDef="PatientId">
+            <mat-header-cell *matHeaderCellDef class="hidden-column"></mat-header-cell>
+            <mat-cell class="hidden-column" *matCellDef="let element; let rowIndex = index">
 
-            *matHeaderCellDef
-          >
-            <div class="search_input" *ngIf="searchPatientList_Name">
-              <img
-                class="search_icon"
-                src="../../../../../assets/04-Icons/Icons_Cancel.svg"
-                id="p_patientNameSearch1"
-                (click)="refreshTable()"
-                (click)="searchPatientListNameClose()"
-              /><input
-                class="input_panel"
-                id="p_patientSearchInput"
-                (keyup)="applyDataFilter($event)"
-                (focus)="setupFilter('PatientName')"
-                [value]="patientSearch"
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="PatientNumber">
+            <mat-header-cell *matHeaderCellDef class="patient-number-column">
+
+              Patient Number
+            </mat-header-cell>
+            <mat-cell
+              *matCellDef="let element; let rowIndex = index"
+             class="patient-number-column"
+                >
+                <input
+                type="radio"
+                name="rhSelectionRadio"
+                [value]="rowIndex"
+                [checked]="element.selected"
+                (click)="selectRow($event, element)"
+                id="selectdraftRow-{{ rowIndex }}"
               />
-            </div>
-            <div class="search_heading_default" *ngIf="!searchPatientList_Name">
-              <img
-                class="search_icon_default"
-                src="../../../../../assets/04-Icons/Icons_Search Small.svg"
-                (click)="searchPatientListName()"
-                id="p_patientNameSearch2"
-              />
-              Patient Name
-            </div>
-          </mat-header-cell>
-          <mat-cell *matCellDef="let element">
-            <span
-              class="patient_name_col"
-              (click)="clickHandler(element)"
-              title="{{ element.PatientName }}"
-              >{{ element.PatientName }}
-            </span>
-          </mat-cell>
-        </ng-container>
+              <label [for]="'selectdraftRow-' + rowIndex"></label>
+                <span class="patient-number">{{ element.PatientNumber }}</span>
 
-        <ng-container matColumnDef="ProgramName">
-          <mat-header-cell *matHeaderCellDef>
-            Program Name
-            <div>
-              <!-- <select class="task_priority" dir="rtl">
-              <option value="1"> Program </option>
-              <option value="2">To do</option>
-              <option value="3">In Progress</option>
-           </select> -->
-            </div>
-          </mat-header-cell>
-          <mat-cell
+              </mat-cell>
 
-            *matCellDef="let element"
-          >
-            {{ element.ProgramName }}
-          </mat-cell>
-        </ng-container>
+          </ng-container>
+          <ng-container matColumnDef="PatientName">
+            <mat-header-cell
 
-        <ng-container matColumnDef="ProgramDuration">
-          <mat-header-cell *matHeaderCellDef mat-sort-header class="hide-arrow"
-            >Enrolled Date
-          </mat-header-cell>
-          <mat-cell *matCellDef="let element">
-            <span>{{
-              getEntrollDate(element.EnrolledDate)
-            }}</span>
-          </mat-cell>
-        </ng-container>
-
-        <ng-container matColumnDef="PhysicianName">
-          <mat-header-cell *matHeaderCellDef>
-            <!-- <div class="search_input" *ngIf="searchPatientList_physician"><img  class="search_icon" src="../../../../../assets/04-Icons/Icons_Cancel.svg" (click)="onreloadAfterFilter($event)"
-            (click)="searchPatientListPhysician()"><input class="search_input input_panel"(change)="applyFilterphysicianby($event)" >
-          </div> -->
-            <div class="search_input" *ngIf="searchPatientList_physician">
-              <img
-                class="search_icon"
-                src="../../../../../assets/04-Icons/Icons_Cancel.svg"
-                (click)="refreshTable()"
-                (click)="searchPatientListPhysicianClose()"
-                id="p_PhysicianSearch1"
-              /><input
-                class="search_input input_panel"
-                id="p_PhsycianSearchInput"
-                (keyup)="applyDataFilter($event)"
-                (focus)="setupFilter('PhysicianName')"
-                [value]="phySearchValue"
-              />
-            </div>
-            <div
-              class="search_heading_default"
-              *ngIf="!searchPatientList_physician"
+              *matHeaderCellDef
             >
-              <img
-                class="search_icon_default"
-                src="../../../../../assets/04-Icons/Icons_Search Small.svg"
-                (click)="searchPatientListPhysician()"
-                id="p_PhysicianSearch2"
-              />Physician Name
-            </div></mat-header-cell
-          >
-          <mat-cell
-
-            *matCellDef="let element"
-            ><span class="patient_name_col" title="{{ element.PhysicianName }}"
-              >{{ element.PhysicianName }}
-            </span>
-          </mat-cell>
-        </ng-container>
-        <ng-container matColumnDef="Priority">
-          <mat-header-cell *matHeaderCellDef class="hidden-column"> </mat-header-cell>
-          <mat-cell class="hidden-column" *matCellDef="let element">
-            {{ element.Priority }}
-          </mat-cell>
-        </ng-container>
-
-        <ng-container matColumnDef="CinicNameOrAssigned">
-          <div>
-            <mat-header-cell *matHeaderCellDef>
-              <div class="search_input" *ngIf="searchPatientList_assign">
+              <div class="search_input" *ngIf="searchPatientList_Name">
                 <img
                   class="search_icon"
                   src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                  id="p_patientNameSearch1"
                   (click)="refreshTable()"
-                  (click)="searchPatientListAssignClose()"
-                  id="p_ClinicSearch1"
+                  (click)="searchPatientListNameClose()"
                 /><input
-                  class="search_input input_panel"
+                  class="input_panel"
+                  id="p_patientSearchInput"
                   (keyup)="applyDataFilter($event)"
-                  id="p_ClinicSearchInput"
-                  (focus)="setupFilter('ClinicName')"
-                  [value]="clinicNameSerach"
+                  (focus)="setupFilter('PatientName')"
+                  [value]="patientSearch"
                 />
               </div>
-              <div
-                class="search_heading_default"
-                *ngIf="!searchPatientList_assign"
-              >
+              <div class="search_heading_default" *ngIf="!searchPatientList_Name">
                 <img
                   class="search_icon_default"
                   src="../../../../../assets/04-Icons/Icons_Search Small.svg"
-                  (click)="searchPatientListAssign()"
-                  id="p_ClinicSearch2"
+                  (click)="searchPatientListName()"
+                  id="p_patientNameSearch2"
                 />
-                Clinic Name
+                Patient Name
+              </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              <span
+                class="patient_name_col"
+                (click)="clickHandler(element)"
+                title="{{ element.PatientName }}"
+                >{{ element.PatientName }}
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="ProgramName">
+            <mat-header-cell *matHeaderCellDef>
+              Program Name
+              <div>
+                <!-- <select class="task_priority" dir="rtl">
+                <option value="1"> Program </option>
+                <option value="2">To do</option>
+                <option value="3">In Progress</option>
+             </select> -->
               </div>
             </mat-header-cell>
             <mat-cell
 
               *matCellDef="let element"
             >
-              <span *ngIf="element.ClinicName != undefined">
-                {{ element.ClinicName }}
+              {{ element.ProgramName }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="ProgramDuration">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="hide-arrow"
+              >Enrolled Date
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              <span>{{
+                getEntrollDate(element.EnrolledDate)
+              }}</span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="PhysicianName">
+            <mat-header-cell *matHeaderCellDef>
+              <!-- <div class="search_input" *ngIf="searchPatientList_physician"><img  class="search_icon" src="../../../../../assets/04-Icons/Icons_Cancel.svg" (click)="onreloadAfterFilter($event)"
+              (click)="searchPatientListPhysician()"><input class="search_input input_panel"(change)="applyFilterphysicianby($event)" >
+            </div> -->
+              <div class="search_input" *ngIf="searchPatientList_physician">
+                <img
+                  class="search_icon"
+                  src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                  (click)="refreshTable()"
+                  (click)="searchPatientListPhysicianClose()"
+                  id="p_PhysicianSearch1"
+                /><input
+                  class="search_input input_panel"
+                  id="p_PhsycianSearchInput"
+                  (keyup)="applyDataFilter($event)"
+                  (focus)="setupFilter('PhysicianName')"
+                  [value]="phySearchValue"
+                />
+              </div>
+              <div
+                class="search_heading_default"
+                *ngIf="!searchPatientList_physician"
+              >
+                <img
+                  class="search_icon_default"
+                  src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                  (click)="searchPatientListPhysician()"
+                  id="p_PhysicianSearch2"
+                />Physician Name
+              </div></mat-header-cell
+            >
+            <mat-cell
+
+              *matCellDef="let element"
+              ><span class="patient_name_col" title="{{ element.PhysicianName }}"
+                >{{ element.PhysicianName }}
               </span>
             </mat-cell>
-          </div>
-
-          <!-- <div *ngIf="roles[0].Id != 1">
-            <mat-header-cell *matHeaderCellDef>
-
-              <div class="search_input" *ngIf="searchPatientList_assign"><img  class="search_icon" src="../../../../../assets/04-Icons/Icons_Cancel.svg"
-                (click)="searchPatientListAssign()" id="p_AssignedSearch1"><input class="search_input input_panel"(keyup)="applyDataFilter($event)" id="p_AssignedSearchInput" (focus)="setupFilter('AssignedMember')"  >
-              </div>
-              <div class="search_heading_default" *ngIf="!searchPatientList_assign"> <img  class="search_icon_default" src="../../../../../assets/04-Icons/Icons_Search Small.svg"
-                (click)="searchPatientListAssign()" id="p_AssiginedSearch2"> Assigned Member</div>
-             </mat-header-cell>
-            <mat-cell style="padding-left:1.5rem !important ;" *matCellDef="let element"> {{element.AssignedMember}} </mat-cell>
-          </div> -->
-        </ng-container>
-
-        <ng-container matColumnDef="Assigned">
-          <mat-header-cell *matHeaderCellDef>
-            <div class="search_input" *ngIf="searchPatient_assignMember">
-              <img
-                class="search_icon"
-                src="../../../../../assets/04-Icons/Icons_Cancel.svg"
-                (click)="refreshTable()"
-                (click)="searchPatientAssignedMemberClose()"
-                id="p_AssignedSearchdata1"
-              /><input
-                class="search_input input_panel"
-                (keyup)="applyDataFilter($event)"
-                id="p_AssignedSearchInput"
-                (focus)="setupFilter('AssignedMember')"
-                [value]="assigneeSerach"
-              />
-            </div>
-            <div
-              class="search_heading_default"
-              *ngIf="!searchPatient_assignMember"
-            >
-              <img
-                class="search_icon_default"
-                src="../../../../../assets/04-Icons/Icons_Search Small.svg"
-                (click)="searchPatientAssignedMember()"
-                id="p_AssignedSearchdata2"
-              />
-              Assigned Member
-            </div>
-          </mat-header-cell>
-          <mat-cell
-
-            *matCellDef="let element"
-          >
-            {{ element.AssignedMember }}
-          </mat-cell>
-        </ng-container>
-
-        <!-- <div style="width: 0px"> -->
-        <ng-container matColumnDef="action">
-        <mat-header-cell *matHeaderCellDef class="action-column"> </mat-header-cell>
-        <mat-cell *matCellDef="let element" class="action-column">
-          <div [ngClass]="element.selected ? 'displayIcon' : 'hideIcon'">
-            <div class="front_img_container">
-              <img class="front_img" src="../../../../../../assets/04-Icons/Icons_Arrow - Front.svg" (click)="clickHandler(element)"
-                id="p_GotoPatient" />
-              </div>
-              </div>
-              </mat-cell>
           </ng-container>
-<!-- </div> -->
-        <ng-container matColumnDef="PatientProgramId">
-          <mat-header-cell
-          class="hidden-column"
-            *matHeaderCellDef
-            style="border-radius: 0.8rem 0.8rem 0.8rem 0.8rem"
-          >
-          </mat-header-cell>
-          <mat-cell class="hidden-column" *matCellDef="let element"> </mat-cell>
-        </ng-container>
+          <ng-container matColumnDef="Priority">
+            <mat-header-cell *matHeaderCellDef class="hidden-column"> </mat-header-cell>
+            <mat-cell class="hidden-column" *matCellDef="let element">
+              {{ element.Priority }}
+            </mat-cell>
+          </ng-container>
 
-        <mat-header-row
-          *matHeaderRowDef="PatientList_columnHeader; sticky: true"
-        ></mat-header-row>
-        <!-- <mat-row *matRowDef="let row; columns: columnHeader;"></mat-row> -->
-        <mat-row
-          [style.minHeight.px]="35"
-          *matRowDef="let row; columns: PatientList_columnHeader"
-          [ngClass]="{
-            critical: row.Priority == 'Critical',
-            cautious: row.Priority == 'Cautious',
-            normal: row.Priority == 'Normal',
-            selectedrow: row.selected == true
-          }"
-        ></mat-row>
-        <!-- [ngClass]="{'selectedrow':row.selected == true}" -->
-        <!-- (click)="clickHandler(row)" -->
+          <ng-container matColumnDef="CinicNameOrAssigned">
+            <div>
+              <mat-header-cell *matHeaderCellDef>
+                <div class="search_input" *ngIf="searchPatientList_assign">
+                  <img
+                    class="search_icon"
+                    src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                    (click)="refreshTable()"
+                    (click)="searchPatientListAssignClose()"
+                    id="p_ClinicSearch1"
+                  /><input
+                    class="search_input input_panel"
+                    (keyup)="applyDataFilter($event)"
+                    id="p_ClinicSearchInput"
+                    (focus)="setupFilter('ClinicName')"
+                    [value]="clinicNameSerach"
+                  />
+                </div>
+                <div
+                  class="search_heading_default"
+                  *ngIf="!searchPatientList_assign"
+                >
+                  <img
+                    class="search_icon_default"
+                    src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                    (click)="searchPatientListAssign()"
+                    id="p_ClinicSearch2"
+                  />
+                  Clinic Name
+                </div>
+              </mat-header-cell>
+              <mat-cell
 
-        <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell">No data Found</td>
-        </tr>
-      </mat-table>
-    </div>
+                *matCellDef="let element"
+              >
+                <span *ngIf="element.ClinicName != undefined">
+                  {{ element.ClinicName }}
+                </span>
+              </mat-cell>
+            </div>
+
+            <!-- <div *ngIf="roles[0].Id != 1">
+              <mat-header-cell *matHeaderCellDef>
+
+                <div class="search_input" *ngIf="searchPatientList_assign"><img  class="search_icon" src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                  (click)="searchPatientListAssign()" id="p_AssignedSearch1"><input class="search_input input_panel"(keyup)="applyDataFilter($event)" id="p_AssignedSearchInput" (focus)="setupFilter('AssignedMember')"  >
+                </div>
+                <div class="search_heading_default" *ngIf="!searchPatientList_assign"> <img  class="search_icon_default" src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                  (click)="searchPatientListAssign()" id="p_AssiginedSearch2"> Assigned Member</div>
+               </mat-header-cell>
+              <mat-cell style="padding-left:1.5rem !important ;" *matCellDef="let element"> {{element.AssignedMember}} </mat-cell>
+            </div> -->
+          </ng-container>
+
+          <ng-container matColumnDef="Assigned">
+            <mat-header-cell *matHeaderCellDef>
+              <div class="search_input" *ngIf="searchPatient_assignMember">
+                <img
+                  class="search_icon"
+                  src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                  (click)="refreshTable()"
+                  (click)="searchPatientAssignedMemberClose()"
+                  id="p_AssignedSearchdata1"
+                /><input
+                  class="search_input input_panel"
+                  (keyup)="applyDataFilter($event)"
+                  id="p_AssignedSearchInput"
+                  (focus)="setupFilter('AssignedMember')"
+                  [value]="assigneeSerach"
+                />
+              </div>
+              <div
+                class="search_heading_default"
+                *ngIf="!searchPatient_assignMember"
+              >
+                <img
+                  class="search_icon_default"
+                  src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                  (click)="searchPatientAssignedMember()"
+                  id="p_AssignedSearchdata2"
+                />
+                Assigned Member
+              </div>
+            </mat-header-cell>
+            <mat-cell
+
+              *matCellDef="let element"
+            >
+              {{ element.AssignedMember }}
+            </mat-cell>
+          </ng-container>
+
+          <!-- <div style="width: 0px"> -->
+          <ng-container matColumnDef="action">
+          <mat-header-cell *matHeaderCellDef class="action-column"> </mat-header-cell>
+          <mat-cell *matCellDef="let element" class="action-column">
+            <div [ngClass]="element.selected ? 'displayIcon' : 'hideIcon'">
+              <div class="front_img_container">
+                <img class="front_img" src="../../../../../../assets/04-Icons/Icons_Arrow - Front.svg" (click)="clickHandler(element)"
+                  id="p_GotoPatient" />
+                </div>
+                </div>
+                </mat-cell>
+            </ng-container>
+  <!-- </div> -->
+          <ng-container matColumnDef="PatientProgramId">
+            <mat-header-cell
+            class="hidden-column"
+              *matHeaderCellDef
+              style="border-radius: 0.8rem 0.8rem 0.8rem 0.8rem"
+            >
+            </mat-header-cell>
+            <mat-cell class="hidden-column" *matCellDef="let element"> </mat-cell>
+          </ng-container>
+
+          <mat-header-row
+            *matHeaderRowDef="PatientList_columnHeader; sticky: true"
+          ></mat-header-row>
+          <!-- <mat-row *matRowDef="let row; columns: columnHeader;"></mat-row> -->
+          <mat-row
+            [style.minHeight.px]="35"
+            *matRowDef="let row; columns: PatientList_columnHeader"
+            [ngClass]="{
+              critical: row.Priority == 'Critical',
+              cautious: row.Priority == 'Cautious',
+              normal: row.Priority == 'Normal',
+              selectedrow: row.selected == true
+            }"
+          ></mat-row>
+          <!-- [ngClass]="{'selectedrow':row.selected == true}" -->
+          <!-- (click)="clickHandler(row)" -->
+
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell">No data Found</td>
+          </tr>
+        </mat-table>
+      </div>
+     </div>
+
   </div>
 </ng-template>
 <ng-template #taskKPI>

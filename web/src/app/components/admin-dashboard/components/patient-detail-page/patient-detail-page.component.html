@@ -4,7 +4,7 @@
 </ng-container>
 <div class="container_panel">
   <div class="main_panel">
-    <div class="main-content-panel01" [ngStyle]="{ width: '98%' }">
+    <div class="main-content-panel01" >
       <div class="main_page_upper_panel">
         <div class="page-header">
           <div class="page-header-panel">
@@ -441,12 +441,12 @@
             >
            <div id="mydiv" class="myvideoContainer" cdkDrag  style="position: absolute; top: 0px; left: 0px;">
             <div>
-            <img
+            <!-- <img
       class="tool_icon tool_icon_close"
       style="cursor: pointer; float: right"
       src="../../../../../assets/04-Icons/Icons_Cancel.svg"
       (click)="disconnectVideo()"
-    />
+    /> -->
   </div>
   <div class="upper_toolPanel">
     <div class="timerPanel">{{ videoTimer }}</div>
@@ -1566,6 +1566,7 @@
                 <img
                   class="device_img"
                   src="../../../../../assets/04-Icons/Icons_SMS A.svg"
+                  (click)="openDialogWithTemplateRef()"
                 />
               </div>
             </div>
@@ -5227,7 +5228,7 @@
 <!-- Activity 5 th Main Menu - Sub Menu  Chat Template Start -->
 <ng-template #activityInfoChat>
 
-  <app-activityinfo-chat [dataSourceTable]="dataSourceTable" [http_chat_data]="http_chatData"></app-activityinfo-chat>
+  <app-activityinfo-chat [dataSourceTable]="dataSourceTable" [http_chat_data]="http_chatData" [patientname]="http_rpm_patientList&&http_rpm_patientList.PatientDetails.UserName"></app-activityinfo-chat>
 </ng-template>
 <!-- Activity 5 th Main Menu - Sub Menu  Chat Template End -->
 <!-- Activity 5 th Main Menu - Sub Menu  SMS Template Start -->
@@ -5641,7 +5642,7 @@
         class="btn_cancel"
         [mat-dialog-close]="true"
         id="pd_smryUpdateCancel"
-        (click)="OnpreviewUpdateCancel()"
+        (click)="onPreviewSummaryCancel()"
       >
         CANCEL
       </button>
