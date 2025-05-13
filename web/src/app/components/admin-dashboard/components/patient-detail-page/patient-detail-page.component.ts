@@ -313,7 +313,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     that.master_data = JSON.parse(that.master_data);
     that.StatesAndCities = sessionStorage.getItem('states_cities');
     that.StatesAndCities = JSON.parse(that.StatesAndCities);
-    that.programDetails = that.master_data.ProgramDetailsMasterData;
+    that.programDetails = that.master_data?.ProgramDetailsMasterData;
     this.rolelist = sessionStorage.getItem('Roles');
     this.billingtypeVariable = sessionStorage.getItem('billingType');
     this.rolelist = JSON.parse(this.rolelist);

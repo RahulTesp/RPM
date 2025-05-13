@@ -1783,7 +1783,11 @@ table {
 
 .diagosis_panel {
   width: 100%;
+  max-height: 290px;
+  overflow-y: auto;
+  padding-right: 10px;
 }
+
 
 .vital_data_right_sub {
   display: flex;
@@ -2391,4 +2395,45 @@ button {
   display: flex;
   width: 100%;
 
+}
+.noteTextArea {
+  background-color: #edeff5;
+  height: 100%;
+  border-radius: 8px;
+  width: 100%;
+  padding: 8px;
+  line-height: 24px;
+  font-family: "Rubik";
+  font-size: 0.8rem;
+  border: none;
+}
+ 
+.noteTextArea1 {
+  background-color: #edeff5;
+  height: 270px;
+  border-radius: 8px;
+  width: 100%;
+  padding: 8px;
+  border: none;
+}
+
+.custom-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #164d61;
+  padding: 20px;
+  border-radius: 10px;
+  position: relative;
+  max-width: 440px;
 }
