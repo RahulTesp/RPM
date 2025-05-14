@@ -1157,16 +1157,19 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // var that = this
     this.rpm.rpm_post('/api/comm/SMSService', req_body).then(
       (data) => {
         //show patient id created
-        this.dialog.closeAll();
+        // this.dialog.closeAll();
+        this.smsCancel();  // close the panel
         alert('Message Sent Successfully..!');
         this.loading_sms = false;
         this.getSMSData();
       },
       (err) => {
-        this.dialog.closeAll();
+        // this.dialog.closeAll();
+        this.smsCancel(); // close the panel
         alert('Failed to Sent Message..!');
         this.loading_sms = false;
       }
