@@ -1553,24 +1553,9 @@
                               (inputCleared)="cleared($event, i)"
                               [itemTemplate]="itemTemplate"
                               [notFoundTemplate]="notFoundTemplate"
-
-                              >
-
-                            </ng-autocomplete>
-
-                            <ng-autocomplete
-                            id="patientReport"
-                            [initialValue]="Diagnosis.DiagnosisName"
-                            [searchKeyword]="keyword"
-                            [data]="Diagnosis_Name"
-                            placeholder="Select Diagnosis"
-                            (selected)="diagnosisChanged($event, i)"
-                            (inputCleared)="cleared($event, i)"
-                            [itemTemplate]="itemTemplate"
-                            [notFoundTemplate]="notFoundTemplate"
-
                             >
-                          </ng-autocomplete>
+                              >
+                            </ng-autocomplete>
                             <ng-template #itemTemplate let-item>
                               <a [innerHTML]="item.DiagnosisField"></a>
                             </ng-template>
@@ -1594,7 +1579,6 @@
                               <div class="code_data">
                                 <input
                                   class="userInfovalue"
-                                  name="diagnosisCode"
                                   id="editPatientDiagnosisCode"
                                   [(ngModel)]="Diagnosis.DiagnosisCode"
                                   [ngModelOptions]="{ standalone: true }"
