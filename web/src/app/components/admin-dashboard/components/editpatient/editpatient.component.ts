@@ -1024,6 +1024,8 @@ export class EditpatientComponent implements OnInit {
         that.InsuranceInfo =
           that.Patientdata.PatientInsurenceDetails.PatientInsurenceInfos;
         that.EnrolmentDetails = that.Patientdata.PatientEnrolledDetails;
+        console.log("EnrolmentDetails");
+        console.log(that.EnrolmentDetails);
         that.ActiveDetails = that.Patientdata.ActivePatientDetails;
         that.ReadyToDischarge =
           that.Patientdata.ReadyForDischargePatientDetails;

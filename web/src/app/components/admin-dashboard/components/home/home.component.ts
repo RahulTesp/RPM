@@ -208,7 +208,7 @@ export class HomeComponent implements OnInit {
     this.ms.requestPermission();
     this.ms.requestToken();
     this.message1 = this.ms.receiveMessage();
-    this.message1 = this.ms.registerMessageEventListener();
+    //this.message1 = this.ms.registerMessageEventListener();
     console.log('Message Call From Service:' + this.message1);
   }
 
