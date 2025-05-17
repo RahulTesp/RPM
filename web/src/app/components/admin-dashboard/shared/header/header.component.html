@@ -74,7 +74,7 @@
             src="../../../../../assets/04-Icons/Icons_Notification.svg"
             (click)="notification_click()"
           />
-          <div *ngIf="ms.getCurrentUnreadCount() != 0">
+          <div *ngIf="ms.getCurrentUnreadCount() !== null && ms.getCurrentUnreadCount() > 0">
             <span
               class="badge"
               id="header_Notification"

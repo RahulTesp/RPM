@@ -172,13 +172,21 @@ private messageAddedListenerCount: number = 0;
      console.log('message Listener');
      console.log(this.messageListenerRegistered)
      if (!this.messageListenerRegistered) {
-          this.client.on('messageAdded', (msg: Message) => {
-          this.messageAddedListenerCount++;
-           console.log(`messageAdded listener registered. Total listeners: ${this.messageAddedListenerCount}`);
+    this.client.on('messageAdded', (msg: Message) => {
+    this.messageAddedListenerCount++;
+    console.log(`messageAdded event received. Total events: ${this.messageAddedListenerCount}`);
 
-            // Call the handler
-           this.handleMessageAdded(msg);
-       });
+    // Get the current conversation ID
+    const currentConversation = this.currentConversationSubject.getValue();
+    const currentConversationId = currentConversation?.sid;
+        if (currentConversationId && msg.conversation?.sid === currentConversationId) {
+      console.log(`Message belongs to current conversation (${currentConversationId}). Processing...`);
+      this.handleMessageAdded(msg);
+    } else {
+      console.log(`Message is for conversation ${msg.conversation?.sid}, but current conversation is ${currentConversationId}. Ignoring.`);
+
+    }
+  });
       this.client.on('messageRemoved', this.handleMessageRemoved);
       this.client.on('messageUpdated', this.handleMessageUpdated);
       this.messageListenerRegistered = true;
@@ -283,8 +291,7 @@ private messageAddedListenerCount: number = 0;
         const hasCurrentUser = normalizedParticipants.includes(normalizedUserName);
         const hasPatientUser = normalizedParticipants.includes(normalizedPatientUser);
 
-        console.log('Conversation includes current user:', hasCurrentUser);
-        console.log('Conversation includes patient user:', hasPatientUser);
+
 
         // If both users are in this conversation, we can use this conversation directly
         if (hasCurrentUser && hasPatientUser) {
