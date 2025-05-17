@@ -73,18 +73,41 @@ export class ChatbuttonComponent implements OnInit, OnDestroy {
       this.patientChatService.chatList$.subscribe(
         (list) => (this.chatList = list)
       ),
-      this.patientChatService.messages$.subscribe(
-        (msgs) => (this.messages = msgs)
-      ),
+      // this.patientChatService.messages$.subscribe(
+      //   (msgs) => (this.messages = msgs)
+      // ),
+      // Add this subscription to log messages
+this.patientChatService.messages$.subscribe(
+  (msgs) => {
+    // Assign messages to class property
+    this.messages = msgs;
+
+    // Print message details to console
+    console.log('===== MESSAGES UPDATE RECEIVED =====');
+    console.log(`Total messages: ${msgs.length}`);
+
+    if (msgs.length > 0) {
+      // Print the last 5 messages (or all if fewer than 5)
+      const messagesToShow = msgs.slice(-5);
+      console.log('Last 5 messages:');
+
+      messagesToShow.forEach((message, index) => {
+        const position = msgs.length - messagesToShow.length + index + 1;
+        console.log(`[${position}/${msgs.length}] From: ${message.body || 'Unknown'}`);
+
+        console.log('-----------------------------------');
+      });
+    } else {
+      console.log('No messages in the conversation.');
+    }
+
+    console.log('====================================');
+  }
+),
       this.patientChatService.currentConversation$.subscribe(
         (conv) => (this.currentConversation = conv)
       ),
-      // this.patientChatService.isTyping$.subscribe(
-      //   (typing) => (this.isTyping = typing)
-      // ),
-      // this.patientChatService.loading$.subscribe(
-      //   (loading) => (this.isLoading = loading)
-      // ),
+
       this.patientChatService.error$.subscribe((err) => (this.error = err)),
       this.patientChatService.unreadCount$.subscribe((count) => {
         this.unreadMessagesCount = count;

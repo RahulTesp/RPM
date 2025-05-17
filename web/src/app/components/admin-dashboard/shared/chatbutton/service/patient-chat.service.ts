@@ -600,7 +600,8 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
     console.log('Message');
     console.log(message);
     if (!message.trim()) return;
-
+ console.log('Message2');
+    console.log(message);
     try {
       const currentConversation = this.currentConversationSubject.getValue();
       if (!currentConversation) {
@@ -629,7 +630,7 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
       console.log(chatList);
       const updatedChatList = chatList.map((el) =>
         el.chat.sid === currentConversation.sid
-          ? { ...el, lastMessage: message.trim() }
+          ? { ...el, lastMessage: message }
           : el
       );
       console.log('Update Chat List');
