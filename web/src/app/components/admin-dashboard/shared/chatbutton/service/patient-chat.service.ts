@@ -165,19 +165,24 @@ export class PatientChatService {
       console.error(' Twilio Client Reconnection Failed:', error);
     }
   }
-
+private messageAddedListenerCount: number = 0;
   // Event listeners
   private setupEventListeners(): void {
     if (!this.client) return;
      console.log('message Listener');
      console.log(this.messageListenerRegistered)
-    // if (!this.messageListenerRegistered) {
-      //this.client.on('messageAdded', this.handleMessageAdded);
-      this.client.on('messageAdded', (msg: Message) => this.handleMessageAdded(msg));
+     if (!this.messageListenerRegistered) {
+          this.client.on('messageAdded', (msg: Message) => {
+          this.messageAddedListenerCount++;
+           console.log(`messageAdded listener registered. Total listeners: ${this.messageAddedListenerCount}`);
+
+            // Call the handler
+           this.handleMessageAdded(msg);
+       });
       this.client.on('messageRemoved', this.handleMessageRemoved);
       this.client.on('messageUpdated', this.handleMessageUpdated);
-    //   this.messageListenerRegistered = true;
-    // }
+      this.messageListenerRegistered = true;
+     }
 
     // CLIENT INITIALIZATION EVENTS
     this.client.on('initialized', () => {
@@ -365,98 +370,19 @@ export class PatientChatService {
     });
   }
 
-  // private handleMessageAdded = async (msg: Message) => {
-  //   console.log('New Message Received:', msg);
 
-  //   const currentConversation = this.currentConversationSubject.getValue();
-  //   console.log('Current Conversation - handleMessageAdded-1');
-  //   console.log(currentConversation);
-  //   const chatList = this.chatListSubject.getValue();
-  //   console.log('Current chatList - handleMessageAdded-1');
-  //   console.log(chatList);
-  //   const messages = this.messagesSubject.getValue();
-  //   console.log('Current messages - handleMessageAdded-1');
-  //   console.log(messages);
-  //   const isChatOpen = this.chatPanelOpenSubject.getValue();
-  //   console.log('Current isChatOpen - handleMessageAdded-1');
-  //   console.log(isChatOpen);
-
-  //   if (!this.userName) {
-  //     const storedName = sessionStorage.getItem('useraccessrights');
-  //     const parsedData = storedName ? JSON.parse(storedName) : null;
-  //     if (parsedData) this.userName = parsedData.Username;
-  //   }
-
-  //   const isIncoming = msg.author !== this.userName;
-  //   console.log(
-  //     `Message author: ${msg.author}, currentUser: ${this.userName}, isIncoming: ${isIncoming}`
-  //   );
-
-  //   if (currentConversation?.sid === msg.conversation.sid && isChatOpen) {
-  //     this.messagesSubject.next([...messages, msg]);
-  //     await currentConversation.updateLastReadMessageIndex(msg.index);
-
-  //     const updatedChatList = chatList.map((el) =>
-  //       el.chat.sid === currentConversation.sid
-  //         ? { ...el, lastMessage: msg.body || el.lastMessage }
-  //         : el
-  //     );
-  //     console.log('updatedChatList - handleMessageAdded-currentConversation-msg.conversation.sid');
-  //     console.log(updatedChatList);
-  //     this.chatListSubject.next(updatedChatList);
-  //   } else if (isIncoming) {
-
-  //     const updatedChatList = chatList.map((el) => {
-  //       if (el.chat.sid === msg.conversation.sid) {
-  //         return {
-  //           ...el,
-  //           lastMessage: msg.body || el.lastMessage,
-  //           unreadCount: (el.unreadCount || 0) + 1,
-  //         };
-  //       }
-  //       return el;
-  //     });
-  //     console.log('updatedChatList - handleMessageAdded2');
-  //     console.log(updatedChatList);
-
-  //     this.chatListSubject.next(updatedChatList);
-  //     this.updateTotalUnreadCount();
-  //   } else {
-  //     const updatedChatList = chatList.map((el) =>
-  //       el.chat.sid === msg.conversation.sid
-  //         ? {
-  //             ...el,
-  //             lastMessage: msg.body || el.lastMessage,
-  //           }
-  //         : el
-  //     );
-
-  //     this.chatListSubject.next(updatedChatList);
-  //   }
-  //   this.getPatientChat(this.currentPatientUser)
-  // };
   private handleMessageAdded = async (msg: Message) => {
     console.log('New Message Received:', msg);
 
     // Get current state
     const currentConversation = this.currentConversationSubject.getValue();
-    console.log('Current Conversation - handleMessageAdded-1');
-    console.log(currentConversation);
-
     const chatList = this.chatListSubject.getValue() || [];
-    console.log('Current chatList - handleMessageAdded-1');
-    console.log(chatList);
     this.fetchMessages().catch(error => {
       console.error('Error in background message fetching:', error);
     });
     const messages = this.messagesSubject.getValue();
-
-    console.log('Current messages - handleMessageAdded-1');
-
-
     const isChatOpen = this.chatPanelOpenSubject.getValue();
-    console.log('Current isChatOpen - handleMessageAdded-1');
-    console.log(isChatOpen);
+
 
     // Set username if needed
     if (!this.userName) {
@@ -488,12 +414,11 @@ export class PatientChatService {
           },
           ...chatList
         ];
-
-        console.log('New chat list after adding conversation:', newChatList);
         this.chatListSubject.next(newChatList);
 
         // Update total unread count if incoming message
         if (isIncoming) {
+
           this.updateTotalUnreadCount();
         }
 
@@ -633,14 +558,18 @@ async fetchMessages(skip?: number): Promise<void> {
     this.setError('Failed to load messages');
   } finally {
     const endTime = performance.now();
-    console.log(`fetchMessages took ${(endTime - startTime).toFixed(2)} ms`);
+    //console.log(`fetchMessages took ${(endTime - startTime).toFixed(2)} ms`);
     this.setLoading(false);
   }
 }
 
 private async updateReadStatus(conversation: Conversation, messages: any[]): Promise<void> {
   try {
-    const lastMessage = messages[messages.length - 1];
+    const isChatOpen = this.chatPanelOpenSubject.getValue();
+    console.log('Chat Panel Open updateReadStatus');
+    console.log(isChatOpen)
+     if (isChatOpen) {
+        const lastMessage = messages[messages.length - 1];
 
     // Only update if we have a valid index
     if (lastMessage && typeof lastMessage.index === 'number') {
@@ -658,6 +587,8 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
 
       this.updateTotalUnreadCount();
     }
+     }
+
   } catch (error) {
     console.error('Error updating read status:', error);
     // Don't throw - this is a non-critical operation
@@ -804,15 +735,10 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
 
   async getUnreadMessagesForConversation(conversationId: any): Promise<number> {
     try {
-      // const currentConversation = this.currentConversationSubject.getValue();
 
       if (!this.client) return 0;
       if (!conversationId) return 0;
-     // console.log('getExisting Conversation ');
 
-     // console.log('conservation id');
-     // console.log(conversationId);
-      // Get the specific conversation by SID
       const conversation = await this.client.getConversationBySid(
         conversationId
       );
@@ -845,10 +771,17 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
     const chatList = this.chatListSubject.getValue();
     console.log('ChatList Updated TotalCount');
     console.log(chatList);
-    const totalUnread = chatList.reduce(
-      (total, chat) => total + (chat.unreadCount || 0),
-      0
-    );
+
+
+     const totalUnread = chatList.reduce(
+    (total, chat) => {
+      const chatUnread = chat.unreadCount || 0;
+
+       console.log(`Total ${total} from chat unread ${chat.unreadCount}`);
+      return total + chatUnread;
+    },
+    0
+  );
     console.log('updateTotalUnreadCount TotalCount');
     console.log(totalUnread);
     this.unreadCountSubject.next(totalUnread);
@@ -1091,6 +1024,7 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
       // const url = `${apiUrl}?ToUser=${patientId}`;
       //     return await this.rpmService.rpm_get(url);
       const response = await this.rpm.rpm_get(`/api/comm/getallchats?ToUser=${patientUsername}`);
+      this.messageListenerRegistered = false;
 
       // Update the BehaviorSubject with new data
       this.updateChatData(response);
