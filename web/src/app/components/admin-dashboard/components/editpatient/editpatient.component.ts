@@ -2085,13 +2085,7 @@ export class EditpatientComponent implements OnInit {
     }
 
     if (this.status_to_send == 'Active') {
-      // if(this.insurance_pname!="" &&this.isDeviceActive){//&&this.Patientdata_Document.PatientDocumentDetails.PatientDocumentinfos.length>0){
-      //   console.log("All Patient Details are Verified")
-      // }
-      // else{
-      //   alert("Please complete Device Registration/Primary Insurance to Make a Patient Active...!")
-      //   return;
-      // }
+
       if (
         this.Patientdata &&
         this.Patientdata.PatientProgramdetails.ProgramName != 'CCM' &&
@@ -2345,6 +2339,9 @@ export class EditpatientComponent implements OnInit {
               this.ReloadDeviceList(2);
               this.ReloadDeviceList(3);
               this.ReloadDeviceList(4);
+              this.UpdatePatient_Device(this.pid, this.patientprogramid);
+              this.ChangeScreen(2);
+
             },
             false
           );

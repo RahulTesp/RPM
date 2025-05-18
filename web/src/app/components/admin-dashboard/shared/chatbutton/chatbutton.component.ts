@@ -101,14 +101,24 @@ export class ChatbuttonComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
-  // User interaction methods
-  async sendMessage() {
-    if (!this.message.trim()) return;
 
+isSending = false;
+
+async sendMessage() {
+  if (!this.message.trim() || this.isSending) return;
+
+  this.isSending = true;
+
+  try {
     await this.patientChatService.sendMessage(this.message);
     this.message = '';
+  } catch (error) {
+    // Handle error if needed
+    console.error('Failed to send message:', error);
+  } finally {
+    this.isSending = false;
   }
-
+}
   async openChat(conv: Conversation) {
     await this.patientChatService.openChat(conv);
   }

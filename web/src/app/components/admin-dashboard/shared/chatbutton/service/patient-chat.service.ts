@@ -581,11 +581,9 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
 
 
   async sendMessage(message: string): Promise<void> {
-    console.log('Message');
-    console.log(message);
+
     if (!message.trim()) return;
- console.log('Message2');
-    console.log(message);
+
     try {
       const currentConversation = this.currentConversationSubject.getValue();
       if (!currentConversation) {
@@ -610,16 +608,12 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
 
       // 🟢 Update chat list with the new message
       const chatList = this.chatListSubject.getValue();
-      console.log(' Chat List');
-      console.log(chatList);
+
       const updatedChatList = chatList.map((el) =>
         el.chat.sid === currentConversation.sid
           ? { ...el, lastMessage: message }
           : el
       );
-      console.log('Update Chat List');
-      console.log(chatList);
-
       this.chatListSubject.next(updatedChatList);
       this.chatNotify(currentConversation.sid,this.currentPatientUser,this.userName,message);
     } catch (error) {
