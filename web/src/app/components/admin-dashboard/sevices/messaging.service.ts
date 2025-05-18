@@ -173,7 +173,8 @@ export class MessagingService {
   }
 
   getCurrentUnreadCount(): number {
-    return this.notificationData.getValue().count;
+     const data = this.notificationData.getValue();
+     return data?.count ?? 0;
   }
 
   markNotificationAsRead(notificationId: number, notificationAuditId: number): Promise<any> {

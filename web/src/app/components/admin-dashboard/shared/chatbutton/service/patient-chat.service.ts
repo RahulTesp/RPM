@@ -171,26 +171,28 @@ private messageAddedListenerCount: number = 0;
     if (!this.client) return;
      console.log('message Listener');
      console.log(this.messageListenerRegistered)
-     if (!this.messageListenerRegistered) {
-    this.client.on('messageAdded', (msg: Message) => {
-    this.messageAddedListenerCount++;
-    console.log(`messageAdded event received. Total events: ${this.messageAddedListenerCount}`);
+     this.removeMessageListeners();
+    this.client.on('messageAdded', async (msg: Message) => {
+      console.log('message Listener1');
+     console.log(this.messageListenerRegistered)
+       if (!this.messageListenerRegistered)
+       {
+               this.messageAddedListenerCount++;
+               console.log(`messageAdded event received. Total events: ${this.messageAddedListenerCount}`);
 
-    // Get the current conversation ID
-    const currentConversation = this.currentConversationSubject.getValue();
-    const currentConversationId = currentConversation?.sid;
-        if (currentConversationId && msg.conversation?.sid === currentConversationId) {
-      console.log(`Message belongs to current conversation (${currentConversationId}). Processing...`);
-      this.handleMessageAdded(msg);
-    } else {
-      console.log(`Message is for conversation ${msg.conversation?.sid}, but current conversation is ${currentConversationId}. Ignoring.`);
+              // Get the current conversation ID
+               const currentConversation = this.currentConversationSubject.getValue();
+               const currentConversationId = currentConversation?.sid;
+               console.log(`Message belongs to current conversation (${currentConversationId}). Processing...`);
+               this.handleMessageAdded(msg);
 
-    }
-  });
+       }
+
+       });
       this.client.on('messageRemoved', this.handleMessageRemoved);
       this.client.on('messageUpdated', this.handleMessageUpdated);
-      this.messageListenerRegistered = true;
-     }
+
+
 
     // CLIENT INITIALIZATION EVENTS
     this.client.on('initialized', () => {
@@ -231,44 +233,9 @@ private messageAddedListenerCount: number = 0;
 
 
 
-    // CONVERSATION EVENTS
-    // this.client.on('conversationAdded', async (conv: Conversation) => {
-    //   console.log('📢 New Conversation Added:', conv);
-    //   this.currentConversationSubject.next(conv)
-    //   const currentConversationId = await this.getExistingConversation(
-    //     this.client,
-    //     this.userName,
-    //     this.currentPatientUser
-    //   );
-    //   console.log('username');
-    //   console.log(this.userName);
-    //   console.log('currentPatientUser');
-    //   console.log(this.currentPatientUser);
-    //   console.log('📢 New currentConversationId Added:', currentConversationId);
-    //   if (!currentConversationId) {
-    //     return;
-    //   }
-    //   if (currentConversationId == conv.sid) {
-    //     this.getUnreadMessagesForConversation(currentConversationId);
-    //   }
-
-    //   const chatList = this.chatListSubject.getValue();
-    //   console.log('chatList conve Added')
-    //   console.log(chatList)
-
-    //    if (conv.dateCreated && conv.dateCreated > this.currentTime) {
-    //     await conv.setAllMessagesUnread();
-    //     const updatedChatList = [
-    //       { chat: conv, unreadCount: 0, lastMessage: '' },
-    //       ...chatList,
-    //     ];
-    //     this.chatListSubject.next(updatedChatList);
-    //  }
-    // });
-
     this.client.on('conversationAdded', async (conv: Conversation) => {
       console.log('📢 New Conversation Added:', conv.sid);
-      this.currentConversationSubject.next(conv);
+
 
       // Get participants for this conversation
       try {
@@ -296,7 +263,7 @@ private messageAddedListenerCount: number = 0;
         // If both users are in this conversation, we can use this conversation directly
         if (hasCurrentUser && hasPatientUser) {
           console.log('This is the conversation for current users:', conv.sid);
-
+          this.currentConversationSubject.next(conv);
           // Get unread messages for this conversation
           this.getUnreadMessagesForConversation(conv.sid);
 
@@ -376,12 +343,22 @@ private messageAddedListenerCount: number = 0;
       }
     });
   }
+private removeMessageListeners(): void {
+  if (this.client && this.messageListenerRegistered) {
+    console.log('Removing existing message listeners');
+    this.client.off('messageAdded', this.handleMessageAdded);
+    this.client.off('messageRemoved', this.handleMessageRemoved);
+    this.client.off('messageUpdated', this.handleMessageUpdated);
+    this.messageListenerRegistered = false;
+  }
+}
 
 
   private handleMessageAdded = async (msg: Message) => {
     console.log('New Message Received:', msg);
 
     // Get current state
+
     const currentConversation = this.currentConversationSubject.getValue();
     const chatList = this.chatListSubject.getValue() || [];
     this.fetchMessages().catch(error => {
@@ -480,7 +457,7 @@ private messageAddedListenerCount: number = 0;
       );
       this.chatListSubject.next(updatedChatList);
     }
-
+    this.messageListenerRegistered = true;
     this.getPatientChat(this.currentPatientUser);
   };
 // Optimized version of the chat service methods
@@ -768,13 +745,72 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
       console.log(lastReadMessageIndex)
       let totalUnreadCount = unreadCount > 0 ? unreadCount : 0;
       this.unreadCountSubject.next(totalUnreadCount);
+     await this.updateChatListUnreadCount(conversationId, totalUnreadCount, messages.items);
+
       return totalUnreadCount;
     } catch (error) {
       console.error(`Error fetching unread messages for conversation:`, error);
       return 0;
     }
   }
+private async updateChatListUnreadCount(
+  conversationId: string,
+  unreadCount: number,
+  messages?: any[]
+): Promise<void> {
+  try {
+    const chatList = this.chatListSubject.getValue() || [];
 
+    // Find the conversation in the chat list
+    const conversationIndex = chatList.findIndex(
+      item => item.chat.sid === conversationId
+    );
+
+    if (conversationIndex !== -1) {
+      // Update existing conversation in chat list
+      const updatedChatList = [...chatList];
+      updatedChatList[conversationIndex] = {
+        ...updatedChatList[conversationIndex],
+        unreadCount: unreadCount
+      };
+
+      // Optionally update last message if messages are provided
+      if (messages && messages.length > 0) {
+        const lastMessage = messages[messages.length - 1];
+        updatedChatList[conversationIndex].lastMessage =
+          lastMessage.body || '(Media message)';
+      }
+
+      this.chatListSubject.next(updatedChatList);
+      console.log(`Updated chat list unread count for conversation ${conversationId}: ${unreadCount}`);
+    } else {
+      // If conversation not in chat list, optionally add it
+      console.log(`Conversation ${conversationId} not found in chat list`);
+
+      // Uncomment below if you want to add missing conversations to chat list
+      /*
+      try {
+        const conversation = await this.client.getConversationBySid(conversationId);
+        const newChatItem = {
+          chat: conversation,
+          unreadCount: unreadCount,
+          lastMessage: messages && messages.length > 0
+            ? (messages[messages.length - 1].body || '(Media message)')
+            : ''
+        };
+
+        const updatedChatList = [newChatItem, ...chatList];
+        this.chatListSubject.next(updatedChatList);
+        console.log(`Added new conversation to chat list: ${conversationId}`);
+      } catch (error) {
+        console.error('Error adding conversation to chat list:', error);
+      }
+      */
+    }
+  } catch (error) {
+    console.error('Error updating chat list unread count:', error);
+  }
+}
   private updateTotalUnreadCount(): void {
     const chatList = this.chatListSubject.getValue();
     console.log('ChatList Updated TotalCount');
@@ -943,7 +979,7 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
       });
   }
 
-  private handleMessageRemoved = (message: Message): void => {
+  private handleMessageRemoved = async (message: Message): Promise<void> => {
     try {
       console.log('Message Removed:', message.sid);
       const currentConversation = this.currentConversationSubject.getValue();
@@ -959,6 +995,7 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
 
         // Update the messages subject with the filtered array
         this.messagesSubject.next(updatedMessages);
+        await this.getUnreadMessagesForConversation(currentConversation.sid);
       }
 
       // Also update chat list if needed
