@@ -256,7 +256,7 @@
                   {{ data.ProgramName }}
                 </span>
                 <span class="activeStatusStyle">
-                  {{ data.StartDate | date : "mediumDate" }}
+                  {{ convertToLocalTime(data.StartDate) | date : "mediumDate" }}
                 </span>
               </option>
             </select>
