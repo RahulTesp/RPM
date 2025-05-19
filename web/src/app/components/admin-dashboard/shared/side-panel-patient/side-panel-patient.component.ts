@@ -608,6 +608,7 @@ export class SidePanelPatientComponent implements OnInit {
               () => {
                 this.getMenuChioce(1);
                 this.taskTableReload();
+                this.openTaskTableReload()
                 this.registerTask.reset();
                 this.loading = false;
               },
@@ -634,8 +635,13 @@ export class SidePanelPatientComponent implements OnInit {
     }
   }
   @Output() TaskTablereload = new EventEmitter();
+  @Output() openTaskTablereload = new EventEmitter();
   taskTableReload() {
     this.TaskTablereload.emit();
+  }
+  openTaskTableReload(){
+    this.openTaskTablereload.emit()
+
   }
   updateTask() {
     this.patientId = sessionStorage.getItem('PatientId');
@@ -668,6 +674,7 @@ export class SidePanelPatientComponent implements OnInit {
               this.getMenuChioce(1);
 
               this.taskTableReload();
+              this.openTaskTableReload();
             },
             false
           );
@@ -814,7 +821,7 @@ export class SidePanelPatientComponent implements OnInit {
     return this.registerSchedule.get(`schedule${day}`)?.value === true;
   }
   private getSubDayValue(day: string): boolean {
-    return this.registerSchedule.get(`schedule${day}`)?.value === true;
+    return this.registerSchedule.get(`scheduleSub${day}`)?.value === true;
   }
   private validateScheduleInputs(): boolean {
     const freq = this.registerSchedule.controls.frequency.value;
@@ -1626,7 +1633,7 @@ export class SidePanelPatientComponent implements OnInit {
           () => {
             this.getMenuChioce(1);
             this.taskTableReload();
-
+            this.openTaskTableReload();
             this.loading = false;
           },
           false

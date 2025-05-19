@@ -972,7 +972,7 @@ export class RightSidebarComponent implements OnInit {
     return this.registerSchedule.get(`schedule${day}`)?.value === true;
   }
   private getSubDayValue(day: string): boolean {
-    return this.registerSchedule.get(`schedule${day}`)?.value === true;
+    return this.registerSchedule.get(`scheduleSub${day}`)?.value === true;
   }
   private validateScheduleInputs(): boolean {
     const freq = this.registerSchedule.controls.frequency.value;

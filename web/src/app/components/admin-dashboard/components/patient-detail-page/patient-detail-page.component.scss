@@ -3599,7 +3599,7 @@ li + li {
 
 .progress-fill {
   height: 100%;
-  background-color: #ffbf77; /* Progress bar color (changeable) */
+
   transition: width 0.3s ease-in-out;
   border-radius: 5px;
 }
@@ -3650,12 +3650,7 @@ li + li {
 }
 
 /* Dynamic inner fill bar */
-.custom-progress-bar-inner {
-  height: 100%;
-  background-color: #ffbf77;
-  /* default fill color */
-  transition: width 0.3s ease;
-}
+
 
 /* Completed state */
 .completed-target .custom-progress-bar-inner {

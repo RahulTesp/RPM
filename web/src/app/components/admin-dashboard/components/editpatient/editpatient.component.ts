@@ -1024,6 +1024,8 @@ export class EditpatientComponent implements OnInit {
         that.InsuranceInfo =
           that.Patientdata.PatientInsurenceDetails.PatientInsurenceInfos;
         that.EnrolmentDetails = that.Patientdata.PatientEnrolledDetails;
+        console.log("EnrolmentDetails");
+        console.log(that.EnrolmentDetails);
         that.ActiveDetails = that.Patientdata.ActivePatientDetails;
         that.ReadyToDischarge =
           that.Patientdata.ReadyForDischargePatientDetails;
@@ -2083,13 +2085,7 @@ export class EditpatientComponent implements OnInit {
     }
 
     if (this.status_to_send == 'Active') {
-      // if(this.insurance_pname!="" &&this.isDeviceActive){//&&this.Patientdata_Document.PatientDocumentDetails.PatientDocumentinfos.length>0){
-      //   console.log("All Patient Details are Verified")
-      // }
-      // else{
-      //   alert("Please complete Device Registration/Primary Insurance to Make a Patient Active...!")
-      //   return;
-      // }
+
       if (
         this.Patientdata &&
         this.Patientdata.PatientProgramdetails.ProgramName != 'CCM' &&
@@ -2343,6 +2339,9 @@ export class EditpatientComponent implements OnInit {
               this.ReloadDeviceList(2);
               this.ReloadDeviceList(3);
               this.ReloadDeviceList(4);
+              this.UpdatePatient_Device(this.pid, this.patientprogramid);
+              this.ChangeScreen(2);
+
             },
             false
           );
@@ -2435,7 +2434,7 @@ export class EditpatientComponent implements OnInit {
                 this.ErrorFlag = false;
               },
               false
-            ); 
+            );
           }
           // this.reloadMasterData();
           this.ReloadDeviceList(1);
@@ -2494,7 +2493,7 @@ export class EditpatientComponent implements OnInit {
               this.ReloadDeviceList(4);
             },
             false
-          ); 
+          );
         },
         (err) => {
           // this.openDialogWindow('Error',`Device not removed from user assets.`);
@@ -2508,7 +2507,7 @@ export class EditpatientComponent implements OnInit {
               this.ReloadDeviceList(4);
             },
             false
-          );         
+          );
         }
       );
     }

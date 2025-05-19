@@ -175,9 +175,10 @@
     ></textarea>
     <div class="chat_send_icon">
       <img
+       [class.disabled]="isSending"
         class="callIcon"
         src="../../../../../assets/04-Icons/Icons_Send.svg"
-        (click)="message.trim() && sendMessage()"
+        (click)="!isSending && message.trim() && sendMessage()"
       />
     </div>
   </div>

@@ -18,7 +18,7 @@
 .incoming_msg {
   display: flex;
   width: 100%;
-  justify-content: right;
+
   margin-right: 1rem;
 }
 .messge_right {
@@ -31,15 +31,22 @@
   line-height: 0.8rem;
 
   border-radius: 0.5rem;
-  float: right;
+  float: left;
   clear: both;
   font-family: "Rubik";
   position: relative;
   min-width: 150px;
   max-width: 250px;
+
+   white-space: pre-wrap; /* Preserves whitespace and line breaks */
   word-wrap: break-word;
   overflow-wrap: break-word;
-  white-space: normal;
+  overflow: visible;
+  text-overflow: initial;
+
+  display: inline-block;
+  margin-bottom: 8px;
+  height: auto;
 }
 .messge_right p {
   margin-bottom: 0.5rem !important;
@@ -82,15 +89,24 @@ li + li {
   font-size: 0.8rem;
   line-height: 0.8rem;
   width: fit-content;
-  float: left;
+  float: right;
   clear: both;
   position: relative;
   font-family: "Rubik";
   min-width: 120px;
   max-width: 250px;
+
+
+  /* These properties preserve whitespace */
+  white-space: pre-wrap; /* Preserves whitespace and line breaks */
   word-wrap: break-word;
   overflow-wrap: break-word;
-  white-space: normal;
+  overflow: visible;
+  text-overflow: initial;
+
+  display: inline-block;
+  margin-bottom: 8px;
+  height: auto;
 }
 // new updates
 .chat-container {
@@ -327,4 +343,9 @@ li + li {
   width: 100%;
   display: flex;
   justify-content: flex-end;
+}
+.callIcon.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
 }

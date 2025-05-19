@@ -79,12 +79,7 @@ export class ChatbuttonComponent implements OnInit, OnDestroy {
       this.patientChatService.currentConversation$.subscribe(
         (conv) => (this.currentConversation = conv)
       ),
-      // this.patientChatService.isTyping$.subscribe(
-      //   (typing) => (this.isTyping = typing)
-      // ),
-      // this.patientChatService.loading$.subscribe(
-      //   (loading) => (this.isLoading = loading)
-      // ),
+
       this.patientChatService.error$.subscribe((err) => (this.error = err)),
       this.patientChatService.unreadCount$.subscribe((count) => {
         this.unreadMessagesCount = count;
@@ -106,14 +101,24 @@ export class ChatbuttonComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
-  // User interaction methods
-  async sendMessage() {
-    if (!this.message.trim()) return;
 
+isSending = false;
+
+async sendMessage() {
+  if (!this.message.trim() || this.isSending) return;
+
+  this.isSending = true;
+
+  try {
     await this.patientChatService.sendMessage(this.message);
     this.message = '';
+  } catch (error) {
+    // Handle error if needed
+    console.error('Failed to send message:', error);
+  } finally {
+    this.isSending = false;
   }
-
+}
   async openChat(conv: Conversation) {
     await this.patientChatService.openChat(conv);
   }
