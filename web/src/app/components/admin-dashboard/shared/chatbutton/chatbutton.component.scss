@@ -98,7 +98,7 @@ li + li {
 
 
   /* These properties preserve whitespace */
-  white-space: pre-wrap; /* Preserves whitespace and line breaks */
+  white-space: pre-line; /* Treats \n as line breaks but collapses other whitespace */
   word-wrap: break-word;
   overflow-wrap: break-word;
   overflow: visible;
