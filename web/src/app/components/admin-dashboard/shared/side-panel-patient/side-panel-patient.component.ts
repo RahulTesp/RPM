@@ -258,6 +258,8 @@ export class SidePanelPatientComponent implements OnInit {
 
     this.registerSchedule.controls.frmpatientName.setValue(this.patientName);
     this.isOpen = false;
+    this.checkedSingle = true;
+    this.checkedSeries = false;
   }
 
   OnClickSymptomCancel() {
