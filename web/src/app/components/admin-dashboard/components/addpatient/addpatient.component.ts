@@ -497,7 +497,6 @@ export class AddpatientComponent implements OnInit {
   }
 
   columnHeader = [
-    'selection',
     'PatientName',
     'PatientId',
     'CreatedOn',

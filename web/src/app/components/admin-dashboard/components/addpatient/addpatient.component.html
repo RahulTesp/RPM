@@ -88,36 +88,9 @@
   <p class="main_input_main_heading save_draft_heading">Saved Drafts</p>
   <div class="user_data_table">
     <mat-table #table [dataSource]="datasourceDocument">
-      <ng-container matColumnDef="selection">
-        <mat-header-cell
-          *matHeaderCellDef
-          style="border-radius: 20px 0px 0px 0px"
-          class="select-column"
-        >
-        </mat-header-cell>
-        <mat-cell *matCellDef="let element; let rowIndex = index"  class="select-column">
-          <!-- <mat-radio-button
-            color="primary"
-            name="rhSelectionRadio"
-            [value]="rowIndex"
-            (click)="selectRow($event, element)"
-            id="selectdraftRow"
-            [checked]="element.selected"
-          >
-          </mat-radio-button> -->
-          <input
-          type="radio"
-          name="rhSelectionRadio"
-          [value]="rowIndex"
-          [checked]="element.selected"
-          (click)="selectRow($event, element)"
-          id="selectdraftRow-{{ rowIndex }}"
-        />
-        <label [for]="'selectdraftRow-' + rowIndex"></label>
-        </mat-cell>
-      </ng-container>
+
       <ng-container matColumnDef="PatientName">
-        <mat-header-cell *matHeaderCellDef  >
+        <mat-header-cell *matHeaderCellDef  style="border-radius: 20px 0px 0px 0px" >
           <div class="search_input" *ngIf="searchPatientName">
             <img
               class="search_icon"
@@ -139,8 +112,19 @@
           </div>
         </mat-header-cell>
 
-        <mat-cell *matCellDef="let element">
-          {{ element.PatientName }}</mat-cell
+        <mat-cell *matCellDef="let element;let rowIndex = index">
+
+            <input
+                type="radio"
+                name="rhSelectionRadio"
+                [value]="rowIndex"
+                [checked]="element.selected"
+                (click)="selectRow($event, element)"
+                id="selectdraftRow-{{ rowIndex }}"
+              />
+              <label [for]="'selectdraftRow-' + rowIndex"></label>
+              <span class="patient-name"> {{ element.PatientName }}</span>
+         </mat-cell
         >
       </ng-container>
       <ng-container matColumnDef="PatientId">

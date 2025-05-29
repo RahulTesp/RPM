@@ -440,6 +440,8 @@ export class RightSidebarComponent implements OnInit {
         });
 
         this.http_taskAssigneeList = res.filteredAssignees;
+        console.log('this.http_taskAssigneeList');
+        console.log(this.http_taskAssigneeList)
       })
       .catch((err) => {
         console.error('Error fetching task master data:', err);
@@ -1845,11 +1847,17 @@ export class RightSidebarComponent implements OnInit {
           (data) => {
             this.worklistgettaskbyid = data;
             this.alertAssigneeName = this.worklistgettaskbyid.CareTeamId;
-
+            console.log('this.alertAssigneeName');
+            console.log(this.alertAssigneeName);
             this.WorkListTaskArrayList = this.worklistgettaskbyid.Members;
+            console.log('WorkList Task');
+            console.log(this.WorkListTaskArrayList);
 
             this.task_pname = this.worklistgettaskbyid.PatientName;
             this.task_pid = this.worklistgettaskbyid.PatientId;
+             this.task_careteam_name = this.worklistgettaskbyid.AssignedMember;
+            this.task_careteam_id = this.worklistgettaskbyid.AssignedMemberId;
+
             this.registerTask.controls.tasktype.setValue(
               parseInt(this.worklistgettaskbyid.TaskTypeId)
             );
@@ -1869,8 +1877,7 @@ export class RightSidebarComponent implements OnInit {
               { onlySelf: true }
             );
             // this.registerTask.controls.assignee_name.setValue(this.worklistgettaskbyid.AssignedMemberId,{ onlySelf: true });
-            this.task_careteam_name = this.worklistgettaskbyid.AssignedMember;
-            this.task_careteam_id = this.worklistgettaskbyid.AssignedMemberId;
+
             this.registerTask.controls.task_comment.setValue(
               this.worklistgettaskbyid.Comments
             );
@@ -2339,6 +2346,32 @@ export class RightSidebarComponent implements OnInit {
   task_pid: any;
   task_pname: any;
 
+  selectEvent_update_task_patient(item: any) {
+    // do something with selected item
+    if (typeof item != 'string') {
+      this.task_pid = item.PatientId;
+      this.task_pname = item.PatientName;
+    }
+
+    var userTeam = this.http_TaskMasterData.PatientList.filter(
+      (c: { PatientId: number }) => c.PatientId == this.task_pid
+    );
+    if (userTeam && userTeam.length > 0) {
+      this.http_taskAssigneeList =
+        this.http_TaskMasterData.CareTeamMembersList.filter(
+          (c: { CareTeamId: number }) => c.CareTeamId == userTeam[0].CareTeamId
+        );
+    } else {
+      return;
+    }
+  //  this.refreshTaskAssign();
+  //  this.onClear_taskAssign(null);
+  //  this.selectEvent_task_careteam(null);
+  //  this.onFocused_task_careteam(null);
+
+  //   this.task_careteam_name = null;
+  //   this.task_careteam_id = null;
+  }
   selectEvent_task_patient(item: any) {
     // do something with selected item
     if (typeof item != 'string') {
@@ -2357,10 +2390,10 @@ export class RightSidebarComponent implements OnInit {
     } else {
       return;
     }
-    this.refreshTaskAssign();
-    this.onClear_taskAssign(null);
-    this.selectEvent_task_careteam(null);
-    this.onFocused_task_careteam(null);
+   this.refreshTaskAssign();
+   this.onClear_taskAssign(null);
+   this.selectEvent_task_careteam(null);
+   this.onFocused_task_careteam(null);
 
     this.task_careteam_name = null;
     this.task_careteam_id = null;
@@ -3033,6 +3066,7 @@ export class RightSidebarComponent implements OnInit {
             this.http_taskData = data;
             this.taskArrayList = this.http_taskData.Members;
             this.alertAssigneeName = this.http_taskData.CareTeamId;
+
 
             this.http_taskAssigneeList =
               this.http_TaskMasterData.CareTeamMembersList.filter(
