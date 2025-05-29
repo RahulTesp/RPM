@@ -24,12 +24,12 @@ messaging.onBackgroundMessage(function(payload) {
   channel.postMessage(payload);
 
   // Show notification if needed
-  const notificationTitle = payload.notification?.title || 'New Notification';
-  const notificationOptions = {
-    body: payload.notification?.body || payload.data?.Body || '',
-    icon: '/assets/icons/icon-72x72.png',
-    data: payload.data
-  };
+  // const notificationTitle = payload.notification?.title || 'New Notification';
+  // const notificationOptions = {
+  //   body: payload.notification?.body || payload.data?.Body || '',
+  //   icon: '/assets/icons/icon-72x72.png',
+  //   data: payload.data
+  // };
 
   return self.registration.showNotification(notificationTitle, notificationOptions);
 });

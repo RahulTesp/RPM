@@ -29,7 +29,8 @@
 }
 .password_img {
   width: 1.2rem;
-  height: 1.2rem;
+  height: 1.4rem;
+	padding-top: 6px;
   filter: invert(96%) sepia(1%) saturate(6615%) hue-rotate(184deg)
     brightness(87%) contrast(91%);
 }

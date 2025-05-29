@@ -88,36 +88,9 @@
   <p class="main_input_main_heading save_draft_heading">Saved Drafts</p>
   <div class="user_data_table">
     <mat-table #table [dataSource]="datasourceDocument">
-      <ng-container matColumnDef="selection">
-        <mat-header-cell
-          *matHeaderCellDef
-          style="border-radius: 20px 0px 0px 0px"
-          class="select-column"
-        >
-        </mat-header-cell>
-        <mat-cell *matCellDef="let element; let rowIndex = index"  class="select-column">
-          <!-- <mat-radio-button
-            color="primary"
-            name="rhSelectionRadio"
-            [value]="rowIndex"
-            (click)="selectRow($event, element)"
-            id="selectdraftRow"
-            [checked]="element.selected"
-          >
-          </mat-radio-button> -->
-          <input
-          type="radio"
-          name="rhSelectionRadio"
-          [value]="rowIndex"
-          [checked]="element.selected"
-          (click)="selectRow($event, element)"
-          id="selectdraftRow-{{ rowIndex }}"
-        />
-        <label [for]="'selectdraftRow-' + rowIndex"></label>
-        </mat-cell>
-      </ng-container>
+
       <ng-container matColumnDef="PatientName">
-        <mat-header-cell *matHeaderCellDef  >
+        <mat-header-cell *matHeaderCellDef  style="border-radius: 20px 0px 0px 0px" >
           <div class="search_input" *ngIf="searchPatientName">
             <img
               class="search_icon"
@@ -139,8 +112,19 @@
           </div>
         </mat-header-cell>
 
-        <mat-cell *matCellDef="let element">
-          {{ element.PatientName }}</mat-cell
+        <mat-cell *matCellDef="let element;let rowIndex = index">
+
+            <input
+                type="radio"
+                name="rhSelectionRadio"
+                [value]="rowIndex"
+                [checked]="element.selected"
+                (click)="selectRow($event, element)"
+                id="selectdraftRow-{{ rowIndex }}"
+              />
+              <label [for]="'selectdraftRow-' + rowIndex"></label>
+              <span class="patient-name"> {{ element.PatientName }}</span>
+         </mat-cell
         >
       </ng-container>
       <ng-container matColumnDef="PatientId">
@@ -686,7 +670,7 @@
                     PatientInfoForm.get('clinicname')?.touched
                   "
                 >
-                  Clinic Name is Required
+                  Clinic Name is required
                 </ng-container>
               </div>
             </div>
@@ -735,7 +719,7 @@
                       PatientInfoForm.get('addressline1')?.touched
                     "
                   >
-                    Address is Required
+                    Address is required
                   </ng-container>
                 </div>
               </div>
@@ -782,7 +766,7 @@
                           PatientInfoForm.get('state')?.touched
                         "
                       >
-                        State is Required
+                        State is required
                       </ng-container>
                     </div>
                   </div>
@@ -809,7 +793,7 @@
                           PatientInfoForm.get('city')?.touched
                         "
                       >
-                        City is Required
+                        City is required
                       </ng-container>
                     </div>
                   </div>
@@ -834,7 +818,7 @@
                           PatientInfoForm.get('zipcode')?.touched
                         "
                       >
-                        ZipCode is Required
+                        ZipCode is required
                       </ng-container>
                     </div>
                   </div>
@@ -862,7 +846,7 @@
                           PatientInfoForm.get('timezone')?.touched
                         "
                       >
-                        Time Zone is Required
+                        Time Zone is required
                       </ng-container>
                     </div>
                   </div>
@@ -1224,7 +1208,7 @@
                         programForm.get('startdate')?.touched
                       "
                     >
-                      start date is required
+                      Start date is required
                     </ng-container>
                   </div>
                 </div>
@@ -1292,9 +1276,10 @@
                 class="goals_note_container"
                 *ngFor="let goal of Goals_Selected; let i = index"
               >
-                <form class="goal_list" [name]="i">
+              <!-- class="goal_list" -->
+                <form  [name]="i">
                   <div class="goal-details" *ngIf="goal.Goal != null">
-                    <div class="note_dropdown">
+                    <!-- <div class="note_dropdown"> -->
                       <div class="userInfoItem" style="width: 50%">
                         <p class="main_input_title">Goals</p>
                         <input
@@ -1305,8 +1290,8 @@
                           [disabled]="true"
                         />
                       </div>
-                      <br />
-                    </div>
+
+                    <!-- </div> -->
                     <div>
                       <textarea
                         class="userInfovalue"
@@ -1586,6 +1571,7 @@
                     <div class="program_timeline_data">
                       <div class="userInfoItem program_timeline_data_left">
                         <p class="main_input_title">*Diagnosis</p>
+                        <!---->
                         <ng-autocomplete
                           id="patientReport"
                           [initialValue]="Diagnosis.DiagnosisName"
@@ -1596,7 +1582,7 @@
                           (inputCleared)="cleared($event, i)"
                           [itemTemplate]="itemTemplate"
                           [notFoundTemplate]="notFoundTemplate"
-                        >
+
                           >
                         </ng-autocomplete>
                         <ng-template #itemTemplate let-item>
@@ -1661,7 +1647,7 @@
                             programForm.get('code')?.invalid &&
                             programForm.get('code')?.touched
                           "
-                          >code is Required</small
+                          >code is required</small
                         >
                       </div>
                     </div>

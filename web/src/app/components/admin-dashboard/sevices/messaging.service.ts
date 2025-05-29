@@ -68,12 +68,22 @@ export class MessagingService {
   receiveMessage() {
     this.afm.messages.subscribe((message) => {
       console.log('Foreground message received:', message.data);
-      this.notificationData.next(message);
+     this.notificationData.next(message);
       // this.snackBar.open(
       //   message?.data?.Title || 'New message',
       //   message?.data?.Body || 'Check your notifications',
       //   { duration: 5000 }
       // );
+          this.snackBar.open(
+            message?.data?.Title|| 'New message',
+          '',
+         // payload.data.Body,
+          { duration: 5000 }
+        );
+
+      this.GetNotifications()
+      .then(() => console.log('Notifications refreshed after background message'))
+      .catch(err => console.error('Failed to refresh notifications:', err));
     });
   }
 
@@ -89,6 +99,7 @@ export class MessagingService {
   //         '',
   //         { duration: 5000 }
   //       );
+
   //     }
 
   //   });
@@ -101,15 +112,14 @@ export class MessagingService {
       console.log('Background notification received:', payload.data.body);
       this.notificationData.next(payload.data.body);
 
-      if (payload.data && payload.data.Body) {
-        this.snackBar.open(
-         payload.notification?.title || 'New message',
-          '',
-         // payload.data.Body,
-          { duration: 5000 }
-        );
+       if (payload.data && payload.data.Body) {
+      //   this.snackBar.open(
+      //    payload.notification?.title || 'New message',
+      //     '',
+      //    // payload.data.Body,
+      //     { duration: 5000 }
+      //   );
 
-        // Call GetNotifications to refresh notification data after receiving a notification
         this.GetNotifications()
           .then(() => console.log('Notifications refreshed after background message'))
           .catch(err => console.error('Failed to refresh notifications:', err));
@@ -163,7 +173,8 @@ export class MessagingService {
   }
 
   getCurrentUnreadCount(): number {
-    return this.notificationData.getValue().count;
+     const data = this.notificationData.getValue();
+     return data?.count ?? 0;
   }
 
   markNotificationAsRead(notificationId: number, notificationAuditId: number): Promise<any> {

@@ -458,7 +458,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.getProgramHistory();
     this.getPatientCriticalAlerts(patientId);
     this.calculateUpcomingSchedule(patientId);
-    this.getLatestAlertsAndTasks(patientId);
+    this.getLatestAlertsAndTasks();
     this.getBillingOverview(patientId, programId);
     this.getPatientDetails();
     this.getActivityMenuLoadData();
@@ -1176,16 +1176,19 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // var that = this
     this.rpm.rpm_post('/api/comm/SMSService', req_body).then(
       (data) => {
         //show patient id created
-        this.dialog.closeAll();
+        // this.dialog.closeAll();
+        this.smsCancel();  // close the panel
         alert('Message Sent Successfully..!');
         this.loading_sms = false;
         this.getSMSData();
       },
       (err) => {
-        this.dialog.closeAll();
+        // this.dialog.closeAll();
+        this.smsCancel(); // close the panel
         alert('Failed to Sent Message..!');
         this.loading_sms = false;
       }
@@ -1365,7 +1368,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.ChangeScreen(5);
     this.getalertTask();
   }
+ getOpenTaskDataReload() {
 
+   this.getLatestAlertsAndTasks();
+  }
 
   async getreviewData() {
     try {
@@ -1822,7 +1828,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.variable = 1;
         this.clinicalMenuVariable = 1;
         this.activityMenuVariable = 1;
-
+        this.calculateUpcomingSchedule(this.patient_id)
         this.dataSourceChange(this.variable, 1);
 
         break;
@@ -3107,7 +3113,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   latestAlertsAndTasks: any;
   OpenAlertsAndTasks: any;
 
-  async getLatestAlertsAndTasks(program_id: any) {
+  async getLatestAlertsAndTasks() {
     this.loading = true;
 
     try {
@@ -3779,6 +3785,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
             monthStart,
             true
           );
+
           formattedEndDate = this.patientutilService.formatDateForApi(
             monthEnd,
             false
@@ -3821,6 +3828,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
             endDate,
             false
           );
+
         } catch (error) {
           console.error('Error with custom date range:', error);
           throw new Error('Failed to process custom date range');

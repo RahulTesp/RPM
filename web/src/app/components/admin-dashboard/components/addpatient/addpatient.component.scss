@@ -23,7 +23,9 @@
   position: relative;
   //background-color: red;
 }
-
+.patient-name{
+  margin-left: 0.4rem;
+}
 .patientpage {
   width: 100%;
   height: 60vh;
@@ -483,6 +485,8 @@ option {
 }
 .goal_container {
   margin-top: 2rem;
+  height: 200px;
+  overflow-y: scroll;
 }
 .Program-details_container_sub {
   width: 100%;
@@ -577,9 +581,9 @@ option {
 
 .program_main_container {
   width: 75%;
-    height: 70vh;
+    // height: 70vh;
   // display: flex;
-  overflow-y: auto;
+  //overflow-y: auto;
     padding-left: 2rem;
     ;
 
@@ -587,14 +591,15 @@ option {
 }
 .program_main_container_content {
   width: 100%;
-  height: 100%;
+  height: 60vh;
   display: flex;
+  overflow-y: auto;
 }
 
 .programpage {
   width: 100%;
 
-  overflow-y: hidden;
+  //overflow-y: hidden;
   display: flex;
   //background-color: green;
 }
@@ -602,25 +607,16 @@ option {
 .program_subpanel1 {
   width: 100%;
   margin-right: 2rem;
+
   // min-width: fit-content;
   // background-color: blue;
 }
 
 .program_subpanel2 {
   width: 100%;
-  //min-width: fit-content;
-  // background-color: blue;
+
 }
 
-// .program_column1 {
-//   height: fit-content;
-//   width: 100%;
-// }
-
-// .program_column2 {
-//   height: fit-content;
-//   width: 100%;
-// }
 
 .start_date {
   width: 100%;
@@ -628,7 +624,7 @@ option {
 
 .end_date {
   width: 100%;
-  // margin-top: 8px;
+
 }
 
 .program_column3 {
@@ -644,7 +640,7 @@ option {
 .btn-common {
   width: 1.2rem;
   height: 1.2rem;
-  // background-color: #edeff5;
+
   background-color: #e1e6ed;
 }
 .btn_common_cont {
@@ -653,8 +649,7 @@ option {
 }
 
 .add_icon1 {
-  //right: 280px;
-  //top: 15px;
+
   width: 24px;
   height: 24px;
 }
@@ -673,23 +668,19 @@ option {
 
 .add_icon2 {
   position: relative;
-  //right: 350px;
-  //left: 180px;
+
   top: 30px;
   width: 24px;
   height: 24px;
-  //filter: brightness(0) saturate(100%) invert(96%) sepia(16%) saturate(452%)
-  // hue-rotate(75deg) brightness(117%) contrast(91%);
   justify-content: space-between;
   display: flex;
-  //align-items: flex-end;
+
 }
 
 .arrow-search {
   width: 24px;
   height: 24px;
-  // margin-left: -16px;
-  // position: absolute;
+
 }
 .mat-column-PatientId {
   flex: 0 0 0;
@@ -699,7 +690,7 @@ option {
   position: absolute;
   right: 180px;
   margin-top: -10px;
-  //padding-right: 5px;
+
   width: 20px;
   height: 20px;
 }
@@ -725,13 +716,11 @@ option {
 
 .add_icon {
   position: relative;
-  // left: 15px;
-  // top: 32px;
+
   margin-left: 0.4rem;
   width: 1.2rem;
   height: 1.2rem;
-  //filter: brightness(0) saturate(100%) invert(96%) sepia(16%) saturate(452%)
-  // hue-rotate(75deg) brightness(117%) contrast(91%);
+
 }
 .add_icon:hover {
   background-color: #8be3d9;
@@ -740,15 +729,7 @@ option {
   border-radius: 50%;
 }
 
-// .add_icon3 {
-//   position: relative;
-//   //right: 350px;
-//   left: 50px;
-//   top: 30px;
-//   width: 24px;
-//   height: 24px;
-//   justify-content: space-between;
-// }
+
 .months_duration {
   color: #c1c7d5;
   font-family: "Rubik";
@@ -770,7 +751,6 @@ option {
 }
 .height_div {
   color: #164d61;
-  // font-size: 0.7rem;
   font-family: "Rubik";
   line-height: 1.25rem;
 }
@@ -789,7 +769,6 @@ option {
 
 .feet {
   width: 100%;
-  // height: 32px;
 }
 
 .dummy {
@@ -817,7 +796,6 @@ option {
 .program_duration_content_panel {
   display: flex;
   align-items: flex-end;
-  // margin-bottom: 10px;
   height: 1.6rem;
 }
 
@@ -873,7 +851,7 @@ textarea {
 }
 ::ng-deep .mat-form-field-outline {
   border-radius: 8px !important;
-  //min-width: 8px !important;
+
   background: #edeff5;
 }
 
@@ -894,13 +872,13 @@ textarea {
 
 .Communication_panel_column2 {
   width: 100%;
-  //background-color: #590ca7;
+
   height: fit-content;
 }
 
 .Communication_panel_column3 {
   width: 100%;
-  // background-color: #590ca7;
+
   height: 100px;
 }
 
@@ -974,7 +952,7 @@ textarea {
 
 form {
   width: 100% !important;
-  //background-color: red;
+
 }
 
 .dialog {
@@ -1746,10 +1724,6 @@ mat-progress-spinner {
   backdrop-filter: blur(2px);
 }
 
-// .additionalnotes {
-//   padding-left: 5%;
-//   padding-right: 5%;
-// }
 
 .patient_main_container {
   overflow-y: scroll;
@@ -1759,14 +1733,7 @@ mat-progress-spinner {
   display: none;
 }
 
-.goal_list {
-  height: fit-content !important;
-}
-// .mat-column-selection {
-//   flex: 0 0 1%;
-//   padding-right: 0.8rem !important ;
-//   padding-left: 0.9rem !important;
-// }
+
 .select-column
 {
  max-width: 30px;
@@ -1820,10 +1787,10 @@ button {
   width: 10px;
 }
 :host ::ng-deep .mat-radio-button .mat-radio-ripple {
-  height: 20px; /*double of your required circle radius*/
-  width: 20px; /*double of your required circle radius*/
-  left: calc(50% - 10px); /*'10px'-same as your required circle radius*/
-  top: calc(50% - 10px); /*'10px'-same as your required circle radius*/
+  height: 20px;
+  width: 20px;
+  left: calc(50% - 10px);
+  top: calc(50% - 10px);
 }
 ::ng-deep .mat-input-underline {
   display: none !important;

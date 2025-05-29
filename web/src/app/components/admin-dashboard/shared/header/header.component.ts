@@ -124,7 +124,7 @@ export class HeaderComponent implements OnInit {
 
       this.Auth.firstLogin = false;
     }
-    this.message1 = this.ms.registerMessageEventListener();
+   // this.message1 = this.ms.registerMessageEventListener();
 
     var days = [
       'Sunday',
