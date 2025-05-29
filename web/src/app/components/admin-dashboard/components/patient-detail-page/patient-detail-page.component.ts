@@ -161,6 +161,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   loading3: any;
   loading4: boolean;
   onHoldDate: any;
+  healthtrendVitalNameArray: any;
+  public http_healthtrends_current_data: any;
   dateCompare = 'undefined';
   public unreadCount: number = 0;
   @ViewChild(MatSort) sort = new MatSort();
@@ -231,6 +233,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   cid: any;
   ptime: any;
   heath_trends_frequency: number;
+  heath_trends_frequencies: number[] = []; // one per chart
   interval1: NodeJS.Timeout;
   interval: NodeJS.Timeout;
   interval2: NodeJS.Timeout;
@@ -241,6 +244,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   public pageLabel!: string;
   private unreadSubscription: Subscription | null = null;
   private destroy$ = new Subject<void>();
+  currentY: number=15;
   public showDialog = false;
   public showProgramRenewModal = false;
   public smsdialogpanel=false;
@@ -286,6 +290,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   patientProgramName: any;
   ProgramHistory: any;
   patientProgramId: any;
+  selectedVital: string = '';
   private chatHistoryDataSubscription: Subscription;
 
   constructor(
@@ -303,7 +308,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     private patientchatservice: PatientChatService,
     private PatientReportapi: PatientReportApiService,
     private patientdownloadService: DownloadPatientReportService,
-    private confirmDialog:ConfirmDialogServiceService
+    private confirmDialog:ConfirmDialogServiceService,
+    private cdr: ChangeDetectorRef
   ) {
     var that = this;
 
@@ -407,7 +413,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       }
     });
   }
-
+  
   getCallTokenMethod() {
     this.rpm.rpm_get('/api/comm/CallToken').then((data: any) => {
       this.data_json = data;
@@ -467,6 +473,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
     // Fetch Health Trends
     this.getHealthTrends(this.heath_trends_frequency);
+    this.getVitalHealthTrendDataGraph(this.heath_trends_frequency);
   }
 
   async loadPatientInfo() {
@@ -481,6 +488,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.patient_id,
         this.program_id
       );
+      // Manjusha code change
+      this.http_rpm_patientList["PatientPrescribtionDetails"].ConsultationDate = 
+      this.formatDate(this.http_rpm_patientList["PatientPrescribtionDetails"].ConsultationDate);
       this.getchatData(this.http_rpm_patientList.PatientDetails.UserName)
 
       this.setPatientData();
@@ -490,6 +500,14 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     }
     //}
   }
+  // Manjusha code change
+  formatDate(dateStr: string): Date {
+    const [day, month, yearAndTime] = dateStr.split('-');
+    const [year, time] = yearAndTime.split(' ');
+    const formatted = `${year}-${month}-${day}T${time}`;
+    return new Date(formatted);
+  }
+  
   private setPatientData() {
     this.processPatientHeight();
     this.processPatientTimezone();
@@ -632,7 +650,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.ptime = this.patientTimeZone();
     }, 60000);
   }
-
+  
   /**
    Extracted Function: Fetch & Process Program Details
    */
@@ -1979,8 +1997,18 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     'July',
   ];
   color = 'primary';
+  // Manjusha code change
   public lineChartOptions: any = {
     responsive: true,
+    maintainAspectRatio: false,
+    layout: {
+      padding: {
+        top: 10,
+        bottom: 30,
+        left: 10,
+        right: 20,
+      }
+    },
     pan: {
       enabled: true,
       mode: 'xy',
@@ -2012,9 +2040,17 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
       speed: 0.1,
     },
-    maintainAspectRatio: false,
     line: {
       tension: 0.5,
+    },
+    scales: {
+      x: {
+        ticks: {
+          autoSkip: false,
+          maxRotation: 75,
+          minRotation: 0
+        }
+      }
     },
     legend: {
       display: true,
@@ -2058,6 +2094,16 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   ];
   public lineChartLegend: boolean = true;
   public lineChartType: any = 'line';
+  // Manjusha code change
+  emptyChartDataset = [
+    {
+      data: [],
+      label: 'No Data',
+      fill: false,
+      borderColor: 'transparent',
+      pointRadius: 0
+    }
+  ];  
 
   minValue: number = 30;
   maxValue: number = 75;
@@ -2546,37 +2592,91 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   Health_date_from: any;
   Health_date_to: any;
   healthtrenddisplay = true;
-
+  // Manjusha code change
   async getHealthTrends(daycount: number) {
     try {
-      this.http_healthtrends = await this.patientService.fetchHealthTrendInfo(
+      const data = await this.patientService.fetchHealthTrendInfo(
         this.patient_id,
         this.program_id,
-        daycount,
-        this.convertDate.bind(this),
-        this.auth.ConvertToUTCRangeInput.bind(this.auth)
+        daycount
       );
-
-      this.healthtrenddisplay = this.http_healthtrends?.VitalName != null;
-
-      if (this.http_healthtrends?.Values?.length > 0) {
-        this.lineChartLabels = this.patientService.convertDateforHealthTrends(
-          this.http_healthtrends.Time,
-          this.http_healthtrends
-        );
-
-        this.processChartData(daycount);
-      } else {
-        this.setGraphFallback(daycount);
+      this.http_healthtrends = data.trends;
+      this.healthtrendVitalNameArray = data.vitalNames;
+      this.healthtrenddisplay = this.http_healthtrends.length > 0;  
+      
+      if (this.healthtrendVitalNameArray.length > 0) {
+        this.onHealthTrendVitalClick(this.healthtrendVitalNameArray[0], daycount);
       }
+      
     } catch (error) {
-      this.setGraphFallback(daycount);
-      console.error('❌ Error:', error);
-    } finally {
-      this.loading = false;
+      console.error('Error loading health trends:', error);
     }
   }
 
+  async getSingleHealthTrendData(index: number, daycount: number) {
+    try {
+      const data = await this.patientService.fetchHealthTrendInfo(
+        this.patient_id,
+        this.program_id,
+        daycount
+      );
+  
+      const trendData = data.trends[index]; // get the vital at that index
+  
+      if (!trendData || !trendData.Values || trendData.Values.length === 0) {
+        const emptyGraph = (daycount === 7)
+          ? this.createEmptyGraph(7)
+          : this.createEmptyGraph(30);
+  
+        this.allLineChartData[index] = emptyGraph;
+        return;
+      }
+  
+      const isVital = trendData.Values?.[0]?.label === 'Vital';
+      const lineChartLabels = this.patientService.convertDateforHealthTrends(
+        trendData.Time,
+        isVital
+      );
+  
+      const lineChartData = trendData.Values.map(
+        (item: { data: any[]; label: any }) => ({
+          data: this.cleanData(item.data, trendData.VitalName),
+          label: item.label,
+          fill: false,
+          lineTension: 0.5,
+        })
+      );
+  
+      this.allLineChartData[index] = {
+        lineChartLabels,
+        lineChartData,
+      };
+  
+    } catch (error) {
+      console.error('Error loading individual health trend:', error);
+    }
+  }
+  
+  createEmptyGraph(daycount: number) {
+    const days = Array.from({ length: daycount }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (daycount - 1 - i));
+      return this.convertDate(d);
+    });
+    const labels = this.patientService.convertDateforHealthTrends(days, false);
+    return {
+      lineChartLabels: labels,
+      lineChartData: [
+        {
+          data: Array(daycount).fill(null),
+          label: 'No data available',
+          fill: false,
+          lineTension: 0.5,
+        },
+      ],
+    };
+  }
+  
   private processChartData(daycount: number) {
     const temp = [];
     let j = 0;
@@ -2630,6 +2730,169 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.setEmpty30DaysGraph();
     }
   }
+  // Manjusha code change
+  onHealthTrendVitalClick(vital: string, duration: number) {
+    this.selectedVital = vital;
+    this.http_healthtrends_current_data = this.http_healthtrends.filter(
+      (item: { VitalName: string }) => item.VitalName === vital
+    );
+  
+    if (!this.http_healthtrends_current_data[0] || this.http_healthtrends_current_data[0].Values.length === 0) {
+      this.setGraphFallback(duration);
+      return;
+    }
+  
+    const trendData = this.http_healthtrends_current_data[0];
+    const isVital = trendData.Values?.[0]?.label === 'Vital';
+    const originalLabels = this.patientService.convertDateforHealthTrends(
+      trendData.Time,
+      isVital
+    );
+
+    const originalDataSets = trendData.Values.map((item: any) => ({
+      data: [...item.data],
+      label: item.label,
+      fill: false,
+      lineTension: 0.5
+    }));
+  
+    const {
+      filteredData,
+      filteredLabels
+    } = this.filterChartDataAndLabelsTogether(
+      originalDataSets,
+      originalLabels,
+      trendData.VitalName
+    );
+  
+    this.lineChartLabels = filteredLabels;
+    this.lineChartData = originalDataSets.map((ds: any, idx: any) => ({
+      ...ds,
+      data: filteredData[idx]
+    }));
+  }
+  
+  allLineChartData: any=[];
+  async getVitalHealthTrendDataGraph(daycount: number) {
+    try {
+      //Fetch Health Trend Data
+      const data = await this.patientService.fetchHealthTrendInfo(
+        this.patient_id,
+        this.program_id,
+        daycount
+      );
+
+      const vitalHttpHealthTrends = data.trends;
+      const healthtrendVitalNameArray = data.vitalNames;
+      //Set default frequency for all charts to 30 days
+      this.heath_trends_frequencies = new Array(data.vitalNames.length).fill(30);
+      //  Clear previous data before pushing new ones
+      this.allLineChartData = []; // clear previous data
+
+      // Only process trends with actual data
+      console.log("vitalHttpHealthTrends",vitalHttpHealthTrends)
+      vitalHttpHealthTrends.forEach((trendData: any) => {
+        if (!trendData.Values || trendData.Values.length === 0) {
+          if (daycount === 7) {
+            this.setEmptyGraphHealthInfo();
+          } else {
+            this.setEmpty30DaysGraphHealthInfo();
+          }
+          return;
+        }
+      
+        const isVital = trendData.Values?.[0]?.label === 'Vital';
+        const originalLabels = this.patientService.convertDateforHealthTrends(
+          trendData.Time,
+          isVital
+        );
+
+        const originalDataSets = trendData.Values.map((item: any) => ({
+          data: [...item.data],
+          label: item.label,
+          fill: false,
+          lineTension: 0.5
+        }));
+      
+        const {
+          filteredData,
+          filteredLabels
+        } = this.filterChartDataAndLabelsTogether(
+          originalDataSets,
+          originalLabels,
+          trendData.VitalName
+        );
+      
+        const lineChartData = originalDataSets.map((ds: any, idx: any) => ({
+          ...ds,
+          data: filteredData[idx]
+        }));
+      
+        this.allLineChartData.push({
+          lineChartLabels: filteredLabels,
+          lineChartData
+        });
+      });
+      
+    } catch (error) {
+      console.error('Error loading health trends:', error);
+    }
+  }
+  
+  private cleanData(dataArray: any[], vitalName: string): any[] {
+    if (!Array.isArray(dataArray)) return [];
+
+    return dataArray.filter((value, i) => {
+      if (value !== null) return true;
+
+      if (i > 0 && i < dataArray.length - 1 && vitalName !== 'Blood Glucose') {
+        const [prevDate] = this.lineChartLabels[i - 1]?.split(' - ') || [];
+        const [currDate] = this.lineChartLabels[i]?.split(' - ') || [];
+        const [nextDate] = this.lineChartLabels[i + 1]?.split(' - ') || [];
+
+        if (currDate === prevDate || currDate === nextDate) {
+          this.lineChartLabels.splice(i, 1);
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
+  filterChartDataAndLabelsTogether(
+    datasets: { data: any[]; label: string }[],
+    labels: string[],
+    vitalName: string
+  ): { filteredData: any[][]; filteredLabels: string[] } {
+    const filteredData = datasets.map(ds => [...ds.data]);
+    const filteredLabels = [...labels];
+  
+    for (let i = filteredLabels.length - 1; i >= 0; i--) {
+      const isNullAcrossAll = filteredData.every(ds => ds[i] === null);
+  
+      if (
+        isNullAcrossAll &&
+        i > 0 &&
+        i < filteredLabels.length - 1 &&
+        vitalName !== 'Blood Glucose'
+      ) {
+        const [prevDate] = filteredLabels[i - 1]?.split(' - ') || [];
+        const [currDate] = filteredLabels[i]?.split(' - ') || [];
+        const [nextDate] = filteredLabels[i + 1]?.split(' - ') || [];
+  
+        if (currDate === prevDate || currDate === nextDate) {
+          filteredLabels.splice(i, 1);
+          filteredData.forEach(ds => ds.splice(i, 1));
+        }
+      }
+    }
+  
+    return {
+      filteredData,
+      filteredLabels
+    };
+  }
+  // Manjusha code change
   setEmptyGraph() {
     var date_val = new Date();
     var x = [0, 1, 2, 3, 4, 5, 6];
@@ -2641,21 +2904,21 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       date_val_set = this.convertDate(date_val.setDate(date_val.getDate() - 1));
     }
 
-    this.http_healthtrends = {
+    const fallbackData = {
       VitalName: 'No Data',
       VitalId: 1,
       Time: DefaultDates.reverse(),
       Values: [
-        { data: [null, null, null, null, null, null, null], label: 'Vital' },
+        { data: [null, null, null, null, null, null, null], label: 'No data available' },
       ],
     };
     this.lineChartLabels = this.patientService.convertDateforHealthTrends(
-      this.http_healthtrends.Time,
-      this.http_healthtrends
+      fallbackData.Time,
+      fallbackData
     );
 
     var temp = [];
-    for (var item of this.http_healthtrends.Values) {
+    for (var item of fallbackData.Values) {
       var obj = {
         data: item.data,
         label: item.label,
@@ -2681,21 +2944,20 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       date_val_set = this.convertDate(date_val.setDate(date_val.getDate() - 1));
     }
 
-    this.http_healthtrends = {
+    const fallbackData  = {
       VitalName: 'No Data',
       VitalId: 1,
       Time: DefaultDates.reverse(),
       Values: [
-        { data: [null, null, null, null, null, null, null], label: 'Vital' },
+        { data: [null, null, null, null, null, null, null], label: 'No data available' },
       ],
     };
     this.lineChartLabels = this.patientService.convertDateforHealthTrends(
-      this.http_healthtrends.Time,
-      this.http_healthtrends
+      fallbackData.Time,
+      fallbackData
     );
-
     var temp = [];
-    for (var item of this.http_healthtrends.Values) {
+    for (var item of fallbackData.Values) {
       var obj = {
         data: item.data,
         label: item.label,
@@ -2706,6 +2968,90 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     }
     this.lineChartData = temp;
   }
+  setEmptyGraphHealthInfo() {
+    var date_val = new Date();
+    var x = [0, 1, 2, 3, 4, 5, 6];
+    var DefaultDates = [];
+    var date_val_set = '';
+    for (var item1 of x) {
+      date_val_set = this.convertDate(date_val.setDate(date_val.getDate()));
+      DefaultDates.push(date_val_set);
+      date_val_set = this.convertDate(date_val.setDate(date_val.getDate() - 1));
+    }
+
+    const fallbackData = {
+      VitalName: 'No Data',
+      VitalId: 1,
+      Time: DefaultDates.reverse(),
+      Values: [
+        { data: [null, null, null, null, null, null, null], label: 'No data available' },
+      ],
+    };
+    const lineChartLabels = this.lineChartLabels;
+    var temp = [];
+    for (var item of fallbackData.Values) {
+      var obj = {
+        data: item.data,
+        label: item.label,
+        fill: false,
+        lineTension: 0.5,
+      };
+      temp.push(obj);
+    }
+    this.lineChartData = temp;
+    const lineChartData = this.lineChartData;
+    // Push processed data into array
+    this.allLineChartData.push({
+      lineChartLabels,
+      lineChartData,
+    });
+  }
+
+  setEmpty30DaysGraphHealthInfo() {
+    var date_val = new Date();
+    var x = [
+      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+      21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+    ];
+    var DefaultDates = [];
+    var date_val_set = '';
+    for (var item1 of x) {
+      date_val_set = this.convertDate(date_val.setDate(date_val.getDate()));
+      DefaultDates.push(date_val_set);
+      date_val_set = this.convertDate(date_val.setDate(date_val.getDate() - 1));
+    }
+
+    const fallbackData = {
+      VitalName: 'No Data',
+      VitalId: 1,
+      Time: DefaultDates.reverse(),
+      Values: [
+        { data: [null, null, null, null, null, null, null], label: 'No data avaiable' },
+      ],
+    };
+    this.lineChartLabels = this.patientService.convertDateforHealthTrends(
+      fallbackData.Time,
+      fallbackData
+    );
+    const lineChartLabels = this.lineChartLabels;
+    var temp = [];
+    for (var item of fallbackData.Values) {
+      var obj = {
+        data: item.data,
+        label: item.label,
+        fill: false,
+        lineTension: 0.5,
+      };
+      temp.push(obj);
+    }
+    this.lineChartData = temp;
+    const lineChartData = this.lineChartData;
+    this.allLineChartData.push({
+      lineChartLabels,
+      lineChartData,
+    });
+  }
+  
   UpcomingSchedule: any;
   LatestSchedule: any;
   calculateUpcomingSchedule(patient_id: any) {
@@ -3194,6 +3540,12 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.heath_trends_frequency = selected_val;
     this.getHealthTrends(selected_val);
   }
+  // Manjusha code change
+  healthtrendsHealthInfo(selected_val: any,index:any) {
+    this.heath_trends_frequencies[index] = selected_val;
+    this.getSingleHealthTrendData(index, selected_val);
+  }
+
   patient_page_nav: any;
   backtopatientlist() {
     this.patient_page_nav = sessionStorage.getItem('patient-page-status');
@@ -4913,10 +5265,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     );
     this.getHealthTrendsReport();
   }
-
+  // Manjusha code change
   async getHealthTrendsReport() {
-    if (!this.http_healthtrends || !this.http_healthtrends.Values) {
-      this.setEmptyGraphReport();
+    if (!this.http_healthtrends) {
+      //this.setEmptyGraphReport();
       return;
     }
 
@@ -4966,16 +5318,27 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.doc.save('PatientReport.pdf');
       this.DownloadStatus = false;
     } else {
-      this.HtmlGraph = document.querySelector('#pdfGraph');
-      await this.patientdownloadService.captureHealthTrendsChart(
-        this.doc,
-        this.HtmlGraph
-      );
+      // Manjusha code change
+      this.doc.setFontSize(14);
+      this.doc.text('Patient Health Trends', 15, this.currentY);
+      this.doc.setDrawColor('black');
+      const headingWidth = this.doc.getTextWidth('Patient Health Trends');
+      this.doc.line(15, this.currentY + 1, 15 + headingWidth, this.currentY + 1);
+      this.currentY += 20;
+      await this.patientdownloadService.resetPosition();
+      const allGraphs = Array.from(document.querySelectorAll('.pdfData'));
+
+      for (let i = 0; i < allGraphs.length; i++) {
+        const graph = allGraphs[i] as HTMLElement;
+        const vitalTitle = this.healthtrendVitalNameArray[i] || `Chart ${i + 1}`;
+        await this.patientdownloadService.captureHealthTrendsChart(this.doc, graph, vitalTitle);
+      }
+      this.currentY = this.patientdownloadService.getChartCurrentY();
       this.patientdownloadService.generateHealthTrendsTable(
         this.doc,
         this.httpVitalData
       );
-      this.patientdownloadService.generateDaysVitals(this.httpVitalData);
+      this.patientdownloadService.generateDaysVitals(this.http7VitalData);
       this.patientdownloadService.generatePatientSummaryReport(
         this.doc,
         this.patientProgramname,
@@ -4984,7 +5347,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.BillingInfo,
         this.httpSMSData
       );
-      this.patientdownloadService.generateVitalReadingSummary(this.doc);
+      await this.patientdownloadService.generateVitalReadingSummary(this.doc, this.selectedPatient,this.selectedProgram);
       this.DownloadStatus = false;
       this.doc.save('PatientReport.pdf');
     }
@@ -5010,6 +5373,4 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   closesmsDialogModal(){
     this.smsdialogpanel=false;
   }
-
-
 }

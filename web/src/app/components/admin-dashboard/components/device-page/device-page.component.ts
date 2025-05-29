@@ -158,8 +158,19 @@ export class DevicePageComponent implements OnInit {
 
     that.rpm.rpm_get('/api/devices/getalldevices').then((data2) => {
       this.loading1 = false;
-      this.tempDeviceList = data2;
-      this.deviceListSource = data2;
+      const transformedData = (data2 as any[]).map((device: any) => {
+        const rawDate = device.DeviceActivatedDateTime;
+        if (rawDate) {
+          const [datePart, timePart] = rawDate.split(' ');
+          const [day, month, year] = datePart.split('-');
+          const isoDateStr = `${year}-${month}-${day}T${timePart || '00:00:00'}`;
+          device.DeviceActivatedDateTime = new Date(isoDateStr);
+        }
+        return device;
+      });      
+    
+      this.tempDeviceList = transformedData;
+      this.deviceListSource = new MatTableDataSource(transformedData);
 
       this.activeDeviceCountArray = this.tempDeviceList.filter(
         (c: { DeviceStatus: any }) => c.DeviceStatus == 'Active'

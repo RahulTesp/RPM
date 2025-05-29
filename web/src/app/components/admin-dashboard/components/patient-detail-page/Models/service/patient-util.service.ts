@@ -83,18 +83,35 @@ export class PatientUtilService {
       [`${vitalInfo}`]: groups[ReadingDate], // Dynamically assigning vital type
     }));
   }
-
+  // Manjusha code change
   convertToLocalTime(stillUtc: any) {
     if (stillUtc) {
-      if (stillUtc.includes('+')) {
-        var temp = stillUtc.split('+');
-        stillUtc = temp[0];
+      // Only format ISO strings with time
+      const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(stillUtc);
+  
+      if (isDateOnly) {
+        // Treat it as local date at 12:00 AM
+        const local = moment(stillUtc + ' 00:00:00').format('YYYY-MM-DD HH:mm:ss');
+        return local;
       }
+  
+      // Remove timezone offset if present
+      if (stillUtc.includes('+')) {
+        stillUtc = stillUtc.split('+')[0];
+      }
+  
+      // Append Z if missing
+      if (!stillUtc.endsWith('Z')) {
+        stillUtc = stillUtc + 'Z';
+      }
+  
+      const local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+      return local;
     }
-    stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
-    return local;
+  
+    return null;
   }
+  
   getCurrentMonthDates(): { start: Date; end: Date } {
     try {
       const today = new Date();

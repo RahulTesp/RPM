@@ -110,3 +110,26 @@ input[type="radio"] {
 .upper-panel-data {
   width: 250px;
 }
+
+.summary_graph_container {
+  width: 100%; // or fixed like 600px
+  max-width: 800px;
+  margin: auto;
+}
+.charttrends {
+  width: 100% !important;
+  height: auto !important;
+  display: block;
+}
+.chart-wrapper-scrollfix {
+  position: relative;
+  overflow: hidden;
+  height: 0;
+}
+.chart-hidden-container {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+}

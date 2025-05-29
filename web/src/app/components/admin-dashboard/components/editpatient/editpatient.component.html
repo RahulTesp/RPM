@@ -685,7 +685,8 @@
           </div>
           <div
             #patientpreferences
-            class="personal preference_panelContent"
+            class="personal"
+            class="preference_panelContent"
           >
             <div>
               <p class="main_input_main_heading">Patient Preferences</p>
@@ -1752,22 +1753,20 @@
                           <div class="userInfoItem">
                             <p class="main_input_title">*Vital Monitoring</p>
                             <div *ngIf="device.DeviceStatus == 'InActive'">
+                              <!-- Renders only if the selection is valid -->
                               <select
-                                class="userInfovalue"
-                                id="editDeviceVitalInActive"
-                                [(ngModel)]="device.VitalId"
-                                [ngModelOptions]="{ standalone: true }"
+                              *ngIf="!device.invalidSelection"
+                              class="userInfovalue"
+                              id="editDeviceVitalInActive"
+                              [(ngModel)]="device.VitalId"
+                              [ngModelOptions]="{ standalone: true }"
+                              (change)="onVitalChange(device, $event)"
                               >
-                                <ng-container
-                                  *ngFor="let x of patientdevicedetails"
-                                >
-                                  <option
-                                    *ngIf="x.VitalName != ''"
-                                    value="{{ x.VitalId }}"
-                                  >
-                                    {{ x.VitalName }}
-                                  </option>
-                                </ng-container>
+                              <ng-container *ngFor="let x of getUniqueVitals()">
+                                <option *ngIf="x.VitalName != ''" [value]="x.VitalId">
+                                  {{ x.VitalName }}
+                                </option>
+                              </ng-container>
                               </select>
                             </div>
                             <div *ngIf="device.DeviceStatus != 'InActive'">
@@ -1792,8 +1791,6 @@
                             </div>
                           </div>
                         </div>
-
-
                         <div class="second_panel">
                           <div class="userInfoItem">
                             <p class="main_input_title">*Device Type</p>

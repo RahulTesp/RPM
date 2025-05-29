@@ -31,6 +31,15 @@ export const CHART_OPTIONS = {
   line: {
     tension: 0.5,
   },
+  scales: {
+    x: {
+      ticks: {
+        autoSkip: false,
+        maxRotation: 90,
+        minRotation: 45
+      }
+    }
+  },
   legend: {
     display: true,
     position: 'bottom',

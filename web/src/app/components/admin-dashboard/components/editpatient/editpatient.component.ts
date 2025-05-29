@@ -167,7 +167,11 @@ export class EditpatientComponent implements OnInit {
     }));    
     
   }
-  getInitialValue(diagnosis: any): string {   console.log('Getting initial value for:', diagnosis);   return diagnosis?.DiagnosisName || ''; }
+
+  getInitialValue(diagnosis: any): string {    
+    return diagnosis?.DiagnosisName || ''; 
+  }
+
   get diagnosisList() {
     return this.editProgramdata.get('selectedDiagnoses') as FormArray;
   }
@@ -612,7 +616,6 @@ export class EditpatientComponent implements OnInit {
       )
       .then((data) => {
         that.Patientdata = data;
-
         this.processMasterData();
         that.PatientVitalInfos =
           that.Patientdata.PatientVitalDetails.PatientVitalInfos;
@@ -790,14 +793,28 @@ export class EditpatientComponent implements OnInit {
         that.programForm.controls['clinic'].setValue(
           that.Patientdata.PatientPrescribtionDetails.Clinic
         );
-        var consultDateData = this.datepipe.transform(
-          that.Patientdata.PatientPrescribtionDetails.ConsultationDate,
-          'MMM/dd/yyyy'
-        );
+        // Manjusha code change
+        // Parse the custom date format "dd-MM-yyyy HH:mm:ss"
+        const rawDate = that.Patientdata.PatientPrescribtionDetails.ConsultationDate;
 
+        let consultDateData: string | null = null;
+
+        if (rawDate) {
+          const [datePart, timePart] = rawDate.split(' ');
+          const [day, month, year] = datePart.split('-');
+
+          // Convert to ISO format: "yyyy-MM-ddTHH:mm:ss"
+          const isoFormatted = `${year}-${month}-${day}T${timePart || '00:00:00'}`;
+
+          // Transform using Angular DatePipe
+          consultDateData = this.datepipe.transform(isoFormatted, 'MMM/dd/yyyy');
+        }
+
+        // Now pass the transformed date into convertDate
         that.programForm.controls['consultdate'].setValue(
           this.convertDate(consultDateData)
         );
+
 
         var prescribeDateData = this.datepipe.transform(
           this.convertToLocalTime(
@@ -1032,10 +1049,10 @@ export class EditpatientComponent implements OnInit {
           this.insurance_tname = that.secondaryinsurnace[1].InsuranceVendorName;
         }
 
-        that.patientdevicedetails =
+        var patientdevicedetailsData =
           that.Patientdata.PatientDevicesDetails.PatientDeviceInfos;
-        if (that.patientdevicedetails.length == 0) {
-          var vitalArr = [];
+        var vitalArr = [];
+        if (patientdevicedetailsData.length == 0) {
           for (let v of that.PatientVitalInfos) {
             var obj = {
               VitalName: v.VitalName,
@@ -1044,6 +1061,33 @@ export class EditpatientComponent implements OnInit {
               DeviceNumber: '',
             };
             vitalArr.push(obj);
+          }
+          that.patientdevicedetails = vitalArr;
+        }
+        if (patientdevicedetailsData.length != 0) {
+          for (let v of that.PatientVitalInfos) {
+            const isPresent = this.checkVitalName(
+              patientdevicedetailsData,
+              v.VitalName
+            );
+            // Manjusha code change
+            if (isPresent) {
+              var device = this.getVitalObject(
+                patientdevicedetailsData,
+                v.VitalName
+              );
+              vitalArr.push(...device);
+            } else {
+              var obj = {
+                VitalName: v.VitalName,
+                DeviceStatus: 'InActive',
+                VitalId: v.VitalId,
+                DeviceNumber: '',
+              };
+              if (!vitalArr.some((item) => item.VitalName == obj.VitalName)) {
+                vitalArr.push(obj);
+              }
+            }
           }
           that.patientdevicedetails = vitalArr;
         }
@@ -1062,17 +1106,33 @@ export class EditpatientComponent implements OnInit {
         that.vitalListChange();
       });
   }
+
+  checkVitalName(vitals: any[], nameToCheck: string): boolean {
+    return vitals.some(
+      (vital) => vital.VitalName.toLowerCase() === nameToCheck.toLowerCase()
+    );
+  }
+  // Manjusha code change
+  getVitalObject(vitals: any[], nameToFind: string): any {
+    return vitals.filter(
+      (vital) => vital.VitalName.toLowerCase() === nameToFind.toLowerCase()
+    );
+  }
+   // Manjusha code change
   codeSelected: any;
   DeviceCheck() {
-    for (let x of this.patientdevicedetails) {
-      if (x.DeviceStatus == 'Active') {
-        this.DeviceNotAvaliable = false;
-        break;
-      } else {
-        this.DeviceNotAvaliable = true;
-      }
-    }
-  }
+    const allVitalsActive = this.PatientVitalInfos.every((vital: { VitalName: string }) => {
+      const vitalName = vital?.VitalName?.toLowerCase();
+      if (!vitalName) return false; // if vital name is missing, consider it failed
+  
+      return this.patientdevicedetails.some(
+        (device: { VitalName?: string; DeviceStatus: string }) =>
+          device?.VitalName?.toLowerCase() === vitalName &&
+          device.DeviceStatus === 'Active'
+      );
+    });
+    this.DeviceNotAvaliable = !allVitalsActive;
+  }  
 
   DeviceCheckOnSubmit() {
     if (!Array.isArray(this.patientdevicedetails)) {
@@ -1101,6 +1161,7 @@ export class EditpatientComponent implements OnInit {
   a: any;
   vitalschedule: any;
   InsuranceInfo: any;
+  // Manjusha code change
   addNewDevice() {
     var obj = {
       VitalName: '',
@@ -1108,7 +1169,7 @@ export class EditpatientComponent implements OnInit {
       VitalId: '',
       DeviceNumber: '',
     };
-    if (this.patientdevicedetails?.length < 5) {
+    if (this.patientdevicedetails?.length < 10) {
       this.patientdevicedetails.push(obj);
     }
   }
@@ -1463,6 +1524,7 @@ export class EditpatientComponent implements OnInit {
 
   editObjDiagnosis = { Id: 0, DiagnosisCode: null, DiagnosisName: null };
 
+  // Manjusha code change
   programaddNewDiaganostic() {
     const selectedDiagnosesArray = this.editProgramdata.get('selectedDiagnoses') as FormArray;
   
@@ -1496,7 +1558,7 @@ export class EditpatientComponent implements OnInit {
     const selectedDiagnosesArray = this.editProgramdata.get('selectedDiagnoses') as FormArray;
   
     if (selectedDiagnosesArray.length > 1) {
-      selectedDiagnosesArray.removeAt(selectedDiagnosesArray.length - 1); // ✅ Proper reactive removal
+      selectedDiagnosesArray.removeAt(selectedDiagnosesArray.length - 1); //Proper reactive removal
       this.display = !this.display;
     } else {
       alert('At least one diagnosis must remain.');
@@ -2316,6 +2378,9 @@ export class EditpatientComponent implements OnInit {
               this.ReloadDeviceList(2);
               this.ReloadDeviceList(3);
               this.ReloadDeviceList(4);
+              this.UpdatePatient_Device(this.pid, this.patientprogramid);
+              this.ChangeScreen(2);
+
             },
             false
           );
@@ -2355,6 +2420,7 @@ export class EditpatientComponent implements OnInit {
             'Device Error Updated Successfully.',
             'Success',
             () => {
+              this.RemoveDevice(index);
               this.ReloadDeviceList(1);
               this.ReloadDeviceList(2);
               this.ReloadDeviceList(3);
@@ -2364,6 +2430,7 @@ export class EditpatientComponent implements OnInit {
           );
         },
         (err) => {
+          console.error('Device update failed:', err);
           this.showconfirmDialog.showConfirmDialog(
             'Failed to Update Device Error',
             'Error',
@@ -2963,10 +3030,10 @@ export class EditpatientComponent implements OnInit {
       .then((data) => {
         that.Patientdata_Device = data;
         that.processMasterData();
-        that.patientdevicedetails =
+        var patientdevicedetailsData =
           that.Patientdata_Device.PatientDevicesDetails.PatientDeviceInfos;
-        if (that.patientdevicedetails.length == 0) {
-          var vitalArr = [];
+        var vitalArr = [];
+        if (patientdevicedetailsData.length == 0) {
           for (let v of that.PatientVitalInfos) {
             var obj = {
               VitalName: v.VitalName,
@@ -2978,9 +3045,38 @@ export class EditpatientComponent implements OnInit {
           }
           that.patientdevicedetails = vitalArr;
         }
+        if (patientdevicedetailsData.length != 0) {
+          for (let v of that.PatientVitalInfos) {
+            const isPresent = this.checkVitalName(
+              patientdevicedetailsData,
+              v.VitalName
+            );
+
+            if (isPresent) {
+              var device = this.getVitalObject(
+                patientdevicedetailsData,
+                v.VitalName
+              );
+              vitalArr.push(...device);
+            } else {
+              var obj = {
+                VitalName: v.VitalName,
+                DeviceStatus: 'InActive',
+                VitalId: v.VitalId,
+                DeviceNumber: '',
+              };
+              if (!vitalArr.some((item) => item.VitalName == obj.VitalName)) {
+                vitalArr.push(obj);
+              }
+            }
+          }
+          that.patientdevicedetails = vitalArr;
+        }
         that.DeviceCheck();
+        // this.DeviceNotAvaliable=true;
       });
   }
+
   Patientdata_Image: any;
   UpdatePatient_Image(PatientId: any, ProgramId: any) {
     //call on clicking on one patient row in the draft list, pass patient id from table to get the info
@@ -3277,17 +3373,13 @@ export class EditpatientComponent implements OnInit {
       }));
     });
     this.selectedDiagnoses = selectedDiagnosesArray.value;
-    console.log("selectedDiagnoses inside programNameEditPanel:", this.selectedDiagnoses);
     // Store the current vital list before it gets changed
     this.vitalListDialog = this.vitalList;
-    console.log("selectedDiagnoses after patch:", selectedDiagnosesArray.value);
   
     this.editProgramdata.patchValue({
       programname: this.selectedProgramId,
       vitalListDialog: this.vitalListDialog,
     });
-    console.log("this.editProgramdata", this.editProgramdata.value);
-    console.log("selectedDiagnoses after patch:", this.selectedDiagnoses);
     
     // Open the dialog after patching the values
     //this.dialog.open(this.programedit);
@@ -3670,7 +3762,7 @@ export class EditpatientComponent implements OnInit {
     );
   }
   rangeControl = new FormControl<[number, number]>([this.minValue, this.maxValue]);
-
+  // Manjusha code change
   isDropdownDisabled(): boolean {
     return this.Patientdata?.PatientProgramdetails?.Status === 'Active' && !!this.selectedProgram;
   }  
@@ -3680,5 +3772,51 @@ export class EditpatientComponent implements OnInit {
     return (this.Patientdata.PatientProgramdetails.Status === 'Active' &&
             !!this.selectedProgram &&
             this.initiallySelectedVitals.includes(vitalId));  // Check if the vitalId is selected
+  }
+
+  getUniqueVitals() {
+    const seen = new Set();
+    return this.patientdevicedetails.filter((device: { VitalName: string; }) => {
+      const key = device.VitalName?.toLowerCase();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+  
+  onVitalChange(device: any, event: Event) {
+    const selectedValue = (event.target as HTMLSelectElement).value;
+    const selectedId = Number(selectedValue);
+  
+    const selectedVital = this.getUniqueVitals().find((v: { VitalId: number }) => v.VitalId === selectedId);
+    if (!selectedVital) return;
+  
+    const selectedVitalName = selectedVital.VitalName.toLowerCase();
+  
+    const alreadyActive = this.patientdevicedetails.some(
+      (d: any) =>
+        d.DeviceStatus === 'Active' &&
+        d.VitalName.toLowerCase() === selectedVitalName
+    );
+  
+    if (alreadyActive) {
+      alert(
+        'The selected vital already has an active device. You cannot add another device for this vital. Please select a different vital.'
+      );
+  
+      // Temporarily mark invalid and clear value
+      device.invalidSelection = true;
+      device.VitalId = null;
+  
+      // Force a refresh after short delay
+      setTimeout(() => {
+        device.invalidSelection = false;
+      });
+  
+      return;
+    }
+  
+    // If valid, update previousVitalId
+    device.previousVitalId = selectedId;
   }
 }

@@ -153,6 +153,7 @@ export class SidePanelPatientComponent implements OnInit {
 
 
   getMenuChioce(choice: any): void {
+    this.getPatientname();
     this.patientStatus = this.patientSatausData;
     this.refreshTaskAssign();
     this.refreshScheduleAssign();
@@ -211,7 +212,7 @@ export class SidePanelPatientComponent implements OnInit {
   }
 
   private loadVitals(): void {
-    const vitalsData = sessionStorage.getItem('viatls');
+    const vitalsData = sessionStorage.getItem('vitals');
     this.vitals = vitalsData ? JSON.parse(vitalsData) : null;
   }
 
@@ -2579,11 +2580,19 @@ export class SidePanelPatientComponent implements OnInit {
   }
   MasterDataQuestionTemp: any;
   getMasterDataQuestions(patientProgramName: any) {
-    this.patientProgramId = this.http_rpm_patientList['PatientProgramdetails'].ProgramId;
-
+    if (
+      this.http_rpm_patientList &&
+      this.http_rpm_patientList['PatientProgramdetails'] &&
+      this.http_rpm_patientList['PatientProgramdetails'].ProgramId
+    ) {
+      this.patientProgramId = this.http_rpm_patientList['PatientProgramdetails'].ProgramId;
+    } else {
+      console.error('PatientProgramdetails or ProgramId is missing in http_rpm_patientList');
+      return;
+    }
     this.rpm
       .rpm_get(
-        `/api/patient/getmasterdatanotes?ProgramName=${this.patientProgramId}&Type=REVIEW`
+        `/api/patient/getmasterdatanotes?ProgramId=${this.patientProgramId}&Type=REVIEW`
       )
       .then(
         (data) => {
@@ -2605,7 +2614,6 @@ export class SidePanelPatientComponent implements OnInit {
     var that = this;
 
     patientProgramName = sessionStorage.getItem('patientPgmName');
-
     if (patientProgramName == 'RPM') {
       that.noteTypeIdArray = that.http_getId.filter(function (data: any) {
         return data.Type == 'PatientNoteType' && data.Name != 'Incoming Call';
@@ -2700,7 +2708,24 @@ export class SidePanelPatientComponent implements OnInit {
 
   http_rpm_patientList: any;
 
-
+  getPatientname() {
+    this.currentpPatientId = sessionStorage.getItem('PatientId');
+    this.currentpPatientId = JSON.parse(this.currentpPatientId);
+    this.currentProgramId = sessionStorage.getItem('ProgramId');
+    this.currentProgramId = JSON.parse(this.currentProgramId);
+    this.rpm
+      .rpm_get(
+        `/api/patient/getpatient?PatientId=${this.currentpPatientId}&PatientprogramId=${this.currentProgramId}`
+      )
+      .then((data) => {
+        this.http_rpm_patientList = data;
+        this.patientName =
+          this.http_rpm_patientList['PatientDetails'].FirstName +
+          ' ' +
+          this.http_rpm_patientList['PatientDetails'].LastName;
+      });
+  }
+  
   refresh() {
     this.registerSchedule.reset();
     this.registerTask.reset();

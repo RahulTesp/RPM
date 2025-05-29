@@ -140,9 +140,9 @@
             <option [ngValue]="undefined" selected>All Vitals</option>
             <option
               *ngFor="let data of patientVitalsArray; let i = index"
-              [value]="data.Vital"
+              [value]="data"
             >
-              {{ data.Vital }}
+              {{ data }}
             </option>
           </select>
         </div>

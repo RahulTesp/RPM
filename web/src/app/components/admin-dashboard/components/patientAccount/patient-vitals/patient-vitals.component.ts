@@ -2868,7 +2868,7 @@ export class PatientVitalsComponent implements OnInit {
       sessionStorage.setItem('patientdataUserId', this.patientdataUserId);
       this.vitals =
         this.http_rpm_patientList.PatientProgramdetails.PatientVitalInfos;
-      sessionStorage.setItem('viatls', JSON.stringify(this.vitals));
+      sessionStorage.setItem('vitals', JSON.stringify(this.vitals));
       sessionStorage.setItem(
         'pname',
         this.http_rpm_patientList['PatientDetails'].FirstName +

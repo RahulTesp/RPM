@@ -187,4 +187,11 @@ export class AuthService {
 
     return combineDateIsoFrm;
   }
+
+  ConvertToUTCRangeInputs(data: any) {
+    const dateObj = new Date(data); // Ensures it's a Date instance
+    const combineDateIsoFrm = dateObj.toISOString(); // Already in UTC
+    return combineDateIsoFrm;
+  }
+  
 }

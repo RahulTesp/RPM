@@ -9,15 +9,19 @@ import { PatientUtilService } from '../../patient-detail-page/Models/service/pat
 import html2canvas from 'html2canvas';
 // import Chart from 'chart.js';
 import { PatientReportApiService } from './patient-report-api.service';
+import { PatientDataDetailsService } from '../../patient-detail-page/Models/service/patient-data-details.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DownloadPatientReportService {
+  vitals: any;
+  patientInfo: any;
   constructor(
     private datepipe: DatePipe,
     private patientReportService: ReportDataService,
     private rpmService: RPMService,
+    private patientService: PatientDataDetailsService,
     private patientUtilService: PatientUtilService,
     private patientReportApiService: PatientReportApiService
   ) {}
@@ -26,6 +30,9 @@ export class DownloadPatientReportService {
   private VitalsSevenDaysConsolidated: any[] = []; // 🟢 Store last 7 days vitals
   private reviewNotes: any;
   private callNotes: any;
+  private selectedVitals: any;
+  currentpPatientId: any;
+  currentProgramId: any;
 
   /**
    * Set main heading style for PDF
@@ -265,9 +272,7 @@ export class DownloadPatientReportService {
     healthTrends: any
   ): Promise<{ chartData: any; chartLabels: string[] }> {
     if (
-      !healthTrends ||
-      !healthTrends.Values ||
-      healthTrends.Values.length === 0
+      !healthTrends
     ) {
       return this.generateEmptyChartData();
     }
@@ -1029,7 +1034,7 @@ export class DownloadPatientReportService {
 
     return intervals.length > 0 ? intervals.join(' - ') : 'None';
   }
-
+  // Manjusha code change
   generateHealthTrendsTable(doc: jsPDF, vitalData: any): void {
     this.vitalsConsolidated = [];
     const vitals = {
@@ -1066,31 +1071,37 @@ export class DownloadPatientReportService {
         ],
         vitals.BloodGlucose,
         'BloodGlucoseReadings',
-        this.BloodGlucoseReportDisplayTest
+        this.BloodGlucoseReportDisplayTest.bind(this)
       );
-    } else if (vitals.BloodPressure?.length > 0) {
+    } 
+    if (vitals.BloodPressure?.length > 0) {
       this.generateVitalTable(
         doc,
         'Blood Pressure Readings',
         ['Date', 'Time', 'SBP', 'DBP', 'Pulse', 'Remarks'],
         vitals.BloodPressure,
-        'BloodPressureReadings'
+        'BloodPressureReadings',
+        this.formatBloodPressureRow
       );
-    } else if (vitals.BloodOxygen?.length > 0) {
+    } 
+    if (vitals.BloodOxygen?.length > 0) {
       this.generateVitalTable(
         doc,
         'Blood Oxygen Readings',
         ['Date', 'Time', 'Oxygen', 'Pulse', 'Remarks'],
         vitals.BloodOxygen,
-        'BloodOxygenReadings'
+        'BloodOxygenReadings',
+        this.formatBloodOxygenRow
       );
-    } else if (vitals.Weight?.length > 0) {
+    } 
+    if (vitals.Weight?.length > 0) {
       this.generateVitalTable(
         doc,
         'Weight Readings',
-        ['Date', 'Time', 'Schedule', 'Weight', 'Remarks'],
+        ['Date', 'Time', 'Weight', 'Remarks'],
         vitals.Weight,
-        'WeightReadings'
+        'WeightReadings',
+        this.formatWeightRow
       );
     }
   }
@@ -1105,9 +1116,23 @@ export class DownloadPatientReportService {
     formatter?: (data: any) => string[]
   ): void {
     let rows: string[][] = [];
+    const vitalTypeMap: { [key: string]: string } = {
+      BloodPressureReadings: 'Blood Pressure',
+      BloodGlucoseReadings: 'Blood Glucose',
+      BloodOxygenReadings: 'Oxygen',
+      WeightReadings: 'Weight',
+    };
+    const vitalType = vitalTypeMap[readingType];
+
+    // 🏷️ Add Title Above Table
+    const startY = this.currentY || 30;
+    doc.setFontSize(12);
+    doc.text(title, 15, startY);
+    const tableStartY = startY + 7;
 
     for (let vital of vitalData) {
       for (let reading of vital[readingType]) {
+        reading.VitalType = vitalType;
         this.vitalsConsolidated.push(reading); // 🟢 Store consolidated readings
 
         let temp = formatter
@@ -1120,11 +1145,42 @@ export class DownloadPatientReportService {
     autoTable(doc, {
       head: [columns],
       body: rows,
-      startY: 105,
+      startY: tableStartY,
       didParseCell: this.formatTableCells,
     });
+    const docAny = doc as any;
+    this.currentY = docAny.lastAutoTable?.finalY + 10 || tableStartY + rows.length * 10;
   }
-
+  private formatBloodPressureRow = (reading: any): string[] => {
+    return [
+      this.datepipe.transform(reading.ReadingTime) ?? 'N/A',
+      this.datepipe.transform(reading.ReadingTime, 'h:mm a') ?? 'N/A',
+      reading.Systolic ?? '-',
+      reading.Diastolic ?? '-',
+      reading.Pulse ?? '-',
+      reading.Remarks ?? '-',
+    ];
+  };
+  
+  private formatBloodOxygenRow = (reading: any): string[] => {
+    return [
+      this.datepipe.transform(reading.ReadingTime) ?? 'N/A',
+      this.datepipe.transform(reading.ReadingTime, 'h:mm a') ?? 'N/A',
+      reading.Oxygen ?? '-',
+      reading.Pulse ?? '-',
+      reading.Remarks ?? '-',
+    ];
+  };
+  
+  private formatWeightRow = (reading: any): string[] => {
+    return [
+      this.datepipe.transform(reading.ReadingTime) ?? 'N/A',
+      this.datepipe.transform(reading.ReadingTime, 'h:mm a') ?? 'N/A',
+      reading.BWlbs ?? '-',
+      reading.Remarks ?? '-',
+    ];
+  };
+  
   // ✅ Format Vital Row Data
   private formatVitalRow(reading: any): string[] {
     return [
@@ -1269,12 +1325,9 @@ export class DownloadPatientReportService {
     }
     return vitalDataArray;
   }
-
-  // setVitalsData(vitalsSevenDays: any[]): void {
-  //   this.VitalsSevenDaysConsolidated = vitalsSevenDays;
-  // }
-
-  generateVitalReadingSummary(doc: jsPDF): void {
+  
+  // Manjusha code change
+  async generateVitalReadingSummary(doc: jsPDF,currentpPatientId:any, currentProgramId:any): Promise<void> {
     doc.addPage();
     this.setSubHeadingStyle(doc);
 
@@ -1282,82 +1335,180 @@ export class DownloadPatientReportService {
     doc.text(statSumm, 15, 20);
     const textWidth = doc.getTextWidth(statSumm);
     doc.line(15, 21, 15 + textWidth, 21);
-
-    const columns = [
-      'Days of Reading',
-      'Selected Last 7 days',
-      'Selected Last 30 Days',
-    ];
-    const rows: string[][] = [];
-
-    rows.push([
-      'Total Days of Reading',
-      this.VitalsSevenDaysConsolidated.length.toString(),
-      this.vitalsConsolidated.length.toString(),
-    ]);
-
-    const critical7 = this.VitalsSevenDaysConsolidated.filter(
-      (data) => data.Status === 'Critical'
+    this.patientInfo = await this.patientService.fetchPatientInfo(
+      currentpPatientId,
+      currentProgramId
     );
-    const critical30 = this.vitalsConsolidated.filter(
-      (data) => data.Status === 'Critical'
-    );
-    rows.push([
-      'Critical Readings',
-      critical7.length.toString(),
-      critical30.length.toString(),
-    ]);
+    this.vitals = this.patientInfo.PatientProgramdetails.PatientVitalInfos;
+    console.log("this.vitals",this.vitals);
+    if (this.vitals) {
+      const selectedVitals = this.vitals
+        .filter((v: any) => v.Selected)
+        .map((v: any) => v.Vital);
+      this.selectedVitals = selectedVitals;
+    }
+    console.log("this.selectedVitals",this.selectedVitals);
+    let currentY = 30;
+    this.selectedVitals.forEach((vital: string) => {
+      doc.setFontSize(12);
+      doc.text(`${vital} - Summary`, 15, currentY);
 
-    const cautious7 = this.VitalsSevenDaysConsolidated.filter(
-      (data) => data.Status === 'Cautious'
-    );
-    const cautious30 = this.vitalsConsolidated.filter(
-      (data) => data.Status === 'Cautious'
-    );
-    rows.push([
-      'Cautious Readings',
-      cautious7.length.toString(),
-      cautious30.length.toString(),
-    ]);
+      currentY += 5;
+      const columns = [
+        'Days of Reading',
+        'Selected Last 7 days',
+        'Selected Last 30 Days',
+      ];
+      const rows: string[][] = [];
 
-    autoTable(doc, {
-      head: [columns],
-      body: rows,
-      startY: 30,
-    });
-  }
-  generateDaysVitals(vitalData: any): void {
-    this.VitalsSevenDaysConsolidated = [];
+      // 🔍 Filter 7-day and 30-day data for current vital
+      const vitalKeyMap: { [key: string]: string } = {
+        'Blood Pressure': 'BloodPressure',
+        'Blood Glucose': 'BloodGlucose',
+        'Oxygen': 'BloodOxygen',
+        'Weight': 'Weight',
+      };
+      const vitalKey = vitalKeyMap[vital];
+      const vital7 = this.VitalsSevenDaysConsolidated.filter(
+        (v) => v.VitalType === vital
+      );
+      const vital30 = this.vitalsConsolidated.filter(
+        (v) => v.VitalType === vital
+      );
+      // Total Days
+      rows.push([
+        'Total Days of Reading',
+        Object.keys(this.groupByDate(vital7)).length.toString(),
+        Object.keys(this.groupByDate(vital30)).length.toString(),
+      ]);
 
-    const vitals = {
-      BloodGlucose: this.patientUtilService.newVitalreadingData(
-        vitalData.BloodGlucose,
-        'BloodGlucoseReadings'
-      ),
-      BloodPressure: this.patientUtilService.newVitalreadingData(
-        vitalData.BloodPressure,
-        'BloodPressureReadings'
-      ),
-      BloodOxygen: this.patientUtilService.newVitalreadingData(
-        vitalData.BloodOxygen,
-        'BloodOxygenReadings'
-      ),
-      Weight: this.patientUtilService.newVitalreadingData(
-        vitalData.Weight,
-        'WeightReadings'
-      ),
-    };
+      // Critical
+      const critical7 = vital7.filter((v) => v.Status === 'Critical');
+      const critical30 = vital30.filter((v) => v.Status === 'Critical');
+      rows.push([
+        'Critical Readings',
+        Object.keys(this.groupByDate(critical7)).length.toString(),
+        Object.keys(this.groupByDate(critical30)).length.toString(),
+      ]);
 
-    Object.values(vitals).forEach((vitalArray: any) => {
-      if (vitalArray?.length > 0) {
-        for (let vital of vitalArray) {
-          const readingsKey = Object.keys(vital)[1]; // Extract reading key dynamically
-          for (let reading of vital[readingsKey]) {
-            this.VitalsSevenDaysConsolidated.push(reading);
+      // Cautious
+      const cautious7 = vital7.filter((v) => v.Status === 'Cautious');
+      const cautious30 = vital30.filter((v) => v.Status === 'Cautious');
+      rows.push([
+        'Cautious Readings',
+        Object.keys(this.groupByDate(cautious7)).length.toString(),
+        Object.keys(this.groupByDate(cautious30)).length.toString(),
+      ]);
+
+      autoTable(doc, {
+        head: [columns],
+        body: rows,
+        startY: currentY + 5,
+        styles: { fontSize: 10 },
+        didDrawPage: (data) => {
+          if (data.cursor) {
+            currentY = data.cursor.y + 10;
           }
         }
-      }
+      });
     });
+  }
+
+  groupByDate(vitalDataArray: any[]) {
+    const groups = vitalDataArray.reduce((groups: any, vitals: any) => {
+        const date = vitals.DateData.split(' ')[0]; // Extract date without time
+        if (!groups[date]) {
+            groups[date] = [];
+        }
+        groups[date].push(vitals);
+        return groups;
+    }, {});
+
+    return groups;
+  }
+
+  convertDate(dateval: any) {
+    let today = new Date(dateval);
+    let dd = today.getDate();
+    let dd2;
+    if (dd < 10) {
+      dd2 = '0' + dd;
+    } else {
+      dd2 = dd;
+    }
+    let mm = today.getMonth() + 1;
+    let mm2;
+    if (mm < 10) {
+      mm2 = '0' + mm;
+    } else {
+      mm2 = mm;
+    }
+    const yyyy = today.getFullYear();
+    dateval = yyyy + '-' + mm2 + '-' + dd2;
+    return dateval;
+  }
+
+  http_7day_vitalDataReport: any;
+  generateDaysVitals(vitalData: any): void {
+    this.VitalsSevenDaysConsolidated = [];
+    this.http_7day_vitalDataReport = vitalData;
+    var vitalBloodPressure =
+      this.http_7day_vitalDataReport &&
+      this.patientUtilService.newVitalreadingData(
+        this.http_7day_vitalDataReport.BloodPressure,
+        'BloodPressureReadings'
+      );
+
+    var vitalGlucoseData =
+      this.http_7day_vitalDataReport &&
+      this.patientUtilService.newVitalreadingData(
+        this.http_7day_vitalDataReport.BloodGlucose,
+        'BloodGlucoseReadings'
+      );
+
+    var VitalOxygen =
+      this.http_7day_vitalDataReport &&
+      this.patientUtilService.newVitalreadingData(
+        this.http_7day_vitalDataReport.BloodOxygen,
+        'BloodOxygenReadings'
+      );
+
+    var VitalWight =
+      this.http_7day_vitalDataReport &&
+      this.patientUtilService.newVitalreadingData(
+        this.http_7day_vitalDataReport.Weight,
+        'WeightReadings'
+      );
+
+    if (vitalGlucoseData && vitalGlucoseData.length > 0) {
+      for (let vl of vitalGlucoseData) {
+        for (let vv of vl.BloodGlucoseReadings) {
+          vv.VitalType = 'Blood Glucose';
+          this.VitalsSevenDaysConsolidated.push(vv);
+        }
+      }
+    } if (vitalBloodPressure && vitalBloodPressure.length > 0) {
+      for (let vl of vitalBloodPressure) {
+        for (let vv of vl.BloodPressureReadings) {
+          vv.VitalType = 'Blood Pressure';
+          this.VitalsSevenDaysConsolidated.push(vv);
+        }
+      }
+    } if (VitalOxygen && VitalOxygen.length > 0) {
+      for (let vl of VitalOxygen) {
+        for (let vv of vl.BloodOxygenReadings) {
+          vv.VitalType = 'Oxygen';
+          this.VitalsSevenDaysConsolidated.push(vv);
+        }
+      }
+    } if (VitalWight && VitalWight.length > 0) {
+      for (let vl of VitalWight) {
+        for (let vv of vl.WeightReadings) {
+          vv.VitalType = 'Weight';
+          this.VitalsSevenDaysConsolidated.push(vv);
+        }
+      }
+    }
   }
 
   getVitalsSevenDays(): any[] {
@@ -1375,35 +1526,40 @@ export class DownloadPatientReportService {
     return val ? flg : '0';
   }
 
+  currentY: number = 10;
   async captureHealthTrendsChart(
     doc: jsPDF,
-    chartElement: HTMLElement
+    chartElement: HTMLElement,
+    title: string
   ): Promise<jsPDF> {
     return new Promise((resolve, reject) => {
       try {
         // Make chart visible for capturing
         chartElement.style.visibility = 'visible';
-
+        console.log("chart elemet",chartElement.innerHTML);
         html2canvas(chartElement)
           .then((canvas) => {
             try {
-              // Set heading style and add title
-              this.setSubHeadingStyle(doc);
-              const healthTrends = 'Patient Health Trends';
-              doc.text(healthTrends, 15, 20);
+              // 🔹 Chart-specific heading
+            doc.setFontSize(12);
+            doc.text(title, 15, this.currentY);
 
-              // Add underline
-              doc.setDrawColor('black');
-              const textWidth = doc.getTextWidth(healthTrends);
-              doc.line(15, 21, 15 + textWidth, 21);
+            // Add underline
+            doc.setDrawColor('black');
+            const textWidth = doc.getTextWidth(title);
+            doc.line(15, this.currentY + 1, 15 + textWidth, this.currentY + 1);
 
-              // Add chart image to PDF
-              const imgData = canvas.toDataURL('image/jpeg', 1.0);
-              doc.addImage(imgData, 10, 35, 180, 65);
+            // Add chart image
+            const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            const imageY = this.currentY + 6;
+            const imageHeight = 65;
+            doc.addImage(imgData, 10, imageY, 180, imageHeight);
 
-              // Hide the chart element again
-              // chartElement.style.visibility = 'hidden';
-
+            this.currentY = imageY + imageHeight + 15;
+              if (this.currentY > 270) {
+                doc.addPage();
+                this.currentY = 20;
+              }
               resolve(doc);
             } catch (error) {
               console.error('Error processing chart canvas:', error);
@@ -1422,6 +1578,14 @@ export class DownloadPatientReportService {
         reject(error);
       }
     });
+  }
+
+  getChartCurrentY(): number {
+    return this.currentY;
+  }
+  
+  resetPosition(): void {
+    this.currentY = 30;
   }
 
   generateReportHeading(doc: any, startDate: any, endDate: any) {
