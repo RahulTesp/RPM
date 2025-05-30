@@ -335,6 +335,9 @@ public class ChangePassword extends AppCompatActivity {
 
                 if (password.isEmpty()) {
                     newpw.setError("Password cannot be empty ! ");
+
+            } else if (password.equals(oldPassword)) {
+                    newpw.setError("Current password cannot be used as new password.");
                 }
                 else
                 if (password.contains(" ")) {

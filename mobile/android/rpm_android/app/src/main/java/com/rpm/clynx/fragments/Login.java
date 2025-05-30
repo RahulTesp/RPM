@@ -94,53 +94,81 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
     private final QuickstartConversationsManager quickstartConversationsManager = new QuickstartConversationsManager(this);
     private static Login logininstance;
     String roomnameVal,tokenid, callStatus;
-    private boolean isCallJoined = false; // Track whether the user has joined the call
+    private boolean isCallJoined = false; // Tr
+    private Handler alertHandler;
+    private Runnable alertTimeoutRunnable;// ack whether the user has joined the call
+
     private BroadcastReceiver notificationReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("loginnotialert","loginnotialert");
-            FileLogger.d("videologinnotialert","videologinnotialert");
+            Log.d("loginnotialert", "loginnotialert");
+            FileLogger.d("videologinnotialert", "loginnotialert");
+
             if (intent.getAction().equals(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED)) {
+                FileLogger.d("notificationReceiver1", "ACTION_NOTIFICATION_RECEIVED received");
+
                 // Handle the received notification data
                 Bundle notificationData = intent.getBundleExtra(NotificationReceiver.EXTRA_NOTIFICATION_DATA);
+                if (notificationData == null) {
+                    Log.d("notificationReceiver", "notificationData is null");
+                    FileLogger.d("notificationReceiver2", "notificationData is null");
+                    return;
+                }
+
                 title = notificationData.getString("title");
                 body = notificationData.getString("body");
+
+                Log.d("notificationReceiver", "Notification title: " + title);
+                Log.d("notificationReceiver", "Notification body: " + body);
+                FileLogger.d("notificationReceiver3", "Notification title: " + title);
+                FileLogger.d("notificationReceiver4", "Notification body: " + body);
+
                 if (body != null) {
-                    System.out.println("alert success");
-                    // Find the indices of the underscores and "@" symbol
+                    FileLogger.d("notificationReceiver5", "alert success");
+
                     int atSymbolIndex = body.indexOf("@");
                     int hashIndex = body.indexOf("#");
 
-                    if (atSymbolIndex != -1 && hashIndex != -1 && atSymbolIndex < hashIndex)
-                    {
-                        // Extract the username, room name, and token ID
+                    if (atSymbolIndex != -1 && hashIndex != -1 && atSymbolIndex < hashIndex) {
                         roomnameVal = body.substring(0, atSymbolIndex);
                         tokenid = body.substring(atSymbolIndex + 1, hashIndex);
-                        // Extract the value after '#'
                         callStatus = body.substring(hashIndex + 1);
-                        Log.d("callbody", body); // It will be either "True" or "False"
-                        Log.d("CallStatusfrombody", callStatus); // It will be either "True" or "False"
+
+                        Log.d("callbody", body);
+                        Log.d("CallStatusfrombody", callStatus);
                         Log.d("roomnameVal", roomnameVal);
                         Log.d("TokenID", tokenid);
+
+                        FileLogger.d("notificationReceiver6", "callbody: " + body);
+                        FileLogger.d("notificationReceiver7", "CallStatusfrombody: " + callStatus);
+                        FileLogger.d("notificationReceiver8", "roomnameVal: " + roomnameVal);
+                        FileLogger.d("notificationReceiver9", "TokenID: " + tokenid);
 
                         int firstUnderscoreIndex = body.indexOf('_');
                         if (firstUnderscoreIndex != -1) {
                             int secondUnderscoreIndex = body.indexOf('_', firstUnderscoreIndex + 1);
                             if (secondUnderscoreIndex != -1) {
                                 toUsername = body.substring(0, secondUnderscoreIndex);
-                                // Use the toUsername as desired
                                 Log.d("toUsername", toUsername);
+                                FileLogger.d("notificationReceiver10", "toUsername: " + toUsername);
                             } else {
-                                // Only one underscore found in the string
                                 Log.d("CutString", "Only one underscore found");
+                                FileLogger.d("notificationReceiver11", "Only one underscore found");
                             }
                         } else {
-                            // No underscore found in the string
                             Log.d("CutString", "No underscore found");
+                            FileLogger.d("notificationReceiver12", "No underscore found");
                         }
 
+                        FileLogger.d("notificationReceiver13", "Calling startAlertTimer with callStatus: " + callStatus);
                         startAlertTimer(callStatus);
+                    } else {
+                        Log.d("notificationReceiver14", "Invalid body format: missing '@' or '#' or incorrect order");
+                        FileLogger.d("notificationReceiver14", "Invalid body format: missing '@' or '#' or incorrect order");
                     }
+                } else {
+                    Log.d("notificationReceiver", "Notification body is null");
+                    FileLogger.d("notificationReceiver15", "Notification body is null");
                 }
             }
         }
@@ -326,58 +354,124 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
         }
     };
 
+
+
     private void startAlertTimer(String callStatus) {
-        Log.d("callStatus", callStatus);
+      //  Log.d("startAlertTimer", "Invoked with callStatus: " + callStatus);
+        FileLogger.d("startAlertTimer", "Invoked with callStatus: " + callStatus);
+
         latestActivity = ((MyApplication) getApplication()).getLatestActivity();
-        FileLogger.d("videocalllatestActivity: ", String.valueOf(latestActivity));
+       // Log.d("startAlertTimer", "latestActivity: " + latestActivity);
+        FileLogger.d("startAlertTimer", "latestActivity: " + latestActivity);
 
-        // If callStatus is "False", dismiss any existing alert
-        if ("False".equalsIgnoreCase(callStatus)) {
-            if (alertDialog != null && alertDialog.isShowing()) {
-                alertDialog.dismiss();
-                alertDialog = null;
-                FileLogger.d("Call status is False,", "alert dismissed");
-                System.out.println("Call status is False, alert dismissed.");
-            }
+        if (latestActivity == null || latestActivity.isFinishing() || latestActivity.isDestroyed()) {
+            Log.e("startAlertTimer", "latestActivity is invalid. Cannot show dialog.");
+            FileLogger.e("startAlertTimer", "latestActivity is invalid. Cannot show dialog.");
             return;
         }
 
-        // If alert already showing, don't show it again
-        if (alertDialog != null && alertDialog.isShowing()) {
-            return;
-        }
+        latestActivity.runOnUiThread(() -> {
+            if ("False".equalsIgnoreCase(callStatus)) {
+               // Log.d("startAlertTimer", "callStatus is False. Checking existing alertDialog...");
+                FileLogger.d("startAlertTimer", "callStatus is False. Checking existing alertDialog...");
 
-        // callStatus is "True" – show alert dialog
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(latestActivity);
-        alertDialogBuilder.setTitle(title);
-        alertDialogBuilder.setMessage("Do you want to join?");
-        alertDialogBuilder.setCancelable(false);
-
-        alertDialogBuilder.setPositiveButton("Yes", (dialog, which) -> {
-            dialog.dismiss();
-            alertDialog = null;
-            isCallJoined = true;
-            videoCall(roomnameVal, title, latestActivity);
-        });
-
-        alertDialogBuilder.setNegativeButton("No", (dialog, which) -> {
-            dialog.dismiss();
-            alertDialog = null;
-            Toast.makeText(latestActivity, "No clicked", Toast.LENGTH_SHORT).show();
-            callReject(latestActivity);
-        });
-
-        alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-
-        // Auto-dismiss after 2 minutes IF still showing
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            if (alertDialog != null && alertDialog.isShowing()) {
-                alertDialog.dismiss();
-                alertDialog = null;
-                Log.d("AutoDismiss", "Alert dismissed after timeout.");
+                if (alertDialog != null && alertDialog.isShowing()) {
+                    FileLogger.d("startAlertTimer", "alertDialog is showing. Dismissing.");
+                    safelyDismissAlertDialog();
+                    FileLogger.d("startAlertTimer", "alertDialog dismissed.");
+                }
+                return;
             }
-        }, 120000); // 2 minutes = 120000 ms
+
+            if (alertDialog != null) {
+                safelyDismissAlertDialog(); // Dismiss previous alert
+            }
+
+            FileLogger.d("startAlertTimer", "Preparing to show new alert dialog.");
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(latestActivity);
+            alertDialogBuilder.setTitle(title);
+            alertDialogBuilder.setMessage("Do you want to join?");
+            alertDialogBuilder.setCancelable(false);
+
+            alertDialogBuilder.setPositiveButton("Yes", (dialog, which) -> {
+              //  Log.d("AlertDialog", "User clicked YES");
+                FileLogger.d("AlertDialog", "User clicked YES");
+
+                cancelAlertTimer(); // Cancel the 2-minute timeout
+                dialog.dismiss();
+                alertDialog = null;
+                isCallJoined = true;
+                videoCall(roomnameVal, title, latestActivity);
+            });
+
+            alertDialogBuilder.setNegativeButton("No", (dialog, which) -> {
+                //Log.d("AlertDialog", "User clicked NO");
+                FileLogger.d("AlertDialog", "User clicked NO");
+
+                cancelAlertTimer(); // Cancel the 2-minute timeout
+                safelyDismissAlertDialog();
+                Toast.makeText(latestActivity, "No clicked", Toast.LENGTH_SHORT).show();
+                callReject(latestActivity);
+            });
+
+            try {
+                alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+              //  Log.d("startAlertTimer", "Alert dialog shown.");
+                FileLogger.d("startAlertTimer", "Alert dialog shown.");
+            } catch (Exception e) {
+                Log.e("startAlertTimer", "Exception while showing alert dialog", e);
+                FileLogger.e("startAlertTimer", "Exception while showing alert dialog: " + e.getMessage());
+            }
+
+            // Start 2-minute timeout only if no interaction
+            startAlertAutoDismissTimer();
+        });
+    }
+
+    private void startAlertAutoDismissTimer() {
+        cancelAlertTimer(); // Clear previous if any
+
+        alertHandler = new Handler(Looper.getMainLooper());
+        alertTimeoutRunnable = () -> {
+            Log.d("AlertTimer", "2-minute timeout reached. Auto-dismissing alert.");
+            FileLogger.d("AlertTimer", "2-minute timeout reached. Auto-dismissing alert.");
+            safelyDismissAlertDialog();
+        };
+        alertHandler.postDelayed(alertTimeoutRunnable, 120000); // 2 minutes
+    }
+
+    private void cancelAlertTimer() {
+        if (alertHandler != null && alertTimeoutRunnable != null) {
+            alertHandler.removeCallbacks(alertTimeoutRunnable);
+            alertHandler = null;
+            alertTimeoutRunnable = null;
+        }
+    }
+
+    private void safelyDismissAlertDialog() {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (alertDialog != null) {
+                try {
+                    if (alertDialog.isShowing()) {
+                        alertDialog.dismiss();
+                        Log.d("AlertDialog", "Dialog dismissed successfully.");
+                        FileLogger.d("AlertDialog", "Dialog dismissed successfully.");
+                    } else {
+                        Log.d("AlertDialog", "Dialog was not showing.");
+                        FileLogger.d("AlertDialog", "Dialog was not showing.");
+                    }
+                } catch (Exception e) {
+                    Log.e("AlertDialog", "Exception during dismiss: " + e.getMessage());
+                    FileLogger.e("AlertDialog", "Exception during dismiss: " + e.getMessage());
+                } finally {
+                    alertDialog = null;
+                }
+            } else {
+                Log.d("AlertDialog", "alertDialog is already null.");
+                FileLogger.d("AlertDialog", "alertDialog is already null.");
+            }
+        });
     }
 
     private void videoCall(String roomname, String caller, Activity latstActvty)  {
@@ -439,15 +533,11 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
         Log.d("tokenid", tokenid);
         String CALL_REJECT_URL = BASE_URL+ CALL_REJECT +
                 toUsername + "&tokenid="+ tokenid;
-        System.out.println("CALL_REJECT_URL");
-        System.out.println(CALL_REJECT_URL);
         String body =  "Rejected your Call";
         JSONObject parameters = new JSONObject();
         try{
             parameters.put("Title", "");
             parameters.put("Body", body);
-            System.out.println("Formed String is-->"+parameters);
-            System.out.println("Formed CALL_REJECT_URL is-->"+CALL_REJECT_URL);
         } catch (JSONException e) {
             e.printStackTrace();
         }

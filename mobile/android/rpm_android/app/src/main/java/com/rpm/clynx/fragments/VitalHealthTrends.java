@@ -45,9 +45,12 @@ import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.rpm.clynx.activity.ClinicalInfoActivity;
 import com.rpm.clynx.adapter.NewVitalListAdapter;
+import com.rpm.clynx.adapter.VitalReadingsListAdapter;
 import com.rpm.clynx.model.NewVitalsItemModel;
 import com.rpm.clynx.model.NewVitalsModel;
 import com.rpm.clynx.model.VitalItemsModel;
+import com.rpm.clynx.model.VitalReadingsItemModel;
+import com.rpm.clynx.model.VitalReadingsModel;
 import com.rpm.clynx.service.TimeFormatter;
 import com.rpm.clynx.utility.CustomMarkerView;
 import com.rpm.clynx.utility.DataBaseHelper;
@@ -80,10 +83,11 @@ public class VitalHealthTrends extends Fragment {
 
     View view;
     TextView emptyView, emptyChart,textHighlight7,textHighlight30,headername,viewMoreTextView,VitalNameLabel7,VitalNameLabel30 ;
-    RecyclerView recyclerView_newvitals;
-    private List<NewVitalsModel> newVitalsModels;
+   // RecyclerView recyclerView_newvitals;
+    RecyclerView recyclerView_vitalreadings;
+    //private List<NewVitalsModel> newVitalsModels;
     LineChart mpLinechart7, mpLinechart30;
-    private NewVitalListAdapter adapter;
+    //private NewVitalListAdapter adapter;
     RecyclerView.LayoutManager layoutManager;
     DataBaseHelper db;
     SharedPreferences pref;
@@ -112,7 +116,8 @@ public class VitalHealthTrends extends Fragment {
     CardView cardViewLineChart7, cardViewLineChart30;
     private LinearLayout chartHealthTrends,chartHealthTrends30;
     MyMarkerView markerView77,markerView3030;
-
+    private List<VitalReadingsModel> vitalReadingsModels;
+    private VitalReadingsListAdapter adapter;
     public VitalHealthTrends() {
         // Required empty public constructor
     }
@@ -177,7 +182,7 @@ public class VitalHealthTrends extends Fragment {
 
         ProgramTypeName = pref.getString("ProgramTypeName", null);
 
-        recyclerView_newvitals = view.findViewById(R.id.recyclerview_newvitals);
+        //recyclerView_newvitals = view.findViewById(R.id.recyclerview_newvitals);
         emptyView = (TextView) view.findViewById(R.id.empty_viewnew);
         emptyChart = (TextView) view.findViewById(R.id.empty_viewnew);
 
@@ -323,18 +328,25 @@ public class VitalHealthTrends extends Fragment {
             }
         });
 
-        layoutManager = new LinearLayoutManager(getContext());
-        newVitalsModels = new ArrayList<>();
-        adapter = new NewVitalListAdapter( newVitalsModels,getContext());
-        recyclerView_newvitals.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        recyclerView_newvitals.setAdapter(adapter);
+       // layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        // newVitalsModels = new ArrayList<>();
+        vitalReadingsModels = new ArrayList<>();
+        adapter = new VitalReadingsListAdapter(vitalReadingsModels,getContext());
+        //adapter = new NewVitalListAdapter( newVitalsModels,getContext());
+        recyclerView_vitalreadings =  view.findViewById(R.id.fragmentHTVitalReadings);
+        recyclerView_vitalreadings.setLayoutManager(layoutManager);
+        recyclerView_vitalreadings.setAdapter(adapter);
+
+        //  recyclerView_newvitals.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+       // recyclerView_newvitals.setAdapter(adapter);
         curDay = view.findViewById(R.id.VitalFragment_today_dt);
 
         DateTime curdt = new DateTime(dt);
         getLocalToUTCDate(dt);
         Log.d("current date",getLocalToUTCDate(dt));
 
-        checkvitels(curdt,curdt);
+        checkvitels(curdt.toString(),curdt.toString());
         curDay.setText(spdf.format(curdt.toDate()));
         return  view;
     }
@@ -368,7 +380,7 @@ public class VitalHealthTrends extends Fragment {
         Log.d("day1",spdff.format(dtPlusOne.toDate()));
         Log.d("daycurdt1",spdff.format(curdt.toDate()));
 
-        checkvitels(dtPlusOne,dtPlusOne);
+        checkvitels(dtPlusOne.toString(),dtPlusOne.toString());
     }
 
     private void nextDateVital() throws ParseException {
@@ -381,131 +393,164 @@ public class VitalHealthTrends extends Fragment {
         Log.d("nextDateaddsOne",dtPlusOne.toString());
         Log.d("nextDatecurdt",curdt.toString());
 
-        checkvitels(dtPlusOne,dtPlusOne);
+        checkvitels(dtPlusOne.toString(),dtPlusOne.toString());
         Log.d("day1",spdf.format(dtPlusOne.toDate()));
     }
 
-    private void checkvitels(DateTime startDate, DateTime endDate) {
-        Log.d("startDate",startDate.toString());
-        Log.d("endDate",endDate.toString());
-        Log.d("day1startDate",spdff.format(startDate.toDate()));
-        Log.d("daycurdt1endDate",spdff.format(endDate.toDate()));
-        String asubstring1 =  spdff.format(startDate.toDate()).substring(0, 10);
-        Log.d("substr1", asubstring1);
-        String result1 = asubstring1+"T00:00:00";
-        Log.d("result1", result1);
-        String utcDateStrstart = DateUtils.convertToUTC(result1, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss");
-        Log.d("utcDateStrstart", utcDateStrstart);
-        String asubstring2 =  spdff.format(endDate.toDate()).substring(0, 10);
-        Log.d("substr2", asubstring2);
-        String result2 = asubstring2+"T23:59:59";
-        Log.d("result2", result2);
-        String utcDateStrend = DateUtils.convertToUTC(result2, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss");
-        Log.d("utcDateStrend", utcDateStrend);
+    private void checkvitels(String startDate, String endDate) {
+        Log.d("startDateschedules", startDate);
+        String getStartDate = DateUtils.getStartDateOnly(startDate);
+        Log.d("getStartDate", getStartDate);
+        String vrstdt = getStartDate + "T00:00:00";
+        Log.d("vrstdt", vrstdt);
+        String vrUtcStDate = DateUtils.convertToUTC(vrstdt, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss");
+        Log.d("HTUtcStDate", vrUtcStDate);
+        Log.d("endDate schedules", endDate);
+        String getEndDate = DateUtils.getStartDateOnly(endDate);
+        Log.d("getEndDate", getEndDate);
+        String vrenddt = getEndDate + "T23:59:59";
+        Log.d("vrenddt", vrenddt);
+        String vrUtcEndDate = DateUtils.convertToUTC(vrenddt, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss");
+        Log.d("HTUtcEndDate", vrUtcEndDate);
 
-        String url = Links.BASE_URL+  Links.VITALS + "StartDate=" +
-                utcDateStrstart
-                +
-                "&EndDate=" +
-                utcDateStrend
-                ;
-        final Loader l1 = new Loader(getActivity());
-        Log.d("url",url.toString());
-        l1.show("Please wait...");
+        String url = Links.BASE_URL + Links.GET_VITALREADINGS +
+                "StartDate=" + vrUtcStDate + "&EndDate=" + vrUtcEndDate;
 
-        newVitalsModels.clear();
-        aList.clear();
+        final Loader loader = new Loader(getActivity());
+        loader.show("Please wait...");
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onResponse(String response) {
-                Log.d("VITALresponse",response.toString());
+        vitalReadingsModels.clear();
+        Log.d("vitalHTurl", url);
 
-                JSONArray jsonArray=null;
-                JSONArray jsonArray1=null;
-                JSONArray jsonArray3=null;
-
-                l1.dismiss();
-
-                try {
-                    JSONObject jsonObject = new JSONObject(response);
-                    jsonArray = new JSONArray(jsonObject.getString("vitals"));
-                    Log.d("vhjsonArray",jsonArray.toString());
-
-                    for (int i = 0; i < jsonArray.length(); i++){
-                        recyclerView_newvitals.setVisibility(View.VISIBLE);
-                        emptyView.setVisibility(View.GONE);
-                        try {
-                            JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-                            NewVitalsModel newVitalsModel = new NewVitalsModel();
-                            newVitalsModel.setVitalName(jsonObject1.getString("VitalName"));
-                            String vitalname = jsonObject1.getString("VitalName");
-                            jsonArray1 = new JSONArray(jsonObject1.getString("VitalDetails"));
-                            Log.d("vitaldetailsaray", jsonArray1.toString());
-
-                            for (int j = 0; j < jsonArray1.length(); j++) {
-                                JSONObject jsonObject2 = jsonArray1.getJSONObject(j);
-                                Log.i("jsonobject2index", jsonObject2.toString());
-                                jsonArray3 = new JSONArray(jsonObject2.getString("Vitaldata"));
-                                Log.d("vitaldetailsaray3", jsonArray3.toString());
-                                Log.i("jsonarray3", jsonArray3.toString());
-
-                                ArrayList<NewVitalsItemModel> nim = new ArrayList<NewVitalsItemModel>();
-                                for (int k = 0; k < jsonArray3.length(); k++) {
-                                    JSONObject jsonObject3 = jsonArray3.getJSONObject(k);
-                                    Log.i("value", jsonObject3.getString("Value"));
-                                    Log.i("value", jsonObject3.getString("unit"));
-                                    Log.i("length", String.valueOf(k));
-
-                                    String utcTime = uTCToLocal("yyyy/MM/dd'T'HH:mm:ss","h:mm a" , jsonObject3.getString("time"));
-                                    if(vitalname.equals("Blood Glucose")) {
-                                        nim.add(new NewVitalsItemModel(jsonObject3.getString("Value"), jsonObject3.getString("unit"), jsonObject3.getString("MeasureName"), utcTime));
-                                    }
-                                    else
-                                    {
-                                        nim.add(new NewVitalsItemModel(jsonObject3.getString("Value"), jsonObject3.getString("unit"),"", utcTime));
-                                    }
-                                    Log.d("nimNoti", nim.toString());
-                                }
-                                newVitalsModels.add(new NewVitalsModel( jsonObject1.getString("VitalName"),nim));
-                                adapter.notifyDataSetChanged();
-                            }
-                        } catch(JSONException e){
-                            e.printStackTrace();
-                        } finally{
-                            adapter.notifyDataSetChanged();
-                        }
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                response -> {
+                    loader.dismiss();
+                    try {
+                        JSONObject jsonObject = new JSONObject(response);
+                        parseHTVitalReadings(jsonObject);
+                        adapter.notifyDataSetChanged();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                if (jsonArray.length()<=0){
-                    recyclerView_newvitals.setVisibility(View.GONE);
-                    emptyView.setVisibility(View.VISIBLE);
-                }
-            }
-        } ,new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getContext(), "No data available!", Toast.LENGTH_SHORT).show();
-                l1.dismiss();
-            }
-        }){
-
+                },
+                error -> {
+                    Toast.makeText(getContext(), "No data available!", Toast.LENGTH_SHORT).show();
+                    loader.dismiss();
+                }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
-                headers.put("Bearer",Token);
-                Log.d("headers_myprofileandprogram",headers.toString());
-                Log.d("Token_myprofileandprogram", Token);
+                headers.put("Bearer", Token);
+                Log.d("headers", headers.toString());
                 return headers;
             }
         };
+
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(stringRequest);
+    }
+
+    private void parseHTVitalReadings(JSONObject jsonObject) {
+        Map<String, String> vitalTypeMapping = new HashMap<>();
+        vitalTypeMapping.put("BloodPressure", "Blood Pressure");
+        vitalTypeMapping.put("BloodGlucose", "Blood Glucose");
+        vitalTypeMapping.put("Weight", "Weight");
+        vitalTypeMapping.put("BloodOxygen", "Blood Oxygen");
+
+        for (String key : vitalTypeMapping.keySet()) {
+            if (!jsonObject.has(key) || jsonObject.isNull(key)) {
+                // Skip null vitals (e.g., BloodGlucose is null)
+                continue;
+            }
+
+            JSONArray jsonArray = jsonObject.optJSONArray(key);
+            ArrayList<VitalReadingsItemModel> items = parseHTVitalData(jsonArray, key);
+
+            if (jsonArray != null && jsonArray.length() == 0) {
+                // Add "No Readings" if the array is empty ([])
+                items.add(createHTNoReadingsItem(key));
+            }
+
+            //  Always add each vital type with data (or "No Readings" if empty)
+            vitalReadingsModels.add(new VitalReadingsModel(vitalTypeMapping.get(key), items));
+        }
+    }
+
+    private ArrayList<VitalReadingsItemModel> parseHTVitalData(JSONArray jsonArray, String type) {
+        ArrayList<VitalReadingsItemModel> items = new ArrayList<>();
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                JSONObject obj = jsonArray.getJSONObject(i);
+                String VRutcTime = DateUtils.convertUtcToLocalFormatted(obj.getString("ReadingTime"), "MMM dd, hh:mm a");
+
+                switch (type) {
+                    case "BloodPressure":
+                        items.add(new VitalReadingsItemModel(
+                                obj.getString("Systolic"),
+                                obj.getString("Diastolic"),
+                                obj.getString("pulse"),
+                                "", "", "", "", "",
+                                VRutcTime,
+                                obj.getString("SystolicStatus"),
+                                obj.getString("DiastolicStatus"),
+                                obj.getString("pulseStatus"),
+                                obj.getString("Status"),
+                                "", ""
+                        ));
+                        break;
+
+                    case "BloodGlucose":
+                        items.add(new VitalReadingsItemModel(
+                                "", "", "", "", "", "",
+                                obj.optString("BGmgdl", "No Readings"),
+                                obj.optString("Schedule", "No Readings"),
+                                VRutcTime, "", "", "",
+                                obj.optString("Status", "No Readings"),
+                                "", ""
+                        ));
+                        break;
+
+                    case "BloodOxygen":
+                        items.add(new VitalReadingsItemModel(
+                                "", "", "",
+                                obj.getString("Oxygen"),
+                                obj.getString("Pulse"),
+                                "", "", "",
+                                VRutcTime, "", "", "",
+                                obj.getString("Status"),
+                                obj.getString("OxygenStatus"),
+                                obj.getString("PulseStatus")
+                        ));
+                        break;
+
+                    case "Weight":
+                        items.add(new VitalReadingsItemModel(
+                                "", "", "", "", "",
+                                obj.optString("BWlbs", "No Readings"),
+                                "", "",
+                                VRutcTime, "", "", "",
+                                obj.optString("Status", "No Readings"),
+                                "", ""
+                        ));
+                        break;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return items;
+    }
+
+    private VitalReadingsItemModel createHTNoReadingsItem(String type) {
+        return new VitalReadingsItemModel(
+                "No Readings", "", "", "", "",
+                "", "", "",
+                "", "", "", "",
+                "", "", ""
+        );
     }
 
     private void initPerformBackClick() {
@@ -904,21 +949,4 @@ public class VitalHealthTrends extends Fragment {
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(stringRequest);
     }
-
-    public static String uTCToLocal(String dateFormatInPut, String dateFomratOutPut, String datesToConvert) {
-        String dateToReturn = datesToConvert;
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormatInPut);
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        Date gmt = null;
-        SimpleDateFormat sdfOutPutToSend = new SimpleDateFormat(dateFomratOutPut);
-        sdfOutPutToSend.setTimeZone(TimeZone.getDefault());
-
-        try {
-            gmt = sdf.parse(datesToConvert);
-            dateToReturn = sdfOutPutToSend.format(gmt);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return dateToReturn; }
 }

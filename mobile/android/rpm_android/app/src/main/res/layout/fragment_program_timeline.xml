@@ -5,7 +5,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
 xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
-android:background="@color/background3"
+android:background="@color/background_grey1"
 tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
 
 <androidx.constraintlayout.widget.ConstraintLayout
@@ -64,7 +64,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_marginTop="@dimen/spacing_xmedium"
-                        android:background="@drawable/myinfo_card_bg_radius"
+                        android:background="@drawable/pgm_info_bg"
                         android:gravity="center">
 
                         <TextView
@@ -93,7 +93,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_marginTop="@dimen/spacing_xmedium"
-                        android:background="@drawable/myinfo_card_bg_radius"
+                        android:background="@drawable/pgm_info_bg"
                         android:gravity="center">
 
                         <TextView
@@ -123,7 +123,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_marginTop="@dimen/spacing_xmedium"
-                        android:background="@drawable/myinfo_card_bg_radius"
+                        android:background="@drawable/pgm_info_bg"
                         android:gravity="center">
 
                         <TextView
@@ -152,7 +152,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_marginTop="@dimen/spacing_xmedium"
-                        android:background="@drawable/myinfo_card_bg_radius"
+                        android:background="@drawable/pgm_info_bg"
                         android:gravity="center">
 
                         <TextView
@@ -182,7 +182,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_marginTop="@dimen/spacing_xmedium"
-                        android:background="@drawable/myinfo_card_bg_radius"
+                        android:background="@drawable/pgm_info_bg"
                         android:gravity="center">
 
                         <TextView
@@ -240,7 +240,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_marginTop="@dimen/spacing_xmedium"
-                        android:background="@drawable/myinfo_card_bg_radius"
+                        android:background="@drawable/pgm_info_bg"
                         android:gravity="center">
 
                         <TextView
@@ -270,7 +270,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_marginTop="@dimen/spacing_xmedium"
-                        android:background="@drawable/myinfo_card_bg_radius"
+                        android:background="@drawable/pgm_info_bg"
                         android:gravity="center">
 
                         <TextView
@@ -315,7 +315,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_marginTop="@dimen/spacing_xmedium"
-                        android:background="@drawable/myinfo_card_bg_radius"
+                        android:background="@drawable/pgm_info_bg"
                         android:gravity="center">
 
                         <TextView
@@ -346,7 +346,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_marginTop="@dimen/spacing_xmedium"
-                        android:background="@drawable/myinfo_card_bg_radius"
+                        android:background="@drawable/pgm_info_bg"
                         android:gravity="center">
 
                         <TextView
@@ -375,7 +375,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_marginTop="@dimen/spacing_xmedium"
-                        android:background="@drawable/myinfo_card_bg_radius"
+                        android:background="@drawable/pgm_info_bg"
                         android:gravity="center">
 
                         <TextView

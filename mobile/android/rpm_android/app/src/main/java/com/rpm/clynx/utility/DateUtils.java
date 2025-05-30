@@ -24,6 +24,13 @@ public class DateUtils {
         }
     }
 
+    public static String getStartDateOnly(String dateTimeString) {
+        if (dateTimeString == null || !dateTimeString.contains("T")) {
+            return dateTimeString; // return as-is if format is unexpected
+        }
+        return dateTimeString.split("T")[0]; // splits at 'T' and returns the date part
+    }
+
     public static String convertUtcToLocalFormatted(String utcDateStr, String outputFormatStr) {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));

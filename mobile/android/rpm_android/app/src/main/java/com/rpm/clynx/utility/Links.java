@@ -28,7 +28,8 @@ public class Links {
 
     //public static  final String VITAL_SUMMARY= "/patient/getRecentPatientVitalSummary";
     public static  final String VITAL_SUMMARY= "/patients/getpatienthealthtrends?";
-    public static  final String VITALS= "/patient/getVitalSummaryDetails?";
+
+    //public static  final String VITALS= "/patient/getVitalSummaryDetails?";
     //public static  final String VITALHEALTHTRENDS30 = "/patient/getPatientVitalSummary?dayCount=30";
     //public static  final String VITALHEALTHTRENDS7 = "/patient/getPatientVitalSummary?dayCount=7";
     // public static  final String VITALHEALTHTRENDS30 = "/patient/getPatientVitalSummary?";

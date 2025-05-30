@@ -375,23 +375,29 @@ public class VideoCallTwilio extends AppCompatActivity {
         updateAudioDeviceIcon(audioSwitch.getSelectedAudioDevice());
         return true;
     }
+    private boolean shouldCallSuperBack = false;
+
+
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (shouldCallSuperBack) {
+            super.onBackPressed(); // linter is happy now
+            return;
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Do you want to exit?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // Exit the app or perform any other desired action
                         room.disconnect();
-                        finish();
+                        shouldCallSuperBack = true;
+                        onBackPressed(); // triggers super now
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // Continue with the current activity
                         dialog.dismiss();
                     }
                 })
@@ -927,14 +933,6 @@ public class VideoCallTwilio extends AppCompatActivity {
                 remoteParticipantval =  room.getRemoteParticipants();
                 Log.d("remotepartys", String.valueOf(remoteParticipantval));
 
-//                if(remoteParticipantval.size() == 0)
-//                {
-//                    Log.d("size", String.valueOf(remoteParticipantval.size()));
-//                    room.disconnect();
-//                    finish();
-//                    Toast.makeText(((MyApplication) getApplication()).getLatestActivity(), "Video Call Expired", Toast.LENGTH_LONG).show();
-//                }
-//                else {
                     System.out.println(localParticipant);
                     setTitle(room.getName());
 
@@ -946,7 +944,6 @@ public class VideoCallTwilio extends AppCompatActivity {
                 }
                     editor.putBoolean("onCall", true);
                     editor.apply();
-               // }
             }
 
             @Override
