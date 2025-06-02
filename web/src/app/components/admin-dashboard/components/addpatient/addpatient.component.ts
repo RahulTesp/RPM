@@ -1744,4 +1744,15 @@ export class AddpatientComponent implements OnInit {
       }
     );
   }
+    convertToLocalTime(stillUtc: any) {
+    if (stillUtc) {
+      if (stillUtc.includes('+')) {
+        var temp = stillUtc.split('+');
+        stillUtc = temp[0];
+      }
+    }
+    stillUtc = stillUtc + 'Z';
+    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    return local;
+  }
 }
