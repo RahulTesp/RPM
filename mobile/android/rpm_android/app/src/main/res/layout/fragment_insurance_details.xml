@@ -70,15 +70,6 @@
                             tools:listitem="@layout/insurance_item_list"
                             app:layout_constraintTop_toBottomOf="@+id/insno" />
 
-<!--                        <TextView-->
-<!--                            android:id="@+id/empty_viewInsur"-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="match_parent"-->
-<!--                            android:gravity="center"-->
-<!--                            android:visibility="gone"-->
-<!--                            android:layout_marginTop="10dp"-->
-<!--                            android:text="@string/no_data_available" />-->
-
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="700dp"/>

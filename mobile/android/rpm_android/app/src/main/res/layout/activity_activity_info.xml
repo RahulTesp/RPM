@@ -64,44 +64,13 @@
             app:tabIndicatorColor="@color/colorPrimary"
             app:tabInlineLabel="true"
             app:tabSelectedTextColor="@color/colorPrimary"
-
-
             app:tabTextAppearance="@style/CustomTextAppearanceTab">
-
-
-<!--            app:tabInlineLabel="true"-->
-
-<!--            app:tabIconTint="@color/unselected_color"-->
-<!--            app:tabSelectedIconColor="@color/blue_A40"-->
-
-<!--            app:tabSelectedTextColor="@color/colorAccent"-->
-<!--            app:tabTextColor="@color/green_800"-->
-
-            <!--            app:tabIndicatorColor="@color/indigo_A700"-->
-
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:icon="@drawable/icons_settings"
-
                 />
-
-            <!--            <ImageView-->
-            <!--                android:layout_width="60dp"-->
-            <!--                android:layout_height="70dp"-->
-
-            <!--                android:padding="10dp"-->
-            <!--                android:src="@drawable/icons_program" />-->
-
-
-
-            <!--            android:text="Communication"-->
-
-            <!--            android:text="Preference"-->
-
-
 
         </com.google.android.material.tabs.TabLayout>
 

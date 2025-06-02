@@ -71,17 +71,6 @@ tools:context="com.rpm.clynx.activity.ClinicalInfoActivity">
         app:tabSelectedTextColor="@color/colorPrimary"
         app:tabTextAppearance="@style/CustomTextAppearanceTab">
 
-<!--        app:tabIconTint="@color/unselected_color"-->
-<!--        app:tabSelectedIconColor="@color/blue_A40"-->
-
-<!--        app:tabSelectedTextColor="@color/colorAccent"-->
-<!--        app:tabTextColor="@color/green_800"-->
-
-
-
-        <!--            app:tabIndicatorColor="@color/indigo_A700"-->
-
-
         <com.google.android.material.tabs.TabItem
             android:id="@+id/tab1"
             android:layout_width="wrap_content"
@@ -90,14 +79,6 @@ tools:context="com.rpm.clynx.activity.ClinicalInfoActivity">
 
             />
 
-        <!--            <ImageView-->
-        <!--                android:layout_width="60dp"-->
-        <!--                android:layout_height="70dp"-->
-
-        <!--                android:padding="10dp"-->
-        <!--                android:src="@drawable/icons_program" />-->
-
-
         <com.google.android.material.tabs.TabItem
             android:id="@+id/tab2"
             android:layout_width="wrap_content"
@@ -105,14 +86,12 @@ tools:context="com.rpm.clynx.activity.ClinicalInfoActivity">
             android:icon="@drawable/icons_settings"
 
             />
-        <!--            android:text="Communication"-->
+
         <com.google.android.material.tabs.TabItem
             android:id="@+id/tab3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:icon="@drawable/icons_settings" />
-        <!--            android:text="Preference"-->
-
 
     </com.google.android.material.tabs.TabLayout>
 

@@ -62,14 +62,6 @@ tools:context="com.rpm.clynx.fragments.DeviceDetailsFragment">
                         tools:listitem="@layout/device_item_list"
                         app:layout_constraintTop_toBottomOf="@+id/devno" />
 
-<!--                    <TextView-->
-<!--                        android:id="@+id/empty_viewDD"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        android:gravity="center"-->
-<!--                        android:visibility="gone"-->
-<!--                        android:text="@string/no_data_available" />-->
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="300dp"/>
