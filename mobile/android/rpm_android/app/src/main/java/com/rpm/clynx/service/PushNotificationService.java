@@ -84,6 +84,7 @@ SharedPreferences pref;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
+
     public void onMessageReceived(RemoteMessage remoteMessage) {
         Log.d("remoteMessageRCVD", remoteMessage.toString());
         FileLogger.d("remoteMessageRCVD", remoteMessage.toString());
@@ -95,103 +96,103 @@ SharedPreferences pref;
             sendBroadcast(intent);
         } else {
             Log.d("remoteMessageRCVD", "Dashboard or Notification Fragment not visible, not sending broadcast");
+            FileLogger.d("remoteMessageRCVD", "Dashboard or Notification Fragment not visible, not sending broadcast");
         }
 
-        //  Check if message contains a notification payload
         if (remoteMessage.getNotification() != null) {
             Log.d("Notification", "Notification Payload Received");
+            FileLogger.d("Notification", "Notification Payload Received");
             String title = remoteMessage.getNotification().getTitle();
             String body = remoteMessage.getNotification().getBody();
             Log.d("FCM", "Title: " + title + ", Body: " + body);
+            FileLogger.d("FCM", "Title: " + title + ", Body: " + body);
         }
 
-        //  Check if message contains a data payload
         if (remoteMessage.getData().size() > 0) {
             Log.d("Data", "Data Payload Received");
+            FileLogger.d("Data", "Data Payload Received");
             Map<String, String> data = remoteMessage.getData();
             for (Map.Entry<String, String> entry : data.entrySet()) {
                 Log.d("FCM", "Key: " + entry.getKey() + ", Value: " + entry.getValue());
+                FileLogger.d("FCM", "Key: " + entry.getKey() + ", Value: " + entry.getValue());
             }
         }
 
-             title = remoteMessage.getData().get("Title");  // Key is case-sensitive
-            String videoCallbody = remoteMessage.getData().get("Body");
-            Log.d("TwilioChatRECEIVED", "Push notification received!");
-            Log.d("TwilioChatData", String.valueOf(remoteMessage.getData()));
-            Log.d("TwilioChat", "Push received from: " + remoteMessage.getFrom());
-
-        // Extract message type
+        title = remoteMessage.getData().get("Title");
+        String videoCallbody = remoteMessage.getData().get("Body");
         String messageType = remoteMessage.getData().get("twi_message_type");
 
-        // Check if it's a new Twilio message
         if ("twilio.conversations.new_message".equals(messageType)) {
-            // Extract conversation title and message body
-            String conversationTitle = remoteMessage.getData().get("conversation_title"); // Chat name
-            String rawMessageBody = remoteMessage.getData().get("twi_body"); // Full message with sender info
-            // Extract only the actual message after ":"
+            String conversationTitle = remoteMessage.getData().get("conversation_title");
+            String rawMessageBody = remoteMessage.getData().get("twi_body");
             String messageBody = extractMessageContent(rawMessageBody);
 
-            // Default values if null
             String title = (conversationTitle != null) ? conversationTitle : "New Chat Message";
             String body = (messageBody != null) ? messageBody : "You have a new message";
 
-            // Show the notification
+            FileLogger.d("TwilioChatNotification", "Title: " + title + ", Message: " + body);
             showChatNotification(getApplicationContext(), title, body);
         }
 
-        Log.d("From",remoteMessage.getFrom());
-        Log.d("From", String.valueOf(remoteMessage));
+        Log.d("From", remoteMessage.getFrom());
+        FileLogger.d("From", remoteMessage.getFrom());
         Log.d("remoteMessagetData", String.valueOf(remoteMessage.getData()));
+        FileLogger.d("remoteMessagetData", String.valueOf(remoteMessage.getData()));
         Log.d("remoteMessagetNotification", String.valueOf(remoteMessage.getNotification()));
+        FileLogger.d("remoteMessagetNotification", String.valueOf(remoteMessage.getNotification()));
 
         latestActivity = ((MyApplication) getApplication()).getLatestActivity();
-
         Log.d("pushservclatestActivity", String.valueOf(latestActivity));
+        FileLogger.d("pushservclatestActivity", String.valueOf(latestActivity));
+
         MyApplication appFG = (MyApplication) getApplicationContext();
         Log.d("appFG", String.valueOf(appFG.isAppInForeground()));
+        FileLogger.d("appFG", String.valueOf(appFG.isAppInForeground()));
 
-            System.out.println("remoteMessage");
-            System.out.println(remoteMessage);
+        System.out.println("remoteMessage");
+        System.out.println(remoteMessage);
+        FileLogger.d("SystemOutRemoteMessage", remoteMessage.toString());
 
-                if (appFG.isAppInForeground()) {
-                    Log.d("myApplicationisAppInForeground","myApplicationisAppInForeground");
-                        System.out.println("iaminforegnd");
+        if (appFG.isAppInForeground()) {
+            Log.d("myApplicationisAppInForeground", "myApplicationisAppInForeground");
+            FileLogger.d("myApplicationisAppInForeground", "myApplicationisAppInForeground");
+            System.out.println("iaminforegnd");
+            FileLogger.d("SystemOut", "iaminforegnd");
 
-                    // Create an intent for the notification data
-                    Bundle notificationData = new Bundle();
-                    notificationData.putString("title",remoteMessage.getData().get("Title"));
-                    notificationData.putString("body", remoteMessage.getData().get("Body"));
+            Bundle notificationData = new Bundle();
+            notificationData.putString("title", remoteMessage.getData().get("Title"));
+            notificationData.putString("body", remoteMessage.getData().get("Body"));
 
-                    Log.d("NotificationonCall", String.valueOf(pref.getBoolean("onCall", false)));
+            Log.d("NotificationonCall", String.valueOf(pref.getBoolean("onCall", false)));
+            FileLogger.d("NotificationonCall", String.valueOf(pref.getBoolean("onCall", false)));
 
-                    onCallstatus = pref.getBoolean("onCall", false);
-                    FileLogger.d("onCallstatus1", String.valueOf(onCallstatus));
-                    if (onCallstatus == false) {
-                        Log.d("onCallstatus", String.valueOf(onCallstatus));
-                        FileLogger.d("onCallstatus2", String.valueOf(onCallstatus));
-                        Log.d("latestActivity", String.valueOf(latestActivity));
-                        Log.d("notificationData", String.valueOf(notificationData));
-                        FileLogger.d("notificationData", String.valueOf(notificationData));
-                        Intent intentnew = new Intent(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED);
-                        intentnew.putExtra(NotificationReceiver.EXTRA_NOTIFICATION_DATA, notificationData);
-                        Log.d("sendingvdbroadcast","sendingvdbroadcast");
-                        LocalBroadcastManager.getInstance(latestActivity).sendBroadcast(intentnew);
-                   Log.d("sendvidbroadcast","sendvidbroadcast");
-                    }
+            onCallstatus = pref.getBoolean("onCall", false);
+            FileLogger.d("onCallstatus1", String.valueOf(onCallstatus));
+            if (!onCallstatus) {
+                Log.d("onCallstatus", String.valueOf(onCallstatus));
+                FileLogger.d("onCallstatus2", String.valueOf(onCallstatus));
+                Log.d("latestActivity", String.valueOf(latestActivity));
+                FileLogger.d("latestActivity", String.valueOf(latestActivity));
+                Log.d("notificationData", String.valueOf(notificationData));
+                FileLogger.d("notificationData", String.valueOf(notificationData));
 
-                    else {
-                    }
-                }
-
-                else if (!(appFG.isAppInForeground()))
-                {
-                    Log.d("myApplicationisAppInbg","myApplicationisAppInbg");
-                    // App is in the background → Show notification in the notification panel
-                    showMissedCallNoti(title);
-                    // Handle the received notification here
-                    System.out.println(appFG.isAppInForeground());
-                }
+                Intent intentnew = new Intent(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED);
+                intentnew.putExtra(NotificationReceiver.EXTRA_NOTIFICATION_DATA, notificationData);
+                Log.d("sendingvdbroadcast", "sendingvdbroadcast");
+                FileLogger.d("sendingvdbroadcast", "sendingvdbroadcast");
+                LocalBroadcastManager.getInstance(latestActivity).sendBroadcast(intentnew);
+                Log.d("sendvidbroadcast", "sendvidbroadcast");
+                FileLogger.d("sendbroadcastdone", "sendbroadcastdone");
+            } else {
+                FileLogger.d("onCallstatus", "Call already active. Skipping notification broadcast.");
+            }
+        } else {
+            Log.d("myApplicationisAppInbg", "myApplicationisAppInbg");
+            FileLogger.d("myApplicationisAppInbg", "myApplicationisAppInbg");
+            showMissedCallNoti(title);
+            FileLogger.d("MissedCallNotification", "Notification triggered in background.");
         }
+    }
 
     private void showMissedCallNoti(String callerName) {
         Log.d("showMissedvideocl", "showMissedvideocl");

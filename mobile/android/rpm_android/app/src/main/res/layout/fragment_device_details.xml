@@ -4,12 +4,24 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
 xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
-android:background="@color/background3"
+android:background="@color/background_grey1"
 tools:context="com.rpm.clynx.fragments.DeviceDetailsFragment">
 
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/empty_viewDD"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_data_available"
+        android:visibility="gone"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -49,14 +61,6 @@ tools:context="com.rpm.clynx.fragments.DeviceDetailsFragment">
                         tools:context="com.rpm.clynx.fragments.DeviceDetailsFragment"
                         tools:listitem="@layout/device_item_list"
                         app:layout_constraintTop_toBottomOf="@+id/devno" />
-
-                    <TextView
-                        android:id="@+id/empty_viewDD"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:visibility="gone"
-                        android:text="@string/no_data_available" />
 
                     <View
                         android:layout_width="match_parent"

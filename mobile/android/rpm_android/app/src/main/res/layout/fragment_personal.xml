@@ -71,7 +71,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_marginTop="@dimen/spacing_xmedium"
-                            android:background="@drawable/myinfo_card_bg_radius"
+                            android:background="@drawable/pgm_info_bg"
                             android:gravity="center">
 
                             <TextView
@@ -113,7 +113,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="40dp"
                                     android:layout_marginTop="@dimen/spacing_middle"
-                                    android:background="@drawable/myinfo_card_bg_radius"
+                                    android:background="@drawable/pgm_info_bg"
                                     android:gravity="center">
 
                                     <TextView
@@ -155,7 +155,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="40dp"
                                     android:layout_marginTop="10dp"
-                                    android:background="@drawable/myinfo_card_bg_radius"
+                                    android:background="@drawable/pgm_info_bg"
                                     android:gravity="center">
 
                                     <TextView
@@ -189,7 +189,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_marginTop="10dp"
-                            android:background="@drawable/myinfo_card_bg_radius"
+                            android:background="@drawable/pgm_info_bg"
                             android:gravity="center">
 
                             <TextView
@@ -220,7 +220,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_marginTop="10dp"
-                            android:background="@drawable/myinfo_card_bg_radius"
+                            android:background="@drawable/pgm_info_bg"
                             android:gravity="center">
 
                             <TextView
@@ -262,7 +262,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="40dp"
                                     android:layout_marginTop="10dp"
-                                    android:background="@drawable/myinfo_card_bg_radius"
+                                    android:background="@drawable/pgm_info_bg"
                                     android:gravity="center">
 
                                     <TextView
@@ -305,7 +305,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="40dp"
                                     android:layout_marginTop="10dp"
-                                    android:background="@drawable/myinfo_card_bg_radius"
+                                    android:background="@drawable/pgm_info_bg"
                                     android:gravity="center">
 
                                     <TextView
@@ -356,7 +356,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="40dp"
                                 android:layout_marginTop="10dp"
-                                android:background="@drawable/myinfo_card_bg_radius"
+                                android:background="@drawable/pgm_info_bg"
                                 android:gravity="center">
 
                                 <TextView
@@ -386,7 +386,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="40dp"
                                 android:layout_marginTop="10dp"
-                                android:background="@drawable/myinfo_card_bg_radius"
+                                android:background="@drawable/pgm_info_bg"
                                 android:gravity="center">
 
                                 <TextView
@@ -416,7 +416,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="40dp"
                                 android:layout_marginTop="10dp"
-                                android:background="@drawable/myinfo_card_bg_radius"
+                                android:background="@drawable/pgm_info_bg"
                                 android:gravity="center">
 
                                 <TextView
