@@ -1492,6 +1492,48 @@ namespace RpmCloud.Controllers
             }
         }
 
+        [Route("getpatientnotesbyprogramid")]
+        [HttpGet]
+        public IActionResult GetPatientNotes([FromQuery] int ProgramId, [FromQuery] string Type, [FromQuery] int PatientNoteId)
+        {
+
+            try
+            {
+                if (Request.Headers.ContainsKey("Bearer"))
+                {
+                    string? s = Request.Headers["Bearer"].FirstOrDefault();
+                    RpmDalFacade.ConnectionString = CONN_STRING;
+                    if (string.IsNullOrEmpty(s))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    string UserName = RpmDalFacade.IsSessionValid(s);
+                    if (string.IsNullOrEmpty(UserName))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    if (!RpmDalFacade.ValidateTkn(s))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    GetPatientNotesQA GetPatientNotes = RpmDalFacade.GetPatientNotes(ProgramId, Type, PatientNoteId, UserName);
+                    // List<NotesProgramMaster> GetMasterDataNotes = RpmDalFacade.GetMasterDataNotes(UserName);
+                    if (!GetPatientNotes.Equals(null))
+                    {
+                        return Ok(JsonConvert.SerializeObject(GetPatientNotes, Formatting.Indented));
+                    }
+                    return NotFound("Could not find patient details");
+                }
+                else
+                {
+                    return Unauthorized(new { message = "Invalid session." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [Route("getpatientcallnotesbyid")]
         [HttpGet]
         public IActionResult getpatientcallnotesbyid([FromQuery] int PatientNoteId)

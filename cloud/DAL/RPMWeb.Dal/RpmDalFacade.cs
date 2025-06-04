@@ -536,6 +536,10 @@ namespace RPMWeb.Dal
         {
             return new Notes().GetPatientNotes(ProgrameName, Type, PatientNoteId, CreatedBy, ConnectionString);
         }
+        public static GetPatientNotesQA GetPatientNotes(int ProgramId, string Type, int PatientNoteId, string CreatedBy)
+        {
+            return new Notes().GetPatientNotes(ProgramId, Type, PatientNoteId, CreatedBy, ConnectionString);
+        }
         public static NotesTypeMasterData GetMasterDataNotes(int ProgramId, string Type, string CreatedBy)
         {
             return new Notes().GetMasterDataNotes(ProgramId, Type,CreatedBy, ConnectionString);

@@ -359,6 +359,171 @@ namespace RPMWeb.Dal
             }
             return patientNotesQA;
         }
+        public GetPatientNotesQA GetPatientNotes(int Programid, string Type, int PatientNoteId, string CreatedBy, string connectionString)
+        {
+            DataSet ds;
+            GetPatientNotesQA patientNotesQA = new GetPatientNotesQA();
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    con.Open();
+
+                    using (SqlCommand command = new SqlCommand("usp_GetPatientNoteswithQuestionsAnswerV1", con))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@PatientNoteId", PatientNoteId);
+                        command.Parameters.AddWithValue("@ProgramId", Programid);
+                        command.Parameters.AddWithValue("@Type", Type);
+                        command.Parameters.AddWithValue("@CreatedBy", CreatedBy);
+
+                        using (SqlDataAdapter sda = new SqlDataAdapter())
+                        {
+                            sda.SelectCommand = command;
+                            using (ds = new DataSet())
+                            {
+                                sda.Fill(ds);
+                                var NotecatId = 0;
+                                var noteparentCatid = 0;
+                                List<GetMainQuestion> questions = new List<GetMainQuestion>();
+
+                                foreach (DataRow dr3 in ds.Tables[0].Rows)
+                                {
+                                    if (!DBNull.Value.Equals(dr3["PatientId"]) && (patientNotesQA.PatientId == 0))
+                                    {
+                                        patientNotesQA.PatientId = Convert.ToInt32(dr3["PatientId"]);
+                                        patientNotesQA.PatientProgramId = Convert.ToInt32(dr3["PatientProgramId"]);
+                                        patientNotesQA.NoteTypeId = Convert.ToInt32(dr3["NoteTypeId"]);
+                                        patientNotesQA.IsEstablishedCall = Convert.ToBoolean(dr3["IsEstablishedCall"]);
+                                        patientNotesQA.IsCareGiver = Convert.ToBoolean(dr3["IsCareGiver"]);
+                                        patientNotesQA.IsCallNote = Convert.ToBoolean(dr3["IsCallNote"]);
+                                        patientNotesQA.Duration = Convert.ToInt32(dr3["Duration"]);
+                                        patientNotesQA.Notes = dr3["Notes"].ToString();
+                                        patientNotesQA.CompletedByUserId = Convert.ToInt32(dr3["CompletedByUserId"]);
+                                        //patientNotesQA.CallType = (!DBNull.Value.Equals(dr3["CallType"])) ? dr3["CallType"].ToString() : null;
+
+                                    }
+
+                                    if (
+                                        (NotecatId != Convert.ToInt32(dr3["NotecategoryId"])) &&
+                                        ((noteparentCatid != Convert.ToInt32(dr3["NoteCategoryParentId"])) ||
+                                        (Convert.ToInt32(dr3["NoteCategoryParentId"]) == 0))
+                                        )
+                                    {
+                                        NotecatId = Convert.ToInt32(dr3["NotecategoryId"]);
+                                        GetMainQuestion question = new GetMainQuestion();
+
+                                        List<GetSubQuestion> subQuestions = new List<GetSubQuestion>();
+                                        int questionCategoryId = 0;
+                                        if (Convert.ToInt32(dr3["NoteCategoryParentId"]) == 0)
+                                        {
+                                            question.QuestionId = Convert.ToInt32(dr3["NotecategoryId"]);
+                                            question.Question = (dr3["NoteCategoryName"]).ToString();
+                                            question.IsMandatory = Convert.ToBoolean(dr3["IsMandatory"]);
+                                            question.IsMultipleChoice = Convert.ToBoolean(dr3["IsMultipleChoise"]);
+                                            question.Notes = (from DataRow dr in ds.Tables[1].Rows
+                                                              where (int)dr["NotecategoryId"] == question.QuestionId
+                                                              select (string)dr["Notes"]).FirstOrDefault();
+                                            List<AnswerType> lstanstype = new List<AnswerType>();
+                                            foreach (DataRow dr2 in ds.Tables[0].Rows)
+                                            {
+                                                if (
+                                                (NotecatId == Convert.ToInt32(dr2["NotecategoryId"]))
+                                                )
+                                                {
+                                                    //if (Convert.ToBoolean(dr2["checked"]) == true)
+                                                    //{
+                                                    //    question.Notes = dr2["HeaderNotes"].ToString();
+                                                    //}
+
+                                                    AnswerType answerType = new AnswerType(
+                                                        Convert.ToInt32(dr2["NoteTemplateId"]),
+                                                        dr2["NoteTemplateName"].ToString(),
+                                                        Convert.ToBoolean(dr2["checked"]));
+                                                    lstanstype.Add(answerType);
+
+                                                }
+                                            }
+                                            question.AnswerTypes = lstanstype;
+                                            question.SubQuestions = subQuestions;
+                                            questions.Add(question);
+                                        }
+                                        else
+                                        {
+
+                                            foreach (DataRow drCaterory in ds.Tables[1].Rows)
+                                            {
+                                                if (Convert.ToInt32(dr3["NoteCategoryParentId"]) == Convert.ToInt32(drCaterory["NotecategoryId"])
+                                                    && questionCategoryId != Convert.ToInt32(drCaterory["NotecategoryId"]))
+                                                {
+                                                    question.QuestionId = Convert.ToInt32(drCaterory["NotecategoryId"]);
+                                                    question.Question = drCaterory["NoteCategoryName"].ToString();
+                                                    questionCategoryId = question.QuestionId;
+                                                    noteparentCatid = questionCategoryId;
+                                                }
+                                            }
+                                            int subqnId = 0;
+                                            foreach (DataRow dr4 in ds.Tables[0].Rows)
+                                            {
+                                                GetSubQuestion subQuestion = new GetSubQuestion();
+                                                if ((questionCategoryId == Convert.ToInt32(dr4["NoteCategoryParentId"])) &&
+                                                   subqnId != Convert.ToInt32(dr4["NotecategoryId"]))
+                                                {
+                                                    subqnId = Convert.ToInt32(dr4["NotecategoryId"]);
+                                                    subQuestion.Question = dr4["NoteCategoryName"].ToString();
+                                                    subQuestion.QuestionId = Convert.ToInt32(dr4["NotecategoryId"]);
+
+                                                    subQuestion.IsMandatory = Convert.ToBoolean(dr4["IsMandatory"]);
+                                                    subQuestion.IsMultipleChoice = Convert.ToBoolean(dr4["IsMultipleChoise"]);
+                                                    subQuestion.Notes = (from DataRow dr in ds.Tables[1].Rows
+                                                                         where (int)dr["NotecategoryId"] == subQuestion.QuestionId
+                                                                         select (string)dr["Notes"]).FirstOrDefault();
+                                                    int subqntcategoryid = subQuestion.QuestionId;
+                                                    List<AnswerType> lstanstype = new List<AnswerType>();
+                                                    foreach (DataRow dr2 in ds.Tables[0].Rows)
+                                                    {
+                                                        if ((subqntcategoryid == Convert.ToInt32(dr2["NotecategoryId"])) &&
+                                                       (questionCategoryId == Convert.ToInt32(dr2["NoteCategoryParentId"])))
+                                                        {
+                                                            //if (Convert.ToBoolean(dr2["checked"]) == true)
+                                                            //{
+                                                            //    question.Notes = dr2["HeaderNotes"].ToString();
+                                                            //}
+
+                                                            AnswerType answerType = new AnswerType(
+                                                            Convert.ToInt32(dr2["NoteTemplateId"]),
+                                                            dr2["NoteTemplateName"].ToString(),
+                                                             Convert.ToBoolean(dr2["checked"]));
+                                                            lstanstype.Add(answerType);
+                                                        }
+
+                                                    }
+                                                    subQuestion.AnswerTypes = lstanstype;
+
+                                                    subQuestions.Add(subQuestion);
+
+                                                }
+
+                                            }
+                                            question.AnswerTypes = new List<AnswerType>();
+                                            question.SubQuestions = subQuestions;
+                                            questions.Add(question);
+                                        }
+                                    }
+                                    patientNotesQA.MainQuestions = questions;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            return patientNotesQA;
+        }
         public NotesTypeMasterData GetMasterDataNotes(int Programid,string Type,  string CreatedBy,string connectionString)
         {
             DataSet ds;
