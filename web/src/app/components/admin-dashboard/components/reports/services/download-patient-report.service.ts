@@ -390,7 +390,7 @@ export class DownloadPatientReportService {
 
     return { chartData, chartLabels };
   }
-
+  allLineChartData: any=[];
   /**
    * Generate empty chart data when no data is available
    */
@@ -430,7 +430,6 @@ export class DownloadPatientReportService {
         lineTension: 0.5,
       })
     );
-
     return { chartData, chartLabels };
   }
 
@@ -439,6 +438,11 @@ export class DownloadPatientReportService {
    */
   convertDateforHealthTrends(dateArr: string[]): string[] {
     const formattedDates: string[] = [];
+
+    if (!Array.isArray(dateArr)) {
+      console.error('Invalid input to convertDateforHealthTrends:', dateArr);
+      return formattedDates; // return empty array instead of crashing
+    }
 
     for (const dateVal of dateArr) {
       const dateParts = dateVal.split('+');
@@ -475,7 +479,6 @@ export class DownloadPatientReportService {
       // Combine date and time
       formattedDates.push(date + ' - ' + time);
     }
-
     return formattedDates;
   }
 
@@ -579,12 +582,12 @@ export class DownloadPatientReportService {
   // ✅ Fetch and Populate Notes Details Recursively
   async populateNotesDetails(
     notes: any[],
-    programName: string,
+    idProgram: string,
     noteType: string
   ): Promise<any[]> {
     for (let i = 0; i < notes.length; i++) {
       const details = await this.patientReportApiService.getNoteDetails(
-        programName,
+        idProgram,
         noteType,
         notes[i].Id
       );
@@ -661,9 +664,11 @@ export class DownloadPatientReportService {
 
     for (let mainQuestion of notes.NoteDetails.MainQuestions) {
       this.Notesh += 5;
+      this.checkPageSpace(doc);
       this.setPages(doc, mainQuestion.Question, 20);
       this.drawLine(doc, mainQuestion.Question, 20);
       this.Notesh += 5;
+      this.checkPageSpace(doc);
 
       let hasCheckedAnswer = mainQuestion.AnswerTypes.some(
         (answer: { Checked: any }) => answer.Checked
@@ -672,10 +677,12 @@ export class DownloadPatientReportService {
         mainQuestion.AnswerTypes.filter(
           (answer: { Checked: any }) => answer.Checked
         ).forEach((answer: { Answer: any }) => {
+          this.checkPageSpace(doc);
           this.setPages(doc, `- ${answer.Answer}`, 25);
           this.Notesh += 5;
         });
       } else {
+        this.checkPageSpace(doc);
         this.setPages(doc, '- None', 25);
         this.Notesh += 5;
       }
@@ -683,6 +690,7 @@ export class DownloadPatientReportService {
       this.processSubQuestions(doc, mainQuestion.SubQuestions);
 
       if (mainQuestion.Notes) {
+        this.checkPageSpace(doc);
         this.setPages(doc, `Extra Notes : ${mainQuestion.Notes}`, 25);
         this.Notesh += 10;
       }
@@ -690,9 +698,11 @@ export class DownloadPatientReportService {
 
     if (notes.NoteDetails.Notes) {
       this.Notesh += 5;
+      this.checkPageSpace(doc);
       this.setPages(doc, 'Additional Notes', 20);
       this.drawLine(doc, 'Additional Notes', 20);
       this.Notesh += 5;
+      this.checkPageSpace(doc);
       this.setPages(doc, notes.NoteDetails.Notes, 25);
       this.Notesh += 15;
     }
@@ -702,9 +712,11 @@ export class DownloadPatientReportService {
   private processSubQuestions(doc: jsPDF, subQuestions: any[]): void {
     subQuestions.forEach((subQuestion) => {
       this.Notesh += 5;
+      this.checkPageSpace(doc);
       this.setPages(doc, subQuestion.Question, 25);
       this.drawLine(doc, subQuestion.Question, 25);
       this.Notesh += 5;
+      this.checkPageSpace(doc);
 
       let hasCheckedAnswer = subQuestion.AnswerTypes.some(
         (answer: { Checked: any }) => answer.Checked
@@ -713,15 +725,26 @@ export class DownloadPatientReportService {
         subQuestion.AnswerTypes.filter(
           (answer: { Checked: any }) => answer.Checked
         ).forEach((answer: { Answer: any }) => {
+          this.checkPageSpace(doc);
           this.setPages(doc, `- ${answer.Answer}`, 25);
           this.Notesh += 5;
         });
       } else {
+        this.checkPageSpace(doc);
         this.setPages(doc, '- None', 25);
         this.Notesh += 5;
       }
     });
   }
+
+  private checkPageSpace(doc: jsPDF, buffer: number = 20): void {
+    const pageHeight = doc.internal.pageSize.height;
+    if (this.Notesh + buffer > pageHeight) {
+      doc.addPage();
+      this.Notesh = 30; // Reset to top margin
+    }
+  }
+  
   /**
    * Gets patient review notes, then call notes, and generates report sections
    */
@@ -731,7 +754,7 @@ export class DownloadPatientReportService {
     rpmEndDate: any,
     currentPatient: any,
     currentProgram: any,
-    patientProgramName: any
+    idProgram: any
   ): Promise<any[]> {
     try {
       // ✅ Fetch REVIEW Notes
@@ -746,7 +769,7 @@ export class DownloadPatientReportService {
       if (this.reviewNotes.length > 0) {
         this.reviewNotes = await this.populateNotesDetails(
           this.reviewNotes,
-          patientProgramName,
+          idProgram,
           'REVIEW'
         );
       }
@@ -758,7 +781,7 @@ export class DownloadPatientReportService {
         rpmEndDate,
         currentPatient,
         currentProgram,
-        patientProgramName
+        idProgram
       );
 
       return combinedNotes;
@@ -777,7 +800,7 @@ export class DownloadPatientReportService {
     rpmEndDate: any,
     currentPatient: any,
     currentProgram: any,
-    patientProgramName: any
+    idProgram: any
   ): Promise<any[]> {
     try {
       // Fetch CALL Notes
@@ -793,7 +816,7 @@ export class DownloadPatientReportService {
       if (this.callNotes.length > 0) {
         this.callNotes = await this.populateNotesDetails(
           this.callNotes,
-          patientProgramName,
+          idProgram,
           'CALL'
         );
       }
@@ -1536,7 +1559,6 @@ export class DownloadPatientReportService {
       try {
         // Make chart visible for capturing
         chartElement.style.visibility = 'visible';
-        console.log("chart elemet",chartElement.innerHTML);
         html2canvas(chartElement)
           .then((canvas) => {
             try {

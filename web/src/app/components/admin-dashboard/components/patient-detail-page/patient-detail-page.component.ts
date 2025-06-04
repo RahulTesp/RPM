@@ -684,6 +684,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.getNoteIdArray(programDetails.ProgramName);
     this.getMasterDataQuestions(programDetails.ProgramName);
     this.patientProgramname = programDetails.ProgramName;
+    this.idProgram = programDetails.ProgramId;
     this.getBillingInfoSrc();
     this.getBillingData();
 
@@ -1247,7 +1248,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.patientProgramName =
       this.http_rpm_patientList['PatientProgramdetails'].ProgramName;
     this.patientProgramId = this.http_rpm_patientList['PatientProgramdetails'].ProgramId;
-
     this.rpm
       .rpm_get(
         `/api/patient/getmasterdatanotes?ProgramId=${this.patientProgramId}&Type=CALL`
@@ -1722,6 +1722,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.CurrentProgramSelected = programId;
   }
   patientProgramname: any;
+  idProgram: any;
   // currentPhysician: any;
   calltimer: any;
   callTimerEnabled: boolean;
@@ -2796,7 +2797,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.allLineChartData = []; // clear previous data
 
       // Only process trends with actual data
-      console.log("vitalHttpHealthTrends",vitalHttpHealthTrends)
       vitalHttpHealthTrends.forEach((trendData: any) => {
         if (!trendData.Values || trendData.Values.length === 0) {
           if (daycount === 7) {
@@ -4267,10 +4267,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       if (!element.Id || !this.patientProgramName) {
         throw new Error('Missing note ID or program name');
       }
-
       // Fetch note data using service
       const data = await this.patientService.getPatientCallNoteById(
-        this.patientProgramName,
+        this.patientProgramId,
         element.Id
       );
 
@@ -5248,6 +5247,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.patientStatusData = this.httpPatient.PatientProgramdetails.Status;
     this.patientProgramname =
       this.httpPatient['PatientProgramdetails'].ProgramName;
+      console.log("this.httpPatient",this.httpPatient)
     this.reportStart();
     this.getPatientAndProgramInfo();
   }
@@ -5312,7 +5312,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.endDateReport,
       this.selectedPatient,
       this.selectedProgram,
-      this.patientProgramname
+      this.idProgram
     );
     if (this.patientProgramname == 'CCM' || this.patientProgramname == 'PCM') {
       this.patientdownloadService.generatePatientSummaryReport(

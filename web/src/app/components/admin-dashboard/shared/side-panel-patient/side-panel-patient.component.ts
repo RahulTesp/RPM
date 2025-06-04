@@ -2530,10 +2530,10 @@ export class SidePanelPatientComponent implements OnInit {
     this.noteId = data.Id;
 
     this.QuestionArrayBase = null;
-
+    this.patientProgramId = this.http_rpm_patientList['PatientProgramdetails'].ProgramId;
     this.rpm
       .rpm_get(
-        `/api/patient/getpatientnotesbyprogram?ProgramName=${this.patientProgramName}&Type=REVIEW&PatientNoteId=${this.noteId}`
+        `/api/patient/getpatientnotesbyprogramid?ProgramId=${this.patientProgramId}&Type=REVIEW&PatientNoteId=${this.noteId}`
       )
       .then((data) => {
         if (data) {

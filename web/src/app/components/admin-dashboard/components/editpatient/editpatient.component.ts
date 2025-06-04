@@ -2416,38 +2416,35 @@ export class EditpatientComponent implements OnInit {
         DeviceStatus: 'Error',
       };
 
-      this.rpm.rpm_post('/api/device/updatedevicestatus', req_body).then(
-        (data) => {
-          this.showconfirmDialog.showConfirmDialog(
-            'Device Error Updated Successfully.',
-            'Success',
-            () => {
-              this.RemoveDevice(index);
-              this.ReloadDeviceList(1);
-              this.ReloadDeviceList(2);
-              this.ReloadDeviceList(3);
-              this.ReloadDeviceList(4);
-            },
-            false
-          );
-        },
-        (err) => {
-          console.error('Device update failed:', err);
-          this.showconfirmDialog.showConfirmDialog(
-            'Failed to Update Device Error',
-            'Error',
-            () => {
-              this.ReloadDeviceList(1);
-              this.ReloadDeviceList(2);
-              this.ReloadDeviceList(3);
-              this.ReloadDeviceList(4);
-            },
-            false
-          );
-          // this.openDialogWindow('Error', `Failed to Update Device Error.`);
-          //show error pop up, could not update patient
-        }
-      );
+      this.rpm.rpm_post('/api/device/updatedevicestatus', req_body)
+      .then((data) => {
+        this.showconfirmDialog.showConfirmDialog(
+          'Device Error Updated Successfully.',
+          'Success',
+          () => {
+            this.RemoveDevice(index);
+            this.ReloadDeviceList(1);
+            this.ReloadDeviceList(2);
+            this.ReloadDeviceList(3);
+            this.ReloadDeviceList(4);
+          },
+          false
+        );
+      })
+      .catch((err) => {
+        console.error('Device update failed:', err);
+        this.showconfirmDialog.showConfirmDialog(
+          'Failed to Update Device Error',
+          'Error',
+          () => {
+            this.ReloadDeviceList(1);
+            this.ReloadDeviceList(2);
+            this.ReloadDeviceList(3);
+            this.ReloadDeviceList(4);
+          },
+          false
+        );
+      });
     }
   }
   RemoveDevice(index: any) {
@@ -3803,7 +3800,7 @@ export class EditpatientComponent implements OnInit {
   
     if (alreadyActive) {
       alert(
-        'The selected vital already has an active device. You cannot add another device for this vital. Please select a different vital.'
+        'This vital already has an active device assigned. Please choose a different vital or remove the existing device before adding a new one.'
       );
   
       // Temporarily mark invalid and clear value

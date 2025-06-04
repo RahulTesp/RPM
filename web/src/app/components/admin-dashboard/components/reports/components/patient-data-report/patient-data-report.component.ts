@@ -39,6 +39,7 @@ export class PatientDataReportComponent implements OnInit {
   private http_medication_data: any;
   private selectedProgramName: any;
   private patientProgramname: any;
+  private idProgram: any;
   private programDetails: any;
   public downloadstatus = true;
   private HtmlGraph: any;
@@ -149,6 +150,7 @@ export class PatientDataReportComponent implements OnInit {
     this.patientStatusData = this.http_rpm_patient.PatientProgramdetails.Status;
     this.patientProgramname =
       this.http_rpm_patient['PatientProgramdetails'].ProgramName;
+    this.idProgram = this.http_rpm_patient['PatientProgramdetails'].ProgramId;
     this.reportStart();
     this.getPatientAndProgramInfo();
   }
@@ -217,11 +219,7 @@ export class PatientDataReportComponent implements OnInit {
       //  Loop through health trends & process them
       vitalHttpHealthTrends.forEach((trendData: any) => {
         if (!trendData.Values || trendData.Values.length === 0) {
-          if (daycount === 7) {
-            this.setEmptyGraphHealthInfo();
-          } else {
-            this.setEmpty30DaysGraphHealthInfo();
-          }
+          this.setEmptyGraphWithDate(startDate ?? this.convertDate(new Date(Date.now() - (daycount - 1) * 86400000)), endDate ?? this.convertDate(new Date()));
           return;
         }
       
@@ -305,50 +303,52 @@ export class PatientDataReportComponent implements OnInit {
     });
   }
 
-  setEmpty30DaysGraphHealthInfo() {
-    var date_val = new Date();
-    var x = [
-      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-      21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-    ];
-    var DefaultDates = [];
-    var date_val_set = '';
-    for (var item1 of x) {
-      date_val_set = this.convertDate(date_val.setDate(date_val.getDate()));
-      DefaultDates.push(date_val_set);
-      date_val_set = this.convertDate(date_val.setDate(date_val.getDate() - 1));
+  setEmptyGraphWithDate(startDate: string, endDate: string) {
+    const DefaultDates: string[] = [];
+  
+    let start = new Date(startDate);
+    let end = new Date(endDate);
+  
+    // Normalize times
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+  
+    // Loop through dates from start to end
+    while (start <= end) {
+      DefaultDates.push(this.convertDate(start));
+      start.setDate(start.getDate() + 1);
     }
-
-    var http_healthtrends = {
+  
+    const http_healthtrends = {
       VitalName: 'No Data',
       VitalId: 1,
-      Time: DefaultDates.reverse(),
+      Time: DefaultDates,
       Values: [
-        { data: [null, null, null, null, null, null, null], label: 'No data avaiable' },
+        {
+          data: new Array(DefaultDates.length).fill(null),
+          label: 'No data available',
+        },
       ],
     };
+  
     this.lineChartLabels = this.patientService.convertDateforHealthTrends(
       http_healthtrends.Time,
       false
     );
-    const lineChartLabels = this.lineChartLabels;
-    var temp = [];
-    for (var item of http_healthtrends.Values) {
-      var obj = {
-        data: item.data,
-        label: item.label,
-        fill: false,
-        lineTension: 0.5,
-      };
-      temp.push(obj);
-    }
-    this.lineChartData = temp;
-    const lineChartData = this.lineChartData;
+  
+    const lineChartData = http_healthtrends.Values.map(item => ({
+      data: item.data,
+      label: item.label,
+      fill: false,
+      lineTension: 0.5,
+    }));
+  
     this.allLineChartData.push({
-      lineChartLabels,
+      lineChartLabels: this.lineChartLabels,
       lineChartData,
     });
   }
+  
 
   filterChartDataAndLabelsTogether(
     datasets: { data: any[]; label: string }[],
@@ -449,7 +449,7 @@ export class PatientDataReportComponent implements OnInit {
       endDate,
       this.selectedPatient,
       this.selectedProgram,
-      this.patientProgramname
+      this.idProgram
     );
     if (this.patientProgramname == 'CCM' || this.patientProgramname == 'PCM') {
       this.patientdownloadService.generatePatientSummaryReport(

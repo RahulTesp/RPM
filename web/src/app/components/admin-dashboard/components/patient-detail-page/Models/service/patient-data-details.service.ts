@@ -323,12 +323,12 @@ export class PatientDataDetailsService {
   }
 
   async getPatientCallNoteById(
-    programName: string,
+    programId: string,
     noteId: string
   ): Promise<any> {
     try {
       return await this.rpmService.rpm_get(
-        `/api/patient/getpatientnotesbyprogram?ProgramName=${programName}&Type=CALL&PatientNoteId=${noteId}`
+        `/api/patient/getpatientnotesbyprogramid?ProgramId=${programId}&Type=CALL&PatientNoteId=${noteId}`
       );
     } catch (error) {
       console.error('Error fetching patient call note by ID:', error);

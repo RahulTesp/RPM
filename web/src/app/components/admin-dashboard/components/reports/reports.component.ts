@@ -69,6 +69,7 @@ export class ReportsComponent implements OnInit {
   patientVital: any;
   programDetails: any;
   patientProgramname: any;
+  idProgram: any
   patientListArray: any;
   today = new Date();
   http_healthtrends: any;
@@ -859,6 +860,7 @@ export class ReportsComponent implements OnInit {
     this.patientStatusData = this.http_rpm_patient.PatientProgramdetails.Status;
     this.patientProgramname =
       this.http_rpm_patient['PatientProgramdetails'].ProgramName;
+    this.idProgram = this.http_rpm_patient['PatientProgramdetails'].ProgramId;
     this.reportStart();
     this.getPatientAndProgramInfo();
   }
@@ -929,7 +931,7 @@ export class ReportsComponent implements OnInit {
       endDate,
       this.selectedPatient,
       this.selectedProgram,
-      this.patientProgramname
+      this.idProgram
     );
     if (this.patientProgramname == 'CCM' || this.patientProgramname == 'PCM') {
       this.patientdownloadService.generatePatientSummaryReport(
