@@ -252,7 +252,7 @@
                         <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
                             xmlns:app="http://schemas.android.com/apk/res-auto"
                             xmlns:tools="http://schemas.android.com/tools"
-                            android:id="@+id/recyclerview_newvitals"
+                            android:id="@+id/fragmentHTVitalReadings"
                             android:name="com.rpm.clynx.fragments.NewVitalFragment"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -260,7 +260,7 @@
                             app:layoutManager="LinearLayoutManager"
                             app:layout_constraintTop_toBottomOf="@+id/llo_goals"
                             tools:context=".fragments.NewVitalFragment"
-                            tools:listitem="@layout/new_vital_item_list" />
+                            tools:listitem="@layout/vital_readings_item_list" />
                         <TextView
                             android:id="@+id/empty_viewnew"
                             android:layout_width="wrap_content"

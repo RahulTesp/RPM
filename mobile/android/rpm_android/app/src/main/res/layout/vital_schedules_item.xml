@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/myinfo_card_bg_radius"
+    android:background="@drawable/pgm_info_bg"
     android:orientation="vertical"
     android:layout_marginVertical="@dimen/spacing_medium"
     android:padding="10dp">
@@ -63,7 +63,7 @@
         android:layout_height="30dp"
         android:layout_marginTop="@dimen/spacing_xmedium"
         android:orientation="horizontal"
-        android:background="@drawable/myinfo_card_bg_radius">
+        android:background="@drawable/pgm_info_bg">
 
         <TextView
             android:id="@+id/Range1"

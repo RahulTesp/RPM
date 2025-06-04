@@ -50,7 +50,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_marginTop="10dp"
-                            android:background="@drawable/myinfo_card_bg_radius"
+                            android:background="@drawable/pgm_info_bg"
                             android:gravity="center">
 
                             <TextView
@@ -82,7 +82,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_marginTop="10dp"
-                            android:background="@drawable/myinfo_card_bg_radius"
+                            android:background="@drawable/pgm_info_bg"
                             android:gravity="center">
 
                             <TextView
@@ -114,7 +114,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:background="@drawable/myinfo_card_bg_radius"
+                            android:background="@drawable/pgm_info_bg"
                             android:gravity="center"
                             android:padding="@dimen/margin_10dp">
 
@@ -145,7 +145,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:background="@drawable/myinfo_card_bg_radius"
+                            android:background="@drawable/pgm_info_bg"
                             android:gravity="center"
                             android:padding="@dimen/margin_10dp">
 
@@ -176,7 +176,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:background="@drawable/myinfo_card_bg_radius"
+                            android:background="@drawable/pgm_info_bg"
                             android:gravity="center"
                             android:padding="@dimen/margin_10dp">
 
@@ -221,7 +221,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:background="@drawable/myinfo_card_bg_radius"
+                            android:background="@drawable/pgm_info_bg"
                             android:gravity="center"
                             android:padding="@dimen/margin_10dp">
 
