@@ -141,7 +141,6 @@ export class SideBarComponent implements OnInit {
     // this.activePageMainMenu = sessionStorage.getItem('ActiveMainMenu');
 
     this.activePage = sessionStorage.getItem('currentactivepage');
-    console.log('ActivePage:', this.activePage);
     this.roles = sessionStorage.getItem('Roles');
     this.roles = JSON.parse(this.roles);
     that.rpm

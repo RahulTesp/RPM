@@ -1263,7 +1263,6 @@ export class TaskComponent implements OnInit {
   seachAssignedclose() {
     this.alertAssignedName = false;
     this.getReloadDataAlert();
-    console.log('Click');
   }
   searchAlertNameClick() {
     this.alertSearchValeName = !this.alertSearchValeName;
@@ -2309,7 +2308,6 @@ export class TaskComponent implements OnInit {
         this.tableDataSource.paginator = this.paginator;
         this.tableDataSource.sort = this.sort;
         this.total_number = this.tableDataSource.filteredData.length;
-        console.log(this.total_number);
         this.loading = false;
       });
   }

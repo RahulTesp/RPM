@@ -1634,8 +1634,6 @@ export class AddpatientComponent implements OnInit {
       (data) => {
         this.Diagnosis_Name = data;
 
-        console.log('Diagnosis Ds');
-        console.log(this.Diagnosis_Name);
         this.loading = false;
         // New Code Change 29/03/2023
         for (let x of this.Diagnosis_Name) {
@@ -1647,12 +1645,6 @@ export class AddpatientComponent implements OnInit {
         for (let y of this.Diagnosis_List) {
           found = false;
           for (let x of this.Diagnosis_Name) {
-            console.log(
-              'x.DiagnosisCode: ' +
-                x.DiagnosisCode +
-                'y.DiagnosisCode: ' +
-                y.DiagnosisCode
-            );
             if (
               x.DiagnosisCode == y.DiagnosisCode &&
               y.DiagnosisCode.trim() != ''
@@ -1718,7 +1710,6 @@ export class AddpatientComponent implements OnInit {
   applyDataFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.datasourceDocument.filter = filterValue.trim().toLowerCase();
-    console.log(this.datasourceDocument.filter);
   }
 
   setupFilter(column: string) {
@@ -1737,7 +1728,6 @@ export class AddpatientComponent implements OnInit {
     this.rpm.rpm_get('/api/users/getlanguages').then(
       (data) => {
         that.languageList = data;
-        console.log(that.languageList);
       },
       (err) => {
         console.log(err.error);

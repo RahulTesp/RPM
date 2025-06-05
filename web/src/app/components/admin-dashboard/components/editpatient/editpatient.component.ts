@@ -1097,8 +1097,6 @@ export class EditpatientComponent implements OnInit {
         that.InsuranceInfo =
           that.Patientdata.PatientInsurenceDetails.PatientInsurenceInfos;
         that.EnrolmentDetails = that.Patientdata.PatientEnrolledDetails;
-        console.log("EnrolmentDetails");
-        console.log(that.EnrolmentDetails);
         that.ActiveDetails = that.Patientdata.ActivePatientDetails;
         that.ReadyToDischarge =
           that.Patientdata.ReadyForDischargePatientDetails;
@@ -1620,7 +1618,6 @@ export class EditpatientComponent implements OnInit {
         Preference3: this.PatientInfoForm.controls.preference4.value,
         Notes: this.PatientInfoForm.controls.additionalnotes.value,
       };
-      console.log(req_body);
       var that = this;
       this.rpm.rpm_post('/api/patient/updatepatient', req_body).then(
         (data) => {
@@ -3753,7 +3750,6 @@ export class EditpatientComponent implements OnInit {
     this.rpm.rpm_get('/api/users/getlanguages').then(
       (data) => {
         that.languageList = data;
-        console.log(that.languageList);
       },
       (err) => {
         console.log(err.error);

@@ -267,9 +267,6 @@ export class HeaderComponent implements OnInit {
         this.unreadlist = this.list.filter((data: { IsRead: boolean }) => {
                 return data.IsRead == false;
               });
-              console.log('List');
-              console.log(this.list)
-       console.log('Notifications refreshed in component');
       })
       .catch(error => {
         console.error('Error refreshing notifications:', error);

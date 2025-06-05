@@ -122,8 +122,6 @@ export class ProfileMenuButtonComponent implements OnInit {
 
       this.userName = this.userData.UserName;
       this.passwordForm.controls.username?.setValue(this.userData.UserName);
-      console.log('User Name');
-      console.log(this.userName);
     });
   }
 
@@ -167,7 +165,6 @@ export class ProfileMenuButtonComponent implements OnInit {
   }
   CloseChangePasswordDialog() {
     this.isChangePasswordVisible = false;
-    console.log(this.isChangePasswordVisible);
   }
   get NewTextEntered() {
     return this.passwordForm.controls;
@@ -193,7 +190,6 @@ export class ProfileMenuButtonComponent implements OnInit {
   }
   updatePasswordErrors(): void {
     const control = this.passwordForm.get('newpw');
-    console.log(control);
     if (!control) {
       return;
     }

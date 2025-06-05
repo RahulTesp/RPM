@@ -409,7 +409,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       if (data) {
         this.http_chatData = data;
         this.dataSourceChange(5, 5);
-        console.log('Chat data updated:', this.http_chatData);
       }
     });
   }
@@ -4381,13 +4380,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   }
   OnCancelNotesTimer() {
     clearInterval(this.interval);
-    console.log('Timer Value before');
-    console.log(this.timerValue);
     this.timerValue = this.timerValue + this.calltimerValue;
-    console.log('Timer Value');
-    console.log(this.timerValue);
-    console.log('calltimer Value');
-    console.log(this.calltimerValue);
     this.interval = setInterval(() => {
       if (!this.callTimerEnabled) {
         this.timerValue = this.timerValue + 1;
@@ -5247,7 +5240,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.patientStatusData = this.httpPatient.PatientProgramdetails.Status;
     this.patientProgramname =
       this.httpPatient['PatientProgramdetails'].ProgramName;
-      console.log("this.httpPatient",this.httpPatient)
     this.reportStart();
     this.getPatientAndProgramInfo();
   }
@@ -5367,7 +5359,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.clearIntervals();
     this.destroy$.next();
     this.destroy$.complete();
-    console.log('Clearing cached data...');
     this.patientService.clearCachedPatientData();
     this.patientchatservice.initialized = false;
     if (this.unreadSubscription) {

@@ -142,7 +142,6 @@ export class TeamPageComponent implements OnInit {
   SelectId: any;
   SelectedName: any;
   selectedPatient(event: { option: { value: any } }) {
-    console.log(event.option.value);
     this.SelectedData = event.option.value;
     this.SelectId = this.SelectedData.CareTeamMemberUserId;
     this.SelectedName = this.SelectedData.Name;
@@ -366,7 +365,6 @@ export class TeamPageComponent implements OnInit {
   }
 
   clickHandler(data: any) {
-    console.log(data.teamname);
     this.table_detailed_view = true;
   }
   // team Alert template Start
@@ -465,7 +463,6 @@ export class TeamPageComponent implements OnInit {
       .then((data) => {
         this.alert_table_render = 2;
         this.alertCritical = data;
-        console.log(this.alertCritical);
 
         this.loader1 = false;
         this.tableDataSource = new MatTableDataSource(
@@ -690,8 +687,6 @@ export class TeamPageComponent implements OnInit {
 
     this.tableDataSource = new MatTableDataSource(dataSourceAlertFilter);
     if (this.patientNavigationStatus == 'true') {
-      console.log(this.tableFilterValuealert);
-      console.log('data');
       this.redirectionAlertFilter(this.tableFilterValuealert);
     }
     this.changeDetectorRef.detectChanges();

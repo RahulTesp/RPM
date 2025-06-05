@@ -235,8 +235,6 @@ export class PatientPageComponent implements OnInit {
   onClickPatientCritical() {
     this.containerSelection = 2;
     this.patientProgramStaus = 'Critical';
-    console.log(this.patientTypeSelect);
-    console.log(this.patientVitalSelect);
     this.maskingDataSrc();
     this.searchPatientList_Name = false;
     this.searchPatientList_assign = false;
@@ -1025,7 +1023,6 @@ export class PatientPageComponent implements OnInit {
   applyDataFilter(filterValue: any) {
     filterValue = (<HTMLInputElement>filterValue.target).value.trim();
     filterValue = filterValue.toLowerCase();
-    console.log(filterValue);
     this.tableFilterValue = filterValue;
 
     this.dataSourceTableList.filter = filterValue;
@@ -2176,7 +2173,6 @@ export class PatientPageComponent implements OnInit {
 
   // Timezone Offset Function Start
   getTimeZoneOffsetData() {
-    console.log(Intl.DateTimeFormat().resolvedOptions().timeZone);
     let offsetValue = new Date().getTimezoneOffset();
     var offset;
     offset = offsetValue <= 0 ? '+' : '-';
@@ -2270,6 +2266,5 @@ export class PatientPageComponent implements OnInit {
     // if (pageEvent.pageIndex > pageEvent.previousPageIndex!)
     this.pageSize = pageEvent.pageSize;
     this.pageIndxValue = pageEvent.pageIndex;
-    console.log(this.pageIndxValue);
   }
 }

@@ -53,7 +53,6 @@ export class AuthService {
         .then(
           (data) => {
             resolve(data);
-            console.log(data);
           },
           (err) => {
             reject(err);
@@ -102,7 +101,6 @@ export class AuthService {
         .then(
           (data) => {
             resolve(data);
-            console.log(data);
           },
           (err) => {
             reject(err);

@@ -48,7 +48,6 @@ export class MessagingService {
           // Subscribe to get token
           this.afm.requestToken.subscribe({
             next: (token) => {
-              console.log('Token received:', token);
               this.firebase_token = token;
               this.saveFirebaseToken();
               resolve(token);
@@ -67,7 +66,6 @@ export class MessagingService {
 
   receiveMessage() {
     this.afm.messages.subscribe((message) => {
-      console.log('Foreground message received:', message.data);
      this.notificationData.next(message);
       // this.snackBar.open(
       //   message?.data?.Title || 'New message',
@@ -109,7 +107,6 @@ export class MessagingService {
     const channel = new BroadcastChannel('notification-channel');
     channel.addEventListener('message', (event) => {
       const payload = event.data;
-      console.log('Background notification received:', payload.data.body);
       this.notificationData.next(payload.data.body);
 
        if (payload.data && payload.data.Body) {

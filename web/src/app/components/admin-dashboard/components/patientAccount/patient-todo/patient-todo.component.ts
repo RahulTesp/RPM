@@ -63,8 +63,6 @@ export class PatientTodoComponent implements OnInit {
     // enddate = this.auth.ConvertToUTCRangeInput(new Date(enddate));
     // startdate = new Date(startdate).toISOString().replace('Z', '');
     // enddate = new Date(enddate).toISOString().replace('Z', '');
-    console.log(startdate);
-    console.log(enddate);
 
     that.rpm
       .rpm_get(
@@ -168,7 +166,6 @@ export class PatientTodoComponent implements OnInit {
 
   selectRow($event: any, row: any) {
     console.info('clicked', $event);
-    console.log(row);
     // this.switchvariable = 2;
     $event.preventDefault();
 

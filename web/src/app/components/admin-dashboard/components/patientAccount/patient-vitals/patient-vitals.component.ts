@@ -798,7 +798,6 @@ export class PatientVitalsComponent implements OnInit {
       .then(
         (data) => {
           that.http_getDocument = data;
-          console.log(that.http_getDocument);
           this.docType = that.http_getDocument.DocumentType;
           this.fileName = that.http_getDocument.DocumentName;
           this.documentviewSrc = that.http_getDocument.DocumentUNC;
@@ -948,8 +947,6 @@ export class PatientVitalsComponent implements OnInit {
     } else {
       // this.callTimerEnabled=false;
       this.Stop();
-
-      console.log(this.call_connected);
     }
   }
 
@@ -3140,7 +3137,6 @@ export class PatientVitalsComponent implements OnInit {
 
   getlinechartLabel(lineData: any) {
     lineData.map((v: any) => {
-      console.log(v.label);
       if (v.label == 'Non-Fasting') {
         this.lineChartColor = 'red';
         var temp = {
@@ -3182,7 +3178,6 @@ export class PatientVitalsComponent implements OnInit {
         this.lineChartColors.push(temp);
       }
     });
-    console.log(this.lineChartColor);
 
     return this.lineChartColors;
   }
@@ -3202,9 +3197,6 @@ export class PatientVitalsComponent implements OnInit {
           this.HealthData.push(tempData);
         }
       }
-
-      console.log('HealthData');
-      console.log(this.HealthData);
     }
   }
 }

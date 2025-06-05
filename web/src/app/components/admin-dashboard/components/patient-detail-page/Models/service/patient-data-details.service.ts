@@ -88,7 +88,6 @@ export class PatientDataDetailsService {
     }
   }
   clearCachedPatientData() {
-    console.log('Resetting patient cache...');
     this.patientDataSubject.next(null);
     sessionStorage.removeItem('patientdataUserId');
     sessionStorage.removeItem('pname');

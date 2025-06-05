@@ -403,7 +403,6 @@ export class ActivityinfoChatComponent implements OnInit, OnDestroy, AfterViewIn
 
         // Update with new data
         this.http_chat_data = data;
-        console.log('Chat data updated:', this.http_chat_data);
 
         // Compare with previous data to see if it changed
         const currentData = JSON.stringify(this.http_chat_data);
@@ -413,7 +412,6 @@ export class ActivityinfoChatComponent implements OnInit, OnDestroy, AfterViewIn
         // if (dataHasChanged) {
         this.dataRefreshNeeded = true;
         this.lastUpdateTimestamp = Date.now();
-        console.log('Data has changed, refresh needed!', this.lastUpdateTimestamp);
 
         // Trigger any refresh actions needed
         this.refreshData();
@@ -467,11 +465,8 @@ export class ActivityinfoChatComponent implements OnInit, OnDestroy, AfterViewIn
 
   getMessagesByConversationSid(conversationSid: string): Message[] {
     this.showMessagePanel = false;
-    console.log('Getting messages for conversation:', conversationSid);
-    console.log('Current http_chat_data:', this.http_chat_data);
 
     const convo = this.http_chat_data.find((c: { ConversationSid: string; }) => c.ConversationSid === conversationSid);
-    console.log('Found conversation:', convo);
 
     this.dataSourceChatPaneldata = convo;
     this.showMessagePanel = true;

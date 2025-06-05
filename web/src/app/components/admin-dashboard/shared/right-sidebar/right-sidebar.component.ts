@@ -440,8 +440,6 @@ export class RightSidebarComponent implements OnInit {
         });
 
         this.http_taskAssigneeList = res.filteredAssignees;
-        console.log('this.http_taskAssigneeList');
-        console.log(this.http_taskAssigneeList)
       })
       .catch((err) => {
         console.error('Error fetching task master data:', err);
@@ -1847,11 +1845,7 @@ export class RightSidebarComponent implements OnInit {
           (data) => {
             this.worklistgettaskbyid = data;
             this.alertAssigneeName = this.worklistgettaskbyid.CareTeamId;
-            console.log('this.alertAssigneeName');
-            console.log(this.alertAssigneeName);
             this.WorkListTaskArrayList = this.worklistgettaskbyid.Members;
-            console.log('WorkList Task');
-            console.log(this.WorkListTaskArrayList);
 
             this.task_pname = this.worklistgettaskbyid.PatientName;
             this.task_pid = this.worklistgettaskbyid.PatientId;
