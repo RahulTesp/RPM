@@ -8,7 +8,7 @@ export const environment = {
   production: false,
   //  host: 'rpm-demo-api.azurewebsites.net',
   //host: 'cx-preprod-server.azurewebsites.net',
- // host: 'cx-dev-server.azurewebsites.net',
+  host: 'cx-dev-server.azurewebsites.net',
   //host: 'rpm-demo-api.azurewebsites.net',
   // host: 'cx-dev-server.azurewebsites.net',
   //host: 'md-preprod-server.azurewebsites.net',
@@ -16,7 +16,7 @@ export const environment = {
   //host: 'c-lynxapi.azurewebsites.net',
   //host: 'rpm-demo-api.azurewebsites.net',
   //host: 'meditprodapi.azurewebsites.net',
-  host:'rpm-dev-tespcare.azurewebsites.net',
+  // host:'rpm-dev-tespcare.azurewebsites.net',
 
   protocol: 'https',
   firebase: {
