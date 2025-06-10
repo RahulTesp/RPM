@@ -16,7 +16,7 @@ class NavigationHelper: ObservableObject {
     }
     
     func resetToHomeTab() {
-          self.path.removeAll()            //  You named it `path`, not `navigationPath`
+          self.path.removeAll()
           self.selectedTab = 0             //  This will switch to the Home tab
       }
 }
@@ -117,9 +117,9 @@ struct RPMTabBarView: View {
                     }
             }
             .toolbar(.visible, for: .tabBar)
-            .toolbarBackground(Color("bgColor"), for: .tabBar)
+            .toolbarBackground(Color("ChatBGcolor"), for: .tabBar)
             .padding(.bottom, 10)
-            .background(Color("bgColor"))
+            .background(Color("ChatBGcolor"))
             .navigationBarBackButtonHidden(true)
         }
         .navigationBarBackButtonHidden(true)

@@ -60,7 +60,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     // MARK: FCM Token
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         print(" FCM Token: \(fcmToken ?? "")")
-        // Optionally send to your backend
+        // send to backend
     }
     
     // MARK: Receive Foreground Notification
@@ -129,10 +129,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             NotificationManager.shared.handleBackgroundNotification(userInfo: userInfo)
         }
         
-        
-        
         completionHandler(.newData)
-        
         
     }
     

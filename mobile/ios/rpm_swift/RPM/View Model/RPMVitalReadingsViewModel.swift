@@ -56,44 +56,28 @@ print("inputDatemonth",inputDate)
     
 #if targetEnvironment(simulator)
     print("simulator")
-    // Simulator
-    //IF IST TIME SELECTED IN SIMULATOR 16.4 REGION INDIA
-
-    // Determine the current time zone
-    let currentTimeZone = TimeZone.current.identifier
-    print("Current Time Zone: \(currentTimeZone)")
-
-    if currentTimeZone == "America/Phoenix" {
-        // If the current time zone is Arizona, use the "MMM d, yyyy" format
-        print("Arizona Time Zone")
-       // olDateFormatter.dateFormat = "d MMM yyyy"
-        olDateFormatter.dateFormat = "MMM d, yyyy"
-       
-    } else {
-        // For other time zones, use the "d MMM yyyy" format
-        print("Other Time Zone")
-        olDateFormatter.dateFormat = "MMM d, yyyy"
-    }
-
-
     
-    //IF US TIME SELECTED IN SIMULATOR 16.0 REGION INDIA
-   
-    //IF US TIME SELECTED IN SIMULATOR
-    
-  //  olDateFormatter.dateFormat = "MMM d, yyyy"
-    if let oldDate = olDateFormatter.date(from: inputDate) {
-        let convertDateFormatter = DateFormatter()
-        convertDateFormatter.dateFormat = "yyyy-MM-dd"
-        var monthdt1 = convertDateFormatter.string(from: oldDate)
-        print("simumonthdt1",monthdt1)
-        return monthdt1
-    } else {
-        // Handle the case where date conversion fails
-        return "Invalid Date"
-    }
 
-   
+
+let currentTimeZone = TimeZone.current.identifier
+print("Current Time Zone: \(currentTimeZone)")
+
+// Set correct input date format
+olDateFormatter.dateFormat = "d MMM yyyy"  // Matches input like "1 May 2025"
+olDateFormatter.locale = Locale(identifier: "en_US_POSIX") // Ensure consistent parsing across devices
+
+if let oldDate = olDateFormatter.date(from: inputDate) {
+    let convertDateFormatter = DateFormatter()
+    convertDateFormatter.dateFormat = "yyyy-MM-dd"
+    let monthdt1 = convertDateFormatter.string(from: oldDate)
+    print("simumonthdt1", monthdt1)
+    return monthdt1
+} else {
+    print("Failed to parse date: \(inputDate)")
+    return "Invalid Date"
+}
+
+ 
 #else
     // Device
     print("Device")
@@ -188,9 +172,8 @@ final class RPMVitalReadingsViewModel: ObservableObject {
                 case .noInternet:
                     self.showNoInternetAlert = true
                 default:
-                    // Optionally show another alert or just log
+                
                     print("Unhandled error: \(error)")
-             
                 }
                 print("monthrdngs init failed")
                 
@@ -203,9 +186,9 @@ final class RPMVitalReadingsViewModel: ObservableObject {
 
     func getVitalReadings(startDate: String, endDate : String , completed: @escaping (String?, AlertItem?) -> Void)
     {
-        print("getVitalReadings startDate")
-        print(startDate)
-        print(endDate)
+        print("getVitalReadings startDate",startDate)
+        print("getVitalReadings endDate",endDate)
+  
         let defaults = UserDefaults.standard
         guard let tkn = defaults.string(forKey: "jsonwebtoken")
             

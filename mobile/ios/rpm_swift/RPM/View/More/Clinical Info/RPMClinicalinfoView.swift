@@ -20,109 +20,112 @@ struct RPMClinicalinfoView: View {
     
     var body: some View {
         GeometryReader { geometry in
-                let width = geometry.size.width
-                let height = geometry.size.height
-        ZStack{
-            BackgroundView()
-            
-            VStack{
-                // NOTE : TOP 3 TABS : VITAL READINGS / MEDICATION DETAILS / SYMPTOM DETAILS
+            let width = geometry.size.width
+            let height = geometry.size.height
+            ZStack{
+                BackgroundView()
                 
-                HStack(spacing:20.0){
-                    if(UserDefaults.standard.string(forKey: "pgmTypeString") ?? "" == "RPM")
-                    {
+                VStack{
+                    // NOTE : TOP 3 TABS : VITAL READINGS / MEDICATION DETAILS / SYMPTOM DETAILS
+                    
+                    HStack(spacing:20.0){
+                        if(UserDefaults.standard.string(forKey: "pgmTypeString") ?? "" == "RPM")
+                        {
+                            
+                            ClinicalInfoTabs(text: "VitalOutline", colorf: Color(.white), colorb: Color("title1"),
+                                             id: 1, currentlySelectedId: $currentlySelectedId,
+                                             showingInfo: $showingInfo
+                                             
+                            )
+                        }
                         
-                        ClinicalInfoTabs(text: "VitalOutline", colorf: Color(.white), colorb: Color("title1"),
-                                         id: 1, currentlySelectedId: $currentlySelectedId,
+                        
+                        ClinicalInfoTabs(text: "Icons_Medication", colorf: Color(.white), colorb:  Color("title1"),
+                                         id: 2, currentlySelectedId: $currentlySelectedId,
                                          showingInfo: $showingInfo
-                                         
                         )
+                        
+                        ClinicalInfoTabs(text: "Icons_Symptoms", colorf: Color(.white), colorb:  Color("title1"),
+                                         id: 3, currentlySelectedId: $currentlySelectedId,
+                                         showingInfo: $showingInfo
+                        )
+                        
+                        
                     }
                     
-                    
-                    ClinicalInfoTabs(text: "Icons_Medication", colorf: Color(.white), colorb:  Color("title1"),
-                                     id: 2, currentlySelectedId: $currentlySelectedId,
-                                     showingInfo: $showingInfo
-                    )
-                    
-                    ClinicalInfoTabs(text: "Icons_Symptoms", colorf: Color(.white), colorb:  Color("title1"),
-                                     id: 3, currentlySelectedId: $currentlySelectedId,
-                                     showingInfo: $showingInfo
-                    )
+                    .background(Color("bgColorDark"))
+                    .cornerRadius(13)
                     
                     
-                }
-                
-                .background(Color("bgColorDark"))
-                .cornerRadius(13)
-                
-                
-                
-                Divider()
-                
-                
-                if(   ( UserDefaults.standard.string(forKey: "pgmTypeString")  == "RPM") && (showingInfo == 1) )
-          
-                {
-                
-                    // NOTE : VITAL READINGS VIEW PAGE
-                    RPMVitalMonthReadingsView()
-                   
-                }
-                else if
                     
-                    ( showingInfo == 2 )
-                     
+                    Divider()
+                    
+                    
+                    if(   ( UserDefaults.standard.string(forKey: "pgmTypeString")  == "RPM") && (showingInfo == 1) )
                         
-                {
-                    // NOTE : MEDICATION VIEW PAGE
-                    RPMMedicationsView()
-                }
-             
-                else if(  showingInfo == 3 )
-                {
-                    // NOTE : SYMPTOMS VIEW PAGE
-                    RPMSymptomsView()
-                }
-                
-            }
-           
-            .frame(width: width)
-            .padding(.vertical, 6)
-            .navigationBarBackButtonHidden(true)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("Clinical Info")
-                        .font(Font.custom("Rubik-Regular", size: 16))
-                        .accessibilityAddTraits(.isHeader)
-                        .foregroundColor( Color("TextColorBlack"))
-                }
-            }
-            
-            
-            .navigationBarItems(leading:
-                                    
-                                    Button(action: {
-                returningFromClinicalInfo = true
-                self.presentationMode.wrappedValue.dismiss()
-            }) {
-                
-                
-                Image("ArrowBack") .renderingMode(.template)
-                    .foregroundColor(  Color("buttonColor"))
-                
-            }
-                                , trailing:
+                    {
+                        
+                        // NOTE : VITAL READINGS VIEW PAGE
+                        RPMVitalMonthReadingsView()
+                        
+                    }
+                    else if
+                        
+                        ( showingInfo == 2 )
                             
-                                Button(action: {
-                navigationHelper.path.append(.medicationAdd)
+                            
+                    {
+                        // NOTE : MEDICATION VIEW PAGE
+                        RPMMedicationsView()
+                    }
+                    
+                    else if(  showingInfo == 3 )
+                    {
+                        // NOTE : SYMPTOMS VIEW PAGE
+                        RPMSymptomsView()
+                    }
+                    
+                }
                 
-            }) {
-                Image("Icons_Add")
-                    .renderingMode(.template)
-                    .foregroundColor(Color("buttonColor"))
+                .frame(width: width)
+                .padding(.vertical, 6)
+                .navigationBarBackButtonHidden(true)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Text("Clinical Info")
+                            .font(Font.custom("Rubik-Regular", size: 16))
+                            .accessibilityAddTraits(.isHeader)
+                            .foregroundColor( Color("TextColorBlack"))
+                    }
+                }
+                
+                
+                .navigationBarItems(leading:
+                                        
+                                        Button(action: {
+                    returningFromClinicalInfo = true
+                    self.presentationMode.wrappedValue.dismiss()
+                }) {
+                    
+                    
+                    Image("ArrowBack") .renderingMode(.template)
+                        .foregroundColor(  Color("buttonColor"))
+                    
+                }
+                                    , trailing:
+                                        Group {
+                                                 if showingInfo == 2 {
+                                        Button(action: {
+                    navigationHelper.path.append(.medicationAdd)
+                    
+                }) {
+                    Image("Icons_Add")
+                        .renderingMode(.template)
+                        .foregroundColor(Color("buttonColor"))
+                }
             }
+        }
             )
             .padding(.horizontal,16)
             

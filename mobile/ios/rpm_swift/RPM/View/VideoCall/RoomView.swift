@@ -31,6 +31,9 @@ struct RoomView: View {
     @EnvironmentObject var speakerLayoutViewModel: SpeakerLayoutViewModel
     @EnvironmentObject var mediaSetupViewModel: MediaSetupViewModel
     
+    @EnvironmentObject var callManager: CallManager
+    @EnvironmentObject var roomManager: RoomManager
+    
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Environment(\.verticalSizeClass) var verticalSizeClass
@@ -123,11 +126,16 @@ struct RoomView: View {
 
         
 //        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+//            print("isShowingPictureInPicture1",isShowingPictureInPicture)
 //            isShowingPictureInPicture = true
+//            print("isShowingPictureInPicture2",isShowingPictureInPicture)
 //        }
 
 //        .sheet(isPresented: $isShowingPictureInPicture) {
+//       
 //            SwiftUIPictureInPictureView()
+//                .environmentObject(callManager)
+//                .environmentObject(roomManager)
 //        }
 
    

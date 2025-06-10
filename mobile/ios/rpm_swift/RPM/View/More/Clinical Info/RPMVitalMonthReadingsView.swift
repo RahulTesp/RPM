@@ -60,37 +60,40 @@ struct RPMVitalMonthReadingsView: View {
         
         ZStack{
             BackgroundView()
+            GeometryReader { geometry in
+                let screenWidth = geometry.size.width
+                
             VStack ( alignment: .leading){
-             
+                
                 HStack {
                     Spacer()
                     
                     Button {
                         vitalReadingsList.loading = true
                         currentMonthDate = Calendar.current.date(byAdding: .month, value: -1, to: currentMonthDate)!
-                        print("currentMonthDate1")
-                        print(currentMonthDate)
-                        print("startDateOfMonth")
-                        print(startDateOfMonth)
-                        print("endDateOfMonth")
-                        print(endDateOfMonth)
-                   
+                        print("currentMonthDate1",startDateOfMonth)
+                        
+                        print("startDateOfMonth",startDateOfMonth)
+                        
+                        print("endDateOfMonth",endDateOfMonth)
+                        
+                        
                         vitalReadingsList.getVitalReadings(
                             
                             startDate:
                                 
                                 convertVitalMonthRdngsDate(inputDate: startDateOfMonth)
-
+                            
                             ,  endDate:
                                 
                                 convertVitalMonthRdngsDate(inputDate: endDateOfMonth)
-     
+                            
                             , completed: {_,_ in
                                 print("vitals chng")
                                 
                             }
                         )
-                
+                        
                     } label: {
                         Image(systemName: "chevron.left")
                             .foregroundColor(Color("title1"))
@@ -104,7 +107,7 @@ struct RPMVitalMonthReadingsView: View {
                     
                     HStack
                     {
-                   
+                        
                         Text(Date.getCurrentMonth())
                             .foregroundColor(Color("title1"))
                     }
@@ -116,11 +119,11 @@ struct RPMVitalMonthReadingsView: View {
                             .dateTime.month(.wide).year(
                                 
                             ) )) .foregroundColor(Color("title1"))
-                   
+                        
                     }
-                  
+                    
                     Spacer()
-                   
+                    
                     Button {
                         vitalReadingsList.loading = true
                         currentMonthDate = Calendar.current.date(byAdding: .month, value: 1, to: currentMonthDate)!
@@ -135,7 +138,7 @@ struct RPMVitalMonthReadingsView: View {
                                     
                                 }
                         )
-                   
+                        
                     } label: {
                         Image(systemName: "chevron.right")
                             .foregroundColor(.gray)
@@ -146,17 +149,17 @@ struct RPMVitalMonthReadingsView: View {
                 }
                 .padding(.horizontal,6)
                 .padding(.vertical,6)
-               
+                
                 Text("   Vital Readings")
                     .foregroundColor(.black)
                     .font(Font.custom("Rubik-SemiBold", size: 24))
-             
+                
                 if (vitalReadingsList.vitalReadings?.bloodPressure == []
                     && vitalReadingsList.vitalReadings?.weight == []
                     && vitalReadingsList.vitalReadings?.bloodOxygen == []
                     
                     && vitalReadingsList.vitalReadings?.bloodGlucose == []
-          
+                    
                 )
                 {
                     Text("No Readings !").foregroundColor(.red)
@@ -175,7 +178,7 @@ struct RPMVitalMonthReadingsView: View {
                         {
                             ProgressView()
                                 .tint(Color("TextColorBlack"))
-                               
+                            
                             Text("Loading…") .foregroundColor( Color("TextColorBlack"))
                         }
                         .frame(
@@ -185,27 +188,39 @@ struct RPMVitalMonthReadingsView: View {
                     }
                     
                     else{
-                
+                        
                         ScrollView(.horizontal)
                         {
-                       
+                            
                             HStack
                             {
-                               
-                                    BPReadings(bpitem : vitalReadingsList.vitalReadings?.bloodPressure ?? [], returningFromClinicalInfo: $returningFromClinicalInfo)
-                                    
-                                                WeightReadings(wtitem : vitalReadingsList.vitalReadings?.weight ?? [], returningFromClinicalInfo: $returningFromClinicalInfo)
-                                   
-                                                GlucoseReadings(gluitem : vitalReadingsList.vitalReadings?.bloodGlucose ?? [], returningFromClinicalInfo: $returningFromClinicalInfo)
-                                             
-                                                OxygenReadings(oxyitem : vitalReadingsList.vitalReadings?.bloodOxygen ?? [], returningFromClinicalInfo: $returningFromClinicalInfo)
-                           
+                                
+                                BPReadings(bpitem : vitalReadingsList.vitalReadings?.bloodPressure ?? [], returningFromClinicalInfo: $returningFromClinicalInfo,
+                                           viewWidth: screenWidth * 0.80
+                                           
+                                )
+                                
+                                WeightReadings(wtitem : vitalReadingsList.vitalReadings?.weight ?? [], returningFromClinicalInfo: $returningFromClinicalInfo
+                                               ,
+                                                          viewWidth: screenWidth * 0.80
+                                )
+                                
+                                GlucoseReadings(gluitem : vitalReadingsList.vitalReadings?.bloodGlucose ?? [], returningFromClinicalInfo: $returningFromClinicalInfo
+                                                ,
+                                                           viewWidth: screenWidth * 0.80
+                                )
+                                
+                                OxygenReadings(oxyitem : vitalReadingsList.vitalReadings?.bloodOxygen ?? [], returningFromClinicalInfo: $returningFromClinicalInfo
+                                               ,
+                                                          viewWidth: screenWidth * 0.80
+                                )
+                                
                             }
-                      
+                            
                         }
                     }
                 }
-     
+                
             }
             
             .cornerRadius(15)
@@ -223,7 +238,7 @@ struct RPMVitalMonthReadingsView: View {
                     secondaryButton: .cancel()
                 )
             }
-            
+        }
         }
         
         .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -247,6 +262,7 @@ struct WeightReadings: View {
     @Binding var returningFromClinicalInfo: Bool
     @EnvironmentObject var navigationHelper: NavigationHelper
     var showViewMore: Bool = false
+    var viewWidth: CGFloat
     
     var body: some View {
         
@@ -312,9 +328,10 @@ struct WeightReadings: View {
             }
             }
           
-        }  .frame(width: 400)
+        }
+        .frame(width: viewWidth)
             .background(Color("textFieldBG"))
-            .padding(.horizontal, 15)
+            .padding(.horizontal, 5)
         
             .cornerRadius(15)
     }
@@ -326,6 +343,7 @@ struct GlucoseReadings: View {
     @Binding var returningFromClinicalInfo: Bool
     @EnvironmentObject var navigationHelper: NavigationHelper
     var showViewMore: Bool = false
+    var viewWidth: CGFloat
     
     var body: some View {
         
@@ -395,9 +413,10 @@ struct GlucoseReadings: View {
             }
             }
     
-        }  .frame(width: 400)
+        }
+        .frame(width: viewWidth)
             .background(Color("textFieldBG"))
-            .padding(.horizontal, 15)
+            .padding(.horizontal, 5)
         
             .cornerRadius(15)
     }
@@ -409,6 +428,7 @@ struct OxygenReadings: View {
     @Binding var returningFromClinicalInfo: Bool
     @EnvironmentObject var navigationHelper: NavigationHelper
     var showViewMore: Bool = false
+    var viewWidth: CGFloat
     
     var body: some View {
         
@@ -476,9 +496,10 @@ struct OxygenReadings: View {
             }
         }
          
-        }  .frame(width: 400)
+        }
+        .frame(width: viewWidth)
             .background(Color("textFieldBG"))
-            .padding(.horizontal, 15)
+            .padding(.horizontal, 5)
         
             .cornerRadius(15)
     }
@@ -491,6 +512,7 @@ struct BPReadings: View {
     @Binding var returningFromClinicalInfo: Bool
     @EnvironmentObject var navigationHelper: NavigationHelper
     var showViewMore: Bool = false
+    var viewWidth: CGFloat
     
     var body: some View {
         
@@ -500,51 +522,51 @@ struct BPReadings: View {
             {
                 
                 VStack(spacing: 0) {
-                
-                HStack
-                {
-            
-                    Text(
-                        " Blood Pressure" )
-                    .foregroundColor(Color("darkGreen"))
-                    .font(.system(size: 20,weight: .medium))
-                    //.font(Font.custom("Rubik-Regular", size: 20 )
-                    Spacer()
                     
-                }
-            
-                .frame(maxWidth: .infinity, minHeight: 45)
-                .background(Color("ColorGreen"))
-                .cornerRadius(8, corners: [.topLeft, .topRight])
-                
-                VStack(spacing: 0) {
-                    
-                    ForEach(
-                        bpitem
-                      
-                    ) { item in
+                    HStack
+                    {
                         
-                        HStack
-                        {
-                        
-                            VitalReadingsScrollView(
-                                
-                                systolic : item.systolic,
-                                diastolic : item.diastolic,
-                                pulse : item.pulse,
-                                systolicstatus: item.systolicStatus,
-                                diastolicstatus: item.diastolicStatus,
-                                pulsestatus: item.pulseStatus,
-                                status:item.status,
-                                time : item.readingTime
-                                
-                                
-                            )
-                      
-                        }
+                        Text(
+                            " Blood Pressure" )
+                        .foregroundColor(Color("darkGreen"))
+                        .font(.system(size: 20,weight: .medium))
+                        //.font(Font.custom("Rubik-Regular", size: 20 )
+                        Spacer()
                         
                     }
-                }
+                    
+                    .frame(maxWidth: .infinity, minHeight: 45)
+                    .background(Color("ColorGreen"))
+                    .cornerRadius(8, corners: [.topLeft, .topRight])
+                    
+                    VStack(spacing: 0) {
+                        
+                        ForEach(
+                            bpitem
+                            
+                        ) { item in
+                            
+                            HStack
+                            {
+                                
+                                VitalReadingsScrollView(
+                                    
+                                    systolic : item.systolic,
+                                    diastolic : item.diastolic,
+                                    pulse : item.pulse,
+                                    systolicstatus: item.systolicStatus,
+                                    diastolicstatus: item.diastolicStatus,
+                                    pulsestatus: item.pulseStatus,
+                                    status:item.status,
+                                    time : item.readingTime
+                                    
+                                    
+                                )
+                                
+                            }
+                            
+                        }
+                    }
                     // Conditionally show "View More..."
                     if showViewMore {
                         Button(action: {
@@ -565,12 +587,14 @@ struct BPReadings: View {
                     }
                     
                     
+                }
             }
-            }
-        } .frame(width: 400)
+        }
+        .frame(width: viewWidth)
             .background(Color("textFieldBG"))
-            .padding(.horizontal, 15)
+            .padding(.horizontal, 5)
             .cornerRadius(15)
+    
     }
 }
 

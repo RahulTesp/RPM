@@ -320,8 +320,7 @@ struct chart7DaysView: View {
           
         }
     
-        .frame(minWidth: width, maxWidth: width, minHeight:  height, maxHeight: .infinity)
- 
+  
     }
     
 }
@@ -514,11 +513,21 @@ print("itemlabelnames",item.values?.map { $0.label } ?? [])
         chart.data = addData()
      
         // Set the maximum number of initially visible data points
-           let initialVisibleDataPoints = 15
-           chart.setVisibleXRangeMaximum(Double(initialVisibleDataPoints))
+//           let initialVisibleDataPoints = 15
+//           chart.setVisibleXRangeMaximum(Double(initialVisibleDataPoints))
+//
+//           // Enable horizontal scrolling (disable zooming)
+//           chart.scaleXEnabled = true
+        
+        
+        chart.scaleXEnabled = false
+        chart.pinchZoomEnabled = false
+        chart.doubleTapToZoomEnabled = false
+        chart.dragEnabled = false // If you want to lock the chart entirely
 
-           // Enable horizontal scrolling (disable zooming)
-           chart.scaleXEnabled = true
+        
+        
+        
 
         return chart
     }
@@ -850,29 +859,10 @@ print("itemlabelnames",item.values?.map { $0.label } ?? [])
         chart.xAxis.granularity = 1.0
         chart.xAxis.valueFormatter = CustomChartFormatterv(days: days)
       
-        
-       // chart.leftAxis.spaceBottom = 0
-        
         chart.xAxis.setLabelCount(days.count, force: false)
-       // chart.xAxis.centerAxisLabelsEnabled = true
-      
+ 
         chart.xAxis.labelTextColor = UIColor.black
     
-       // chart.xAxis.granularity = 1.0
-        
-        //chart.leftAxis.spaceTop = 0
-     //   chart.rightAxis.spaceBottom = 0.5
-       // chart.rightAxis.spaceTop = 0
-        
-       // chart.xAxis.axisMinimum = 10
-    //    chart.leftAxis.axisMaximum = 200
-     //   chart.leftAxis.axisMinimum = 10
-     
-       // chart.rightAxis.axisMinimum = 0
-       //chart.rightAxis.spaceBottom = 0.4
-       // chart.minOffset = 0
-        
-      //  chart.xAxis.labelWidth = 12
         
         chart.data = addData()
         // Set the maximum number of initially visible data points

@@ -14,9 +14,7 @@ struct CreateConversationView: View {
     @EnvironmentObject var participantsManager: ParticipantsManager
     @EnvironmentObject var appModel: AppModel
     @EnvironmentObject var navigationHelper: NavigationHelper
-    
-    @ObservedObject var memberDetList = MembersListViewModel()
-    @StateObject var messageListViewModel = MessageListViewModel()
+    @StateObject var memberDetList = MembersListViewModel()
     
     var items: [PersistentConversationDataItem]
     
@@ -24,32 +22,51 @@ struct CreateConversationView: View {
     @State private var errorText = ""
     @State private var createButtonDisabled = false
     
+    
     var body: some View {
         VStack {
-            List(memberDetList.memberDetails ?? []) { item in
-                Button(action: {
-                    fetchChatSid(memberUserName: item.memberUserName)
-                }) {
-                    Text(item.memberName)
+            if memberDetList.loading {
+                ProgressView("Loading members...")
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .padding()
+            } else {
+                if let members = memberDetList.memberDetails, !members.isEmpty {
+                    List(members) { item in
+                        Button(action: {
+                            fetchChatSid(memberUserName: item.memberUserName)
+                        }) {
+                            Text(item.memberName)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color.gray.opacity(0.2))
+                                )
+                                .foregroundColor(Color("title1"))
+                        }
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                    }
+                    .listStyle(PlainListStyle())
+
+                } else {
+                    Text("No members found.")
+                        .foregroundColor(.gray)
+                        .padding()
                 }
             }
         }
         .padding()
-        .navigationTitle("Select Member")
+        .navigationTitle("Select Contact")
         .onAppear {
-            
             print("""
                CreateConversationView appeared.
-              Environment Objects:
-               
-                conversationManager: \(conversationManager)
-                participantsManager: \(participantsManager)
-               
-              """)
-            // You can print debug info here if needed
+               Environment Objects:
+               conversationManager: \(conversationManager)
+               participantsManager: \(participantsManager)
+               """)
         }
     }
-    
+
     private func fetchChatSid(memberUserName: String) {
         print("[fetchChatSid] Started for member: \(memberUserName)")
         
@@ -110,10 +127,7 @@ struct CreateConversationView: View {
         }
     }
     
-    
-    
-    
-    
+
     private func navigateToMessageListView(with conversation: PersistentConversationDataItem) {
         print("Navigating to Message List View with conversation SID: \(conversation.sid)")
         // Add the conversation to the navigation path to trigger the navigation

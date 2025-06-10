@@ -15,6 +15,7 @@ final class MembersListViewModel: ObservableObject {
     @Published var loading = true
     
     init() {
+        print("initmemeberapicalled")
         memDetails()
     }
     
@@ -32,22 +33,22 @@ final class MembersListViewModel: ObservableObject {
         }
         
         
-        DashboardManager.shared.membersLists(tkn: tkn){ [self] (result ) in
+        DashboardManager.shared.membersLists(tkn: tkn){ (result ) in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let account):
                     
                     self.memberDetails = account
                     self.loading = false
-                    print("loading")
+                    print("membersListsloading")
                     print(self.loading)
                     
                     
                 case .failure(let accounttt):
-                    print("accounttt")
+                    print("membersListsaccounttt")
                     print(accounttt)
                     self.loading = false
-                    print("loading")
+                    print("membersListsloadingF")
                     print(self.loading)
                     print("memberDetails faileddd")
                     

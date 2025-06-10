@@ -49,14 +49,14 @@ struct RPMApp: App {
                     .environmentObject(model)  // Pass AppModel to the environment
                     .environmentObject(navigationHelper)
                     .environmentObject(model.conversationManager)
-                    .environmentObject(messageListViewModel)
-            
+              
                     .environmentObject(callManager)
                     .environmentObject(roomManager)
                     .environmentObject(localParticipant)
                     .environmentObject(mediaSetupViewModel)
                 
                     .environmentObject(homeViewModel)
+              
                     .onAppear {
                         print("AppModel in RPMTabBar:", model)
                         // Log AppModel details for debugging
@@ -209,6 +209,8 @@ struct RPMApp: App {
                                 .environmentObject(model.messagesManager)
                                 .environmentObject(model.participantsManager)
                                 .environmentObject(navigationHelper)
+                            
+                            
                         case .createConversation:
                             CreateConversationView(
                                 items: model.conversationManager.conversations
@@ -219,6 +221,8 @@ struct RPMApp: App {
                             .environmentObject(model.messagesManager)
                             .environmentObject(model.participantsManager)
                             .environmentObject(navigationHelper)
+                      
+                          
                         case .messageList(let conversation):
                             MessageListView(
                                 conversation: conversation,
@@ -243,14 +247,15 @@ struct ApplicationSwitcher: View {
     @EnvironmentObject var appModel: AppModel
     @EnvironmentObject var navigationHelper: NavigationHelper
     @EnvironmentObject var conversationManager: ConversationManager
-    @EnvironmentObject var messageListViewModel: MessageListViewModel
-    
+
     @EnvironmentObject var callManager: CallManager
     @EnvironmentObject var roomManager: RoomManager
     @EnvironmentObject var localParticipant: LocalParticipantManager
     @EnvironmentObject var mediaSetupViewModel: MediaSetupViewModel
     
     @EnvironmentObject var accountListVM: RPMHomeViewModel
+    @EnvironmentObject var memberListViewModel: RPMHomeViewModel
+    @StateObject var memberDetList = MembersListViewModel()
     
     var body: some View {
             VStack {
@@ -269,6 +274,7 @@ struct ApplicationSwitcher: View {
                     
                         .environmentObject(accountListVM)
                         .environmentObject(loginViewModel)
+                        .environmentObject(memberDetList)
                     
                         .onAppear {
                             print("AppModel in RPMTabBarView:", appModel)
@@ -297,7 +303,7 @@ struct ApplicationSwitcher: View {
         }
     }
     
-// Add the enum here
+
 enum Screen: Hashable{
     case login
     case createConversation

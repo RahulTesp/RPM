@@ -61,7 +61,6 @@ struct ConversationsList: View {
                                     conversationManager.subscribeConversations(onRefresh: false)
                                 }
                             } else {
-                                // Placeholder view if needed
                                 
                                 // Show toast when no conversations exist
                                 Text("") // dummy view to force evaluation
@@ -158,6 +157,7 @@ struct ConversationsList: View {
                     .environmentObject(conversationManager)
                     .environmentObject(participantsManager)
                     .environmentObject(navigationHelper)
+                    .environmentObject(appModel.messagesManager)
             default:
                 EmptyView()
             }

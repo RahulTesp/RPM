@@ -148,6 +148,8 @@
 		3CBDD8472B5A3D78007C9DBD /* OtpResetVerificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CBDD8462B5A3D78007C9DBD /* OtpResetVerificationView.swift */; };
 		3CC3464D2AFB6177002F2F14 /* TimeAgoUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC3464C2AFB6177002F2F14 /* TimeAgoUtils.swift */; };
 		3CC3464F2AFB6D66002F2F14 /* DateUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC3464E2AFB6D66002F2F14 /* DateUtils.swift */; };
+		3CED1E112DF6C0310097FB88 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3CED1E102DF6C02D0097FB88 /* Debug.xcconfig */; };
+		3CED1E132DF6C6670097FB88 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3CED1E122DF6C6500097FB88 /* Release.xcconfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -303,6 +305,8 @@
 		3CBDD8462B5A3D78007C9DBD /* OtpResetVerificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OtpResetVerificationView.swift; sourceTree = "<group>"; };
 		3CC3464C2AFB6177002F2F14 /* TimeAgoUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeAgoUtils.swift; sourceTree = "<group>"; };
 		3CC3464E2AFB6D66002F2F14 /* DateUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateUtils.swift; sourceTree = "<group>"; };
+		3CED1E102DF6C02D0097FB88 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		3CED1E122DF6C6500097FB88 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -463,6 +467,8 @@
 		13B4581E284507A400A76F67 = {
 			isa = PBXGroup;
 			children = (
+				3CED1E122DF6C6500097FB88 /* Release.xcconfig */,
+				3CED1E102DF6C02D0097FB88 /* Debug.xcconfig */,
 				3C4966B22D7EC35D00B35848 /* GoogleService-Info.plist */,
 				13B45829284507A400A76F67 /* RPM */,
 				13B4583A284507A800A76F67 /* RPMTests */,
@@ -979,8 +985,10 @@
 			files = (
 				13B45832284507A800A76F67 /* Preview Assets.xcassets in Resources */,
 				3CBD6B44296C2575000597E1 /* Rubik-Italic.ttf in Resources */,
+				3CED1E132DF6C6670097FB88 /* Release.xcconfig in Resources */,
 				3CB92A762B4FEDEC00580DD0 /* testConversations.json in Resources */,
 				3CBD6B40296C1CCE000597E1 /* Rubik-Regular.ttf in Resources */,
+				3CED1E112DF6C0310097FB88 /* Debug.xcconfig in Resources */,
 				3C8AFD27284BE1FF00A06078 /* Assets.xcassets in Resources */,
 				3CBD6B42296C24D8000597E1 /* Rubik-SemiBold.ttf in Resources */,
 				3C4966B32D7EC35D00B35848 /* GoogleService-Info.plist in Resources */,
@@ -1166,6 +1174,7 @@
 /* Begin XCBuildConfiguration section */
 		13B45849284507A800A76F67 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3CED1E102DF6C02D0097FB88 /* Debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1227,6 +1236,7 @@
 		};
 		13B4584A284507A800A76F67 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3CED1E122DF6C6500097FB88 /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;

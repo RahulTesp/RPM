@@ -25,20 +25,19 @@ enum APIError: Error {
     
 }
 
+
 class NetworkManager: NSObject {
     
     static let shared           = NetworkManager()
-    static let baseURL          =
-    //"https://rpmappservicepreprod.azurewebsites.net"
-    // "https://rpmwebapp.azurewebsites.net"
-    // "https://c-lynxapi.azurewebsites.net"
-    //  "https://rpmdevnew.azurewebsites.net"
-    // "https://cx-dev-server.azurewebsites.net"
-    // "https://cx-preprod-server.azurewebsites.net"
-    // "https://md-preprod-server.azurewebsites.net"
-    "https://rpm-dev-tespcare.azurewebsites.net"
     
-    
+    // Static computed property at class level
+     static var baseURL: String {
+         guard let url = Bundle.main.infoDictionary?["BaseURL"] as? String else {
+             fatalError(" BaseURL not found in Info.plist")
+         }
+         return url
+     }
+
     private override init() {}
     
     // NOTE : LOGIN API INTEGRATION
@@ -46,10 +45,17 @@ class NetworkManager: NSObject {
     func login(userName: String,
                password: String,
                completed: @escaping (Result<RPMLoginDataModel, APIError>) -> Void) {
+        
         guard let url = URL(string: NetworkManager.baseURL + "/api/authorization/Patientlogin") else {
             completed(.failure(.invalidURL))
             return
         }
+        
+        print("Base URL: \(NetworkManager.baseURL)")
+
+        
+        print("LOGINurl:", url)
+        
         
         let bodyData = "{\"UserName\": \"\(userName)\", \"Password\": \"\(password)\"}"
         let postData = bodyData.data(using: .utf8)
@@ -67,8 +73,10 @@ class NetworkManager: NSObject {
                 print("URLError:", error.code)
                 
                 switch error.code {
-                case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                    completed(.failure(.noInternet)) // Create a new case for this
+                case .notConnectedToInternet, .timedOut:
+                    completed(.failure(.noInternet))
+                case .cannotFindHost, .cannotConnectToHost:
+                    completed(.failure(.invalidURL))
                 default:
                     completed(.failure(.unableToComplete))
                 }
@@ -526,7 +534,7 @@ class NetworkManager: NSObject {
                 
                 switch error.code {
                 case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                    completed(.failure(.noInternet)) // Create a new case for this
+                    completed(.failure(.noInternet))
                 default:
                     completed(.failure(.unableToComplete))
                 }
@@ -562,14 +570,14 @@ class NetworkManager: NSObject {
     
     
     func saveFirebaseToken(fbToken: String, accessToken: String , completed: @escaping (Result<Bool, APIError>) -> Void) {
-        // Construct the URL with the token as a query parameter
+   
         guard let url = URL(string: "\(NetworkManager.baseURL)/api/notification/insertfirebasetoken?Token=\(fbToken)") else {
             completed(.failure(.invalidURL))
             return
         }
         
         var request = URLRequest(url: url)
-        request.httpMethod = "POST"  // Assuming it's a POST request
+        request.httpMethod = "POST"
         
         
         
@@ -583,7 +591,7 @@ class NetworkManager: NSObject {
                 
                 switch error.code {
                 case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                    completed(.failure(.noInternet)) // Create a new case for this
+                    completed(.failure(.noInternet))
                 default:
                     completed(.failure(.unableToComplete))
                 }
@@ -623,7 +631,7 @@ class NetworkManager: NSObject {
         if let accessToken = UserDefaults.standard.string(forKey: "jsonwebtoken") {
             print(" Using Access Token: \(accessToken)")
             
-            // Add token in headers with "Bearer" as the key
+          
             request.addValue(accessToken, forHTTPHeaderField: "Bearer")
         } else {
             print(" No Access Token found in UserDefaults")
@@ -692,20 +700,20 @@ class NetworkManager: NSObject {
             return
         }
         
-        // Construct the URL with the token as a query parameter
+    
         guard let url = URL(string: "\(NetworkManager.baseURL)/api/comm/notifibyfirebase?toUser=\(rejectToUser)&tokenid=\(rejectTokenId)") else {
             completed(.failure(.invalidURL))
             return
         }
         
         var request = URLRequest(url: url)
-        request.httpMethod = "POST"  // Assuming it's a POST request
+        request.httpMethod = "POST"
         
         
         if let accessToken = UserDefaults.standard.string(forKey: "jsonwebtoken") {
             print(" Using Access Token: \(accessToken)")
             
-            // Add token in headers with "Bearer" as the key
+       
             request.addValue(accessToken, forHTTPHeaderField: "Bearer")
         } else {
             print(" No Access Token found in UserDefaults")
@@ -740,15 +748,14 @@ class NetworkManager: NSObject {
 class ProfileManager: NSObject {
     
     static let shared           = ProfileManager()
-    static let baseURL          =
-    // "https://rpmappservicepreprod.azurewebsites.net"
-    // "https://rpmwebapp.azurewebsites.net"
-    //"https://c-lynxapi.azurewebsites.net"
-    // "https://rpmdevnew.azurewebsites.net"
-    //"https://cx-dev-server.azurewebsites.net"
-    //"https://cx-preprod-server.azurewebsites.net"
-    //"https://md-preprod-server.azurewebsites.net"
-    "https://rpm-dev-tespcare.azurewebsites.net"
+    
+    static var baseURL: String {
+        guard let url = Bundle.main.infoDictionary?["BaseURL"] as? String else {
+            fatalError(" BaseURL not found in Info.plist")
+        }
+        return url
+    }
+    
     
     private override init() {}
     
@@ -825,15 +832,14 @@ class DashboardManager:
     var pgmType : String?
     
     static let shared           = DashboardManager()
-    static let baseURL          =
-    //  "https://rpmappservicepreprod.azurewebsites.net"
-    //"https://rpmwebapp.azurewebsites.net"
-    // "https://c-lynxapi.azurewebsites.net"
-    // "https://rpmdevnew.azurewebsites.net"
-    //"https://cx-dev-server.azurewebsites.net"
-    //"https://cx-preprod-server.azurewebsites.net"
-    //  "https://md-preprod-server.azurewebsites.net"
-    "https://rpm-dev-tespcare.azurewebsites.net"
+    
+    static var baseURL: String {
+        guard let url = Bundle.main.infoDictionary?["BaseURL"] as? String else {
+            fatalError(" BaseURL not found in Info.plist")
+        }
+        return url
+    }
+    
     
     private override init() {}
     
@@ -1024,7 +1030,7 @@ class DashboardManager:
             do {
                 let decoder = JSONDecoder()
                 let decodedResponse = try decoder.decode(Notifications.self, from: data)
-                
+                print("bellnotification",decodedResponse)
                 completed(.success(decodedResponse))
                 
             } catch {
@@ -1167,7 +1173,7 @@ class DashboardManager:
                                 
                                 switch error.code {
                                 case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                                    completed(.failure(.noInternet)) // Create a new case for this
+                                    completed(.failure(.noInternet))
                                 default:
                                     completed(.failure(.unableToComplete))
                                 }
@@ -1453,7 +1459,7 @@ class DashboardManager:
                     
                     switch error.code {
                     case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                        completed(.failure(.noInternet)) // Create a new case for this
+                        completed(.failure(.noInternet))
                     default:
                         completed(.failure(.unableToComplete))
                     }
@@ -1535,7 +1541,7 @@ class DashboardManager:
                     
                     switch error.code {
                     case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                        completed(.failure(.noInternet)) // Create a new case for this
+                        completed(.failure(.noInternet))
                     default:
                         completed(.failure(.unableToComplete))
                     }
@@ -1671,7 +1677,7 @@ class DashboardManager:
                 
                 switch error.code {
                 case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                    completed(.failure(.noInternet)) // Create a new case for this
+                    completed(.failure(.noInternet))
                 default:
                     completed(.failure(.unableToComplete))
                 }
@@ -1718,6 +1724,7 @@ class DashboardManager:
                       
                       completed: @escaping (Result<[MembersListDataModel], APIError>) -> Void) {
         
+        print("memeberapicalled")
         guard let url = URL(string: DashboardManager.baseURL + "/api/careteam/getpatientcareteammembers") else {
             completed(.failure(.invalidURL))
             return
@@ -1848,7 +1855,7 @@ class DashboardManager:
                 case 404:
                     // Handle the 404 case specifically if needed
                     completed(.failure(.invalidResponse))
-                    // completed(.success(responseString))
+                  
                 default:
                     completed(.failure(.invalidResponse))
                 }
@@ -2048,7 +2055,7 @@ class DashboardManager:
         message: String,
         completion: @escaping (Result<Int, Error>) -> Void
     ) {
-        print("[NotifyConversation] Preparing to send message notification...")
+      
         
         let payload: [String: Any] = [
             "ConversationSid": convSID,
@@ -2060,7 +2067,7 @@ class DashboardManager:
         print("[NotifyConversation] Payload: \(payload)")
         
         guard let url = URL(string: DashboardManager.baseURL + "/api/comm/NotifyConversation") else {
-            print("[NotifyConversation] Invalid URL!")
+    
             completion(.failure(NSError(domain: "NotifyConversation", code: -1, userInfo: [
                 NSLocalizedDescriptionKey: "Invalid URL"
             ])))
@@ -2128,15 +2135,13 @@ class DashboardManager:
 class MoreManager: NSObject {
     
     static let shared           = MoreManager()
-    static let baseURL          =
-    // "https://rpmappservicepreprod.azurewebsites.net"
-    // "https://rpmwebapp.azurewebsites.net"
-    //"https://c-lynxapi.azurewebsites.net"
-    //  "https://rpmdevnew.azurewebsites.net"
-    // "https://cx-dev-server.azurewebsites.net"
-    //"https://cx-preprod-server.azurewebsites.net"
-    //  "https://md-preprod-server.azurewebsites.net"
-    "https://rpm-dev-tespcare.azurewebsites.net"
+    
+    static var baseURL: String {
+        guard let url = Bundle.main.infoDictionary?["BaseURL"] as? String else {
+            fatalError(" BaseURL not found in Info.plist")
+        }
+        return url
+    }
     
     private override init() {}
     
@@ -2148,15 +2153,12 @@ class MoreManager: NSObject {
             completed(.failure(.invalidURL))
             return
         }
-        
-        
-        
+     
         var request = URLRequest(url: url)
         
         request.addValue(tkn, forHTTPHeaderField: "Bearer")
         print("reque")
-        // print(request)
-        
+     
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             
             if let data = data,let _ = String(data: data,encoding:  .utf8)
@@ -2170,7 +2172,7 @@ class MoreManager: NSObject {
                 
                 switch error.code {
                 case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                    completed(.failure(.noInternet)) // Create a new case for this
+                    completed(.failure(.noInternet))
                 default:
                     completed(.failure(.unableToComplete))
                 }
@@ -2302,19 +2304,7 @@ class MoreManager: NSObject {
                                    "Morning" : morning , "AfterNoon":afternoon , "Evening" : evening , "Night" : night , "StartDate" : startDate , "EndDate" : endDate , "Description" :comments ]
         
         let jsonData = try? JSONSerialization.data(withJSONObject: json)
-        
-        
-        print("datass")
-        print(medName)
-        print(schedule1)
-        print(schedule2)
-        print(morning)
-        print(afternoon)
-        print(evening)
-        print(night)
-        print(startDate)
-        print(endDate)
-        print(comments)
+       
         
         var request = URLRequest(url: url)
         request.addValue(tkn, forHTTPHeaderField: "Bearer")
@@ -2391,7 +2381,7 @@ class MoreManager: NSObject {
                 
                 switch error.code {
                 case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                    completed(.failure(.noInternet)) // Create a new case for this
+                    completed(.failure(.noInternet))
                 default:
                     completed(.failure(.unableToComplete))
                 }

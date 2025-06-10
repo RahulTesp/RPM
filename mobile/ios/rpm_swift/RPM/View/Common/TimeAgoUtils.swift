@@ -10,6 +10,7 @@ import SwiftUI
 struct TimeAgoUtils {
     static func calculateTimeAgo(localDateString: String) -> String {
         
+        print("localDateString: \(localDateString)")
         // First, create a DateFormatter for parsing the input string
         let inputDateFormatter = DateFormatter()
         inputDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
@@ -42,7 +43,8 @@ struct TimeAgoUtils {
         
         // Calculate the time difference in seconds
      
-        let timeDifference = calendar.dateComponents([.second, .minute, .hour, .day], from: localDate, to: currentDate)
+        let timeDifference = calendar.dateComponents([.second, .minute, .hour, .day, .weekOfYear, .month], from: localDate, to: currentDate)
+
         print("Time Difference: \(timeDifference)")
         
         
@@ -95,9 +97,10 @@ struct TimeAgoUtils {
         
         else if daysDifference < 7 && daysDifference >= 1 {
             let localDayOfWeek = calendar.component(.weekday, from: localDate)
-            let correctedLocalDayOfWeek = (localDayOfWeek + 5) % 7 // Adjust to start from Monday
-            let dayOfWeekSymbol = calendar.weekdaySymbols[correctedLocalDayOfWeek]
-            print("localDayOfWeek: \(localDayOfWeek), correctedLocalDayOfWeek: \(correctedLocalDayOfWeek), dayOfWeekSymbol: \(dayOfWeekSymbol)")
+    
+            let dayOfWeekSymbol = calendar.weekdaySymbols[calendar.component(.weekday, from: localDate) - 1]
+
+            print("localDayOfWeek: \(localDayOfWeek), dayOfWeekSymbol: \(dayOfWeekSymbol)")
             return dayOfWeekSymbol
         }
 

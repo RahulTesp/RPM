@@ -46,6 +46,8 @@ struct RoomViewDependencyWrapper: View {
     var body: some View {
         Group {
             RoomView(roomName: roomName,isShowingPictureInPicture: $isShowingPictureInPicture)
+                .environmentObject(callManager)
+                .environmentObject(roomManager)
         }
         .environmentObject(roomViewModel)
         .environmentObject(galleryLayoutViewModel)

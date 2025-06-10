@@ -40,6 +40,20 @@ struct RecentVitalsScrollView: View {
                         Spacer()
                     }
                     
+                    HStack
+                    {
+                        
+                        Text(item.latestvm?.pulseValue ?? "")
+                        
+                            .foregroundColor(Color("darkGreen"))
+                            .font(Font.custom("Rubik-Regular", size: 30))
+                        
+                        Text(item.latestvm?.pulseUnit ?? "")
+                            .foregroundColor(Color("darkGreen"))
+                            .font(Font.custom("Rubik-Regular", size: 15))
+                        Spacer()
+                    }
+                    
                     Text( item.latestvm?.date != nil ?    TimeAgoUtils.calculateTimeAgo(localDateString: item.latestvm?.date  ?? "") : "")
                         .font(Font.custom("Rubik-Regular", size: 16))
                         .foregroundColor(.black)
@@ -49,6 +63,7 @@ struct RecentVitalsScrollView: View {
                 
             }
             .frame(width: 300)
+          
             .background(Color("LGreen"))
             .cornerRadius(15)
           
@@ -85,11 +100,8 @@ struct RecentVitalsScrollView: View {
                 .frame(maxWidth: .infinity)
             }
         }
-        
-        .padding(.top,3)
+        .padding(.all,3)
         .background(.white)
-        .padding(.bottom,3)
-        .padding(.vertical,3)
         .cornerRadius(15)
     }
 }
@@ -188,7 +200,7 @@ struct VitalReadingsScrollView: View {
                         .foregroundColor(ColourStatus.getColorForStatus(diastolicstatus))
                         .font(Font.custom("Rubik-Regular", size: 18))
                     Spacer()
-                    Text(String(convertUTCtoLOCAL(inputDate: time ?? "") ?? ""))
+                    Text(String(convertUTCtoLOCAL(inputDate: time) ?? ""))
                         .font(Font.custom("Rubik-Regular", size: 16))
                         .foregroundColor(.black)
                         .padding(.vertical,0.5)

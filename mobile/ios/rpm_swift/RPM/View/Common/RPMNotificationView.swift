@@ -28,35 +28,8 @@ struct RPMNotificationView: View {
                     
  //NOTIFICATION LIST LOOP
                     
-                    ForEach(
-                        notifList.notif?.data ?? []
-                        
-                    ) { item in
-                        
-                        HStack
-                        {
-                            Text( convertDateFormat(inputDate: item.notificationDate ?? "")) .padding(.top,10)
-                                .foregroundColor(Color("title1"))
-                            
-                            Spacer()
-                            
-                        }
-                        
-                        ForEach(
-                            notifList.notif?.data[0].notificationList ?? []
-                            
-                        ) { item in
-                            
-                            NotificationScrollView(
-                                
-                                
-                                time:
-                                    convertUTCtoLocalNotificationDate(inputDate: item.createdOn ?? "") ?? "",
-                                decription:
-                                    item.notificationListDescription ?? "",
-                                fontColor1 : Color("darkGreen"),fontColor2: .black, bgColor: Color(.white))
-                        }
-                    }
+                    NotificationListView(data: notifList.notif?.data ?? [])
+
                 }
             }
             .padding(.horizontal, 12)
@@ -116,6 +89,34 @@ struct RPMNotificationView: View {
     }
     
 }
+
+struct NotificationListView: View {
+    let data: [Datum]
+
+    var body: some View {
+        ForEach(data) { day in
+            VStack(alignment: .leading) {
+                HStack {
+                    Text(convertDateFormat(inputDate: day.notificationDate ?? ""))
+                        .padding(.top, 10)
+                        .foregroundColor(Color("title1"))
+                    Spacer()
+                }
+
+                ForEach(day.notificationList) { notification in
+                    NotificationScrollView(
+                        time: convertUTCtoLocalNotificationDate(inputDate: notification.createdOn ?? "") ?? "",
+                        decription: notification.notificationListDescription ?? "",
+                        fontColor1: Color("darkGreen"),
+                        fontColor2: .black,
+                        bgColor: Color(.white)
+                    )
+                }
+            }
+        }
+    }
+}
+
 
 
 func convertDateFormat(inputDate: String) -> String {

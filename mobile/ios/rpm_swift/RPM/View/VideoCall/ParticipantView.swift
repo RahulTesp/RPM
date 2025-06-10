@@ -31,13 +31,7 @@ struct ParticipantView: View {
     var body: some View {
         ZStack {
             Color.backgroundStronger
-            Text(viewModel.displayName)
-                .lineLimit(3)
-                .multilineTextAlignment(.center)
-                .foregroundColor(.white)
-                .font(.system(size: 24, weight: .bold))
-                .padding()
-            
+
             if let cameraTrack = viewModel.cameraTrack, !viewModel.isCameraTrackSwitchedOff {
                 // Video is available and active
                 ZStack {
@@ -58,8 +52,8 @@ struct ParticipantView: View {
 
                     VStack {
                         Text("Video is paused")
-                                .font(.headline) // Customize the font if needed
-                                .foregroundColor(.gray) // Optional: add color
+                                .font(.headline)
+                                .foregroundColor(.gray)
                                 .padding()
                     }
                 }

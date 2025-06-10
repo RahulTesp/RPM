@@ -55,7 +55,7 @@ struct RPMOTPView: View {
                         .multilineTextAlignment(.center)
                         .padding(.vertical,10)
                   
-                    Image("logocylinx")
+                    Image("logoclynx")
                         .resizable()
                         .frame(width: 160.0, height: 150.0)
                         .padding(10)
@@ -126,15 +126,15 @@ struct RPMOTPView: View {
                                     print(viewModel.isAuthenticated)
                                     
                                     print("alertItem1")
-                                    print(self.alertItem)
+                                   // print(self.alertItem)
                                 
                                 }else {
                                     shouldShowLoginAlert = true
                                     self.alertItem = alertItem
                                     print("alertItem2")
-                                    print(self.alertItem)
+                                  //  print(self.alertItem)
                                     print("alertItem title ")
-                                    print(self.alertItem?.title)
+                                   // print(self.alertItem?.title)
                                     
                                 }
                             

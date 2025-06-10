@@ -33,6 +33,8 @@ class PictureInPictureViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     
+        print("PictureInPictureViewController")
+        
         let sampleBufferVideoCallView = SampleBufferVideoView()
         sampleBufferVideoCallView.contentMode = .scaleAspectFit
 

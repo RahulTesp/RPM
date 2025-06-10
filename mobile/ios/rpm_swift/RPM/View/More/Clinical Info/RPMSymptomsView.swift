@@ -13,26 +13,34 @@ struct RPMSymptomsView: View {
     @ObservedObject  var sympDetList = RPMSymptomsViewModel()
     
     var body: some View {
+        GeometryReader { geometry in
+            
+            if  sympDetList.loading {
+                
+                VStack(spacing: 20) {
+                    Spacer()
+                    ProgressView()
+                        .tint(Color("TextColorBlack"))
+                    Text("Loading…")
+                        .foregroundColor(Color("TextColorBlack"))
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
         
-        if  sympDetList.loading {
+            }
+          
             
-            Spacer()
-            ProgressView()
-                .tint(Color("TextColorBlack"))
-               
-            Text("Loading…") .foregroundColor( Color("TextColorBlack"))
-            Spacer()
-            
-        } else
+            else
         
         {
             
             ScrollView
             {
-                VStack(alignment: .leading)
+                VStack(alignment: .leading, spacing: 20)
                 {
                     
-                    Text(" Symptoms")
+                    Text("Symptoms")
                         .foregroundColor(.black)
                         .font(Font.custom("Rubik-SemiBold", size: 24))
                     
@@ -41,7 +49,7 @@ struct RPMSymptomsView: View {
                         
                     )
                     {
-            
+                        
                         Text("NO DATA !").foregroundColor(.red)
                             .frame(
                                 maxWidth: .infinity,
@@ -84,41 +92,45 @@ struct RPMSymptomsView: View {
                             
                         }
                         .foregroundColor(.black)
-                        .frame(width: 320, height: 100, alignment: .leading)
-                        
-                        .padding(.horizontal,15)
-                        .padding(.vertical,5)
+                     
+                        .padding(8)
+                        .frame(maxWidth: .infinity)
                         .background(
-                            RoundedRectangle(cornerRadius: 8, style: .continuous
-                                            )
-                            .stroke(Color("textFieldBG"), lineWidth: 2
-                                   )
-                            .background(.white)
-                            .cornerRadius(8)
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color.white)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color("textFieldBG"), lineWidth: 2)
+                                )
                         )
-                  
+                    
+                   
                     }
-                 
+                    
                 }
-                .padding()
-                .padding(.horizontal,10)
+                .padding(.horizontal, 16)
+                .padding(.top, 10)
+         
+                .frame(width: geometry.size.width-32, alignment: .leading)
+          
                 
-                .alert(isPresented: $sympDetList.showNoInternetAlert) {
-                    Alert(
-                        title: Text("No Internet Connection"),
-                        message: Text("Please turn on Wi-Fi or Mobile Data."),
-                        primaryButton: .default(Text("Open Settings")) {
-                            if let url = URL(string: UIApplication.openSettingsURLString),
-                               UIApplication.shared.canOpenURL(url) {
-                                UIApplication.shared.open(url)
-                            }
-                        },
-                        secondaryButton: .cancel()
-                    )
-                }
+             
+            }
+            .alert(isPresented: $sympDetList.showNoInternetAlert) {
+                Alert(
+                    title: Text("No Internet Connection"),
+                    message: Text("Please turn on Wi-Fi or Mobile Data."),
+                    primaryButton: .default(Text("Open Settings")) {
+                        if let url = URL(string: UIApplication.openSettingsURLString),
+                           UIApplication.shared.canOpenURL(url) {
+                            UIApplication.shared.open(url)
+                        }
+                    },
+                    secondaryButton: .cancel()
+                )
             }
         }
-        
+    }
     }
     
     // NOTE : SYMPTOM DATE FORMATTER

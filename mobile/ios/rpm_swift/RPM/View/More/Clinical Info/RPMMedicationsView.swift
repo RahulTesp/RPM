@@ -22,181 +22,198 @@ struct RPMMedicationsView: View {
     @ObservedObject  var medicDetList = RPMMedicationsViewModel()
     
     var body: some View {
-        
-        if  medicDetList.loading {
+        GeometryReader { geometry in
             
-            Spacer()
-            ProgressView()
-                .tint(Color("TextColorBlack"))
             
-            Text("Loading…") .foregroundColor( Color("TextColorBlack"))
-            Spacer()
             
-        } else
-        
-        {
             
-            ScrollView
-            {
-                VStack(alignment: .leading)
-                {
+            if  medicDetList.loading {
                 
-                    Text(" Medications")
-                        .foregroundColor(.black)
-                        .font(Font.custom("Rubik-SemiBold", size: 24))
-                  
-                    if (medicDetList.medicDetls == []
-                     
-                    )
+                VStack(spacing: 20) {
+                    Spacer()
+                    ProgressView()
+                        .tint(Color("TextColorBlack"))
+                    Text("Loading…")
+                        .foregroundColor(Color("TextColorBlack"))
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+              
+                
+            }
+            
+            else
+            
+            {
+                
+                ScrollView
+                {
+                    VStack(alignment: .leading, spacing: 20)
                     {
-                   
-                        Text("NO DATA !").foregroundColor(.red)
-                            .frame(
-                                maxWidth: .infinity,
-                                maxHeight: .infinity,
-                                alignment: .center)
-                    }
-                    
-                    ForEach(
-                        medicDetList.medicDetls ?? []
                         
+                        Text("Medications")
+                            .foregroundColor(.black)
+                            .font(Font.custom("Rubik-SemiBold", size: 24))
                         
-                    ) {  item in
-                      
-                        VStack(alignment: .leading)
+                        if (medicDetList.medicDetls == []
+                            
+                        )
                         {
                             
-                            Text(
-                                
-                                item.medicinename
-                                
-                            ) .padding(.top,5)
-                                .foregroundColor(Color("title1"))
-                                .font(Font.custom("Rubik-Regular", size: 18))
-                            HStack
-                            {
-                                Text(
-                                    
-                                    item.medicineSchedule
-                                ) .padding(.bottom,5)
-                                    .foregroundColor(.black)
-                                    .font(Font.custom("Rubik-Regular", size: 16))
-                                Text(
-                                    
-                                   ", "
-                                ) .padding(.bottom,5)
-                                    .foregroundColor(.black)
-                                    .font(Font.custom("Rubik-Regular", size: 16))
-                                Text(
-                                    
-                                    item.beforeoraftermeal
-                                ) .padding(.bottom,5)
-                                    .foregroundColor(.black)
-                                    .font(Font.custom("Rubik-Regular", size: 16))
-                                
-                            }
-                            HStack
-                            {
-                                
-                                Text(
-                                    extractDatePartFromTimestamp(timestamp: item.startDate) ?? ""
-                                    // item.startDate
-                                ) .padding(.bottom,5)
-                                    .foregroundColor(.black)
-                                    .font(Font.custom("Rubik-Regular", size: 16))
-                                Text("-")
-                                Text(
-                                    extractDatePartFromTimestamp(timestamp: item.endDate) ?? ""
-                                    //  item.endDate
-                                ) .padding(.bottom,5)
-                                    .foregroundColor(.black)
-                                    .font(Font.custom("Rubik-Regular", size: 16))
-                            }
-                            HStack(spacing: 17)
-                            {
-                                Text("M")
-                                    .font(Font.custom("Rubik-Regular", size: 16))
-                                    .padding(5)
-                                    .font(.subheadline)
-                                    .foregroundColor(.white)
-                                    .frame( minWidth : 50)
-                                    .fixedSize(horizontal: true, vertical: false)
-                                
-                                    .background(item.morning == true ? Color("GreenLight") : .gray)
-                                
-                                
-                                    .cornerRadius(15)
-                                
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .stroke(.black, lineWidth: 1))
-                                
-                                Text("AF")
-                                    .font(Font.custom("Rubik-Regular", size: 16))
-                                    .padding(5)
-                                    .font(.subheadline)
-                                    .foregroundColor(.white)
-                                    .frame( minWidth : 50)
-                                    .fixedSize(horizontal: true, vertical: false)
-                                    .background(item.afterNoon == true ? Color("GreenLight") : .gray)
-                                    .cornerRadius(15)
-                                
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .stroke(.black, lineWidth: 1))
-                                
-                                Text("E")
-                                    .font(Font.custom("Rubik-Regular", size: 16))
-                                    .padding(5)
-                                    .font(.subheadline)
-                                    .foregroundColor(.white)
-                                    .frame( minWidth : 50)
-                                    .fixedSize(horizontal: true, vertical: false)
-                                    .background(item.evening == true ? Color("GreenLight") : .gray)
-                                    .cornerRadius(15)
-                                
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .stroke(.black, lineWidth: 1))
-                                
-                                Text("N")
-                                    .font(Font.custom("Rubik-Regular", size: 16))
-                                    .padding(5)
-                                    .font(.subheadline)
-                                    .foregroundColor(.white)
-                                    .frame( minWidth : 50)
-                                    .fixedSize(horizontal: true, vertical: false)
-                                    .background(item.night == true ? Color("GreenLight") : .gray)
-                                    .cornerRadius(15)
-                                
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .stroke(.black, lineWidth: 1))
-                                
-                            }   .padding(.bottom,8)
+                            Text("NO DATA !").foregroundColor(.red)
+                                .frame(
+                                    maxWidth: .infinity,
+                                    maxHeight: .infinity,
+                                    alignment: .center)
+                        }
+                        
+                        ForEach(
+                            medicDetList.medicDetls ?? []
                             
                             
-                        }.foregroundColor(.black)
+                        ) {  item in
+                            
+                            VStack(alignment: .leading)
+                            {
+                                                            
+                                                            Text(
+                                                                
+                                                                item.medicinename
+                                                                
+                                                            ) .padding(.top,5)
+                                                                .foregroundColor(Color("title1"))
+                                                                .font(Font.custom("Rubik-Regular", size: 18))
+                                                            HStack
+                                                            {
+                                                                Text(
+                                                                    
+                                                                    item.medicineSchedule
+                                                                ) .padding(.bottom,5)
+                                                                    .foregroundColor(.black)
+                                                                    .font(Font.custom("Rubik-Regular", size: 16))
+                                                                Text(
+                                                                    
+                                                                    ", "
+                                                                ) .padding(.bottom,5)
+                                                                    .foregroundColor(.black)
+                                                                    .font(Font.custom("Rubik-Regular", size: 16))
+                                                                Text(
+                                                                    
+                                                                    item.beforeoraftermeal
+                                                                ) .padding(.bottom,5)
+                                                                    .foregroundColor(.black)
+                                                                    .font(Font.custom("Rubik-Regular", size: 16))
+                                                                
+                                                            }
+                                                            HStack
+                                                            {
+                                                                
+                                                                Text(
+                                                                    extractDatePartFromTimestamp(timestamp: item.startDate) ?? ""
+                                                                    
+                                                                ) .padding(.bottom,5)
+                                                                    .foregroundColor(.black)
+                                                                    .font(Font.custom("Rubik-Regular", size: 16))
+                                                                Text("-")
+                                                                Text(
+                                                                    extractDatePartFromTimestamp(timestamp: item.endDate) ?? ""
+                                                                    
+                                                                ) .padding(.bottom,5)
+                                                                    .foregroundColor(.black)
+                                                                    .font(Font.custom("Rubik-Regular", size: 16))
+                                                            }
+                                                            HStack(spacing: 17)
+                                                            {
+                                                                Text("M")
+                                                                    .font(Font.custom("Rubik-Regular", size: 16))
+                                                                    .padding(5)
+                                                                    .font(.subheadline)
+                                                                    .foregroundColor(.white)
+                                                                    .frame( minWidth : 50)
+                                                                
+                                                                
+                                                                    .background(item.morning == true ? Color("GreenLight") : .gray)
+                                                                
+                                                                
+                                                                    .cornerRadius(15)
+                                                                
+                                                                    .overlay(
+                                                                        RoundedRectangle(cornerRadius: 16)
+                                                                            .stroke(.black, lineWidth: 1))
+                                                                
+                                                                Text("AF")
+                                                                    .font(Font.custom("Rubik-Regular", size: 16))
+                                                                    .padding(5)
+                                                                    .font(.subheadline)
+                                                                    .foregroundColor(.white)
+                                                                    .frame( minWidth : 50)
+                                                                
+                                                                    .background(item.afterNoon == true ? Color("GreenLight") : .gray)
+                                                                    .cornerRadius(15)
+                                                                
+                                                                    .overlay(
+                                                                        RoundedRectangle(cornerRadius: 16)
+                                                                            .stroke(.black, lineWidth: 1))
+                                                                
+                                                                Text("E")
+                                                                    .font(Font.custom("Rubik-Regular", size: 16))
+                                                                    .padding(5)
+                                                                    .font(.subheadline)
+                                                                    .foregroundColor(.white)
+                                                                    .frame( minWidth : 50)
+                                                                
+                                                                    .background(item.evening == true ? Color("GreenLight") : .gray)
+                                                                    .cornerRadius(15)
+                                                                
+                                                                    .overlay(
+                                                                        RoundedRectangle(cornerRadius: 16)
+                                                                            .stroke(.black, lineWidth: 1))
+                                                                
+                                                                Text("N")
+                                                                    .font(Font.custom("Rubik-Regular", size: 16))
+                                                                    .padding(5)
+                                                                    .font(.subheadline)
+                                                                    .foregroundColor(.white)
+                                                                    .frame( minWidth : 50)
+                                                                
+                                                                    .background(item.night == true ? Color("GreenLight") : .gray)
+                                                                    .cornerRadius(15)
+                                                                
+                                                                    .overlay(
+                                                                        RoundedRectangle(cornerRadius: 16)
+                                                                            .stroke(.black, lineWidth: 1))
+                                                                
+                                                            }   .padding(.bottom,8)
+                                                            
+                                                            
+                                                        }.foregroundColor(.black)
+                            
+                            
+                                .padding(.horizontal, 16)
+                            
+                            
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                        .fill(isExpired(endDateString: item.endDate) ? Color.gray.opacity(0.3) : Color.white)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color("textFieldBG"), lineWidth: 2)
+                                        )
+                                )
+                            
+                            
+                        }
                         
-                            .frame(width: 320, height: 120, alignment: .leading)
-                        
-                            .padding(.horizontal,15)
-                            .padding(.vertical,5)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8, style: .continuous
-                                                )
-                                .stroke(Color("textFieldBG"), lineWidth: 2
-                                       )
-                                .background(.white)
-                                .cornerRadius(8)
-                                
-                            )
                     }
                     
+                    .padding(.horizontal, 16)
+                    .padding(.top, 10)
+                    .frame(width: geometry.size.width - 32)
+                
                 }
                 
-                .padding()
-                .padding(.horizontal,10)
+                .scrollIndicators(.hidden)
+              
                 .alert(isPresented: $medicDetList.showNoInternetAlert) {
                     Alert(
                         title: Text("No Internet Connection"),
@@ -210,11 +227,10 @@ struct RPMMedicationsView: View {
                         secondaryButton: .cancel()
                     )
                 }
-   
             }
         }
-        
     }
+    
     func extractDatePartFromTimestamp(timestamp: String) -> String? {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
@@ -226,6 +242,20 @@ struct RPMMedicationsView: View {
 
         return nil
     }
+    
+    func isExpired(endDateString: String) -> Bool {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        formatter.timeZone = TimeZone(abbreviation: "UTC")
+        
+        guard let endDate = formatter.date(from: endDateString) else {
+            return false // Treat as not expired if parsing fails
+        }
+
+        let currentDate = Date()
+        return endDate < currentDate
+    }
+
 }
 
 struct RPMMedicationsView_Previews: PreviewProvider {

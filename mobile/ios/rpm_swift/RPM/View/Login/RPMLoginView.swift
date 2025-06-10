@@ -27,10 +27,14 @@ struct RPMLoginView: View {
     @EnvironmentObject var homeViewModel: RPMHomeViewModel
     
 #if DEBUG
-    @State private var username: String = "AHV01927"
-    @State private var password: String = "cXPJKIWQ"
-//
-//    
+//    @State private var username: String = "AHV01927"
+//    @State private var password: String = "cXPJKIWQ"
+    
+    @State private var username: String = "SMD01846"
+    @State private var password: String = "I5TOBWHB"
+    
+//    @State private var username: String = "SMD01847"
+//    @State private var password: String = "PND6RM8L"
 //    @State private var username: String = "154201932"
 //    @State private var password: String = "ODJVOBCB"
 //    @State private var username: String = "WSPC01933"
@@ -99,7 +103,7 @@ struct RPMLoginView: View {
                         .foregroundColor(Color("title1"))
                         .font(Font.custom("Rubik-Regular", size: 24))
                     
-                    Image("logocylinx")
+                    Image("logoclynx")
                         .resizable()
                         .frame(width: 160.0, height: 150.0)
                 }
@@ -119,11 +123,10 @@ struct RPMLoginView: View {
                     .cornerRadius(10)
                 
                 Spacer()
-                
-                // Remove NavigationLink here and use the navigationPath directly
+             
                 Button(action: {
                     // Push Forgot Password screen using navigationPath
-                    navigationHelper.path.append(.forgotPassword) // Update this according to your enum
+                    navigationHelper.path.append(.forgotPassword)
                 }) {
                     Text("Forgot your Password ?")
                         .padding(10)
@@ -154,7 +157,7 @@ struct RPMLoginView: View {
         }
         .navigationBarBackButtonHidden(true)
         .frame(width: width, height: height)
-        .background(Color("bgColorDark"))
+        .background(Color("ChatBGcolor"))
         .onAppear {
             let systemTimeZone = TimeZone.current
             print("NSTimeZone.default", NSTimeZone.default)
@@ -378,7 +381,7 @@ struct SecureInputView: View {
                         .renderingMode(.template)
                         .accentColor(Color("TextColorGray"))
             
-                        .padding(.horizontal, 30)
+                        .padding(.horizontal, 60)
                 }
           
         }

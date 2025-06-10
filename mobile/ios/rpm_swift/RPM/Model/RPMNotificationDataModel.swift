@@ -35,7 +35,8 @@ struct Datum: Hashable, Codable ,Identifiable{
     func hash(into hasher: inout Hasher) {
         
     }
-    let id = UUID()
+
+    var id: String { notificationDate ?? UUID().uuidString } // <- stable ID
     let notificationDate: String?
     let notificationList: [NotificationList]
     
@@ -54,9 +55,8 @@ struct NotificationList: Hashable, Codable ,Identifiable {
     func hash(into hasher: inout Hasher) {
         
     }
-    let id = UUID()
-    
-    
+    var id: Int { notificationID ?? -1 }
+
     let notificationListDescription, createdOn, type, subType: String?
     let notificationAuditID, notificationID: Int?
     let isRead, isNotify: Bool?

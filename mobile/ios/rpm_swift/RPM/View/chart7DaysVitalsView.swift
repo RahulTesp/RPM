@@ -11,19 +11,11 @@ import Charts
 
 struct chart7DaysVitalsView: View {
     
-    var widthFull = UIScreen.main.bounds.width
-    var width: CGFloat {
-        UIDevice.current.userInterfaceIdiom == .phone ? UIScreen.main.bounds.width / 1.1 : UIScreen.main.bounds.width / 1.3
-    }
-    
-    var heightFull = UIScreen.main.bounds.height
-    var height: CGFloat {
-        UIDevice.current.userInterfaceIdiom == .phone ? UIScreen.main.bounds.height / 1.39 : UIScreen.main.bounds.height / 1.3
-    }
-    
     @State private var highlightedIndex: Int?
     
     var item: RPMVitalsChartDaysDataModel
+    
+    var viewWidth: CGFloat
     
     var body: some View {
         VStack(spacing: 0) {  // Stack elements without extra spacing
@@ -36,7 +28,7 @@ struct chart7DaysVitalsView: View {
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(width: 400, height: 50)  // Ensure consistent width
+            .frame(width: viewWidth, height: 50)  // Ensure consistent width
             .background(Color("ColorGreen"))
             .cornerRadius(10, corners: [.topLeft, .topRight])
            
@@ -57,7 +49,7 @@ struct chart7DaysVitalsView: View {
                         }
                 }
             }
-            .frame(width: 400, height: 300) // Ensure same width
+            .frame(width: viewWidth, height: 300) // Ensure same width
             .background(Color.white)  // White background
             .cornerRadius(0) // No corner radius to keep separation clear
          
@@ -68,13 +60,13 @@ struct chart7DaysVitalsView: View {
                     legendView(for: values)
                 }
             }
-            .frame(width: 400, height: 30) // Ensure same width
+            .frame(width: viewWidth, height: 30) // Ensure same width
             .padding(.bottom, 10)
             .background(Color.white) // White background
             .cornerRadius(10, corners: [.bottomLeft, .bottomRight]) // Round bottom corners
         }
        // .shadow(radius: 5) // Optional shadow
-        .frame(width: 400)  // Ensure proper width
+        .frame(width: viewWidth)  // Ensure proper width
     }
     
     /// **Function to get the appropriate chart view dynamically**

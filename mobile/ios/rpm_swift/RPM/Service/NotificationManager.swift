@@ -10,9 +10,6 @@ import Combine
 import Foundation
 import UserNotifications
 
-
-@MainActor
-
 class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterDelegate {
     
     static let shared = NotificationManager()
@@ -20,20 +17,20 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
     @Published var notificationTitle: String = ""  // Stores the notification title
     @Published var notificationBody: String = ""
     @Published var roomName: String?  // Room name for navigation
-    @Published var callRejectToUserName: String = ""  // Declare this
-    @Published var callRejectTokenId: String = ""     // Declare this
+    @Published var callRejectToUserName: String = ""
+    @Published var callRejectTokenId: String = ""
     var lastNotificationIdentifier: String? // Store last notification ID
     // Declare globally to track last notification ID
     var lastProcessedNotificationID: String?
     private var shownSessionIds = Set<String>()
     
-    override private init() {
+
+    override init() {
         super.init()
         //   UNUserNotificationCenter.current().delegate = self
         print("currentdelegate")
     }
     
-
     func handle(notification: UNNotification) {
         let userInfo = notification.request.content.userInfo
         print("HandlE Foreground Noti")
@@ -45,7 +42,6 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
             NotificationCenter.default.post(name: Notification.Name("RefreshNotifications"), object: nil)
         }
 
-        // Optional: handle video call or other types similarly
     }
 
 
@@ -80,13 +76,13 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
         } else {
             shouldShowAlert = false
         }
-
+        DispatchQueue.main.async {
             self.notificationTitle = title
             self.roomName = extractedRoomName
             self.callRejectToUserName = callRejectToUserName
             self.callRejectTokenId = callRejectTokenId
             self.showAlert = shouldShowAlert //  UI update moved here
-            
+        }
             print(" Background Notification Parsed")
             print("Room: \(self.roomName ?? "nil")")
             print("User: \(self.callRejectToUserName)")
@@ -236,7 +232,7 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
         }
       
         
-        /// ✅ This is called when a notification is **tapped** while in background or killed state
+        //This is called when a notification is **tapped** while in background or killed state
         func userNotificationCenter(_ center: UNUserNotificationCenter,
                                     didReceive response: UNNotificationResponse,
                                     withCompletionHandler completionHandler: @escaping () -> Void) {

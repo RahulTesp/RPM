@@ -1,103 +1,103 @@
 {
   "images" : [
     {
-      "filename" : "4040cylinx.png",
+      "filename" : "4040clynx-1.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "20x20"
     },
     {
-      "filename" : "6060cylinx.png",
+      "filename" : "6060clynx.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "20x20"
     },
     {
-      "filename" : "5858cylinx.png",
+      "filename" : "5858clynx-1.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "29x29"
     },
     {
-      "filename" : "8787cylinx.png",
+      "filename" : "8787clynx.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "29x29"
     },
     {
-      "filename" : "8080cylinx.png",
+      "filename" : "8080clynx.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "40x40"
     },
     {
-      "filename" : "120120cylinx.png",
+      "filename" : "120120clynx.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "40x40"
     },
     {
-      "filename" : "120120cylinx-1.png",
+      "filename" : "120120clynx-1.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "60x60"
     },
     {
-      "filename" : "180180cylinx.png",
+      "filename" : "180180clynx.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "60x60"
     },
     {
-      "filename" : "2020cylinx.png",
+      "filename" : "2020clynx.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "20x20"
     },
     {
-      "filename" : "4040cylinx-1.png",
+      "filename" : "4040clynx-2.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "20x20"
     },
     {
-      "filename" : "2929cylinx.png",
+      "filename" : "2929clynx.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "29x29"
     },
     {
-      "filename" : "5858cylinx-1.png",
+      "filename" : "5858clynx.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "29x29"
     },
     {
-      "filename" : "4040cylinx-2.png",
+      "filename" : "4040clynx.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "40x40"
     },
     {
-      "filename" : "8080cylinx-1.png",
+      "filename" : "8080clynx-1.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "40x40"
     },
     {
-      "filename" : "7676cylinx.png",
+      "filename" : "7676clynx.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "76x76"
     },
     {
-      "filename" : "152152cylinx.png",
+      "filename" : "152152clynx.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "76x76"
     },
     {
-      "filename" : "167167cylinx.png",
+      "filename" : "167167clynx.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "83.5x83.5"

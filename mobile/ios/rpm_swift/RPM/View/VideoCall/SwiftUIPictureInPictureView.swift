@@ -6,14 +6,6 @@
 //
 
 
-//
-//  SwiftUIPictureInPictureInPictureView.swift
-//  VideoApp
-//
-//  Created by Tim Rozum on 8/8/22.
-//  Copyright © 2022 Twilio, Inc. All rights reserved.
-//
-
 import SwiftUI
 
 struct SwiftUIPictureInPictureView: UIViewControllerRepresentable {
@@ -21,6 +13,7 @@ struct SwiftUIPictureInPictureView: UIViewControllerRepresentable {
     @EnvironmentObject var roomManager: RoomManager
     
     func makeUIViewController(context: Context) -> PictureInPictureViewController {
+        print("PictureView")
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let controller = storyboard.instantiateViewController(withIdentifier: "PictureInPictureViewController") as! PictureInPictureViewController
         controller.callManager = callManager

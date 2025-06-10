@@ -59,9 +59,9 @@ struct RPMVitalsView: View {
  
     @StateObject var vitalSummaryList = RPMVitalDaySummaryViewModel()
 
-    @EnvironmentObject var appModel: AppModel // Add this line
-    @EnvironmentObject var messagesManager: MessagesManager // Add this line
-    @EnvironmentObject var participantsManager: ParticipantsManager // Add this line
+    @EnvironmentObject var appModel: AppModel
+    @EnvironmentObject var messagesManager: MessagesManager
+    @EnvironmentObject var participantsManager: ParticipantsManager
     @EnvironmentObject var conversationManager: ConversationManager
     @EnvironmentObject var navigationHelper: NavigationHelper
     
@@ -69,6 +69,8 @@ struct RPMVitalsView: View {
     var body: some View {
       
         ScrollView(.vertical) {
+            GeometryReader { geometry in
+                let screenWidth = geometry.size.width
             VStack ( alignment: .leading){
                 Group
                 {
@@ -76,14 +78,14 @@ struct RPMVitalsView: View {
                     {
                         
                         Button(action: {
-                            navigationHelper.resetToHomeTab() // 👈 clears nav and goes to Home tab
+                            navigationHelper.resetToHomeTab() //  clears nav and goes to Home tab
                         }) {
                             Image("ArrowBack")
                                 .renderingMode(.template)
                                 .foregroundColor(Color("buttonColor"))
                                 .padding()
                         }
-
+                        
                         
                         Spacer()
                         Text("Vitals").foregroundColor(Color("title1"))
@@ -91,7 +93,7 @@ struct RPMVitalsView: View {
                         Spacer()
                         
                     }
-                 
+                    
                 }
                 
                 Spacer()
@@ -108,14 +110,14 @@ struct RPMVitalsView: View {
                             print("currentDateb4",currentDate)
                             print("currentDateb4",TimeZone.current)
                             
-                          
+                            
                             print("currentDa",Date.getCurrentVitalDate())
                             
-                           
+                            
                             currentDate = Calendar.current.date(byAdding: .day, value: -1, to: currentDate)!
                             
-                           
-                             print("currentDateaftr",currentDate)
+                            
+                            print("currentDateaftr",currentDate)
                             
                             print("cdformtd",currentDate.formatted(
                                 .iso8601
@@ -126,7 +128,7 @@ struct RPMVitalsView: View {
                                 
                             ))
                             
-                           
+                            
                             vitalSummaryList.getVitalSummary(
                                 
                                 startDate:
@@ -139,7 +141,7 @@ struct RPMVitalsView: View {
                                             .dateSeparator(.dash)
                                         
                                     )
-                               
+                                
                                 ,  endDate:
                                     
                                     currentDate.formatted(
@@ -151,7 +153,7 @@ struct RPMVitalsView: View {
                                         
                                     )
                                 
-             
+                                
                                 , completed: {_,_ in
                                     print("vitals chng")
                                     
@@ -161,16 +163,16 @@ struct RPMVitalsView: View {
                             
                             showVitalSummary = true
                             
-                      
+                            
                             
                         } label: {
                             Image(systemName: "chevron.left")
                                 .foregroundColor(Color("title1"))
                                 .font(.title3)
-                       
+                            
                         }
                         
-                
+                        
                         
                         // NOTE : DATE SHOWING SECTION
                         
@@ -197,7 +199,7 @@ struct RPMVitalsView: View {
                                 .foregroundColor(Color("title1"))
                                 .font(Font.custom("Rubik-Regular", size: 16))
                                 
-                              
+                                
                             }
                         }
                         
@@ -216,12 +218,12 @@ struct RPMVitalsView: View {
                             
                         }
                         
-                 
+                        
                         Button {
                             vitalSummaryList.loading = true
                             currentDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate)!
                             
-                     
+                            
                             vitalSummaryList.getVitalSummary(
                                 
                                 startDate:
@@ -236,7 +238,7 @@ struct RPMVitalsView: View {
                                         
                                     )
                                 
-                           
+                                
                                 
                                 ,  endDate:
                                     
@@ -249,7 +251,7 @@ struct RPMVitalsView: View {
                                         
                                     )
                                 
-                           
+                                
                                 
                                 , completed: {_,_ in
                                     //   print("vitals chng")
@@ -265,7 +267,7 @@ struct RPMVitalsView: View {
                             Image(systemName: "chevron.right")
                                 .foregroundColor(.gray)
                                 .font(.title3)
-                      
+                            
                         }
                         Spacer()
                     }
@@ -273,30 +275,30 @@ struct RPMVitalsView: View {
                     
                     .onAppear()
                     {
-                     
+                        
+                        
+                        if returningFromClinicalInfo {
+                            // Logic to handle the return from Clinical Info page
+                            print("Returned from Clinical Info page to Vitals page")
+                            returningFromClinicalInfo = false
+                        }
+                        else
+                        {
+                            currentDate = currentDateFix
                             
-                            if returningFromClinicalInfo {
-                                                  // Logic to handle the return from Clinical Info page
-                                                  print("Returned from Clinical Info page to Vitals page")
-                                returningFromClinicalInfo = false
-                                              }
-                            else
-                            {
-                                currentDate = currentDateFix
-                                
-                                currentDateValue =
-                                vitalSummaryList.currentDateValue
-                                
-                          
-                                vitalSummaryList.defaultVitalSumm()
-                                
-                                showVitalSummary = true
-                                // Set the flag to false after the initial appearance
-                              
-                                // Set the flags accordingly
-                                                   isFirstAppearance = false
-                                                  
-                            }
+                            currentDateValue =
+                            vitalSummaryList.currentDateValue
+                            
+                            
+                            vitalSummaryList.defaultVitalSumm()
+                            
+                            showVitalSummary = true
+                            // Set the flag to false after the initial appearance
+                            
+                            // Set the flags accordingly
+                            isFirstAppearance = false
+                            
+                        }
                         
                     }
                 }
@@ -304,7 +306,7 @@ struct RPMVitalsView: View {
                 {
                     HStack(spacing:1.0){
                         Spacer()
-                     
+                        
                         TopTabViews(text: "<7 Days", colorf: Color(.white), colorb:  Color("title1"),
                                     id: 2, tabViewSelectedId: $tabViewSelectedId,
                                     showingInfo: $showingInfo
@@ -315,7 +317,7 @@ struct RPMVitalsView: View {
                                     showingInfo: $showingInfo
                         )
                         
-              
+                        
                         
                         Spacer()
                     }
@@ -325,23 +327,23 @@ struct RPMVitalsView: View {
                     
                 }
                 
-        
+                
                 HStack
                 {
                     showingSecVitalSummary == true ?
-                   
-                        Text("Vitals").foregroundColor(.black)
-                            .font(Font.custom("Rubik-SemiBold", size: 24))
-                        
-                   :
-                  
-                        Text("Health Trends")
-                            .font(.system(size: 25 , weight: .heavy))
-                        
-              
+                    
+                    Text("Vitals").foregroundColor(.black)
+                        .font(Font.custom("Rubik-SemiBold", size: 24))
+                    
+                    :
+                    
+                    Text("Health Trends")
+                        .font(.system(size: 25 , weight: .heavy))
+                    
+                    
                     Spacer()
                     
-                 
+                    
                     HStack{
                         TopButtons(text: "ListView", colorf: Color("darkGreen"), colorb: Color("transparentGreen"),
                                    id: 1, currentlySelectedId: $currentlySelectedId,
@@ -355,44 +357,47 @@ struct RPMVitalsView: View {
                         
                     }.background(Color("transparentGreen"))
                         .cornerRadius(14)
-               
+                    
                 }.padding()
-             
+                
                 // CONTENT VIEW
                 
                 
                 HStack{
-                  
+                    
                     
                     if showingSecVitalSummary == true &&
-                   
-                         (vitalSummaryList.vitalSummary?.bloodPressure == []
-                            && vitalSummaryList.vitalSummary?.weight == []
-                            && vitalSummaryList.vitalSummary?.bloodOxygen == []
-                            
-                            && vitalSummaryList.vitalSummary?.bloodGlucose == []
-                      
-                         ) {
+                        
+                        (vitalSummaryList.vitalSummary?.bloodPressure == []
+                         && vitalSummaryList.vitalSummary?.weight == []
+                         && vitalSummaryList.vitalSummary?.bloodOxygen == []
+                         
+                         && vitalSummaryList.vitalSummary?.bloodGlucose == []
+                         
+                        ) {
                         
                         NoDataVSView(returningFromClinicalInfo: $returningFromClinicalInfo).environmentObject(navigationHelper)
                     } else {
                         if showingSecVitalSummary == true && showVitalSummary == true {
-
-                                
-                                VitalDataScrollView(vitalSummaryList: vitalSummaryList,returningFromClinicalInfo: $returningFromClinicalInfo)  .environmentObject(navigationHelper)
-                                
-                       
+                            
+                            
+                            VitalDataScrollView(vitalSummaryList: vitalSummaryList,returningFromClinicalInfo: $returningFromClinicalInfo
+                                                ,
+                                                           viewWidth: screenWidth * 0.80
+                            )  .environmentObject(navigationHelper)
+                            
+                            
                         }
                     }
-
-        
+                    
+                    
                     
                     // MARK: SECTION FOR 7 DAYS CHART VIEW
                     
                     if !showingSecVitalSummary && tabViewSelectedId == 2 {
-                   
+                        
                         if chartDays.vitalsGraph7.isEmpty {
-
+                            
                             NoDataView()
                         } else {
                             
@@ -400,26 +405,27 @@ struct RPMVitalsView: View {
                             ScrollView(.horizontal) {
                                 HStack {
                                     // Ensure chartDays.vitalsGraph7 is an array, not a single object
-                                    VitalsListView(vitalsList: chartDays.vitalsGraph7 ?? [])
+                                    VitalsListView(vitalsList: chartDays.vitalsGraph7 ?? [] ,
+                                                   viewWidth: screenWidth * 0.80)
                                 }
                             }
-
+                            
                         }
                     }
                     
-             
+                    
                     // MARK: SECTION FOR 30 DAYS CHART VIEW
-
+                    
                     if showingSecVitalSummary != true && tabViewSelectedId != 2 {
                         
                         if chartDays.vitalsGraph30.isEmpty {
-
+                            
                             NoDataView()
                         }
                         
- 
+                        
                         else {
-
+                            
                             
                             ScrollView(.horizontal) {
                                 HStack {
@@ -428,17 +434,17 @@ struct RPMVitalsView: View {
                                 }
                             }
                             
-                   
-                       }
+                            
+                        }
                         
-                 
+                        
                     }
-
-              
+                    
+                    
                 }
                 
             }.padding(.horizontal, 12)
-      
+            
                 .alert(isPresented: $chartDays.showNoInternetAlert) {
                     Alert(
                         title: Text("No Internet Connection"),
@@ -467,7 +473,7 @@ struct RPMVitalsView: View {
                     )
                 }
             
-            
+        }
         }
         .padding(.bottom, 10)
       
@@ -592,6 +598,8 @@ struct VitalDataScrollView: View {
     @ObservedObject var vitalSummaryList: RPMVitalDaySummaryViewModel
     @Binding var returningFromClinicalInfo: Bool
     @EnvironmentObject var navigationHelper: NavigationHelper
+    var viewWidth: CGFloat
+    
     var body: some View {
         
         
@@ -604,7 +612,10 @@ struct VitalDataScrollView: View {
                 else
                 {
             
-                VitalDataItemView(vitalSummaryList: vitalSummaryList,returningFromClinicalInfo: $returningFromClinicalInfo)    .environmentObject(navigationHelper)
+                VitalDataItemView(vitalSummaryList: vitalSummaryList,returningFromClinicalInfo: $returningFromClinicalInfo,
+                                  viewWidth: viewWidth
+                )
+                        .environmentObject(navigationHelper)
               }
             }
         }.cornerRadius(20)
@@ -617,31 +628,33 @@ struct VitalDataItemView: View {
     @ObservedObject var vitalSummaryList: RPMVitalDaySummaryViewModel
     @Binding var returningFromClinicalInfo: Bool
     @EnvironmentObject var navigationHelper: NavigationHelper
+    var viewWidth: CGFloat
+    
     var body: some View {
-       // Group {
+      
             VStack(alignment: .leading) {
                
                 ScrollView(.horizontal) {
-                    HStack {
+                    HStack (spacing: 2){
                        
-                        BPReadings(bpitem : vitalSummaryList.vitalSummary?.bloodPressure ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true)
+                        BPReadings(bpitem : vitalSummaryList.vitalSummary?.bloodPressure ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true, viewWidth: viewWidth)
                             .environmentObject(navigationHelper)
 
                     
-                        WeightReadings(wtitem: vitalSummaryList.vitalSummary?.weight ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true)
+                        WeightReadings(wtitem: vitalSummaryList.vitalSummary?.weight ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true, viewWidth: viewWidth)
                             .environmentObject(navigationHelper)
 
-                            GlucoseReadings(gluitem: vitalSummaryList.vitalSummary?.bloodGlucose ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true)
+                            GlucoseReadings(gluitem: vitalSummaryList.vitalSummary?.bloodGlucose ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true, viewWidth: viewWidth)
                             .environmentObject(navigationHelper)
 
-                            OxygenReadings(oxyitem: vitalSummaryList.vitalSummary?.bloodOxygen ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true)
+                            OxygenReadings(oxyitem: vitalSummaryList.vitalSummary?.bloodOxygen ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true, viewWidth: viewWidth)
                             .environmentObject(navigationHelper)
                     
                     }
-                }
+                } .frame( height: 200)
+               
     
             }
-            .frame(maxWidth: .infinity)
 
     }
 }
@@ -760,6 +773,7 @@ struct NoDataVSView: View {
 
 struct VitalsListView: View {
     let vitalsList: [RPMVitalsChartDaysDataModel]
+    var viewWidth: CGFloat
     
     var body: some View {
         
@@ -768,7 +782,8 @@ struct VitalsListView: View {
                 ForEach(vitalsList, id: \.vitalName) { vital in
                 
     
-                        chart7DaysVitalsView(item: vital)  // Pass a single item
+                        chart7DaysVitalsView(item: vital,
+                                             viewWidth: viewWidth)  // Pass a single item
                  
                 }
             }

@@ -11,71 +11,116 @@ import Charts
 
 struct chart30DaysView: View {
     
-    var widthFull = UIScreen.main.bounds.width
-    var width: CGFloat {
-        UIDevice.current.userInterfaceIdiom == .phone ? UIScreen.main.bounds.width / 1.1 : UIScreen.main.bounds.width / 1.3
-    }
-    
-    var heightFull = UIScreen.main.bounds.height
-    var height: CGFloat {
-        UIDevice.current.userInterfaceIdiom == .phone ? UIScreen.main.bounds.height / 1.39 : UIScreen.main.bounds.height / 1.3
-    }
+//    var widthFull = UIScreen.main.bounds.width
+//    var width: CGFloat {
+//        UIDevice.current.userInterfaceIdiom == .phone ? UIScreen.main.bounds.width / 1.1 : UIScreen.main.bounds.width / 1.3
+//    }
+//    
+//    var heightFull = UIScreen.main.bounds.height
+//    var height: CGFloat {
+//        UIDevice.current.userInterfaceIdiom == .phone ? UIScreen.main.bounds.height / 1.39 : UIScreen.main.bounds.height / 1.3
+//    }
     
     @State private var highlightedIndex: Int?
     
     var item: RPMVitalsChartDaysDataModel
     
     var body: some View {
-        VStack(spacing: 0) {  // Stack elements without extra spacing
-            
-            // **1st HStack: Vital Name (Green Background)**
-            HStack {
-                Text(item.vitalName ?? "No Vital")
-                    .foregroundColor(Color("darkGreen"))
-                    .font(.system(size: 20, weight: .medium))
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .frame(width: 600, height: 50)  // Ensure consistent width
-            .background(Color("ColorGreen"))
-            .cornerRadius(10, corners: [.topLeft, .topRight])
-           
-            
-            // **2nd HStack: Chart (White Background)**
-            HStack {
-                if item.time == nil || item.values?.isEmpty == true {
-                    Text("No Readings").foregroundColor(.red)
-                } else {
-                    let valSummary = item.values ?? []
-                    let dayCount = item.time ?? []
-                    
-                    let chartView = getChartView(for: item.vitalName ?? "", values: valSummary, days: dayCount)
-                    
-                    chartView
-                        .onTapGesture {
-                            print("Tapped on index: \(highlightedIndex ?? -1)")
-                        }
-                }
-            }
-            .frame(width: 600, height: 400) // Ensure same width
-            .background(Color.white)  // White background
-            .cornerRadius(0) // No corner radius to keep separation clear
-         
-            
-            // **3rd HStack: Legend (White Background)**
-            HStack {
-                if let values = item.values {
-                    legendView(for: values)
-                }
-            }
-            .frame(width: 600, height: 30) // Ensure same width
-            .padding(.bottom, 10)
-            .background(Color.white) // White background
-            .cornerRadius(10, corners: [.bottomLeft, .bottomRight]) // Round bottom corners
-        }
-       // .shadow(radius: 5) // Optional shadow
-        .frame(width: 600)  // Ensure proper width
-    }
+          VStack(spacing: 0) {
+              // Vital name header
+              HStack {
+                  Text(item.vitalName ?? "No Vital")
+                      .foregroundColor(Color("darkGreen"))
+                      .font(.system(size: 20, weight: .medium))
+                      .padding()
+                      .frame(maxWidth: .infinity, alignment: .leading)
+              }
+              .frame(height: 50)
+              .background(Color("ColorGreen"))
+              .cornerRadius(10, corners: [.topLeft, .topRight])
+
+              // Chart
+              if item.time == nil || item.values?.isEmpty == true {
+                  Text("No Readings").foregroundColor(.red)
+                      .frame(height: 400)
+                      .background(Color.white)
+              } else {
+                  let valSummary = item.values ?? []
+                  let dayCount = item.time ?? []
+                  let dynamicWidth = CGFloat(max(dayCount.count, 7)) * 30  // Adjust `30` as per your need
+
+                  getChartView(for: item.vitalName ?? "", values: valSummary, days: dayCount)
+                      .frame(width: dynamicWidth, height: 400)
+                      .background(Color.white)
+              }
+
+              // Legend
+              HStack {
+                  if let values = item.values {
+                      legendView(for: values)
+                  }
+              }
+              .frame(height: 30)
+              .padding(.bottom, 10)
+              .background(Color.white)
+              .cornerRadius(10, corners: [.bottomLeft, .bottomRight])
+          }
+          .padding()
+      }
+    
+    
+    
+//    var body: some View {
+//        VStack(spacing: 0) {  // Stack elements without extra spacing
+//            
+//            // **1st HStack: Vital Name (Green Background)**
+//            HStack {
+//                Text(item.vitalName ?? "No Vital")
+//                    .foregroundColor(Color("darkGreen"))
+//                    .font(.system(size: 20, weight: .medium))
+//                    .padding()
+//                    .frame(maxWidth: .infinity, alignment: .leading)
+//            }
+//            .frame(width: 600, height: 50)  // Ensure consistent width
+//            .background(Color("ColorGreen"))
+//            .cornerRadius(10, corners: [.topLeft, .topRight])
+//           
+//            
+//            // **2nd HStack: Chart (White Background)**
+//            HStack {
+//                if item.time == nil || item.values?.isEmpty == true {
+//                    Text("No Readings").foregroundColor(.red)
+//                } else {
+//                    let valSummary = item.values ?? []
+//                    let dayCount = item.time ?? []
+//                    
+//                    let chartView = getChartView(for: item.vitalName ?? "", values: valSummary, days: dayCount)
+//                    
+//                    chartView
+//                        .onTapGesture {
+//                            print("Tapped on index: \(highlightedIndex ?? -1)")
+//                        }
+//                }
+//            }
+//            .frame(width: 600, height: 400) // Ensure same width
+//            .background(Color.white)  // White background
+//            .cornerRadius(0) // No corner radius to keep separation clear
+//         
+//            
+//            // **3rd HStack: Legend (White Background)**
+//            HStack {
+//                if let values = item.values {
+//                    legendView(for: values)
+//                }
+//            }
+//            .frame(width: 600, height: 30) // Ensure same width
+//            .padding(.bottom, 10)
+//            .background(Color.white) // White background
+//            .cornerRadius(10, corners: [.bottomLeft, .bottomRight]) // Round bottom corners
+//        }
+//       // .shadow(radius: 5) // Optional shadow
+//        .frame(width: 600)  // Ensure proper width
+//    }
     
     /// **Function to get the appropriate chart view dynamically**
     @ViewBuilder

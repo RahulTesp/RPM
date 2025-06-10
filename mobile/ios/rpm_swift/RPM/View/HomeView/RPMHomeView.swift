@@ -58,9 +58,9 @@ struct RPMHomeView: View {
     
     @StateObject  var notifList = NotificationViewModel()
     @EnvironmentObject var homeViewModel: RPMHomeViewModel
-    @EnvironmentObject var appModel: AppModel // Add this line
-    @EnvironmentObject var messagesManager: MessagesManager // Add this line
-    @EnvironmentObject var participantsManager: ParticipantsManager // Add this line
+    @EnvironmentObject var appModel: AppModel
+    @EnvironmentObject var messagesManager: MessagesManager
+    @EnvironmentObject var participantsManager: ParticipantsManager
     @EnvironmentObject var conversationManager: ConversationManager
     @EnvironmentObject var navigationHelper: NavigationHelper
     @State private var action: Bool = false
@@ -81,253 +81,331 @@ struct RPMHomeView: View {
     @State private var showAlertProxy: Bool = false
     @State private var showRejectionAlert = false
     @State private var rejectionMessage = ""
+    @ObservedObject var sessionManager = SessionManager.shared
+
     
     var body: some View {
-     
-                  VStack {
-        if  homeViewModel.loading
-    
-        {
-          
-            LoadingCircleView(homeViewModel: homeViewModel)
-        }
-        
-        else
-        {
-          
-            VStack(alignment: .leading)
+        ZStack {
+        VStack {
+            if  homeViewModel.loading
+                    
             {
                 
-                VStack {
-                    // Notification Bell Section
-                    HStack {
-                        Spacer()
-                        
-                        Button(action: {
-                            navigationHelper.path.append(.notificationView)
-
-                        }) {
-                            Image("BellOutline")
+                LoadingCircleView(homeViewModel: homeViewModel)
+            }
+            
+            else
+            {
+                
+                VStack(alignment: .leading, spacing: 0)
+                {
+                    
+                    VStack(spacing: 0){
+                        // Notification Bell Section
+                        HStack {
+                            Spacer()
+                            
+                            Button(action: {
+                                navigationHelper.path.append(.notificationView)
+                                
+                            }) {
+                                Image("BellOutline")
+                            }
+                            
+                            // Notification count bubble
+                            
+                            if let unreadCount = notifList.notif?.totalUnRead, unreadCount > 0 {
+                                Text("\(unreadCount)")
+                                    .padding(5)
+                                    .font(.system(size: 12))
+                                    .background(Color("buttonColor"))
+                                    .foregroundColor(.white)
+                                    .clipShape(Circle())
+                                    .offset(x: -20, y: -10)
+                            }
+                         
+                            
                         }
-
-                        // Notification count bubble
-                        Text("\(notifList.notif?.totalUnRead ?? 0)")
-                            .padding(5)
-                            .font(.system(size: 12))
-                            .background(Color("buttonColor"))
-                            .foregroundColor(.white)
-                            .clipShape(Circle())
-                            .offset(x: -20, y: -10)
-
-                    }
-                    .padding(.horizontal)
-                    .frame(width: UIScreen.main.bounds.width, height: 20)
-                    .padding(.top, 50)
                     
-                    // Profile Info or Loader
-                    if homeViewModel.loading {
-                        ProgressView()
-                        Text("Loading…")
-                    } else {
-                        profileInfoSection
-                    }
-                    
-                    // Top Buttons
-                    
-                    HStack {
-
-
-                        ZStack(alignment: .topTrailing) {
+                        .padding(.horizontal)
+                        .frame(width: UIScreen.main.bounds.width, height: 20)
+                        .padding(.top, 50)
+                        
+                        // Profile Info or Loader
+                        if homeViewModel.loading {
+                            ProgressView()
+                            Text("Loading…")
+                        } else {
+                            profileInfoSection
+                        }
+                        
+                        // Top Buttons
+                        
+                        HStack {
+                            
+                            
+                            ZStack(alignment: .topTrailing) {
+                                TopButton(
+                                    text: "ChatOutline",
+                                    colorf: Color("darkGreen"),
+                                    colorb: Color("transparentGreen"),
+                                    flagval: 1
+                                )
+                                .environmentObject(appModel)
+                                .environmentObject(navigationHelper)
+                                .environmentObject(conversationManager)
+                              
+                                
+                                if conversationManager.unreadCount > 0 {
+                                    Text("\(conversationManager.unreadCount)")
+                                        .font(.caption2).bold()
+                                        .foregroundColor(.white)
+                                        .padding(6)
+                                        .background(Color.red)
+                                        .clipShape(Circle())
+                                        .offset(x: 10, y: -10)  // Adjust position of badge
+                                        .transition(.scale)
+                                }
+                                
+                            }
+                            
                             TopButton(
-                                text: "ChatOutline",
+                                text: "PhoneOutline",
                                 colorf: Color("darkGreen"),
                                 colorb: Color("transparentGreen"),
-                                flagval: 1
+                                flagval: 2
                             )
                             .environmentObject(appModel)
                             .environmentObject(navigationHelper)
                             .environmentObject(conversationManager)
+                        }
+                      
+                        .padding(.vertical)
+                   
+                    }
+                    .background(Color("lightGreen"))
+                  
+                    ScrollView
+                    {
+                        VStack
+                        {
                             
-                            if conversationManager.unreadCount > 0 {
-                                     Text("\(conversationManager.unreadCount)")
-                                         .font(.caption2).bold()
-                                         .foregroundColor(.white)
-                                         .padding(6)
-                                         .background(Color.red)
-                                         .clipShape(Circle())
-                                         .offset(x: 10, y: -10)  // Adjust position of badge
-                                         .transition(.scale)
-                                 }
-
+                            if  homeViewModel.loading {
+                                
+                                ProgressView()
+                                
+                            }
+                            else{
+                                
+                                VStack (alignment:.leading){
+                                    
+                                    HStack{
+                                        
+                                        Text(homeViewModel.accounts?.programName ?? "" )
+                                        
+                                            .foregroundColor(.black)
+                                            .font(Font.custom("Rubik-Regular", size: 16))
+                                        Spacer()
+                                        
+                                        
+                                        HStack
+                                        {
+                                            Text(homeViewModel.accounts?.status ?? "" )
+                                                .padding(5)
+                                                .font(Font.custom("Rubik-Regular", size: 14))
+                                            
+                                                .foregroundColor(ColourStatus.getForegroundColor(for: homeViewModel.accounts?.status))
+                                            
+                                                .frame( minWidth :  70)
+                                                .fixedSize(horizontal: true, vertical: false)
+                                            
+                                                .background(ColourStatus.getBackgroundColor(for: homeViewModel.accounts?.status))
+                                            
+                                        }.clipShape(RoundedRectangle(cornerRadius:20))
+                                    }
+                                    
+                                }
+                                .navigationBarBackButtonHidden(true)
+                                .frame(maxWidth: .infinity, minHeight: 60)
+                                .padding(.horizontal)
+                                .padding(.vertical,5)
+                                .background(Color("avgGreen"))
+                                .cornerRadius(15)
+                                .padding(.horizontal,10)
+                                .padding(.vertical,6)
+                            }
                         }
                         
-                        TopButton(
-                            text: "PhoneOutline",
-                            colorf: Color("darkGreen"),
-                            colorb: Color("transparentGreen"),
-                            flagval: 2
-                        )
-                        .environmentObject(appModel)
-                        .environmentObject(navigationHelper)
-                        .environmentObject(conversationManager)
-                    }
-                    .padding(.vertical)
-
-                }
-                .background(Color("lightGreen"))
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-
-                ScrollView
-                {
-                    VStack
-                    {
-                      
-                        if  homeViewModel.loading {
-                            
-                            ProgressView()
-                       
-                        }
-                        else{
-                      
-                            VStack (alignment:.leading){
-                                
-                                HStack{
-                                    
-                                    Text(homeViewModel.accounts?.programName ?? "" )
-                               
-                                        .foregroundColor(.black)
-                                        .font(Font.custom("Rubik-Regular", size: 16))
-                                    Spacer()
-                                    
-                                    
-                                    HStack
-                                    {
-                                        Text(homeViewModel.accounts?.status ?? "" )
-                                            .padding(5)
-                                            .font(Font.custom("Rubik-Regular", size: 14))
-                                      
-                                            .foregroundColor(ColourStatus.getForegroundColor(for: homeViewModel.accounts?.status))
-                                        
-                                            .frame( minWidth :  70)
-                                            .fixedSize(horizontal: true, vertical: false)
-                                     
-                                            .background(ColourStatus.getBackgroundColor(for: homeViewModel.accounts?.status))
-                                      
-                                    }.clipShape(RoundedRectangle(cornerRadius:20))
-                                }
-                              
+                        .background( Color("lightGreen"))
+                    
+                        .cornerRadius(10, corners: [.bottomLeft, .bottomRight])
+                        
+                        ScrollView {
+                            dateHeader
+                            todoSection
+                            if isRPMProgram {
+                                recentVitalsSection
                             }
-                            .navigationBarBackButtonHidden(true)
-                            .frame(maxWidth: .infinity, minHeight: 60)
-                            .padding(.horizontal)
-                            .padding(.vertical,5)
-                            .background(Color("avgGreen"))
-                            .cornerRadius(15)
-                            .padding(.horizontal,10)
-                            .padding(.vertical,6)
+                        }
+                        
+                    }
+                 
+                }
+                .background(Color("ChatBGcolor"))
+                .onAppear {
+                    
+                    localParticipant.isMicOn = true
+                    localParticipant.isCameraOn = true
+                    
+                    todoList.refresh()
+                    
+                    //  Move all necessary configurations here before navigation
+                    callManager.configure(roomManager: roomManager)
+                    roomManager.configure(localParticipant: localParticipant)
+                    //           localParticipant.configure(identity: AuthStore.shared.userDisplayName)
+                    mediaSetupViewModel.configure(localParticipant: localParticipant)
+                    
+                    //localParticipant.isMicOn = true
+                    //localParticipant.isCameraOn = true
+                    
+                    if let deepLink = DeepLinkStore.shared.consumeDeepLink() {
+                        if case let .room(name) = deepLink {
+                            self.roomName = name
                         }
                     }
-                    
-                    .background( Color("lightGreen"))
-                    .clipShape(RoundedRectangle(cornerRadius:20))
-                    
-                    
-                    ScrollView {
-                        dateHeader
-                        todoSection
-                        if isRPMProgram {
-                            recentVitalsSection
-                        }
-                    }
-                
                 }
-                .padding(.bottom,50)
                 
-            }
-     
-            .onAppear {
                 
-                localParticipant.isMicOn = true
-                localParticipant.isCameraOn = true
-                
-                todoList.refresh()
-                
-                // ✅ Move all necessary configurations here before navigation
-                callManager.configure(roomManager: roomManager)
-                roomManager.configure(localParticipant: localParticipant)
-    //           localParticipant.configure(identity: AuthStore.shared.userDisplayName)
-                mediaSetupViewModel.configure(localParticipant: localParticipant)
-
-                //localParticipant.isMicOn = true
-                //localParticipant.isCameraOn = true
-                
-                if let deepLink = DeepLinkStore.shared.consumeDeepLink() {
-                    if case let .room(name) = deepLink {
-                        self.roomName = name
-                    }
+                .fullScreenCover(isPresented: $isShowingRoom) {
+                    
+                    RoomViewDependencyWrapper(roomName: roomName, isShowingPictureInPicture: $isShowingPictureInPicture)
+                        .environmentObject(callManager)
+                        .environmentObject(roomManager)
+                        .environmentObject(localParticipant)
+                        .environmentObject(mediaSetupViewModel)
                 }
-            }
-
-            
-            .fullScreenCover(isPresented: $isShowingRoom) {
                 
-                RoomViewDependencyWrapper(roomName: roomName, isShowingPictureInPicture: $isShowingPictureInPicture)
-                    .environmentObject(callManager)
-                    .environmentObject(roomManager)
-                    .environmentObject(localParticipant)
-                    .environmentObject(mediaSetupViewModel)
+                .edgesIgnoringSafeArea(.bottom)
+                
+                .hiddenNavigationBarStyle()
+                
+                .ignoresSafeArea(.all)
+                
+                .navigationBarHidden(true)
+                
+                .navigationBarBackButtonHidden(true)
+                
             }
-       
-            .edgesIgnoringSafeArea(.bottom)
-           
-            .hiddenNavigationBarStyle()
             
-            .background(VStack(spacing: 0 ){Color("lightGreen"); Color("bgColorDark"); Color("bgColorDark") })
-            
-            .ignoresSafeArea(.all)
-            
-            .navigationBarHidden(true)
-            
-            .navigationBarBackButtonHidden(true)
-        
         }
+            
+            //  TOAST OVERLAY SECTION
+                   if showRejectionAlert {
+                       VStack {
+                           Spacer()
+                           Text(rejectionMessage)
+                               .padding()
+                               .background(Color.black.opacity(0.8))
+                               .foregroundColor(.white)
+                               .cornerRadius(10)
+                               .padding(.bottom, 50)
+                               .transition(.opacity)
+                               .animation(.easeInOut, value: showRejectionAlert)
+                       }
+                   }
+               
         
     }
+                  .alert(notificationManager.notificationTitle,
+                                isPresented: $showAlertProxy,
+                                actions: {
+                                    Button("No", role: .cancel) {
+                                        print("No tapped")
+                                        showAlertProxy = false
+                                        notificationManager.showAlert = false
+                                        
+                                        if let room = notificationManager.roomName {
+                                            homeViewModel.rejectCall(roomName: room) { success in
+                                                rejectionMessage = success
+                                                    ? "Rejected call notification sent successfully."
+                                                    : "Failed to reject call. Please try again."
+                                                DispatchQueue.main.async {
+                                                    showRejectionAlert = true
+                                                    
+                                                    //  Automatically hide after 3 seconds
+                                                       DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                                           showRejectionAlert = false
+                                                       }
+                                                    
+                                                }
+                                            }
+                                        }
+                                    }
+                                    Button("Yes") {
+                                        print("Yes tapped")
+                                        showAlertProxy = false
+                                        notificationManager.showAlert = false
+                                        
+                                        if let room = notificationManager.roomName {
+                                            self.roomName = room
+                                        }
+                                        
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                            isShowingRoom = true
+                                        }
+                                    }
+                                },
+                                message: {
+                                    Text("Do you want to join?")
+                                })
         
-                  .alert(isPresented: $showRejectionAlert) {
-                      Alert(
-                          title: Text("Call Rejection Status"),
-                          message: Text(rejectionMessage),
-                          dismissButton: .default(Text("OK"))
-                      )
-                  }
-                  .alert(isPresented: $showAlertProxy) {
-                      Alert(
-                          title: Text(notificationManager.notificationTitle),
-                          message: Text("Do you want to join?"),
-                          primaryButton: .default(Text("Yes")) {
-                             
-                              if let room = notificationManager.roomName {
-                                  self.roomName = room
-                              }
-                              isShowingRoom = true
-                              print("yesclicked", self.roomName)
-                          },
-                          secondaryButton: .cancel(Text("No")) {
-                     
-                              if let room = notificationManager.roomName {
-                                  homeViewModel.rejectCall(roomName: room) { success in
-                                      rejectionMessage = success ? "Rejected call notification sent successfully." : "Failed to reject call. Please try again."
+        
+        
+     
+        
+                  .onChange(of: sessionManager.didReceiveUnauthorized) { isUnauthorized in
+                      if isUnauthorized {
+                          
+                          loginViewModel.logout { res, val in
+                              DispatchQueue.main.async {
+                                  print("Logout Result: \(res ?? "nil")")
+
+                                  loginViewModel.isLoggedOut = true
+                                  loginViewModel.loggedIn = false
+
+                                  if let bundleID = Bundle.main.bundleIdentifier {
+                                      UserDefaults.standard.removePersistentDomain(forName: bundleID)
+                                  }
+
+                                  DispatchQueue.global(qos: .background).async {
+                                      
+                                      print("morecallManager: \(callManager)")
+                                      print("moreroomManager: \(roomManager)")
+                                      print("morelocalParticipant: \(localParticipant)")
+
+                                      callManager.disconnect()
+                               
+                                      roomManager.disconnect()
+                                    
+                                      appModel.signOut()
+                                  
                                       DispatchQueue.main.async {
-                                          showRejectionAlert = true
-                                      }
+                                          homeViewModel.reset()
+
+                                                      //  Critical: Reset navigation on main thread
+                                                      navigationHelper.path = []
+                                          navigationHelper.selectedTab = 0
+                                                      navigationHelper.path.append(.login)
+                                          print(" navigationHelper.path: \( navigationHelper.path)")
+                                                  }
+                                      
                                   }
                               }
-                              print("noclicked")
                           }
-                      )
+                      }
                   }
 
+        
                   .onReceive(notificationManager.$showAlert) { newValue in
                       showAlertProxy = newValue
                   }
@@ -343,7 +421,8 @@ struct RPMHomeView: View {
                   .onAppear {
               
                       homeViewModel.dashboard()
-                      homeViewModel.getnotifyCount()
+                      notifList.getnotify()
+                  
                       
                   }
     }
@@ -381,7 +460,11 @@ struct RPMHomeView: View {
                         }
                     }
                     .padding(.horizontal)
-                }
+                    .padding(.vertical, 8)
+                }.scrollIndicators(.hidden)
+                    .background(Color("ChatDateLineColor"))
+                 
+
             }
         }
     }
@@ -420,7 +503,7 @@ struct RPMHomeView: View {
                     HStack(spacing: 0) {
                         ForEach(chartDays.vitalsGraph7, id: \.vitalName) { item in
                             RecentVitalsScrollView(item: item)
-                                .frame(width: 300, height: 600)
+                                .frame(width: 280, height: 700)
                         }
                     }
                 }
@@ -455,6 +538,7 @@ struct RPMHomeView: View {
             
             Spacer()
         }
+      
     }
 }
 

@@ -82,7 +82,7 @@ struct ConversationItemsListView: View {
 
 struct ConversationRowItem: View {
     var conversation: PersistentConversationDataItem
-    @StateObject var messageListViewModel = MessageListViewModel()
+   // @StateObject var messageListViewModel = MessageListViewModel()
     @EnvironmentObject var navigationHelper: NavigationHelper
 
     var body: some View {

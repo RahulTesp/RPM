@@ -38,7 +38,7 @@ final class NotificationViewModel: ObservableObject {
             DispatchQueue.main.async {
             switch result {
             case .success(let account):
-                print("getnotifysuccess")
+                print("getnotifysuccess",account)
           
                 self.notif = account
             

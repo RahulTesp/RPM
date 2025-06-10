@@ -68,10 +68,14 @@ class RoomManager: NSObject, ObservableObject {
     
     private func cleanUp() {
         room?.disconnect()
-        room = nil
+        DispatchQueue.main.async {
+            self.room = nil
+        }
       //  localParticipant.participant = nil
         remoteParticipants.removeAll()
-        isRecording = false
+        DispatchQueue.main.async {
+            self.isRecording = false
+        }
     }
 //    private func cleanUp() {
 //        room?.disconnect()
