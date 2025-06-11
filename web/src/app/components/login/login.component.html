@@ -144,6 +144,9 @@
             </p>
           </ng-container>
         </div>
+        <div class="warn" *ngIf="serverError">
+          <p class="loginWarning">{{ serverError }}</p>
+        </div>
       </div>
       <div class="form-group"></div>
       <div class="btn_panel action_panel_content">
