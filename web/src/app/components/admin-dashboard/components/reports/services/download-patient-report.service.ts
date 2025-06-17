@@ -1363,14 +1363,12 @@ export class DownloadPatientReportService {
       currentProgramId
     );
     this.vitals = this.patientInfo.PatientProgramdetails.PatientVitalInfos;
-    console.log("this.vitals",this.vitals);
     if (this.vitals) {
       const selectedVitals = this.vitals
         .filter((v: any) => v.Selected)
         .map((v: any) => v.Vital);
       this.selectedVitals = selectedVitals;
     }
-    console.log("this.selectedVitals",this.selectedVitals);
     let currentY = 30;
     this.selectedVitals.forEach((vital: string) => {
       doc.setFontSize(12);

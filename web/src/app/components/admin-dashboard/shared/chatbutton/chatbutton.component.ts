@@ -197,9 +197,6 @@ async sendMessage() {
       // Initialize chat service
       await this.patientChatService.ensureInitialized(this.currentuserName);
 
-      // Explicitly tell the service which user's conversations to load
-      console.log('Loading conversations for user:', this.currentuserName);
-
       try {
         // Get the current SID for this specific user
         this.currentSid = await this.patientChatService.getChatId(
@@ -243,8 +240,6 @@ chatHeartBeat(currentSid: string, username: string) {
     }) + " +05:30"
   };
 
-  console.log("Sending heartbeat with payload:", payload);
-
   this.rpm.rpm_post('/api/comm/chatheartbeat', payload)
     .then(data => {
       console.log('Heartbeat sent successfully at:', new Date().toLocaleString());
@@ -279,8 +274,6 @@ chatHeartBeat(currentSid: string, username: string) {
   async newChat() {
     // Wait for getUserName to complete
     await this.getUserName();
-    console.log('Username');
-    console.log(this.userName);
     await this.patientChatService.createNewChat(
       this.currentuserName,
       this.userName
