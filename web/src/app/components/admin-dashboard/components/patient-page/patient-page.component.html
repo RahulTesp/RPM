@@ -348,14 +348,38 @@
 
           <ng-container matColumnDef="ProgramName">
             <mat-header-cell *matHeaderCellDef>
-              Program Name
-              <div>
+                <div class="search_input" *ngIf="searchProgram_Name">
+                <img
+                  class="search_icon"
+                  src="../../../../../assets/04-Icons/Icons_Cancel.svg"
+                  id="p_patientNameSearch1"
+                  (click)="refreshTable()"
+                  (click)="searchProgramListNameClose()"
+                /><input
+                  class="input_panel"
+                  id="p_programNameSearch1"
+                  (keyup)="applyDataFilter($event)"
+                  (focus)="setupFilter('ProgramName')"
+                  [value]="programSearch"
+                />
+              </div>
+               <div class="search_heading_default" *ngIf="!searchProgram_Name">
+                <img
+                  class="search_icon_default"
+                  src="../../../../../assets/04-Icons/Icons_Search Small.svg"
+                  (click)="searchProgramListName()"
+                  id="p_programNameSearch"
+                />
+               Program Name
+              </div>
+              <!-- Program Name -->
+             <!-- <div> -->
                 <!-- <select class="task_priority" dir="rtl">
                 <option value="1"> Program </option>
                 <option value="2">To do</option>
                 <option value="3">In Progress</option>
              </select> -->
-              </div>
+              <!-- </div> -->
             </mat-header-cell>
             <mat-cell
 

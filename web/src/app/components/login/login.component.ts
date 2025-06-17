@@ -39,6 +39,8 @@ export class LoginComponent implements OnInit {
 
   verificationForm = new UntypedFormGroup({});
 
+  serverError: string = '';
+
   loginForm = new UntypedFormGroup({
     username: new UntypedFormControl(null, [Validators.required]),
     password: new UntypedFormControl(null, [Validators.required]),
@@ -302,6 +304,15 @@ export class LoginComponent implements OnInit {
               alert(err.error);
               window.location.reload();
               this.auth.unauthorized();
+            }
+            else {
+              if (err.status == 400) {
+                this.serverError = 'Invalid request. Please check your input and try again.';
+                // this.serverError = 'Bad Request: ' + (err.error?.message || 'Please check your request.');
+                this.IsPassword = true; // show form error, hide Login failed messages
+              } else {
+                alert('An unexpected error occurred.');
+              }
             }
           }
         }

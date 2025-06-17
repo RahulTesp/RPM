@@ -240,6 +240,7 @@ export class PatientPageComponent implements OnInit {
     this.searchPatientList_assign = false;
     this.searchPatientList_physician = false;
     this.searchPatient_assignMember = false;
+    this.searchProgram_Name = false;
   }
 
   onClickPatientCautious() {
@@ -250,6 +251,7 @@ export class PatientPageComponent implements OnInit {
     this.searchPatientList_assign = false;
     this.searchPatientList_physician = false;
     this.searchPatient_assignMember = false;
+    this.searchProgram_Name = false;
   }
   onClickPatientNormal() {
     this.containerSelection = 4;
@@ -259,6 +261,7 @@ export class PatientPageComponent implements OnInit {
     this.searchPatientList_assign = false;
     this.searchPatientList_physician = false;
     this.searchPatient_assignMember = false;
+    this.searchProgram_Name = false;
   }
 
   onClickPatientTotal() {
@@ -270,6 +273,7 @@ export class PatientPageComponent implements OnInit {
     this.searchPatientList_assign = false;
     this.searchPatientList_physician = false;
     this.searchPatient_assignMember = false;
+    this.searchProgram_Name = false;
   }
 
   refreshTable() {
@@ -361,6 +365,14 @@ export class PatientPageComponent implements OnInit {
           } else {
             this.searchPatient_assignMember = false;
           }
+          this.searchProgram_Name = sessionStorage.getItem(
+            'searchProgram_Name'
+          );
+          if (this.searchProgram_Name == 'true') {
+            this.searchProgram_Name = true;
+          } else {
+            this.searchProgram_Name = false;
+          }
           this.maskingDataSrc();
         } else if (this.CurrentMenuItem == 2) {
           this.variable = 2;
@@ -418,6 +430,7 @@ export class PatientPageComponent implements OnInit {
         this.searchPatientList_assign = false;
         this.searchPatientList_physician = false;
         this.searchPatient_assignMember = false;
+        this.searchProgram_Name=false;
         if (this.patientCategory) {
           this.homeVitalSelection = undefined;
           this.homedurationvalue = undefined;
@@ -490,6 +503,11 @@ export class PatientPageComponent implements OnInit {
       'searchPatient_assignMember',
       this.searchPatient_assignMember
     );
+ sessionStorage.setItem(
+      'searchProgram_Name',
+      this.searchProgram_Name
+    );
+
     sessionStorage.setItem('patient-page-status', 'patient-page');
   }
   addpatient() {
@@ -923,7 +941,7 @@ export class PatientPageComponent implements OnInit {
   searchPatientList_assign: any;
   searchPatientList_physician: any;
   searchPatient_assignMember: any;
-
+  searchProgram_Name: any;
   searchPatientListAssign() {
     this.searchPatientList_assign = !this.searchPatientList_assign;
     this.searchPatientList_physician = false;
@@ -931,6 +949,7 @@ export class PatientPageComponent implements OnInit {
     this.searchPatientList_Id = false;
     this.searchValueName = false;
     this.searchPatient_assignMember = false;
+    this.searchProgram_Name = false;
     this.clinicNameSerach = '';
   }
   searchPatientListAssignClose() {
@@ -940,6 +959,7 @@ export class PatientPageComponent implements OnInit {
     this.searchPatientList_Id = false;
     this.searchValueName = false;
     this.searchPatient_assignMember = false;
+    this.searchProgram_Name = false;
     this.clinicNameSerach = '';
   }
   searchPatientAssignedMember() {
@@ -948,6 +968,7 @@ export class PatientPageComponent implements OnInit {
     this.searchPatientList_Name = false;
     this.searchPatientList_Id = false;
     this.searchPatientList_assign = false;
+    this.searchProgram_Name = false;
     this.assigneeSerach = '';
   }
   searchPatientAssignedMemberClose() {
@@ -956,6 +977,7 @@ export class PatientPageComponent implements OnInit {
     this.searchPatientList_Name = false;
     this.searchPatientList_Id = false;
     this.searchPatientList_assign = false;
+    this.searchProgram_Name = false;
     this.assigneeSerach = '';
     this.pageIndxValue = 0;
   }
@@ -965,6 +987,7 @@ export class PatientPageComponent implements OnInit {
     this.searchPatientList_Name = false;
     this.searchPatientList_Id = false;
     this.searchPatient_assignMember = false;
+    this.searchProgram_Name = false;
     this.phySearchValue = '';
   }
   searchPatientListPhysicianClose() {
@@ -973,6 +996,7 @@ export class PatientPageComponent implements OnInit {
     this.searchPatientList_Name = false;
     this.searchPatientList_Id = false;
     this.searchPatient_assignMember = false;
+    this.searchProgram_Name = false;
     this.phySearchValue = '';
     this.pageIndxValue = 0;
   }
@@ -987,6 +1011,7 @@ export class PatientPageComponent implements OnInit {
     this.searchPatientList_assign = false;
     this.searchPatientList_physician = false;
     this.searchPatient_assignMember = false;
+    this.searchProgram_Name = false;
     this.patientSearch = '';
   }
   searchPatientListNameClose() {
@@ -994,10 +1019,27 @@ export class PatientPageComponent implements OnInit {
     this.searchPatientList_assign = false;
     this.searchPatientList_physician = false;
     this.searchPatient_assignMember = false;
+    this.searchProgram_Name = false;
     this.patientSearch = '';
     this.pageIndxValue = 0;
   }
-
+  searchProgramListName() {
+    this.searchProgram_Name = ! this.searchProgram_Name;
+    this.searchPatientList_assign = false;
+    this.searchPatientList_physician = false;
+    this.searchPatient_assignMember = false;
+    this.searchPatientList_Name = false;
+    this.programSearch = '';
+  }
+  searchProgramListNameClose() {
+    this.searchPatientList_Name = false;
+    this.searchPatientList_assign = false;
+    this.searchPatientList_physician = false;
+    this.searchPatient_assignMember = false;
+    this.searchProgram_Name = false;
+    this.programSearch = '';
+    this.pageIndxValue = 0;
+  }
   serachIdClick() {
     this.searchValueId = !this.searchValueId;
   }
@@ -2234,6 +2276,7 @@ export class PatientPageComponent implements OnInit {
   patientSearch: any;
   clinicNameSerach: any;
   assigneeSerach: any;
+  programSearch:any;
   redirectionFilter(value: any) {
     if (value == 'undefined') {
       value = '';
@@ -2252,12 +2295,17 @@ export class PatientPageComponent implements OnInit {
       } else if (this.searchPatient_assignMember == true) {
         this.setupFilter('AssignedMember');
         this.assigneeSerach = value;
+      }else if(this.searchProgram_Name = false)
+      {
+         this.setupFilter('ProgramName');
+         this.programSearch = value;
       }
     } else {
       this.phySearchValue = value;
       this.patientSearch = value;
       this.clinicNameSerach = value;
       this.assigneeSerach = value;
+      this.programSearch = value;
       return;
     }
   }
