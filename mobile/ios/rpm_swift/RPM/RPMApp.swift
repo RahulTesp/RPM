@@ -13,7 +13,6 @@ import Firebase
 @main
 struct RPMApp: App {
     @StateObject var loginStateViewModel = RPMLoginViewModel()
-    @State private var isLogin = false
     @StateObject private var model: AppModel // For iOS 14+
     @State var showChatAlert = false
     @State var isChatLogout = false
@@ -29,6 +28,7 @@ struct RPMApp: App {
     @AppStorage("isLoggedIn") private var isLoggedIn: Bool = false
     @Environment(\.scenePhase) var scenePhase
     @StateObject private var sessionManager = SessionManager.shared
+    
 
     // Only one init, which sets up the app model.
     init() {
@@ -68,59 +68,16 @@ struct RPMApp: App {
                                                print("Messages Manager: \(model.messagesManager != nil ? "Initialized" : "Not Initialized")")
                                                print("Participants Manager: \(model.participantsManager != nil ? "Initialized" : "Not Initialized")")
                     }
-                    .onChange(of: scenePhase) { newPhase in
-                        switch newPhase {
-                        case .active:
-                            let wasInBackground = UserDefaults.standard.bool(forKey: "wasInBackground")
-                               let wasTerminated = UserDefaults.standard.bool(forKey: "wasTerminated")
-
-                               print("App is active")
-                               print("wasInBackground: \(wasInBackground)")
-                               print("wasTerminated: \(wasTerminated)")
-                            if wasInBackground && wasTerminated {
-                                // This means app was killed in background and relaunched
-                                UserDefaults.standard.set(false, forKey: "wasInBackground")
-                                UserDefaults.standard.set(false, forKey: "wasTerminated")
-
-                                print("App relaunched after being killed. Logging out...")
-                                isLoggedIn = false
-                                
-                                // Call logout
-                                loginStateViewModel.logout { _, _ in
-                                    print("App MAIN LOGOUT")
-                                    DispatchQueue.main.async {
-                                        navigationHelper.path = [.login] // Navigate to login screen
-                                        print("MAINnavigationHelper.path: \( navigationHelper.path)")
-                                    }
-                                }
-                            }
-                            else {
-                                    // Normal resume from background
-                                    UserDefaults.standard.set(false, forKey: "wasInBackground")
-                                }
-
-                        case .background:
-                            print("App entered background")
-                            wasInBackground = true
-                            UserDefaults.standard.set(true, forKey: "wasInBackground")
-                        case .inactive:
-                            print("App is inactive")
-
-                        @unknown default:
-                            break
-                        }
-                    }
-
                     .onChange(of: sessionManager.didReceiveUnauthorized) { isUnauthorized in
                         if isUnauthorized {
-                            print(" Received 401 Unauthorized. Logging out...")
+                            print("Received 401 Unauthorized. Logging out...")
 
                             isLoggedIn = false
                             loginStateViewModel.logout { _, _ in
                                 DispatchQueue.main.async {
-                                    navigationHelper.path = [.login]
-                                    print("🚪 Logged out and navigated to login.")
-                                    sessionManager.reset()  // Reset to avoid repeated triggers
+                                    navigationHelper.path = [.loginView]
+                                    print("Logged out and navigated to login.")
+                                    sessionManager.reset()  // Important to prevent infinite loop
                                 }
                             }
                         }
@@ -128,7 +85,7 @@ struct RPMApp: App {
 
                     .navigationDestination(for: Screen.self) { screen in
                         switch screen {
-                        case .login:
+                        case .loginView:
                             //RPMLoginView(isLogin: $isLogin)
                             RPMLoginView()
                                 .environmentObject(model)
@@ -149,11 +106,15 @@ struct RPMApp: App {
                             
                         case .otp:
                               
-                            RPMOTPView(isLogin: $isLogin)
+                            RPMOTPView()
+                                .environmentObject(navigationHelper)
+                                .environmentObject(loginStateViewModel)
+                            
                         case .resetPassword:
                              
                             RPMResetPasswordView()
                                 .environmentObject(navigationHelper)
+                                .environmentObject(loginStateViewModel)
                             
                         case .tabBarView:
                              
@@ -173,9 +134,11 @@ struct RPMApp: App {
                         case .programInfoView:
                                    RPMProgramInfoView()
                                 .environmentObject(homeViewModel)
+                                .environmentObject(navigationHelper)
                             
                         case .myInfoView:
                             RPMMyInfoView()
+                                .environmentObject(navigationHelper)
                            
                         case .clinicalinfoView(let value):
                               RPMClinicalinfoView(returningFromClinicalInfo: .constant(value))
@@ -197,6 +160,7 @@ struct RPMApp: App {
                             
                             RPMChangePasswordView()
                                 .environmentObject(navigationHelper)
+                                .environmentObject(loginStateViewModel)
                             
                         case .notificationView:
                                  
@@ -253,8 +217,7 @@ struct ApplicationSwitcher: View {
     @EnvironmentObject var localParticipant: LocalParticipantManager
     @EnvironmentObject var mediaSetupViewModel: MediaSetupViewModel
     
-    @EnvironmentObject var accountListVM: RPMHomeViewModel
-    @EnvironmentObject var memberListViewModel: RPMHomeViewModel
+    @EnvironmentObject var homeViewModel: RPMHomeViewModel
     @StateObject var memberDetList = MembersListViewModel()
     
     var body: some View {
@@ -272,7 +235,7 @@ struct ApplicationSwitcher: View {
                         .environmentObject(localParticipant)
                         .environmentObject(mediaSetupViewModel)
                     
-                        .environmentObject(accountListVM)
+                        .environmentObject(homeViewModel)
                         .environmentObject(loginViewModel)
                         .environmentObject(memberDetList)
                     
@@ -293,7 +256,7 @@ struct ApplicationSwitcher: View {
                         .environmentObject(localParticipant)
                         .environmentObject(mediaSetupViewModel)
                     
-                        .environmentObject(accountListVM)
+                        .environmentObject(homeViewModel)
                         .environmentObject(loginViewModel)
                         .onAppear {
                             print("AppModel in RPMLoginView:", appModel)
@@ -305,7 +268,7 @@ struct ApplicationSwitcher: View {
     
 
 enum Screen: Hashable{
-    case login
+    case loginView
     case createConversation
     case messageList(conversation: PersistentConversationDataItem)
     case conversationsList

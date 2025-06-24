@@ -10,12 +10,9 @@ import Combine
 
 @available(iOS 15, *)
 public struct OtpResetVerificationView: View {
-    
-    @State var usrlokd: Bool = false
+
     @State private var shouldShowLoginAlert: Bool = false
-    @ObservedObject private var viewModel = RPMLoginViewModel()
     @State private var alertItem: AlertItem?
-    @State var isActive = false
     @State private var isLogin = false
     @FocusState private var isTextFieldFocused: Bool
     //MARK: Fields
@@ -28,6 +25,9 @@ public struct OtpResetVerificationView: View {
     var textColor: Color
     var textSize: CGFloat
     
+    @EnvironmentObject var navigationHelper: NavigationHelper
+    @EnvironmentObject var loginViewModel: RPMLoginViewModel
+
     //MARK: Constructor
      init(otpCode: Binding<String>, otpCodeLength: Int, textColor: Color, textSize: CGFloat) {
         self._otpCode = otpCode
@@ -40,36 +40,8 @@ public struct OtpResetVerificationView: View {
     //MARK: Body
     public var body: some View {
         HStack {
-           // let _ = Self._printChanges()
             ZStack(alignment: .center) {
-                NavigationLink (
-                    
-                    destination:
-                    
-                       // RPMLoginView( isLogin: $isLogin)
-                    RPMLoginView()
-                    ,
-                                        
-                    isActive: $usrlokd
-        
-                )
-                {
-                    
-                }
-                
-                                    NavigationLink (
-                                        
-                                        destination:
-                                        
-                                         RPMTabBarView() ,
-                                                            
-                                                            isActive: $isActive
-                             
-                                    )
-                                    {
-                                        
-                                    }
-                          
+     
                 TextField("", text: $otpCode ,
                         
                           onEditingChanged: { (changed) in
@@ -199,7 +171,10 @@ public struct OtpResetVerificationView: View {
                                    print("ok clik lok")
                                    print( (UserDefaults.standard.bool(forKey: "userLocked") ))
                                    print("Ok Click")
-                                   self.usrlokd = true
+                                //   self.usrlokd = true
+//                                   DispatchQueue.main.async {
+//                                                     navigationHelper.path.append(.login)
+//                                                 }
                                }
                 if( ((UserDefaults.standard.bool(forKey: "otpWrong") ) == true))
                  {

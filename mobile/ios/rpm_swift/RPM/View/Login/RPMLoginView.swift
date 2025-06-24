@@ -30,34 +30,29 @@ struct RPMLoginView: View {
 //    @State private var username: String = "AHV01927"
 //    @State private var password: String = "cXPJKIWQ"
     
-    @State private var username: String = "SMD01846"
-    @State private var password: String = "I5TOBWHB"
-    
+//    @State private var username: String = "SMD01846"
+//    @State private var password: String = "I5TOBWHB"
+//    
 //    @State private var username: String = "SMD01847"
 //    @State private var password: String = "PND6RM8L"
-//    @State private var username: String = "154201932"
-//    @State private var password: String = "ODJVOBCB"
+    @State private var username: String = "154201932"
+    @State private var password: String = "ODJVOBCB"
 //    @State private var username: String = "WSPC01933"
 //    @State private var password: String = "7YLDDXQF"
-    
-//    @State private var username: String = "WSPC00531"
-//    @State private var password: String = "bOCbRdNX"
-//
-    
-////
+
 //    @State private var username: String = "154201949"
 //    @State private var password: String = "RF3JVNNN"
     
 //    @State private var username: String = "AFC01952"
 //    @State private var password: String = "J3bCBUI6"
     
+//    @State private var username: String = "SPCP01554"
+//    @State private var password: String = "QTN4QNT7"
+    
 //    @State private var username: String = "ARPL00104"
 //    @State private var password: String = "EDKUC6Kc"
     
-    
-//
-//    @State private var username: String = "48901365"
-//    @State private var password: String = "53FYLPQQ"
+
     
     
 //    @State private var username: String = ""
@@ -76,20 +71,7 @@ struct RPMLoginView: View {
                 let height = geometry.size.height
   
         VStack {
-            if loginViewModel.isAuthenticated {
-                RPMTabBarView()
-                    .environmentObject(appModel)
-                    .environmentObject(navigationHelper)
-                    .environmentObject(messagesManager)
-                    .environmentObject(conversationManager)
-                
-                    .environmentObject(callManager)
-                    .environmentObject(roomManager)
-                    .environmentObject(localParticipant)
-                    .environmentObject(mediaSetupViewModel)
-                    .environmentObject(homeViewModel)
-             
-            } else {
+
                 Group {
                     Text("Log In")
                         .font(Font.custom("Rubik-Regular", size: 16))
@@ -113,11 +95,14 @@ struct RPMLoginView: View {
                     .textFieldStyle(MyTextFieldStyle())
                     .cornerRadius(10)
                     .disableAutocorrection(true)
-                    .frame(width: width.isNaN ? 0 : max(0, width))
-         
+                    .frame(maxWidth: .infinity)
+                 
+                    .onTapGesture {
+                           print("Username tapped")
+                       }
                 SecureInputView("Enter Password", text: $password)
                     .colorScheme(.light)
-                    .frame(width: width.isNaN ? 0 : max(0, width))
+                    .frame(maxWidth: .infinity)
                     .disableAutocorrection(false)
                     .textFieldStyle(MyTextFieldStyle())
                     .cornerRadius(10)
@@ -151,8 +136,7 @@ struct RPMLoginView: View {
                 }
          
                 .padding(.horizontal, 22)
-            }
-            
+      
             Spacer()
         }
         .navigationBarBackButtonHidden(true)
@@ -163,6 +147,9 @@ struct RPMLoginView: View {
             print("NSTimeZone.default", NSTimeZone.default)
             print("systemTimeZone", systemTimeZone)
             print("geometry size:", width, height, "isNaN:", width.isNaN, height.isNaN)
+          
+            print("LoginView appeared, isAuthenticated = \(loginViewModel.isAuthenticated)")
+            print("🧭 Path:", navigationHelper.path)
         }
     }
 }
@@ -193,9 +180,6 @@ struct RPMLoginView: View {
               
                 UserDefaults.standard.set(username, forKey: "usernameSaved")
                 UserDefaults.standard.set(password, forKey: "passwordSaved")
-
-                loginViewModel.loggedIn = true
-                UserDefaults.standard.set(loginViewModel.loggedIn, forKey: "loggedInValue")
 
                 print("Checking MFA flag:", UserDefaults.standard.string(forKey: "MFAENABLEDFALSE") ?? "nil")
 
@@ -331,18 +315,6 @@ struct MyTextFieldStyle: TextFieldStyle {
             .padding(.vertical,5)
             .padding(.horizontal, 25)
          
-    }
-}
-struct DisableTextSelection: ViewModifier {
-    var disabled: Bool
-    
-    func body(content: Content) -> some View {
-        content
-            .onTapGesture {
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to:nil, from:nil, for:nil)
-            }
-            .disabled(disabled)
-            .opacity(disabled ? 0.5 : 1.0)
     }
 }
 

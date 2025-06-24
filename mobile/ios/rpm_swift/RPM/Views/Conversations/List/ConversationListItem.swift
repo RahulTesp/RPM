@@ -11,8 +11,10 @@ import SwiftUI
 struct ConversationListItem: View {
     @ObservedObject var viewModel: PersistentConversationDataItem
     @EnvironmentObject var appModel: AppModel
-    
+  
     var body: some View {
+      
+        
         VStack {
             HStack {
                 if viewModel.muted {
@@ -33,8 +35,7 @@ struct ConversationListItem: View {
                         HStack
                         {
                             Text(displayName)
-                            
-                            //                        Text(viewModel.title.components(separatedBy: "-").first ?? "")
+                   
                                 .lineLimit(1)
                                 .font(.system(size: 22))
                                 .foregroundColor(Color("title1"))
@@ -42,36 +43,49 @@ struct ConversationListItem: View {
                             Spacer()
                             
                             Text("\(viewModel.lastMessageDateFormatted)")
-                                .font(.system(size: 16))
+                                .font(.system(size: 15))
                                 .foregroundColor(Color("ChatLastMsgColor"))
                         }
-                        Text(viewModel.lastMessageText)
-                            .lineLimit(1)
-                            .font(.system(size: 15))
-                            .foregroundColor(Color("ChatLastMsgColor"))
-                    }  .padding(.top, 4)
+                        
+                        HStack {
+                            
+                            Text(viewModel.lastMessageTextTrimmed)
+                                  .frame(maxWidth: .infinity, alignment: .leading)
+                                  .font(.system(size: 15))
+                                  .lineLimit(1)
+                                  .foregroundColor(Color("ChatLastMsgColor"))
+                                  .fixedSize(horizontal: false, vertical: true)
+
+                            Spacer()
+                            
+                            if (viewModel.unreadMessagesCount > 0) {
+                                Text("\(viewModel.unreadMessagesCount)")
+                                    .font(.system(size: 14))
+                                    .padding(.horizontal, 8)
+                                    .background(Color("ChatCountBg"))
+                                    .foregroundColor(Color("buttonColor"))
+                                    .cornerRadius(16)
+                            }
+                        }
+                        
+                        
+                      
+                    }
+                    
+                    .padding(.top, 4)
                     
                     
                 }
-                Spacer()
+               
                 
             }
             .padding(.bottom, 1)
-            HStack {
-                
-                
-                Spacer()
-                
-                if (viewModel.unreadMessagesCount > 0) {
-                    Text("\(viewModel.unreadMessagesCount)")
-                        .font(.system(size: 14))
-                        .padding(.horizontal, 8)
-                        .background(Color.cyan)
-                        .foregroundColor(Color("buttonColor"))
-                        .cornerRadius(16)
-                }
-            }
+         
         }
+        .onAppear {
+            print("viewModel.unreadReceivedMessages.count", viewModel.unreadMessagesCount )
+        }
+    
     }
     
     func getMemberNameFromUsername(_ username: String) -> String? {

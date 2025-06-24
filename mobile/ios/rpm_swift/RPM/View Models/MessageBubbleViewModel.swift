@@ -78,8 +78,8 @@ final class MessageBubbleViewModel: ObservableObject, Identifiable, Hashable, Eq
     @Published var isEditing = false
     @Published var editedText: String = ""
 
-    let isFirstMessageOfDay: Bool  //  Add this
-    let conversation: PersistentConversationDataItem  //  Add this line
+    let isFirstMessageOfDay: Bool
+    let conversation: PersistentConversationDataItem
     
     public var text: NSMutableAttributedString {
         get {
@@ -102,8 +102,15 @@ final class MessageBubbleViewModel: ObservableObject, Identifiable, Hashable, Eq
         }
     }
     
+    var messageStatus: MessageStatus? {
+        guard let raw = source.status?.lowercased() else { return nil }
+        print("Message status: \(String(describing: raw))")
+
+        return MessageStatus(rawValue: raw)
+    }
+    
+    
     var formattedDateString: String {
-        // Example formatting logic
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
@@ -135,8 +142,8 @@ final class MessageBubbleViewModel: ObservableObject, Identifiable, Hashable, Eq
             return ""
         }
         let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .none  // ✅ don't show date
-        dateFormatter.timeStyle = .short // ✅ show time like "7:23 PM"
+        dateFormatter.dateStyle = .none  //  don't show date
+        dateFormatter.timeStyle = .short //  show time like "7:23 PM"
         return dateFormatter.string(from: date)
     }
 

@@ -48,15 +48,13 @@ struct MessageBubbleView: View {
                             }
                             .padding(EdgeInsets(top: 16, leading: 20, bottom: 12, trailing: 16)) // Make room inside bubble
                         }
-                        .frame(maxWidth: UIScreen.main.bounds.width * 0.6, alignment: .leading)
+                        .frame(maxWidth: UIScreen.main.bounds.width * 0.5, alignment: .leading)
                         
-                    }.padding(.bottom, 4)
-                    HStack {
-                        //                        TappableReactionView(viewModel: viewModel, showingReactionsDetailsView: $showingReactionsDetailsView, showingDetailSheet: $showingMessageDetailsSheet, whichSheet: $whichSheet)
-                        Spacer()
                     }
+                    .padding(.bottom, 4)
+                 
                 }
-                .padding(.bottom, 22)
+                .padding(.bottom, 12)
                 Spacer()
             }
             
@@ -66,13 +64,18 @@ struct MessageBubbleView: View {
                 {
                     
                     HStack {
-                        
-                        
+                   
                         
                         Spacer() // Pushes the entire message bubble to the right
                         
                         HStack(alignment: .bottom, spacing: 8) {
                             
+                            //  Status Icon
+                            if let status = viewModel.messageStatus {
+                                statusIcon(for: status)
+                                    .padding(.bottom, 4)
+                            }
+  
                             ZStack(alignment: .topLeading) {
                                 ChatBubbleRight()
                                     .fill(Color("ChatBoxColour"))
@@ -84,11 +87,12 @@ struct MessageBubbleView: View {
                                     
                                     MessageDateView(viewModel, isInbound: false)
                                     MessageTextView(viewModel, isMessageSelected: $isMessageSelected)
+                                        .environmentObject(messagesManager)
                                 }
                                 .padding(EdgeInsets(top: 16, leading: 10, bottom: 12, trailing: 16)) // Make room inside bubble
                             }
-                            .frame(maxWidth: UIScreen.main.bounds.width * 0.6, alignment: .trailing)
-                            .padding(8)
+                            .frame(maxWidth: UIScreen.main.bounds.width * 0.5, alignment: .trailing)
+                            .padding(.bottom, 4)
                             
                             
                         }
@@ -106,28 +110,31 @@ struct MessageBubbleView: View {
             showingMessageDetailsSheet.toggle()
         }
         
-        .alert(isPresented: $showingDeleteConfirmation) {
-            Alert(
-                title: Text("message.details.delete_title"),
-                message: Text("message.details.delete_description"),
-                primaryButton: .default(
-                    Text("Cancel"),
-                    action: {}
-                ),
-                secondaryButton: .destructive(
-                    Text("message.details.delete"),
-                    action: { messagesManager.deleteMessage(viewModel.source) }
-                )
-            )
-        }
+
     }
     
+    @ViewBuilder
+    func statusIcon(for status: MessageStatus) -> some View {
+        switch status {
+        case .sending:
+            Image(systemName: "clock")
+                .foregroundColor(.gray)
+                .font(.caption2)
+
+        case .sent:
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundColor(.green)
+                .font(.caption2)
+
+        case .failed:
+            Image(systemName: "exclamationmark.circle.fill")
+                .foregroundColor(.red)
+                .font(.caption2)
+        }
+    }
+
     // MARK: - Actions
-    
-    // func tapReactionAction() {
-    //        messagesManager.updateMessage(attributes: viewModel.source.attributesDictionary, for: viewModel.source.messageIndex, conversationSid: viewModel.source.conversationSid)
-    // }
-    
+
     func copyAction() {
         messagesManager.copyMessage()
     }
@@ -141,7 +148,6 @@ fileprivate enum ShowWhichDetails {
     case message, reactions
 }
 
-
 struct PlaceholderImage: View {
     var body: some View {
         Image(systemName: "questionmark.app")
@@ -152,18 +158,20 @@ struct PlaceholderImage: View {
 }
 
 struct MessageTextView: View {
-    // private var viewModel: MessageBubbleViewModel
     @ObservedObject var viewModel: MessageBubbleViewModel
     @EnvironmentObject var appModel: AppModel
-    
+    @EnvironmentObject var messagesManager: MessagesManager
     @State private var editedText: String = ""
     @State private var isEditing: Bool = false
     @FocusState private var isTextEditorFocused: Bool
     @State private var showDeleteConfirmation = false
+
+    var isDeleting: Bool {
+        messagesManager.isDeleting(viewModel.source)
+    }
     
     @Binding var isMessageSelected: Bool // Binding to control visibility of Edit/Delete buttons
-    
-    
+
     var body: some View {
         
         ZStack {
@@ -173,7 +181,7 @@ struct MessageTextView: View {
                 if viewModel.direction == .outgoing {
                     HStack(alignment: .bottom, spacing: 8) {
                         Spacer() // Push everything to the right
-                        
+                 
                         HStack {
                             Spacer() // Pushes text to the left, icons stay on the right
                             
@@ -187,11 +195,9 @@ struct MessageTextView: View {
                                                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
                                                 .padding(.bottom, 8)
                                                 .onAppear {
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                                        isTextEditorFocused = true
-                                                    }
-                                                }
-                                            
+                                                     isTextEditorFocused = true
+                                                 }
+
                                             HStack {
                                                 Button("Cancel") {
                                                     isEditing = false
@@ -206,7 +212,7 @@ struct MessageTextView: View {
                                                     let conversationSid = viewModel.source.conversationSid
                                                     
                                                     if let sid = conversationSid {
-                                                        appModel.messagesManager.updateMessageBody(
+                                                        messagesManager.updateMessageBody(
                                                             newText: editedText,
                                                             for: messageIndex,
                                                             conversationSid: sid
@@ -236,14 +242,9 @@ struct MessageTextView: View {
                                                     Button(action: {
                                                         print("Edit tapped")
                                                         editedText = viewModel.source.body ?? viewModel.text.string
-                                                        
-                                                        withAnimation(nil) {
+                                                    
                                                             isEditing = true
-                                                        }
-                                                        
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                                            isTextEditorFocused = true
-                                                        }
+     
                                                     }) {
                                                         Image("Icons_Edit A")
                                                             .resizable()
@@ -282,6 +283,16 @@ struct MessageTextView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .trailing) // Ensures entire HStack is right aligned
                     .padding(.trailing, 4)
+                    
+                    HStack{
+                        if isDeleting {
+                             
+                               Text("Deleting...")
+                                   .foregroundColor(.red)
+                                   .bold()
+                           }
+                           
+                    } .padding(.top, 2)
                 }
                 
                 
@@ -306,17 +317,32 @@ struct MessageTextView: View {
         .confirmationDialog("Delete Message?", isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
             Button("Delete", role: .destructive) {
                 let message = viewModel.source
-                appModel.messagesManager.deleteMessage(message)
+                
+                print("UIMSGINDEX",message.messageIndex)
+                print("UImessage",message)
+                
+                messagesManager.deletingMessages.insert(message.sid ?? "")
+           
+                messagesManager.deleteMessageFromTwilio(message) { success in
+                
+                    messagesManager.deletingMessages.remove(message.sid ?? "")
+                    
+                    if success {
+                      //   Update UI, show confirmation, etc.
+                        print("Deletion success")
+
+                    } else {
+                        // Show error UI
+                        print("Deletion failed")
+                    }
+                }
+
             }
             Button("Cancel", role: .cancel) { }
         }
-        
-        
+
     }
-    
-    //    init(_ model: MessageBubbleViewModel) {
-    //        self.viewModel = model
-    //    }
+
     init(_ model: MessageBubbleViewModel, isMessageSelected: Binding<Bool>) {
         self.viewModel = model
         self._isMessageSelected = isMessageSelected // Note the underscore (_) prefix here
@@ -377,50 +403,64 @@ struct ChatBubble: Shape {
 struct ChatBubbleRight: Shape {
     func path(in rect: CGRect) -> Path {
         let cornerRadius: CGFloat = 12
-        let arrowWidth: CGFloat = 12
-        let arrowHeight: CGFloat = 10
-        
+        let arrowWidth: CGFloat = 16       // Length of tail (how far it sticks out)
+        let arrowHeight: CGFloat = 16      // Height of the triangle
+        let arrowBaseOffset: CGFloat = 8   // NEW: how wide the base is (was full arrowHeight before)
+
         var path = Path()
-        
-        // Start from top-left corner (rounded)
+
+        // Start from top-left corner
         path.move(to: CGPoint(x: cornerRadius, y: 0))
-        path.addArc(center: CGPoint(x: cornerRadius, y: cornerRadius),
+
+        // Top edge to just before triangle
+        path.addLine(to: CGPoint(x: rect.width - arrowWidth - cornerRadius, y: 0))
+
+        // Top-right corner curve
+        path.addArc(center: CGPoint(x: rect.width - arrowWidth - cornerRadius, y: cornerRadius),
                     radius: cornerRadius,
                     startAngle: .degrees(270),
-                    endAngle: .degrees(180),
-                    clockwise: true)
-        
-        // Left edge
-        path.addLine(to: CGPoint(x: 0, y: rect.height - cornerRadius))
-        path.addArc(center: CGPoint(x: cornerRadius, y: rect.height - cornerRadius),
-                    radius: cornerRadius,
-                    startAngle: .degrees(180),
-                    endAngle: .degrees(90),
-                    clockwise: true)
-        
-        // Bottom edge
-        path.addLine(to: CGPoint(x: rect.width - arrowWidth - cornerRadius, y: rect.height))
+                    endAngle: .degrees(0),
+                    clockwise: false)
+
+        // Right edge down
+        path.addLine(to: CGPoint(x: rect.width - arrowWidth, y: rect.height - cornerRadius))
         path.addArc(center: CGPoint(x: rect.width - arrowWidth - cornerRadius, y: rect.height - cornerRadius),
                     radius: cornerRadius,
+                    startAngle: .degrees(0),
+                    endAngle: .degrees(90),
+                    clockwise: false)
+
+        // Bottom edge
+        path.addLine(to: CGPoint(x: cornerRadius, y: rect.height))
+        path.addArc(center: CGPoint(x: cornerRadius, y: rect.height - cornerRadius),
+                    radius: cornerRadius,
                     startAngle: .degrees(90),
-                    endAngle: .degrees(0),
-                    clockwise: true)
-        
-        // Right edge
-        path.addLine(to: CGPoint(x: rect.width - arrowWidth, y: arrowHeight + cornerRadius))
-        
-        // Triangle (tail) on top-right
-        path.addLine(to: CGPoint(x: rect.width, y: arrowHeight / 2))
-        path.addLine(to: CGPoint(x: rect.width - arrowWidth, y: 0))
-        
-        // Skip rounding top-right, connect back to top-left edge
-        path.addLine(to: CGPoint(x: cornerRadius, y: 0))
-        
+                    endAngle: .degrees(180),
+                    clockwise: false)
+
+        // Left edge up
+        path.addLine(to: CGPoint(x: 0, y: cornerRadius))
+        path.addArc(center: CGPoint(x: cornerRadius, y: cornerRadius),
+                    radius: cornerRadius,
+                    startAngle: .degrees(180),
+                    endAngle: .degrees(270),
+                    clockwise: false)
+
+        // Triangle tail (top-right, with slimmer base)
+        let triangleTop = CGPoint(x: rect.width - arrowWidth, y: 0)
+        let triangleTip = CGPoint(x: rect.width, y: arrowHeight / 2)
+        let triangleBottom = CGPoint(x: rect.width - arrowWidth, y: arrowBaseOffset)
+
+        path.addLine(to: triangleTop)
+        path.addLine(to: triangleTip)
+        path.addLine(to: triangleBottom)
+
+        // Continue downward after tail to rejoin rectangle
+        path.addLine(to: CGPoint(x: rect.width - arrowWidth, y: arrowBaseOffset + cornerRadius))
+
         return path
     }
 }
-
-
 
 struct MessageDateView: View {
     private var viewModel: MessageBubbleViewModel
@@ -432,14 +472,14 @@ struct MessageDateView: View {
                 .lineLimit(1)
                 .foregroundColor(Color("title1"))
                 .font(.system(size: 12))
-                .padding(EdgeInsets(top: 6, leading: 8, bottom: 5, trailing: 6))
+                .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 6))
         } else {    //Outgoing message date
             Text(viewModel.formattedDate)
                 .lineLimit(1)
                 .foregroundColor(Color("title1"))
             
                 .font(.system(size: 12))
-                .padding(EdgeInsets(top: 6, leading: 8, bottom: 5, trailing: 6))
+                .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 6))
         }
     }
     

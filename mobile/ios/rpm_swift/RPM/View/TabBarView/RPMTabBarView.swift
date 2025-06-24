@@ -17,7 +17,7 @@ class NavigationHelper: ObservableObject {
     
     func resetToHomeTab() {
           self.path.removeAll()
-          self.selectedTab = 0             //  This will switch to the Home tab
+          self.selectedTab = 0       //  This will switch to the Home tab
       }
 }
 
@@ -58,6 +58,8 @@ struct RPMTabBarView: View {
                     .environmentObject(roomManager)
                     .environmentObject(localParticipant)
                     .environmentObject(mediaSetupViewModel)
+                    .environmentObject(loginViewModel)
+                
                     .onAppear {
                         print("AppModelinRPMHome:", appModel)
                         print("APPconversationManagerinRPMHome:", appModel.conversationManager)
@@ -124,6 +126,10 @@ struct RPMTabBarView: View {
         }
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
+        .onAppear()
+        {
+            print(" tabONAPEARPath:", navigationHelper.path)
+        }
     }
 }
 

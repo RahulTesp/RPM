@@ -43,9 +43,9 @@ struct RPMTodoListView: View {
     @State private var selectedIndex: Int?
     @State private var showTodoList: Bool = false
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
-    @EnvironmentObject var appModel: AppModel // Add this line
-    @EnvironmentObject var messagesManager: MessagesManager // Add this line
-    @EnvironmentObject var participantsManager: ParticipantsManager // Add this line
+    @EnvironmentObject var appModel: AppModel
+    @EnvironmentObject var messagesManager: MessagesManager
+    @EnvironmentObject var participantsManager: ParticipantsManager
     @EnvironmentObject var conversationManager: ConversationManager
     @EnvironmentObject var navigationHelper: NavigationHelper
     
@@ -93,6 +93,9 @@ struct RPMTodoListView: View {
             }
         }
         
+        .background(Color("ChatBGcolor"))
+            
+        
         // Bind alert to local @State, not directly to view model's published property
         .alert(isPresented: $showNoInternetAlert) {
             Alert(
@@ -111,6 +114,11 @@ struct RPMTodoListView: View {
         .onReceive(todoList.$showNoInternetAlert) { newValue in
             showNoInternetAlert = newValue
         }
+            
+        .onAppear()
+            {
+                print(" todoListONAPEARPath:", navigationHelper.path)
+            }
    
     }
     }
@@ -189,7 +197,7 @@ struct RPMTodoListView: View {
         HStack {
             
             Button(action: {
-                navigationHelper.resetToHomeTab() // 👈 clears nav and goes to Home tab
+                navigationHelper.resetToHomeTab() //  clears nav and goes to Home tab
             }) {
                 Image("ArrowBack")
                     .renderingMode(.template)
@@ -205,6 +213,11 @@ struct RPMTodoListView: View {
                 .padding(.top, 6)
 
             Spacer()
+            
+            // Dummy view to balance the HStack
+                   Image("ArrowBack")
+                       .opacity(0) // invisible
+                       .padding()
         }
     }
 
@@ -263,10 +276,10 @@ struct RPMTodoListView: View {
 
 
     private var activityListView: some View {
-        ScrollView {
+        ScrollView (.vertical){
             VStack(alignment: .leading) {
                 HStack {
-                    Text("    \(todoList.todoAct?.count ?? 0)")
+                    Text("\(todoList.todoAct?.count ?? 0)")
                         .foregroundColor(.black)
                         .font(Font.custom("Rubik-SemiBold", size: 24))
                     Text((todoList.todoAct?.count ?? 0) <= 1 ? " Activity" : " Activities")

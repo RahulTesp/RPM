@@ -14,6 +14,7 @@ struct RPMMyInfoView: View {
     @State var showingInfo : Int = 1
     @State var currentlytextId: Int = 0
     @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var navigationHelper: NavigationHelper
     
     var body: some View {
         GeometryReader { geometry in
@@ -54,6 +55,7 @@ struct RPMMyInfoView: View {
                 {
                     //PERSONAL INFO VIEW PAGE
                     RPMPersonalInfoView()
+                        .environmentObject(navigationHelper)
                 }
              
                 else if

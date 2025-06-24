@@ -41,6 +41,7 @@ struct RPMMedicationsAddView: View {
 
     var body: some View {
         // Background
+        
         ZStack{
             BackgroundView()
             
@@ -55,8 +56,7 @@ struct RPMMedicationsAddView: View {
                         .font(.system(size: 25 , weight: .heavy))
                         .foregroundColor(Color("TextColorBlack"))
                     
-                    Group
-                    {
+
                         
                         Text("Medicine Name")
                             .foregroundColor(Color("title1"))
@@ -65,10 +65,12 @@ struct RPMMedicationsAddView: View {
                         
                         TextField("", text: $medname,prompt: Text("Select Medicine Name").foregroundColor(Color("TextColorGray")))
                        
-                            .textFieldStyle(MyTextFieldStyle()).cornerRadius(10)
+                            .textFieldStyle(AddMedTextFieldStyle()).cornerRadius(10)
                             .disableAutocorrection(true)
                         
-                            .frame(width: 320)
+                  
+                            .frame(maxWidth: .infinity)
+                           
                             .colorScheme(.light)
                         
                         // Error message for Medicine Name
@@ -87,99 +89,75 @@ struct RPMMedicationsAddView: View {
                                 .font(Font.system(size: 15))
                                 .padding(.top,3)
                         }
+                    
+                    
+                    HStack(spacing: 16) {
                         
-                        HStack
-                        {
-                            
+                        // First dropdown
+                        GeometryReader { geo in
                             Menu {
-                                ForEach(dropDownList1, id: \.self){ client in
+                                ForEach(dropDownList1, id: \.self) { client in
                                     Button(client) {
                                         self.value1 = client
-                                        print("value1")
-                                        print(value1)
-                                        //dismissKeyboard()
-                                     
                                     }
                                 }
                             } label: {
-                                VStack(spacing: 3){
-                                    HStack{
-                                        Text(value1.isEmpty ? placeholder : value1)
-                                            .foregroundColor(value1.isEmpty ? .gray : .black)
-                                      
-                                        Image(systemName: "chevron.down")
-                                            .foregroundColor(Color("title1"))
-                                            .font(Font.system(size: 16, weight: .light))
-                                    }
-                                    
-                                    
-                                    .frame(width: 140, height: 40)
-                                    
-                                    .padding(.horizontal,10)
-                                    .padding(.vertical,5)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 8, style: .continuous
-                                                        )
-                                        .stroke(Color("textFieldBG"), lineWidth: 2
-                                               )
+                                HStack {
+                                    Text(value1.isEmpty ? placeholder : value1)
+                                        .foregroundColor(value1.isEmpty ? .gray : .black)
+
+                                    Image(systemName: "chevron.down")
+                                        .foregroundColor(Color("title1"))
+                                        .font(Font.system(size: 16, weight: .light))
+                                }
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                                .frame(width: geo.size.width, height: 40) // Use dynamic width
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color("textFieldBG"), lineWidth: 2)
                                         .background(Color("textFieldBG"))
                                         .cornerRadius(8)
-                                        
-                                    )
-                                   
-                                    .padding(.horizontal)
-                                    Rectangle()
-                                        .fill(Color.orange)
-                                 
-                                }
-                                .frame(width: 140, height: 40)
+                                )
                             }
-                            
-                            Spacer()
-                            
-                            
+                        }
+                        .frame(maxWidth: .infinity)
+
+                        // Second dropdown
+                        GeometryReader { geo in
                             Menu {
-                                ForEach(dropDownList2, id: \.self){ client in
+                                ForEach(dropDownList2, id: \.self) { client in
                                     Button(client) {
                                         self.value2 = client
                                     }
                                 }
                             } label: {
-                                VStack(spacing: 3){
-                                    HStack{
-                                        Text(value2.isEmpty ? placeholder : value2)
-                                            .foregroundColor(value2.isEmpty ? .gray : .black)
-                                        
-                                        
-                                        Image(systemName: "chevron.down")
-                                            .foregroundColor(Color("title1"))
-                                            .font(Font.system(size: 16, weight: .light))
-                                    }
-                                  
-                                    .frame(width: 140, height: 40)
-                                    
-                                    .padding(.horizontal,10)
-                                    .padding(.vertical,5)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 8, style: .continuous
-                                                        )
-                                        .stroke(Color("textFieldBG"), lineWidth: 2
-                                               )
+                                HStack {
+                                    Text(value2.isEmpty ? placeholder : value2)
+                                        .foregroundColor(value2.isEmpty ? .gray : .black)
+
+                                    Image(systemName: "chevron.down")
+                                        .foregroundColor(Color("title1"))
+                                        .font(Font.system(size: 16, weight: .light))
+                                }
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                                .frame(width: geo.size.width, height: 40) // Use dynamic width
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color("textFieldBG"), lineWidth: 2)
                                         .background(Color("textFieldBG"))
                                         .cornerRadius(8)
-                                        
-                                    )
-                                   
-                                    .padding(.horizontal)
-                                    Rectangle()
-                                        .fill(Color.orange)
-                                 
-                                }
-                                .frame(width: 140, height: 40)
+                                )
                             }
-                            
                         }
-                       
+                        .frame(maxWidth: .infinity)
+
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical,3)
+                    
+                 
                         HStack
                         {
                             if isValidationEnabled && value1.isEmpty {
@@ -194,16 +172,19 @@ struct RPMMedicationsAddView: View {
                                     .font(.system(size: 12))
                             }
                         }
-                    }.padding(.horizontal,10)
+                        .padding(.top,20)
                     
                     HStack
                     {
                         Text("Intervals")
                             .foregroundColor(Color("title1"))
                             .font(Font.system(size: 15))
+                            .padding(.top,10)
                         
-                    } .padding(.horizontal,10)
-                        .padding(.vertical,5)
+                    }
+         
+                    
+                    
                     HStack(spacing : 30)
                     {
                         
@@ -244,9 +225,12 @@ struct RPMMedicationsAddView: View {
                             }
                         }
                         
-                    }.padding(.horizontal,10)
+                    }
+                 
                     
                         .padding(.vertical,5)
+                        .frame(maxWidth: .infinity)
+                    
                     
                     if isValidationEnabled && (isMng == false && isNoon == false && isEve == false && isNight == false){
                         Text("Interval is required")
@@ -258,24 +242,27 @@ struct RPMMedicationsAddView: View {
                         Text("Medication Duration")
                             .foregroundColor(Color("title1"))
                             .font(Font.system(size: 15))
+                            .padding(.top,5)
                     }
-                    .padding(.vertical,5)
-                    .padding(.horizontal,10)
+
                     
-                    HStack
-                    {
+                    
+                    
+                    
+                    HStack {
+                        
+                        // Left Side: Date Picker logic
                         ZStack {
                             HStack {
-                              
                                 if showDate {
                                     Button {
                                         showDate = false
                                         startDate = nil
                                     } label: {
-
+                                        EmptyView()
                                     }
                                     DatePicker(
-                                        "label",
+                                        "",
                                         selection: $hidenDate,
                                         in: Date()...,
                                         displayedComponents: .date
@@ -284,116 +271,67 @@ struct RPMMedicationsAddView: View {
                                     .onChange(of: hidenDate) { newDate in
                                         startDate = newDate
                                     }
-                                    
                                 } else {
                                     Button {
                                         showDate = true
                                         startDate = hidenDate
                                     } label: {
                                         Text("Start Date")
-                                            .multilineTextAlignment(.center)
                                             .foregroundColor(.gray)
+                                            .frame(maxWidth: .infinity)
                                     }
-                                    .frame(width: 140, height: 34)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .fill(Color("textFieldBG"))
-                                    )
-                                    .multilineTextAlignment(.trailing)
                                 }
                             }
-                        }
-               
-                        Spacer()
-                        
-                                                HStack
-                                                {
-                                                   Spacer()
-                                                    
-                                                Button(action : {
-                                                    self.count += 1
-                                                })
-                                                {
-                                                    Image(systemName: "plus")
-                                                        .renderingMode(.template)
-                                                        .foregroundColor(.black)
-                                                }
-                        
-                                               Text("\(count)")
-                                                        .foregroundColor(.gray)
-                        
-                        
-                                                Button(action : {
-                        
-                        
-                                    if(count <= 1) {
-                                    return
-                                    } else {
-                                self.count -= 1
-                                }
-                        
-                                                })
-                                                {
-                                                    Image(systemName: "minus")  .renderingMode(.template)
-                                                        .foregroundColor(.black)
-                                                }
-                        Spacer()
-                        if(value1 == "Monthly")
-                                                    {
-                            Text(
-                                
-                                "Month"
-                                
-                                
-                                
-                            )
-                            .foregroundColor(.gray)
-                        }
-                                                    else if(value1 == "Weekly")
-                                                    {
-                                                        Text(
-                                                            
-                                                            "Week"
-                                                            
-                                                            
-                                                            
-                                                        )
-                                                        .foregroundColor(.gray)
-                                                    }
-                                                    else if(value1 == "Daily")
-                                                    {
-                                                        Text(
-                                                            
-                                                            "Day"
-                                                            
-                                                            
-                                                            
-                                                        )
-                                                        .foregroundColor(.gray)
-                                                    }
-                                                    else if(value1 == "Alternative")
-                                                    {
-                                                        Text(
-                                                            
-                                                            "Day"
-                                                         
-                                                            
-                                                        )
-                                                        .foregroundColor(.gray)
-                                                    }
-                                                }.frame(width: 140, height: 34)
+                            .padding(.horizontal, 10)
+                            .frame(height: 34)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
                                     .fill(Color("textFieldBG"))
                             )
-                                                //.background(.green)
+                        }
+                        .frame(maxWidth: .infinity)
                         
+                        // Right Side: Counter + Label
+                        HStack(spacing: 8) {
+                            Button(action: {
+                                count += 1
+                            }) {
+                                Image(systemName: "plus")
+                                    .renderingMode(.template)
+                                    .foregroundColor(.black)
+                            }
+
+                            Text("\(count)")
+                                .foregroundColor(.gray)
+
+                            Button(action: {
+                                if count > 1 {
+                                    count -= 1
+                                }
+                            }) {
+                                Image(systemName: "minus")
+                                    .renderingMode(.template)
+                                    .foregroundColor(.black)
+                            }
+
+                            // Dynamic label based on value1
+                            Text(value1Label(for: value1))
+                                .foregroundColor(.gray)
+                            
+                        }
+                        .padding(.horizontal, 10)
+                        .frame(height: 34)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color("textFieldBG"))
+                        )
+                        .frame(maxWidth: .infinity)
                         
-                        
-                        
-                    } .padding(.horizontal,10)
+                    }
                 
-                        .padding(.vertical,5)
+
+                    
+
                   
                     if isValidationEnabled && (startDate == nil){
                         Text("Star Date is required")
@@ -407,16 +345,16 @@ struct RPMMedicationsAddView: View {
                         Text("Comments")
                             .foregroundColor(Color("title1"))
                             .font(Font.system(size: 15))
-                        
+                            .padding(.top,10)
                         
                         TextField("Add Comments", text: $comments)
                         
                         
                             .colorScheme(.light)
-                            .textFieldStyle(MyTextFieldStyle()).cornerRadius(10)
+                            .textFieldStyle(AddMedTextFieldStyle()).cornerRadius(10)
                             .disableAutocorrection(true)
-                        
-                            .frame(width: 320, height:40)
+                            .frame(maxWidth: .infinity)
+                     
                         if isValidationEnabled && comments.isEmpty{
                             Text("Comments is required")
                                 .foregroundColor(.red)
@@ -426,7 +364,7 @@ struct RPMMedicationsAddView: View {
                     }
                     
                     Button(action: {
-                 
+                 print("button clicked")
                         if validateForm() {
                               // All fields are filled, make the API call
                            
@@ -490,6 +428,7 @@ struct RPMMedicationsAddView: View {
                           } else {
                               // Show an error message or highlight fields with errors
                               showingErrorAlerts = true
+                              isValidationEnabled = true
                           }
                 
                     },
@@ -497,6 +436,7 @@ struct RPMMedicationsAddView: View {
                            label: {
                         Text("ADD")
                     }
+                     
                    
                     ).alert("Medicine Added Successfully!", isPresented: $showingAlerts) {
                         Button("OK", role: .cancel) { }
@@ -504,18 +444,19 @@ struct RPMMedicationsAddView: View {
                     .alert("Please enter valid Data!", isPresented: $showingErrorAlerts) {
                         Button("OK", role: .cancel) { }
                     }
-                    
-                    .frame(width: 320, height: 55)
+                    .frame(maxWidth: .infinity, minHeight: 55)
+            
                     .background(Color("buttonColor"))
                     .foregroundColor(Color("ButtonTextColor"))
                     .cornerRadius(10)
-                    .padding(.vertical,10)
             
+                    .padding(.vertical,10)
+                    .padding(.horizontal,20)
                 }
                 
                 .padding(.horizontal,10)
-                    .padding(.vertical,5)
-                    .padding()
+                    .padding(.vertical,2)
+                  
                         .padding(.bottom, keyboardHeight)
                           .onReceive(Publishers.keyboardHeight) { self.keyboardHeight = $0 }
                 
@@ -567,12 +508,28 @@ struct RPMMedicationsAddView: View {
     
     }
     
+    func value1Label(for value: String) -> String {
+        switch value {
+        case "Monthly":
+            return "Month"
+        case "Weekly":
+            return "Week"
+        case "Daily":
+            return "Day"
+        case "Alternative":
+            return "Day"
+        default:
+            return ""
+        }
+    }
+
+    
     //NOTE: FORM VALIDATION
     func validateForm() -> Bool {
         
-        guard isValidationEnabled else {
-              return true
-          }
+//        guard isValidationEnabled else {
+//              return true
+//          }
       
         var isValid = true
 
@@ -698,6 +655,24 @@ extension Publishers {
 extension Notification {
     var keyboardHeight: CGFloat {
         return (userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.height ?? 0
+    }
+}
+
+struct AddMedTextFieldStyle: TextFieldStyle {
+    func _body(configuration: TextField<Self._Label>) -> some View {
+        configuration
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color("textFieldBG"), lineWidth: 2)
+                    .background(Color("textFieldBG"))
+                    .foregroundColor(Color("TextColorGray"))
+                    .cornerRadius(10)
+                
+            )
+            .padding(.vertical,5)
+           // .padding(.horizontal, 25)
+         
     }
 }
 

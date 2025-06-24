@@ -15,8 +15,8 @@ struct RPMChangePasswordView: View {
     @State private var showingSuccessAlerts = false
     @State private var isLogin = false
     @State var isActive = false
-    @ObservedObject private var changePwdModel = RPMChangePwdViewModel()
-    @ObservedObject private var loginViewModel = RPMLoginViewModel()
+    @State private var changePwdModel = RPMChangePwdViewModel()
+    @EnvironmentObject var loginViewModel: RPMLoginViewModel
     @State private var currentpassword: String = ""
     @State private var newpassword: String = ""
     @State private var confirmPassword: String = ""
@@ -92,8 +92,9 @@ struct RPMChangePasswordView: View {
                                                 }
 
                                                 // Navigate to login screen
-                                                navigationHelper.path.append(.login)
-                                             
+                                             //   navigationHelper.path.append(.login)
+                                                loginViewModel.isAuthenticated = false
+                                                
                                             } else {
                                                 showingWrongAlerts = true
                                             }
@@ -120,14 +121,14 @@ struct RPMChangePasswordView: View {
                         {
                             Button("OK", role: .cancel) {  self.loginViewModel.isLoggedOut = true
                                 print("  self.loginViewModel.isLoggedOut")
-                                print( self.loginViewModel.isLoggedOut)
+                               // print( self.loginViewModel.isLoggedOut)
                                 
-                                self.loginViewModel.loggedIn = false
-                                UserDefaults.standard.set(self.loginViewModel.loggedIn, forKey: "loggedInValue" )
+                              //  self.loginViewModel.loggedIn = false
+                             //   UserDefaults.standard.set(self.loginViewModel.loggedIn, forKey: "loggedInValue" )
                                 print("loggedin Value2")
-                                print(UserDefaults.standard.bool(forKey: "loggedInValue") )
+                              //  print(UserDefaults.standard.bool(forKey: "loggedInValue") )
                                 print("self.isActive 3")
-                                print(self.isActive)
+                              //  print(self.isActive)
                                 
                                 UserDefaults.resetStandardUserDefaults()
                               

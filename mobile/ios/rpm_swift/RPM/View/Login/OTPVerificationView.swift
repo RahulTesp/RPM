@@ -4,14 +4,16 @@ import Combine
 @available(iOS 15, *)
 public struct OtpView_SwiftUI: View {
     
-    @State var usrlokd: Bool = false
+  //  @State var usrlokd: Bool = false
     @State private var shouldShowLoginAlert: Bool = false
-    @ObservedObject private var viewModel = RPMLoginViewModel()
+   // @ObservedObject private var viewModel = RPMLoginViewModel()
     @State private var alertItem: AlertItem?
-    @State var isActive = false
+ //  @State var isActive = false
     @EnvironmentObject var appModel: AppModel
     @State private var isLogin = false
     @FocusState private var isTextFieldFocused: Bool
+    @EnvironmentObject var navigationHelper: NavigationHelper
+    @EnvironmentObject var loginViewModel: RPMLoginViewModel
     
     //MARK: Fields
     enum FocusField: Hashable {
@@ -37,37 +39,9 @@ public struct OtpView_SwiftUI: View {
     //MARK: Body
     public var body: some View {
         HStack {
-           // let _ = Self._printChanges()
+       
             ZStack(alignment: .center) {
-                NavigationLink (
-                    
-                    destination:
-                    
-                      //  RPMLoginView( isLogin: $isLogin)
-                    RPMLoginView()
-                    ,
-                                        
-                    isActive: $usrlokd
-      
-                )
-                {
-                    
-                }
-                
-                                    NavigationLink (
-                                        
-                                        destination:
-                                        
-                                         RPMTabBarView() ,
-                                                            
-                                                            isActive: $isActive
-                        
-                                    )
-                                    {
-                                        
-                                    }
-                          
-                
+
                 TextField("", text: $otpCode ,
                           
                           onEditingChanged: { (changed) in
@@ -119,7 +93,7 @@ public struct OtpView_SwiftUI: View {
                                    print("newOtpCode",newOtpCode)
                                    if newOtpCode.count == otpCodeLength {
                               
-                                       viewModel.verifyOtp( userName: (UserDefaults.standard.string(forKey: "pgmUserID") ?? ""), otp: otpCode, completed: { token, alertItem in
+                                       loginViewModel.verifyOtp( userName: (UserDefaults.standard.string(forKey: "pgmUserID") ?? ""), otp: otpCode, completed: { token, alertItem in
                                            if let _ = token {
                                                
                                                print("otpVerifTokn",token)
@@ -138,21 +112,23 @@ public struct OtpView_SwiftUI: View {
                                                
                                                print("isLogin otp")
                                            
-                                               self.isActive = true
+                                             //  self.isActive = true
+                                               navigationHelper.path.append(.tabBarView)
+
                                                print("self.isActive 2")
-                                               print(self.isActive)
+                                              // print(self.isActive)
                                               
                                                print("isAuthenticated value")
-                                               print(viewModel.self.isAuthenticated)
-                                               print(viewModel.isAuthenticated)
+                                               print(loginViewModel.self.isAuthenticated)
+                                               print(loginViewModel.isAuthenticated)
                                           
-                                               self.viewModel.loggedIn = true
-                                               UserDefaults.standard.set(self.viewModel.loggedIn, forKey: "loggedInValue" )
+                                             //  self.loginViewModel.loggedIn = true
+                                              // UserDefaults.standard.set(self.viewModel.loggedIn, forKey: "loggedInValue" )
                                                print("loggedin Value1")
                                                print(UserDefaults.standard.bool(forKey: "loggedInValue") )
                                                print("isAuthenticated value2222222")
-                                               print(viewModel.self.isAuthenticated)
-                                               print(viewModel.isAuthenticated)
+                                               print(loginViewModel.self.isAuthenticated)
+                                               print(loginViewModel.isAuthenticated)
                                            
                                            }else {
                                                shouldShowLoginAlert = true
@@ -235,7 +211,12 @@ public struct OtpView_SwiftUI: View {
                                    print("ok clik lok")
                                    print( (UserDefaults.standard.bool(forKey: "userLocked") ))
                                    print("Ok Click")
-                                   self.usrlokd = true
+                                //   self.usrlokd = true
+//                                   DispatchQueue.main.async {
+//                                                     navigationHelper.path.append(.login)
+//                                                 }
+                                 
+
                                }
                 if( ((UserDefaults.standard.bool(forKey: "otpWrong") ) == true))
                  {

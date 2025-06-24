@@ -29,7 +29,7 @@ struct RPMNotificationView: View {
  //NOTIFICATION LIST LOOP
                     
                     NotificationListView(data: notifList.notif?.data ?? [])
-
+                        .id(notifList.notif?.totalUnRead)
                 }
             }
             .padding(.horizontal, 12)
@@ -56,9 +56,13 @@ struct RPMNotificationView: View {
                      }
                 }
             
+            
                 .onReceive(NotificationCenter.default.publisher(for: Notification.Name("RefreshNotifications"))) { _ in
-                    print("RefreshNotifications")
-                    notifList.getnotify()
+                    print("RefreshNotifi")
+                    DispatchQueue.main.async {
+                        notifList.getnotify()
+                    }
+                  
                 }
 
                 .alert(isPresented: $showDeleteConfirmation) {

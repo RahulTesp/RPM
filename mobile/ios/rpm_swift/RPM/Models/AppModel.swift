@@ -77,33 +77,61 @@ class AppModel: NSObject, ObservableObject {
         return coreDataManager.managedObjectContext
     }
     // MARK: Client
-    
-    func saveUser(_ user: TCHUser?) {
-        self.myUser = user
-        //self.myIdentity = user!.identity!
-        if let identity = user?.identity {
-            self.myUser = user
-            self.myIdentity = identity
-        }
-
-    }
-    
-    func signOut() {
-        print("chatsignOut")
    
+    func saveUser(_ user: TCHUser?) {
         DispatchQueue.main.async {
-            self.globalStatus = .signedOutSuccessfully
-            DispatchQueue.main.asyncAfter(deadline: .now() + GlobalStatusView.ttl) {
-                self.clientState = .unknown
-                self.globalStatus = .none
+            self.myUser = user
+            if let identity = user?.identity {
+                self.myIdentity = identity
             }
-            self.client.shutdown()
+            print("myuseridentity", self.myIdentity)
         }
-        
-        self.wipeAllCache()
     }
+
   
+    func signOut() {
+//         deregisterFromPushNotifications()
+//         
+//         try? ConversationsCredentialStorage.shared.deleteCredentials()
+
+         DispatchQueue.main.async {
+             self.globalStatus = .signedOutSuccessfully
+             DispatchQueue.main.asyncAfter(deadline: .now() + GlobalStatusView.ttl) {
+                 self.clientState = .unknown
+                 self.globalStatus = .none
+             }
+             self.client.shutdown()
+         }
+         
+         self.wipeAllCache()
+     }
+     
     
+    func signOutChat() {
+        DispatchQueue.global(qos: .userInitiated).async {
+            // Step 1: Shutdown safely off the main thread
+            self.client.shutdown()
+
+            // Step 2: Wipe local cache
+            self.wipeAllCache()
+
+            //  Step 3: UI updates on the main thread
+            DispatchQueue.main.async {
+                self.selectedConversation = nil
+                self.myIdentity = ""
+                self.myUser = nil
+
+                self.globalStatus = .signedOutSuccessfully
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + GlobalStatusView.ttl) {
+                    self.clientState = .unknown
+                    self.globalStatus = .none
+                }
+            }
+        }
+    }
+
+
     func wipeAllCache() {
         print("wipeAllCache")
         let managedObjectContext = getManagedContext()
@@ -166,14 +194,10 @@ extension AppModel: TwilioConversationsClientDelegate {
   
     func conversationsClient(_ client: TwilioConversationsClient, synchronizationStatusUpdated status: TCHClientSynchronizationStatus) {
         print("syncstatus",status)
-        
         print("synclient1\n",client)
         print("synclient2\n",client.self)
         print("synclient3\n",client.description)
         print("synclient4\n",client.user)
-        
-       
-        
         print("self.client",self.client)
         print("self DELEGATE VAL",self)
         if status == .failed {
@@ -266,6 +290,7 @@ extension AppModel: TCHConversationDelegate {
     }
 
     func conversationsClient(_ client: TwilioConversationsClient, conversation: TCHConversation, messageDeleted message: TCHMessage) {
+        print("message deleted callback")
         guard let messageSid = message.sid else {
             return
         }
@@ -293,7 +318,7 @@ func conversationsClient(_ client: TwilioConversationsClient,
      // print(" Conversation delegate set after sync for: \(conversation.sid ?? "nil")")
 
       //  Log join status
-   //   print(" Conversation join statusAPP:", conversation.status.rawValue)
+      print(" Conversation join statusAPP:", conversation.status.rawValue)
     
      //Update conversation last message stats
     if let _ = PersistentConversationDataItem.from(conversation: conversation, inContext: getManagedContext()) {

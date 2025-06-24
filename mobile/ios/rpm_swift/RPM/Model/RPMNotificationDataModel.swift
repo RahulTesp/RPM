@@ -9,13 +9,7 @@ import Foundation
 
 // MARK: - Notifications
 struct Notifications: Hashable, Codable ,Identifiable {
-    
-    static func == (lhs: Notifications, rhs: Notifications) -> Bool {
-        return true
-    }
-    func hash(into hasher: inout Hasher) {
-        
-    }
+
     let id = UUID()
     let totalNotifications, totalUnRead: Int?
     let data: [Datum]
@@ -29,12 +23,6 @@ struct Notifications: Hashable, Codable ,Identifiable {
 
 // MARK: - Datum
 struct Datum: Hashable, Codable ,Identifiable{
-    static func == (lhs: Datum, rhs: Datum) -> Bool {
-        return true
-    }
-    func hash(into hasher: inout Hasher) {
-        
-    }
 
     var id: String { notificationDate ?? UUID().uuidString } // <- stable ID
     let notificationDate: String?
@@ -48,13 +36,7 @@ struct Datum: Hashable, Codable ,Identifiable{
 
 // MARK: - NotificationList
 struct NotificationList: Hashable, Codable ,Identifiable {
-    
-    static func == (lhs: NotificationList, rhs: NotificationList) -> Bool {
-        return true
-    }
-    func hash(into hasher: inout Hasher) {
-        
-    }
+
     var id: Int { notificationID ?? -1 }
 
     let notificationListDescription, createdOn, type, subType: String?

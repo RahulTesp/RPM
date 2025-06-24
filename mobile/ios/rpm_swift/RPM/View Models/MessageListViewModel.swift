@@ -47,11 +47,7 @@ final class MessageListViewModel: ObservableObject, Identifiable {
         }
         return ""
     }
-//    var isAnyParticipantTyping: Bool {
-//        return typingParticipants.count > 0
-//    }
-    
-    
+
     var isAnyParticipantTyping: Bool {
         let isTyping = typingParticipants.count > 0
         print(" isAnyParticipantTyping = \(isTyping) (count = \(typingParticipants.count))")
@@ -146,9 +142,11 @@ final class MessageListViewModel: ObservableObject, Identifiable {
     }
     
     func clearSelectedImage() {
-        selectedImage = nil
-        selectedImageURL = nil
-        selectedFileName = nil
+        DispatchQueue.main.async {
+            self.selectedImage = nil
+            self.selectedImageURL = nil
+            self.selectedFileName = nil
+        }
     }
     
     // adapted from: https://stackoverflow.com/a/45277557
@@ -201,6 +199,7 @@ final class MessageListViewModel: ObservableObject, Identifiable {
         self.conversation = conversation
     }
     
+    
     // MARK: Conversation Events
     func registerForConversationEvents(_ event: ConversationEvent) {
         DispatchQueue.main.async {
@@ -214,6 +213,10 @@ final class MessageListViewModel: ObservableObject, Identifiable {
     
     // MARK: - Unread messages section
     func prepareMessages(_ conversation: PersistentConversationDataItem, _ messages: [PersistentMessageDataItem], _ participants: [PersistentParticipantDataItem]) {
+        
+        print(" All messages received for prepareMessages:")
+        messages.forEach { print("📝 \(String(describing: $0.messageIndex)) — \(String(describing: $0.author)) — \(String(describing: $0.direction))") }
+
         let lastReadMessageIndex = participants.filter({ participant in
             return participant.identity == AppModel.shared.myIdentity
         }).first?.lastReadMessage

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E258" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788" systemVersion="24F74" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="PersistentConversationDataItem" representedClassName="PersistentConversationDataItem" syncable="YES" codeGenerationType="class">
         <attribute name="attributes" optional="YES" attributeType="String"/>
         <attribute name="createdBy" optional="YES" attributeType="String"/>
@@ -49,6 +49,7 @@
         <attribute name="messageIndex" attributeType="Integer 64" defaultValueString="-1" usesScalarValueType="YES"/>
         <attribute name="participantSid" attributeType="String"/>
         <attribute name="sid" attributeType="String"/>
+        <attribute name="status" optional="YES" attributeType="String"/>
         <attribute name="uuid" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <relationship name="attachedMedia" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PersistentMediaDataItem" inverseName="messageSid" inverseEntity="PersistentMediaDataItem"/>
         <uniquenessConstraints>
@@ -70,10 +71,4 @@
             </uniquenessConstraint>
         </uniquenessConstraints>
     </entity>
-    <elements>
-        <element name="PersistentConversationDataItem" positionX="-218.484375" positionY="85.9375" width="128" height="284"/>
-        <element name="PersistentMediaDataItem" positionX="-225" positionY="225" width="128" height="134"/>
-        <element name="PersistentMessageDataItem" positionX="-63" positionY="90" width="128" height="209"/>
-        <element name="PersistentParticipantDataItem" positionX="-388.6484375" positionY="108.203125" width="128" height="119"/>
-    </elements>
 </model>

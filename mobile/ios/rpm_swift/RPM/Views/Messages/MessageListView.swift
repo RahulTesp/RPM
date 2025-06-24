@@ -5,11 +5,7 @@
 //  Created by Berkus Karchebnyy on 14.10.2021.
 //  Copyright © 2021 Twilio, Inc. All rights reserved.
 //
-// MARK: Working with sheet views
-// https://medium.com/turkishkit/swiftui-managing-sheet-views-432bf129108e
-// https://kristaps.me/blog/swiftui-modal-view/
-// https://www.simpleswiftguide.com/how-to-present-sheet-modally-in-swiftui/
-//
+
 
 import SwiftUI
 import Combine
@@ -18,6 +14,13 @@ import TwilioConversationsClient
 enum MessageAction {
     case edit, remove
 }
+
+enum MessageStatus: String {
+    case sending
+    case sent
+    case failed
+}
+
 
 struct Messages: Identifiable {
     let id = UUID()
@@ -28,7 +31,6 @@ struct MessageListView: View {
     
     // MARK: Observable
     @EnvironmentObject var appModel: AppModel
-    //    @EnvironmentObject var navigationHelper: NavigationHelper
     @EnvironmentObject var conversationManager: ConversationManager
     @EnvironmentObject var messagesManager: MessagesManager
     @EnvironmentObject var participantsManager: ParticipantsManager
@@ -43,7 +45,6 @@ struct MessageListView: View {
     @State private var cancellableSet: Set<AnyCancellable> = []
     private let messagesPaginationSize: UInt = 40
     private let unreadSectionHeaderId = "unreadSectionHeader"
-    private let enableUnreadMessageSection = true
     @State private var showUnreadMessageSection = true
     @State private var messageCount: Int = 0
     @State private var isCancelled = false
@@ -59,15 +60,16 @@ struct MessageListView: View {
     @State private var topOffset: CGFloat? = nil
     @State private var showNewMessageBanner: Bool = false
     
-    
     // The display name is computed here to avoid issues with initialization order.
     @State private var displayName: String = ""
     // MARK: View
     
+    var isLoadingMessages: Bool {
+        viewModel.readMessages.isEmpty && viewModel.unreadReceivedMessages.isEmpty
+    }
     
     var body: some View {
-        
-        
+       
         let markAllMessagesReadTask = self.markAllMessagesReadTask
         
         ZStack(alignment: .center) {
@@ -92,116 +94,70 @@ struct MessageListView: View {
                                 }
                                 .frame(height: 1)
                                 
-                                
                                 PullToRefresh(coordinateSpaceName: "messageListPullToRefresh")
                                     .refreshable {
-                                        guard let lastMessage = appModel.messagesManager.messages.first else { return }
-                                        appModel.messagesManager.loadMessages(for: conversation, before: lastMessage.messageIndex, max: messagesPaginationSize)
+                                        print("PullToRefreshcalled")
+                                        
+                                        print(" Current loaded message indexes = \(messagesManager.messages.map { $0.messageIndex })")
+
+                                        
+                                        guard let lastMessage = messagesManager.messages.first else { return }
+                                        let beforeIndex = lastMessage.messageIndex
+                                        print("messagesManager.messages.first?.messageIndex = \(beforeIndex)")
+                                        
+                                        messagesManager.loadMessages(
+                                            for: conversation,
+                                            before: beforeIndex,
+                                            max: messagesPaginationSize
+                                        )
                                     }
-                                
-                                
+
                                 HStack (alignment: .top, spacing: 0){
+                                    
+                                    if messagesManager.messages.isEmpty {
+                                        ProgressView("Loading messages...Will take 2 minutes")
+                                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    } else {
                                     LazyVStack(alignment: .leading) {
-                                        
-                                        
-                                        if (enableUnreadMessageSection) {
-                                            // no section needed for read messages.
-                                            
-                                            ForEach(Array(viewModel.readMessages.enumerated()), id: \.element) { index, message in
-                                                
-                                                messageRowViewItem(index: index, message: message, conversation: conversation)  .id(message.messageIndex)
-                                            }
-                                            
-                                            // ✅ Add anchor here too
-                                            //                                           Color.clear.frame(height: 1).id("BottomAnchor")
-                                            LazyVStack(alignment: .leading) {
-                                                
-                                                if viewModel.unreadReceivedMessages.count > 0 {
-                                                    if showUnreadMessageSection {
-                                                        ForEach(viewModel.unreadSection) { section in
-                                                            Section(
-                                                                header: UnreadSectionHeaderView(
-                                                                    unreadMessagesCount: viewModel.unreadReceivedMessages.count,
-                                                                    scrollToBottom: {
-                                                                        withAnimation {
-                                                                            proxy.scrollTo("BottomAnchor", anchor: .bottom)
-                                                                        }
-                                                                    }
-                                                                ).id(unreadSectionHeaderId)
-                                                            ) {
-                                                                
-                                                                
-                                                                ForEach(Array(section.messages.enumerated()), id: \.element) { index, message in
-                                                                    messageRowViewForSection(index: index, message: message, messages: section.messages, conversation: conversation)
-                                                                }
-                                                                
-                                                                
-                                                            }
-                                                        }
-                                                    } else {
-                                                        
-                                                        
-                                                        ForEach(Array(viewModel.unreadReceivedMessages.enumerated()), id: \.element) { index, message in
-                                                            messageRowViewForUnread(index: index, message: message, messages: viewModel.unreadReceivedMessages, conversation: conversation)
-                                                        }
-                                                        
-                                                    }
-                                                }
-                                                
-                                                // MARK: - Add Invisible Anchor at Bottom
-                                                //                                                    Color.clear.frame(height: 1).id("BottomAnchor")
-                                            }
-                                            
-                                            
-                                            ForEach(Array(viewModel.unreadSentMessages.enumerated()), id: \.element) { index, message in
-                                                messageRowViewForUnreadSent(index: index, message: message, messages: viewModel.unreadSentMessages, conversation: conversation)
-                                            }
-                                            
-                                        } else {
-                                            
-                                            ForEach(Array(messagesManager.messages.enumerated()), id: \.element) { index, message in
-                                                messageRowView(index: index, message: message, conversation: conversation)
-                                            }
-                                            
-                                            // ✅ Add anchor here too
-                                            //                                           Color.clear.frame(height: 1).id("BottomAnchor")
+                                       
+                                        ForEach(Array(messagesManager.messages.enumerated()), id: \.element) { index, message in
+                                            messageRowView(index: index, message: message, conversation: conversation)
                                         }
-                                        
+                                       
                                         Color.clear.frame(height: 1).id("BottomAnchor")
                                         
                                     }
                                     
                                     .frame(maxWidth: .infinity, alignment: .leading)
+                                    
+                                }
                                 }
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 
                                 
                                 .onAppear {
-                                    guard let lastMessage = appModel.messagesManager.messages.last else { return }
+                                    guard let lastMessage = messagesManager.messages.last else { return }
                                     
                                     if let lastId = viewModel.readMessages.last?.messageIndex {
                                         // print("scrollToBottom to id:", lastId)
                                         proxy.scrollTo(lastId, anchor: .bottom)
                                     }
                                     
-                                    // print("viewModel.unreadReceivedMessages.count", viewModel.unreadReceivedMessages.count)
+                                     print("viewModel.unreadReceivedMessages.count", viewModel.unreadReceivedMessages.count)
+                                  
                                     let isFirstLoad = (messageCount == 0)
                                     let hasUnreadMessages = viewModel.unreadReceivedMessages.count > 0
                                     let isOutgoing = lastMessage.direction == MessageDirection.outgoing.rawValue
                                     
-                                    // print("isOutgoing:", isOutgoing)
-                                    // print("isFirstLoad:", isFirstLoad)
-                                    // print("isNearBottom:", isNearBottom)
-                                    // print("hasUnreadMessages:", hasUnreadMessages)
-                                    
+                                     print("lastMessage:", lastMessage)
+                           
                                     let shouldAutoScroll = isOutgoing || isFirstLoad || isNearBottom || hasUnreadMessages
                                     //  print("shouldAutoScroll:", shouldAutoScroll)
                                     
                                     if shouldAutoScroll {
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                             //  print("Scrolling to last message: \(lastMessage)")
-                                            
-                                            
+                                          
                                             withAnimation {
                                                 proxy.scrollTo(lastMessage, anchor: .bottom)
                                                 showNewMessageBanner = false
@@ -217,14 +173,14 @@ struct MessageListView: View {
                                     }
                                     
                                     messageCount = appModel.messagesManager.messages.count
+                                    
+                                    print("messageCount:", messageCount)
                                 }
                          
                             }
                             
                             .coordinateSpace(name: "scrollView") //  This is good
                        
-                            
-                            
                             .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
                                 scrollOffset = offset
                                 
@@ -241,7 +197,7 @@ struct MessageListView: View {
                                     let nearBottom = diffBottom < 50
                                     let nearTop = abs(top - offset) < 50
                                     
-                                    print("📐 Bottom offset: \(bottom), Top offset: \(top), Current offset: \(offset), DiffBottom: \(diffBottom)")
+                                    print(" Bottom offset: \(bottom), Top offset: \(top), Current offset: \(offset), DiffBottom: \(diffBottom)")
                                     
                                     showScrollToBottom = !nearBottom
                                     
@@ -252,17 +208,17 @@ struct MessageListView: View {
                                     }
                                 }
                             }
-                            
                            
-                            
                             .overlay(
                                 VStack {
                                     Spacer()
                                     if showScrollToBottom {
                                         ScrollToBottomButton {
                                             withAnimation {
-                                                proxy.scrollTo(viewModel.readMessages.last?.messageIndex, anchor: .bottom)
-                                            }
+                                                    proxy.scrollTo("BottomAnchor", anchor: .bottom)
+                                                    showNewMessageBanner = false
+                                                        }
+
                                         }
                                     }
                                 },
@@ -294,10 +250,8 @@ struct MessageListView: View {
                                 },
                                 alignment: .bottomTrailing
                             )
-                            
-                            
-                            
-                            .onChange(of: appModel.messagesManager.messages.count) { newCount in
+                         
+                            .onChange(of: messagesManager.messages.count) { newCount in
                                 print("Messages count changed from \(messageCount) to \(newCount)")
                                 
                                 // If messages decreased or no change, just update and exit
@@ -307,7 +261,7 @@ struct MessageListView: View {
                                 }
                                 
                                 // Get the last message safely
-                                guard let lastMessage = appModel.messagesManager.messages.last else {
+                                guard let lastMessage = messagesManager.messages.last else {
                                     messageCount = newCount
                                     return
                                 }
@@ -320,12 +274,11 @@ struct MessageListView: View {
                                         proxy.scrollTo(lastMessage, anchor: .bottom)
                                         showNewMessageBanner = false
                                     }
-                                    // Mark read only if outgoing message
-                                    if lastMessage.direction == MessageDirection.outgoing.rawValue {
-                                        Task {
-                                            await markAllMessagesReadTask
-                                        }
+
+                                    Task {
+                                        await markAllMessagesReadTask
                                     }
+    
                                 }
                                 
                                 if shouldAutoScroll {
@@ -374,13 +327,11 @@ struct MessageListView: View {
                 .onAppear(perform: {
                     
                     handleOnAppear()
+                    
                     heartbeatTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { _ in
-                        sendHeartbeat()
-                    }
-                    
-                    print("messagesManager = \(String(describing: appModel.messagesManager))")
-                    
-                    
+                           sendHeartbeat()
+                       }
+              
                 })
                 .onDisappear {
                     heartbeatTimer?.invalidate()
@@ -388,8 +339,7 @@ struct MessageListView: View {
                 }
                 getStatusBanner(event: viewModel.currentConversationEvent)
             }
-            
-            
+        
         }
         
     }
@@ -412,12 +362,12 @@ struct MessageListView: View {
         guard let bottom = bottomOffset else { return false }
         return abs(bottom - scrollOffset) < 50
     }
-    
-    
+   
     var markAllMessagesReadTask: DispatchWorkItem {
         DispatchWorkItem {
             if !isCancelled {
-                appModel.messagesManager.setAllMessagesRead(for: conversation.sid)
+                print("setallreadmsg")
+                messagesManager.setAllMessagesRead(for: conversation.sid)
                 showUnreadMessageSection = false
             }
         }
@@ -459,6 +409,7 @@ struct MessageListView: View {
                         .frame(maxWidth: .infinity)
                 }
                 .padding(.horizontal)
+                .padding(.bottom, 8)
             }
             
             MessageBubbleView(
@@ -491,8 +442,7 @@ struct MessageListView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: markAllMessagesReadTask)
             }
         )
-        
-        
+      
     }
     
     
@@ -505,8 +455,7 @@ struct MessageListView: View {
             messages: viewModel.readMessages,
             conversation: conversation
         )
-        
-        
+    
     }
     
     
@@ -524,8 +473,7 @@ struct MessageListView: View {
                 }
             }
         )
-        
-        
+      
     }
     
     
@@ -544,8 +492,7 @@ struct MessageListView: View {
                 }
             }
         )
-        
-        
+     
     }
     
     
@@ -562,26 +509,14 @@ struct MessageListView: View {
     }
     
     
-    // 👇 Optional date formatter
+    //  Optional date formatter
     func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         return formatter.string(from: date)
     }
     
-    // Function to handle scrolling logic
-    //    private func scrollToBottom(proxy: ScrollViewProxy) {
-    //        let unreadCount = viewModel.unreadReceivedMessages.count
-    //        if enableUnreadMessageSection, unreadCount > 0 {
-    //            // If you want to scroll to bottom even when there are unread messages
-    //            proxy.scrollTo(viewModel.readMessages.last?.messageIndex, anchor: .bottom)
-    //        } else {
-    //            proxy.scrollTo(viewModel.readMessages.last?.messageIndex, anchor: .bottom)
-    //        }
-    //
-    //    }
-    
-    
+   
     private func scrollToBottom(proxy: ScrollViewProxy) {
         if let lastId = viewModel.readMessages.last?.messageIndex {
             print("scrollToBottom to id:", lastId)
@@ -589,9 +524,7 @@ struct MessageListView: View {
         }
     }
     
-    
-    
-    
+ 
     // MARK: Init
     init(conversation: PersistentConversationDataItem, viewModel: MessageListViewModel) {
         self.conversation = conversation
@@ -605,65 +538,47 @@ struct MessageListView: View {
     private func isConversationNew() -> Bool {
         return appModel.messagesManager.messages.count == 0 && (appModel.selectedConversation?.participantsCount ?? 0) < 2
     }
-    
-    
-    private func sendImage() {
-        if (viewModel.selectedImage != nil) {
-            messagesManager.sendMessage(toConversation: conversation, withText: textToSend, andMedia: viewModel.selectedImageURL, withFileName: viewModel.selectedFileName) { error in
-                if let error = error {
-                    sendError = error
-                    isShowingSendError = true
-                } else {
-                    DispatchQueue.main.async {
-                        viewModel.clearSelectedImage()
-                        textToSend = ""
-                    }
-                }
-            }
-        }
-    }
-    
-    
-    
+  
     private func handleOnAppear() {
         print("messagesManager = \(String(describing: appModel.messagesManager))")
-        
-        // ⏱️ Send the first heartbeat immediately
-        sendHeartbeat()
-        
+        print("messagesManager", messagesManager)
+       
+        print(" My Identity at onAppear: \(AppModel.shared.myIdentity)")
         
         // Continue all your setup logic here, like:
-        appModel.messagesManager.subscribeMessages(inConversation: conversation)
-        appModel.participantsManager.subscribeParticipants(inConversation: conversation)
+        messagesManager.subscribeMessages(inConversation: conversation)
+        participantsManager.subscribeParticipants(inConversation: conversation)
         
-        appModel.messagesManager.$messages
+        messagesManager.$messages
             .sink { messages in
-                viewModel.prepareMessages(conversation, messages, appModel.participantsManager.participants)
+                viewModel.prepareMessages(conversation, messages, participantsManager.participants)
             }
             .store(in: &cancellableSet)
         
-        appModel.participantsManager.$participants
+        participantsManager.$participants
             .sink { _ in
-                viewModel.prepareMessages(conversation, appModel.messagesManager.messages, appModel.participantsManager.participants)
+                viewModel.prepareMessages(conversation, messagesManager.messages, participantsManager.participants)
             }
             .store(in: &cancellableSet)
         
-        appModel.messagesManager.loadLastMessagePageIn(
+       messagesManager.loadLastMessagePageIn(
             conversation,
             max: max(messagesPaginationSize, UInt(conversation.unreadMessagesCount))
         )
         
         let parsedConversation = PersistanceDataAdapter.transform(from: conversation)
+       
         viewModel.setConversation(parsedConversation)
         
         //        appModel.typingPublisher
         //            .sink { typing in viewModel.registerForTyping(typing) }
         //            .store(in: &cancellableSet)
         
-        appModel.conversationManager.conversationEventPublisher
+        conversationManager.conversationEventPublisher
             .sink { event in viewModel.registerForConversationEvents(event) }
             .store(in: &cancellableSet)
     }
+    
     private func sendHeartbeat() {
         let sid: String = conversation.sid ?? ""
         let user = UserDefaults.standard.string(forKey: "patientUserNameString") ?? "UnknownUser"
@@ -678,9 +593,7 @@ struct MessageListView: View {
             lastActiveAt: timestamp
         )
     }
-    
-    
-    
+  
 }
 
 
@@ -695,14 +608,7 @@ struct MessageInputBar: View {
     
     var body: some View {
         VStack {
-            HStack {
-                if viewModel.isAnyParticipantTyping {
-                    TypingView(label: viewModel.typingText)
-                    Spacer()
-                }
-            }
-            .padding(.horizontal, 16)
-            
+
             HStack(alignment: .center) {
                 Button(action: {
                     showingPickerSheet = true
@@ -713,22 +619,21 @@ struct MessageInputBar: View {
                 
                 HStack(alignment: .bottom, spacing: 5) {
                     ZStack(alignment: .topLeading) {
+                 
                         // Placeholder
-                        if textToSend.isEmpty {
-                            VStack {
-                                Spacer()
-                                Text("Type Your Message")
-                                    .foregroundColor(.gray)
-                                    .padding(.horizontal, 12)
-                                Spacer()
-                            }
-                            .frame(height: textEditorHeight)
-                            // Match maxHeight of TextEditor
-                            .zIndex(1) // Make sure placeholder appears on top
-                        }
-                        
-                    
-                        
+                           if textToSend.isEmpty {
+                               Text("Type Your Message")
+                                   .foregroundColor(.gray)
+                                        .font(.system(size: 17)) // Match UITextView font
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.horizontal, 16)
+                                        .padding(.top, 14)      // Small top padding to compensate UITextView inset
+                                        .padding(.bottom, 6)    // Less bottom padding to balance
+                                        .frame(height: textEditorHeight, alignment: .topLeading)
+                                        .frame(maxWidth: 290)
+                                        .zIndex(1)
+                           }
+                  
                         GrowingTextEditor(
                             text: $textToSend,
                             dynamicHeight: $textEditorHeight,
@@ -736,6 +641,7 @@ struct MessageInputBar: View {
                         )
                         .frame(height: textEditorHeight)
                         .padding(.top, 10)
+                        .padding(.bottom, 10)
                         .padding(.horizontal, 10)
                         .background(Color.white)
                         .overlay(
@@ -744,8 +650,7 @@ struct MessageInputBar: View {
                         )
                         .cornerRadius(14)
                         .frame(maxWidth: 290)
-                        
-                        
+                      
                         .zIndex(0) // Ensure TextEditor is below the placeholder
                         .onAppear {
                             UITextView.appearance().backgroundColor = .clear
@@ -753,8 +658,7 @@ struct MessageInputBar: View {
                         .onChange(of: textToSend) { _ in
                             appModel.typing(in: appModel.selectedConversation)
                         }
-                        
-                        
+                     
                     }
                     
                     
@@ -765,14 +669,17 @@ struct MessageInputBar: View {
                             withText: textToSend,
                             andMedia: viewModel.selectedImageURL,
                             withFileName: viewModel.selectedFileName
-                        ) { _ in
-                            viewModel.clearSelectedImage()
+                        )
+                        
+                        { _ in
+                          
                             let sentText = textToSend
                             textToSend = ""
                             let sid = conversation.sid ?? ""
                             let toUser = appModel.selectedConversation?.title.components(separatedBy: "-").first ?? ""
                             let fromUser = UserDefaults.standard.string(forKey: "patientUserNameString") ?? "UnknownUser"
                             viewModel.notifyMessageSent(conversationSid: sid, toUser: toUser, fromUser: fromUser, message: sentText)
+                            viewModel.clearSelectedImage()
                         }
                     }) {
                         Image("Icons_Send")
@@ -784,6 +691,7 @@ struct MessageInputBar: View {
                             .clipShape(Circle())     // Circular shape
                             .shadow(radius: 1)       // Optional: subtle shadow for depth
                     }
+                  
                     .padding(.trailing, 16)
                     .padding(.leading, 8)// Add margin on the right side of the Send button
                 }
@@ -791,6 +699,7 @@ struct MessageInputBar: View {
             }
             .padding(.top, 8) // Adding top padding to create space above the text editor
         }
+        .frame(maxWidth: .infinity)
         .padding(.bottom, 15)
         .background(Color("TFbgColor"))
     }
@@ -859,8 +768,6 @@ struct GrowingTextEditor: UIViewRepresentable {
 }
 
 
-
-
 struct ScrollToBottomButton: View {
     var action: () -> Void
     
@@ -868,7 +775,7 @@ struct ScrollToBottomButton: View {
         Button(action: action) {
             Image(systemName: "chevron.down.circle.fill")
                 .resizable()
-                .frame(width: 50, height: 50)
+                .frame(width: 45, height: 45)
                 .foregroundColor(Color("title1"))
                 .background(Color.white.opacity(0.8))
                 .clipShape(Circle())
@@ -887,16 +794,13 @@ struct ScrollOffsetPreferenceKey: PreferenceKey {
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         // Use the minimum value so that a negative offset from the first view is preserved.
         value = min(value, nextValue())
-        print("📐 ScrollOffsetPreferenceKey reduce triggered — new value: \(value)")
+       // print(" ScrollOffsetPreferenceKey reduce triggered — new value: \(value)")
     }
 }
 
-
-
-
 struct UnreadSectionHeaderView: View {
     var unreadMessagesCount: Int
-    var scrollToBottom: (() -> Void)?  // ✅ Add this property
+    var scrollToBottom: (() -> Void)?  //  Add this property
     
     var body: some View {
         HStack() {
@@ -906,7 +810,7 @@ struct UnreadSectionHeaderView: View {
                 .foregroundColor(Color.green)
             
             // Drop-down arrow button
-            if let scrollToBottom = scrollToBottom {  // ✅ Unwrap before using
+            if let scrollToBottom = scrollToBottom {  //  Unwrap before using
                 Button(action: {
                     withAnimation {
                         scrollToBottom()
@@ -917,9 +821,7 @@ struct UnreadSectionHeaderView: View {
                         .font(.title2)
                 }
             }
-            
-            
-            
+         
             Spacer()
         }
         .padding(.horizontal, 0)
@@ -935,7 +837,7 @@ struct UnreadSectionHeaderView: View {
         }
     } else if event == .messageDeleted {
         withAnimation {
-            GlobalStatusView(message: NSLocalizedString("conversation.status.message_deleted", comment: "Notification indicating that the message was successfully deleted"), kind: .success)
+            GlobalStatusView(message: NSLocalizedString("Deleted Message", comment: "Notification indicating that the message was successfully deleted"), kind: .success)
         }
     } else {
         EmptyView()

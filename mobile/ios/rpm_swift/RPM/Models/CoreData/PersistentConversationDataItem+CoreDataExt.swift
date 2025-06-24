@@ -15,12 +15,6 @@ extension PersistentConversationDataItem {
             self.friendlyName ?? self.uniqueName ?? self.sid ?? "<unknown>"
         }
     }
-    
-    var lastMessageText: String {
-        get {
-            return self.lastMessagePreview ?? "" // or whatever your variable is
-        }
-    }
 
     var displayName: String {
             get {
@@ -111,6 +105,10 @@ extension PersistentConversationDataItem {
         }
     }
     
+    public var lastMessageTextTrimmed: String {
+           return (lastMessagePreview ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+       }
+    
     static func from(conversation: TCHConversation, inContext context: NSManagedObjectContext) -> PersistentConversationDataItem? {
         guard let conversationSid = conversation.sid else {
             return nil
@@ -188,9 +186,7 @@ extension PersistentConversationDataItem {
                 
                 context.perform {
                     self.unreadMessagesCount = Int64(truncating: count)
-                    
-                    
-                    
+                  
                     //  Add this to recalculate and post the new total
                            let totalUnread = PersistentConversationDataItem.totalUnreadCount(inContext: context)
                            NotificationCenter.default.post(
@@ -219,8 +215,16 @@ extension PersistentConversationDataItem {
                 context.perform {
 
                     if let lastMessage = messages.first {
+                    
                         if lastMessage.attachedMedia.count == 0 {
-                            self.lastMessagePreview = lastMessage.body
+                            let newPreview = lastMessage.body
+                            
+                            
+                            if self.lastMessagePreview != newPreview {
+                                self.lastMessagePreview = newPreview
+                                print("lstmsgsaved", newPreview)
+                            }
+ 
                             self.lastMessageType = MessageType.text.rawValue
                             //For Demo Apps v1 we'll assume that mediaAttachment for a message only has 1 attachment.
                         } else if (["image/jpeg", "image/png"].contains(lastMessage.attachedMedia.first?.contentType)) {

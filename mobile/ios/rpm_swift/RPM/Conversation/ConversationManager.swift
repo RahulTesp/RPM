@@ -33,7 +33,8 @@ class ConversationManager: ObservableObject {
     
     @Published var totalUnreadCount: Int = 0
     @Published var unreadCount: Int64 = 0
-    
+    @Published var hasLoadedConversationsOnce = false
+
     // MARK: Events
     
     var conversationEventPublisher = PassthroughSubject<ConversationEvent, Never>()
@@ -60,15 +61,20 @@ class ConversationManager: ObservableObject {
             .store(in: &cancellableSet)
         
     }
-    
-    
-    
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
     
+    func reset() {
+        // Clear any in-memory arrays or caches
+        self.conversations = []
+  
+    }
+
+    
     func subscribeConversations(onRefresh: Bool) {
-        
+     //   print("isConversationsLoading1",isConversationsLoading)
         if (onRefresh) {
             isConversationsRefreshing = true
         } else {
@@ -82,6 +88,8 @@ class ConversationManager: ObservableObject {
             NSSortDescriptor(key: "lastMessageDate", ascending: false),
             NSSortDescriptor(key: "friendlyName", ascending: true)]
         
+      //  print("isConversationsLoading2",isConversationsLoading)
+     //   print("hasLoadedConversationsOnce2",hasLoadedConversationsOnce)
         ObservableResultPublisher(with: request, context: coreDataDelegate.managedObjectContext)
             .sink(
                 receiveCompletion: {
@@ -92,6 +100,10 @@ class ConversationManager: ObservableObject {
                     let sortedItems = items.sorted(by: self!.sorterForConversations)
                     //   print("sortedItems",sortedItems)
                     self?.conversations = sortedItems
+                    self?.hasLoadedConversationsOnce = true
+                    
+                  //  print("isConversationsLoading3",self?.isConversationsLoading)
+                  //  print("hasLoadedConversationsOnce3",self?.hasLoadedConversationsOnce)
                     //  print("self?.conversations",self?.conversations)
                     if (onRefresh) {
                         self?.isConversationsRefreshing = false
@@ -139,8 +151,7 @@ class ConversationManager: ObservableObject {
             //  print("loadAllclient", client)
             return
         }
-        
-        
+     
         // Assign delegate to each conversation here
         client.myConversations()?.forEach { conversation in
             //    conversation.delegate = self
@@ -168,8 +179,7 @@ class ConversationManager: ObservableObject {
             completion(nil, DataFetchError.conversationsClientIsNotAvailable)
             return
         }
-        
-        
+       
         client.conversation(withSidOrUniqueName: conversationSid) { (result, conversation) in
             guard result.isSuccessful, let conversation = conversation else {
                 completion(nil, DataFetchError.requiredDataCallsFailed)
@@ -187,9 +197,7 @@ class ConversationManager: ObservableObject {
             for participant in conversation.participants() {
                 //     print("Participant identity: \(participant.identity ?? "unknown")")
             }
-            
-            
-            
+        
             if isParticipant {
                 // Already joined
                 conversation.delegate = AppModel.shared
@@ -213,9 +221,7 @@ class ConversationManager: ObservableObject {
                 }
                 
             }
-            
-            
-            
+         
         }
         
     }

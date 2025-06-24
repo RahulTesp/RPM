@@ -36,6 +36,10 @@ struct RPMMoreView: View {
         .background(Color("bgColor"))
         .navigationBarBackButtonHidden(true)
         .ignoresSafeArea(.all)
+        
+        .onAppear(){
+            print(" MOREONAPEARPath:", navigationHelper.path)
+        }
     }
 
     // MARK: - Tabs
@@ -92,56 +96,37 @@ struct RPMMoreView: View {
    
     // MARK: - Logout Logic
     
-    private func performLogout() {
-        print("performLogout triggered")
+    func performLogout() {
+        print(" performLogoutPath:", navigationHelper.path)
+        homeViewModel.reset()
+        // Step 1: Logout API call
+        loginViewModel.logout { response, alert in
+            print(" Logout server call finished")
 
-        loginViewModel.logout { res, val in
-            DispatchQueue.main.async {
-                print("Logout Result: \(res ?? "nil")")
+            // Step 2: Handle error
+            if let alert = alert {
+                print(" Logout failed: \(alert.title)")
+                return
+            }
 
-                loginViewModel.isLoggedOut = true
-                loginViewModel.loggedIn = false
+            // Step 3: Main cleanup
+            Task { @MainActor in
+                appModel.signOutChat() // Twilio cleanup etc.
 
-                if let bundleID = Bundle.main.bundleIdentifier {
-                    UserDefaults.standard.removePersistentDomain(forName: bundleID)
-                }
-
-                DispatchQueue.global(qos: .background).async {
-                    
-                    print("morecallManager: \(callManager)")
-                    print("moreroomManager: \(roomManager)")
-                    print("morelocalParticipant: \(localParticipant)")
-
-                    callManager.disconnect()
-             
-                    roomManager.disconnect()
-                  
-                    appModel.signOut()
-                
-                    DispatchQueue.main.async {
-                        homeViewModel.reset()
-
-                                    //  Critical: Reset navigation on main thread
-                                    navigationHelper.path = []
-                        navigationHelper.selectedTab = 0
-                                    navigationHelper.path.append(.login)
-                        print(" navigationHelper.path: \( navigationHelper.path)")
-                                }
-                    
-                }
+                callManager.disconnect()
+                roomManager.disconnect()
+                // Step 4: Reset app state
+                navigationHelper.path = [] // clear all views
+                loginViewModel.isAuthenticated = false // show LoginView
             }
         }
-
-        print("Logouttriggered")
     }
 
 }
 
 //TOP SECTION
 struct AccountPanel :  View{
-    
-    
-    
+ 
     @State var isLinkActive = false
     @State private var isActive : Bool = false
     

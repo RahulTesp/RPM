@@ -20,6 +20,9 @@ struct RPMOTPView: View {
     @State private var showText = false
     @State private var showResend = false
     
+    @EnvironmentObject var navigationHelper: NavigationHelper
+    @EnvironmentObject var loginViewModel: RPMLoginViewModel
+    
     var width: CGFloat {
           if UIDevice.current.userInterfaceIdiom == .phone {
               return UIScreen.main.bounds.width / 1.39
@@ -29,8 +32,6 @@ struct RPMOTPView: View {
       }
     
     @State var isActive = false
-    @Binding var isLogin: Bool
-    @ObservedObject private var viewModel = RPMLoginViewModel()
     @State private var alertItem: AlertItem?
     @State var otpCode: String = ""
     @State var otpCodeLength: Int = 8
@@ -41,7 +42,7 @@ struct RPMOTPView: View {
 
             VStack {
              
-                if viewModel.isLoggedOut {
+                if loginViewModel.isLoggedOut {
                  
                     RPMLoginView()
                
@@ -73,6 +74,8 @@ struct RPMOTPView: View {
                 
                     
                     OtpView_SwiftUI(otpCode: $otpCode, otpCodeLength: otpCodeLength, textColor: textColor, textSize: textSize)
+                        .environmentObject(navigationHelper)
+                        .environmentObject(loginViewModel)
                         .padding(10)
                     Spacer()
                     if showText {
@@ -103,27 +106,27 @@ struct RPMOTPView: View {
                             
                             print(UserDefaults.standard.string(forKey: "passwordSaved") ?? "")
                             
-                            viewModel.login(userName: (UserDefaults.standard.string(forKey: "pgmUserID") ?? ""), password: (UserDefaults.standard.string(forKey: "passwordSaved") ?? ""), completed: { token, alertItem in
+                            loginViewModel.login(userName: (UserDefaults.standard.string(forKey: "pgmUserID") ?? ""), password: (UserDefaults.standard.string(forKey: "passwordSaved") ?? ""), completed: { token, alertItem in
                                 if let _ = token {
                                     
                                     print("isLogin")
-                                    print(isLogin)
+                                   // print(isLogin)
                                 
                                     self.isActive = true
                                     print("self.isActive 2")
                                     print(self.isActive)
                                 
                                     print("isAuthenticated value")
-                                    print(viewModel.self.isAuthenticated)
-                                    print(viewModel.isAuthenticated)
+                                    print(loginViewModel.self.isAuthenticated)
+                                    print(loginViewModel.isAuthenticated)
                                 
-                                    self.viewModel.loggedIn = true
-                                    UserDefaults.standard.set(self.viewModel.loggedIn, forKey: "loggedInValue" )
+                                   // self.viewModel.loggedIn = true
+                                   // UserDefaults.standard.set(self.loginViewModel.loggedIn, forKey: "loggedInValue" )
                                     print("loggedin Value1")
                                     print(UserDefaults.standard.bool(forKey: "loggedInValue") )
                                     print("isAuthenticated value2222222")
-                                    print(viewModel.self.isAuthenticated)
-                                    print(viewModel.isAuthenticated)
+                                    print(loginViewModel.self.isAuthenticated)
+                                    print(loginViewModel.isAuthenticated)
                                     
                                     print("alertItem1")
                                    // print(self.alertItem)

@@ -16,12 +16,10 @@ struct ConversationItemsListView: View {
     @EnvironmentObject var navigationHelper: NavigationHelper
     @EnvironmentObject var conversationManager: ConversationManager
     @State private var showingLeaveConversationDialog = false
-    
+    @EnvironmentObject var messagesManager: MessagesManager
     @State var selectedConversationForDeletion: PersistentConversationDataItem? = nil
-    
+   
     var filteredConversations: [PersistentConversationDataItem] {
-        
-        
      //   print("filteredConversations",filteredConversations)
         if searchText.isEmpty {
            // print("items:--",items)
@@ -35,6 +33,8 @@ struct ConversationItemsListView: View {
     }
     
     var body: some View {
+        
+ 
         if(filteredConversations.isEmpty){
             
             NoSearchResultsView()
@@ -45,7 +45,7 @@ struct ConversationItemsListView: View {
                           ForEach(filteredConversations) { model in
            
                 ConversationRowItem(conversation: model, navigationHelper: _navigationHelper)
-                              
+                                  .environmentObject(messagesManager)
                                   .padding(.horizontal)
                                           .padding(.vertical, 8) //  Optional internal padding
                                           .background(Color.white)
@@ -82,11 +82,12 @@ struct ConversationItemsListView: View {
 
 struct ConversationRowItem: View {
     var conversation: PersistentConversationDataItem
-   // @StateObject var messageListViewModel = MessageListViewModel()
     @EnvironmentObject var navigationHelper: NavigationHelper
-
+    @EnvironmentObject var messagesManager: MessagesManager
+    
     var body: some View {
         Button {
+   
             navigationHelper.path.append(.messageList(conversation: conversation))
 
         } label: {

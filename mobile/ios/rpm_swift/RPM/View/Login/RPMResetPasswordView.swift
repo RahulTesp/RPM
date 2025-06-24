@@ -42,6 +42,7 @@ struct RPMResetPasswordView: View {
     @State private var usr = ""
 
     @EnvironmentObject var navigationHelper: NavigationHelper
+    @EnvironmentObject var loginViewModel: RPMLoginViewModel
     
     var body: some View {
         VStack {
@@ -73,6 +74,8 @@ struct RPMResetPasswordView: View {
                 .multilineTextAlignment(.center)
 
             OtpResetVerificationView(otpCode: $otpCode, otpCodeLength: otpCodeLength, textColor: textColor, textSize: textSize)
+                .environmentObject(navigationHelper)
+                .environmentObject(loginViewModel)
                 .padding(10)
         }
     }
@@ -179,13 +182,13 @@ struct RPMResetPasswordView: View {
                 self.isActive = true
                 
                 let shouldGoToLogin = UserDefaults.standard.bool(forKey: "resetSuccess")
-                             if shouldGoToLogin {
-                                 navigationHelper.path.append(.login)
-                                
-                             } else {
-                                 navigationHelper.path.append(.resetPassword)
-                               
-                             }
+//                             if shouldGoToLogin {
+//                                 navigationHelper.path.append(.login)
+//                                
+//                             } else {
+//                                 navigationHelper.path.append(.resetPassword)
+//                               
+//                             }
                 
                 
             } else {

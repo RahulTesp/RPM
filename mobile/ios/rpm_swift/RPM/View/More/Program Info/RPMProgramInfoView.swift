@@ -15,6 +15,7 @@ struct RPMProgramInfoView: View {
     @State var currentlytextId: Int = 0
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var accountListVM: RPMHomeViewModel
+    @EnvironmentObject var navigationHelper: NavigationHelper
     
     var body: some View {
         GeometryReader { geometry in
@@ -149,7 +150,13 @@ struct RPMProgramInfoView: View {
             )
             
             .padding(.horizontal,16)
+           
+            .onAppear()
+            {
             
+                    print(" pgminfoAPEARPath:", navigationHelper.path)
+                
+            }
         }
     }
     }

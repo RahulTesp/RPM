@@ -517,13 +517,13 @@ class NetworkManager: NSObject {
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
         request.httpMethod = "POST"
-        print("requestLOOGOUT",request)
+      //  print("requestLOOGOUT",request)
         
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             
             print("errorLOOGOUT",error)
-            print("responseLOOGOUT",response)
+          //  print("responseLOOGOUT",response)
             if let data = data,let _ = String(data: data,encoding:  .utf8)
             {
                 
@@ -881,6 +881,10 @@ class DashboardManager:
             // Check for 401 Unauthorized
             if httpResponse.statusCode == 401 {
                 print("401 Unauthorized: Token expired or invalid")
+                
+                // Notify session manager of the unauthorized error
+                SessionManager.shared.handleAPIError(APIError.unauthorized)
+                
                 completed(.failure(.unauthorized))
                 return
             }
@@ -1420,21 +1424,21 @@ class DashboardManager:
                              
                              completed: @escaping (Result<VitalReadingsDataModel, APIError>) -> Void) {
         
-        print("startDate")
-        print("endDate")
-        print(startDate)
-        print(endDate)
+        print("getVitalSummaryListstartDate",startDate)
+        print("getVitalSummaryListendDate",endDate)
+//        print(startDate)
+//        print(endDate)
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        
-        if let cvStartDate = DateUtils.convertToUTC(localDateStr: "\(startDate)T00:00:00", inputFormatStr: "yyyy-MM-dd'T'HH:mm:ss", outputFormatStr: "yyyy-MM-dd'T'HH:mm:ss"),
-           let cvEndDate = DateUtils.convertToUTC(localDateStr: "\(endDate)T23:59:59", inputFormatStr: "yyyy-MM-dd'T'HH:mm:ss", outputFormatStr: "yyyy-MM-dd'T'HH:mm:ss") {
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+//        
+//        if let cvStartDate = DateUtils.convertToUTC(localDateStr: "\(startDate)T00:00:00", inputFormatStr: "yyyy-MM-dd'T'HH:mm:ss", outputFormatStr: "yyyy-MM-dd'T'HH:mm:ss"),
+//           let cvEndDate = DateUtils.convertToUTC(localDateStr: "\(endDate)T23:59:59", inputFormatStr: "yyyy-MM-dd'T'HH:mm:ss", outputFormatStr: "yyyy-MM-dd'T'HH:mm:ss") {
+//            
+//            print("cvStartDate",cvStartDate)
+//            print("cvEndDate",cvEndDate)
             
-            print("cvStartDate",cvStartDate)
-            print("cvEndDate",cvEndDate)
-            
-            guard let url = URL(string: DashboardManager.baseURL + "/api/patients/getpatientvitalreadings?StartDate=\(cvStartDate)&EndDate=\(cvEndDate)" ) else {
+            guard let url = URL(string: DashboardManager.baseURL + "/api/patients/getpatientvitalreadings?StartDate=\(startDate)&EndDate=\(endDate)" ) else {
                 completed(.failure(.invalidURL))
                 return
             }
@@ -1497,10 +1501,10 @@ class DashboardManager:
             task.resume()
             
             
-        } else {
-            // Handle the case where conversion to Date fails
-            completed(.failure(.invalidData))
-        }
+//        } else {
+//            // Handle the case where conversion to Date fails
+//            completed(.failure(.invalidData))
+//        }
     }
     
     

@@ -13,13 +13,7 @@ class ConversationsClientWrapper: NSObject, ObservableObject {
     private(set) var conversationsClient: TwilioConversationsClient?
     
     var tokenWrapper: TokenWrapper.Type = TokenWrapperImpl.self
-    
-    // Provide a public method to access conversationsClient
-//       func getConversationsClient() -> TwilioConversationsClient? {
-//           return conversationsClient
-//       }
-
-    
+  
     // MARK: - ConversationsProvider
     func create(chatacctoken : String , delegate: TwilioConversationsClientDelegate, completion: @escaping (LoginResult) -> Void) {
         create(chatacctoken : chatacctoken , tokenWrapper: TokenWrapperImpl.self, delegate: delegate, completion: completion)
@@ -182,7 +176,10 @@ class ConversationsClientWrapper: NSObject, ObservableObject {
                 ) { [weak self] result, client in
                     if result.isSuccessful, let client = client {
                         self?.conversationsClient = client
+                        print("tokenupIdentity:",AppModel.shared.client.conversationsClient?.user)
+                        AppModel.shared.saveUser(AppModel.shared.client.conversationsClient?.user)
                         print("Client recreated successfully.")
+                     
                         self?.updateClientToken(client: client, token: token, callback: callback)
                     } else {
                         print("Failed to recreate client: \(result.error?.localizedDescription ?? "Unknown error")")

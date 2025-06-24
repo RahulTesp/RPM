@@ -94,7 +94,7 @@ struct RPMSymptomsView: View {
                         .foregroundColor(.black)
                      
                         .padding(8)
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .background(
                             RoundedRectangle(cornerRadius: 8)
                                 .fill(Color.white)

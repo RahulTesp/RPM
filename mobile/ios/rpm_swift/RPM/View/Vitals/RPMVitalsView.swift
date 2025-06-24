@@ -92,6 +92,11 @@ struct RPMVitalsView: View {
                             .font(Font.custom("Rubik-Regular", size: 16))
                         Spacer()
                         
+                        // Dummy view to balance the HStack
+                               Image("ArrowBack")
+                                   .opacity(0) // invisible
+                                   .padding()
+                        
                     }
                     
                 }
@@ -103,75 +108,46 @@ struct RPMVitalsView: View {
                     // DATE VIEW
                     HStack {
                         Spacer()
-                        
+                      
                         Button {
                             vitalSummaryList.loading = true
-                            print("currentDatefixb4",currentDateFix)
-                            print("currentDateb4",currentDate)
-                            print("currentDateb4",TimeZone.current)
-                            
-                            
-                            print("currentDa",Date.getCurrentVitalDate())
-                            
                             
                             currentDate = Calendar.current.date(byAdding: .day, value: -1, to: currentDate)!
                             
-                            
-                            print("currentDateaftr",currentDate)
-                            
-                            print("cdformtd",currentDate.formatted(
-                                .iso8601
-                                    .month()
-                                    .day()
-                                    .year()
-                                    .dateSeparator(.dash)
-                                
-                            ))
-                            
-                            
+                            let calendar = Calendar.current
+                            let startDateTime = calendar.date(bySettingHour: 18, minute: 30, second: 0, of: calendar.date(byAdding: .day, value: -1, to: currentDate)!)!
+                            let endDateTime = calendar.date(bySettingHour: 18, minute: 29, second: 59, of: currentDate)!
+
+                            let dateFormatter = DateFormatter()
+                            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+                            dateFormatter.timeZone = TimeZone(identifier: "Asia/Kolkata") // Use IST
+
+                            let formattedStartDate = dateFormatter.string(from: startDateTime)
+                            let formattedEndDate = dateFormatter.string(from: endDateTime)
+
+                            print("Start Date: \(formattedStartDate)")
+                            print("End Date: \(formattedEndDate)")
+
+
+                            print("Start Date:", formattedStartDate)  // e.g., 2025-06-10T18:30:00
+                            print("End Date:", formattedEndDate)      // e.g., 2025-06-11T18:29:59
+
                             vitalSummaryList.getVitalSummary(
-                                
-                                startDate:
-                                    
-                                    currentDate.formatted(
-                                        .iso8601
-                                            .month()
-                                            .day()
-                                            .year()
-                                            .dateSeparator(.dash)
-                                        
-                                    )
-                                
-                                ,  endDate:
-                                    
-                                    currentDate.formatted(
-                                        .iso8601
-                                            .month()
-                                            .day()
-                                            .year()
-                                            .dateSeparator(.dash)
-                                        
-                                    )
-                                
-                                
-                                , completed: {_,_ in
-                                    print("vitals chng")
-                                    
+                                startDate: formattedStartDate,
+                                endDate: formattedEndDate,
+                                completed: { _, _ in
+                                    print("Vitals fetched")
                                 }
                             )
-                            
-                            
+
                             showVitalSummary = true
-                            
-                            
-                            
+
                         } label: {
                             Image(systemName: "chevron.left")
                                 .foregroundColor(Color("title1"))
                                 .font(.title3)
-                            
                         }
-                        
+
                         
                         
                         // NOTE : DATE SHOWING SECTION
@@ -218,57 +194,47 @@ struct RPMVitalsView: View {
                             
                         }
                         
-                        
                         Button {
                             vitalSummaryList.loading = true
+
+                            // Go forward by 1 day
                             currentDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate)!
-                            
-                            
+
+                            // Calculate proper start and end datetime in IST
+                            let calendar = Calendar.current
+                            let startDateTime = calendar.date(bySettingHour: 18, minute: 30, second: 0, of: calendar.date(byAdding: .day, value: -1, to: currentDate)!)!
+                            let endDateTime = calendar.date(bySettingHour: 18, minute: 29, second: 59, of: currentDate)!
+
+                            let dateFormatter = DateFormatter()
+                            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+                            dateFormatter.timeZone = TimeZone(identifier: "Asia/Kolkata") // IST
+
+                            let formattedStartDate = dateFormatter.string(from: startDateTime)
+                            let formattedEndDate = dateFormatter.string(from: endDateTime)
+
+                            print("Right Arrow Clicked")
+                            print("API StartDate: \(formattedStartDate)")
+                            print("API EndDate: \(formattedEndDate)")
+
+                            // Make API call
                             vitalSummaryList.getVitalSummary(
-                                
-                                startDate:
-                                    
-                                    
-                                    currentDate.formatted(
-                                        .iso8601
-                                            .month()
-                                            .day()
-                                            .year()
-                                            .dateSeparator(.dash)
-                                        
-                                    )
-                                
-                                
-                                
-                                ,  endDate:
-                                    
-                                    currentDate.formatted(
-                                        .iso8601
-                                            .month()
-                                            .day()
-                                            .year()
-                                            .dateSeparator(.dash)
-                                        
-                                    )
-                                
-                                
-                                
-                                , completed: {_,_ in
-                                    //   print("vitals chng")
-                                    
+                                startDate: formattedStartDate,
+                                endDate: formattedEndDate,
+                                completed: { _, _ in
+                                    print("Vitals fetched")
                                 }
                             )
-                            
-                            
+
                             showVitalSummary = true
-                            
-                            
+
                         } label: {
                             Image(systemName: "chevron.right")
                                 .foregroundColor(.gray)
                                 .font(.title3)
-                            
                         }
+
+                        
+
                         Spacer()
                     }
                     .padding(.horizontal,6)

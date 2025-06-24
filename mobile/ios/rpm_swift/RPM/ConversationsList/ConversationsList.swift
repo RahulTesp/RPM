@@ -16,12 +16,14 @@ struct ConversationsList: View {
     @EnvironmentObject var navigationHelper: NavigationHelper
     @EnvironmentObject var conversationManager: ConversationManager
     @EnvironmentObject var participantsManager: ParticipantsManager
+    @EnvironmentObject var messagesManager: MessagesManager
     
     @StateObject private var viewModel = ConversationListViewModel()
     @State private var filterQuery: String = ""
     @State private var cancellableSet: Set<AnyCancellable> = []
     @State private var showNoChatsToast = false
-    
+    @State private var hasDisplayedData = false
+
     
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     
@@ -53,8 +55,8 @@ struct ConversationsList: View {
                 
                 ScrollView {
                     VStack(spacing: 0) {
-                        if conversationManager.isConversationsLoading {
-                            LoadingView()
+                        if conversationManager.isConversationsLoading  {
+                            ConversationListLoadingView()
                         } else if conversationManager.conversations.isEmpty {
                             if let error = appModel.conversationsError {
                                 ConversationsListErrorView(error: error) {
@@ -77,9 +79,15 @@ struct ConversationsList: View {
                                 
                             }
                         } else {
+                        
                             VStack(alignment: .leading, spacing: 0) {
-                                ConversationItemsListView(items: conversationManager.conversations, searchText: $filterQuery)
+                               
+                                ConversationItemsListView(items: conversationManager.conversations, searchText: $filterQuery
+                                                          
+                                )
+                                    .environmentObject(messagesManager)
                                     .frame(maxWidth: .infinity)
+                       
                             }
                             .padding(.top, 6)
                             .padding(.bottom, 20)
@@ -88,6 +96,7 @@ struct ConversationsList: View {
                     }
                     .padding(.horizontal)
                     .background(Color("ChatBGcolor"))
+         
                 }
             }
             
@@ -113,9 +122,7 @@ struct ConversationsList: View {
                 }
                 .animation(.easeInOut, value: showNoChatsToast)
             }
-            
-            
-            
+       
         }
         .navigationTitle("Activity")
         .navigationBarTitleDisplayMode(.inline)
@@ -138,34 +145,24 @@ struct ConversationsList: View {
                 Image("AddOutline")
             }
         )
-        
-        .navigationDestination(for: Screen.self) { screen in
-            switch screen {
-            case .createConversation:
-                CreateConversationView(
-                    
-                    items: conversationManager.conversations
-                )
-                .environmentObject(appModel)
-                .environmentObject(conversationManager)
-                .environmentObject(participantsManager)
-                .environmentObject(navigationHelper)
-                
-            case .messageList(let conversation):
-                MessageListView(conversation: conversation, viewModel: MessageListViewModel())
-                    .environmentObject(appModel)
-                    .environmentObject(conversationManager)
-                    .environmentObject(participantsManager)
-                    .environmentObject(navigationHelper)
-                    .environmentObject(appModel.messagesManager)
-            default:
-                EmptyView()
-            }
-        }
-        
+  
         .onAppear {
             print("ConversationManager is accessible: \(conversationManager)")
             print("Current navigation path in ConversationsList: \(navigationHelper.path)")
+    
+        }
+    }
+}
+
+
+struct ConversationListLoadingView: View {
+    var body: some View {
+        HStack {
+            ProgressView()
+            Text("loading.text")
+                .font(.system(size: 14))
+                .foregroundColor(Color.red)
+                .padding(.leading, 6)
         }
     }
 }

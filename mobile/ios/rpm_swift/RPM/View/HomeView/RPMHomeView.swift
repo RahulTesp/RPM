@@ -67,7 +67,7 @@ struct RPMHomeView: View {
     @StateObject var todoList = RPMTodoListViewModel()
     @StateObject var chartDays = RPMVitalsChartDaysViewModel()
     @StateObject var memberDetList = MembersListViewModel()
-    @StateObject private var loginViewModel = RPMLoginViewModel()
+    @EnvironmentObject var loginViewModel: RPMLoginViewModel
     @StateObject private var notificationManager = NotificationManager.shared
     @State private var isMediaSetup = false
     @State private var roomName: String = ""
@@ -91,7 +91,8 @@ struct RPMHomeView: View {
                     
             {
                 
-                LoadingCircleView(homeViewModel: homeViewModel)
+                LoadingCircleView()
+                    .environmentObject(homeViewModel)
             }
             
             else
@@ -107,7 +108,7 @@ struct RPMHomeView: View {
                             
                             Button(action: {
                                 navigationHelper.path.append(.notificationView)
-                                
+                                   
                             }) {
                                 Image("BellOutline")
                             }
@@ -359,58 +360,10 @@ struct RPMHomeView: View {
                                     Text("Do you want to join?")
                                 })
         
-        
-        
-     
-        
-                  .onChange(of: sessionManager.didReceiveUnauthorized) { isUnauthorized in
-                      if isUnauthorized {
-                          
-                          loginViewModel.logout { res, val in
-                              DispatchQueue.main.async {
-                                  print("Logout Result: \(res ?? "nil")")
-
-                                  loginViewModel.isLoggedOut = true
-                                  loginViewModel.loggedIn = false
-
-                                  if let bundleID = Bundle.main.bundleIdentifier {
-                                      UserDefaults.standard.removePersistentDomain(forName: bundleID)
-                                  }
-
-                                  DispatchQueue.global(qos: .background).async {
-                                      
-                                      print("morecallManager: \(callManager)")
-                                      print("moreroomManager: \(roomManager)")
-                                      print("morelocalParticipant: \(localParticipant)")
-
-                                      callManager.disconnect()
-                               
-                                      roomManager.disconnect()
-                                    
-                                      appModel.signOut()
-                                  
-                                      DispatchQueue.main.async {
-                                          homeViewModel.reset()
-
-                                                      //  Critical: Reset navigation on main thread
-                                                      navigationHelper.path = []
-                                          navigationHelper.selectedTab = 0
-                                                      navigationHelper.path.append(.login)
-                                          print(" navigationHelper.path: \( navigationHelper.path)")
-                                                  }
-                                      
-                                  }
-                              }
-                          }
-                      }
-                  }
-
-        
                   .onReceive(notificationManager.$showAlert) { newValue in
                       showAlertProxy = newValue
                   }
 
-        
                   .onReceive(NotificationCenter.default.publisher(for: Notification.Name("RefreshNotifications"))) { _ in
                       print("RefreshNotifications")
                       DispatchQueue.main.async {
@@ -419,7 +372,8 @@ struct RPMHomeView: View {
                   }
 
                   .onAppear {
-              
+                     
+                      print(" HOMEONAPEARPath:", navigationHelper.path)
                       homeViewModel.dashboard()
                       notifList.getnotify()
                   
@@ -544,8 +498,8 @@ struct RPMHomeView: View {
 
 
 struct LoadingCircleView: View {
-    @ObservedObject var homeViewModel: RPMHomeViewModel
-
+    @EnvironmentObject var homeViewModel: RPMHomeViewModel
+    
     var body: some View {
         ZStack {
             Circle()

@@ -18,10 +18,7 @@ final class RPMLoginViewModel: ObservableObject {
     @Published var loginData : RPMLoginDataModel?
     var usrnm : String?
     var usrpwd : String?
-    @Published  var loggedIn: Bool = false
-    @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
 
-    
     func login(userName: String, password: String, completed: @escaping (String?, AlertItem?) -> Void) {
         
         let defaults = UserDefaults.standard
@@ -30,9 +27,7 @@ final class RPMLoginViewModel: ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let loginDataModel):
-                    // Pass token immediately
-               
-                    
+                 
                     print("loginDataModel:", loginDataModel)
                     print("Token:", loginDataModel.tkn)
                     print("MFA:", loginDataModel.mfa)
@@ -45,9 +40,9 @@ final class RPMLoginViewModel: ObservableObject {
                     self.loginData = loginDataModel
                     defaults.setValue(loginDataModel.mobilenumber, forKey: "MobileNumber")
                     self.isAuthenticated = true
-                    self.isLoggedIn = true
+                  //  self.isLoggedIn = true
                     
-                    print("LOGINVWMODLisLoggedIn",self.isLoggedIn)
+                    //print("LOGINVWMODLisLoggedIn",self.isLoggedIn)
                     print("User authenticated:", self.isAuthenticated)
                     
                     if loginDataModel.mfa == true {
@@ -257,12 +252,16 @@ final class RPMLoginViewModel: ObservableObject {
                     print("LOGOUTresponseString",responseString)
                     print("self.isAuthenticated",self.isAuthenticated)
                  
-                    self.isAuthenticated = false
-                    print("self.isAuthenticated",self.isAuthenticated)
-                
+                  //  self.loggedIn = false
+                    
+                    SessionManager.shared.reset()
+                 
                     self.isLoggedOut = true
-                    print("self.isLoggedOut",self.isLoggedOut)
+                 //   print("self.isLoggedOut",self.isLoggedOut)
                 
+                      self.isAuthenticated = false
+                       print("self.isAuthenticated",self.isAuthenticated)
+                   
                     completion(responseString, nil)
                     
                 case .failure(let error):

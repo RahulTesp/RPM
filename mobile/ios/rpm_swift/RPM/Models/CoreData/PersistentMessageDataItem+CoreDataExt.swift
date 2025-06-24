@@ -158,6 +158,7 @@ extension PersistentMessageDataItem {
         var dateUpdated: TimeInterval
         var attachedMedia: String?
         var attributes: String?
+        var status: String?
 
         func message(inContext context: NSManagedObjectContext) -> PersistentMessageDataItem {
             let item = PersistentMessageDataItem(context: context)
@@ -168,6 +169,7 @@ extension PersistentMessageDataItem {
             item.author = self.author
             item.body = self.body
             item.attributes = self.attributes
+            item.status = self.status
             item.dateCreated = Date(timeIntervalSince1970: self.dateCreated)
             item.dateUpdated = Date(timeIntervalSince1970: self.dateUpdated)
             let mediaItems = NSMutableSet()

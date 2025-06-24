@@ -48,6 +48,7 @@ public enum DataFetchError: Error {
     case requiredDataCallsFailed
     case conversationsClientIsNotAvailable
     case dataIsInconsistent
+    case messageIndexOutOfBounds
 }
 
 extension DataFetchError: LocalizedError {
@@ -60,6 +61,8 @@ extension DataFetchError: LocalizedError {
             return NSLocalizedString("An error occured during data load, the TwilioConversations SDK client was not available", comment: "An error occured during the data load, the TwilioConversations SDK client was not available")
         case .dataIsInconsistent:
             return NSLocalizedString("The data is inconsistent, try to reload this screen", comment: "An error occured during the data load, data is inconsistent, a screen reload might be needed")
+        case .messageIndexOutOfBounds:
+            return NSLocalizedString("Message", comment: "Index out of bounds")
         }
     }
 }

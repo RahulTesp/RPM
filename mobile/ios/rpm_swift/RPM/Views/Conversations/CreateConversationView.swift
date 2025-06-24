@@ -36,6 +36,7 @@ struct CreateConversationView: View {
                             fetchChatSid(memberUserName: item.memberUserName)
                         }) {
                             Text(item.memberName)
+                                .padding()
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .background(
                                     RoundedRectangle(cornerRadius: 12)
@@ -99,7 +100,7 @@ struct CreateConversationView: View {
                         }
                         
                         DispatchQueue.main.async {
-                            // print("🟢 [UI] Navigating to Message List View with newly created conversation.")
+                            // print(" [UI] Navigating to Message List View with newly created conversation.")
                             navigateToMessageListView(with: newConversation)
                         }
                     }
