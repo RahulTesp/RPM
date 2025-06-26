@@ -3424,12 +3424,14 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       if (!useCustomRange) {
         try {
           // Get current month dates
+
+          
           const { start: monthStart, end: monthEnd } =
             this.patientutilService.getCurrentMonthDates();
 
           formattedStartDate = this.patientutilService.formatDateForApi(
             monthStart,
-            true
+            false
           );
 
           formattedEndDate = this.patientutilService.formatDateForApi(
@@ -3456,24 +3458,34 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
             startDate = new Date(
               this.frmactivitySchedulerange.controls.start.value
             );
+            console.log("startDate :",startDate)
             endDate = new Date(
               this.frmactivitySchedulerange.controls.end.value
             );
+            console.log("endDate :",endDate)
           }
+          const dateStr = this.convertDate(startDate);
+          const dateEnd = this.convertDate(endDate);
 
           // Validate date range
           // if (!startDate || !endDate || startDate > endDate) {
           //   throw new Error('Invalid date range');
           // }
 
-          formattedStartDate = this.patientutilService.formatDateForApi(
-            startDate,
-            true
-          );
-          formattedEndDate = this.patientutilService.formatDateForApi(
-            endDate,
-            false
-          );
+          // formattedStartDate = this.patientutilService.formatDateForApi(
+          //   startDate,
+          //   false
+          // );
+
+          formattedStartDate = dateStr + 'T00:00:00'
+          console.log("formattedStartDate :",formattedStartDate)
+
+          formattedEndDate = dateEnd + 'T23:59:59'
+          console.log("formattedEndDate :",formattedEndDate)
+          // formattedEndDate = this.patientutilService.formatDateForApi(
+          //   endDate,
+          //   false
+          // );
 
         } catch (error) {
           console.error('Error with custom date range:', error);
