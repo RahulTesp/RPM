@@ -117,9 +117,7 @@ export class AddUserComponent implements OnInit {
 
     // Only display clinicName When selection is Physician
     this.registerForm.get('userrole')?.valueChanges.subscribe((data) => {
-      // if (this.selectedUserRole.includes(6) == true) {
-      console.log(data)
-      // if (this.selectedUserRole == 6 || this.selectedUserRole == 8) {
+
         if (data == 6 || data == 8) {
         this.clinicdisplay = true;
       } else {
@@ -175,7 +173,6 @@ export class AddUserComponent implements OnInit {
   registerUser() {
     var req_body: any = {};
     this.markFormGroupTouched(this.registerForm);
-    console.log(this.selectedUserRole);
     if (
       this.registerForm.valid &&
       (this.successUser || this.editVariable) &&
@@ -203,7 +200,6 @@ export class AddUserComponent implements OnInit {
         req_body['OrganizationID'] = 0;
       }
 
-      console.log(this.registerForm.value);
       var that = this;
       if (this.editVariable) {
         req_body['Id'] = this.put_user_id;
@@ -312,8 +308,7 @@ export class AddUserComponent implements OnInit {
         .rpm_get(`/api/users/getuserprofiles?UserId=${this.put_user_id}`)
         .then((data) => {
           this.http_user_data = data;
-          console.log('User Data Array:');
-          console.log(this.http_user_data);
+
           if (this.http_user_data.HasPatients == 1) {
             this.userCountStatus = true;
           } else {
@@ -389,7 +384,6 @@ export class AddUserComponent implements OnInit {
 
     this.auth.getuserVrify('/api/authorization/verifyusername', user).then(
       (data) => {
-        console.log(data);
         this.http_verify = data;
         this.verifyUser = true;
         this.successUser = false;
@@ -471,7 +465,6 @@ export class AddUserComponent implements OnInit {
     this.rpm.rpm_post(`/api/users/UserStatusCheck`, userdata).then(
       (data) => {
         this.AccountLockData = data;
-        console.log(this.AccountLockData);
         this.unlockAccountStatus = this.AccountLockData.isLocked;
         // this.unlockAccountStatus = true;
       },

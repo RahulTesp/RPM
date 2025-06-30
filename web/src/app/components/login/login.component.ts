@@ -158,9 +158,6 @@ export class LoginComponent implements OnInit {
       this.restPasswordloginForm.controls.newpassword.value ===
       this.restPasswordloginForm.controls.confirmpassword.value
     ) {
-      console.log(this.restPasswordloginForm.controls.newpassword.value);
-      console.log(this.restPasswordloginForm.controls.confirmpassword.value);
-
       this.confirmStatus = true;
     } else {
       this.confirmStatus = false;

@@ -235,8 +235,7 @@ export class PatientPageComponent implements OnInit {
   onClickPatientCritical() {
     this.containerSelection = 2;
     this.patientProgramStaus = 'Critical';
-    console.log(this.patientTypeSelect);
-    console.log(this.patientVitalSelect);
+
     this.maskingDataSrc();
     this.searchPatientList_Name = false;
     this.searchPatientList_assign = false;
@@ -1014,9 +1013,7 @@ export class PatientPageComponent implements OnInit {
   applyDataFilter(filterValue: any) {
     filterValue = (<HTMLInputElement>filterValue.target).value.trim();
     filterValue = filterValue.toLowerCase();
-    console.log(filterValue);
     this.tableFilterValue = filterValue;
-
     this.dataSourceTableList.filter = filterValue;
   }
 

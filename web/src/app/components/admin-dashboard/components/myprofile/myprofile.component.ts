@@ -90,9 +90,7 @@ export class MyprofileComponent implements OnInit {
       .rpm_get('/api/authorization/masterdatastatesandcities')
       .then((data) => {
         this.StatesAndCities = data;
-        console.log(this.StatesAndCities);
         this.TimeZoneList = this.StatesAndCities.TimeZones;
-        console.log(this.TimeZoneList);
         this.loading1 = false;
       });
 
@@ -100,7 +98,6 @@ export class MyprofileComponent implements OnInit {
       this.cityArray = this.http_state.Cities.filter(
         (c: { StateId: number }) => c.StateId === this.stateVariable
       );
-      console.log(this.stateVariable);
     });
     this.http_state = sessionStorage.getItem('states_cities');
     this.http_state = JSON.parse(this.http_state);
@@ -112,8 +109,7 @@ export class MyprofileComponent implements OnInit {
     that.rpm.rpm_get('/api/users/getmyprofiles').then((data) => {
       this.loading = false;
       that.http_user_data = data;
-      console.log('User Role is:');
-      console.log(that.http_user_data);
+
       that.registerprofile.controls.email.setValue(that.http_user_data.Email);
       that.registerprofile.controls.mobile.setValue(
         that.http_user_data.MobileNo
@@ -162,7 +158,6 @@ export class MyprofileComponent implements OnInit {
     }
   }
   selectedCity() {
-    console.log(this.cityVariable);
   }
 
   ngOnInit(): void {

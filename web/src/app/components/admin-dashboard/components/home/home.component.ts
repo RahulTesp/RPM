@@ -208,8 +208,6 @@ export class HomeComponent implements OnInit {
     this.ms.requestPermission();
     this.ms.requestToken();
     this.message1 = this.ms.receiveMessage();
-    //this.message1 = this.ms.registerMessageEventListener();
-    console.log('Message Call From Service:' + this.message1);
   }
 
   /// API CALLS
@@ -979,25 +977,7 @@ export class HomeComponent implements OnInit {
   navigateEditSchedule(id: any) {
     this.rightsidebar.navigateEditSchedule_from_Worklist(id);
   }
-  //  subscribePubsub(){
-  //   this.subject = webSocket(this.pubsuburl);
-  //   this.subject.subscribe(
-  //     (msg: any)=>{
-  //       console.log()
-  //       this.GetPriorityAlerts()
-  //     },
-  //     (err: any)=>{
-  //       this.rpmservice.rpm_get("/api/home/getdashboardalerts?RoleId="+this.roles[0].Id).then((data)=>{
-  //         this.alertsArray=data;
-  //       });
-  //       this.subscribePubsub();
-  //     },
-  //     ()=>{console.log("completed")}
-  //   )
-  //  }
-  //  ngOnDestroy(){
-  //   this.subject.unsubscribe();
-  //  }
+
 
   clinicorteam: any;
   vitalSelection: any;

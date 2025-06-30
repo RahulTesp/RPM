@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
-import moment from 'moment';
 import { AuthService } from 'src/app/services/auth.service';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 @Injectable({
   providedIn: 'root',
 })
@@ -92,7 +96,8 @@ export class PatientUtilService {
       }
     }
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+
     return local;
   }
   getCurrentMonthDates(): { start: Date; end: Date } {

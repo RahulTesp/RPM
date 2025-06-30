@@ -6,25 +6,21 @@ import {
   ChangeDetectorRef,
   Output,
 } from '@angular/core';
-// import { Chart, ChartDataSets, ChartOptions } from 'chart.js';
-// import { Color, Label } from 'ng2-charts';
-// import { Options } from '@angular-slider/ngx-slider';
-
-
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
-import moment from 'moment';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { UntypedFormGroup, UntypedFormControl, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { range } from 'lodash';
 import { DatePipe } from '@angular/common';
-import { any } from 'lodash/fp';
 import { RPMService } from '../../../sevices/rpm.service';
-
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+dayjs.extend(utc);
+dayjs.extend(timezone);
 export interface SMS {
   Date: string;
   Time: string;
@@ -2077,7 +2073,8 @@ export class PatientVitalsComponent implements OnInit {
       }
     }
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+
     return local;
   }
   convertDate(dateval: any) {
@@ -3135,7 +3132,7 @@ export class PatientVitalsComponent implements OnInit {
   monthIndex: any;
   selectedMonth: any;
   selectedMonthName(monthNumber: any, year: any) {
-    return moment().month(monthNumber).format('MMMM') + ',' + year;
+    return dayjs().month(monthNumber).format('MMMM') + ',' + year;
   }
 
   getlinechartLabel(lineData: any) {

@@ -14,7 +14,6 @@ import { Router } from '@angular/router';
 import { jsPDF } from 'jspdf';
 import { AuthService } from 'src/app/services/auth.service';
 import { DatePipe } from '@angular/common';
-import moment from 'moment';
 import { Subscription } from 'rxjs';
 import { ReportDataService } from './services/report-data.service';
 import { DownloadPatientReportService } from './services/download-patient-report.service';
@@ -26,7 +25,12 @@ import {
 } from './interfaces/chart-config-interface';
 import { PatientReportApiService } from './services/patient-report-api.service';
 import * as FileSaver from 'file-saver';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 @Component({
   selector: 'app-reports',
@@ -841,7 +845,7 @@ export class ReportsComponent implements OnInit {
       }
     }
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
 
@@ -1028,7 +1032,6 @@ export class ReportsComponent implements OnInit {
           endDate
         );
 
-      console.log('✅ Patient data loaded successfully');
       this.downloadPatientReport();
     } catch (error) {
       console.error('🚨 Error loading patient data:', error);

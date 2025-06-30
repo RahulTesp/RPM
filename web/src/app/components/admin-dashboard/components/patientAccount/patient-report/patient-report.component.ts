@@ -7,26 +7,23 @@ import {
   EventEmitter,
 } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-
 import { MatDialog } from '@angular/material/dialog';
-
-
-
 import { Router } from '@angular/router';
-
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { HttpClient } from '@angular/common/http';
-
 import { AuthService } from 'src/app/services/auth.service';
 import { DatePipe } from '@angular/common';
-import moment from 'moment';
-
 import html2canvas from 'html2canvas';
 import { RPMService } from '../../../sevices/rpm.service';
 import * as FileSaver from 'file-saver';
 
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 
 
@@ -328,7 +325,8 @@ export class PatientReportComponent implements OnInit {
 
   convertToLocalTime(stillUtc: any) {
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+
     return local;
   }
 
@@ -2275,7 +2273,7 @@ export class PatientReportComponent implements OnInit {
       }
     }
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
 

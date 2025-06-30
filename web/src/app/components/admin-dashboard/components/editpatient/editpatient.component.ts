@@ -14,10 +14,14 @@ import _ from 'lodash';
 import { StatusMessageComponent } from '../../shared/status-message/status-message.component';
 import { DatePipe } from '@angular/common';
 import * as uuid from 'uuid';
-import moment from 'moment';
 import { AuthService } from 'src/app/services/auth.service';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export interface document {
   type: string;
@@ -1236,7 +1240,8 @@ export class EditpatientComponent implements OnInit {
     }
     someDate = this.Auth.ConvertToUTCRangeInput(new Date(someDate));
     this.startDateValue = someDate;
-    var someDateValue = moment(someDate).add(this.durationValue, 'M');
+    const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
+
     this.programForm.controls['enddate'].setValue(
       this.convertDate(someDateValue)
     );
@@ -1502,7 +1507,6 @@ export class EditpatientComponent implements OnInit {
         Preference3: this.PatientInfoForm.controls.preference4.value,
         Notes: this.PatientInfoForm.controls.additionalnotes.value,
       };
-      console.log(req_body);
       var that = this;
       this.rpm.rpm_post('/api/patient/updatepatient', req_body).then(
         (data) => {
@@ -1511,9 +1515,6 @@ export class EditpatientComponent implements OnInit {
             this.dialog.closeAll();
             this.redirect_patient();
           }
-
-          // alert("Success, Patient Updated Successfully..!")
-          //show success popup patient is updated
         },
         (err) => {
           this.loading = false;
@@ -3604,7 +3605,7 @@ export class EditpatientComponent implements OnInit {
       stillUtc = temp[0];
     }
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+     const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
 
@@ -3734,7 +3735,7 @@ export class EditpatientComponent implements OnInit {
     this.rpm.rpm_get('/api/users/getlanguages').then(
       (data) => {
         that.languageList = data;
-        console.log(that.languageList);
+
       },
       (err) => {
         console.log(err.error);

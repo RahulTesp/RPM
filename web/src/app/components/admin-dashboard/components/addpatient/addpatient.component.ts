@@ -12,28 +12,19 @@ import { MatDialog } from '@angular/material/dialog';
 import { HttpService } from '../../sevices/http.service';
 import { DatePipe } from '@angular/common';
 import * as uuid from 'uuid';
-import moment from 'moment';
-import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { MatTableDataSource } from '@angular/material/table';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
-import {
-  MomentDateAdapter,
-  MAT_MOMENT_DATE_ADAPTER_OPTIONS,
-} from '@angular/material-moment-adapter';
-import {
-  DateAdapter,
-  MAT_DATE_FORMATS,
-  MAT_DATE_LOCALE,
-} from '@angular/material/core';
-import * as _moment from 'moment';
-import { default as _rollupMoment } from 'moment';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { AuthService } from 'src/app/services/auth.service';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
 
-// import { prepareSyntheticListenerFunctionName } from '@angular/compiler/src/render3/util';
 
 export const MY_FORMATS = {
   parse: {
@@ -57,18 +48,7 @@ export interface userdata {
   selector: 'app-addpatient',
   templateUrl: './addpatient.component.html',
   styleUrls: ['./addpatient.component.scss'],
-  providers: [
-    // `MomentDateAdapter` can be automatically provided by importing `MomentDateModule` in your
-    // application's root module. We provide it at the component level here, due to limitations of
-    // our example generation script.
-    {
-      provide: DateAdapter,
-      useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
-    },
 
-    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
-  ],
 })
 export class AddpatientComponent implements OnInit {
   PatientId: any;
@@ -1223,7 +1203,8 @@ export class AddpatientComponent implements OnInit {
     someDate = someDate + 'T00:00:00';
     someDate = this.Auth.ConvertToUTCRangeInput(new Date(someDate));
     this.startDateValue = someDate;
-    var someDateValue = moment(someDate).add(this.durationValue, 'M');
+    const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
+
     this.programForm.controls['enddate'].setValue(
       this.convertDate(someDateValue)
     );
@@ -1634,8 +1615,6 @@ export class AddpatientComponent implements OnInit {
       (data) => {
         this.Diagnosis_Name = data;
 
-        console.log('Diagnosis Ds');
-        console.log(this.Diagnosis_Name);
         this.loading = false;
         // New Code Change 29/03/2023
         for (let x of this.Diagnosis_Name) {
@@ -1647,12 +1626,7 @@ export class AddpatientComponent implements OnInit {
         for (let y of this.Diagnosis_List) {
           found = false;
           for (let x of this.Diagnosis_Name) {
-            console.log(
-              'x.DiagnosisCode: ' +
-                x.DiagnosisCode +
-                'y.DiagnosisCode: ' +
-                y.DiagnosisCode
-            );
+
             if (
               x.DiagnosisCode == y.DiagnosisCode &&
               y.DiagnosisCode.trim() != ''
@@ -1718,7 +1692,6 @@ export class AddpatientComponent implements OnInit {
   applyDataFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.datasourceDocument.filter = filterValue.trim().toLowerCase();
-    console.log(this.datasourceDocument.filter);
   }
 
   setupFilter(column: string) {
@@ -1737,7 +1710,6 @@ export class AddpatientComponent implements OnInit {
     this.rpm.rpm_get('/api/users/getlanguages').then(
       (data) => {
         that.languageList = data;
-        console.log(that.languageList);
       },
       (err) => {
         console.log(err.error);
@@ -1752,7 +1724,8 @@ export class AddpatientComponent implements OnInit {
       }
     }
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+
     return local;
   }
 }

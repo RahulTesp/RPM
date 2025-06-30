@@ -48,7 +48,6 @@ export class MessagingService {
           // Subscribe to get token
           this.afm.requestToken.subscribe({
             next: (token) => {
-              console.log('Token received:', token);
               this.firebase_token = token;
               this.saveFirebaseToken();
               resolve(token);

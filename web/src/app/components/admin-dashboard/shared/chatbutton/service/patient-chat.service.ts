@@ -77,8 +77,8 @@ export class PatientChatService {
 
     try {
       const token = await this.getToken();
-      console.log("Token Chat");
-      console.log(token)
+      // console.log("Token Chat");
+      // console.log(token)
       await this.initializeClient(token);
 
      // this.setupPushNotifications();
@@ -108,7 +108,7 @@ export class PatientChatService {
       const data = (await this.rpm.rpm_get(
         `/api/comm/regeneratechattoken?app=web`
       )) as { message: string };
-      if (!data) throw new Error('❌ Failed to retrieve chat token.');
+      if (!data.message) throw new Error('❌ Failed to retrieve chat token.');
 
       if (this.client) {
         await this.client.updateToken(data.message);
@@ -158,7 +158,8 @@ export class PatientChatService {
     console.warn('Retrying Twilio Client Initialization...');
 
     try {
-      const newToken = await this.refreshToken(); // Fetch a fresh token
+     // const newToken = await this.refreshToken();
+      const newToken = await this.getToken();// Fetch a fresh token
       await this.initializeClient(newToken);
       console.log(' Twilio Client Successfully Reconnected!');
     } catch (error) {
@@ -234,17 +235,17 @@ private messageAddedListenerCount: number = 0;
 
 
     this.client.on('conversationAdded', async (conv: Conversation) => {
-      console.log('📢 New Conversation Added:', conv.sid);
+     // console.log('📢 New Conversation Added:', conv.sid);
 
 
       // Get participants for this conversation
       try {
         const participants = await conv.getParticipants();
-        console.log('Conversation participants count:', participants.length);
+       // console.log('Conversation participants count:', participants.length);
 
         // Log each participant's identity
         const participantIdentities = participants.map(p => p.identity);
-        console.log('Participant identities:', participantIdentities);
+        //console.log('Participant identities:', participantIdentities);
 
         // Normalize identities for comparison
         const normalizedUserName = this.userName ? String(this.userName).trim().toLowerCase() : '';
@@ -316,7 +317,7 @@ private messageAddedListenerCount: number = 0;
         // }
 
         const chatList = this.chatListSubject.getValue() || [];
-        console.log('chatList count:', chatList ? chatList.length : 0);
+       // console.log('chatList count:', chatList ? chatList.length : 0);
 
         if (conv.dateCreated && conv.dateCreated > this.currentTime) {
           await conv.setAllMessagesUnread();
