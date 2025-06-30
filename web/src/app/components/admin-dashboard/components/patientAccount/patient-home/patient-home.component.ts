@@ -1,16 +1,18 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Resolve, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-
 // import { Options } from '@angular-slider/ngx-slider';
 import { AuthService } from 'src/app/services/auth.service';
-import moment from 'moment';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { RightSidebarComponent } from '../../../shared/right-sidebar/right-sidebar.component';
 import { RPMService } from '../../../sevices/rpm.service';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 @Component({
   selector: 'app-patient-home',
   templateUrl: './patient-home.component.html',
@@ -750,7 +752,7 @@ export class PatientHomeComponent implements OnInit {
     }
 
     stillUtc = stillUtc + 'Z'; // ensure UTC format
-    const local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
 

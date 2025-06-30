@@ -1,6 +1,6 @@
 import { SidePanelPatientComponent } from '../../shared/side-panel-patient/side-panel-patient.component';
 import { TwilioVideoServiceService } from '../../../../services/twilio-video-service.service';
-
+import { Device } from '@twilio/voice-sdk';
 import {
   Component,
   OnInit,
@@ -22,7 +22,6 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { StatusMessageComponent } from '../../shared/status-message/status-message.component';
-import moment from 'moment';
 import { MatSort } from '@angular/material/sort';
 import { jsPDF } from 'jspdf';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
@@ -42,7 +41,12 @@ import {
 import { DownloadPatientReportService } from '../reports/services/download-patient-report.service';
 import { PatientReportApiService } from '../reports/services/patient-report-api.service';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export interface Symptoms {
   Symptom: string;
@@ -77,8 +81,8 @@ export interface DocumentData {
   DocumentUNC: string;
 }
 
-declare const Twilio: any;
-const Video = Twilio.Video;
+// declare const Twilio: any;
+// const Video = Twilio.Video;
 @Component({
   selector: 'app-patient-detail-page',
   templateUrl: './patient-detail-page.component.html',
@@ -402,7 +406,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       if (data) {
         this.http_chatData = data;
         this.dataSourceChange(5, 5);
-        console.log('Chat data updated:', this.http_chatData);
       }
     });
   }
@@ -410,12 +413,26 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   getCallTokenMethod() {
     this.rpm.rpm_get('/api/comm/CallToken').then((data: any) => {
       this.data_json = data;
-      this.device = Twilio.Device.setup(this.data_json.token, {
-        codecPreferences: ['opus', 'pcmu'],
-        fakeLocalDTMF: true,
-        enableRingingState: true,
-        debug: true,
-      });
+      // this.device = Twilio.Device.setup(this.data_json.token, {
+      //   codecPreferences: ['opus', 'pcmu'],
+      //   fakeLocalDTMF: true,
+      //   enableRingingState: true,
+      //   debug: true,
+      // });
+
+      const deviceOptions = {
+       edge: 'umatilla',
+      //codecPreferences: ['opus', 'pcmu'],
+       fakeLocalDTMF: true,
+      enableRingingState: true,
+       debug: true,
+      };
+
+    this.device = new Device( this.data_json.token, deviceOptions);
+
+
+// Don't forget to register in v2.x
+      this.device.register();
       this.setupHandlers(this.device);
     });
   }
@@ -739,10 +756,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.tz = 'HST';
     }
 
-    var utcDateTime = moment.utc().format();
-    var strutcDateTime = utcDateTime.toString();
-    strutcDateTime = strutcDateTime.replace('Z', utlcval);
-    var res4 = moment().utcOffset(strutcDateTime).format('hh:mm A');
+   const res4 = dayjs().utcOffset(utlcval).format('hh:mm A');
     return res4;
   }
   // Vital Reading Template Start
@@ -1100,7 +1114,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.device = device;
   }
   updateCallStatus(status: string): void {
-    console.log('Status -> ');
+    console.log("Status -> "+status);
   }
   callCustomer() {
     if (!this.phoneExtension) {
@@ -1111,7 +1125,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.updateCallStatus('Calling ' + this.phoneNumber + '...');
 
     var params = { To: this.phoneNumber };
-    this.device.connect(params);
+    this.device.connect({ params });
   }
   Stop() {
     this.device.disconnectAll();
@@ -3251,7 +3265,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       }
     }
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+     const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
 
@@ -3425,7 +3439,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         try {
           // Get current month dates
 
-          
+
           const { start: monthStart, end: monthEnd } =
             this.patientutilService.getCurrentMonthDates();
 
@@ -3458,11 +3472,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
             startDate = new Date(
               this.frmactivitySchedulerange.controls.start.value
             );
-            console.log("startDate :",startDate)
             endDate = new Date(
               this.frmactivitySchedulerange.controls.end.value
             );
-            console.log("endDate :",endDate)
           }
           const dateStr = this.convertDate(startDate);
           const dateEnd = this.convertDate(endDate);
@@ -3478,10 +3490,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
           // );
 
           formattedStartDate = dateStr + 'T00:00:00'
-          console.log("formattedStartDate :",formattedStartDate)
-
-          formattedEndDate = dateEnd + 'T23:59:59'
-          console.log("formattedEndDate :",formattedEndDate)
+         formattedEndDate = dateEnd + 'T23:59:59'
           // formattedEndDate = this.patientutilService.formatDateForApi(
           //   endDate,
           //   false
@@ -3594,7 +3603,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   intervalnote: any;
   showNoteModal = false;
   getDataforquestions() {
-    console.log('My Preview Clicked');
     this.showNoteModal = true;
     //this.dialog.open(this.myPreviewTemp);
   }
@@ -4040,13 +4048,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   }
   OnCancelNotesTimer() {
     clearInterval(this.interval);
-    console.log('Timer Value before');
-    console.log(this.timerValue);
     this.timerValue = this.timerValue + this.calltimerValue;
-    console.log('Timer Value');
-    console.log(this.timerValue);
-    console.log('calltimer Value');
-    console.log(this.calltimerValue);
+
     this.interval = setInterval(() => {
       if (!this.callTimerEnabled) {
         this.timerValue = this.timerValue + 1;
@@ -4160,8 +4163,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     }
 
     this.startDateValue = someDate;
-    var someDateValue = moment(someDate).add(this.durationValue, 'M');
-
+    const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
     this.renewProgramForm.controls['pgmendDate'].setValue(
       this.convertDate(someDateValue)
     );
@@ -4793,7 +4795,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       }
     }
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('HH:mm:ss');
     return local;
   }
 
@@ -5014,7 +5016,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.clearIntervals();
     this.destroy$.next();
     this.destroy$.complete();
-    console.log('Clearing cached data...');
     this.patientService.clearCachedPatientData();
     this.patientchatservice.initialized = false;
     if (this.unreadSubscription) {

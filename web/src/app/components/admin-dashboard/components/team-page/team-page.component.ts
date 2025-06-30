@@ -21,8 +21,12 @@ import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { DatePipe } from '@angular/common';
 import { AuthService } from 'src/app/services/auth.service';
 import { RightSidebarComponent } from './../../shared/right-sidebar/right-sidebar.component';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 export interface TeamData {
   teamname: string;
   alerts: number;
@@ -142,7 +146,6 @@ export class TeamPageComponent implements OnInit {
   SelectId: any;
   SelectedName: any;
   selectedPatient(event: { option: { value: any } }) {
-    console.log(event.option.value);
     this.SelectedData = event.option.value;
     this.SelectId = this.SelectedData.CareTeamMemberUserId;
     this.SelectedName = this.SelectedData.Name;
@@ -366,7 +369,6 @@ export class TeamPageComponent implements OnInit {
   }
 
   clickHandler(data: any) {
-    console.log(data.teamname);
     this.table_detailed_view = true;
   }
   // team Alert template Start
@@ -465,7 +467,6 @@ export class TeamPageComponent implements OnInit {
       .then((data) => {
         this.alert_table_render = 2;
         this.alertCritical = data;
-        console.log(this.alertCritical);
 
         this.loader1 = false;
         this.tableDataSource = new MatTableDataSource(
@@ -503,7 +504,6 @@ export class TeamPageComponent implements OnInit {
           this.paginator.firstPage();
         }
         this.loader1 = false;
-        console.log('Loader 1 Completed');
       });
   }
   getAlertfromPatient() {
@@ -690,8 +690,6 @@ export class TeamPageComponent implements OnInit {
 
     this.tableDataSource = new MatTableDataSource(dataSourceAlertFilter);
     if (this.patientNavigationStatus == 'true') {
-      console.log(this.tableFilterValuealert);
-      console.log('data');
       this.redirectionAlertFilter(this.tableFilterValuealert);
     }
     this.changeDetectorRef.detectChanges();
@@ -1354,7 +1352,7 @@ export class TeamPageComponent implements OnInit {
 
   convertToLocalTime(stillUtc: any) {
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
 

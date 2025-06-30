@@ -2,14 +2,14 @@ import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 import jsPDF from 'jspdf';
 import { ReportDataService } from './report-data.service';
-import moment from 'moment';
 import { RPMService } from '../../../sevices/rpm.service';
 import autoTable from 'jspdf-autotable';
 import { PatientUtilService } from '../../patient-detail-page/Models/service/patient-util.service';
 import html2canvas from 'html2canvas';
-// import Chart from 'chart.js';
 import { PatientReportApiService } from './patient-report-api.service';
-
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 @Injectable({
   providedIn: 'root',
 })
@@ -479,7 +479,7 @@ export class DownloadPatientReportService {
    */
   convertToLocalTime(stillUtc: any) {
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
 

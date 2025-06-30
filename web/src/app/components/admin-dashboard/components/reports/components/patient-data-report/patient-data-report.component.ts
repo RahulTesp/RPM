@@ -327,8 +327,7 @@ export class PatientDataReportComponent implements OnInit {
         this.selectedPatient,
         this.selectedProgram
       );
-      console.log('Patient List http patient List');
-      console.log(this.http_rpm_patient);
+
       this.patientStatusData =
         this.http_rpm_patient?.PatientProgramdetails?.Status || '';
 
@@ -382,7 +381,6 @@ export class PatientDataReportComponent implements OnInit {
           endDate
         );
 
-      console.log('✅ Patient data loaded successfully');
       this.downloadPatientReport();
     } catch (error) {
       console.error('🚨 Error loading patient data:', error);

@@ -80,7 +80,6 @@ export class TeamDetailComponent implements OnInit {
 
     // e.setAttribute("style","visibility:visible;")
    }
-   console.log(element.currentTarget.id);
    var x = ele[element.currentTarget.id]
    x.setAttribute("style","visibility:visible;")
 
@@ -376,8 +375,7 @@ alertdatasource = [ {
 
 applyFilterdata()
 {
-  // let c = this.schedule.filter(d => d.data.every(c => this.searchValue.includes(c.id)));
-  // console.log(c);
+
  let result = this.schedule.filter(a => a.data.some(c => this.searchValue.includes(c.id)));
 
 console.log(result);
