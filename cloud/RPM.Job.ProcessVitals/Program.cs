@@ -55,9 +55,7 @@ class Program
                 command.CommandType = CommandType.StoredProcedure;
 
                 command.ExecuteNonQuery();*/
-                /*SqlCommand command4 = new SqlCommand("usp_InsAlerts", connection);
-                command4.CommandType = CommandType.StoredProcedure;
-                command4.ExecuteNonQuery();
+                /*
                 SqlCommand command1 = new SqlCommand("usp_InsAlertsTemp", connection);
                 command1.CommandType = CommandType.StoredProcedure;
                 command1.ExecuteNonQuery();*/
