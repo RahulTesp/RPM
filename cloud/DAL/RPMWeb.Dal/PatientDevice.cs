@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using System.Globalization;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 
 namespace RPMWeb.Dal
 {
@@ -683,392 +685,23 @@ namespace RPMWeb.Dal
             
             return ret;
         }
-        public void GetVitalUnits(string ConnectionString)
-        {
-            try
-            {
-                using (SqlConnection con = new SqlConnection(ConnectionString))
-                {
-                    con.Open();
-                    SqlCommand command1 = new SqlCommand("usp_GetVitalUnits", con);
-                    command1.CommandType = System.Data.CommandType.StoredProcedure;
-                    using (SqlDataReader reader = command1.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var MeasureName = reader["MeasureName"].ToString();
-                            var Unit = reader["UnitName"].ToString();
-                            vitalunits_dictionary.TryAdd(MeasureName, Unit);
-                        }
-                    }
-                    con.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
 
-        }
-        public int GetTimeZoneOffset(string tz)
-        {
-            string tzString = tz.Trim().ToLower();
-            int timeZoneOffset = 0;
-
-            if (tzString.StartsWith("utc"))
-            {
-                tzString = tzString.Substring(3);
-            }
-
-            if (int.TryParse(tzString, out timeZoneOffset))
-            {
-                return timeZoneOffset;
-            }
-            return 0;
-        }
-        public DateTime ConvertUnixTimestampToDateTime(long timestamp)
-        {
-            DateTime dateTimeRx;
-            if (timestamp.ToString().Length == 10)
-            {
-                dateTimeRx = DateTimeOffset.FromUnixTimeSeconds(timestamp).DateTime;
-            }
-            else if (timestamp.ToString().Length == 13)
-            {
-                dateTimeRx = DateTimeOffset.FromUnixTimeSeconds(timestamp / 1000).DateTime;
-            }
-            else
-            {
-                throw new ArgumentException("Invalid timestamp length.");
-            }
-
-            return dateTimeRx;
-        }
-        public string GetCurrentTranstekReadingId(string connectionString)
-        {
-            string newReadingId = string.Empty;
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("usp_GetTranstekReadingId", connection))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    connection.Open();
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            newReadingId = reader.GetString(0);  // Assuming the result is in the first column
-                        }
-                    }
-                }
-            }
-            return newReadingId;
-        }
-        public void UpdateTranstekReadingId(string connectionString, long newReadingId)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("usp_UpdTranstekReadingId", connection))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@NewReadingId", newReadingId);
-                    connection.Open();
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
         public bool StagingTableInsert(TranstekDeviceTelemetry dev, string DeviceType, string ConnectionString)
         {
-            GetVitalUnits(ConnectionString);
-            bool ret = false;
-            string stagingInsert = "INSERT INTO JsonStg([Json])VALUES";
+            bool ret;
 
-            if (DeviceType == "Blood Pressure Monitor ")
+            var options = new JsonSerializerOptions
             {
-                ret=ProcessBloobPressureData(dev, ConnectionString, stagingInsert);
-            }
-            else if (DeviceType == "Blood Glucose Monitor")
-            {
-                ret=ProcessBloodGlucoseData(dev, ConnectionString, stagingInsert);
-            }
-            else if (DeviceType == "Body Weight Monitor")
-            {
-                ret=ProcessWeightData(dev, ConnectionString, stagingInsert);
-            }
-            else if (DeviceType == "Pulse Oximeter")
-            {
-                ret=ProcessOxygenData(dev, ConnectionString, stagingInsert);
-            }
-            return ret;
-        }
-        private bool ProcessBloobPressureData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert)
-        {
-            bool ret;
-            try
-            {
-                vitalunits_dictionary.TryGetValue("Systolic", out string Unitsystolic);
-                vitalunits_dictionary.TryGetValue("Diastolic", out string Unitdiastolic);
-                vitalunits_dictionary.TryGetValue("Pulse", out string Unitpulse);
-                JObject obj = JObject.Parse(dev.data.ToString());
-                StagingInput blood_pressuresystolic = new StagingInput();
-                StagingInput blood_pressurediastolic = new StagingInput();
-                StagingInput blood_pressurepulse = new StagingInput();
-                string readingIdWithPrefix = "TK" + obj["imei"] + obj["ts"];
-                blood_pressuresystolic.reading_id = readingIdWithPrefix;
-                blood_pressurediastolic.reading_id = readingIdWithPrefix;
-                blood_pressurepulse.reading_id = readingIdWithPrefix;
-                blood_pressuresystolic.device_id = dev.deviceId;
-                blood_pressurediastolic.device_id = dev.deviceId;
-                blood_pressurepulse.device_id = dev.deviceId;
-                blood_pressuresystolic.device_model = dev.modelNumber;
-                blood_pressurediastolic.device_model = dev.modelNumber;
-                blood_pressurepulse.device_model = dev.modelNumber;
-                var dateTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(obj["ts"])).DateTime;
-                blood_pressuresystolic.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-                blood_pressurediastolic.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-                blood_pressurepulse.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-                var dateTimeRx = DateTimeOffset.FromUnixTimeSeconds(dev.createdAt).DateTime;
-                blood_pressuresystolic.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
-                blood_pressurediastolic.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
-                blood_pressurepulse.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
-                blood_pressuresystolic.reading_type = "blood_pressure";
-                blood_pressurediastolic.reading_type = "blood_pressure";
-                blood_pressurepulse.reading_type = "blood_pressure";
-                blood_pressuresystolic.battery = (int)obj["bat"];
-                blood_pressurediastolic.battery = (int)obj["bat"];
-                blood_pressurepulse.battery = (int)obj["bat"];
-                var time = obj["tz"];
-                if (time != null)
-                {
-                    int timeZone = GetTimeZoneOffset(time.ToString());
-                    blood_pressuresystolic.time_zone_offset = timeZone.ToString();
-                    blood_pressurediastolic.time_zone_offset = timeZone.ToString();
-                    blood_pressurepulse.time_zone_offset = timeZone.ToString();
-                }
-                else
-                {
-                    blood_pressuresystolic.time_zone_offset = null;
-                    blood_pressurediastolic.time_zone_offset = null;
-                    blood_pressurepulse.time_zone_offset = null;
-                }
-                blood_pressuresystolic.before_meal = false;
-                blood_pressurediastolic.before_meal = false;
-                blood_pressurepulse.before_meal = false;
-                blood_pressuresystolic.event_flag = null;
-                blood_pressurediastolic.event_flag = null;
-                blood_pressurepulse.event_flag = null;
-                blood_pressuresystolic.irregular = false;
-                blood_pressurediastolic.irregular = false;
-                blood_pressurepulse.irregular = false;
-                blood_pressuresystolic.data_type = "systolic";
-                blood_pressuresystolic.data_unit = Unitsystolic;
-                blood_pressuresystolic.data_value = Convert.ToDouble(obj["sys"]);
-                blood_pressurediastolic.data_type = "diastolic";
-                blood_pressurediastolic.data_unit = Unitdiastolic;
-                blood_pressurediastolic.data_value = Convert.ToDouble(obj["dia"]);
-                blood_pressurepulse.data_type = "pulse";
-                blood_pressurepulse.data_unit = Unitpulse;
-                blood_pressurepulse.data_value = Convert.ToDouble(obj["pul"]);
-                string jsonDataSys = JsonConvert.SerializeObject(blood_pressuresystolic);
-                string jsonDataDia = JsonConvert.SerializeObject(blood_pressurediastolic);
-                string jsonDataPul = JsonConvert.SerializeObject(blood_pressurepulse);
-                string insertvalues = "('" + jsonDataSys + "'),('" + jsonDataDia + "'),('" + jsonDataPul + "')";
-                StagingTableInsertJson(stagingInsert + insertvalues, ConnectionString);
-                ret = true;
-            }
-            catch (Exception)
-            {
-                ret = false;
-            }
-            return ret;
-        }
-        private bool ProcessBloodGlucoseData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert)
-        {
-            bool ret;
-            try
-            {
-                vitalunits_dictionary.TryGetValue("Fasting", out string Unitglucose);
-                JObject obj = JObject.Parse(dev.data.ToString());
-                StagingInput blood_glucose = new StagingInput();
-                string readingIdWithPrefix = "TK" + obj["imei"] + obj["ts"];
-                blood_glucose.reading_id = readingIdWithPrefix;
-                blood_glucose.device_id = dev.deviceId;
-                blood_glucose.device_model = dev.modelNumber;
-                var dateTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(obj["ts"])).DateTime;
-                blood_glucose.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-                var dateTimeRx = DateTimeOffset.FromUnixTimeSeconds(dev.createdAt).DateTime;
-                blood_glucose.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
-                blood_glucose.reading_type = "blood_glucose";
-                blood_glucose.battery = 0;
-                var time = obj["ts_tz"];
-                if (time != null)
-                {
-                    int timeZone = GetTimeZoneOffset(time.ToString());
-                    blood_glucose.time_zone_offset = timeZone.ToString();
-                }
-                else
-                {
-                    blood_glucose.time_zone_offset = null;
-                }
-                blood_glucose.irregular = false;
-                bool isUnitmmol = obj["unit"].ToString() == "1";
-                bool isUnitmgdl = obj["unit"].ToString() == "2";
-                blood_glucose.data_unit = Unitglucose;
-                if (isUnitmmol)
-                {
-                    blood_glucose.data_value = Convert.ToDouble(obj["data"]) * 18;
-                }
-                else
-                {
-                    blood_glucose.data_value = Convert.ToDouble(obj["data"]);
-                }
-                bool isFasting = obj["meal"].ToString() == "1";
-                bool isNonFasting = obj["meal"].ToString() == "2";
-                if (isFasting)
-                {
-                    blood_glucose.data_type = "Fasting";
-                    blood_glucose.before_meal = true;
-                    blood_glucose.event_flag = "0";
-                }
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
 
-                if (isNonFasting)
-                {
-                    blood_glucose.data_type = "Non-Fasting";
-                    blood_glucose.before_meal = false;
-                    blood_glucose.event_flag = "1";
-                }
-                string jsonData = JsonConvert.SerializeObject(blood_glucose);
-                StagingTableInsertJson(stagingInsert + "('" + jsonData + "')", ConnectionString);
-                ret = true;
-            }
-            catch (Exception)
-            {
-                ret = false;
-            }
+            string json = System.Text.Json.JsonSerializer.Serialize(dev, options);
+            ret = StagingTableInsertJson(json, ConnectionString);
             return ret;
         }
-        private bool ProcessWeightData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert)
+        private bool StagingTableInsertJson(string jsonData, string ConnectionString)
         {
             bool ret;
-            try
-            {
-                vitalunits_dictionary.TryGetValue("Weight", out string Unitweight);
-                JObject obj = JObject.Parse(dev.data.ToString());
-                string readingIdWithPrefix = "TK" + obj["imei"] + obj["ts"];
-                StagingInput weight = new StagingInput();
-                weight.reading_id = readingIdWithPrefix;
-                weight.device_id = dev.deviceId;
-                weight.device_model = dev.modelNumber;
-                var dateTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(obj["ts"])).DateTime;
-                weight.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-                var dateTimeRx = DateTimeOffset.FromUnixTimeSeconds(dev.createdAt).DateTime;
-                weight.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
-                weight.reading_type = "weight";
-                weight.battery = (int)obj["bat"];
-                var time = obj["tz"];
-                if (time != null)
-                {
-                    int timeZone = GetTimeZoneOffset(time.ToString());
-                    weight.time_zone_offset = timeZone.ToString();
-                }
-                else
-                {
-                    weight.time_zone_offset = null;
-                }
-                weight.before_meal = false;
-                weight.event_flag = null;
-                weight.irregular = false;
-                weight.data_type = "weight";
-                weight.data_unit = Unitweight;
-                if (Unitweight == "kg")
-                {
-                    weight.data_value = Convert.ToDouble(obj["wt"]) / 1000;
-                }
-                else if (Unitweight == "lbs")
-                {
-                    weight.data_value = Convert.ToDouble(obj["wt"]) * 0.00220462;
-                }
-                string jsonData = JsonConvert.SerializeObject(weight);
-                StagingTableInsertJson(stagingInsert + "('" + jsonData + "')", ConnectionString);
-                ret = true;
-            }
-            catch (Exception)
-            {
-                ret = false;
-            }
-            return ret;
-        }
-        private bool ProcessOxygenData(TranstekDeviceTelemetry dev, string ConnectionString,string stagingInsert)
-        {
-            bool ret;
-            try
-            {
-                vitalunits_dictionary.TryGetValue("Pulse", out string Unitpulse);
-                vitalunits_dictionary.TryGetValue("Oxygen", out string Unitspo2);
-                JObject objOxygen = JObject.Parse(dev.deviceData.ToString());
-                string readingIdWithPrefix = "TK" + objOxygen["imei"] + objOxygen["ts"];
-                StagingInput pulseoximeter_oxygen = new StagingInput();
-                StagingInput pulseoximeter_pulse = new StagingInput();
-                pulseoximeter_oxygen.reading_id = readingIdWithPrefix;
-                pulseoximeter_pulse.reading_id = readingIdWithPrefix;
-                pulseoximeter_oxygen.device_id = dev.deviceId;
-                pulseoximeter_pulse.device_id = dev.deviceId;
-                pulseoximeter_oxygen.device_model = "BM1000";
-                pulseoximeter_pulse.device_model = "BM1000";
-                string timeString = objOxygen["time"].ToString();
-                string dateTimePart = timeString.Substring(0, timeString.Length - 3);
-                DateTime time = DateTime.ParseExact(dateTimePart, "yy/MM/dd,HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-                string formattedTime = time.ToString("yyyy-MM-dd HH:mm:ss");
-                pulseoximeter_oxygen.date_recorded = formattedTime;
-                pulseoximeter_pulse.date_recorded = formattedTime;
-                var dateTimeRx = ConvertUnixTimestampToDateTime(dev.createdAt);
-                pulseoximeter_oxygen.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
-                pulseoximeter_pulse.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
-                pulseoximeter_oxygen.reading_type = "pulse_ox";
-                pulseoximeter_pulse.reading_type = "pulse_ox";
-                pulseoximeter_oxygen.battery = (int)objOxygen["battery"];
-                pulseoximeter_pulse.battery = (int)objOxygen["battery"];
-                string timeZone = objOxygen["time"].ToString();
-                string timeZoneOffsetStr = timeZone.Substring(timeZone.Length - 3);
-                if (int.TryParse(timeZoneOffsetStr, out int timeZoneOffsetInMinutes))
-                {
-                    int totalMinutes = timeZoneOffsetInMinutes * 15;
-                    int timeZoneOffsetInHours = totalMinutes / 60;
-                    int remainingMinutes = totalMinutes % 60;
-                    pulseoximeter_oxygen.time_zone_offset = timeZoneOffsetInHours.ToString();
-                    pulseoximeter_pulse.time_zone_offset = timeZoneOffsetInHours.ToString();
-                }
-                else
-                {
-                    pulseoximeter_oxygen.time_zone_offset = null;
-                    pulseoximeter_pulse.time_zone_offset = null;
-                }
-                pulseoximeter_oxygen.before_meal = false;
-                pulseoximeter_pulse.before_meal = false;
-                pulseoximeter_oxygen.event_flag = null;
-                pulseoximeter_pulse.event_flag = null;
-                pulseoximeter_oxygen.irregular = false;
-                pulseoximeter_pulse.irregular = false;
-                pulseoximeter_oxygen.data_type = "Oxygen";
-                pulseoximeter_oxygen.data_unit = Unitspo2;
-                pulseoximeter_oxygen.data_value = Convert.ToDouble(objOxygen["spo2"]);
-                pulseoximeter_pulse.data_type = "Pulse";
-                pulseoximeter_pulse.data_unit = Unitpulse;
-                pulseoximeter_pulse.data_value = Convert.ToDouble(objOxygen["pr"]);
-                string jsonDataOx = JsonConvert.SerializeObject(pulseoximeter_oxygen);
-                string jsonDataPulse = JsonConvert.SerializeObject(pulseoximeter_pulse);
-                string insertvalues = "('" + jsonDataOx + "'),('" + jsonDataPulse + "')";
-                StagingTableInsertJson(stagingInsert + insertvalues, ConnectionString);
-                ret = true;
-            }
-            catch (Exception)
-            {
-                ret = false;
-            }
-            return ret;
-        }
-        private static void StagingTableInsertJson(string jsonData, string ConnectionString)
-        {
             try
             {
                 using (SqlConnection con = new SqlConnection(ConnectionString))
@@ -1081,11 +714,13 @@ namespace RPMWeb.Dal
                     command.ExecuteScalar();
                     con.Close();
                 }
+                ret = true;
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+            return ret;
         }
         public bool InsertPatienVendorConnectivity(AddPatientVendorConn data, string ConnectionString)
         {
@@ -1111,6 +746,39 @@ namespace RPMWeb.Dal
             }
 
             return ret;
+        }
+
+        public string GetDeviceType(string deviceModel, string ConnectionString)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConnectionString))
+                {
+                    using (SqlCommand command = new SqlCommand("usp_GetDeviceType", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@DeviceModel", deviceModel);
+
+                        connection.Open();
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                return reader["DeviceTypeName"].ToString();
+                            }
+                            else
+                            {
+                                return null;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

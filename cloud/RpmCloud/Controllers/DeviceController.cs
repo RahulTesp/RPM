@@ -1,6 +1,8 @@
 ﻿using RPMWeb.Dal;
 using RPMWeb.Data.Common;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Net;
 
 namespace RpmCloud.Controllers
 {
@@ -519,7 +521,50 @@ namespace RpmCloud.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        
+
+        [Route("getDeviceType/{deviceModel}")]
+        [HttpGet]
+        public IActionResult GetDeviceType([FromQuery] string deviceModel)
+        {
+            try
+            {
+                HttpResponseMessage createRes = new HttpResponseMessage();
+                if (Request.Headers.ContainsKey("Bearer"))
+                {
+                    string? s = Request.Headers["Bearer"].FirstOrDefault();
+                    RpmDalFacade.ConnectionString = CONN_STRING;
+                    if (string.IsNullOrEmpty(s))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    string UserName = RpmDalFacade.IsSessionValid(s);
+                    if (string.IsNullOrEmpty(UserName))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    if (!RpmDalFacade.ValidateTkn(s))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+
+                    string DeviceType = RpmDalFacade.GetDeviceType(deviceModel);
+                    if (!DeviceType.Equals(null))
+                    {
+                        return Ok(DeviceType);
+                    }
+                    return NotFound(DeviceType);
+                }
+                else
+                {
+                    return Unauthorized(new { message = "Invalid session." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
     }
 }

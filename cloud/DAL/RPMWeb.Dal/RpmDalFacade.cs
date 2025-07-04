@@ -103,10 +103,6 @@ namespace RPMWeb.Dal
         {
             return new PatientDevice().StagingTableInsert(dev, DeviceType, ConnectionString);
         }
-        public static void GetVitalUnits()
-        {
-            new PatientDevice().GetVitalUnits(ConnectionString);
-        }
         public static  bool InsertPatienVendorConnectivity(AddPatientVendorConn data)
         {
             return new PatientDevice().InsertPatienVendorConnectivity(data, ConnectionString);
@@ -1018,7 +1014,10 @@ namespace RPMWeb.Dal
         {
             new User().NotifyConversation(activeConversationSid, FromUser, ToUser, Message, ConnectionString);
         }
-
+        public static string GetDeviceType(string DeviceModel)
+        {
+            return new PatientDevice().GetDeviceType(DeviceModel, ConnectionString);
+        }
     }
 
 }
