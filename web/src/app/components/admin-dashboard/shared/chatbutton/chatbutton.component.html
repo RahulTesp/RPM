@@ -163,15 +163,15 @@
       Typing...
     </div>
   </div>
-
+  <!-- placeholder="Type something..."
+      (keydown)="currentConversation?.typing()"  -->
   <div class="send-block">
     <textarea
       class="chatTypearea"
       [(ngModel)]="message"
       name="chat-message"
       id="txt-send"
-      placeholder="Type something..."
-      (keydown)="currentConversation?.typing()"
+
     ></textarea>
     <div class="chat_send_icon">
       <img

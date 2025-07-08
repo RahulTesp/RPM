@@ -2,15 +2,15 @@ import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 import jsPDF from 'jspdf';
 import { ReportDataService } from './report-data.service';
-import moment from 'moment';
 import { RPMService } from '../../../sevices/rpm.service';
 import autoTable from 'jspdf-autotable';
 import { PatientUtilService } from '../../patient-detail-page/Models/service/patient-util.service';
 import html2canvas from 'html2canvas';
-// import Chart from 'chart.js';
 import { PatientReportApiService } from './patient-report-api.service';
 import { PatientDataDetailsService } from '../../patient-detail-page/Models/service/patient-data-details.service';
-
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 @Injectable({
   providedIn: 'root',
 })
@@ -487,7 +487,7 @@ export class DownloadPatientReportService {
    */
   convertToLocalTime(stillUtc: any) {
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
 
@@ -744,7 +744,7 @@ export class DownloadPatientReportService {
       this.Notesh = 30; // Reset to top margin
     }
   }
-  
+
   /**
    * Gets patient review notes, then call notes, and generates report sections
    */
@@ -1096,7 +1096,7 @@ export class DownloadPatientReportService {
         'BloodGlucoseReadings',
         this.BloodGlucoseReportDisplayTest.bind(this)
       );
-    } 
+    }
     if (vitals.BloodPressure?.length > 0) {
       this.generateVitalTable(
         doc,
@@ -1106,7 +1106,7 @@ export class DownloadPatientReportService {
         'BloodPressureReadings',
         this.formatBloodPressureRow
       );
-    } 
+    }
     if (vitals.BloodOxygen?.length > 0) {
       this.generateVitalTable(
         doc,
@@ -1116,7 +1116,7 @@ export class DownloadPatientReportService {
         'BloodOxygenReadings',
         this.formatBloodOxygenRow
       );
-    } 
+    }
     if (vitals.Weight?.length > 0) {
       this.generateVitalTable(
         doc,
@@ -1184,7 +1184,7 @@ export class DownloadPatientReportService {
       reading.Remarks ?? '-',
     ];
   };
-  
+
   private formatBloodOxygenRow = (reading: any): string[] => {
     return [
       this.datepipe.transform(reading.ReadingTime) ?? 'N/A',
@@ -1194,7 +1194,7 @@ export class DownloadPatientReportService {
       reading.Remarks ?? '-',
     ];
   };
-  
+
   private formatWeightRow = (reading: any): string[] => {
     return [
       this.datepipe.transform(reading.ReadingTime) ?? 'N/A',
@@ -1203,7 +1203,7 @@ export class DownloadPatientReportService {
       reading.Remarks ?? '-',
     ];
   };
-  
+
   // ✅ Format Vital Row Data
   private formatVitalRow(reading: any): string[] {
     return [
@@ -1348,7 +1348,7 @@ export class DownloadPatientReportService {
     }
     return vitalDataArray;
   }
-  
+
   // Manjusha code change
   async generateVitalReadingSummary(doc: jsPDF,currentpPatientId:any, currentProgramId:any): Promise<void> {
     doc.addPage();
@@ -1603,7 +1603,7 @@ export class DownloadPatientReportService {
   getChartCurrentY(): number {
     return this.currentY;
   }
-  
+
   resetPosition(): void {
     this.currentY = 30;
   }

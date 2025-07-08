@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
-import moment from 'moment';
 import { AuthService } from 'src/app/services/auth.service';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 @Injectable({
   providedIn: 'root',
 })
@@ -86,32 +90,27 @@ export class PatientUtilService {
   // Manjusha code change
   convertToLocalTime(stillUtc: any) {
     if (stillUtc) {
-      // Only format ISO strings with time
       const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(stillUtc);
-  
       if (isDateOnly) {
-        // Treat it as local date at 12:00 AM
-        const local = moment(stillUtc + ' 00:00:00').format('YYYY-MM-DD HH:mm:ss');
+        const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
         return local;
       }
-  
-      // Remove timezone offset if present
       if (stillUtc.includes('+')) {
         stillUtc = stillUtc.split('+')[0];
       }
-  
+
       // Append Z if missing
       if (!stillUtc.endsWith('Z')) {
         stillUtc = stillUtc + 'Z';
       }
-  
-      const local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+
+      const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
       return local;
     }
-  
+
     return null;
   }
-  
+
   getCurrentMonthDates(): { start: Date; end: Date } {
     try {
       const today = new Date();

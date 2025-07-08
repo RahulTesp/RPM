@@ -14,8 +14,6 @@ import { Router } from '@angular/router';
 import { jsPDF } from 'jspdf';
 import { AuthService } from 'src/app/services/auth.service';
 import { DatePipe } from '@angular/common';
-import moment from 'moment';
-import html2canvas from 'html2canvas';
 import { PatientDataDetailsService } from '../patient-detail-page/Models/service/patient-data-details.service';
 import { Subscription } from 'rxjs';
 import { ReportDataService } from './services/report-data.service';
@@ -30,7 +28,9 @@ import { PatientReportApiService } from './services/patient-report-api.service';
 import { PatientUtilService } from '../patient-detail-page/Models/service/patient-util.service';
 import * as FileSaver from 'file-saver';
 import { HttpClient } from '@angular/common/http';
-
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
 @Component({
   selector: 'app-reports',
@@ -848,14 +848,14 @@ export class ReportsComponent implements OnInit {
       }
     }
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('HH:mm:ss');
     return local;
   }
 
   // Report Patient Data
   currentY: number=15;
   healthtrendVitalNameArray: any;
-  
+
   downloadPatientReport() {
     this.patientStatusData = this.http_rpm_patient.PatientProgramdetails.Status;
     this.patientProgramname =

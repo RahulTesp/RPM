@@ -1,6 +1,6 @@
 import { SidePanelPatientComponent } from '../../shared/side-panel-patient/side-panel-patient.component';
 import { TwilioVideoServiceService } from '../../../../services/twilio-video-service.service';
-
+import { Device } from '@twilio/voice-sdk';
 import {
   Component,
   OnInit,
@@ -22,7 +22,6 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { StatusMessageComponent } from '../../shared/status-message/status-message.component';
-import moment from 'moment';
 import { MatSort } from '@angular/material/sort';
 import { jsPDF } from 'jspdf';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
@@ -42,7 +41,12 @@ import {
 import { DownloadPatientReportService } from '../reports/services/download-patient-report.service';
 import { PatientReportApiService } from '../reports/services/patient-report-api.service';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export interface Symptoms {
   Symptom: string;
@@ -77,8 +81,8 @@ export interface DocumentData {
   DocumentUNC: string;
 }
 
-declare const Twilio: any;
-const Video = Twilio.Video;
+// declare const Twilio: any;
+// const Video = Twilio.Video;
 @Component({
   selector: 'app-patient-detail-page',
   templateUrl: './patient-detail-page.component.html',
@@ -412,16 +416,26 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   getCallTokenMethod() {
     this.rpm.rpm_get('/api/comm/CallToken').then((data: any) => {
       this.data_json = data;
-      this.device = Twilio.Device.setup(this.data_json.token, {
-        codecPreferences: ['opus', 'pcmu'],
-        fakeLocalDTMF: true,
-        enableRingingState: true,
-        debug: true,
-      });
+      // this.device = Twilio.Device.setup(this.data_json.token, {
+      //   codecPreferences: ['opus', 'pcmu'],
+      //   fakeLocalDTMF: true,
+      //   enableRingingState: true,
+      //   debug: true,
+      // });
+       const deviceOptions = {
+       edge: 'umatilla',
+      //codecPreferences: ['opus', 'pcmu'],
+       fakeLocalDTMF: true,
+      enableRingingState: true,
+       debug: true,
+      };
+
+    this.device = new Device( this.data_json.token, deviceOptions);
+    this.device.register();
       this.setupHandlers(this.device);
     });
   }
@@ -488,7 +502,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.program_id
       );
       // Manjusha code change
-      this.http_rpm_patientList["PatientPrescribtionDetails"].ConsultationDate = 
+      this.http_rpm_patientList["PatientPrescribtionDetails"].ConsultationDate =
       this.formatDate(this.http_rpm_patientList["PatientPrescribtionDetails"].ConsultationDate);
       this.getchatData(this.http_rpm_patientList.PatientDetails.UserName)
 
@@ -506,7 +520,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     const formatted = `${year}-${month}-${day}T${time}`;
     return new Date(formatted);
   }
-  
+
   private setPatientData() {
     this.processPatientHeight();
     this.processPatientTimezone();
@@ -649,7 +663,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.ptime = this.patientTimeZone();
     }, 60000);
   }
-  
+
   /**
    Extracted Function: Fetch & Process Program Details
    */
@@ -758,10 +772,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.tz = 'HST';
     }
 
-    var utcDateTime = moment.utc().format();
-    var strutcDateTime = utcDateTime.toString();
-    strutcDateTime = strutcDateTime.replace('Z', utlcval);
-    var res4 = moment().utcOffset(strutcDateTime).format('hh:mm A');
+
+    const res4 = dayjs().utcOffset(utlcval).format('hh:mm A');
     return res4;
   }
   // Vital Reading Template Start
@@ -1129,8 +1141,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.callTimerEnabled = true;
     this.updateCallStatus('Calling ' + this.phoneNumber + '...');
 
-    var params = { To: this.phoneNumber };
-    this.device.connect(params);
+   var params = { To: this.phoneNumber };
+    this.device.connect({ params });
   }
   Stop() {
     this.device.disconnectAll();
@@ -2109,7 +2121,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       borderColor: 'transparent',
       pointRadius: 0
     }
-  ];  
+  ];
 
   minValue: number = 30;
   maxValue: number = 75;
@@ -2608,12 +2620,12 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       );
       this.http_healthtrends = data.trends;
       this.healthtrendVitalNameArray = data.vitalNames;
-      this.healthtrenddisplay = this.http_healthtrends.length > 0;  
-      
+      this.healthtrenddisplay = this.http_healthtrends.length > 0;
+
       if (this.healthtrendVitalNameArray.length > 0) {
         this.onHealthTrendVitalClick(this.healthtrendVitalNameArray[0], daycount);
       }
-      
+
     } catch (error) {
       console.error('Error loading health trends:', error);
     }
@@ -2626,24 +2638,24 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.program_id,
         daycount
       );
-  
+
       const trendData = data.trends[index]; // get the vital at that index
-  
+
       if (!trendData || !trendData.Values || trendData.Values.length === 0) {
         const emptyGraph = (daycount === 7)
           ? this.createEmptyGraph(7)
           : this.createEmptyGraph(30);
-  
+
         this.allLineChartData[index] = emptyGraph;
         return;
       }
-  
+
       const isVital = trendData.Values?.[0]?.label === 'Vital';
       const lineChartLabels = this.patientService.convertDateforHealthTrends(
         trendData.Time,
         isVital
       );
-  
+
       const lineChartData = trendData.Values.map(
         (item: { data: any[]; label: any }) => ({
           data: this.cleanData(item.data, trendData.VitalName),
@@ -2652,17 +2664,17 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
           lineTension: 0.5,
         })
       );
-  
+
       this.allLineChartData[index] = {
         lineChartLabels,
         lineChartData,
       };
-  
+
     } catch (error) {
       console.error('Error loading individual health trend:', error);
     }
   }
-  
+
   createEmptyGraph(daycount: number) {
     const days = Array.from({ length: daycount }, (_, i) => {
       const d = new Date();
@@ -2682,7 +2694,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       ],
     };
   }
-  
+
   private processChartData(daycount: number) {
     const temp = [];
     let j = 0;
@@ -2742,12 +2754,12 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.http_healthtrends_current_data = this.http_healthtrends.filter(
       (item: { VitalName: string }) => item.VitalName === vital
     );
-  
+
     if (!this.http_healthtrends_current_data[0] || this.http_healthtrends_current_data[0].Values.length === 0) {
       this.setGraphFallback(duration);
       return;
     }
-  
+
     const trendData = this.http_healthtrends_current_data[0];
     const isVital = trendData.Values?.[0]?.label === 'Vital';
     const originalLabels = this.patientService.convertDateforHealthTrends(
@@ -2761,7 +2773,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       fill: false,
       lineTension: 0.5
     }));
-  
+
     const {
       filteredData,
       filteredLabels
@@ -2770,14 +2782,14 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       originalLabels,
       trendData.VitalName
     );
-  
+
     this.lineChartLabels = filteredLabels;
     this.lineChartData = originalDataSets.map((ds: any, idx: any) => ({
       ...ds,
       data: filteredData[idx]
     }));
   }
-  
+
   allLineChartData: any=[];
   async getVitalHealthTrendDataGraph(daycount: number) {
     try {
@@ -2805,7 +2817,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
           }
           return;
         }
-      
+
         const isVital = trendData.Values?.[0]?.label === 'Vital';
         const originalLabels = this.patientService.convertDateforHealthTrends(
           trendData.Time,
@@ -2818,7 +2830,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
           fill: false,
           lineTension: 0.5
         }));
-      
+
         const {
           filteredData,
           filteredLabels
@@ -2827,23 +2839,23 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
           originalLabels,
           trendData.VitalName
         );
-      
+
         const lineChartData = originalDataSets.map((ds: any, idx: any) => ({
           ...ds,
           data: filteredData[idx]
         }));
-      
+
         this.allLineChartData.push({
           lineChartLabels: filteredLabels,
           lineChartData
         });
       });
-      
+
     } catch (error) {
       console.error('Error loading health trends:', error);
     }
   }
-  
+
   private cleanData(dataArray: any[], vitalName: string): any[] {
     if (!Array.isArray(dataArray)) return [];
 
@@ -2871,10 +2883,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   ): { filteredData: any[][]; filteredLabels: string[] } {
     const filteredData = datasets.map(ds => [...ds.data]);
     const filteredLabels = [...labels];
-  
+
     for (let i = filteredLabels.length - 1; i >= 0; i--) {
       const isNullAcrossAll = filteredData.every(ds => ds[i] === null);
-  
+
       if (
         isNullAcrossAll &&
         i > 0 &&
@@ -2884,14 +2896,14 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         const [prevDate] = filteredLabels[i - 1]?.split(' - ') || [];
         const [currDate] = filteredLabels[i]?.split(' - ') || [];
         const [nextDate] = filteredLabels[i + 1]?.split(' - ') || [];
-  
+
         if (currDate === prevDate || currDate === nextDate) {
           filteredLabels.splice(i, 1);
           filteredData.forEach(ds => ds.splice(i, 1));
         }
       }
     }
-  
+
     return {
       filteredData,
       filteredLabels
@@ -3056,7 +3068,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       lineChartData,
     });
   }
-  
+
   UpcomingSchedule: any;
   LatestSchedule: any;
   calculateUpcomingSchedule(patient_id: any) {
@@ -3604,7 +3616,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       }
     }
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
 
@@ -4494,8 +4507,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     }
 
     this.startDateValue = someDate;
-    var someDateValue = moment(someDate).add(this.durationValue, 'M');
 
+const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
     this.renewProgramForm.controls['pgmendDate'].setValue(
       this.convertDate(someDateValue)
     );
@@ -5127,8 +5140,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       }
     }
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('HH:mm:ss');
-    return local;
+    const local = dayjs.utc(stillUtc).local().format('HH:mm:ss');
+      return local;
   }
 
   getTimefromDate(text: any) {

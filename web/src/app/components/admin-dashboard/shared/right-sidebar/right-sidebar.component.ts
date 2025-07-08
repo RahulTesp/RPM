@@ -16,13 +16,16 @@ import {
 } from 'rxjs/operators';
 import { RPMService } from '../../sevices/rpm.service';
 import { Router } from '@angular/router';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { StatusMessageComponent } from '../../shared/status-message/status-message.component';
-import moment from 'moment';
+import { MatDialog } from '@angular/material/dialog';
 import { DatePipe } from '@angular/common';
 import { from } from 'rxjs';
 import { ConfirmDialogServiceService } from '../confirm-dialog-panel/service/confirm-dialog-service.service';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 @Component({
   selector: 'app-right-sidebar',
   templateUrl: './right-sidebar.component.html',
@@ -2777,14 +2780,13 @@ export class RightSidebarComponent implements OnInit {
 
   convertToLocalTimeDate(stillUtc: any) {
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('MM-DD-YYYY');
+    const local = dayjs.utc(stillUtc).local().format('MM-DD-YYYY');
     return local;
   }
 
   convertToLocalTimedisplay(stillUtc: any) {
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('MM-DD-YYYY HH:mm');
-
+    var local = dayjs.utc(stillUtc).local().format('MM-DD-YYYY HH:mm');
     return local;
   }
 
