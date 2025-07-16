@@ -47,6 +47,18 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
         setCardBackground(holder.mcardAftr,Boolean.parseBoolean(String.valueOf(gValues.get(position).getAfterNoon())));
         setCardBackground(holder.mcardEve,Boolean.parseBoolean(String.valueOf(gValues.get(position).getEvening())));
         setCardBackground(holder.mcardNgt, Boolean.parseBoolean(String.valueOf(gValues.get(position).getNight())));
+
+        // Set expired background color
+        if (holder.mItem.isExpired()) {
+            holder.cardContainer.setBackgroundColor(
+                    cxt.getResources().getColor(R.color.background4)
+            );
+        } else {
+            holder.cardContainer.setBackgroundColor(
+                    cxt.getResources().getColor(R.color.white)
+            );
+        }
+
     }
 
     // Helper method to set card background based on a condition
@@ -73,7 +85,7 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
         public final TextView mDate;
         public MedicationItemModel mItem;
         public LinearLayout mcardMng,mcardAftr,mcardEve,mcardNgt;
-
+        public final LinearLayout cardContainer;
         public MedicationViewHolder(MedicationItemBinding binding) {
             super(binding.getRoot());
             mMedicinename = binding.itemMedname;
@@ -87,6 +99,7 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
             mEvening = binding.itemEvening;
             mNight = binding.itemNight;
             mDate = binding.itemDate;
+            cardContainer = binding.cardContainer;
             Log.d("response mMorning",mMorning.toString());
             Log.d("getText mMorning", mMorning.getText().toString());
         }

@@ -80,6 +80,7 @@ import java.util.TimeZone;
 import java.text.SimpleDateFormat;
 import com.rpm.clynx.utility.MyMarkerView;
 import com.rpm.clynx.utility.NetworkAlert;
+import com.rpm.clynx.utility.NetworkErrorHandler;
 import com.rpm.clynx.utility.TimeAgoUtils;
 import com.twilio.conversations.CallbackListener;
 import com.twilio.conversations.Conversation;
@@ -316,14 +317,8 @@ public class DashboardFragment extends Fragment {
             // Set the text color of the TextView
             tv_status.setTextColor(getResources().getColor(textColorResource));
         } else {
-            tv_status.setBackgroundColor(Color.GREEN); //  Correct
-
-           // tv_status.setBackgroundResource(Color.GREEN);
-            tv_status.setTextColor(Color.WHITE); // ✅ No need to call getResources().getColor()
-
-          //  tv_status.setTextColor(getResources().getColor(Color.WHITE));
-            // Handle the case where the status text is not in your mapping
-            // You can set a default background color or handle it in some other way
+            tv_status.setBackgroundColor(Color.GREEN);
+            tv_status.setTextColor(Color.WHITE);
         }
 
         user_full_name.setText("Hi, " + User_full_Name);
@@ -711,13 +706,7 @@ public class DashboardFragment extends Fragment {
                 Toast.makeText(getContext(), "No data available!", Toast.LENGTH_SHORT).show();
                 l1.dismiss();
 
-                if (error == null || error.networkResponse == null) {
-                    // No internet, show network dialog
-                    if (getContext() != null) {  // Ensure Fragment is attached
-                        NetworkAlert.showNetworkDialog(requireContext());
-                    }
-                    return;
-                }
+                NetworkErrorHandler.handleError(requireContext(), error, editor, db);
 
                 if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
                     Log.d("homecode", String.valueOf(error.networkResponse.statusCode));
@@ -1008,8 +997,6 @@ public class DashboardFragment extends Fragment {
     }
     private void getNotificationsCount () {
             String url = Links.BASE_URL + Links.NOTIFICATION;
-           // final Loader l1 = new Loader(getActivity());
-          //  l1.show("Please wait...");
             StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
@@ -1036,7 +1023,6 @@ public class DashboardFragment extends Fragment {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.d("Error while fetching Notification count", error.toString());
-                  //  l1.dismiss();
                 }
             }) {
                 @Override

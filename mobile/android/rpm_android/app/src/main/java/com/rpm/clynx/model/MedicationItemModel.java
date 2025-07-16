@@ -9,9 +9,9 @@ public class MedicationItemModel {
     private CharSequence Night;
     private String StartDate;
     private String EndDate;
-
+    private boolean isExpired;
     public MedicationItemModel(String medicinename, String medicineSchedule, CharSequence morning,
-                               CharSequence afterNoon, CharSequence evening ,CharSequence night, String startDate, String endDate ) {
+                               CharSequence afterNoon, CharSequence evening ,CharSequence night, String startDate, String endDate, boolean isExpired ) {
         Medicinename = medicinename;
         MedicineSchedule = medicineSchedule;
         Morning = morning;
@@ -20,6 +20,7 @@ public class MedicationItemModel {
         Night = night;
         StartDate = startDate;
         EndDate = endDate;
+        this.isExpired = isExpired;
     }
 
     public MedicationItemModel() {
@@ -86,5 +87,12 @@ public class MedicationItemModel {
 
     public void setEndDate(String endDate) {
         EndDate = endDate;
+    }
+    public boolean isExpired() {
+        return isExpired;
+    }
+
+    public void setExpired(boolean expired) {
+        isExpired = expired;
     }
 }

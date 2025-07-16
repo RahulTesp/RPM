@@ -179,7 +179,14 @@ public class VitalReadingsFragment extends Fragment  {
         Log.d("mydate",mydate.toString());
 
         Log.d("thisMonth",thisMonth.toString());
-        YearMonth nextMonth    = thisMonth.plusMonths(1);
+        YearMonth currentMonth = YearMonth.now();
+        YearMonth nextMonth = thisMonth.plusMonths(1);
+
+        if (nextMonth.isAfter(currentMonth)) {
+            Toast.makeText(getContext(), "You cannot view future months.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         curDay.setText(nextMonth.format(monthYearFormatter));
         curIndex = curIndex+1;
         thisMonth = nextMonth ;
