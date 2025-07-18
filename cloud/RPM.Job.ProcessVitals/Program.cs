@@ -54,11 +54,10 @@ class Program
             await connection.OpenAsync();
 
             // Execute stored procedures
-            //await ExecuteStoredProcedure(connection, "usp_InsPatientVitalMeasures");
-            //await ExecuteStoredProcedure(connection, "usp_InsAlerts");
+            await ExecuteStoredProcedure(connection, "usp_InsPatientVitalMeasures");
             //await ExecuteStoredProcedure(connection, "usp_InsAlertsTemp");
-            await ExecuteStoredProcedure(connection, "usp_InsPatientProgramPriority", 900);
-            await ExecuteStoredProcedure(connection, "usp_InsAlertSummary", 900);
+            //await ExecuteStoredProcedure(connection, "usp_InsPatientProgramPriority", 900);
+            //await ExecuteStoredProcedure(connection, "usp_InsAlertSummary", 900);
         }
         catch (Exception ex)
         {
