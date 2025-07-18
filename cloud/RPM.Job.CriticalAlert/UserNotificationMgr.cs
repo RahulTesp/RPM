@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using RPMWeb.Common;
+﻿using RPMWeb.Common;
 using RPMWeb.Dal;
 using RPMWeb.Data.Common;
 
@@ -8,23 +7,9 @@ namespace RPMCriticalAlertJob
     public class UserNotificationMgr
     {
         static string CONN_STRING = string.Empty;
-        public void VerifyAndSendUserNotifications()
+        public void VerifyAndSendUserNotifications(string Connection)
         {
-            // Set up configuration
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true)
-                .AddEnvironmentVariables() // Allows overriding via Azure App Settings
-                .Build();
-
-            // Access a specific config value
-            string connStr = config["RPM:ConnectionString"];
-            Console.WriteLine($"RPM Connection String: {connStr}");
-
-            // Optional: bind strongly-typed object
-            var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
-            Console.WriteLine($"RPM.ConnectionString (typed): {rpmSettings?.ConnectionString}");
-            CONN_STRING = rpmSettings?.ConnectionString;
+            CONN_STRING = Connection;
             Task task = new Task(() =>
             {
                 while (true)

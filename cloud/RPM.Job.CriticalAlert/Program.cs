@@ -6,24 +6,28 @@ using RPMWeb.Dal;
 class Program
 {
     static string CONN_STRING =string.Empty;
-    private static Timer _timer = null;
     static async Task Main(string[] args)
     {
         // Set up configuration
         var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true)
-            .AddEnvironmentVariables() // Allows overriding via Azure App Settings
-            .Build();
-
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json", optional: true)
+        .AddEnvironmentVariables() // Allows overriding via Azure App Settings
+        .Build();
+        if (config == null)
+        {
+            Console.WriteLine("Configuration is null.");
+            return;
+        }
         // Access a specific config value
-        string connStr = config["RPM:ConnectionString"];
+        string? connStr = config["RPM:ConnectionString"];
         Console.WriteLine($"RPM Connection String: {connStr}");
-
-        // Optional: bind strongly-typed object
-        var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
-        Console.WriteLine($"RPM.ConnectionString (typed): {rpmSettings?.ConnectionString}");
-        CONN_STRING = rpmSettings?.ConnectionString;
+        if (connStr == null)
+        {
+            Console.WriteLine("Connection string is null in appsettings.json.");
+            return;
+        }
+        CONN_STRING = connStr;
         Console.WriteLine("WebJob started...");
         if(CONN_STRING == null)
         {
@@ -37,15 +41,13 @@ class Program
                 List<SystemConfigInfo> lstConfig = DalCommon.GetSystemConfig(CONN_STRING, "Storage", "User");
                 if (lstConfig.Count > 0)
                 {
-                    SystemConfigInfo sci = lstConfig.Find(x => x.Name == "ConnString");
+                    SystemConfigInfo? sci = lstConfig.Find(x => x.Name == "ConnString");
                     if (sci != null)
                     {
-                        //config.DashboardConnectionString = sci.Value;
-                        //config.StorageConnectionString = sci.Value;
                         AlertProcessMgr instAlert = new AlertProcessMgr();
-                        instAlert.CheckandNotifyAlerts();
+                        instAlert.CheckandNotifyAlerts(CONN_STRING);
                         UserNotificationMgr instNotify = new UserNotificationMgr();
-                        instNotify.VerifyAndSendUserNotifications();
+                        instNotify.VerifyAndSendUserNotifications(CONN_STRING);
 
                     }
                     else

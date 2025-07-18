@@ -33,6 +33,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Sync.Devices.iGluco
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.DeviceData.iGlucose", "..\RPM.Job.DeviceData.iGlucose\RPM.Job.DeviceData.iGlucose.csproj", "{BD263F99-4987-460B-946F-7AC5653B23A1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.DeviceData.Transtek", "..\RPM.Job.DeviceData.Transtek\RPM.Job.DeviceData.Transtek.csproj", "{363DC1E1-FD89-491E-A23B-334DA74909BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Sync.Devices.Transtek", "..\RPM.Job.Sync.Devices.Transtek\RPM.Job.Sync.Devices.Transtek.csproj", "{6B5A5D1C-2189-42DF-A8DE-8F6D41EB0F0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.CleanUp.DevicesData.Transtek", "..\RPM.Job.CleanUp.DevicesData.Transtek\RPM.Job.CleanUp.DevicesData.Transtek.csproj", "{D05B00AB-ABF1-471A-958C-FB41C3503F4E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,6 +105,18 @@ Global
 		{BD263F99-4987-460B-946F-7AC5653B23A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD263F99-4987-460B-946F-7AC5653B23A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD263F99-4987-460B-946F-7AC5653B23A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{363DC1E1-FD89-491E-A23B-334DA74909BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{363DC1E1-FD89-491E-A23B-334DA74909BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{363DC1E1-FD89-491E-A23B-334DA74909BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{363DC1E1-FD89-491E-A23B-334DA74909BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B5A5D1C-2189-42DF-A8DE-8F6D41EB0F0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B5A5D1C-2189-42DF-A8DE-8F6D41EB0F0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B5A5D1C-2189-42DF-A8DE-8F6D41EB0F0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B5A5D1C-2189-42DF-A8DE-8F6D41EB0F0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D05B00AB-ABF1-471A-958C-FB41C3503F4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D05B00AB-ABF1-471A-958C-FB41C3503F4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D05B00AB-ABF1-471A-958C-FB41C3503F4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D05B00AB-ABF1-471A-958C-FB41C3503F4E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
