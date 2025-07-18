@@ -259,8 +259,6 @@ private messageAddedListenerCount: number = 0;
         const hasCurrentUser = normalizedParticipants.includes(normalizedUserName);
         const hasPatientUser = normalizedParticipants.includes(normalizedPatientUser);
 
-
-
         // If both users are in this conversation, we can use this conversation directly
         if (hasCurrentUser && hasPatientUser) {
           console.log('This is the conversation for current users:', conv.sid);
@@ -341,6 +339,29 @@ private messageAddedListenerCount: number = 0;
         }
       } catch (error) {
         console.error('Error in conversationAdded handler:', error);
+      }
+    });
+
+    // TYPING EVENTS
+    this.client.on('typingStarted', (user: Participant) => {
+      try {
+        const currentConversation = this.currentConversationSubject.getValue();
+        if (user.conversation.sid === currentConversation?.sid) {
+          console.log('Typing')
+        }
+      } catch (error) {
+        console.error(' Error handling typing event:', error);
+      }
+    });
+
+    this.client.on('typingEnded', (user: Participant) => {
+      try {
+        const currentConversation = this.currentConversationSubject.getValue();
+        if (user.conversation.sid === currentConversation?.sid) {
+           console.log('Typing')
+        }
+      } catch (error) {
+        console.error(' Error handling typing event:', error);
       }
     });
   }
