@@ -1,131 +1,24 @@
-﻿using Microsoft.Extensions.Configuration;
-using RPMPatientBilling.PatientBilling;
-using System.Timers;
-
+﻿
 namespace RPMPatientBillingJob
 {
     public class BillingProcessMgr
     {
-        static System.Timers.Timer timer;
-        static System.Timers.Timer aTimer;
-        ManualResetEvent evBillingResult = new ManualResetEvent(false);
-        ManualResetEvent evBillingCount = new ManualResetEvent(false);
-        static string CONN_STRING = string.Empty;
-
-        public void BillingProcessResults()
-        {
-            // Set up configuration
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true)
-                .AddEnvironmentVariables() // Allows overriding via Azure App Settings
-                .Build();
-
-            // Access a specific config value
-            string connStr = config["RPM:ConnectionString"];
-            Console.WriteLine($"RPM Connection String: {connStr}");
-
-            // Optional: bind strongly-typed object
-            var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
-            var appSettings = config.GetSection("RPM").Get<AppSettings>();
-            Console.WriteLine($"RPM.ConnectionString (typed): {rpmSettings?.ConnectionString}");
-            CONN_STRING = rpmSettings?.ConnectionString;
-            int Hour = Convert.ToInt32(appSettings.Hour);
-            int Minutes = Convert.ToInt32(appSettings.Minutes);
-            Task task = new Task(() =>
-            {
-                try
-                {
-                    
-                    DateTime scheduleTime = new DateTime(DateTime.UtcNow.Year,
-                                                         DateTime.UtcNow.Month,
-                                                         DateTime.UtcNow.Day,
-                                                         Hour,
-                                                         Minutes,
-                                                         0);
-                    if(DateTime.UtcNow>scheduleTime)
-                    {
-                        scheduleTime = scheduleTime.AddDays(1);
-                    }
-                    TimeSpan currentTimeDiff = scheduleTime - DateTime.UtcNow;
-                    int timeToWait = (int)Math.Abs(currentTimeDiff.TotalMilliseconds);
-                    while (true)
-                    {                        
-                        Console.WriteLine("Timeout in " + timeToWait.ToString());
-                        evBillingResult.WaitOne(timeToWait);
-                        {
-                            string cs = CONN_STRING;
-                            RPMBilling rpm = new RPMBilling();
-                            rpm.UpdatePatientBilling(cs);
-                        }
-                        scheduleTime = scheduleTime.AddDays(1);
-                        currentTimeDiff = scheduleTime - DateTime.UtcNow;
-                        timeToWait = (int)Math.Abs(currentTimeDiff.TotalMilliseconds);
-
-                    }
-
-                    /*int Hour = Convert.ToInt32(ConfigurationManager.AppSettings["Hour"]);
-                    int minutes = Convert.ToInt32(ConfigurationManager.AppSettings["Minutes"]);
-                    DateTime nowTime = DateTime.Now;
-                    DateTime scheduledTime = new DateTime(nowTime.Year, nowTime.Month, nowTime.Day, Hour, minutes, 0, 0); //Specify your scheduled time HH,MM,SS [8am and 42 minutes]
-                    if (nowTime > scheduledTime)
-                    {
-                        scheduledTime = scheduledTime.AddDays(1);
-                    }
-                    double tickTime = (double)(scheduledTime - DateTime.Now).TotalMilliseconds;
-                    timer = new System.Timers.Timer(tickTime);
-                    timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-                    timer.Start();*/
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.ToString());
-                }
-            });
-            task.Start();
-            
-        }
         public void BillingProcess(string cs)
         {
             try
             {
                 {
-                   
-                   
-                    Console.WriteLine(@"BillingProcess Initializing  - Running start time" + DateTime.UtcNow );
-                    //string cs = CONN_STRING;
+                    Console.WriteLine(@"Billing Job Processing Started  - Time" + DateTime.UtcNow );
                     RPMPatientBilling.PatientBilling.RPMBilling rpm = new RPMPatientBilling.PatientBilling.RPMBilling();
                     rpm.GenaratePateintBillingCount(cs);
                     rpm.UpdatePatientBilling(cs);
-                    Console.WriteLine(@"BillingProcess Initializing  - Running finish time" + DateTime.UtcNow);
-
+                    Console.WriteLine(@"Billing Job Processing Ended  - Time" + DateTime.UtcNow);
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
-           
-        }
-        private static void OnTimedEvent(object source, ElapsedEventArgs e)
-        {
-            Console.WriteLine("BillingProcessResults Job started! - " + DateTime.UtcNow + "");
-            timer.Stop();
-            string cs = CONN_STRING;
-            //RPMPatientBilling.PatientBilling.RPMBilling rpm = new RPMPatientBilling.PatientBilling.RPMBilling();
-           // rpm.GetPatientBillingReport(cs);
-            BillingProcessMgr bpm = new BillingProcessMgr();
-            bpm.BillingProcessResults();
-            Console.WriteLine("BillingProcessResults Job Completed! - " + DateTime.UtcNow + "");
-        }
-        private static void OnTimedJobEvent(object source, ElapsedEventArgs e)
-        {
-            Console.WriteLine("BillingProcess Job started! - " + DateTime.UtcNow + "");
-            string cs = CONN_STRING;
-            RPMPatientBilling.PatientBilling.RPMBilling rpm = new RPMPatientBilling.PatientBilling.RPMBilling();
-            rpm.GenaratePateintBillingCount(cs);
-            rpm.UpdatePatientBilling(cs);
-            Console.WriteLine("BillingProcess Job Completed! - " + DateTime.UtcNow + "");
         }
     }
 }
