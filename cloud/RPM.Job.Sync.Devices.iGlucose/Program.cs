@@ -59,8 +59,8 @@ class Program
             Console.WriteLine("Connection string is null.");
             return;
         }
-        while (true)
-        {
+        //while (true)
+        //{
             string msg;
             try
             {
@@ -143,7 +143,7 @@ class Program
                 return;
             }
 
-        }
+        //}
     }
     public static JObject getDeviceList()
     {

@@ -85,7 +85,7 @@ namespace RPMPatientBillingJob
             task.Start();
             
         }
-        public void BillingProcess()
+        public void BillingProcess(string cs)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace RPMPatientBillingJob
                    
                    
                     Console.WriteLine(@"BillingProcess Initializing  - Running start time" + DateTime.UtcNow );
-                    string cs = CONN_STRING;
+                    //string cs = CONN_STRING;
                     RPMPatientBilling.PatientBilling.RPMBilling rpm = new RPMPatientBilling.PatientBilling.RPMBilling();
                     rpm.GenaratePateintBillingCount(cs);
                     rpm.UpdatePatientBilling(cs);

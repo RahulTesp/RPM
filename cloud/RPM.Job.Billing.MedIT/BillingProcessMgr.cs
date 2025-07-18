@@ -93,7 +93,7 @@ namespace RPMPatientBillingJob
             
         }
 
-        public void BillingProcess()
+        public void BillingProcess(string cs)
         {
             try
             {
@@ -127,7 +127,6 @@ namespace RPMPatientBillingJob
                 {
                     Console.WriteLine(@"BillingProcess Initializing  - Running first time" + DateTime.UtcNow +
                                        @"Waiting period " + (int)nDelay);
-                    string cs = CONN_STRING;
                     RPMPatientBilling.PatientBilling.RPMBilling rpm = new RPMPatientBilling.PatientBilling.RPMBilling();
                     rpm.GenaratePateintBillingCount(cs);
                     rpm.UpdatePatientBilling(cs);

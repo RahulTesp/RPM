@@ -3,125 +3,135 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+
 
 class Program
 {
-    static string CONN_STRING =string.Empty;
+    static string CONN_STRING = string.Empty;
+
     static async Task Main(string[] args)
     {
-        // Set up configuration
+        // Load configuration
         var config = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: true)
-            .AddEnvironmentVariables() // Allows overriding via Azure App Settings
+            .AddEnvironmentVariables()
             .Build();
 
-        // Access a specific config value
-        string connStr = config["RPM:ConnectionString"];
-        Console.WriteLine($"RPM Connection String: {connStr}");
-
-        // Optional: bind strongly-typed object
         var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
-        Console.WriteLine($"RPM.ConnectionString (typed): {rpmSettings?.ConnectionString}");
         CONN_STRING = rpmSettings?.ConnectionString;
-        Console.WriteLine("WebJob started...");
-        if(CONN_STRING == null)
+
+        if (string.IsNullOrWhiteSpace(CONN_STRING))
         {
-            Console.WriteLine("Connection string is null.");
+            Console.WriteLine("Connection string is null or empty.");
             return;
         }
-        while (true)
+
+        Console.WriteLine("WebJob started...");
+
+        using var timer = new PeriodicTimer(TimeSpan.FromMinutes(1)); // Run every 1 minute
+        while (await timer.WaitForNextTickAsync())
         {
-            try
-            {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var tokenValidationParameters = new TokenValidationParameters
-                {
-                    RequireSignedTokens = false,
-                    ValidateIssuerSigningKey = false,
-                    //IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("remotepatientmonitoring")),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    SignatureValidator = (token, parameters) => { return new JwtSecurityToken(token); }
-
-                };
-                List<string> Tokens = GetAllLoginSessions(CONN_STRING);
-                foreach (string jwtToken in Tokens)
-                {
-
-                    try
-                    {
-                        ClaimsPrincipal claimsPrincipal = tokenHandler.ValidateToken(jwtToken, tokenValidationParameters, out SecurityToken validatedToken);
-                    }
-                    catch (SecurityTokenExpiredException)
-                    {
-                        UpdInvalidSessionZero(jwtToken, CONN_STRING);
-                    }
-                    catch (Exception)
-                    {
-                        Console.WriteLine("Not able to validate token");
-                        //UpdInvalidSessionZero(jwtToken, CONN_STRING);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("exception:" + ex);
-            }
-            
+            await CheckAndInvalidateExpiredTokens();
         }
     }
-    public static List<string> GetAllLoginSessions(string ConnectionString)
+
+    private static async Task CheckAndInvalidateExpiredTokens()
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var tokenValidationParameters = new TokenValidationParameters
+        {
+            RequireSignedTokens = false,
+            ValidateIssuerSigningKey = false,
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            SignatureValidator = (token, parameters) => new JwtSecurityToken(token)
+        };
+
+        try
+        {
+            var tokens = await GetAllLoginSessionsAsync(CONN_STRING);
+
+            foreach (var jwtToken in tokens)
+            {
+                try
+                {
+                    tokenHandler.ValidateToken(jwtToken, tokenValidationParameters, out _);
+                }
+                catch (SecurityTokenExpiredException)
+                {
+                    await UpdInvalidSessionZeroAsync(jwtToken, CONN_STRING);
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Invalid token or unable to validate.");
+                    // Optional: You can decide to update invalid session here too
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error during token check: " + ex.Message);
+        }
+    }
+
+    private static async Task<List<string>> GetAllLoginSessionsAsync(string connectionString)
+    {
+        var tokens = new List<string>();
+
+        try
+        {
+            using var con = new SqlConnection(connectionString);
+            using var command = new SqlCommand("usp_GetAllLoginSessions", con)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            await con.OpenAsync();
+
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                string? jwtToken = reader["JwtToken"]?.ToString();
+                if (!string.IsNullOrWhiteSpace(jwtToken))
+                {
+                    tokens.Add(jwtToken);
+                }
+            }
+
+            return tokens;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error fetching sessions: " + ex.Message);
+            return tokens;
+        }
+    }
+
+    private static async Task UpdInvalidSessionZeroAsync(string jwtToken, string connectionString)
     {
         try
         {
-            List<string> Tokens = new List<string>();
-
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using var con = new SqlConnection(connectionString);
+            using var command = new SqlCommand("usp_UpdInvalidSessionzero", con)
             {
-                SqlCommand command = new SqlCommand("usp_GetAllLoginSessions", con);
-                command.CommandType = CommandType.StoredProcedure;
-                SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
-                returnParameter.Direction = ParameterDirection.ReturnValue;
-                con.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    string jwtToken = Convert.ToString(reader["JwtToken"]);
-                    Tokens.Add(jwtToken);
-                }
+                CommandType = CommandType.StoredProcedure
+            };
 
-                con.Close();
-            }
-            return Tokens;
+            command.Parameters.AddWithValue("@JwtToken", jwtToken);
+            command.Parameters.Add("RetVal", SqlDbType.Int).Direction = ParameterDirection.ReturnValue;
+
+            await con.OpenAsync();
+            await command.ExecuteNonQueryAsync();
         }
-        catch (Exception ex) { throw ex; }
-    }
-
-    public static void UpdInvalidSessionZero(string jwtToken, string ConnectionString)
-    {
-        try
+        catch (Exception ex)
         {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
-            {
-                SqlCommand command = new SqlCommand("usp_UpdInvalidSessionzero", con);
-                command.Parameters.AddWithValue("@JwtToken", jwtToken);
-                command.CommandType = CommandType.StoredProcedure;
-                SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
-                returnParameter.Direction = ParameterDirection.ReturnValue;
-                con.Open();
-                command.ExecuteReader();
-                con.Close();
-            }
-
+            Console.WriteLine("Error updating invalid session: " + ex.Message);
         }
-        catch (Exception ex) { throw ex; }
-
     }
-
 }
+
 public class RpmSettings
 {
     public string? ConnectionString { get; set; }

@@ -33,7 +33,7 @@ class Program
             try
             {
                 BillingProcessMgr inst = new BillingProcessMgr();
-                inst.BillingProcess();
+                inst.BillingProcess(CONN_STRING);
             }
             catch (Exception ex)
             {
