@@ -2,11 +2,15 @@
 import { Component, OnInit } from '@angular/core';
 import { RPMService } from '../../sevices/rpm.service';
 import { Router } from '@angular/router';
-import moment from 'moment';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
 import { MessagingService } from '../../sevices/messaging.service';
 import { Subscription } from 'rxjs';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 @Component({
   selector: 'app-notification',
   templateUrl: './notification.component.html',
@@ -187,7 +191,7 @@ export class NotificationComponent implements OnInit {
       stillUtc = temp[0];
     }
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
 

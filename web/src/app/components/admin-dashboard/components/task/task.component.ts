@@ -14,15 +14,19 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { DatePipe } from '@angular/common';
-import * as _moment from 'moment';
-import { default as _rollupMoment } from 'moment';
+
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { StatusMessageComponent } from '../../shared/status-message/status-message.component';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DateRangeControlComponent } from '../../shared/date-range-control/date-range-control.component';
 import { MasterDataService } from '../../sevices/master-data.service';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
-const moment = _rollupMoment || _moment;
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 
 export const MY_FORMATS = {
   parse: {
@@ -343,7 +347,7 @@ export class TaskComponent implements OnInit {
     this.campaignOne = new FormGroup({
       start: new FormControl(new Date(year, month, 13)),
       end: new FormControl(new Date(year, month, 16)),
-      date: new FormControl(moment()),
+     // date: new FormControl(moment()),
     });
   }
 
@@ -1666,7 +1670,7 @@ export class TaskComponent implements OnInit {
 
   convertToLocalTime(stillUtc: any) {
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
   dueDateStatus: any;

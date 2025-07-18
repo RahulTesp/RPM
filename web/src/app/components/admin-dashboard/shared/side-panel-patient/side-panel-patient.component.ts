@@ -19,13 +19,17 @@ import { map, startWith } from 'rxjs/operators';
 import { StatusMessageComponent } from '../status-message/status-message.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { DatePipe } from '@angular/common';
-import moment from 'moment';
 import { ConfirmDialogServiceService } from '../confirm-dialog-panel/service/confirm-dialog-service.service';
 import { PatientDataDetailsService } from '../../components/patient-detail-page/Models/service/patient-data-details.service';
 
 import { TimeOption, generateTimeOptions } from './interface'
 import { MasterDataService } from '../../sevices/master-data.service';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 @Component({
   selector: 'app-side-panel-patient',
@@ -1137,15 +1141,14 @@ export class SidePanelPatientComponent implements OnInit {
     this.medicationStartDate = startDate;
     var result;
     if (this.SelectedMedicalScheduleInterval == 'Weekly') {
-      result = moment(startDate).add(numberOfDaysToAdd * 7, 'days');
+     result = dayjs(startDate).add(numberOfDaysToAdd * 7, 'day');
     } else if (this.SelectedMedicalScheduleInterval == 'Monthly') {
-      result = moment(startDate).add(numberOfDaysToAdd, 'months');
+      result = dayjs(startDate).add(numberOfDaysToAdd, 'month');
     } else if (this.SelectedMedicalScheduleInterval == 'Daily') {
-      result = moment(startDate).add(numberOfDaysToAdd, 'days');
+      result = dayjs(startDate).add(numberOfDaysToAdd, 'day');
     } else if (this.SelectedMedicalScheduleInterval == 'Alternative') {
       numberOfDaysToAdd = numberOfDaysToAdd * 2;
-
-      result = moment(startDate).add(numberOfDaysToAdd, 'days');
+    result = dayjs(startDate).add(numberOfDaysToAdd, 'day');
     }
     return this.convertDate(result) + 'T00:00:00';
   }
@@ -2281,14 +2284,14 @@ export class SidePanelPatientComponent implements OnInit {
 
   convertToLocalTime(stillUtc: any) {
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('MM-DD-YYYY');
+    const local = dayjs.utc(stillUtc).local().format('MM-DD-YYYY');
     return local;
   }
 
   convertToLocalTimedisplay(stillUtc: any) {
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('MM-DD-YYYY HH:mm');
 
+    const local = dayjs.utc(stillUtc).local().format('MM-DD-YYYY HH:mm');
     return local;
   }
 
@@ -2734,7 +2737,7 @@ export class SidePanelPatientComponent implements OnInit {
           this.http_rpm_patientList['PatientDetails'].LastName;
       });
   }
-  
+
   refresh() {
     this.registerSchedule.reset();
     this.registerTask.reset();

@@ -1,22 +1,12 @@
 import {
   Component,
   OnInit,
-  ViewChild,
-  ElementRef,
-  TemplateRef,
   ChangeDetectorRef,
 } from '@angular/core';
-import { jsPDF } from 'jspdf';
-import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-
-import { saveAs } from 'file-saver';
 import { Router } from '@angular/router';
-import moment from 'moment';
-import * as FileSaver from 'file-saver';
-
 import { DatePipe } from '@angular/common';
 export interface PeriodicElement {
   time: string;
@@ -26,7 +16,12 @@ export interface PeriodicElement {
 }
 import { AuthService } from 'src/app/services/auth.service';
 import { RPMService } from '../../../sevices/rpm.service';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 @Component({
   selector: 'app-patient-todo',
   templateUrl: './patient-todo.component.html',
@@ -144,7 +139,7 @@ export class PatientTodoComponent implements OnInit {
   }
   convertToLocalTime(stillUtc: any) {
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
   ConvertTimeVital(dateArr: any) {

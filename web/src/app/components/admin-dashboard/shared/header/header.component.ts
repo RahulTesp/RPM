@@ -8,12 +8,9 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-
 import { HttpService } from '../../sevices/http.service';
 import {
-
-  Router,
-
+  Router
 } from '@angular/router';
 import { RPMService } from '../../sevices/rpm.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
@@ -22,9 +19,13 @@ import { webSocket } from 'rxjs/webSocket';
 import { AuthService } from 'src/app/services/auth.service';
 import { MessagingService } from '../../sevices/messaging.service';
 import { Subject, Subscription } from 'rxjs';
-
-import moment from 'moment';
 import { DatePipe } from '@angular/common';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
@@ -96,7 +97,7 @@ export class HeaderComponent implements OnInit {
 
   convertToLocalTime(stillUtc: any) {
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+   const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
   data_patient: any;

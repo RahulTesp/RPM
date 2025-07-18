@@ -106,7 +106,8 @@ export class PatientChatService {
       const data = (await this.rpm.rpm_get(
         `/api/comm/regeneratechattoken?app=web`
       )) as { message: string };
-      if (!data) throw new Error('❌ Failed to retrieve chat token.');
+
+    if (!data.message) throw new Error('❌ Failed to retrieve chat token.');
 
       if (this.client) {
         await this.client.updateToken(data.message);
@@ -152,7 +153,8 @@ export class PatientChatService {
     console.warn('Retrying Twilio Client Initialization...');
 
     try {
-      const newToken = await this.refreshToken(); // Fetch a fresh token
+
+      const newToken = await this.getToken(); // Fetch a fresh token
       await this.initializeClient(newToken);
       console.log(' Twilio Client Successfully Reconnected!');
     } catch (error) {
@@ -223,7 +225,6 @@ private messageAddedListenerCount: number = 0;
 
     this.client.on('conversationAdded', async (conv: Conversation) => {
 
-
       // Get participants for this conversation
       try {
         const participants = await conv.getParticipants();
@@ -242,9 +243,6 @@ private messageAddedListenerCount: number = 0;
         // Check if this conversation includes both current users
         const hasCurrentUser = normalizedParticipants.includes(normalizedUserName);
         const hasPatientUser = normalizedParticipants.includes(normalizedPatientUser);
-
-
-
         // If both users are in this conversation, we can use this conversation directly
         if (hasCurrentUser && hasPatientUser) {
           this.currentConversationSubject.next(conv);

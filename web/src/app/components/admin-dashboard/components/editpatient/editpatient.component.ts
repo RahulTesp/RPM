@@ -17,11 +17,15 @@ import _ from 'lodash';
 import { StatusMessageComponent } from '../../shared/status-message/status-message.component';
 import { DatePipe } from '@angular/common';
 import * as uuid from 'uuid';
-import moment from 'moment';
 import { AuthService } from 'src/app/services/auth.service';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
 import { Subscription } from 'rxjs';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 export interface document {
   type: string;
   name: string;
@@ -164,26 +168,26 @@ export class EditpatientComponent implements OnInit {
     this.diagnosisFormGroups = this.selectedDiagnoses.map(() => this.fb.group({
       diagnosis: [''],
       DiagnosisCode: ['']
-    }));    
-    
+    }));
+
   }
 
-  getInitialValue(diagnosis: any): string {    
-    return diagnosis?.DiagnosisName || ''; 
+  getInitialValue(diagnosis: any): string {
+    return diagnosis?.DiagnosisName || '';
   }
 
   get diagnosisList() {
     return this.editProgramdata.get('selectedDiagnoses') as FormArray;
   }
-  
+
   addDiagnosis(diagnosis = { diagnosisName: '', diagnosisCode: '' }) {
     const group = this.fb.group({
       diagnosisName: [diagnosis.diagnosisName],
       diagnosisCode: [{ value: diagnosis.diagnosisCode, disabled: true }],
     });
     this.diagnosisList.push(group);
-  } 
-  
+  }
+
   getPhysicianList() {
     this.physicianList = this.master_data.PhysicianDetails.filter(
       (phy: { ClinicID: any }) =>
@@ -350,7 +354,7 @@ export class EditpatientComponent implements OnInit {
     this.devArr = [];
     this.careTeamMembers = this.master_data.CareTeamMembers;
     this.programDetails = this.master_data.ProgramDetailsMasterData;
-    this.programDetails = this.master_data.ProgramDetailsMasterData.filter((program: { Name: string; Vitals: string | any[]; }) => 
+    this.programDetails = this.master_data.ProgramDetailsMasterData.filter((program: { Name: string; Vitals: string | any[]; }) =>
       program.Name === "RPM" && program.Vitals.length > 1
     );
     var myuser = sessionStorage.getItem('user_name');
@@ -462,7 +466,7 @@ export class EditpatientComponent implements OnInit {
       billingcode3: new UntypedFormControl(''),
       billingcode4: new UntypedFormControl(''),
     });
-    
+
     this.programForm_3 = this.PatientFormBuilderObj.group({
       deviceDataList: this.PatientFormBuilderObj.array([
         this.createDeviceGroup(),
@@ -634,7 +638,7 @@ export class EditpatientComponent implements OnInit {
         });
         this.selectedProgram = this.selectedProgram;
         this.initiallySelectedVitals = [...this.vitalListDialog];
-        this.allVitalsSelected = this.programVitals.every((vital: { VitalId: number; }) => 
+        this.allVitalsSelected = this.programVitals.every((vital: { VitalId: number; }) =>
           this.vitalListDialog.includes(vital.VitalId)
         );
         //
@@ -776,7 +780,7 @@ export class EditpatientComponent implements OnInit {
         that.programForm.controls['enddate'].setValue(
           that.convertDate(that.Patientdata.PatientProgramdetails.EndDate)
         );
-        
+
         that.programForm.controls['assignedMember'].setValue(
           that.Patientdata.PatientProgramdetails.CareTeamUserId,
           { onlySelf: true }
@@ -1124,7 +1128,7 @@ export class EditpatientComponent implements OnInit {
     const allVitalsActive = this.PatientVitalInfos.every((vital: { VitalName: string }) => {
       const vitalName = vital?.VitalName?.toLowerCase();
       if (!vitalName) return false; // if vital name is missing, consider it failed
-  
+
       return this.patientdevicedetails.some(
         (device: { VitalName?: string; DeviceStatus: string }) =>
           device?.VitalName?.toLowerCase() === vitalName &&
@@ -1132,7 +1136,7 @@ export class EditpatientComponent implements OnInit {
       );
     });
     this.DeviceNotAvaliable = !allVitalsActive;
-  }  
+  }
 
   DeviceCheckOnSubmit() {
     if (!Array.isArray(this.patientdevicedetails)) {
@@ -1345,7 +1349,7 @@ export class EditpatientComponent implements OnInit {
     }
     someDate = this.Auth.ConvertToUTCRangeInput(new Date(someDate));
     this.startDateValue = someDate;
-    var someDateValue = moment(someDate).add(this.durationValue, 'M');
+    const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
     this.programForm.controls['enddate'].setValue(
       this.convertDate(someDateValue)
     );
@@ -1527,10 +1531,10 @@ export class EditpatientComponent implements OnInit {
   // Manjusha code change
   programaddNewDiaganostic() {
     const selectedDiagnosesArray = this.editProgramdata.get('selectedDiagnoses') as FormArray;
-  
+
     // Get the last diagnosis form group (if any)
     const lastItem = selectedDiagnosesArray.at(selectedDiagnosesArray.length - 1);
-  
+
     // Only add a new one if last item is filled
     if (
       !lastItem ||
@@ -1543,7 +1547,7 @@ export class EditpatientComponent implements OnInit {
           DiagnosisCode: [null],
           DiagnosisName: [null],
         }));
-  
+
         // Optional: toggle UI or emit event
         this.display = !this.display;
       } else {
@@ -1556,7 +1560,7 @@ export class EditpatientComponent implements OnInit {
 
   programaremoveNewDiaganostic() {
     const selectedDiagnosesArray = this.editProgramdata.get('selectedDiagnoses') as FormArray;
-  
+
     if (selectedDiagnosesArray.length > 1) {
       selectedDiagnosesArray.removeAt(selectedDiagnosesArray.length - 1); //Proper reactive removal
       this.display = !this.display;
@@ -1564,7 +1568,7 @@ export class EditpatientComponent implements OnInit {
       alert('At least one diagnosis must remain.');
     }
   }
-  
+
   confirm_action() {
     if (this.variable == 1) {
       this.UpdatePatientInfo();
@@ -3130,27 +3134,27 @@ export class EditpatientComponent implements OnInit {
     const DiagnosisSelected = this.editProgramDiagoList.filter(
       (data: any) => data === event
     );
-  
+
     if (DiagnosisSelected.length === 0) return;
-  
+
     const selected = DiagnosisSelected[0];
-  
+
     const foundInMainList = this.diaganosisMainList.some(
       (el: { DiagnosisCode: string }) => el.DiagnosisCode === selected.DiagnosisCode
     );
-  
+
     const selectedDiagnosesArray = this.editProgramdata.get('selectedDiagnoses') as FormArray;
-  
+
     const foundInForm = selectedDiagnosesArray.controls.some(
       (ctrl: AbstractControl) => ctrl.value.DiagnosisCode === selected.DiagnosisCode
     );
-  
+
     if (foundInForm || foundInMainList) {
       alert('Diagnosis Already Selected');
       this.programaremoveNewDiaganostic(); // Optional: only remove if you just added
       return;
     }
-  
+
     // Update form group at index
     const formGroup = selectedDiagnosesArray.at(index) as FormGroup;
     formGroup.patchValue({
@@ -3158,7 +3162,7 @@ export class EditpatientComponent implements OnInit {
       DiagnosisName: selected.DiagnosisName
     });
   }
-  
+
   keyword_primary_insurance = 'VendorName';
   insurance_pid: any;
   insurance_pname: any;
@@ -3344,16 +3348,16 @@ export class EditpatientComponent implements OnInit {
   getDiagnosisControl(group: AbstractControl, key: string): FormControl {
     return group.get(key) as FormControl;
   }
-  
+
   selectedDiagnoses: any;
   VitalId: number;
 
   get selectedDiagnosesArray(): FormArray {
     return this.editProgramdata.get('selectedDiagnoses') as FormArray;
   }
-  
-  getSelectedDiagnoses() {   
-    return this.editProgramdata.get('selectedDiagnoses') as FormArray; 
+
+  getSelectedDiagnoses() {
+    return this.editProgramdata.get('selectedDiagnoses') as FormArray;
   }
   showProgramEditModal = false;
   programNameEditPanel() {
@@ -3371,12 +3375,12 @@ export class EditpatientComponent implements OnInit {
     this.selectedDiagnoses = selectedDiagnosesArray.value;
     // Store the current vital list before it gets changed
     this.vitalListDialog = this.vitalList;
-  
+
     this.editProgramdata.patchValue({
       programname: this.selectedProgramId,
       vitalListDialog: this.vitalListDialog,
     });
-    
+
     // Open the dialog after patching the values
     //this.dialog.open(this.programedit);
     if (this.programNameValueChangesSubscription) {
@@ -3402,12 +3406,12 @@ export class EditpatientComponent implements OnInit {
     this.showProgramEditModal = true;
     this.updateProgramDropdownState();
   }
-  
+
   updateProgramDropdownState() {
     const shouldDisable =
       this.Patientdata?.PatientProgramdetails?.Status === 'Active' &&
       !!this.selectedProgram;
-  
+
     if (shouldDisable) {
       this.editProgramdata.get('programname')?.disable({ emitEvent: false });
     } else {
@@ -3426,18 +3430,18 @@ export class EditpatientComponent implements OnInit {
     const currentProgramName = this.editProgramdata.controls.programname.value;
     const currentVitals = this.editProgramdata.controls.vitalListDialog.value;
     const currentDiagnoses = (this.editProgramdata.get('selectedDiagnoses') as FormArray).value;
-  
+
     const vitalsChanged = !this.arrayEqual(this.initiallySelectedVitals, currentVitals);
     const programChanged = Number(this.program_id) !== Number(currentProgramName);
     const diagnosisChanged = !this.arrayEqual(currentDiagnoses, this.Diagnosis_List);
-  
+
     return vitalsChanged || programChanged || diagnosisChanged;
   }
-  
+
   arrayEqual(a: any[], b: any[]): boolean {
     // If the arrays have different lengths, they're not equal
     if (a.length !== b.length) return false;
-  
+
     for (let i = 0; i < a.length; i++) {
       // If the elements are objects, compare their properties
       if (typeof a[i] === 'object' && typeof b[i] === 'object') {
@@ -3458,33 +3462,33 @@ export class EditpatientComponent implements OnInit {
   deepEqual(obj1: any, obj2: any): boolean {
     // If the objects are not the same reference, compare their properties
     if (obj1 === obj2) return true;
-  
+
     // If either is not an object, they can't be equal
     if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) {
       return false;
     }
-  
+
     const keys1 = Object.keys(obj1);
     const keys2 = Object.keys(obj2);
-  
+
     if (keys1.length !== keys2.length) return false;
-  
+
     // Compare each key and value recursively
     for (let key of keys1) {
       if (!keys2.includes(key) || !this.deepEqual(obj1[key], obj2[key])) {
         return false;
       }
     }
-  
+
     return true;
   }
-  
+
   newProgramid: any;
   EditProgramData() {
     const selectedDiagnosesArray = this.editProgramdata.get('selectedDiagnoses') as FormArray;
     const selectedDiagnoses = selectedDiagnosesArray.value;
     const vitalList = this.editProgramdata.controls.vitalListDialog.value;
-  
+
     if (
       selectedDiagnoses.length > 0 &&
       selectedDiagnoses[0].DiagnosisName &&
@@ -3499,9 +3503,9 @@ export class EditpatientComponent implements OnInit {
         ProgramDiagnosis: selectedDiagnoses,
         VitalIds: vitalList
       };
-  
+
       if (!this.DeviceCheckOnSubmit()) return;
-  
+
       this.rpm.rpm_post('/api/patient/updatepatientprogramdetails', req_body).then(
         (data) => {
           alert('Program Changed Successfully !!');
@@ -3525,7 +3529,7 @@ export class EditpatientComponent implements OnInit {
       this.editProgramDiagoList = [];
     }
   }
-  
+
   EditProgramCancel() {
     this.showProgramEditModal = false;  // Hide the modal
     if (this.programNameValueChangesSubscription) {
@@ -3648,39 +3652,39 @@ export class EditpatientComponent implements OnInit {
       stillUtc = temp[0];
     }
     stillUtc = stillUtc + 'Z';
-    var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
 
   vitalEditPgmListChange() {
     this.loading = true;
     const req_body = { VitalIds: this.vitalListDialog };
-  
+
     this.rpm.rpm_post(`/api/patient/getdiagnosiscodebyvitalid`, req_body).then(
       (data) => {
         this.editProgramDiagoList = data;
         this.loading = false;
-  
+
         for (let x of this.editProgramDiagoList) {
           x.DiagnosisFieldEdit = x.DiagnosisName + '-' + x.DiagnosisCode;
         }
-  
+
         const selectedDiagnosesArray = this.editProgramdata.get('selectedDiagnoses') as FormArray;
-  
+
         let j = 0;
         while (j < selectedDiagnosesArray.length) {
           const currentDiagnosis = selectedDiagnosesArray.at(j).value;
           const match = this.editProgramDiagoList.some(
             (            x: { DiagnosisCode: any; }) => x.DiagnosisCode === currentDiagnosis.DiagnosisCode && currentDiagnosis.DiagnosisCode?.trim() !== ''
           );
-  
+
           if (!match) {
             selectedDiagnosesArray.removeAt(j); // Remove using FormArray API
           } else {
             j++;
           }
         }
-  
+
         // Add default if no diagnoses left
         if (selectedDiagnosesArray.length === 0) {
           selectedDiagnosesArray.push(
@@ -3691,7 +3695,7 @@ export class EditpatientComponent implements OnInit {
             })
           );
         }
-  
+
         // Optionally update your internal model
         this.selectedDiagnoses = selectedDiagnosesArray.value;
       },
@@ -3701,7 +3705,7 @@ export class EditpatientComponent implements OnInit {
       }
     );
   }
-  
+
   deleteDocument(documentId: any) {
     this.rpm
       .rpm_post(
@@ -3760,7 +3764,7 @@ export class EditpatientComponent implements OnInit {
   // Manjusha code change
   isDropdownDisabled(): boolean {
     return this.Patientdata?.PatientProgramdetails?.Status === 'Active' && !!this.selectedProgram;
-  }  
+  }
 
   isOptionDisabled(vitalId: number): boolean {
     // Disable the option only if it's selected and the status is 'Active'
@@ -3778,39 +3782,39 @@ export class EditpatientComponent implements OnInit {
       return true;
     });
   }
-  
+
   onVitalChange(device: any, event: Event) {
     const selectedValue = (event.target as HTMLSelectElement).value;
     const selectedId = Number(selectedValue);
-  
+
     const selectedVital = this.getUniqueVitals().find((v: { VitalId: number }) => v.VitalId === selectedId);
     if (!selectedVital) return;
-  
+
     const selectedVitalName = selectedVital.VitalName.toLowerCase();
-  
+
     const alreadyActive = this.patientdevicedetails.some(
       (d: any) =>
         d.DeviceStatus === 'Active' &&
         d.VitalName.toLowerCase() === selectedVitalName
     );
-  
+
     if (alreadyActive) {
       alert(
         'This vital already has an active device assigned. Please choose a different vital or remove the existing device before adding a new one.'
       );
-  
+
       // Temporarily mark invalid and clear value
       device.invalidSelection = true;
       device.VitalId = null;
-  
+
       // Force a refresh after short delay
       setTimeout(() => {
         device.invalidSelection = false;
       });
-  
+
       return;
     }
-  
+
     // If valid, update previousVitalId
     device.previousVitalId = selectedId;
   }
