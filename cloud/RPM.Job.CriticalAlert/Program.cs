@@ -2,7 +2,7 @@
 using RPMCriticalAlertJob;
 using RPMWeb.Data.Common;
 using RPMWeb.Dal;
-
+// cron continuous
 class Program
 {
     static string CONN_STRING =string.Empty;

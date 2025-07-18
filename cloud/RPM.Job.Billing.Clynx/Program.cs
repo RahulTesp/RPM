@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RPMPatientBillingJob;
+// cron 0 0 * * * *
 class Program
 {
     static string CONN_STRING =string.Empty;

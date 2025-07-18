@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using SyncTranstekDevices;
+//cron 0 0 7 * * *
 class Program
 {
     static string CONN_STRING = string.Empty;

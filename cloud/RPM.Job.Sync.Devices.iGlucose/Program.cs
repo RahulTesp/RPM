@@ -7,7 +7,7 @@ using System.Net;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-
+//cron 0 0 7 * * *
 class Program
 {
     static string CONN_STRING =string.Empty;

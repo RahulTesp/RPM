@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-
+// cron 0 0 7 * * *
 namespace TranstekDataCleanupJob
 {
     internal class Program

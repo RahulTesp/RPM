@@ -4,7 +4,7 @@ using System.Data;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Collections.Concurrent;
+//cron continuous
 
 namespace azuretranstekwebjob
 {

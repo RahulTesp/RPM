@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
-
+//cron 0 0 7 * * *
 class Program
 {
     static string CONN_STRING = string.Empty;

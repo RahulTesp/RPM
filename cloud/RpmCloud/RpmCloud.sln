@@ -27,8 +27,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Lib.Billing.MedIT", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Billing.MedIT", "..\RPM.Job.Billing.MedIT\RPM.Job.Billing.MedIT.csproj", "{3C4A215B-04F7-48FB-84BB-941407EF2046}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.SessionValidation", "..\RPM.Job.SessionValidation\RPM.Job.SessionValidation.csproj", "{B22747AA-89D8-49DA-BD79-EB08ACEBD43A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Sync.Devices.iGlucose", "..\RPM.Job.Sync.Devices.iGlucose\RPM.Job.Sync.Devices.iGlucose.csproj", "{1155700F-D99D-4059-BAF0-1A96183101A4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.DeviceData.iGlucose", "..\RPM.Job.DeviceData.iGlucose\RPM.Job.DeviceData.iGlucose.csproj", "{BD263F99-4987-460B-946F-7AC5653B23A1}"
@@ -95,10 +93,6 @@ Global
 		{3C4A215B-04F7-48FB-84BB-941407EF2046}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C4A215B-04F7-48FB-84BB-941407EF2046}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C4A215B-04F7-48FB-84BB-941407EF2046}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B22747AA-89D8-49DA-BD79-EB08ACEBD43A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B22747AA-89D8-49DA-BD79-EB08ACEBD43A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B22747AA-89D8-49DA-BD79-EB08ACEBD43A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B22747AA-89D8-49DA-BD79-EB08ACEBD43A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1155700F-D99D-4059-BAF0-1A96183101A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1155700F-D99D-4059-BAF0-1A96183101A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1155700F-D99D-4059-BAF0-1A96183101A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
