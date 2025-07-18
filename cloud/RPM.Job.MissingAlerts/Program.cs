@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
-
+//cron 0 0 7 * * *
 class Program
 {
     static string CONN_STRING = string.Empty;
@@ -10,13 +10,24 @@ class Program
     {
         // Set up configuration
         var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true)
-            .AddEnvironmentVariables()
-            .Build();
-
-        var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
-        CONN_STRING = rpmSettings?.ConnectionString;
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json", optional: true)
+        .AddEnvironmentVariables() // Allows overriding via Azure App Settings
+        .Build();
+        if (config == null)
+        {
+            Console.WriteLine("Configuration is null.");
+            return;
+        }
+        // Access a specific config value
+        string? connStr = config["RPM:ConnectionString"];
+        Console.WriteLine($"RPM Connection String: {connStr}");
+        if (connStr == null)
+        {
+            Console.WriteLine("Connection string is null in appsettings.json.");
+            return;
+        }
+        CONN_STRING = connStr;
 
         if (string.IsNullOrEmpty(CONN_STRING))
         {
@@ -26,55 +37,48 @@ class Program
 
         Console.WriteLine("WebJob started...");
 
-        while (true)
+        try
         {
-            try
+            using SqlConnection connection = new SqlConnection(CONN_STRING);
+            await connection.OpenAsync();
+
+            // First stored procedure
+            using (SqlCommand command = new SqlCommand("usp_InsMissingAlerts", connection))
             {
-                using SqlConnection connection = new SqlConnection(CONN_STRING);
-                await connection.OpenAsync();
+                command.CommandType = CommandType.StoredProcedure;
+                command.CommandTimeout = 300;
 
-                // First stored procedure
-                using (SqlCommand command = new SqlCommand("usp_InsMissingAlerts", connection))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandTimeout = 300;
+                SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
+                returnParameter.Direction = ParameterDirection.ReturnValue;
 
-                    SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
-                    returnParameter.Direction = ParameterDirection.ReturnValue;
-
-                    await command.ExecuteNonQueryAsync();
-                    int result1 = (int)returnParameter.Value;
-                    Console.WriteLine($"usp_InsMissingAlerts executed with return value: {result1}");
-                }
-
-                // Second stored procedure
-                using (SqlCommand command1 = new SqlCommand("usp_DelPatientProgramPriority", connection))
-                {
-                    command1.CommandType = CommandType.StoredProcedure;
-                    command1.CommandTimeout = 300;
-
-                    SqlParameter returnParameter1 = command1.Parameters.Add("RetVal", SqlDbType.Int);
-                    returnParameter1.Direction = ParameterDirection.ReturnValue;
-
-                    await command1.ExecuteNonQueryAsync();
-                    int result2 = (int)returnParameter1.Value;
-                    Console.WriteLine($"usp_DelPatientProgramPriority executed with return value: {result2}");
-                }
-
-                await connection.CloseAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception: " + ex.ToString());
+                await command.ExecuteNonQueryAsync();
+                int result1 = (int)returnParameter.Value;
+                Console.WriteLine($"usp_InsMissingAlerts executed with return value: {result1}");
             }
 
-            // Optional: Delay between executions
-            await Task.Delay(TimeSpan.FromMinutes(1)); // Adjust as needed
+            // Second stored procedure
+            using (SqlCommand command1 = new SqlCommand("usp_DelPatientProgramPriority", connection))
+            {
+                command1.CommandType = CommandType.StoredProcedure;
+                command1.CommandTimeout = 300;
+
+                SqlParameter returnParameter1 = command1.Parameters.Add("RetVal", SqlDbType.Int);
+                returnParameter1.Direction = ParameterDirection.ReturnValue;
+
+                await command1.ExecuteNonQueryAsync();
+                int result2 = (int)returnParameter1.Value;
+                Console.WriteLine($"usp_DelPatientProgramPriority executed with return value: {result2}");
+            }
+
+            await connection.CloseAsync();
         }
-    }
-}
+        catch (Exception ex)
+        {
+            Console.WriteLine("Exception: " + ex.ToString());
+        }
 
-public class RpmSettings
-{
-    public string? ConnectionString { get; set; }
+        // Optional: Delay between executions
+        await Task.Delay(TimeSpan.FromMinutes(1)); // Adjust as needed
+
+    }
 }

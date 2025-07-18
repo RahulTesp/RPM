@@ -1,8 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
-using System.Threading;
-
+//cron contiuous
 class Program
 {
     static string CONN_STRING = string.Empty;
@@ -11,13 +10,24 @@ class Program
     {
         // Set up configuration
         var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true)
-            .AddEnvironmentVariables()
-            .Build();
-
-        var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
-        CONN_STRING = rpmSettings?.ConnectionString;
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json", optional: true)
+        .AddEnvironmentVariables() // Allows overriding via Azure App Settings
+        .Build();
+        if (config == null)
+        {
+            Console.WriteLine("Configuration is null.");
+            return;
+        }
+        // Access a specific config value
+        string? connStr = config["RPM:ConnectionString"];
+        Console.WriteLine($"RPM Connection String: {connStr}");
+        if (connStr == null)
+        {
+            Console.WriteLine("Connection string is null in appsettings.json.");
+            return;
+        }
+        CONN_STRING = connStr;
         Console.WriteLine(CONN_STRING);
         if (string.IsNullOrEmpty(CONN_STRING))
         {
@@ -44,11 +54,10 @@ class Program
             await connection.OpenAsync();
 
             // Execute stored procedures
-            //await ExecuteStoredProcedure(connection, "usp_InsPatientVitalMeasures");
-            //await ExecuteStoredProcedure(connection, "usp_InsAlerts");
+            await ExecuteStoredProcedure(connection, "usp_InsPatientVitalMeasures");
             //await ExecuteStoredProcedure(connection, "usp_InsAlertsTemp");
-            await ExecuteStoredProcedure(connection, "usp_InsPatientProgramPriority", 900);
-            await ExecuteStoredProcedure(connection, "usp_InsAlertSummary", 900);
+            //await ExecuteStoredProcedure(connection, "usp_InsPatientProgramPriority", 900);
+            //await ExecuteStoredProcedure(connection, "usp_InsAlertSummary", 900);
         }
         catch (Exception ex)
         {
@@ -67,9 +76,4 @@ class Program
         await command.ExecuteNonQueryAsync();
         Console.WriteLine($"Executed {procedureName} successfully.");
     }
-}
-
-public class RpmSettings
-{
-    public string? ConnectionString { get; set; }
 }
