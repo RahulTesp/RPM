@@ -384,17 +384,23 @@ public class VitalHealthTrends extends Fragment {
     }
 
     private void nextDateVital() throws ParseException {
-        Date dt = new Date();
-        DateTime curdt = new DateTime(dt);
+        DateTime today = new DateTime(); // current date
         DateTime dtPlusOne = curdate.plusDays(1);
-        curDay.setText(spdf.format(dtPlusOne.toDate()));
-        curIndex = curIndex+1;
-        curdate = dtPlusOne;
-        Log.d("nextDateaddsOne",dtPlusOne.toString());
-        Log.d("nextDatecurdt",curdt.toString());
 
-        checkvitels(dtPlusOne.toString(),dtPlusOne.toString());
-        Log.d("day1",spdf.format(dtPlusOne.toDate()));
+        // 🔒 Prevent selecting a future date
+        if (dtPlusOne.isAfter(today)) {
+            Toast.makeText(getContext(), "You cannot view upcoming dates.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        curDay.setText(spdf.format(dtPlusOne.toDate()));
+        curIndex = curIndex + 1;
+        curdate = dtPlusOne;
+
+        Log.d("nextDateaddsOne", dtPlusOne.toString());
+        Log.d("today", today.toString());
+
+        checkvitels(dtPlusOne.toString(), dtPlusOne.toString());
     }
 
     private void checkvitels(String startDate, String endDate) {

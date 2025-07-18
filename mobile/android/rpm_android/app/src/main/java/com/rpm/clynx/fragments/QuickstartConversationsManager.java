@@ -784,8 +784,10 @@ class QuickstartConversationsManager extends  AppCompatActivity {
                 conversation.getUnreadMessagesCount(new CallbackListener<Long>() {
                     @Override
                     public void onSuccess(Long unreadMsgCount) {
+                        Log.d("unreadMsgCountloadAllConversations", String.valueOf(unreadMsgCount));
                         if (unreadMsgCount == null) {
                             unreadMsgCount = 0L; // Default value
+                            Log.d("unreadMsgCountloadAllConversations1", String.valueOf(unreadMsgCount));
                         }
                         handleInitialUnreadMessages(conversation, unreadMsgCount, contx, chatRs);
                         progressBarChat.setVisibility(View.GONE);
@@ -817,8 +819,10 @@ class QuickstartConversationsManager extends  AppCompatActivity {
                             conversation.getUnreadMessagesCount(new CallbackListener<Long>() {
                                 @Override
                                 public void onSuccess(Long unreadMsgCount) {
+                                    Log.d("unreadMsgCountonMessageAdded", String.valueOf(unreadMsgCount));
                                     if (unreadMsgCount == null || unreadMsgCount == 0) {
                                         unreadMsgCount = 1L; // Ensure the first message gets counted
+                                        Log.d("unreadMsgCountonMessageAdded1", String.valueOf(unreadMsgCount));
                                     }
                                     handleUnreadMessages(conversation, unreadMsgCount, contx, chatRs, sender);
                                 }

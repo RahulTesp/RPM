@@ -92,6 +92,11 @@ public class MedicationFragment extends Fragment {
                         for (int i = 0; i < jsonArrayData.length(); i++){
                             medR.setVisibility(View.VISIBLE);
                             emptyView.setVisibility(View.GONE);
+
+                            String endDateStr = jsonArrayData.getJSONObject(i).getString("EndDate");
+                            boolean isExpired = DateUtils.isPastDate(endDateStr); // Implement this if not already
+
+
                             nim.add(new MedicationItemModel(jsonArrayData.getJSONObject(i).getString("Medicinename"),
                                     jsonArrayData.getJSONObject(i).getString("MedicineSchedule") + " / " + jsonArrayData.getJSONObject(i).getString("BeforeOrAfterMeal") ,
                                     jsonArrayData.getJSONObject(i).getString("Morning"),
@@ -99,7 +104,8 @@ public class MedicationFragment extends Fragment {
                                     jsonArrayData.getJSONObject(i).getString("Evening"),
                                     jsonArrayData.getJSONObject(i).getString("Night"),
                                     DateUtils.formatDate(jsonArrayData.getJSONObject(i).getString("StartDate"),"dd, MMM yyyy"),
-                                    DateUtils.formatDate(jsonArrayData.getJSONObject(i).getString("EndDate"),"dd, MMM yyyy")
+                                    DateUtils.formatDate(jsonArrayData.getJSONObject(i).getString("EndDate"),"dd, MMM yyyy"),
+                                    isExpired
                             ));
                             Log.d("nimGoals", nim.toString());
                         }
