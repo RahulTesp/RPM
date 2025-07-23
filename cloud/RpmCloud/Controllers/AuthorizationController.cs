@@ -61,14 +61,16 @@ namespace RpmCloud.Controllers
                 List<SystemConfigInfo> lstConf = DalCommon.GetSystemConfig(CONN_STRING, "Login", "User");
                 if (lstConf == null || lstConf.Count == 0)
                 {
-                    throw new Exception("Invalid System Configurations");
+                    Console.WriteLine("Invalid System Configurations");
+                    return BadRequest(new { message = "Unauthorized user." }); 
                 }
                 SystemConfigInfo? Mfa = lstConf.Find(x => x.Name.Equals("MFA"));
                 SystemConfigInfo? MfaLimit = lstConf.Find(x => x.Name.Equals("MFATimeOut"));
                 SystemConfigInfo? MfaRetryCount = lstConf.Find(x => x.Name.Equals("MFARetryCount"));
                 if(Mfa == null || MfaLimit == null || MfaRetryCount == null)
                 {
-                    throw new Exception("Invalid System Configurations");
+                    Console.WriteLine("Invalid System Configurations");
+                    return BadRequest(new { message = "Unauthorized user." });
                 }
                 int MFA_Enable = Convert.ToInt32(Mfa.Value);
                 if (MFA_Enable!=0 && otprequired)
@@ -77,14 +79,18 @@ namespace RpmCloud.Controllers
                     bool UserLocked = RpmDalFacade.CheckUserLockedStatus(verPass.UserName);
                     if (UserLocked)
                     {
-                        return Forbid("The user is temporarily locked. Please contact Admin /try again after 5 Minutes.");
+                        return StatusCode(
+                            StatusCodes.Status403Forbidden,
+                            new { message = "The user is temporarily locked. Please contact Admin or try again after 5 minutes." }
+                        );
                     }
                     ContactDetails contactDetails = new ContactDetails();
                     contactDetails = RpmDalFacade.GetPhoneNumberByUserName(verPass.UserName);
                     List<SystemConfigInfo> lstConfig = DalCommon.GetSystemConfig(CONN_STRING, "Twilio", "User");
                     if (lstConfig == null || lstConfig.Count == 0)
                     {
-                        throw new Exception("Invalid System Configurations");
+                        Console.WriteLine("Invalid System Configurations");
+                        return BadRequest(new { message = "Unauthorized user." });
                     }
                     SystemConfigInfo? accsid = lstConfig.Find(x => x.Name.Equals("AccountSID"));
                     SystemConfigInfo? authtoken = lstConfig.Find(x => x.Name.Equals("AuthToken"));
@@ -117,7 +123,8 @@ namespace RpmCloud.Controllers
                         List<SystemConfigInfo> providerName = DalCommon.GetSystemConfig(CONN_STRING, "Provider", "User");
                         if (lstConf == null || lstConf.Count == 0)
                         {
-                            throw new Exception("Invalid System Configurations");
+                            Console.WriteLine("Invalid System Configurations");
+                            return BadRequest(new { message = "Unauthorized user." });
                         }
                         SystemConfigInfo? provider = providerName.Find(x => x.Name.Equals("Provider"));
                         if(resp== null)
@@ -128,7 +135,8 @@ namespace RpmCloud.Controllers
                         {
                             if(provider== null)
                             {
-                                return BadRequest(new { message = "Invalid Provider" });
+                                Console.WriteLine("Invalid Provider");
+                                return BadRequest(new { message = "Unauthorized user." });
                             }
                             //xlawywleciknobww
                             string fromEmail = contactDetails.FromMail;
@@ -159,7 +167,8 @@ namespace RpmCloud.Controllers
                                     SendSms sendSms = new SendSms();
                                     if(Code == null)
                                     {
-                                        return BadRequest(new { message = "Invalid Country Code" });
+                                        Console.WriteLine("Invalid Country Code");
+                                        return BadRequest(new { message = "Unauthorized user." });
                                     }
                                     sendSms.PhoneNo = Code.Value+contactDetails.MobileNumber;
                                     phonenumber = contactDetails.MobileNumber;
@@ -179,7 +188,10 @@ namespace RpmCloud.Controllers
                             // xlawywleciknobww
                             try
                             {
-                                if (provider == null) { return BadRequest(new { message = "Invalid Provider" }); }
+                                if (provider == null) {
+                                    Console.WriteLine("Invalid Provider");
+                                    return BadRequest(new { message = "Unauthorized user." });
+                                }
                                 string fromEmail = contactDetails.FromMail;
                                 string toEmail = contactDetails.MailId;
                                 string subject = "One Time Password";
@@ -194,7 +206,10 @@ namespace RpmCloud.Controllers
                             }
                             catch (Exception ex)
                             {
-                                return StatusCode(503, "Failed to send otp to Email,Please contact Admin");
+                                return StatusCode(
+                                    StatusCodes.Status503ServiceUnavailable,
+                                    new { message = "Failed to send otp to Email,Please contact Admin." }
+                                );
                             }
                         }
                         else if(resp.IsSmsSend)
@@ -209,11 +224,13 @@ namespace RpmCloud.Controllers
                                     SendSms sendSms = new SendSms();
                                     if(Code == null)
                                     {
-                                        return BadRequest(new { message = "Invalid Country Code" });
+                                        Console.WriteLine("Invalid Country Code");
+                                        return BadRequest(new { message = "Unauthorized user." });
                                     }
                                     if(provider == null)
                                     {
-                                        return BadRequest(new { message = "Invalid Provider" });
+                                        Console.WriteLine("Invalid Provider");
+                                        return BadRequest(new { message = "Unauthorized user." });
                                     }
                                     sendSms.PhoneNo = Code.Value+contactDetails.MobileNumber; ;
                                     phonenumber = contactDetails.MobileNumber; ;
@@ -224,7 +241,11 @@ namespace RpmCloud.Controllers
                             }
                             catch (Exception ex)
                             {
-                                return StatusCode(503, "Failed to send otp to Mobile,Please contact Admin");
+                                return StatusCode(
+                                    StatusCodes.Status503ServiceUnavailable,
+                                    new { message = "Failed to send OTP to mobile. Please contact Admin." }
+                                );
+
                             }
                         }
                         //send otp  to patient mobile
@@ -236,16 +257,20 @@ namespace RpmCloud.Controllers
                         {
                             if (RetryAdded==Convert.ToInt32(MfaRetryCount.Value))
                             {
-                                return Forbid("The user is temporarily locked. Please contact Admin /try again after 5 Minutes.");
+                                return StatusCode(
+                                   StatusCodes.Status403Forbidden,
+                                   new { message = "The user is temporarily locked. Please contact Admin or try again after 5 minutes." }
+                               );
                             }
                             else
                             {
-                                return Unauthorized("Invalid Login details, Please check the username/passowrd.");
+                                return Unauthorized(new { message = "Invalid Login details, Please check the username/passowrd." });
                             }
                         }
                         else
                         {
-                            return Unauthorized();
+                            Console.WriteLine("Unauthorized user.");
+                            return Unauthorized(new { message = "Unauthorized user." });
                         }
                     }
                     else
@@ -260,7 +285,8 @@ namespace RpmCloud.Controllers
                         string result = Regex.Replace(input, pattern, m => new string('*', m.Length));
                         if(resp==null)
                         {
-                            return BadRequest("Invalid User");
+                            Console.WriteLine("Invalid User");
+                            return BadRequest(new { message = "Unauthorized user." });
                         }
                         if (resp.IsMailSend&&resp.IsSmsSend)
                         {
@@ -302,7 +328,10 @@ namespace RpmCloud.Controllers
                         bool UserLocked = RpmDalFacade.CheckUserLockedStatus(verPass.UserName);
                         if (UserLocked)
                         {
-                            return Forbid("The User is locked, Please contact your careteam.");
+                            return StatusCode(
+                                   StatusCodes.Status403Forbidden,
+                                   new { message = "The User is locked, Please contact your careteam." }
+                               );
                         }
                     }
                     RpmDalFacade.ConnectionString = CONN_STRING;
@@ -316,15 +345,19 @@ namespace RpmCloud.Controllers
                         {
                             if (RetryAdded==Convert.ToInt32(MfaRetryCount.Value))
                             {
-                                return Forbid("The User is locked, Please contact your careteam.");
+                                return StatusCode(
+                                    StatusCodes.Status403Forbidden,
+                                    new { message = "The User is locked, Please contact your careteam." }
+                                );
                             }
                             else
                             {
-                                return Unauthorized("Invalid Login details, Please check the username/passowrd.");
+                                Console.WriteLine("Unauthorized");
+                                return Unauthorized(new { message = "Invalid Login details, Please check the username/passowrd." });
                             }
 
                         }
-                        return Unauthorized();
+                        return Unauthorized(new { message = "Unauthorized" });
                     }
                     else
                     {
@@ -334,14 +367,17 @@ namespace RpmCloud.Controllers
                         {
                             return Ok(response);
                         }
-                        return StatusCode(500, "Db update failed");
+                        return StatusCode(
+                                StatusCodes.Status500InternalServerError,
+                                new { message = "Internal Server Error." }
+                            );
                     }
                 } 
             }
             catch (Exception ex)
             {
-
-                return BadRequest(ex.Message);
+                Console.WriteLine(ex.Message);
+                return BadRequest(new { message = "Unauthorized" });
             }
                                
         }
@@ -375,7 +411,8 @@ namespace RpmCloud.Controllers
                             List<SystemConfigInfo> lstConf = DalCommon.GetSystemConfig(CONN_STRING, "Login", "User");
                             if (lstConf == null || lstConf.Count == 0)
                             {
-                                throw new Exception("Invalid System Configurations");
+                                Console.WriteLine("Invalid System Configurations");
+                                return BadRequest(new { message = "Unauthorized" });
                             }
                             SystemConfigInfo? MfaRetryCount = lstConf.Find(x => x.Name.Equals("MFARetryCount"));
                             if (loginDetails.Match.ToLower()=="nomatch" || loginDetails.RetryCount>Convert.ToInt32(MfaRetryCount.Value))
@@ -385,16 +422,23 @@ namespace RpmCloud.Controllers
                                     bool resp = RpmDalFacade.LockUser(verPass.UserName);
                                     if (resp)
                                     {
-                                        return Forbid("User Locked,Please contact your careteam");
+                                        return StatusCode(
+                                              StatusCodes.Status403Forbidden,
+                                              new { message = "The User is locked, Please contact your careteam." }
+                                          );
                                     }
                                     else
                                     {
-                                        return Forbid("User lock update failed.");
+                                        return StatusCode(
+                                              StatusCodes.Status403Forbidden,
+                                              new { message = "The User is locked, Please contact your careteam." }
+                                          );
                                     }
                                 }
                                 else
                                 {
-                                    return Unauthorized("Invalid OTP");
+                                    Console.WriteLine("Invalid OTP");
+                                    return BadRequest(new { message = "Unauthorized" });
                                 }
                             }
 
@@ -427,31 +471,36 @@ namespace RpmCloud.Controllers
                                 }
                                 else
                                 {
-                                    return Unauthorized();
+                                   
+                                    return Unauthorized(new { message = "Unauthorized" });
                                 }
                             }
                         }
                         else
                         {
-                            return Forbid("OTP validation process failed.");
+                            return StatusCode(
+                                StatusCodes.Status403Forbidden,
+                                new { message = "The User is locked, Please contact your careteam." }
+                            );
                         }
                         
                         
                     }
                     else
                     {
-                        return Unauthorized();
+                        return Unauthorized(new { message = "Unauthorized" });
                     }
                 }
                 else
                 {
-                    return Unauthorized();
+                    return Unauthorized(new { message = "Unauthorized" });
                 }
             }
             catch (Exception ex)
             {
 
-                return BadRequest(ex.Message);
+                Console.WriteLine(ex.Message);
+                return Unauthorized(new { message = "Unauthorized" });
             }
 
         }
@@ -486,7 +535,8 @@ namespace RpmCloud.Controllers
                             List<SystemConfigInfo> lstConf = DalCommon.GetSystemConfig(CONN_STRING, "Login", "User");
                             if (lstConf == null || lstConf.Count == 0)
                             {
-                                throw new Exception("Invalid System Configurations");
+                                Console.WriteLine("Invalid System Configurations");
+                                return BadRequest(new { message = "Unauthorized" });
                             }
                             SystemConfigInfo? MfaRetryCount = lstConf.Find(x => x.Name.Equals("MFARetryCount"));
                             if (loginDetails.Match.ToLower()=="nomatch" || loginDetails.RetryCount>Convert.ToInt32(MfaRetryCount.Value))
@@ -496,16 +546,22 @@ namespace RpmCloud.Controllers
                                     bool resp = RpmDalFacade.LockUser(verPass.Username);
                                     if (resp)
                                     {
-                                        return Forbid("The user is temporarily locked. Please contact Admin /try again after 5 Minutes.");
+                                        return StatusCode(
+                                           StatusCodes.Status403Forbidden,
+                                           new { message = "The user is temporarily locked. Please contact Admin or try again after 5 minutes." }
+                                       );
                                     }
                                     else
                                     {
-                                        return Forbid("The user is temporarily locked. Please contact Admin /try again after 5 Minutes.");
+                                        return StatusCode(
+                                            StatusCodes.Status403Forbidden,
+                                            new { message = "The user is temporarily locked. Please contact Admin or try again after 5 minutes." }
+                                        );
                                     }
                                 }
                                 else
                                 {
-                                    return Unauthorized("OTP entered is not valid.");
+                                    return Unauthorized(new { message = "Unauthorized" });
                                 }
                             }
                             else
@@ -516,38 +572,46 @@ namespace RpmCloud.Controllers
                                     bool res1 = RpmDalFacade.ClearOldSessions(verPass.Username);
                                     if (res1)
                                     {
-                                        return Ok("Password changed successfully, please re-login to continue.");
+                                        return Ok(new { message = "Password changed successfully, please re-login to continue." });
                                     }
                                     else
                                     {
-                                        return Ok("Password changed successfully, old sessions are still alive and please re-login to continue.");
+                                        return Ok(new { message = "Password changed successfully, old sessions are still alive and please re-login to continue." });
                                     }
                                 }
                                 else
                                 {
-                                    return Forbid("Failed to Reset Password, Please try again.");
+                                    return StatusCode(
+                                            StatusCodes.Status403Forbidden,
+                                            new { message = "Failed to Reset Password, Please try again." }
+                                        );
+                                    
                                 }
                             }
                         }
                         else
                         {
-                            return Forbid("OTP entered is not valid.");
+                            return StatusCode(
+                                            StatusCodes.Status403Forbidden,
+                                            new { message = "OTP entered is not valid." }
+                                        );
                         }
                     }
                     else
                     {
-                        return Unauthorized();
+                        return Unauthorized(new { message = "Unauthorized" });
                     }
                 }
                 else
                 {
-                    return Unauthorized();
+                    return Unauthorized(new { message = "Unauthorized" });
                 }
             }
             catch (Exception ex)
             {
 
-                return BadRequest(ex.Message);
+                Console.WriteLine(ex.Message);
+                return BadRequest(new { message = "Unauthorized" });
             }
         }
         [Route("forgetpassword")]
@@ -560,13 +624,16 @@ namespace RpmCloud.Controllers
                 bool UserLocked = RpmDalFacade.CheckUserLockedStatus(username);
                 if (UserLocked)
                 {
-                    return Forbid("The User is locked, Please contact your careteam.");
+                    return StatusCode(
+                        StatusCodes.Status403Forbidden,
+                        new { message = "The User is locked, Please contact your careteam." }
+                    );
                 }
                 bool isActive = RpmDalFacade.CheckUserActive(username);
 
                 if (!isActive)
                 {
-                    return NotFound("The User is Inactive");
+                    return NotFound(new { message = "The User is Inactive" });
                 }
                 LoginResponseToken token = new LoginResponseToken();
                 RpmDalFacade.ConnectionString = CONN_STRING;
@@ -579,7 +646,8 @@ namespace RpmCloud.Controllers
                 List<SystemConfigInfo> lstConf = DalCommon.GetSystemConfig(CONN_STRING, "Login", "User");
                 if (lstConf == null || lstConf.Count == 0)
                 {
-                    throw new Exception("Invalid System Configurations");
+                    Console.WriteLine("Invalid System Configurations");
+                    return BadRequest(new { message = "Unauthorized" });
                 }
                 UserRoleConfig resp = RpmDalFacade.GetUserRoleConfig(username);
                 bool ValidMailId = false;
@@ -593,7 +661,8 @@ namespace RpmCloud.Controllers
                 LoginResponseToken loginResponseToken = new LoginResponseToken();
                 if(MfaLimit == null)
                 {
-                    throw new Exception("Invalid System Configurations");
+                    Console.WriteLine("Invalid System Configurations");
+                    return BadRequest(new { message = "Unauthorized" });
                 }
                 loginResponseToken = RpmDalFacade.CreateNewToken(Convert.ToInt32(MfaLimit.Value));
                 //insert otp and new token to logindetails table
@@ -609,7 +678,8 @@ namespace RpmCloud.Controllers
                     List<SystemConfigInfo> lstConfig = DalCommon.GetSystemConfig(CONN_STRING, "Twilio", "User");
                     if (lstConfig == null || lstConfig.Count == 0)
                     {
-                        throw new Exception("Invalid System Configurations");
+                        Console.WriteLine("Invalid System Configurations");
+                        return BadRequest(new { message = "Unauthorized" });
                     }
                     SystemConfigInfo? accsid = lstConfig.Find(x => x.Name.Equals("AccountSID"));
                     SystemConfigInfo? authtoken = lstConfig.Find(x => x.Name.Equals("AuthToken"));
@@ -677,7 +747,10 @@ namespace RpmCloud.Controllers
                         }
                         catch (Exception ex)
                         {
-                            return StatusCode(503,"Failed to send otp to Email,Please contact Admin");
+                            return StatusCode(
+                                    StatusCodes.Status503ServiceUnavailable,
+                                    new { message = "Failed to send otp to Email,Please contact Admin." }
+                                );
                         }
                     }
                     else if (resp.IsSmsSend)
@@ -699,7 +772,10 @@ namespace RpmCloud.Controllers
                         }
                         catch (Exception ex)
                         {
-                            return StatusCode(503, "Failed to send otp to Mobile,Please contact Admin");
+                            return StatusCode(
+                                    StatusCodes.Status503ServiceUnavailable,
+                                    new { message = "Failed to send otp to Mobile,Please contact Admin." }
+                                );
                         }
                     }
                     loginResponseToken.MFA=true;
@@ -729,11 +805,12 @@ namespace RpmCloud.Controllers
                     }
                     return Ok(loginResponseToken);
                 }
-                return NotFound("Invalid Login details, Please check the username.");
+                return NotFound(new { message = "Invalid Login details, Please check the username." });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                Console.WriteLine(ex.Message);
+                return BadRequest(new { message = "Unauthorized" });
             }
         }
         [Route("UnlockUser")]
@@ -767,18 +844,19 @@ namespace RpmCloud.Controllers
                     bool res = RpmDalFacade.UnlockUser(unlockUser.UserId,unlockUser.Patientid);
                     if (res)
                     {
-                        return Ok("User/Patient Unlocked");
+                        return Ok(new { message = "User/Patient Unlocked" });
                     }
-                    return NotFound("Could not find  details");
+                    return NotFound(new { message = "Could not find  details" });
                 }
                 else
                 {
-                    return  Unauthorized();
+                    return  Unauthorized(new { message = "Unauthorized" });
                 }
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                Console.WriteLine(ex.Message);
+                return BadRequest(new { message = "Unauthorized" });
             }
 
         }
@@ -811,9 +889,9 @@ namespace RpmCloud.Controllers
                     logout.createdBy = UserName;
                     if (RpmDalFacade.LogOut(logout))
                     {
-                        return Ok("Logout Sucess");
+                        return Ok(new { message = "Logout Sucess" });
                     }
-                    return NotFound("Invalid session");
+                    return NotFound(new { message = "Invalid session" });
                 }
                 else
                 {
@@ -822,7 +900,9 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                Console.WriteLine(ex.Message);
+                return BadRequest(new { message = "Invalid session." });
+
             }
         }
         [Route("updatepassword")]
@@ -894,7 +974,7 @@ namespace RpmCloud.Controllers
                     }
                     if (!RpmDalFacade.ValidateTkn(s))
                     {
-                        return Unauthorized( "Invalid session.");
+                        return Unauthorized(new { message = "Invalid session." });
                     }
 
                     List<OperationalMasterData> Info = RpmDalFacade.GetOperationalMasterData(UserName);
@@ -902,7 +982,7 @@ namespace RpmCloud.Controllers
                     {
                         return Ok(Info);
                     }
-                    return NotFound("Could not find  details");
+                    return NotFound(new { message = "Could not find  details" });
                 }
                 else
                 {
@@ -947,7 +1027,7 @@ namespace RpmCloud.Controllers
                     {
                         return Ok(Info);
                     }
-                    return NotFound("Could not find  details");
+                    return NotFound(new { message = "Could not find  details" });
                 }
                 else
                 {
@@ -991,7 +1071,7 @@ namespace RpmCloud.Controllers
                     {
                         return Ok(JsonConvert.SerializeObject(Info, Formatting.Indented));
                     }
-                    return NotFound("Could not find  details");
+                    return NotFound(new { message = "Could not find  details" });
                 }
                 else
                 {
@@ -1033,7 +1113,7 @@ namespace RpmCloud.Controllers
                     UserPermission up = RpmDalFacade.GetUserAccessRights(UserName, RoleId);
                     if (up == null)
                     {
-                        return BadRequest();
+                        return BadRequest(new { message = "Bad Request" });
                     }
                     return Ok(up);
                 }
@@ -1124,14 +1204,16 @@ namespace RpmCloud.Controllers
                 List<SystemConfigInfo> lstConf = DalCommon.GetSystemConfig(CONN_STRING, "Login", "User");
                 if (lstConf == null || lstConf.Count == 0)
                 {
-                    throw new Exception("Invalid System Configurations");
+                    Console.WriteLine("Invalid System Configurations");
+                    return BadRequest(new { message = "Unauthorized" });
                 }
                 SystemConfigInfo? Mfa = lstConf.Find(x => x.Name.Equals("MFA"));
                 SystemConfigInfo? MfaLimit = lstConf.Find(x => x.Name.Equals("MFATimeOut"));
                 SystemConfigInfo? MfaRetryCount = lstConf.Find(x => x.Name.Equals("MFARetryCount"));
                 if (Mfa == null)
                 {
-                    throw new Exception("Something went wrong!");
+                    Console.WriteLine("Invalid System Configurations");
+                    return BadRequest(new { message = "Unauthorized" });
                 }
                 int MFA_Enable = Convert.ToInt32(Mfa.Value);
                 if (MFA_Enable != 0 && otprequired)
@@ -1140,14 +1222,19 @@ namespace RpmCloud.Controllers
                     bool UserLocked = RpmDalFacade.CheckUserLockedStatus(verPass.UserName);
                     if (UserLocked)
                     {
-                        return Forbid("The user is temporarily locked. Please contact Admin /try again after 5 Minutes.");
+                        
+                        return StatusCode(
+                            StatusCodes.Status403Forbidden,
+                            new { message = "The user is temporarily locked. Please contact Admin /try again after 5 Minutes." }
+                        );
                     }
                     ContactDetails contactDetails = new ContactDetails();
                     contactDetails = RpmDalFacade.GetPhoneNumberByUserName(verPass.UserName);
                     List<SystemConfigInfo> lstConfig = DalCommon.GetSystemConfig(CONN_STRING, "Twilio", "User");
                     if (lstConfig == null || lstConfig.Count == 0)
                     {
-                        throw new Exception("Invalid System Configurations");
+                        Console.WriteLine("Invalid System Configurations");
+                        return BadRequest(new { message = "Unauthorized" });
                     }
                     SystemConfigInfo? accsid = lstConfig.Find(x => x.Name.Equals("AccountSID"));
                     SystemConfigInfo? authtoken = lstConfig.Find(x => x.Name.Equals("AuthToken"));
@@ -1179,12 +1266,14 @@ namespace RpmCloud.Controllers
                         List<SystemConfigInfo> providerName = DalCommon.GetSystemConfig(CONN_STRING, "Provider", "User");
                         if (lstConf == null || lstConf.Count == 0)
                         {
-                            throw new Exception("Invalid System Configurations");
+                            Console.WriteLine("Invalid System Configurations");
+                            return BadRequest(new { message = "Unauthorized" });
                         }
                         SystemConfigInfo? provider = providerName.Find(x => x.Name.Equals("Provider"));
                         if (resp == null || provider == null)
                         {
-                            throw new Exception("Something went wrong!");
+                            Console.WriteLine("Invalid System Configurations");
+                            return BadRequest(new { message = "Unauthorized" });
                         }
                         if (resp.IsMailSend && resp.IsSmsSend)
                         {
@@ -1254,7 +1343,10 @@ namespace RpmCloud.Controllers
                             }
                             catch (Exception ex)
                             {
-                                return StatusCode(503,"Failed to send otp to Email,Please contact Admin");
+                                return StatusCode(
+                                    StatusCodes.Status503ServiceUnavailable,
+                                    new { message = "Failed to send otp to Mobile,Please contact Admin." });
+
                             }
                         }
                         else if (resp.IsSmsSend)
@@ -1269,7 +1361,8 @@ namespace RpmCloud.Controllers
                                     SendSms sendSms = new SendSms();
                                     if (Code == null)
                                     {
-                                        throw new Exception("Something went wrong!");
+                                        Console.WriteLine("Invalid System Configurations");
+                                        return BadRequest(new { message = "Unauthorized" });
                                     }
                                     sendSms.PhoneNo = Code.Value + contactDetails.MobileNumber; ;
                                     phonenumber = contactDetails.MobileNumber; ;
@@ -1280,7 +1373,10 @@ namespace RpmCloud.Controllers
                             }
                             catch (Exception ex)
                             {
-                                return StatusCode(503, "Failed to send otp to Mobile,Please contact Admin");
+                                return StatusCode(
+                                    StatusCodes.Status503ServiceUnavailable,
+                                    new { message = "Failed to send otp to Mobile,Please contact Admin." }
+                                );
                             }
                         }
 
@@ -1294,21 +1390,27 @@ namespace RpmCloud.Controllers
                         {
                             if (MfaRetryCount == null)
                             {
-                                throw new Exception("Something went wrong!");
+                                Console.WriteLine("Invalid System Configurations");
+                                return BadRequest(new { message = "Unauthorized" });
                             }
                             if (RetryAdded == Convert.ToInt32(MfaRetryCount.Value))
                             {
-                                return Forbid("The user is temporarily locked. Please contact Admin /try again after 5 Minutes.");
+                                return StatusCode(
+                                    StatusCodes.Status403Forbidden,
+                                    new { message = "The user is temporarily locked. Please contact Admin /try again after 5 Minutes." }
+                                );
+                                
                             }
                             else
                             {
-                                return Unauthorized("Invalid Login details, Please check the username/passowrd.");
+                                Console.WriteLine("Invalid Login details, Please check the username/passowrd.");
+                                return BadRequest(new { message = "Unauthorized" });
                             }
 
                         }
                         else
                         {
-                            return Unauthorized();
+                            return Unauthorized(new { message = "Unauthorized" });
                         }
 
 
@@ -1321,7 +1423,8 @@ namespace RpmCloud.Controllers
                         loginResponseToken.Roles = roles;
                         if (MfaLimit == null)
                         {
-                            throw new Exception("Something went wrong!");
+                            Console.WriteLine("Invalid System Configurations");
+                            return BadRequest(new { message = "Unauthorized" });
                         }
                         loginResponseToken.MFA = true;
                         loginResponseToken.TimeLimit = Convert.ToInt32(MfaLimit.Value);
@@ -1330,7 +1433,8 @@ namespace RpmCloud.Controllers
                         string result = Regex.Replace(input, pattern, m => new string('*', m.Length));
                         if (resp == null)
                         {
-                            throw new Exception("Something went wrong!");
+                            Console.WriteLine("Invalid System Configurations");
+                            return BadRequest(new { message = "Unauthorized" });
                         }
                         if (resp.IsMailSend && resp.IsSmsSend)
                         {
@@ -1375,7 +1479,10 @@ namespace RpmCloud.Controllers
 
                         if (UserLocked)
                         {
-                            return Forbid("The User is locked, Please contact your careteam.");
+                            return StatusCode(
+                                    StatusCodes.Status403Forbidden,
+                                    new { message = "The User is locked, Please contact your careteam." }
+                                );
                         }
                     }
 
@@ -1390,15 +1497,18 @@ namespace RpmCloud.Controllers
                         {
                             if (RetryAdded == Convert.ToInt32(MfaRetryCount.Value))
                             {
-                                return Forbid( "The User is locked, Please contact your careteam.");
+                                return StatusCode(
+                                    StatusCodes.Status403Forbidden,
+                                    new { message = "The User is locked, Please contact your careteam." }
+                                );
                             }
                             else
                             {
-                                return Unauthorized("Invalid Login details, Please check the username/passowrd.");
+                                return Unauthorized(new { message = "Invalid Login details, Please check the username/passowrd." });
                             }
 
                         }
-                        return Unauthorized();
+                        return Unauthorized(new { message = "Unauthorized" });
                     }
                     else
                     {
@@ -1408,7 +1518,7 @@ namespace RpmCloud.Controllers
                         {
                             return Ok(response);
                         }
-                        return StatusCode(500, "Db update failed");
+                        return StatusCode(500, new { message = "Db update failed" });
                     }
                 }
 
@@ -1416,7 +1526,8 @@ namespace RpmCloud.Controllers
             catch (Exception ex)
             {
 
-                return BadRequest(ex.Message);
+                Console.WriteLine(ex.Message);
+                return BadRequest(new { message = "Unauthorized" });
             }
 
         }
