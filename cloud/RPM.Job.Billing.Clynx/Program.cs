@@ -21,11 +21,12 @@ class Program
             }
             // Access a specific config value
             string? connStr = config["RPM:ConnectionString"];
-            Console.WriteLine($"RPM Connection String: {connStr}");
-            if(connStr == null) {
+            if (connStr == null)
+            {
                 Console.WriteLine("Connection string is null in appsettings.json.");
                 return;
             }
+            Console.WriteLine($"RPM Connection String: {connStr}");
             CONN_STRING = connStr;
             Console.WriteLine("WebJob started...");
             if(CONN_STRING == null)
