@@ -53,7 +53,7 @@ export class PatientChatService {
   public error$ = this.errorSubject.asObservable();
   private chatPanelOpenSubject = new BehaviorSubject<boolean>(false);
   public chatPanelOpen$ = this.chatPanelOpenSubject.asObservable();
-
+  public LoginStatus = true;
   private userName: string = '';
   private currentTime: Date = new Date();
   private currentPatientUser: string = '';
@@ -485,7 +485,6 @@ private removeMessageListeners(): void {
 // Optimized version of the chat service methods
 async fetchUserChats(conversationSid: string): Promise<void> {
   this.setLoading(true);
-
   try {
     if (!this.client) throw new Error('Client not initialized');
 
@@ -507,6 +506,7 @@ async fetchUserChats(conversationSid: string): Promise<void> {
     this.openChat(conversation);
 
   } catch (error) {
+    console.log('Fetch User Chat Details Error')
     console.error('Error fetching conversation:', error);
     this.setError('Failed to load chat');
   } finally {
@@ -673,7 +673,7 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
       // Add the other user if it's a different user
       if (userName !== currentUserName) {
         await channel.add(currentUserName);
-        console.log('Added other user to conversation:', currentUserName);
+
       }
 
       // Make sure current user is added (this might be redundant if join() adds the user)
@@ -691,7 +691,10 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
 
       await this.updateChatResource(channel, currentUserName);
       await this.openChat(channel);
+      this.setError('');
+      this.LoginStatus = true;
     } catch (error) {
+      this.LoginStatus = false;
       console.error('Error creating new chat:', error);
       this.setError('Patient login required. Please have the patient sign in to the mobile app to begin the conversation.')
 
@@ -729,7 +732,7 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
 
       return response.message;
     } catch (error) {
-      console.error(' Error getting chat ID:', error);
+
       throw error;
     }
   }
