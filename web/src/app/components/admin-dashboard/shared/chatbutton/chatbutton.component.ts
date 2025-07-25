@@ -59,7 +59,7 @@ export class ChatbuttonComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   constructor(
-    private patientChatService: PatientChatService,
+    public patientChatService: PatientChatService,
     private rpm: RPMService
   ) {}
 
@@ -206,6 +206,8 @@ async sendMessage() {
         // Force a fresh load of conversations
         await this.patientChatService.fetchUserChats(this.currentSid);
         this.startChatHeartBeat( this.currentSid,this.userName);
+        this.patientChatService.setError('');
+        this.patientChatService.LoginStatus = true;
       } catch (error: any) {
         if (error.status === 404) {
           //console.error('this Patient is not logged in to Mobile App yet, please ask him to Login for Establishing a conversation.');
