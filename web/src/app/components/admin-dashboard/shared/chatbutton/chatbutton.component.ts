@@ -59,7 +59,7 @@ export class ChatbuttonComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   constructor(
-    private patientChatService: PatientChatService,
+    public patientChatService: PatientChatService,
     private rpm: RPMService
   ) {}
 
@@ -185,7 +185,6 @@ async sendMessage() {
     this.chatVariable = true;
     this.currentTime = new Date();
     this.isLoading = true;
-
     try {
       // Clear existing data first
       this.patientChatService.chatListSubject.next([]);
@@ -193,19 +192,18 @@ async sendMessage() {
       this.patientChatService.messagesSubject.next([]);
       this.messages = [];
       this.currentConversation = null;
-
       // Initialize chat service
       await this.patientChatService.ensureInitialized(this.currentuserName);
-
       // Explicitly tell the service which user's conversations to load
       console.log('Loading conversations for user:', this.currentuserName);
-
       try {
         // Get the current SID for this specific user
         this.currentSid = await this.patientChatService.getChatId(
           this.currentuserName
         );
 
+        this.patientChatService.setError('');
+        this.patientChatService.LoginStatus = true;
         // Force a fresh load of conversations
         await this.patientChatService.fetchUserChats(this.currentSid);
         this.startChatHeartBeat( this.currentSid,this.userName);

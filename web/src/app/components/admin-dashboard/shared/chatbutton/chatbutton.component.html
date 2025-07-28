@@ -164,7 +164,7 @@
     </div>
   </div>
 
-  <div class="send-block">
+  <div class="send-block" *ngIf="patientChatService.LoginStatus">
     <textarea
       class="chatTypearea"
       [(ngModel)]="message"
