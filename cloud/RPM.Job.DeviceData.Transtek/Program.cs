@@ -325,7 +325,7 @@ namespace azuretranstekwebjob
             bool ret = false;
             string stagingInsert = "INSERT INTO JsonStg([Json])VALUES";
 
-            if (deviceType == "Blood Pressure Monitor ")
+            if (deviceType == "Blood Pressure Monitor")
             {
                 ret = ProcessBloobPressureData(dev, CONN_STRING, stagingInsert);
             }
