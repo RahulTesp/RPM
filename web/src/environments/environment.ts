@@ -6,7 +6,7 @@ import { VAPID_KEY } from '@angular/fire/compat/messaging';
 // The list of file replacements can be found in `angular.json`.
 export const environment = {
   production: false,
-  host:'rpm-multivital-api.azurewebsites.net',
+  host:'rpm-multivital-api-v2.azurewebsites.net',
 
   protocol: 'https',
   firebase: {
