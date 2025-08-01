@@ -296,7 +296,8 @@ export class LoginComponent implements OnInit {
               window.location.reload();
               this.auth.unauthorized();
             } else if (err.status == 403) {
-              alert(err.error);
+              // alert(err.error);
+              alert("The User is locked, Please contact your careteam.")
               window.location.reload();
               this.auth.unauthorized();
             } else if (err.status == 404) {
