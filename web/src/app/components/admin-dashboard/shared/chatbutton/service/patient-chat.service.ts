@@ -53,7 +53,7 @@ export class PatientChatService {
   public error$ = this.errorSubject.asObservable();
   private chatPanelOpenSubject = new BehaviorSubject<boolean>(false);
   public chatPanelOpen$ = this.chatPanelOpenSubject.asObservable();
-
+ public LoginStatus = true;
   private userName: string = '';
   private currentTime: Date = new Date();
   private currentPatientUser: string = '';
@@ -635,7 +635,10 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
 
       await this.updateChatResource(channel, currentUserName);
       await this.openChat(channel);
+      this.setError('');
+      this.LoginStatus = true;
     } catch (error) {
+      this.LoginStatus = false;
       console.error('Error creating new chat:', error);
       this.setError('Patient login required. Please have the patient sign in to the mobile app to begin the conversation.')
 
