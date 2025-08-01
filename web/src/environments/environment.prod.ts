@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  host:'rpm-multivital-api.azurewebsites.net',
+  host:'rpm-multivital-api-v2.azurewebsites.net',
   protocol: 'https',
   firebase: {
     apiKey: 'AIzaSyACz7ajD-LO6x6FlcSjTcevAV0dVDypans',
