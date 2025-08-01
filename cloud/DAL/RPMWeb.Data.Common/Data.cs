@@ -204,7 +204,6 @@ namespace RPMWeb.Data.Common
         public string UserName { get; set; }
         public string NewPassword { get; set; }
         public string OldPassword { get; set; }
-        public string CreatedBy { get; set; }
     }
     public class OperationalMasterData
     {
