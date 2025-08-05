@@ -13,6 +13,7 @@ import { PatientReportApiService } from '../../services/patient-report-api.servi
 import jsPDF from 'jspdf';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ConfirmDialogServiceService } from 'src/app/components/admin-dashboard/shared/confirm-dialog-panel/service/confirm-dialog-service.service';
+import { PatientDataDetailsService } from '../../../patient-detail-page/Models/service/patient-data-details.service';
 
 @Component({
   selector: 'app-patient-data-report',
@@ -38,6 +39,7 @@ export class PatientDataReportComponent implements OnInit {
   private http_medication_data: any;
   private selectedProgramName: any;
   private patientProgramname: any;
+  private idProgram: any;
   private programDetails: any;
   public downloadstatus = true;
   private HtmlGraph: any;
@@ -51,6 +53,7 @@ export class PatientDataReportComponent implements OnInit {
   enddate: any;
   month1: any;
   public showDialog = false;
+  heath_trends_frequency: number;
   range = new FormGroup({
     start: new FormControl(null),
     end: new FormControl(null),
@@ -84,7 +87,8 @@ export class PatientDataReportComponent implements OnInit {
     private patientdownloadService: DownloadPatientReportService,
     // private patientUtilService: PatientUtilService,
     private PatientReportapi: PatientReportApiService,
-    private confirmDialog:ConfirmDialogServiceService
+    private confirmDialog:ConfirmDialogServiceService,
+    private patientService: PatientDataDetailsService
   ) {}
 
   ngOnInit(): void {
@@ -140,10 +144,13 @@ export class PatientDataReportComponent implements OnInit {
     );
     this.maxDate = new Date(maxdate);
   }
+  currentY: number=15;
+  healthtrendVitalNameArray: any;
   downloadPatientReport() {
     this.patientStatusData = this.http_rpm_patient.PatientProgramdetails.Status;
     this.patientProgramname =
       this.http_rpm_patient['PatientProgramdetails'].ProgramName;
+    this.idProgram = this.http_rpm_patient['PatientProgramdetails'].ProgramId;
     this.reportStart();
     this.getPatientAndProgramInfo();
   }
@@ -170,8 +177,236 @@ export class PatientDataReportComponent implements OnInit {
     this.getHealthTrends();
   }
 
+  /**
+   *  Removes `null` values and fixes date issues
+   */
+  private cleanData(dataArray: any[], vitalName: string): any[] {
+    if (!Array.isArray(dataArray)) return [];
+
+    return dataArray.filter((value, i) => {
+      if (value !== null) return true;
+
+      if (i > 0 && i < dataArray.length - 1 && vitalName !== 'Blood Glucose') {
+        const [prevDate] = this.lineChartLabels[i - 1]?.split(' - ') || [];
+        const [currDate] = this.lineChartLabels[i]?.split(' - ') || [];
+        const [nextDate] = this.lineChartLabels[i + 1]?.split(' - ') || [];
+
+        if (currDate === prevDate || currDate === nextDate) {
+          this.lineChartLabels.splice(i, 1);
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
+  allLineChartData: any=[];
+  async getVitalHealthTrendDataGraph(daycount: number, startDate?: string, endDate?: string) {
+    try {
+      //Fetch Health Trend Data
+      const data = await this.patientService.fetchHealthTrendInfo(
+        this.selectedPatient,
+        this.selectedProgram,
+        daycount,
+        startDate,
+        endDate
+      );
+      const vitalHttpHealthTrends = data.trends;
+      this.healthtrendVitalNameArray = data.vitalNames;
+      //  Clear previous data before pushing new ones
+      this.allLineChartData = [];
+
+      //  Loop through health trends & process them
+      vitalHttpHealthTrends.forEach((trendData: any) => {
+        if (!trendData.Values || trendData.Values.length === 0) {
+          this.setEmptyGraphWithDate(startDate ?? this.convertDate(new Date(Date.now() - (daycount - 1) * 86400000)), endDate ?? this.convertDate(new Date()));
+          return;
+        }
+
+        const isVital = trendData.Values?.[0]?.label === 'Vital';
+        const originalLabels = this.patientService.convertDateforHealthTrends(
+          trendData.Time,
+          isVital
+        );
+
+        const originalDataSets = trendData.Values.map((item: any) => ({
+          data: [...item.data],
+          label: item.label,
+          fill: false,
+          lineTension: 0.5
+        }));
+
+        const {
+          filteredData,
+          filteredLabels
+        } = this.filterChartDataAndLabelsTogether(
+          originalDataSets,
+          originalLabels,
+          trendData.VitalName
+        );
+
+        const lineChartData = originalDataSets.map((ds: any, idx: any) => ({
+          ...ds,
+          data: filteredData[idx]
+        }));
+
+        this.allLineChartData.push({
+          lineChartLabels: filteredLabels,
+          lineChartData
+        });
+      });
+    } catch (error) {
+      console.error('Error loading health trends:', error);
+    }
+  }
+
+  setEmptyGraphHealthInfo() {
+    var date_val = new Date();
+    var x = [0, 1, 2, 3, 4, 5, 6];
+    var DefaultDates = [];
+    var date_val_set = '';
+    for (var item1 of x) {
+      date_val_set = this.convertDate(date_val.setDate(date_val.getDate()));
+      DefaultDates.push(date_val_set);
+      date_val_set = this.convertDate(date_val.setDate(date_val.getDate() - 1));
+    }
+
+    var http_healthtrends = {
+      VitalName: 'No Data',
+      VitalId: 1,
+      Time: DefaultDates.reverse(),
+      Values: [
+        { data: [null, null, null, null, null, null, null], label: 'No data available' },
+      ],
+    };
+    this.lineChartLabels = this.patientService.convertDateforHealthTrends(
+      http_healthtrends.Time,
+      false
+    );
+    const lineChartLabels = this.lineChartLabels;
+    var temp = [];
+    for (var item of http_healthtrends.Values) {
+      var obj = {
+        data: item.data,
+        label: item.label,
+        fill: false,
+        lineTension: 0.5,
+      };
+      temp.push(obj);
+    }
+    this.lineChartData = temp;
+    const lineChartData = this.lineChartData;
+    // Push processed data into array
+    this.allLineChartData.push({
+      lineChartLabels,
+      lineChartData,
+    });
+  }
+
+  setEmptyGraphWithDate(startDate: string, endDate: string) {
+    const DefaultDates: string[] = [];
+
+    let start = new Date(startDate);
+    let end = new Date(endDate);
+
+    // Normalize times
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+
+    // Loop through dates from start to end
+    while (start <= end) {
+      DefaultDates.push(this.convertDate(start));
+      start.setDate(start.getDate() + 1);
+    }
+
+    const http_healthtrends = {
+      VitalName: 'No Data',
+      VitalId: 1,
+      Time: DefaultDates,
+      Values: [
+        {
+          data: new Array(DefaultDates.length).fill(null),
+          label: 'No data available',
+        },
+      ],
+    };
+
+    this.lineChartLabels = this.patientService.convertDateforHealthTrends(
+      http_healthtrends.Time,
+      false
+    );
+
+    const lineChartData = http_healthtrends.Values.map(item => ({
+      data: item.data,
+      label: item.label,
+      fill: false,
+      lineTension: 0.5,
+    }));
+
+    this.allLineChartData.push({
+      lineChartLabels: this.lineChartLabels,
+      lineChartData,
+    });
+  }
+
+
+  filterChartDataAndLabelsTogether(
+    datasets: { data: any[]; label: string }[],
+    labels: string[],
+    vitalName: string
+  ): { filteredData: any[][]; filteredLabels: string[] } {
+    const filteredData = datasets.map(ds => [...ds.data]);
+    const filteredLabels = [...labels];
+
+    for (let i = filteredLabels.length - 1; i >= 0; i--) {
+      const isNullAcrossAll = filteredData.every(ds => ds[i] === null);
+
+      if (
+        isNullAcrossAll &&
+        i > 0 &&
+        i < filteredLabels.length - 1 &&
+        vitalName !== 'Blood Glucose'
+      ) {
+        const [prevDate] = filteredLabels[i - 1]?.split(' - ') || [];
+        const [currDate] = filteredLabels[i]?.split(' - ') || [];
+        const [nextDate] = filteredLabels[i + 1]?.split(' - ') || [];
+
+        if (currDate === prevDate || currDate === nextDate) {
+          filteredLabels.splice(i, 1);
+          filteredData.forEach(ds => ds.splice(i, 1));
+        }
+      }
+    }
+
+    return {
+      filteredData,
+      filteredLabels
+    };
+  }
+
+  convertDate(dateval: any) {
+    let today = new Date(dateval);
+    let dd = today.getDate();
+    let dd2;
+    if (dd < 10) {
+      dd2 = '0' + dd;
+    } else {
+      dd2 = dd;
+    }
+    let mm = today.getMonth() + 1;
+    let mm2;
+    if (mm < 10) {
+      mm2 = '0' + mm;
+    } else {
+      mm2 = mm;
+    }
+    const yyyy = today.getFullYear();
+    dateval = yyyy + '-' + mm2 + '-' + dd2;
+    return dateval;
+  }
+
   async getHealthTrends() {
-    if (!this.http_healthtrends || !this.http_healthtrends.Values) {
+    if (!this.http_healthtrends) {
       this.setEmptyGraph();
       return;
     }
@@ -214,7 +449,7 @@ export class PatientDataReportComponent implements OnInit {
       endDate,
       this.selectedPatient,
       this.selectedProgram,
-      this.patientProgramname
+      this.idProgram
     );
     if (this.patientProgramname == 'CCM' || this.patientProgramname == 'PCM') {
       this.patientdownloadService.generatePatientSummaryReport(
@@ -228,16 +463,26 @@ export class PatientDataReportComponent implements OnInit {
       this.doc.save('PatientReport.pdf');
       this.downloadstatus = true;
     } else {
-      this.HtmlGraph = document.querySelector('#pdfGraph');
-      await this.patientdownloadService.captureHealthTrendsChart(
-        this.doc,
-        this.HtmlGraph
-      );
+      this.doc.setFontSize(14);
+      this.doc.text('Patient Health Trends', 15, this.currentY);
+      const headingWidth = this.doc.getTextWidth('Patient Health Trends');
+      this.doc.setDrawColor('black');
+      this.doc.line(15, this.currentY + 1, 15 + headingWidth, this.currentY + 1);
+      this.currentY += 15;
+      await this.patientdownloadService.resetPosition();
+
+      const allGraphs = Array.from(document.querySelectorAll('.pdfData'));
+      for (let i = 0; i < allGraphs.length; i++) {
+        const graph = allGraphs[i] as HTMLElement;
+        const vitalTitle = this.healthtrendVitalNameArray[i] || `Chart ${i + 1}`;
+        await this.patientdownloadService.captureHealthTrendsChart(this.doc, graph, vitalTitle);
+      }
+      this.currentY = this.patientdownloadService.getChartCurrentY();
       this.patientdownloadService.generateHealthTrendsTable(
         this.doc,
         this.http_vitalData
       );
-      this.patientdownloadService.generateDaysVitals(this.http_vitalData);
+      this.patientdownloadService.generateDaysVitals(this.http_7day_vitalData);
       this.patientdownloadService.generatePatientSummaryReport(
         this.doc,
         this.patientProgramname,
@@ -246,7 +491,7 @@ export class PatientDataReportComponent implements OnInit {
         this.BillingInfo,
         this.http_SmsData
       );
-      this.patientdownloadService.generateVitalReadingSummary(this.doc);
+      await this.patientdownloadService.generateVitalReadingSummary(this.doc,this.selectedPatient, this.selectedProgram);
       this.doc.save('PatientReport.pdf');
       this.downloadstatus = true;
     }
@@ -287,12 +532,12 @@ export class PatientDataReportComponent implements OnInit {
         this.downloadstatus = true;
         return;
       }
+      this.getVitalHealthTrendDataGraph(this.heath_trends_frequency, this.RptStartDate, this.RptEndDate);
     } else {
 
-      this.RptStartDate = this.patientreportService.convertDate(
-        this.RptStartDate
-      );
+      this.RptStartDate = this.patientreportService.convertDate(this.RptStartDate);
       this.RptEndDate = this.patientreportService.convertDate(this.RptEndDate);
+      this.getVitalHealthTrendDataGraph(this.heath_trends_frequency, this.RptStartDate, this.RptEndDate);
     }
     if (
       this.RptStartDate == null ||
@@ -327,7 +572,6 @@ export class PatientDataReportComponent implements OnInit {
         this.selectedPatient,
         this.selectedProgram
       );
-
       this.patientStatusData =
         this.http_rpm_patient?.PatientProgramdetails?.Status || '';
 
@@ -381,6 +625,7 @@ export class PatientDataReportComponent implements OnInit {
           endDate
         );
 
+      console.log('✅ Patient data loaded successfully');
       this.downloadPatientReport();
     } catch (error) {
       console.error('🚨 Error loading patient data:', error);

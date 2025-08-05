@@ -625,8 +625,6 @@ export class EditpatientComponent implements OnInit {
         this.processMasterData();
         that.PatientVitalInfos =
           that.Patientdata.PatientVitalDetails.PatientVitalInfos;
-          console.log("Patient Vital Info");
-          console.log(that.PatientVitalInfos)
         this.vital_selected =
           this.Patientdata.PatientProgramdetails.PatientVitalInfos;
 
@@ -804,36 +802,19 @@ export class EditpatientComponent implements OnInit {
         // Parse the custom date format "dd-MM-yyyy HH:mm:ss"
         const rawDate = that.Patientdata.PatientPrescribtionDetails.ConsultationDate;
 
-         var consultDateData = this.datepipe.transform(
-          that.Patientdata.PatientPrescribtionDetails.ConsultationDate,
-          'MMM/dd/yyyy'
-        );
-        // that.programForm.controls['consultdate'].setValue(
-        //   this.convertDate(consultDateData)
-        // );
+         var  ConsultationDateIso  = new Date(rawDate);
+       // Convert to ISO string
+      const isoString = ConsultationDateIso.toISOString();
+      that.programForm.controls['consultdate'].setValue(
+          this.convertDate(isoString)
+       );
+
           this.programForm.patchValue({
           consultdate: consultDateData &&
                       consultDateData !== '1/1/1970 12:00:00 AM'
             ? this.convertDate(consultDateData)
             : null
         });
-        // if (rawDate) {
-        //   const [datePart, timePart] = rawDate.split(' ');
-        //   const [day, month, year] = datePart.split('-');
-
-        //   // Convert to ISO format: "yyyy-MM-ddTHH:mm:ss"
-        //   const isoFormatted = `${year}-${month}-${day}T${timePart || '00:00:00'}`;
-
-        //   // Transform using Angular DatePipe
-        //   consultDateData = this.datepipe.transform(isoFormatted, 'MMM/dd/yyyy');
-        // }
-
-        // Now pass the transformed date into convertDate
-        //that.programForm.controls['consultdate'].setValue(
-          //this.convertDate(consultDateData)
-       // );
-
-
         var prescribeDateData = this.datepipe.transform(
           this.convertToLocalTime(
             that.Patientdata.PatientPrescribtionDetails.PrescribedDate

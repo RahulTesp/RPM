@@ -1067,14 +1067,18 @@ private async updateChatListUnreadCount(
 
       return response;
     } catch (error:any) {
-      if(error.status == 404)
-      {
-        console.log(error.error.message)
-      }else{
-      console.error('❌ Error in PatientChatService.getPatientChat:', error);
+     if (error.status === 404) {
+    console.warn('⚠️ No conversation history found for this user.');
+    // You can handle empty data scenario here:
+    this.updateChatData([]);
+    return []; // or handle gracefully without throwing
+  } else if (error.status) {
+    console.error(`❌ HTTP Error ${error.status}:`, error.message || error.error?.message);
+  } else {
+    console.error('❌ Unexpected Error:', error);
+  }
 
-      }
-      throw error;
+  throw error;
     }
   }
 
