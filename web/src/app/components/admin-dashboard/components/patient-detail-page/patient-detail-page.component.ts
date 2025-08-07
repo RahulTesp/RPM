@@ -1184,7 +1184,13 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       (err) => {
         // this.dialog.closeAll();
         this.smsCancel(); // close the panel
-        alert('Failed to Sent Message..!');
+        if(err.status == 400)
+        {
+          alert(err.error);
+        }else{
+          alert('SMS Sent Failed')
+        }
+        console.log(err.error);
         this.loading_sms = false;
       }
     );

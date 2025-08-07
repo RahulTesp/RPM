@@ -2279,10 +2279,15 @@ td.mat-cell:last-child {
     font-size: 12px;
   }
 }
+@media only screen and (min-width: 980px) and (max-width: 1280px) {
+  .summaryInfo {
+    width: 98%;
+  }
 
+}
 @media only screen and (max-width: 980px) {
-   .middle_panel {
-    width: 100% ;
+.middle_panel {
+    width: 100%;
   }
   .programInfo_menu_item button {
     padding-right: 0px ;
