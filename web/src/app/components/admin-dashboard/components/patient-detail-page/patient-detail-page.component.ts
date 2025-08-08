@@ -1,3 +1,4 @@
+import { Message } from '@twilio/conversations';
 import { SidePanelPatientComponent } from '../../shared/side-panel-patient/side-panel-patient.component';
 import { TwilioVideoServiceService } from '../../../../services/twilio-video-service.service';
 import { Device } from '@twilio/voice-sdk';
@@ -506,10 +507,15 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.program_id
       );
       var ConsultationDate =  this.http_rpm_patientList["PatientPrescribtionDetails"].ConsultationDate
+      if(ConsultationDate != "")
+      {
       var  ConsultationDateIso  = new Date(ConsultationDate);
        // Convert to ISO string
       const isoString = ConsultationDateIso.toISOString();
-      this.http_rpm_patientList["PatientPrescribtionDetails"].ConsultationDate = isoString;
+          this.http_rpm_patientList["PatientPrescribtionDetails"].ConsultationDate = isoString;
+      }
+
+
       this.getchatData(this.http_rpm_patientList.PatientDetails.UserName)
       this.setPatientData();
       this.loading = false;

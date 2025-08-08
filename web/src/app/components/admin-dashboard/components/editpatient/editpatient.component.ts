@@ -811,13 +811,16 @@ export class EditpatientComponent implements OnInit {
         // Manjusha code change
         // Parse the custom date format "dd-MM-yyyy HH:mm:ss"
         const rawDate = that.Patientdata.PatientPrescribtionDetails.ConsultationDate;
-
-         var  ConsultationDateIso  = new Date(rawDate);
+        if(rawDate != "")
+        {
+        var  ConsultationDateIso  = new Date(rawDate);
        // Convert to ISO string
-      const isoString = ConsultationDateIso.toISOString();
-      that.programForm.controls['consultdate'].setValue(
+         const isoString = ConsultationDateIso.toISOString();
+          that.programForm.controls['consultdate'].setValue(
           this.convertDate(isoString)
        );
+        }
+
 
        
         var prescribeDateData = this.datepipe.transform(
