@@ -1696,9 +1696,12 @@
                       : "Condition Monitored"
                   }}
                 </p>
-                <div *ngFor="let vital of patiantVital">
-                  <p class="program_overview_value">{{ vital.Vital }}</p>
+                <div  class="program_overview_value_panel">
+                  <div *ngFor="let vital of patiantVital" >
+                     <p class="program_overview_value">{{ vital.Vital }}</p>
                 </div>
+                </div>
+
               </div>
             </div>
           </div>
