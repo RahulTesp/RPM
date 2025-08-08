@@ -104,6 +104,7 @@ export class BillingSummaryReportComponent implements OnInit {
   onFocused(e: any) {
     this.searchiconvisible = false;
     // do something when input is focused
+   this.searchiconvisible = false
   }
   dateRangeScheduleChange() {
     this.startDate = this.patientreportService.convertDate(this.startDate);

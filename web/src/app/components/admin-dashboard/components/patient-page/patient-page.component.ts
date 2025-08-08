@@ -629,6 +629,7 @@ export class PatientPageComponent implements OnInit {
               (a: { Vital: any }) => a.Vital === Vital
             );
           });
+          console.log('Patient Vital array'+this.patientVitalsArray)
         }
         this.firstload = false;
         var tempCountdatasrc;
