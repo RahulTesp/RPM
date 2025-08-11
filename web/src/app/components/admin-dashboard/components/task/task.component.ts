@@ -346,7 +346,6 @@ export class TaskComponent implements OnInit {
     this.campaignOne = new FormGroup({
       start: new FormControl(new Date(year, month, 13)),
       end: new FormControl(new Date(year, month, 16)),
-      // date: new FormControl(moment()),
     });
   }
 

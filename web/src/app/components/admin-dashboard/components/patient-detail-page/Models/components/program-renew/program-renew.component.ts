@@ -32,7 +32,11 @@ export class ProgramRenewComponent {
 constructor(  private auth: AuthService,private rpm: RPMService,private router: Router, public datepipe: DatePipe,){
   this.today_date = this.datepipe.transform(new Date(), 'yyyy-MM-dd');
 }
-
+ngOnInit() {
+  this.renewProgramForm.get('startdate')?.valueChanges.subscribe(() => {
+    this.calculateEndDate();
+  });
+}
   renewProgram() {
     var req_body: any = {};
     req_body['PatientId'] = parseInt(this.currentpPatientId);

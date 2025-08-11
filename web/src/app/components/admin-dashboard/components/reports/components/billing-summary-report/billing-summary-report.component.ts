@@ -27,6 +27,7 @@ export class BillingSummaryReportComponent implements OnInit {
   url: any;
   public clinic: any;
   public keyword = 'searchField';
+  public searchiconvisible = true;
   constructor(private patientreportService: ReportDataService) {
     this.programType = 'RPM';
   }
@@ -83,10 +84,12 @@ export class BillingSummaryReportComponent implements OnInit {
 
   onClearSearchbilldetail(event: any) {
     this.selectedBillingDetailPatient = null;
+    this.searchiconvisible = true;
   }
   selectEvent(item: any) {
     this.selectedBillingPatient = item.PatientId;
     this.selectedBillingPatientProgram = item.PatientProgramId;
+    this.searchiconvisible = false;
   }
   onChangeSearch(val: string) {
     this.selectedPatient = val;
@@ -95,6 +98,7 @@ export class BillingSummaryReportComponent implements OnInit {
     // And reassign the 'data' which is binded to 'data' property.
   }
   onFocused(e: any) {
+    this.searchiconvisible = false;
     // do something when input is focused
   }
   dateRangeScheduleChange() {

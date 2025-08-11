@@ -2279,10 +2279,15 @@ td.mat-cell:last-child {
     font-size: 12px;
   }
 }
+@media only screen and (min-width: 980px) and (max-width: 1280px) {
+  .summaryInfo {
+    width: 98%;
+  }
 
+}
 @media only screen and (max-width: 980px) {
-   .middle_panel {
-    width: 100% ;
+.middle_panel {
+    width: 100%;
   }
   .programInfo_menu_item button {
     padding-right: 0px ;
@@ -3728,4 +3733,25 @@ li + li {
   border-radius: 8px;
   border: 1px solid #e0e0e0;
   background-color: #f5f5f5;
+}
+.program_overview_value_panel{
+  max-height:100px;
+  overflow-y: auto;
+
+}
+.program_overview_value_panel::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px #e0e0e0 !important;
+  border-radius: 10px !important;
+  background-color: #f5f5f5 !important;
+}
+
+.program_overview_value_panel::-webkit-scrollbar {
+  width: 6px !important;
+  background-color: #f5f5f5 !important;
+}
+
+.program_overview_value_panel::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px #98c7c8;
+  background-color: #edeff5;
 }
