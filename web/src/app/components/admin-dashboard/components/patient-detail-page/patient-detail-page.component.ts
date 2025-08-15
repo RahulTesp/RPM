@@ -4079,7 +4079,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   OnpreviewCancel() {
     this.stopCallEditTimer();
     this.showNoteModal=false;
-    this.callVariable = false;
+    //this.callVariable = false;
     this.callDisConnected();
     this.incomingCallVal = false;
     this.incomingVariableDisable = false;

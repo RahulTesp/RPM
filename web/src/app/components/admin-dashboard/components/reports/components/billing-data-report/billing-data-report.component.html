@@ -41,7 +41,7 @@
             id="report_AllClinics"
             [(ngModel)]="clinic"
           >
-            <option value="" selected>All Clinics</option>
+           <option value="" selected>All Clinics</option>
             <option *ngFor="let c of clinicBillingDetails" [value]="c.ClinicId">
               {{ c.ClinicName }}
             </option>

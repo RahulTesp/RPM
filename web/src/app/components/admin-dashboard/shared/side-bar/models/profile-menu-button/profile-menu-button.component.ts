@@ -29,6 +29,7 @@ export class ProfileMenuButtonComponent implements OnInit {
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
   passwordErrors: any;
+  logoutAfterDialog = false;
   @ViewChild('statusDialog') statusDialog!: StatusDialogBoxComponent;
   constructor(
     private router: Router,
@@ -181,7 +182,7 @@ export class ProfileMenuButtonComponent implements OnInit {
       this.rpm.rpm_post('/api/authorization/updatepassword', req_body).then(
         (data) => {
           this.statusDialog.showSuccessDialog();
-          this.logout();
+          this.logoutAfterDialog = true;
         },
         (err) => {
           this.statusDialog.showFailDialog();
@@ -222,4 +223,10 @@ export class ProfileMenuButtonComponent implements OnInit {
     const confirmPassword = this.passwordForm.get('confirmpw')?.value;
     return newPassword && confirmPassword && newPassword === confirmPassword;
   }
+
+onDialogClosed() {
+  if (this.logoutAfterDialog) {
+    this.logout();
+  }
+}
 }

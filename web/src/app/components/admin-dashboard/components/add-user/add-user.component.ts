@@ -7,6 +7,7 @@ import { StatusMessageComponent } from '../../shared/status-message/status-messa
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
+import * as uuid from 'uuid';
 
 @Component({
   selector: 'app-add-user',
@@ -16,6 +17,7 @@ import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/s
 export class AddUserComponent implements OnInit {
   @ViewChild(AdminComponent) private admincomponent: AdminComponent;
   public showCancelButton=false;
+  public file: any;
 
   checked = true;
   varData = true;
@@ -473,5 +475,33 @@ export class AddUserComponent implements OnInit {
       }
     );
   }
+  image: any;
+  openFile() {
+    this.image = null;
+    var a = document.getElementById('image');
+    a?.click();
+  }
+  handle(e: any) {
+    this.image = e.target.files[0];
+    var a = document.getElementsByClassName('uploadPhoto');
+    this.file = this.image.name;
 
+    // a[0].setAttribute("style", "background-image:"+this.image.name);
+    // a[0].setAttribute("style", "background: url(\"https://rpmstorage123.blob.core.windows.net/rpmprofilepictures/CL500626\"); background-repeat: no-repeat;  background-size: 100% 100%;");
+  }
+  submitImage(pid: any) {
+    if (this.image) {
+      const myPhoto = uuid.v4();
+      var formData: any = new FormData();
+      formData.append(myPhoto, this.image);
+      this.rpm
+        .rpm_post(`/api/patient/addimage?PatientId=${pid}`, formData)
+        .then(
+          (data) => {},
+          (err) => {
+            console.log('Img error');
+          }
+        );
+    }
+  }
 }

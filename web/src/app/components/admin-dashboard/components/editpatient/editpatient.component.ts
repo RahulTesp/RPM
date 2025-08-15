@@ -2483,6 +2483,7 @@ export class EditpatientComponent implements OnInit {
 
       this.rpm.rpm_post('/api/device/resetdevice', req_body).then(
         (data) => {
+          console.log(data)
           // this.openDialogWindow('Success', `Device Removed Successfully.`);
           this.showconfirmDialog.showConfirmDialog(
             'Device Removed Successfully.',
@@ -2497,6 +2498,7 @@ export class EditpatientComponent implements OnInit {
           );
         },
         (err) => {
+          console.log(err)
           // this.openDialogWindow('Error',`Device not removed from user assets.`);
           this.showconfirmDialog.showConfirmDialog(
             'Device not removed from user assets.',
@@ -2773,6 +2775,7 @@ export class EditpatientComponent implements OnInit {
     this.docDesc = null;
     this.Doc = null;
     this.documentAddFlag = false;
+    this.file=null;
   }
   downloadDoc(doc: any) {
     // alert(doc);
