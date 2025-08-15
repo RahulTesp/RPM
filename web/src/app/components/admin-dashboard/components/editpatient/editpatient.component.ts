@@ -2826,6 +2826,7 @@ export class EditpatientComponent implements OnInit {
     this.submitDocument(this.pid);
   }
   CancelDocForm() {
+    this.file = null
     this.docType = null;
     this.docDesc = null;
     this.Doc = null;

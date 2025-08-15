@@ -8,7 +8,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
 import * as uuid from 'uuid';
-
 @Component({
   selector: 'app-add-user',
   templateUrl: './add-user.component.html',
@@ -479,7 +478,7 @@ export class AddUserComponent implements OnInit {
     const formData: any = new FormData();
     formData.append(myPhoto, this.image);
 
-    // ✅ return the Promise
+    // ? return the Promise
     return this.rpm
       .rpm_post(`/api/users/addimage?UserId=${pid}`, formData)
       .then((data) => {
@@ -491,7 +490,7 @@ export class AddUserComponent implements OnInit {
         throw err;
       });
   } else {
-    // ✅ always return a promise
+    // ? always return a promise
     return Promise.resolve(null);
   }
 }

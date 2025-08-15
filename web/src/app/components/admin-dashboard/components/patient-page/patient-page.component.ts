@@ -526,7 +526,7 @@ export class PatientPageComponent implements OnInit {
   }
 
   entroll_date: any;
-  getEntrollDate(data: any) {
+ getEntrollDate(data: any) {
     data = data.trim();
 
     if (data != '') {
@@ -535,6 +535,17 @@ export class PatientPageComponent implements OnInit {
       return 'Not Enrolled';
     }
   }
+convertToLocalTime(stillUtc: any) {
+      if (stillUtc.includes('+')) {
+        var temp = stillUtc.split('+');
+
+        stillUtc = temp[0];
+      }
+      stillUtc = stillUtc + 'Z';
+       const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+      return local;
+    }
+
 
   getEntrolldateCopy(data: any) {
     data = data.trim();
@@ -2315,14 +2326,5 @@ export class PatientPageComponent implements OnInit {
     this.pageIndxValue = pageEvent.pageIndex;
     console.log(this.pageIndxValue);
   }
-   convertToLocalTime(stillUtc: any) {
-      if (stillUtc.includes('+')) {
-        var temp = stillUtc.split('+');
-
-        stillUtc = temp[0];
-      }
-      stillUtc = stillUtc + 'Z';
-       const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
-      return local;
-    }
+ 
 }
