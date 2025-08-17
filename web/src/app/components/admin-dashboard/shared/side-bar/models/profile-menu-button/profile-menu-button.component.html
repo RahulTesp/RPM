@@ -207,4 +207,5 @@
     </div>
   </div>
 </ng-template>
-<app-status-dialog-box #statusDialog></app-status-dialog-box>
+<app-status-dialog-box  #statusDialog  (dialogClosed)="onDialogClosed()">
+</app-status-dialog-box>

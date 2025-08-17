@@ -174,6 +174,9 @@ export class AddpatientComponent implements OnInit {
   cityFlag: any;
   ngOnInit(): void {
     // this.todaty_date = new Date();
+    this.file = null;
+    this.image = null;
+
     this.todaty_date = this.datepipe.transform(new Date(), 'yyyy-MM-dd');
     this.cityFlag = false;
     this.timezonecalculation();

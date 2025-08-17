@@ -1678,7 +1678,7 @@
                   {{ programStart | date : "mediumDate" }}
                 </p>
               </div>
-              <div class="program_overview_item">
+              <!-- <div class="program_overview_item">
                 <p class="program_overview_header">Duration</p>
                 <p class="program_overview_value">
                   {{
@@ -1687,7 +1687,7 @@
                   }}
                   Months
                 </p>
-              </div>
+              </div> -->
               <div class="program_overview_item program_overview_vital">
                 <p class="program_overview_header">
                   {{
@@ -1764,7 +1764,9 @@
     </div>
     <div
       class="summary_graph_main"
-      *ngIf="patientProgramname != 'CCM' && patientProgramname != 'PCM'"
+      *ngIf="!loading && !loading_two && !loading3 && !loading4
+         && patientProgramname != 'CCM'
+         && patientProgramname != 'PCM'"
     >
       <div class="health-panel-btn">
         <p class="patient-detail-panel-heading">Health Trends</p>
@@ -4166,7 +4168,9 @@
 <!-- healthTrendInfo Start Clinical activity Second   Sub-Menu -->
 <ng-template #healthTrendInfo>
   <div class="health-panel-btn"
-    *ngIf="patientProgramname != 'CCM' || patientProgramname != 'PCM'"
+    *ngIf="!loading && !loading_two && !loading3 && !loading4
+         && patientProgramname != 'CCM'
+         && patientProgramname != 'PCM'"
   >
     <p class="patient-detail-panel-heading">Health Trends</p>
 

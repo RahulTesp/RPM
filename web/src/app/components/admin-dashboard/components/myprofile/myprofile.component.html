@@ -76,11 +76,20 @@
             <div class="userInfoContent">
               <div class="userInfoContLeft">
                 <div class="uploadPhoto">
-                  <img
-                    class="icon_camera"
-                    src="../../../assets/04-Icons/Icons_Camera.svg"
-                  />
-                </div>
+                   {{ file }}
+                      <img
+                         id="btnaddPatientImg"
+                         (click)="openFile()"
+                          class="icon_camera"
+                          src="../../../assets/04-Icons/Icons_Camera.svg"
+                         />
+                        <input
+                          id="image"
+                          type="file"
+                          style="display: none"
+                          (change)="handle($event)"
+                        />
+                  </div>
                 <div class="userInfoItem">
                   <p class="userInfoTitle">*Email ID</p>
                   <input
