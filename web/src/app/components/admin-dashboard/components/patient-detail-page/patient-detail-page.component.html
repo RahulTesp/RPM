@@ -2668,6 +2668,11 @@
                   <div class="program_timeline_left_data">
                     <p class="program_data_title">Date</p>
                     <p class="program_data_value">
+                      <!-- {{
+                        http_rpm_patientList &&
+                          http_rpm_patientList["PatientPrescribtionDetails"]
+                            .PrescribedDate | date : "MMM d, y"
+                      }} -->
                       {{
                          convertToLocalTime(
                         http_rpm_patientList.PatientPrescribtionDetails.PrescribedDate
