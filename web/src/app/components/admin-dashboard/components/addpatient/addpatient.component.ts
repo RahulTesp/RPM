@@ -141,7 +141,7 @@ export class AddpatientComponent implements OnInit {
   cities: any;
   image: any;
   openFile() {
-    this.image = null;
+   // this.image = null;
     var a = document.getElementById('image');
     a?.click();
   }
@@ -149,14 +149,17 @@ export class AddpatientComponent implements OnInit {
     this.image = e.target.files[0];
     var a = document.getElementsByClassName('uploadPhoto');
     this.file = this.image.name;
-
+    console.log(this.image)
     // a[0].setAttribute("style", "background-image:"+this.image.name);
     // a[0].setAttribute("style", "background: url(\"https://rpmstorage123.blob.core.windows.net/rpmprofilepictures/CL500626\"); background-repeat: no-repeat;  background-size: 100% 100%;");
   }
   submitImage(pid: any) {
+    console.log('Submit Image');
+    console.log(this.image);
     if (this.image) {
       const myPhoto = uuid.v4();
       var formData: any = new FormData();
+      console.log(formData)
       formData.append(myPhoto, this.image);
       this.rpm
         .rpm_post(`/api/patient/addimage?PatientId=${pid}`, formData)

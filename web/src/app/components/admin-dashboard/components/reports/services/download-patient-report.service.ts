@@ -146,7 +146,7 @@ export class DownloadPatientReportService {
     doc.setTextColor('black');
 
     doc.text(
-      this.formatDate(patientDetails['PatientProgramdetails'].StartDate),
+      this.convertToLocalFormat(patientDetails['PatientProgramdetails'].StartDate),
       60,
       textHeight
     );
@@ -200,7 +200,7 @@ export class DownloadPatientReportService {
     doc.setTextColor('black');
 
     doc.text(
-      this.formatDate(patientDetails['PatientProgramdetails'].StartDate),
+  this.convertToLocalFormat(patientDetails['PatientProgramdetails'].StartDate),
       60,
       textHeight
     );
@@ -1555,4 +1555,19 @@ export class DownloadPatientReportService {
     doc.setFontSize(10);
     doc.setTextColor('black');
   }
+  private convertToLocalFormat(dateStr: string): string {
+  if (!dateStr) return '';
+
+  // Normalize input
+  let normalized = dateStr;
+  if (dateStr.includes('+')) {
+    normalized = dateStr.split('+')[0];
+  }
+  if (!normalized.endsWith('Z')) {
+    normalized += 'Z'; // interpret as UTC
+  }
+
+  // Convert UTC → Local and format
+  return dayjs.utc(normalized).local().format('MM/DD/YYYY');
+}
 }
