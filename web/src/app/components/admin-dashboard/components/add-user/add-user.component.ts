@@ -234,6 +234,14 @@ export class AddUserComponent implements OnInit {
             that.result = data;
             that.userId = that.result.UserId;
             that.password = that.result.password;
+             that.submitImage(that.userId)
+            // this.openDialog(
+            //   'Message',
+            //   `New User Added Successfully!! \n
+            //    Password:${that.password}
+            //   `
+            // );
+            // this.showDialog = true;
               this.confirmDialog.showConfirmDialog(
                 `New User Added Successfully!! \n
                Password:${that.password}
@@ -463,6 +471,7 @@ export class AddUserComponent implements OnInit {
     // a[0].setAttribute("style", "background-image:"+this.image.name);
     // a[0].setAttribute("style", "background: url(\"https://rpmstorage123.blob.core.windows.net/rpmprofilepictures/CL500626\"); background-repeat: no-repeat;  background-size: 100% 100%;");
   }
+
   async saveUserFlow() {
   try {
     await this.submitImage(this.put_user_id);  // wait until upload completes
@@ -470,8 +479,7 @@ export class AddUserComponent implements OnInit {
   } catch (err:any) {
    alert(`${err.error.message} Registration aborted.`);
   }
-}
-
+  }
   submitImage(pid: any) {
   if (this.image) {
     const myPhoto = uuid.v4();
@@ -494,4 +502,6 @@ export class AddUserComponent implements OnInit {
     return Promise.resolve(null);
   }
 }
-}
+  }
+
+
