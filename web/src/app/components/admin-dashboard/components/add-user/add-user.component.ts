@@ -243,7 +243,7 @@ export class AddUserComponent implements OnInit {
             that.result = data;
             that.userId = that.result.UserId;
             that.password = that.result.password;
-
+            this.submitImage(that.userId);
             // this.openDialog(
             //   'Message',
             //   `New User Added Successfully!! \n
@@ -477,7 +477,6 @@ export class AddUserComponent implements OnInit {
   }
   image: any;
   openFile() {
-    this.image = null;
     var a = document.getElementById('image');
     a?.click();
   }
@@ -495,7 +494,7 @@ export class AddUserComponent implements OnInit {
       var formData: any = new FormData();
       formData.append(myPhoto, this.image);
       this.rpm
-        .rpm_post(`/api/patient/addimage?PatientId=${pid}`, formData)
+        .rpm_post(`/api/users/addimage?UserId=${pid}`, formData)
         .then(
           (data) => {},
           (err) => {
