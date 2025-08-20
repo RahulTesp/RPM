@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, TemplateRef } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -38,6 +38,7 @@ export class SideBarComponent implements OnInit {
   AdminVar: any;
   // activePageMainMenu: any;
   activePage: any;
+  @Output() emitter: EventEmitter<string> = new EventEmitter<string>();
 
   menuItems = [
     {
@@ -248,4 +249,9 @@ export class SideBarComponent implements OnInit {
   smallScreenOpenProfile() {
     this.profile();
   }
+
+   toggleMenu() {
+    this.emitter.emit('out');
+  }
+
 }
