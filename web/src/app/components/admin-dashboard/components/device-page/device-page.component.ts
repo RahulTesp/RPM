@@ -381,6 +381,8 @@ export class DevicePageComponent implements OnInit {
         alert('Removed Device Successfully');
         this.dialog.closeAll();
         this.loading1 = false;
+        this.deviceavailabledialog = false;
+
       },
       (err) => {
         this.dialog.closeAll();

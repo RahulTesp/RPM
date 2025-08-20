@@ -77,6 +77,7 @@ export class BillingSummaryReportComponent implements OnInit {
   selectBillingEvent(item: any) {
     this.selectedBillingDetailPatient = item.PatientId;
     this.selectedBillingPatientProgram = item.PatientProgramId;
+     this.searchiconvisible = false;
   }
   OnChangeSeachDetail(val: string) {
     this.selectedBillingDetailPatient = val;
