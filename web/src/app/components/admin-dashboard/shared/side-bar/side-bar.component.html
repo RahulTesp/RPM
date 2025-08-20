@@ -38,7 +38,7 @@
         [backgroundImage]="item.icon"
       ></app-menu-item>
     </div>
-    <app-profile-menu-button></app-profile-menu-button>
+    <app-profile-menu-button (closeMenu)="toggleMenu()"></app-profile-menu-button>
   </ul>
 
 </div>

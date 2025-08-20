@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, HostListener, OnInit, Output, ViewChild } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -30,6 +30,8 @@ export class ProfileMenuButtonComponent implements OnInit {
   showConfirmPassword: boolean = false;
   passwordErrors: any;
   logoutAfterDialog = false;
+    @Output() closeMenu: EventEmitter<string> = new EventEmitter<string>();
+
   @ViewChild('statusDialog') statusDialog!: StatusDialogBoxComponent;
   constructor(
     private router: Router,
@@ -95,6 +97,7 @@ export class ProfileMenuButtonComponent implements OnInit {
   profile() {
     this.router.navigate(['/admin/myprofile']);
     this.closeDropdown();
+    this.closeMenubar();
   }
   feedback() {
     this.router.navigate(['/admin/feedback']);
@@ -132,19 +135,6 @@ export class ProfileMenuButtonComponent implements OnInit {
     this.closeDropdown();
   }
 
-  // formControlValueChanged() {
-  //   this.passwordForm.get('newpw')?.valueChanges.subscribe((data) => {
-  //     this.userName = this.userData.UserName;
-  //     this.password = data;
-
-  //     if (this.password.includes(this.userName)) {
-  //       this.result = true;
-  //       console.log(this.result);
-  //     } else {
-  //       this.result = false;
-  //     }
-  //   });
-  // }
 
   MustMatch(newpw: any, confirmpw: any) {
     return (formGroup: FormGroup) => {
@@ -167,6 +157,7 @@ export class ProfileMenuButtonComponent implements OnInit {
   }
   CloseChangePasswordDialog() {
     this.isChangePasswordVisible = false;
+   this.passwordForm.reset();
   }
   get NewTextEntered() {
     return this.passwordForm.controls;
@@ -174,6 +165,7 @@ export class ProfileMenuButtonComponent implements OnInit {
 
   confirm() {
     var req_body: any = {};
+    console.log('Req Body'+req_body)
     if (this.passwordForm.valid) {
       req_body['UserName'] = this.passwordForm.controls.username.value;
       req_body['OldPassword'] = this.passwordForm.controls.oldpw.value;
@@ -183,16 +175,20 @@ export class ProfileMenuButtonComponent implements OnInit {
         (data) => {
           this.statusDialog.showSuccessDialog();
           this.logoutAfterDialog = true;
+          this.passwordForm.reset();
         },
         (err) => {
-          this.statusDialog.showFailDialog();
+
+          this.statusDialog.showFailDialog(err.error.Status);
+          this.passwordForm.reset();
         }
       );
+    }else{
+      alert('Please Fill the Form ')
     }
   }
   updatePasswordErrors(): void {
     const control = this.passwordForm.get('newpw');
-    console.log(control);
     if (!control) {
       return;
     }
@@ -229,4 +225,8 @@ onDialogClosed() {
     this.logout();
   }
 }
+  closeMenubar() {
+    this.closeMenu.emit();
+  }
+
 }
