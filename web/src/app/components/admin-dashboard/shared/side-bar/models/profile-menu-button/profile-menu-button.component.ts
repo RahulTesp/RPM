@@ -10,7 +10,6 @@ import { RPMService } from 'src/app/components/admin-dashboard/sevices/rpm.servi
 import { AuthService } from 'src/app/services/auth.service';
 import { passwordNotContainUsernameValidator } from './password-username-validator';
 import { StatusDialogBoxComponent } from '../status-dialog-box/status-dialog-box.component';
-import * as uuid from 'uuid';
 
 @Component({
   selector: 'app-profile-menu-button',
@@ -164,7 +163,7 @@ export class ProfileMenuButtonComponent implements OnInit {
     return this.passwordForm.controls;
   }
 
-confirm() {
+  confirm() {
     var req_body: any = {};
     this.passwordForm.controls.username?.setValue(this.userName);
     if (this.passwordForm.valid) {
