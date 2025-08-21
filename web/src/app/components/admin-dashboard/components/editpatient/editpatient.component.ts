@@ -2716,10 +2716,20 @@ export class EditpatientComponent implements OnInit {
     // a[0].setAttribute("style", "background-image:"+this.image.name);
     // a[0].setAttribute("style", "background: url(\"https://rpmstorage123.blob.core.windows.net/rpmprofilepictures/CL500626\"); background-repeat: no-repeat;  background-size: 100% 100%;");
   }
+  pdfTypeStatus = false;
   openFileData(e: any) {
     this.Doc = e.target.files[0];
     this.documentType = this.Doc.type;
-    this.file = this.Doc.name;
+    if(this.documentType != 'application/pdf')
+    {
+     this.Doc = null;
+     this.pdfTypeStatus = true
+    }else{
+      this.pdfTypeStatus = false;
+    }
+     this.file = this.Doc.name;
+
+
   }
   submitDocument(pid: any) {
     var formData: any = new FormData();
@@ -2734,13 +2744,9 @@ export class EditpatientComponent implements OnInit {
       this.docDesc != null &&
       this.docDesc != undefined &&
       this.docType != null &&
-      this.Doc != undefined
+      this.Doc != undefined &&  this.docDesc != ''
     ) {
-      if (this.documentType != 'application/pdf') {
-        alert('Please Select Pdf File Type');
-        this.DownloadStatus = false;
-        return;
-      } else {
+
         this.rpm.rpm_post(`/api/patient/adddocument`, formData).then(
           (data) => {
             alert('Document Added Successfully');
@@ -2755,7 +2761,7 @@ export class EditpatientComponent implements OnInit {
             this.DownloadStatus = false;
           }
         );
-      }
+
     } else {
       alert('Please Complete the Form');
       this.DownloadStatus = false;

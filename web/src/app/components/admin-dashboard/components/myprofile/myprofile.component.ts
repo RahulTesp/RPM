@@ -408,7 +408,6 @@ closeDropdown() {
 
   confirm() {
     var req_body: any = {};
-    console.log('password')
     if (this.passwordForm.valid) {
       req_body['UserName'] = this.passwordForm.controls.username.value;
       req_body['OldPassword'] = this.passwordForm.controls.oldpw.value;
@@ -427,6 +426,9 @@ closeDropdown() {
           this.passwordForm.reset();
         }
       );
+    }else{
+      alert('All password fields are required. Kindly provide the Old, New, and Confirm Password')
+
     }
   }
   updatePasswordErrors(): void {

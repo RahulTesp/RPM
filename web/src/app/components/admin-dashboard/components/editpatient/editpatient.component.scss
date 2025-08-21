@@ -2405,3 +2405,11 @@ button {
   pointer-events: none;
   opacity: 0.6;
 }
+.err {
+  min-height: 10px; /* Reserve space */
+  color: red;
+  font-size: 0.7rem;
+  transition: opacity 0.3s ease;
+  margin-left: 10px;
+  margin-top: -5px;
+}
