@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace RPMPatientBilling.PatientBilling
 {
-    public class RPMBilling
+    public class RPMCycleBasedBilling
     {
         enum DayConditions
         {

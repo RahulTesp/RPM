@@ -1,7 +1,9 @@
 ﻿using RPMPatientBilling.Model;
 using System.Data;
-using Microsoft.Data.SqlClient;
 using System.Reflection;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System;
 
 namespace RPMPatientBilling.PatientBilling
 {
@@ -302,6 +304,45 @@ namespace RPMPatientBilling.PatientBilling
 
 
 
+        }
+        public string GetProgramName(string connectionString, int PatientProgramId)
+        {
+            try
+            {
+                // string ConnectionString = ConfigurationManager.AppSettings["RPM"].ToString();
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    con.Open();
+
+                    using (SqlCommand command = new SqlCommand("usp_GetProgramName", con))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@PatientProgramId", PatientProgramId);
+                        SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
+                        returnParameter.Direction = ParameterDirection.ReturnValue;
+                        SqlDataReader reader = command.ExecuteReader();
+                        string ProgramName = string.Empty;
+
+                        while (reader.Read())
+                        {
+                            ProgramName = Convert.ToString(reader["ProgramName"]);
+                        }
+
+                        if (ProgramName == string.Empty)
+                        {
+                            con.Close();
+                            return null;
+                        }
+                        con.Close();
+                        return ProgramName;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occured - class Name :" + this.GetType().Name + ",  Method Name : " + MethodBase.GetCurrentMethod().Name + ", Error Message :" + ex.Message + "");
+                return null;
+            }
         }
         public List<BillingCodes> GetBillingCodeDetails(string connectionString)
         {
@@ -1038,6 +1079,47 @@ namespace RPMPatientBilling.PatientBilling
                 Console.WriteLine("Exception occured - class Name :" + this.GetType().Name + ",  Method Name : " + MethodBase.GetCurrentMethod().Name + ", Error Message :" + ex.Message + "");
                 return null;
             }
+        }
+        public int GetPatientSmsCount(object patientProgramData, string connectionString, DateTime startDate, DateTime enddate)
+        {
+            try
+            {
+                int count;
+                //string ConnectionString = ConfigurationManager.ConnectionStrings[0].ToString();
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    con.Open();
+
+
+                    using (SqlCommand command = new SqlCommand("usp_GetPatientSmsCount", con))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@patientId", ((PatientProgramData)patientProgramData).PatienttId);
+                        command.Parameters.AddWithValue("@startdate", startDate);
+                        command.Parameters.AddWithValue("@enddate", enddate);
+                        //count = (int)command.ExecuteScalar();
+                        SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
+                        returnParameter.Direction = ParameterDirection.ReturnValue;
+                        SqlDataReader reader = command.ExecuteReader();
+                        while (reader.Read())
+                        {
+
+                            return 1;
+
+                        }
+                        con.Close();
+                        return 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occured - class Name :" + this.GetType().Name + ",  Method Name : " + MethodBase.GetCurrentMethod().Name + ", Error Message :" + ex.Message + "");
+                return 0;
+            }
+
+
+
         }
     }
 }
