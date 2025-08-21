@@ -25,6 +25,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RPM.Lib.Billing.Clynx\RPM.Lib.Billing.Clynx.csproj" />
+	  
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="RPM.Lib.Billing.MedIT">
+      <HintPath>..\RPM.Lib.Billing.MedIT\bin\Debug\net8.0\RPM.Lib.Billing.MedIT.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

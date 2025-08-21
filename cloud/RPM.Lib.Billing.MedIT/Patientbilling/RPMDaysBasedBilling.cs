@@ -1,12 +1,10 @@
-﻿using System.Data.SqlClient;
+﻿
+using Microsoft.Data.SqlClient;
 using RPMPatientBilling.Interface;
 using RPMPatientBilling.Model;
-using System;
+
 using System.Data;
 using System.Reflection;
-using System.Threading;
-using System.Collections.Generic;
-using System.Linq;
 
 
 namespace RPMPatientBilling.PatientBilling
