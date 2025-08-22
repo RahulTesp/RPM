@@ -34,20 +34,17 @@
               </div>
               <div class="userInfoContent">
                 <div class="userInfoContLeft">
-                  <div class="uploadPhoto">
-                   {{ file }}
-                      <img
-                         id="btnaddPatientImg"
-                         (click)="openFile()"
-                          class="icon_camera"
-                          src="../../../assets/04-Icons/Icons_Camera.svg"
-                         />
-                        <input
-                          id="image"
-                          type="file"
-                          style="display: none"
-                          (change)="handle($event)"
-                        />
+                 <div class="uploadPhoto"
+                    [ngStyle]="editVariable ? {
+                      'background-image': 'url(' +imagePath+ ')',
+                      'background-repeat': 'no-repeat',
+                      'background-size': '100% 100%'
+                    } : {}">
+
+                    {{ file }}
+                    <img id="btnaddPatientImg" (click)="openFile()" class="icon_camera"
+                      src="../../../assets/04-Icons/Icons_Camera.svg" />
+                    <input id="image" type="file" style="display: none" (change)="handle($event)" />
                   </div>
                   <div class="userInfoItem">
                     <p class="userInfoTitle input_title">*Email ID</p>

@@ -66,8 +66,8 @@ export class AddUserComponent implements OnInit {
   http_user_data: any;
 
   editVariable = false;
-
-
+//  imagePath :any;
+  public imagePath: string;
   GenderArray = [
     {
       value: 'M',
@@ -164,9 +164,10 @@ export class AddUserComponent implements OnInit {
       this.userbuttondisplay = this.editVariable;
       this.unlockAccountStatus = true;
       this.getUserAccountLockData();
+
     });
 
-    this.getUserInfo();
+  this.getUserInfo();
   }
   myDate = new Date();
   // Register User
@@ -222,6 +223,7 @@ export class AddUserComponent implements OnInit {
               this.router.navigate(['/admin/admin'], { queryParams: { page: 2 } });
               this.resetAddPateintMasterData();
               this.userVerifyCompleted = false;
+              this.submitImage(that.userId);
             },
             false
           );
@@ -310,6 +312,7 @@ export class AddUserComponent implements OnInit {
         .rpm_get(`/api/users/getuserprofiles?UserId=${this.put_user_id}`)
         .then((data) => {
           this.http_user_data = data;
+          console.log( this.http_user_data)
 
           if (this.http_user_data.HasPatients == 1) {
             this.userCountStatus = true;
@@ -373,6 +376,8 @@ export class AddUserComponent implements OnInit {
           }
           this.stateVariable = this.http_user_data.StateId;
           this.cityVariable = this.http_user_data.CityId;
+          this.imagePath = this.http_user_data.Picture;
+
         });
     }
   }
@@ -497,8 +502,8 @@ export class AddUserComponent implements OnInit {
         .rpm_post(`/api/users/addimage?UserId=${pid}`, formData)
         .then(
           (data) => {},
-          (err) => {
-            console.log('Img error');
+          (err:any) => {
+            alert(err.error.message);
           }
         );
     }
