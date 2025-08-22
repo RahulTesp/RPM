@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿
+using Microsoft.Extensions.Configuration;
 using RPMPatientBillingJob;
 // cron 0 0 * * * *
 class Program
 {
-    static string CONN_STRING = string.Empty;
+    static string CONN_STRING =string.Empty;
     static async Task Main(string[] args)
     {
         try
@@ -14,7 +15,7 @@ class Program
             .AddJsonFile("appsettings.json", optional: true)
             .AddEnvironmentVariables() // Allows overriding via Azure App Settings
             .Build();
-            if (config == null)
+            if(config == null)
             {
                 Console.WriteLine("Configuration is null.");
                 return;
@@ -29,12 +30,12 @@ class Program
             Console.WriteLine($"RPM Connection String: {connStr}");
             CONN_STRING = connStr;
             Console.WriteLine("WebJob started...");
-            if (CONN_STRING == null)
+            if(CONN_STRING == null)
             {
                 Console.WriteLine("Connection string is null.");
                 return;
             }
-
+       
             BillingProcessMgr inst = new BillingProcessMgr();
             inst.BillingProcess(CONN_STRING);
         }
