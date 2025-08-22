@@ -1331,7 +1331,7 @@ export class PatientPageComponent implements OnInit {
   billing_tableCount: any;
   billingDataFilter() {
     var that = this;
-
+    console.log('Billing Data Filter')
     var searchbillingpgm;
     var searchtotalvitalfiltervalue;
     var searchinteractionfiltervalue;
