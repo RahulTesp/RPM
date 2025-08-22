@@ -946,12 +946,12 @@
                 class="search_icon"
                 src="../../../../../assets/04-Icons/Icons_Cancel.svg"
                 (click)="searchAssigneeClose()"
-              />
-              <input
-                class="search_input input_panel"
-                [(ngModel)]="billingAssigneeName"
-                (ngModelChange)="billingDataFilter()"
-              />
+              /> <input
+                  class="search_input input_panel"
+                  (keyup)="applyDataFilter($event)"
+                  id="p_AssignedSearchInput"
+                  (focus)="setupFilter('AssignedMemeber')"
+                  [value]="assigneeSerach" autocomplete="off"/>
 
             </div>
             <div
