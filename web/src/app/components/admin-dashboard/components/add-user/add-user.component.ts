@@ -8,6 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
 import * as uuid from 'uuid';
+
 @Component({
   selector: 'app-add-user',
   templateUrl: './add-user.component.html',
@@ -214,6 +215,7 @@ export class AddUserComponent implements OnInit {
               this.router.navigate(['/admin/admin'], { queryParams: { page: 2 } });
               this.resetAddPateintMasterData();
               this.userVerifyCompleted = false;
+              this.submitImage(that.userId);
             },
             false
           );
@@ -234,7 +236,7 @@ export class AddUserComponent implements OnInit {
             that.result = data;
             that.userId = that.result.UserId;
             that.password = that.result.password;
-             that.submitImage(that.userId)
+            this.submitImage(that.userId);
             // this.openDialog(
             //   'Message',
             //   `New User Added Successfully!! \n
@@ -478,6 +480,7 @@ export class AddUserComponent implements OnInit {
     this.registerUser();               // run only if upload succeeded
   } catch (err:any) {
    alert(`${err.error.message} Registration aborted.`);
+
   }
   }
   submitImage(pid: any) {

@@ -1634,6 +1634,7 @@ export class EditpatientComponent implements OnInit {
         (data) => {
           this.loading = false;
           if (this.variable != 2) {
+            this.submitImage(that.pid);
             this.dialog.closeAll();
             this.redirect_patient();
 
