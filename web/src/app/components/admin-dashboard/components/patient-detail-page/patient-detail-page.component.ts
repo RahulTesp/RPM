@@ -880,7 +880,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.stopCallEditTimer();
     this.callDisConnected();
     this.videoOnVariable = false;
-    this.disconnectVideo();
+    //this.disconnectVideo();
   }
   NoteData: any;
   NoteTypeId: any;
@@ -3747,7 +3747,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
           this.incomingCallVal = false;
           this.incomingVariableDisable = false;
           this.callDisConnected();
-          this.disconnectVideo();
+          this.showNoteModal=false;
+          //this.disconnectVideo();
           this.billingReload();
           this.loading_note = false;
           this.resetCallPanel();
@@ -4085,7 +4086,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.incomingVariableDisable = false;
     //25/07/2023
     this.videoOnVariable = false;
-    this.disconnectVideo();
+    //this.disconnectVideo();
 
   }
   closenoterDialogModal()
@@ -4587,6 +4588,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       .then(
         async (body) => {},
         (error: any) => {
+          console.log('error')
           alert(error.error);
         }
       );

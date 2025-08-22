@@ -184,7 +184,7 @@ export class ProfileMenuButtonComponent implements OnInit {
         }
       );
     }else{
-      alert('Please Fill the Form ')
+      alert('All password fields are required. Kindly provide the Old, New, and Confirm Password')
     }
   }
   updatePasswordErrors(): void {

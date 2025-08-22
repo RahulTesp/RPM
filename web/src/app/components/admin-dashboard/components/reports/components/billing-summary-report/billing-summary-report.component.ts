@@ -53,6 +53,7 @@ export class BillingSummaryReportComponent implements OnInit {
         return data.Program == this.programType;
       }
     );
+
     this.clinicBillingDetails = this.removeDuplicateObjects(
       this.billingDetailPatientList,
       'ClinicId'
