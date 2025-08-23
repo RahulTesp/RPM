@@ -10,54 +10,52 @@ import SwiftUI
 
 struct AlertItem: Identifiable {
     var id = UUID()
-    var title: Text
-    var message: Text
+    var title: String
+    var message: String?
     var dismissButton: Alert.Button?
 }
+
 
 enum AlertContext {
     
     //MARK: - Network Errors
-    static let invalidURL       = AlertItem(title: Text("Server Error"),
-                                            message: Text("There is an error trying to reach the server. If this persists, please contact support."),
+    static let invalidURL       = AlertItem(title: "Server Error",
+                                            message: "There is an error trying to reach the server. If this persists, please contact support.",
                                             dismissButton: .default(Text("Ok")))
     
-    static let unableToComplete = AlertItem(title: Text("Server Error"),
-                                            message: Text("Unable to complete your request at this time. Please check your internet connection."),
+    static let unableToComplete = AlertItem(title: "Server Error",
+                                            message: "Unable to complete your request at this time. Please check your internet connection.",
                                             dismissButton: .default(Text("Ok")))
     
-    static let invalidResponse  = AlertItem(title: Text("Server Error"),
-                                            message: Text("Invalid response from the server. Please try again or contact support."),
+    static let invalidResponse  = AlertItem(title: "Server Error",
+                                            message: "Invalid response from the server. Please try again or contact support.",
                                             dismissButton: .default(Text("Ok")))
-    static let invalidUser  = AlertItem(title: Text("Server Error"),
-                                            message: Text("Invalid User."),
-                                            dismissButton: .default(Text("Ok")))
-    
-    static let invalidPassword  = AlertItem(title: Text("Server Error"),
-                                            message: Text("You have entered an invalid username or password."),
+    static let invalidUser  = AlertItem(title: "Server Error",
+                                            message: "Invalid User.",
                                             dismissButton: .default(Text("Ok")))
     
-    static let invalidData      = AlertItem(title: Text("Server Error"),
-                                            message: Text("The data received from the server was invalid. Please try again or contact support."),
+    static let invalidPassword  = AlertItem(title: "Login Failed, Please Check Your Credentials..!",
+                                            message: "Your Account will be locked after 5 invalid attempts.",
                                             dismissButton: .default(Text("Ok")))
     
-    static let decodingError      = AlertItem(title: Text("Decoding Error"),
-                                            message: Text("Please try again or contact support."),
+    static let invalidData      = AlertItem(title: "Server Error",
+                                            message: "The data received from the server was invalid. Please try again or contact support.",
                                             dismissButton: .default(Text("Ok")))
-    static let lockedError      = AlertItem(title: Text("User Locked"),
-                                            message: Text("Please contact your careteam."),
+    
+    static let decodingError      = AlertItem(title: "Decoding Error",
+                                            message: "Please try again or contact support.",
                                             dismissButton: .default(Text("Ok")))
-    static let numberInvalidError      = AlertItem(title: Text("Invalid Number"),
-                                            message: Text("Failed to send otp to Mobile,Please contact Admin."),
+    static let lockedError      = AlertItem(title: "User Locked",
+                                            message: "Please contact your careteam.",
                                             dismissButton: .default(Text("Ok")))
-    static let otpWrongError      = AlertItem(title: Text("Error"),
-                                            message: Text("OTP may be Wrong."),
+    static let numberInvalidError      = AlertItem(title: "Invalid Number",
+                                            message: "Failed to send otp to Mobile,Please contact Admin.",
                                             dismissButton: .default(Text("Ok")))
-    static let noInternet      = AlertItem(title: Text("Error"),
-                                            message: Text("No Internet Connection."),
+    static let otpWrongError      = AlertItem(title: "Error",
+                                            message: "OTP may be Wrong.",
                                             dismissButton: .default(Text("Ok")))
-    static let unauthorized      = AlertItem(title: Text("Error"),
-                                            message: Text("Session Expired."),
+    static let unauthorized      = AlertItem(title: "Error",
+                                            message: "Session Expired.",
                                             dismissButton: .default(Text("Ok")))
   
 }

@@ -85,8 +85,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         
         
-        
-        
         guard let messageId = userInfo["gcm.message_id"] as? String else {
             completionHandler(.noData)
             return
@@ -101,8 +99,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         lastMessageId = messageId
         
         print(" Handling New Remote Notification: \(userInfo)")
-        
-        
         
         // Extract custom fields
         guard let title = userInfo["Title"] as? String,

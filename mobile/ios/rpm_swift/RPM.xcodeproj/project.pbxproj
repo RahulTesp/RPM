@@ -30,6 +30,7 @@
 		3C5B73AC290FA50C0039FB6E /* RPMProgramInfoDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C5B73AB290FA50C0039FB6E /* RPMProgramInfoDataModel.swift */; };
 		3C5B73AE290FA5530039FB6E /* RPMProgramInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C5B73AD290FA5530039FB6E /* RPMProgramInfoViewModel.swift */; };
 		3C5B88452915107B0006658E /* RPMMedicationsAddViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C5B88442915107B0006658E /* RPMMedicationsAddViewModel.swift */; };
+		3C7782172E12560400C90F78 /* ConversationItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7782162E12560400C90F78 /* ConversationItemViewModel.swift */; };
 		3C861B8E2875913A00461048 /* RPMProfileDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C861B8D2875913A00461048 /* RPMProfileDataModel.swift */; };
 		3C894206288A665B0070258A /* RPMChangePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C894205288A665B0070258A /* RPMChangePasswordView.swift */; };
 		3C8A3BDA2862F7E900899F3D /* RPMNotificationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C8A3BD92862F7E900899F3D /* RPMNotificationViewModel.swift */; };
@@ -67,7 +68,6 @@
 		3C98595128505F9600507DE9 /* RPMHomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C98595028505F9600507DE9 /* RPMHomeViewModel.swift */; };
 		3C9919D82856309100B53514 /* Charts in Frameworks */ = {isa = PBXBuildFile; productRef = 3C9919D72856309100B53514 /* Charts */; };
 		3C99450A2897D72400B3ADB3 /* RPMNotificationCountDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C9945092897D72400B3ADB3 /* RPMNotificationCountDataModel.swift */; };
-		3C99AD2428E312D1009EDFB1 /* RPMTabBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C99AD2328E312D1009EDFB1 /* RPMTabBarViewModel.swift */; };
 		3C9A054E288958A700DF2952 /* NotificationScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C9A054D288958A700DF2952 /* NotificationScrollView.swift */; };
 		3C9A6B452B57B52A00D04844 /* CreateConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C9A6B442B57B52A00D04844 /* CreateConversationView.swift */; };
 		3C9A6B482B57B59000D04844 /* InputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C9A6B472B57B59000D04844 /* InputField.swift */; };
@@ -197,6 +197,7 @@
 		3C5B73AB290FA50C0039FB6E /* RPMProgramInfoDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPMProgramInfoDataModel.swift; sourceTree = "<group>"; };
 		3C5B73AD290FA5530039FB6E /* RPMProgramInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPMProgramInfoViewModel.swift; sourceTree = "<group>"; };
 		3C5B88442915107B0006658E /* RPMMedicationsAddViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPMMedicationsAddViewModel.swift; sourceTree = "<group>"; };
+		3C7782162E12560400C90F78 /* ConversationItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationItemViewModel.swift; sourceTree = "<group>"; };
 		3C861B8D2875913A00461048 /* RPMProfileDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPMProfileDataModel.swift; sourceTree = "<group>"; };
 		3C894205288A665B0070258A /* RPMChangePasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPMChangePasswordView.swift; sourceTree = "<group>"; };
 		3C8A3BD92862F7E900899F3D /* RPMNotificationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPMNotificationViewModel.swift; sourceTree = "<group>"; };
@@ -226,7 +227,6 @@
 		3C98594E28505D1F00507DE9 /* RPMProfileAndProgramDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPMProfileAndProgramDataModel.swift; sourceTree = "<group>"; };
 		3C98595028505F9600507DE9 /* RPMHomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPMHomeViewModel.swift; sourceTree = "<group>"; };
 		3C9945092897D72400B3ADB3 /* RPMNotificationCountDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPMNotificationCountDataModel.swift; sourceTree = "<group>"; };
-		3C99AD2328E312D1009EDFB1 /* RPMTabBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPMTabBarViewModel.swift; sourceTree = "<group>"; };
 		3C9A054D288958A700DF2952 /* NotificationScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScrollView.swift; sourceTree = "<group>"; };
 		3C9A6B442B57B52A00D04844 /* CreateConversationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateConversationView.swift; sourceTree = "<group>"; };
 		3C9A6B472B57B59000D04844 /* InputField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputField.swift; sourceTree = "<group>"; };
@@ -349,7 +349,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		133A271B284555D60039996D /* Model */ = {
+		133A271B284555D60039996D /* BasicModels */ = {
 			isa = PBXGroup;
 			children = (
 				3CB3D79428EAB45D0095BAD8 /* RPMVitalsChartDaysDataModel.swift */,
@@ -368,13 +368,12 @@
 				3CA20ED329B9A49000D51CE6 /* RPMGeneratePasswordDataModel.swift */,
 				3C9F68532B3ACBDF002ABCB6 /* ChangePasswordDataModel.swift */,
 			);
-			path = Model;
+			path = BasicModels;
 			sourceTree = "<group>";
 		};
-		13411EE428450B3B00C9F694 /* View */ = {
+		13411EE428450B3B00C9F694 /* BasicViews */ = {
 			isa = PBXGroup;
 			children = (
-				3C8A931E2D7CA1CD00B9D1E3 /* VideoCall */,
 				135E4138284BF4B90022BF76 /* More */,
 				135E4135284BF4670022BF76 /* Vitals */,
 				135E4132284BF43B0022BF76 /* Todo List */,
@@ -386,7 +385,7 @@
 				3CA018342AEF72BB00D5AFE5 /* chart30DaysView.swift */,
 				3C9DE0DA2B3C40C300E45B8D /* chart7DaysVitalsView.swift */,
 			);
-			path = View;
+			path = BasicViews;
 			sourceTree = "<group>";
 		};
 		13411EE528450E9C00C9F694 /* Login */ = {
@@ -491,27 +490,19 @@
 		13B45829284507A400A76F67 /* RPM */ = {
 			isa = PBXGroup;
 			children = (
+				3C8A931E2D7CA1CD00B9D1E3 /* VideoCall */,
+				3C75326B2E4873D80078784B /* Chat */,
 				3C4966B42D7EC4D300B35848 /* RPM.entitlements */,
 				3C4966AC2D7EB89700B35848 /* AppDelegate.swift */,
-				3C9E25952B56851D001E4C93 /* Messages */,
-				3C9E258B2B565836001E4C93 /* Views */,
-				3C9E25882B5656C8001E4C93 /* View Models */,
-				3CA1CE432B55499E00EB3771 /* Participants */,
-				3CB92A742B4FEDDD00580DD0 /* Resources */,
-				3CB92A6E2B4FEBA600580DD0 /* ConversationsList */,
-				3CB92A6B2B4FE3C000580DD0 /* Conversation */,
-				3CB92A5F2B4FB0BE00580DD0 /* Helpers */,
-				3CB92A5C2B4FAFEF00580DD0 /* Models */,
-				3CB92A572B4FAF8500580DD0 /* ConversationsClient */,
+				13B4582A284507A400A76F67 /* RPMApp.swift */,
 				3CBD6B3E296C1C61000597E1 /* CustomFonts */,
-				3CA6EBD728F42A3F00EF5F91 /* View Model */,
+				3CA6EBD728F42A3F00EF5F91 /* BasicViewModels */,
 				3CBA246B289A377E000526CF /* Service */,
 				3C8D1F1528646C8F00FC4F31 /* Info.plist */,
 				3C8AFD26284BE1FF00A06078 /* Assets.xcassets */,
-				133A271B284555D60039996D /* Model */,
+				133A271B284555D60039996D /* BasicModels */,
 				13B45830284507A800A76F67 /* Preview Content */,
-				13B4582A284507A400A76F67 /* RPMApp.swift */,
-				13411EE428450B3B00C9F694 /* View */,
+				13411EE428450B3B00C9F694 /* BasicViews */,
 			);
 			path = RPM;
 			sourceTree = "<group>";
@@ -541,6 +532,22 @@
 			path = RPMUITests;
 			sourceTree = "<group>";
 		};
+		3C75326B2E4873D80078784B /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				3CB92A572B4FAF8500580DD0 /* ConversationsClient */,
+				3C9E25882B5656C8001E4C93 /* View Models */,
+				3CB92A5C2B4FAFEF00580DD0 /* Models */,
+				3CB92A5F2B4FB0BE00580DD0 /* Helpers */,
+				3CB92A6B2B4FE3C000580DD0 /* Conversation */,
+				3CB92A742B4FEDDD00580DD0 /* Resources */,
+				3CA1CE432B55499E00EB3771 /* Participants */,
+				3C9E25952B56851D001E4C93 /* Messages */,
+				3C9E258B2B565836001E4C93 /* Views */,
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
 		3C8C172728B384FD0030F09B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -557,12 +564,12 @@
 			path = Activity;
 			sourceTree = "<group>";
 		};
-		3C9A6B462B57B58200D04844 /* Participants */ = {
+		3C9A6B462B57B58200D04844 /* ParticipantsView */ = {
 			isa = PBXGroup;
 			children = (
 				3C9A6B472B57B59000D04844 /* InputField.swift */,
 			);
-			path = Participants;
+			path = ParticipantsView;
 			sourceTree = "<group>";
 		};
 		3C9BABA82B610241003E609C /* Extensions */ = {
@@ -576,6 +583,7 @@
 		3C9E25882B5656C8001E4C93 /* View Models */ = {
 			isa = PBXGroup;
 			children = (
+				3C7782162E12560400C90F78 /* ConversationItemViewModel.swift */,
 				3C9E259F2B56861D001E4C93 /* MessageBubbleViewModel.swift */,
 				3C9E25982B568566001E4C93 /* MessageListViewModel.swift */,
 				3C9E25892B5656D5001E4C93 /* ConversationListViewModel.swift */,
@@ -588,23 +596,24 @@
 		3C9E258B2B565836001E4C93 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				3C9A6B462B57B58200D04844 /* Participants */,
+				3CB92A6E2B4FEBA600580DD0 /* ConversationsList */,
+				3C9A6B462B57B58200D04844 /* ParticipantsView */,
 				3C9E259A2B5685A6001E4C93 /* CustomViews */,
-				3C9E25922B568376001E4C93 /* Messages */,
-				3CB92A7F2B4FFD0800580DD0 /* Conversations */,
+				3C9E25922B568376001E4C93 /* MessagesView */,
+				3CB92A7F2B4FFD0800580DD0 /* ConversationsView */,
 				3C9E258C2B56584F001E4C93 /* GlobalStatusView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		3C9E25922B568376001E4C93 /* Messages */ = {
+		3C9E25922B568376001E4C93 /* MessagesView */ = {
 			isa = PBXGroup;
 			children = (
 				3C9E25A82B5689E8001E4C93 /* TypingView.swift */,
 				3C9E259D2B568607001E4C93 /* MessageBubbleView.swift */,
 				3C9E25932B5683C9001E4C93 /* MessageListView.swift */,
 			);
-			path = Messages;
+			path = MessagesView;
 			sourceTree = "<group>";
 		};
 		3C9E25952B56851D001E4C93 /* Messages */ = {
@@ -686,7 +695,7 @@
 			path = "Clinical Info";
 			sourceTree = "<group>";
 		};
-		3CA6EBD728F42A3F00EF5F91 /* View Model */ = {
+		3CA6EBD728F42A3F00EF5F91 /* BasicViewModels */ = {
 			isa = PBXGroup;
 			children = (
 				3C9B8BC82DDD8E7B00884A27 /* RPMVitalDaySummaryViewModel.swift */,
@@ -694,7 +703,6 @@
 				3CB3D79628EACB3F0095BAD8 /* RPMVitalsChartDaysViewModel.swift */,
 				3C8A3BD92862F7E900899F3D /* RPMNotificationViewModel.swift */,
 				3C98595028505F9600507DE9 /* RPMHomeViewModel.swift */,
-				3C99AD2328E312D1009EDFB1 /* RPMTabBarViewModel.swift */,
 				133A27252845CFEA0039996D /* RPMLoginViewModel.swift */,
 				3CA4938E288E6E4F0090CD70 /* RPMChangePwdViewModel.swift */,
 				3C8CFBFC28FEB06C0012EF83 /* RPMMedicationsViewModel.swift */,
@@ -705,7 +713,7 @@
 				3CBA6776294AE14D005809D6 /* RPMVitalReadingsViewModel.swift */,
 				3CA7425A29B89285006E0FCA /* RPMResetPasswordViewModel.swift */,
 			);
-			path = "View Model";
+			path = BasicViewModels;
 			sourceTree = "<group>";
 		};
 		3CB92A572B4FAF8500580DD0 /* ConversationsClient */ = {
@@ -811,13 +819,13 @@
 			path = CoreData;
 			sourceTree = "<group>";
 		};
-		3CB92A7F2B4FFD0800580DD0 /* Conversations */ = {
+		3CB92A7F2B4FFD0800580DD0 /* ConversationsView */ = {
 			isa = PBXGroup;
 			children = (
 				3C9A6B442B57B52A00D04844 /* CreateConversationView.swift */,
 				3CB92A802B4FFD1300580DD0 /* List */,
 			);
-			path = Conversations;
+			path = ConversationsView;
 			sourceTree = "<group>";
 		};
 		3CB92A802B4FFD1300580DD0 /* List */ = {
@@ -1082,6 +1090,7 @@
 				133A27222845579B0039996D /* RPMLoginDataModel.swift in Sources */,
 				3C9E25A72B56890D001E4C93 /* Conversation.swift in Sources */,
 				3C8CFBFD28FEB06C0012EF83 /* RPMMedicationsViewModel.swift in Sources */,
+				3C7782172E12560400C90F78 /* ConversationItemViewModel.swift in Sources */,
 				13B4582B284507A400A76F67 /* RPMApp.swift in Sources */,
 				3C9BABAA2B61027D003E609C /* NSManagedObjectContext+Ext.swift in Sources */,
 				3C9E25A02B56861D001E4C93 /* MessageBubbleViewModel.swift in Sources */,
@@ -1124,7 +1133,6 @@
 				3CB92A842B4FFD4400580DD0 /* ConversationItemsListView.swift in Sources */,
 				3CA9E78729ACA7CF002BFF25 /* OTPVerificationView.swift in Sources */,
 				3C9E25A92B5689E8001E4C93 /* TypingView.swift in Sources */,
-				3C99AD2428E312D1009EDFB1 /* RPMTabBarViewModel.swift in Sources */,
 				3C9A6B452B57B52A00D04844 /* CreateConversationView.swift in Sources */,
 				3C8A3BDC2862FA1F00899F3D /* RPMNotificationDataModel.swift in Sources */,
 				3CBD35B82B05FB7500F5FFA7 /* ColourStatus.swift in Sources */,

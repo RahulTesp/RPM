@@ -20,7 +20,6 @@ enum APIError: Error {
     case lockedError
     case numberInvalidError
     case otpWrongError
-    case noInternet
     case unauthorized
     
 }
@@ -40,7 +39,7 @@ class NetworkManager: NSObject {
 
     private override init() {}
     
-    // NOTE : LOGIN API INTEGRATION
+    // NOTE : LOGIN API
     
     func login(userName: String,
                password: String,
@@ -73,8 +72,6 @@ class NetworkManager: NSObject {
                 print("URLError:", error.code)
                 
                 switch error.code {
-                case .notConnectedToInternet, .timedOut:
-                    completed(.failure(.noInternet))
                 case .cannotFindHost, .cannotConnectToHost:
                     completed(.failure(.invalidURL))
                 default:
@@ -107,6 +104,14 @@ class NetworkManager: NSObject {
                 return
             }
             
+            guard   statusCode != 500  else{
+                
+                completed(.failure(.lockedError))
+                
+                
+                return
+            }
+            
             guard   statusCode != 503 else {
                 
                 completed(.failure(.numberInvalidError))
@@ -133,13 +138,13 @@ class NetworkManager: NSObject {
                     if(decodedResponse.mfa == false)
                     {
                         
-                        let pgmTypedemo = UserDefaults.standard.set(decodedResponse.roles?[0].programName, forKey: "pgmTypeString" )
+                   UserDefaults.standard.set(decodedResponse.roles?[0].programName, forKey: "pgmTypeString" )
                         
                         completed(.success(decodedResponse))
                     }
                     else
                     {
-                        let pgmTypedemo = UserDefaults.standard.set(decodedResponse.roles?[0].programName, forKey: "pgmTypeString" )
+                        UserDefaults.standard.set(decodedResponse.roles?[0].programName, forKey: "pgmTypeString" )
                         UserDefaults.standard.set(decodedResponse.timeLimit, forKey: "TimeLimit" )
                         
                         completed(.success(decodedResponse))
@@ -200,8 +205,7 @@ class NetworkManager: NSObject {
                 print("URLError:", error.code)
                 
                 switch error.code {
-                case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                    completed(.failure(.noInternet)) // Create a new case for this
+
                 default:
                     completed(.failure(.unableToComplete))
                 }
@@ -244,7 +248,7 @@ class NetworkManager: NSObject {
                 let decodedResponse = try decoder.decode(RPMLoginDataModel.self, from: data)
                 print("RPMOTPDataModeldecodedResponse",decodedResponse)
                 
-                let pgmTypedemo = UserDefaults.standard.set(decodedResponse.roles?[0].programName, forKey: "pgmTypeString" )
+              UserDefaults.standard.set(decodedResponse.roles?[0].programName, forKey: "pgmTypeString" )
                 
                 if(decodedResponse.roles?[0].id == 7)
                 {
@@ -292,7 +296,11 @@ class NetworkManager: NSObject {
                 return
             }
             print("genotpresponse")
-            print(response)
+            if let response = response {
+                print("genotpresponse:",response)
+              
+            }
+
             
             let statusCode: Int? = {
                 if let httpUrlResponse = response as? HTTPURLResponse {
@@ -301,7 +309,12 @@ class NetworkManager: NSObject {
                 return nil
             }()
             
-            print("statusCode: \(statusCode)")
+            if let statusCode = statusCode {
+                print("statusCode: \(statusCode)")
+            } else {
+                print("statusCode: nil")
+            }
+
             
             guard   statusCode != 404 else {
                 
@@ -431,72 +444,88 @@ class NetworkManager: NSObject {
     
     // NOTE : CHANGE PASSWORD API INTEGRATION
     
-    
     func changePwd(tkn: String, userName: String,
-                   oldPassword: String,    newPassword: String,
+                   oldPassword: String, newPassword: String,
                    completed: @escaping (Result<ChangePasswordDataModel, APIError>) -> Void) {
+        
+        print(" changePwd called with:")
+        print("- userName: \(userName)")
+        print("- oldPassword: \(oldPassword)")
+        print("- newPassword: \(newPassword)")
+        print("- token: \(tkn)")
+        
         guard let url = URL(string: NetworkManager.baseURL + "/api/authorization/updatepassword") else {
+            print(" Invalid URL")
             completed(.failure(.invalidURL))
             return
         }
+        print(" URL: \(url.absoluteString)")
         
         let bodyData = "{\"UserName\": \"\(userName)\", \"OldPassword\": \"\(oldPassword)\" , \"NewPassword\": \"\(newPassword)\"}"
+        print(" Request Body JSON: \(bodyData)")
         
-        let postData = bodyData.data(using: .utf8)
-        
+        guard let postData = bodyData.data(using: .utf8) else {
+            print(" Failed to encode request body")
+            completed(.failure(.invalidData))
+            return
+        }
+
         var request = URLRequest(url: url)
         request.addValue(tkn, forHTTPHeaderField: "Bearer")
-        
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
         request.httpMethod = "POST"
         request.httpBody = postData
+
+        print(" Sending request...")
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            
-            if let data = data,let _ = String(data: data,encoding:  .utf8)
-            {
-                
-            }
-            
-            if let _ =  error {
-                
+            if let error = error {
+                print(" Network error: \(error.localizedDescription)")
                 completed(.failure(.unableToComplete))
-                
-                return
-                
-            }
-            
-            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {                completed(.failure(.invalidResponse))
-                
                 return
             }
-            print("changePwdResponse",response)
-            guard let data = data
-                    
-            else {
-                print(data as Any)
+
+            if let httpResponse = response as? HTTPURLResponse {
+                print(" HTTP Status Code: \(httpResponse.statusCode)")
+            } else {
+                print(" Invalid response type")
+            }
+
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                print(" Invalid response or status code not 200")
+                if let response = response {
+                    print("Response: \(response)")
+                }
+                completed(.failure(.invalidResponse))
+                return
+            }
+
+            guard let data = data else {
+                print(" No data received")
                 completed(.failure(.invalidData))
                 return
             }
-            
+
+            if let rawResponse = String(data: data, encoding: .utf8) {
+                print(" Raw Response: \(rawResponse)")
+            }
+
             do {
                 let decoder = JSONDecoder()
                 let decodedResponse = try decoder.decode(ChangePasswordDataModel.self, from: data)
-                print("CHANGEpwddecodedResponse",decodedResponse)
-                
+                print(" Decoded Response: \(decodedResponse)")
                 completed(.success(decodedResponse))
             } catch {
+                print(" JSON Decoding error: \(error.localizedDescription)")
                 completed(.failure(.invalidData))
-                
             }
         }
-        print("\ntask\n")
-        print(task)
-        
+
+        print(" Starting data task")
         task.resume()
     }
-    
+
+
     
     //  NOTE : LOGOUT INTEGRATION
     
@@ -517,13 +546,16 @@ class NetworkManager: NSObject {
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
         request.httpMethod = "POST"
-      //  print("requestLOOGOUT",request)
-        
-        
+ 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             
-            print("errorLOOGOUT",error)
-          //  print("responseLOOGOUT",response)
+            if let error = error {
+                print("errorLOOGOUT: \(error.localizedDescription)")
+            } else {
+                print("errorLOOGOUT: nil")
+            }
+
+      
             if let data = data,let _ = String(data: data,encoding:  .utf8)
             {
                 
@@ -533,8 +565,7 @@ class NetworkManager: NSObject {
                 print("URLError:", error.code)
                 
                 switch error.code {
-                case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                    completed(.failure(.noInternet))
+
                 default:
                     completed(.failure(.unableToComplete))
                 }
@@ -542,7 +573,8 @@ class NetworkManager: NSObject {
             }
             
             
-            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {                completed(.failure(.invalidResponse))
+            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+                completed(.failure(.invalidResponse))
                 
                 return
             }
@@ -578,9 +610,7 @@ class NetworkManager: NSObject {
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        
-        
-        
+       
         request.addValue(accessToken, forHTTPHeaderField: "Bearer")
         
         
@@ -590,8 +620,7 @@ class NetworkManager: NSObject {
                 print("URLError:", error.code)
                 
                 switch error.code {
-                case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                    completed(.failure(.noInternet))
+
                 default:
                     completed(.failure(.unableToComplete))
                 }
@@ -626,7 +655,6 @@ class NetworkManager: NSObject {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         
-        print("VCjsonwebTOKEN",UserDefaults.standard.string(forKey: "jsonwebtoken"))
         
         if let accessToken = UserDefaults.standard.string(forKey: "jsonwebtoken") {
             print(" Using Access Token: \(accessToken)")
@@ -670,21 +698,16 @@ class NetworkManager: NSObject {
             
             print(" Raw Response Data: \(String(data: data, encoding: .utf8) ?? "Invalid Data")")
             
-            do {
-                let token = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-                
-                if token.isEmpty {
-                    print(" Empty token received")
-                    completed(.failure(.invalidData))
-                } else {
-                    print(" Received Video Call Token: \(token)")
-                    completed(.success(token))
-                }
-            } catch {
-                print(" Error decoding response as String: \(error.localizedDescription)")
+            let token = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+            if token.isEmpty {
+                print("Empty token received")
                 completed(.failure(.invalidData))
+            } else {
+                print("Received Video Call Token: \(token)")
+                completed(.success(token))
             }
-            
+  
         }
         
         task.resume()
@@ -708,7 +731,8 @@ class NetworkManager: NSObject {
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type") //  Add this
+
         
         if let accessToken = UserDefaults.standard.string(forKey: "jsonwebtoken") {
             print(" Using Access Token: \(accessToken)")
@@ -721,17 +745,30 @@ class NetworkManager: NSObject {
             return
         }
         
+        print("Reject Call URL: \(url)")
+        print("Reject Call Headers: \(request.allHTTPHeaderFields ?? [:])")
+
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let _ = error {
+            if let error = error {
+                print(" Network Error: \(error.localizedDescription)")
                 completed(.failure(.unableToComplete))
                 return
             }
             
+            if let httpResponse = response as? HTTPURLResponse {
+                print(" HTTP Response Code: \(httpResponse.statusCode)")
+                print(" HTTP Response Headers: \(httpResponse.allHeaderFields)")
+            }
+            
+            if let data = data, let responseString = String(data: data, encoding: .utf8) {
+                print(" Reject Call Response Body: \(responseString)")
+            }
+
             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
                 completed(.failure(.invalidResponse))
                 return
             }
-            
+
             DispatchQueue.main.async {
                 completed(.success(true))
             }
@@ -901,9 +938,7 @@ class DashboardManager:
                 completed(.failure(.invalidData))
                 return
             }
-            print("dashboarddata",data)
-            print("dashboarderror",error)
-            
+         
             
             do {
                 
@@ -911,11 +946,11 @@ class DashboardManager:
                 let decodedResponse = try decoder.decode(RPMProfileAndProgramDataModel.self, from: data)
                 print("RPMProfileAndProgramDataModel",decodedResponse)
                 
-                let pgmType = UserDefaults.standard.set(decodedResponse.programType, forKey: "pgmTypeString" )
+                UserDefaults.standard.set(decodedResponse.programType, forKey: "pgmTypeString" )
                 
-                let patientName = UserDefaults.standard.set(decodedResponse.name, forKey: "patientNameString" )
+                UserDefaults.standard.set(decodedResponse.name, forKey: "patientNameString" )
                 
-                let patientUserName = UserDefaults.standard.set(decodedResponse.userName, forKey: "patientUserNameString" )
+                UserDefaults.standard.set(decodedResponse.userName, forKey: "patientUserNameString" )
                 
                 completed(.success(decodedResponse))
                 
@@ -1176,8 +1211,7 @@ class DashboardManager:
                                 print("URLError:", error.code)
                                 
                                 switch error.code {
-                                case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                                    completed(.failure(.noInternet))
+
                                 default:
                                     completed(.failure(.unableToComplete))
                                 }
@@ -1194,28 +1228,20 @@ class DashboardManager:
                                 completed(.failure(.invalidData))
                                 return
                             }
-                            do {
-                                print("decoderdecoder")
-                                
-                                let decoder = JSONDecoder()
-                                
-                                if let jsonArray = try? decoder.decode([RPMVitalsChartDaysDataModel].self, from: data) {
-                                    // Case: Response is an array
-                                    print("GRAPH7Decoded as array:", jsonArray)
-                                    completed(.success(jsonArray))
-                                } else if let jsonObject = try? decoder.decode(RPMVitalsChartDaysDataModel.self, from: data) {
-                                    // Case: Response is a single object, wrap it in an array
-                                    print("GTRAPH7Decoded as single object:", jsonObject)
-                                    completed(.success([jsonObject])) // Wrap the single object in an array
-                                } else {
-                                    print("GRAPH7Decoding failed")
-                                    completed(.failure(.decodingError))
-                                }
-                                
-                            } catch {
-                                print("Decoding failed with error: \(error)")
+                            
+                            let decoder = JSONDecoder()
+
+                            if let jsonArray = try? decoder.decode([RPMVitalsChartDaysDataModel].self, from: data) {
+                                print("GRAPH7Decoded as array:", jsonArray)
+                                completed(.success(jsonArray))
+                            } else if let jsonObject = try? decoder.decode(RPMVitalsChartDaysDataModel.self, from: data) {
+                                print("GRAPH7Decoded as single object:", jsonObject)
+                                completed(.success([jsonObject]))
+                            } else {
+                                print("GRAPH7Decoding failed")
                                 completed(.failure(.decodingError))
                             }
+
                         }
                         task.resume()
                     } else {
@@ -1236,102 +1262,80 @@ class DashboardManager:
     
     // NOTE : GRAPH 30
     
-    
     func graph30Vitals(tkn: String, completed: @escaping (Result<[RPMVitalsChartDaysDataModel], APIError>) -> Void) {
-        // Get the current date (today's date)
         let currentDate = Date()
-        
-        // Create a Calendar instance
         let calendar = Calendar.current
-        
-        // Calculate the start date (30 days ago from today)
-        var startDateUTC: String? = nil
-        if let startDate = calendar.date(byAdding: .day, value: -29, to: currentDate) {
-            // Adjust the start date to 00:00:00 local time
-            let startDateTime = calendar.startOfDay(for: startDate)
-            
-            // Convert the start date to the desired format
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-            dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
-            startDateUTC = dateFormatter.string(from: startDateTime)
-            print("Start Date UTC:", startDateUTC ?? "N/A")
+
+        // Create formatter once
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+
+        // Calculate start date (29 days ago at 00:00:00)
+        guard let startDate = calendar.date(byAdding: .day, value: -29, to: currentDate) else {
+            completed(.failure(.invalidData))
+            return
         }
-        
-        // Append "T23:59:59" to the current date
-        let endDateFormatter = DateFormatter()
-        endDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        endDateFormatter.timeZone = TimeZone(abbreviation: "UTC")
-        var endDateUTC: String? = endDateFormatter.string(from: currentDate)
-        print("End Date UTC:", endDateUTC ?? "N/A")
-        
-        // Check if the date conversion succeeded before constructing the URL
-        if let startDateUTC = startDateUTC, let endDateUTC = endDateUTC {
-            if let url = URL(string: DashboardManager.baseURL + "/api/patients/getpatienthealthtrends?StartDate=" + startDateUTC + "&EndDate=" + endDateUTC) {
-                var request = URLRequest(url: url)
-                
-                // Configure your URLRequest here (e.g., add headers, set HTTP method)
-                request.addValue(tkn, forHTTPHeaderField: "Bearer")
-                request.timeoutInterval = 120 // in seconds
-                // Continue with the rest of your URLSession code
-                let task = URLSession.shared.dataTask(with: request) { data, response, error in
-                    // Handle the URLSession response here
-                    if let data = data, let _ = String(data: data, encoding: .utf8) {
-                        // Process the data here if needed
-                    }
-                    
-                    if let error = error as? URLError {
-                        print("URLError:", error.code)
-                        
-                        switch error.code {
-                        case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                            completed(.failure(.noInternet)) // Create a new case for this
-                        default:
-                            completed(.failure(.unableToComplete))
-                        }
-                        return
-                    }
-                    guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-                        completed(.failure(.invalidResponse))
-                        return
-                    }
-                    print("Response:")
-                    print(response)
-                    guard let data = data, error == nil else {
-                        completed(.failure(.invalidData))
-                        return
-                    }
-                    do {
-                        let decoder = JSONDecoder()
-                        
-                        if let jsonArray = try? decoder.decode([RPMVitalsChartDaysDataModel].self, from: data) {
-                            // Case: Response is an array
-                            print("Decoded as array:", jsonArray)
-                            completed(.success(jsonArray))
-                        } else if let jsonObject = try? decoder.decode(RPMVitalsChartDaysDataModel.self, from: data) {
-                            // Case: Response is a single object, wrap it in an array
-                            print("Decoded as single object:", jsonObject)
-                            completed(.success([jsonObject])) // Wrap the single object in an array
-                        } else {
-                            print("Decoding failed")
-                            completed(.failure(.decodingError))
-                        }
-                        
-                    } catch {
-                        completed(.failure(.decodingError))
-                    }
+        let startDateUTC = dateFormatter.string(from: calendar.startOfDay(for: startDate))
+
+        // Use current time as end date
+        let endDateUTC = dateFormatter.string(from: currentDate)
+
+        // Construct URL
+        let urlString = "\(DashboardManager.baseURL)/api/patients/getpatienthealthtrends?StartDate=\(startDateUTC)&EndDate=\(endDateUTC)"
+        guard let url = URL(string: urlString) else {
+            completed(.failure(.invalidURL))
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.addValue(tkn, forHTTPHeaderField: "Bearer")
+        request.timeoutInterval = 120
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            // Handle network error
+            if let urlError = error as? URLError {
+                print("URLError:", urlError.code)
+                switch urlError.code {
+                default:
+                    completed(.failure(.unableToComplete))
                 }
-                task.resume()
-            } else {
-                completed(.failure(.invalidURL))
+                return
             }
-        } else {
-            // Handle the case where date conversion failed
+
+            // Validate response
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                completed(.failure(.invalidResponse))
+                return
+            }
+
+            guard let data = data else {
+                completed(.failure(.invalidData))
+                return
+            }
+
+            let decoder = JSONDecoder()
+
+            // Try decoding as an array first
+            if let jsonArray = try? decoder.decode([RPMVitalsChartDaysDataModel].self, from: data) {
+                print("Decoded as array:", jsonArray)
+                completed(.success(jsonArray))
+            }
+            // Try decoding as single object and wrap
+            else if let jsonObject = try? decoder.decode(RPMVitalsChartDaysDataModel.self, from: data) {
+                print("Decoded as single object:", jsonObject)
+                completed(.success([jsonObject]))
+            } else {
+                print("Decoding failed")
+                completed(.failure(.decodingError))
+            }
         }
+
+        task.resume()
     }
-    
-    
-    
+
+
+  
     //  NOTE : GET VITAL SUMMARY
     
     func getVitalSummaryDefault(tkn: String,
@@ -1374,11 +1378,26 @@ class DashboardManager:
                     print("getVitalSummaryDefaultURLError:", error.code)
                     
                     switch error.code {
-                    case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                        completed(.failure(.noInternet)) // Create a new case for this
+
                     default:
                         completed(.failure(.unableToComplete))
                     }
+                    return
+                }
+                
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    completed(.failure(.invalidResponse))
+                    return
+                }
+                
+                // Check for 401 Unauthorized
+                if httpResponse.statusCode == 401 {
+                    print("401 Unauthorized: Token expired or invalid")
+                    
+                    // Notify session manager of the unauthorized error
+                    SessionManager.shared.handleAPIError(APIError.unauthorized)
+                    
+                    completed(.failure(.unauthorized))
                     return
                 }
                 
@@ -1426,18 +1445,7 @@ class DashboardManager:
         
         print("getVitalSummaryListstartDate",startDate)
         print("getVitalSummaryListendDate",endDate)
-//        print(startDate)
-//        print(endDate)
-        
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-//        
-//        if let cvStartDate = DateUtils.convertToUTC(localDateStr: "\(startDate)T00:00:00", inputFormatStr: "yyyy-MM-dd'T'HH:mm:ss", outputFormatStr: "yyyy-MM-dd'T'HH:mm:ss"),
-//           let cvEndDate = DateUtils.convertToUTC(localDateStr: "\(endDate)T23:59:59", inputFormatStr: "yyyy-MM-dd'T'HH:mm:ss", outputFormatStr: "yyyy-MM-dd'T'HH:mm:ss") {
-//            
-//            print("cvStartDate",cvStartDate)
-//            print("cvEndDate",cvEndDate)
-            
+
             guard let url = URL(string: DashboardManager.baseURL + "/api/patients/getpatientvitalreadings?StartDate=\(startDate)&EndDate=\(endDate)" ) else {
                 completed(.failure(.invalidURL))
                 return
@@ -1462,8 +1470,7 @@ class DashboardManager:
                     print("getVitalSummaryListURLError:", error.code)
                     
                     switch error.code {
-                    case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                        completed(.failure(.noInternet))
+
                     default:
                         completed(.failure(.unableToComplete))
                     }
@@ -1500,11 +1507,6 @@ class DashboardManager:
             
             task.resume()
             
-            
-//        } else {
-//            // Handle the case where conversion to Date fails
-//            completed(.failure(.invalidData))
-//        }
     }
     
     
@@ -1544,8 +1546,7 @@ class DashboardManager:
                     print("URLError:", error.code)
                     
                     switch error.code {
-                    case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                        completed(.failure(.noInternet))
+
                     default:
                         completed(.failure(.unableToComplete))
                     }
@@ -1657,8 +1658,7 @@ class DashboardManager:
         let todaysDate = NSDate()
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
-        let DateInFormat = dateFormatter.string(from: todaysDate as Date)
-        
+       
         guard let url = URL(string: DashboardManager.baseURL + "/api/patients/gettodolist?StartDate="+dt+"T00:00:00&EndDate="+dt+"T23:59:59") else {
             completed(.failure(.invalidURL))
             return
@@ -1680,14 +1680,28 @@ class DashboardManager:
                 print("URLError:", error.code)
                 
                 switch error.code {
-                case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                    completed(.failure(.noInternet))
+
                 default:
                     completed(.failure(.unableToComplete))
                 }
                 return
             }
             
+            guard let httpResponse = response as? HTTPURLResponse else {
+                completed(.failure(.invalidResponse))
+                return
+            }
+            
+            // Check for 401 Unauthorized
+            if httpResponse.statusCode == 401 {
+                print("401 Unauthorized: Token expired or invalid")
+                
+                // Notify session manager of the unauthorized error
+                SessionManager.shared.handleAPIError(APIError.unauthorized)
+                
+                completed(.failure(.unauthorized))
+                return
+            }
             
             guard let response = response as? HTTPURLResponse, response.statusCode == 200
                     
@@ -1697,7 +1711,7 @@ class DashboardManager:
                 
                 return
             }
-            
+        
             guard let data = data , error == nil else {
                 completed(.failure(.invalidData))
                 return
@@ -1803,8 +1817,10 @@ class DashboardManager:
         // Assuming memberUserName is a String variable
         let uppercaseMemberUserName = memberUserName.uppercased()
         print("uppercaseMemberUserName", uppercaseMemberUserName)
-        
-        let encodedMemberUserName = memberUserName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+  
+        let trimmedMemberUserName = memberUserName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let encodedMemberUserName = trimmedMemberUserName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+
         
         guard let url = URL(string: DashboardManager.baseURL +
                             
@@ -1828,8 +1844,7 @@ class DashboardManager:
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             print("chatResponse")
-            print(response)
-            
+         
             if let error = error {
                 print("Network error: \(error.localizedDescription)")
                 completed(.failure(.unableToComplete))
@@ -1900,17 +1915,14 @@ class DashboardManager:
         
         request.httpMethod = "POST"
         request.httpBody = postData
-        
-        print("chatUpPostData",postData)
-        
+     
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             
             if let error =  error {
                 completed(.failure(.unableToComplete))
                 return
             }
-            print("chatUperror",error)
-            
+        
             guard let httpResponse = response as? HTTPURLResponse else {
                 completed(.failure(.invalidResponse))
                 return
@@ -1926,7 +1938,6 @@ class DashboardManager:
                 return
             }
             print("chatUpdata",data)
-            print("chatUpresponse",response)
             
             do {
                 
@@ -1957,10 +1968,6 @@ class DashboardManager:
         convSID: String, toUser: String, lastActiveAt: Date,
         completed: @escaping (Result<Int, APIError>) -> Void
     ) {
-        guard let url = URL(string: DashboardManager.baseURL + "/api/comm/chatheartbeat") else {
-            completed(.failure(.invalidURL))
-            return
-        }
         
         // Format the date just like Postman
         let formattedDate = formatDateLikePostman(lastActiveAt)
@@ -1969,7 +1976,7 @@ class DashboardManager:
         let payload: [String: Any] = [
             "ConversationSid": convSID,
             "UserName": toUser,
-            "LastActiveAt": formattedDate  // Make sure this is in correct format like "4/18/2025, 9:42:00 AM +05:30"
+            "LastActiveAt": formattedDate
         ]
         
         guard let postData = try? JSONSerialization.data(withJSONObject: payload, options: []) else {
@@ -2128,7 +2135,7 @@ class DashboardManager:
     func formatDateLikePostman(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "M/d/yyyy, h:mm:ss a Z"
-        formatter.locale = Locale(identifier: "en_US_POSIX") // important to match AM/PM format
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = TimeZone.current
         return formatter.string(from: date)
     }
@@ -2175,17 +2182,13 @@ class MoreManager: NSObject {
                 print("URLError:", error.code)
                 
                 switch error.code {
-                case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                    completed(.failure(.noInternet))
                 default:
                     completed(.failure(.unableToComplete))
                 }
                 return
             }
             print("error")
-            print(error)
-            
-            
+        
             guard let response = response as? HTTPURLResponse, response.statusCode == 200
                     
                     
@@ -2250,8 +2253,7 @@ class MoreManager: NSObject {
                 print("URLError:", error.code)
                 
                 switch error.code {
-                case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                    completed(.failure(.noInternet)) // Create a new case for this
+
                 default:
                     completed(.failure(.unableToComplete))
                 }
@@ -2333,7 +2335,8 @@ class MoreManager: NSObject {
                 
             }
             
-            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {                completed(.failure(.invalidResponse))
+            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+                completed(.failure(.invalidResponse))
                 
                 return
             }
@@ -2384,8 +2387,7 @@ class MoreManager: NSObject {
                 print("URLError:", error.code)
                 
                 switch error.code {
-                case .notConnectedToInternet, .timedOut, .cannotFindHost, .cannotConnectToHost:
-                    completed(.failure(.noInternet))
+
                 default:
                     completed(.failure(.unableToComplete))
                 }
