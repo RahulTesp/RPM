@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPMWeb.Common", "..\RPMWeb.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Lib.Billing.Clynx", "..\RPM.Lib.Billing.Clynx\RPM.Lib.Billing.Clynx.csproj", "{67197E1A-0CD1-44E5-9DE0-E6E84881C516}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Billing.Clynx", "..\RPM.Job.Billing.Clynx\RPM.Job.Billing.Clynx.csproj", "{9B58CD0A-134B-4BEE-87B8-539096F1B67F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Billing.Common", "..\RPM.Job.Billing.Clynx\RPM.Job.Billing.Common.csproj", "{9B58CD0A-134B-4BEE-87B8-539096F1B67F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Lib.Billing.MedIT", "..\RPM.Lib.Billing.MedIT\RPM.Lib.Billing.MedIT.csproj", "{035B70D2-2599-49E8-843D-AB3C140ADBFB}"
 EndProject

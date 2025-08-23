@@ -1,37 +1,17 @@
-﻿using Microsoft.Data.SqlClient;
+﻿
+using Microsoft.Data.SqlClient;
 using RPMPatientBilling.Interface;
 using RPMPatientBilling.Model;
+
 using System.Data;
 using System.Reflection;
 
 
 namespace RPMPatientBilling.PatientBilling
 {
-    public class RPMBilling
+    public class RPMDaysBasedBilling
     {
-        enum DayConditions
-        {
-            Today,
-            isPast,
-            isFuture,
-
-        };
-        enum MonthConditions
-        {
-
-            isLastMonth,
-            isCurrentMonth,
-        };
-        public class taskdata
-        {
-
-            public taskdata(ManualResetEvent _manualResetEvent)
-            {
-
-                this.manualResetEvent = _manualResetEvent;
-            }
-            public ManualResetEvent manualResetEvent { get; set; }
-        }
+        
 
         public void GenaratePateintBillingCount(string ConnectionString)
         {
@@ -50,126 +30,89 @@ namespace RPMPatientBilling.PatientBilling
                     foreach (PatientProgramData data in patientProgramData)
                     {
                         
+
+
+                            string Program = billing.GetProgramName(ConnectionString, data.PatientProgramid);
                             Console.WriteLine(nCount+". Processing Patient Id " + data.PatienttId);
                             IBilling ibilling;
-                            ibilling = new CPT99453(ConnectionString);
                             BillingCountTaskData td = new BillingCountTaskData(null, data);
-                            ibilling.Execute(td);
-                            ibilling = new CPT99454(ConnectionString);
-                            ibilling.Execute(td);
-                            ibilling = new CPT99457(ConnectionString);
-                            ibilling.Execute(td);
-                            ibilling = new CPT99458(ConnectionString);
-                            ibilling.Execute(td);
-                            nCount++;
+
+                            if (Program == "RPM")
+                            {
+                                ibilling = new CPT99453(ConnectionString);
+                                ibilling.Execute(td);
+                                ibilling = new CPT99454(ConnectionString);
+                                ibilling.Execute(td);
+                                ibilling = new CPT99457(ConnectionString);
+                                ibilling.Execute(td);
+                                ibilling = new CPT99458(ConnectionString);
+                                ibilling.Execute(td);
+                            }
+                            else if (Program == "CCM-C")
+                            {
+                                //G0506 is for Complex CCM so commenting below lines
+                                //ibilling = new CPTG0506(ConnectionString);
+                                //ibilling.Execute(td);
+                                ibilling = new CPT99490(ConnectionString);
+                                ibilling.Execute(td);
+                                ibilling = new CPT99439(ConnectionString);
+                                ibilling.Execute(td);
+
+                            }
+                            else if (Program == "CCM-P")
+                            {
+                                //G0506 is for Complex CCM so commenting below lines
+                                //ibilling = new CPTG0506(ConnectionString);
+                                //ibilling.Execute(td);
+
+                                ibilling = new CPT99491(ConnectionString);
+                                ibilling.Execute(td);
+                                ibilling = new CPT99437(ConnectionString);
+                                ibilling.Execute(td);
+
+                            }
+                            else if (Program == "C-CCM")
+                            {
+                                ibilling = new CPTG0506(ConnectionString);
+                                ibilling.Execute(td);
+
+                                ibilling = new CPT99487(ConnectionString);
+                                ibilling.Execute(td);
+                                ibilling = new CPT99489(ConnectionString);
+                                ibilling.Execute(td);
+                            }
+                            else if (Program == "PCM-P")
+                            {
+                                ibilling = new CPT99424(ConnectionString);
+                                ibilling.Execute(td);
+                                ibilling = new CPT99425(ConnectionString);
+                                ibilling.Execute(td);
+
+
+                            }
+                            else if (Program == "PCM-C")
+                            {
+
+                                ibilling = new CPT99426(ConnectionString);
+                                ibilling.Execute(td);
+                                ibilling = new CPT99427(ConnectionString);
+                                ibilling.Execute(td);
+
+                            }
 
 
 
 
 
-                        //ibilling = new CPT99454(ConnectionString);
-                        //ibilling.Execute(td);
-                        //ibilling = new CPT99457(ConnectionString);
-                        //ibilling.Execute(td);
-                        //ibilling = new CPT99458(ConnectionString);
-                        //ibilling.Execute(td);
+                        
 
-                        /* foreach (var code in billingCodes)
-                         {
-                             ManualResetEvent me = new ManualResetEvent(false);
-                             BillingCountTaskData td = new BillingCountTaskData(me, data);
-                             evts.Add(me);
-                             switch (code.BillingCode)
-                             {
-                                 case "99453":
-                                     ibilling = new CPT99453(ConnectionString);
-                                     ThreadPool.QueueUserWorkItem(new WaitCallback(ibilling.Execute), td);
-                                     break;
-                                 case "99454":
-                                     ibilling = new CPT99454(ConnectionString);
-                                     ThreadPool.QueueUserWorkItem(new WaitCallback(ibilling.Execute), td);
-                                     break;
-                                 case "99457":
-                                     ibilling = new CPT99457(ConnectionString);
-                                     ThreadPool.QueueUserWorkItem(new WaitCallback(ibilling.Execute), td);
-                                     break;
-                                 case "99458":
-                                     ibilling = new CPT99458(ConnectionString);
-                                     ThreadPool.QueueUserWorkItem(new WaitCallback(ibilling.Execute), td);
-                                     break;
-                             }
-                             if (evts.Count >= 64)
-                             {
-                                 Console.WriteLine("Waiting all tasks to complete..." + "Batch - " + nCount + " " + DateTime.UtcNow.ToString());
-                                 if (evts.Count > 0) ManualResetEvent.WaitAll(evts.ToArray());
-                                 evts.Clear();
-                                 nCount++;
-                                 Console.WriteLine("All tasks completed..." + DateTime.UtcNow.ToString());
-                             }
-                         }*/
+                        nCount++;
                     }
-                    //Console.WriteLine("Waiting all tasks to complete..." + "Batch - " + nCount + " " + DateTime.UtcNow.ToString());
-                   // if (evts.Count > 0) ManualResetEvent.WaitAll(evts.ToArray());
+                   
                     Console.WriteLine("All tasks completed..." + DateTime.UtcNow.ToString());
 
                 }
                 Console.WriteLine("Thread 1 Completed - Genarate Pateint Billing count For Report");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception occured - class Name :" + this.GetType().Name + ",  Method Name : " + MethodBase.GetCurrentMethod().Name + ", Error Message :" + ex.Message + "");
-                return;
-            }
-        }
-        public void GetPatientBillingReport(string ConnectionString)
-        {
-            try
-            {
-                List<ManualResetEvent> events = new List<ManualResetEvent>();
-                Console.WriteLine("Thread 1 Started - GenaratePateintBilling  resuls For Report");
-                BillingProcess billing = new BillingProcess();
-                List<BillingCodes> billingCodes = billing.GetBillingCodeDetails(ConnectionString);
-                IBillingResult ibilling;
-                foreach (var code in billingCodes)
-                {
-                    switch (code.BillingCode)
-                    {
-                        case "99453":
-                            ManualResetEvent evt = new ManualResetEvent(false);
-                            taskdata td = new taskdata(evt);
-                            ibilling = new BCPT99453(ConnectionString);
-                            ThreadPool.QueueUserWorkItem(new WaitCallback(ibilling.Execute), td);
-                            events.Add(evt);
-                            break;
-                        case "99454":
-                            ManualResetEvent evt1 = new ManualResetEvent(false);
-                            taskdata td1 = new taskdata(evt1);
-                            ibilling = new BCPT99454(ConnectionString);
-                            ThreadPool.QueueUserWorkItem(new WaitCallback(ibilling.Execute), td1);
-                            events.Add(evt1);
-                            break;
-                        case "99457":
-                            ManualResetEvent evt2 = new ManualResetEvent(false);
-                            taskdata td2 = new taskdata(evt2);
-                            ibilling = new BCPT99457(ConnectionString);
-                            ThreadPool.QueueUserWorkItem(new WaitCallback(ibilling.Execute), td2);
-                            events.Add(evt2);
-                            break;
-                        case "99458":
-                            ManualResetEvent evt3 = new ManualResetEvent(false);
-                            taskdata td3 = new taskdata(evt3);
-                            ibilling = new BCPT99458(ConnectionString);
-                            ThreadPool.QueueUserWorkItem(new WaitCallback(ibilling.Execute), td3);
-                            events.Add(evt3);
-                            break;
-                    }
-
-                }
-                WaitHandle.WaitAll(events.ToArray());
-                Console.WriteLine("Thread 1 Completed - GenaratePateintBilling  resuls For Report");
-
-
-
             }
             catch (Exception ex)
             {
@@ -210,7 +153,7 @@ namespace RPMPatientBilling.PatientBilling
                                             AddData(pdb, bc, (DateTime)pdb.StartDate, ConnectionString);
                                         }
                                         break;
-                                    case "99454":
+                                    case "G0506":
                                         if (pdb.StartDate == null) continue;
                                         if (pdb.Status.ToLower().Equals("active") ||
                                            pdb.Status.ToLower().Equals("onhold") ||
@@ -220,29 +163,41 @@ namespace RPMPatientBilling.PatientBilling
                                             AddData(pdb, bc, (DateTime)pdb.StartDate, ConnectionString);
                                         }
                                         break;
-                                    case "99457":
-                                        if (pdb.StartDate == null) continue;
-                                        if (pdb.Status.ToLower().Equals("active") ||
-                                           pdb.Status.ToLower().Equals("onhold") ||
-                                           pdb.Status.ToLower().Equals("readytodischarge")||
-                                           pdb.Status.ToLower().Equals("inactive"))
-                                        {
-                                            AddData(pdb, bc, (DateTime)pdb.StartDate, ConnectionString);
-                                        }
-                                        break;
-                                    case "99458":
-                                        if (pdb.StartDate == null) continue;
-                                        if (pdb.Status.ToLower().Equals("active") ||
-                                           pdb.Status.ToLower().Equals("onhold") ||
-                                           pdb.Status.ToLower().Equals("readytodischarge")||
-                                           pdb.Status.ToLower().Equals("inactive"))
-                                        {
-                                            BillingCodes bc1 = billingCodes.Find(y => y.BillingCodeID == 3); //457 billing code.
-                                            AddData(pdb, bc1, (DateTime)pdb.StartDate, ConnectionString);
-                                        }
-                                        break;
+                                        //case "99454":
+                                        //    if (pdb.StartDate == null) continue;
+                                        //    if (pdb.Status.ToLower().Equals("active") ||
+                                        //       pdb.Status.ToLower().Equals("onhold") ||
+                                        //       pdb.Status.ToLower().Equals("readytodischarge")||
+                                        //       pdb.Status.ToLower().Equals("inactive"))
+                                        //    {
+                                        //        AddData(pdb, bc, (DateTime)pdb.StartDate, ConnectionString);
+                                        //    }
+                                        //    break;
+                                        //case "99457":
+                                        //if (pdb.StartDate == null) continue;
+                                        //if (pdb.Status.ToLower().Equals("active") ||
+                                        //   pdb.Status.ToLower().Equals("onhold") ||
+                                        //   pdb.Status.ToLower().Equals("readytodischarge")||
+                                        //   pdb.Status.ToLower().Equals("inactive"))
+                                        //{
+                                        //    AddData(pdb, bc, (DateTime)pdb.StartDate, ConnectionString);
+                                        //}
+                                        //break;
+                                        //case "99458":
+                                        //    if (pdb.StartDate == null) continue;
+                                        //    if (pdb.Status.ToLower().Equals("active") ||
+                                        //       pdb.Status.ToLower().Equals("onhold") ||
+                                        //       pdb.Status.ToLower().Equals("readytodischarge")||
+                                        //       pdb.Status.ToLower().Equals("inactive"))
+                                        //    {
+                                        //        BillingCodes bc1 = billingCodes.Find(y => y.BillingCodeID == 3); //457 billing code.
+                                        //        AddData(pdb, bc1, (DateTime)pdb.StartDate, ConnectionString);
+                                        //    }
+                                        //    break;
                                 }
                             }
+                        
+                            
                         
                             
                     }
@@ -313,7 +268,7 @@ namespace RPMPatientBilling.PatientBilling
                 {
                     con.Open();
 
-                    using (SqlCommand command = new SqlCommand("usp_GetpatientbillingbybillingCodeid", con))
+                    using (SqlCommand command = new SqlCommand("usp_GetpatientbillingbybillingCodeid_DaysBasedBilling", con))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@patientProgramId", PatientProgramid);
@@ -350,13 +305,6 @@ namespace RPMPatientBilling.PatientBilling
 
 
         }
-        public void UpdatePatientBilledData(PatientDailyBillingData pdb,
-                                             BillingCodes bc,
-                                             DateTime startDate,
-                                             string ConnectionString)
-        {
-            AddData(pdb, bc, startDate, ConnectionString);
-        }
         private void AddData(PatientDailyBillingData pdb,
                              BillingCodes bc,
                              DateTime startDate,
@@ -376,12 +324,8 @@ namespace RPMPatientBilling.PatientBilling
                     DateTime StartDateTemp = (DateTime)Startdate;
                     StartDateTemp = BillingProcess.GetLocalTimeFromUTC((DateTime)StartDateTemp, ConnectionString);
                     DateTime startDateLoc = StartDateTemp;
-
-
                     DateTime Enddate = DateTime.UtcNow;
-
                     DateTime EnddateTemp = BillingProcess.GetLocalTimeFromUTC((DateTime)Enddate.AddDays(1), ConnectionString);
-
                     var DateDiffDays = Convert.ToDateTime(StartDateTemp).Date - Enddate.Date;
                     int DaysCompletedtotal = Math.Abs(DateDiffDays.Days);
                     var DateDiff = Convert.ToDateTime(Startdate) - Enddate;
@@ -390,7 +334,6 @@ namespace RPMPatientBilling.PatientBilling
                     DateTime? lastdate = null;
                     List<Dates> Dates = new List<Dates>();
                     List<Dates> DatesNew = new List<Dates>();
-
                     string response = GetpatientbillingData(pdb.PatientProgramId, pdb.PatientId, Convert.ToDateTime(pdb.StartDate), ConnectionString, pdb.BillingCodeId);
                     if(response!="true")
                     {
@@ -412,19 +355,10 @@ namespace RPMPatientBilling.PatientBilling
                                 EnddateTemp = StartDateTemp.AddDays(1).Date.AddSeconds(-1);
 
                             }
-
                             StartDateTemp = BillingProcess.GetUTCFromLocalTime((DateTime)StartDateTemp, ConnectionString);
                             EnddateTemp = BillingProcess.GetUTCFromLocalTime((DateTime)EnddateTemp, ConnectionString);
-
-
                             Dates.Add(new Dates() { StartDate = (DateTime)StartDateTemp, EndDate = EnddateTemp, Totalreading=0 });
-
-
-
-
                         }
-
-
                         if (Dates.Count>0)
                         {
 
@@ -451,20 +385,8 @@ namespace RPMPatientBilling.PatientBilling
                                 }
 
                             }
-
-
                         }
-
-
                         int VitalCount = DatesNew.Where(s => s.Totalreading == 1).Count();
-
-
-
-
-
-
-
-
                         // List<VitalReading> VitalReadings = billings.GetVitalReadingsValue(pdb.PatientProgramId, ConnectionString).Where(s => s.ReadingDate >= pdb.StartDate && s.ReadingDate <= Enddate).OrderBy(s => s.ReadingDate).Take(TargetReading).ToList();
                         if (VitalCount== TargetReading)
                         {
@@ -480,15 +402,12 @@ namespace RPMPatientBilling.PatientBilling
                         }
                     }
                     // check already billed in patientbiling
-                    
-                    
-
                 }
 
             }
             else
             {
-                if (bc.BillingCode.Equals("99457") || bc.BillingCode.Equals("99458"))
+                if (bc.BillingCode.Equals("99457") || bc.BillingCode.Equals("99458")||bc.BillingCode.Equals("99490") ||bc.BillingCode.Equals("99439")||bc.BillingCode.Equals("99491") ||bc.BillingCode.Equals("99437")||bc.BillingCode.Equals("99487") ||bc.BillingCode.Equals("99489")||bc.BillingCode.Equals("99424") ||bc.BillingCode.Equals("99425")||bc.BillingCode.Equals("99426") ||bc.BillingCode.Equals("99427"))
                 {
                     TargetReading = TargetReading * 60;
                     TotalReading = pdb.TotalDuration;
@@ -498,26 +417,18 @@ namespace RPMPatientBilling.PatientBilling
                     TotalReading >= TargetReading)
                 {
                     BillingData bd = pdb.ToBillingData();
+                    if (bc.BillingCode.Equals("G0506"))
+                    {
+                        bd.BilledDate = startDate.Date;
+                    }
                     bd.BilledDate = startDate.AddDays(bc.BillingThreshold-1);
                     bd.TargetMet = true;
                     bd.ReadyToBill = true;
                     bd.BilledDuration = TargetReading;
                     billing.SavePatientBillingResult(bd, ConnectionString);
-                    // Console.WriteLine("Patiend Id : " + pdb.PatientId + " Billing code: " + bc.BillingCode + " RB : True & TM: true");
+                    
                 }
-                //Patient billing table record insert before billed date can be removed - removed by rahul
-
-                //else if (pdb.DaysCompleted < bc.BillingThreshold &&
-                //        TotalReading >= TargetReading)
-                //{
-                //    BillingData bd = pdb.ToBillingData();
-                //    bd.BilledDate = null;
-                //    bd.TargetMet = true;
-                //    bd.ReadyToBill = false;
-                //    bd.BilledDuration = TargetReading;
-                //    billing.SavePatientBillingResult(bd, ConnectionString);
-                //    // Console.WriteLine("Patiend Id : " + pdb.PatientId + " Billing code: " + bc.BillingCode + " RB : True & TM: false");
-                //}
+                
                 else if (pdb.DaysCompleted >= bc.BillingThreshold &&
                          TotalReading < TargetReading)
                 {
@@ -527,15 +438,18 @@ namespace RPMPatientBilling.PatientBilling
                     bd.ReadyToBill = false;
                     bd.BilledDuration = TargetReading;
                     billing.SavePatientBillingResult(bd, ConnectionString);
-                    // Console.WriteLine("Patiend Id : " + pdb.PatientId + " Billing code: " + bc.BillingCode + " RB : false & TM: false");
+                   
                 }
-                else
-                {
-                    // Console.WriteLine("Patiend Id : " + pdb.PatientId + " Billing code: " + bc.BillingCode + " Not ready for bill");
-
-                }
+                
             }
 
+        }
+        public void UpdatePatientBilledData(PatientDailyBillingData pdb,
+                                             BillingCodes bc,
+                                             DateTime startDate,
+                                             string ConnectionString)
+        {
+            AddData(pdb, bc, startDate, ConnectionString);
         }
     }
 }

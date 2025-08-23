@@ -1,21 +1,20 @@
 ﻿using RPMPatientBilling.Interface;
 using RPMPatientBilling.Model;
+using System.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-
 
 namespace RPMPatientBilling.PatientBilling
 {
-    public class CPT99453 : IBilling
+    public class CPTG0506 : IBilling
     {
 
         private readonly BillingCodes billingCode = null;
         private readonly BillingProcess billing = null;
         private readonly string con=string.Empty;
-        public string BillingCode => "99453";
-        public CPT99453(string connectionString)
+        public string BillingCode => "G0506";
+        public CPTG0506(string connectionString)
         {
             con = connectionString;
             billing = new BillingProcess();
@@ -65,81 +64,9 @@ namespace RPMPatientBilling.PatientBilling
                     DaysCompleted = Math.Abs(DateDiff.Days);
 
 
-                    //DateTime Enddate = DateTime.UtcNow;
-                    //var EnddateTemp = Enddate.AddDays(1);
-                    //var DateDiff = Convert.ToDateTime(Startdate).Date - Enddate.Date;
-                    //DaysCompleted = Math.Abs(DateDiff.Days);
-                    // Counting the current day also for day of completion
-                    // No need to compate with threashold as its yearly data 
-                    //DaysCompleted += 1;
+                    
 
-
-                    List<Dates> Dates = new List<Dates>();
-                    List<Dates> DatesNew = new List<Dates>();
-
-                    for (int i = 0; i<=DaysCompleted; i++)
-                    {
-                        if (i==0)
-                        {
-                            EnddateTemp = startDateLoc.AddDays(1).Date.AddSeconds(-1);
-
-                        }
-                        else if (i==DaysCompleted)
-                        {
-                            StartDateTemp = startDateLoc.AddDays(i).Date;
-                            EnddateTemp = StartDateTemp.AddDays(1).Date.AddSeconds(-1);
-                        }
-                        else
-                        {
-                            StartDateTemp = startDateLoc.AddDays(i).Date;
-                            EnddateTemp = StartDateTemp.AddDays(1).Date.AddSeconds(-1);
-
-                        }
-
-                        StartDateTemp = BillingProcess.GetUTCFromLocalTime((DateTime)StartDateTemp, con);
-                        EnddateTemp = BillingProcess.GetUTCFromLocalTime((DateTime)EnddateTemp, con);
-
-
-                        Dates.Add(new Dates() { StartDate = (DateTime)StartDateTemp, EndDate = EnddateTemp, Totalreading=0 });
-
-
-
-
-                    }
-
-
-                    if (Dates.Count>0)
-                    {
-
-                        foreach (Dates date in Dates)
-                        {
-
-                            List<VitalReading> VitalReadings = billing.GetVitalReadingsLocal(patientProgramData, con, date.StartDate, date.EndDate).ToList();
-
-                            if (VitalReadings.Count>0)
-                            {
-
-                                DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading=1 });
-
-                            }
-                            else
-                            {
-                                DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading=0 });
-                            }
-
-                        }
-
-
-                    }
-
-
-                    int VitalCount = DatesNew.Where(s => s.Totalreading == 1).Count();
-
-
-
-                    //List<VitalReading> VitalReadings = billing.GetVitalReadings(patientProgramData, con).Where(s => s.ReadingDate >= Startdate && s.ReadingDate <= Enddate).ToList();
-
-                    SetData(patientProgramData, VitalCount, Convert.ToDateTime(Startdate),
+                    SetData(patientProgramData, 0, Convert.ToDateTime(Startdate),
                             billingCode.BillingCodeID, DaysCompleted+1,false, Enddate);
                     
                 }
