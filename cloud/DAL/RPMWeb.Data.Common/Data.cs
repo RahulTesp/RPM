@@ -597,7 +597,7 @@ namespace RPMWeb.Data.Common
         public int TargetReadings { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public string CreatedBy { get; set; }
+        //public string CreatedBy { get; set; }
         public GoalDetails[] GoalDetails { get; set; }
         public ProgramDiagnostics[] ProgramDiagnosis { get; set; }
     }
@@ -889,7 +889,7 @@ namespace RPMWeb.Data.Common
         public int CountryId { get; set; }
         public string ZipCode { get; set; }
         public int TimeZoneID { get; set; }
-        public byte[] Picture { get; set; }
+        public string Picture { get; set; }
         public string CreatedBy { get; set; }
     }
     public class GetUserProfiles
@@ -913,7 +913,7 @@ namespace RPMWeb.Data.Common
         public int CountryId { get; set; }
         public string ZipCode { get; set; }
         public int TimeZoneID { get; set; }
-        public byte[] Picture { get; set; }
+        public string Picture { get; set; }
         public bool HasPatients { get; set; }
 
     }
@@ -2455,6 +2455,10 @@ namespace RPMWeb.Data.Common
         public string Message { get; set; }
         public string DateTime { get; set; }
         public string Author { get; set; }
+    }
+	public class deviceAvailable
+    {
+        public string DeviceNumber { get; set; }
     }
 	 public class PatientProgramDetailsInsertActivePatients
     {

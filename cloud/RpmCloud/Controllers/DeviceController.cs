@@ -52,7 +52,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -97,7 +97,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -138,7 +138,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -183,7 +183,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -228,7 +228,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -274,7 +274,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         
@@ -320,7 +320,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -367,7 +367,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("AddDevice")]
@@ -412,7 +412,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("account/forwardtelemetry")]
@@ -518,11 +518,56 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
-
-        [Route("getDeviceType/{deviceModel}")]
+        [Route("MakeDeviceAvailable")]
+        [HttpPost]
+        public IActionResult MakeDeviceAvailable([FromBody] deviceAvailable device)
+        {
+            if (device.DeviceNumber == string.Empty)
+            {
+                return BadRequest(new { message = "Invalid input data" });
+            }
+            try
+            {
+                HttpResponseMessage createRes = new HttpResponseMessage();
+                if (Request.Headers.ContainsKey("Bearer"))
+                {
+                    string? s = Request.Headers["Bearer"].FirstOrDefault();
+                    RpmDalFacade.ConnectionString = CONN_STRING;
+                    if (string.IsNullOrEmpty(s))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    string UserName = RpmDalFacade.IsSessionValid(s);
+                    if (string.IsNullOrEmpty(UserName))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    if (!RpmDalFacade.ValidateTkn(s))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    bool resp = RpmDalFacade.MakeDeviceAvailable(device.DeviceNumber);
+                    if (resp)
+                    {
+                        return Ok(new { message = "The device has been made available to the Patients." });
+                        
+                    }
+                    return NotFound(new { message = "Could not find device" });
+                }
+                else
+                {
+                    return Unauthorized(new { message = "Invalid session." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Exception" });
+            }
+        }
+		[Route("getDeviceType/{deviceModel}")]
         [HttpGet]
         public IActionResult GetDeviceType([FromQuery] string deviceModel)
         {
@@ -564,7 +609,5 @@ namespace RpmCloud.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
     }
 }
