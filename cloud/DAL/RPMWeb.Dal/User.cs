@@ -9,6 +9,8 @@ using System.Linq;
 using Twilio.Rest.Conversations.V1;
 using Twilio.Rest.Conversations.V1.Conversation;
 using Twilio.TwiML.Fax;
+using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Http;
 
 
 namespace RPMWeb.Dal
@@ -54,7 +56,7 @@ namespace RPMWeb.Dal
                             userProfiles.ZipCode = reader["ZipCode"].ToString();
                             userProfiles.OrganizationID = (!DBNull.Value.Equals(reader["OrganizationID"])) ? Convert.ToInt32(reader["OrganizationID"]):0;
                             userProfiles.TimeZoneID = (!DBNull.Value.Equals(reader["TimeZoneID"])) ? Convert.ToInt32(reader["TimeZoneID"]):0;
-                            //userProfiles.Picture
+                            userProfiles.Picture = reader["Picture"].ToString();
                             userProfiles.Status = reader["Status"].ToString();
                             userProfiles.HasPatients = (!DBNull.Value.Equals(reader["HasPatients"])) ? Convert.ToBoolean(reader["HasPatients"]) : false;
                         }
@@ -153,7 +155,7 @@ namespace RPMWeb.Dal
                             userProfiles.ZipCode = reader["ZipCode"].ToString();
                             userProfiles.OrganizationID = (!DBNull.Value.Equals(reader["OrganizationID"])) ? Convert.ToInt32(reader["OrganizationID"]) : 0;
                             userProfiles.TimeZoneID = (!DBNull.Value.Equals(reader["TimeZoneID"])) ? Convert.ToInt32(reader["TimeZoneID"]) : 0;
-                            //userProfiles.Picture
+                            userProfiles.Picture = reader["Picture"].ToString();
                             userProfiles.Status = reader["Status"].ToString();
                         }
                         userProfiles.RoleIds = roleids;
@@ -1012,6 +1014,76 @@ namespace RPMWeb.Dal
             {
                 throw ex;
             }
+        }
+        public bool UploadUserProfilePicture(int UserId, IFormFile httpPostedFile, string filename, string Blob_Conn_String, string ContainerName, string UserName, string ConnectionString)
+        {
+            var docfiles = new List<string>();
+            bool ret = false;
+            if (string.IsNullOrEmpty(httpPostedFile.FileName))
+            {
+                return ret;
+            }
+            string ext = Path.GetExtension(httpPostedFile.FileName);
+            ext = ext.ToLower();
+            if (!string.IsNullOrEmpty(ext) || ext.Equals(".jpeg") ||
+                ext.Equals(".jpg") || ext.Equals(".png"))
+            {
+                BlobContainerClient containerClient = new BlobContainerClient(Blob_Conn_String, ContainerName);
+                //var filePath = HttpContext.Current.Server.MapPath("~/" +  postedFile.FileName);
+                var filePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\" + "rpmfolder" + Path.GetExtension(httpPostedFile.FileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    httpPostedFile.CopyTo(fileStream);
+                }
+                docfiles.Add(filePath);
+                if (File.Exists(filePath))
+                {
+                    byte[] values = File.ReadAllBytes(filePath);
+                    if (values != null && values.Length > 100000) // 100KB
+                    {
+                        File.Delete(filePath); // not acceptable size
+                        return ret;
+                    }
+                    using (MemoryStream stream = new MemoryStream(values))
+                    {
+                        string dtstring = DateTime.UtcNow.ToString("dd / MM / yyyy HH: mm:ss");
+                        dtstring = dtstring.Replace(".", "");
+                        dtstring = dtstring.Replace(" ", "");
+                        dtstring = dtstring.Replace("-", "");
+                        dtstring = dtstring.Replace("/", "");
+                        dtstring = dtstring.Replace(":", "");
+                        var cli = containerClient.UploadBlob(dtstring + "_" + filename, stream);
+                        var uri = containerClient.Uri;
+                        string Uri = uri + "/" + dtstring + "_" + filename;
+
+                        using (SqlConnection connection = new SqlConnection(ConnectionString))
+                        {
+                            SqlCommand command = new SqlCommand("usp_UpdUserProfilePicture", connection);
+                            command.CommandType = CommandType.StoredProcedure;
+                            command.Parameters.AddWithValue("@UserId", UserId);
+                            command.Parameters.AddWithValue("@Modifiedby", UserName);
+                            command.Parameters.AddWithValue("@Picture", Uri);
+                            SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
+                            returnParameter.Direction = ParameterDirection.ReturnValue;
+                            connection.Open();
+                            command.ExecuteNonQuery();
+                            int id = (int)returnParameter.Value;
+                            connection.Close();
+                            if (id.Equals(0))
+                            {
+                                ret = false;
+                            }
+                            File.Delete(filePath);
+                            ret = true;
+                        }
+                    }
+                }
+                if (docfiles.Count <= 0)
+                {
+                    ret = false;
+                }
+            }
+            return ret;
         }
     }
 }

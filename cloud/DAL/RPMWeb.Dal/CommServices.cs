@@ -1,4 +1,6 @@
 ﻿using RPMWeb.Data.Common;
+using System.Text.Json;
+using System.Text;
 using Twilio;
 using Twilio.Jwt.AccessToken;
 using Twilio.Rest.Conversations.V1.Service.Configuration;
@@ -61,6 +63,44 @@ namespace RPMWeb.Dal
             RpmDalFacade.UpdateChatDetails(UserName, chatdetails);
             return chatdetails;
 
+        }
+        public DateTime? GetExpiryFromJwt(string jwtToken)
+        {
+            if (string.IsNullOrEmpty(jwtToken))
+                return null;
+
+            var parts = jwtToken.Split('.');
+            if (parts.Length != 3)
+                return null;
+
+            // Decode the payload
+            string payload = parts[1];
+            payload = PadBase64(payload);
+            var jsonBytes = Convert.FromBase64String(payload);
+            var payloadJson = Encoding.UTF8.GetString(jsonBytes);
+
+            // Parse payload
+            using (JsonDocument doc = JsonDocument.Parse(payloadJson))
+            {
+                if (doc.RootElement.TryGetProperty("exp", out JsonElement expElement))
+                {
+                    long expUnix = expElement.GetInt64();
+                    // Convert Unix timestamp to DateTime
+                    DateTimeOffset expDate = DateTimeOffset.FromUnixTimeSeconds(expUnix);
+                    return expDate.UtcDateTime;
+                }
+            }
+
+            return null;
+        }
+        private static string PadBase64(string base64)
+        {
+            int pad = 4 - base64.Length % 4;
+            if (pad < 4)
+            {
+                base64 += new string('=', pad);
+            }
+            return base64.Replace('-', '+').Replace('_', '/');
         }
     }
 }
