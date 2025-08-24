@@ -1322,6 +1322,8 @@ export class PatientPageComponent implements OnInit {
     this.SearchpatientBilling = '';
     this.searchPatientList_assign = true;
     this.searchValueName = false;
+    this.assigneeSerach = '';
+
   }
   refreshBillingData() {
     this.c1 = false;
@@ -1331,7 +1333,6 @@ export class PatientPageComponent implements OnInit {
   billing_tableCount: any;
   billingDataFilter() {
     var that = this;
-
     var searchbillingpgm;
     var searchtotalvitalfiltervalue;
     var searchinteractionfiltervalue;

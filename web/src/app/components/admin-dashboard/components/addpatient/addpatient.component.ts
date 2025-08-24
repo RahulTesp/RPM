@@ -154,8 +154,6 @@ export class AddpatientComponent implements OnInit {
     // a[0].setAttribute("style", "background: url(\"https://rpmstorage123.blob.core.windows.net/rpmprofilepictures/CL500626\"); background-repeat: no-repeat;  background-size: 100% 100%;");
   }
   submitImage(pid: any) {
-    console.log('Submit Image');
-    console.log(this.image);
     if (this.image) {
       const myPhoto = uuid.v4();
       var formData: any = new FormData();
@@ -165,8 +163,8 @@ export class AddpatientComponent implements OnInit {
         .rpm_post(`/api/patient/addimage?PatientId=${pid}`, formData)
         .then(
           (data) => {},
-          (err) => {
-            console.log('Img error');
+          (err:any) => {
+             alert(err.error.message);
           }
         );
     }

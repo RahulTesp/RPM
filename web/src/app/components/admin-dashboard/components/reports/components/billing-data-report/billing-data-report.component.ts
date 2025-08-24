@@ -33,7 +33,7 @@ export class BillingDataReportComponent implements OnInit {
 
   ngOnInit(): void {
     this.billing_variable = 1;
-    this.programType = 'RPM';
+    // this.programType = 'RPM';
     this.getClincDetails();
     this.getBillingCode();
     this.clinic = '';
@@ -59,11 +59,12 @@ export class BillingDataReportComponent implements OnInit {
   }
 
   getClincDetails() {
-    this.billingDetailPatientList = this.http_getActivePatientList.filter(
-      (data: any) => {
-        return data.Program == this.programType;
-      }
-    );
+    // this.billingDetailPatientList = this.http_getActivePatientList.filter(
+    //   (data: any) => {
+    //     return data.Program == this.programType;
+    //   }
+    // );
+    this.billingDetailPatientList = this.http_getActivePatientList;
     this.clinicBillingDetails = this.removeDuplicateObjects(
       this.billingDetailPatientList,
       'ClinicId'

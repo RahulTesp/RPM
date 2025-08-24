@@ -1513,6 +1513,7 @@ export class EditpatientComponent implements OnInit {
           this.loading = false;
           if (this.variable != 2) {
             this.dialog.closeAll();
+            this.submitImage(that.pid);
             this.redirect_patient();
           }
         },
@@ -2796,7 +2797,7 @@ export class EditpatientComponent implements OnInit {
     this.image = e.target.files[0];
     var a = document.getElementsByClassName('uploadPhoto');
     this.profilePic = this.image.name;
-    this.submitImage(this.pid);
+    //this.submitImage(this.pid);
   }
   submitImage(pid: any) {
     const myPhoto = uuid.v4();
@@ -2811,8 +2812,8 @@ export class EditpatientComponent implements OnInit {
         //   { onlySelf: true }
         // );
       },
-      (err) => {
-        alert('Error While Adding Image....!');
+      (err:any) => {
+        alert(err.error.message);
       }
     );
   }

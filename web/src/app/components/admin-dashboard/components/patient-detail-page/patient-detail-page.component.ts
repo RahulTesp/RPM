@@ -879,6 +879,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.resetCallTimer();
     this.stopCallEditTimer();
     this.callDisConnected();
+    if(this.videoOnVariable == true)
+    {
+      this.disconnectVideo();
+    }
     this.videoOnVariable = false;
     //this.disconnectVideo();
   }
@@ -3748,6 +3752,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
           this.incomingVariableDisable = false;
           this.callDisConnected();
           this.showNoteModal=false;
+          if(this.videoOnVariable == true)
+            {
+              this.disconnectVideo();
+            }
           //this.disconnectVideo();
           this.billingReload();
           this.loading_note = false;
@@ -4085,6 +4093,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.incomingCallVal = false;
     this.incomingVariableDisable = false;
     //25/07/2023
+    if(this.videoOnVariable == true)
+    {
+      this.disconnectVideo();
+    }
     this.videoOnVariable = false;
     //this.disconnectVideo();
 
