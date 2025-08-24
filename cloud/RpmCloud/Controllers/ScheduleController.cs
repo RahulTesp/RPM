@@ -106,7 +106,7 @@ namespace RpmCloud.Controllers
                 }
                 else
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return BadRequest(new { message = "Exception" });
                 }
             }
         }
@@ -147,7 +147,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
       
@@ -189,7 +189,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [HttpGet("getschedulemasterdata")]
@@ -275,7 +275,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getworklistschedulesbyid")]
@@ -317,7 +317,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("gettodolist")]
@@ -360,7 +360,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
     }

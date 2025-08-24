@@ -8,6 +8,7 @@ using ParticipantResource = Twilio.Rest.Video.V1.Room.ParticipantResource;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using Newtonsoft.Json;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace RpmCloud.Controllers
 {
@@ -45,7 +46,7 @@ namespace RpmCloud.Controllers
                     List<SystemConfigInfo> lstConfig = DalCommon.GetSystemConfig(CONN_STRING, "Twilio", "User");
                     if (lstConfig == null || lstConfig.Count == 0)
                     {
-                        throw new Exception("Invalid System Configurations");
+                        return BadRequest(new { message = "Invalid System Configurations" });
                     }
                     SystemConfigInfo? accsid = lstConfig.Find(x => x.Name.Equals("AccountSID"));
                     SystemConfigInfo? authtoken = lstConfig.Find(x => x.Name.Equals("AuthToken"));
@@ -53,7 +54,7 @@ namespace RpmCloud.Controllers
                     SystemConfigInfo? fromPhoneNo = lstConfig.Find(x => x.Name.Equals("MyPhoneNumber"));
                     if (fromPhoneNo == null)
                     {
-                        return NotFound("Not Found");
+                        return NotFound(new { message = "Not Found" });
                     }
                     Info.fromPhoneNo = fromPhoneNo.Value;
                     if (accsid != null && authtoken != null && smssid != null)
@@ -63,10 +64,10 @@ namespace RpmCloud.Controllers
                         
                         if (commMgr.MessagingServiceTopatient(Info, accsid.Value, authtoken.Value, smssid.Value, UserName))
                         {
-                            return Ok("Success");
+                            return Ok(new { message = "Success" });
                         }
                     }
-                    return NotFound("Not Found");
+                    return NotFound(new { message = "Not Found" });
                 }
                 else
                 {
@@ -75,7 +76,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
 
         }
@@ -107,7 +108,7 @@ namespace RpmCloud.Controllers
                     List<SystemConfigInfo> lstConfig = DalCommon.GetSystemConfig(CONN_STRING, "Twilio", "User");
                     if (lstConfig == null || lstConfig.Count == 0)
                     {
-                        throw new Exception("Invalid System Configurations");
+                        return BadRequest(new { message = "Invalid System Configurations" });
                     }
                     SystemConfigInfo? accsid = lstConfig.Find(x => x.Name.Equals("AccountSID"));
                     SystemConfigInfo? twimlappsid = lstConfig.Find(x => x.Name.Equals("TwiMLAppSID"));
@@ -127,7 +128,7 @@ namespace RpmCloud.Controllers
                         }
                     }
 
-                    return NotFound("Not Found");
+                    return NotFound(new { message = "Not Found" });
                 }
                 else
                 {
@@ -136,7 +137,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -150,17 +151,17 @@ namespace RpmCloud.Controllers
                 List<SystemConfigInfo> lstConfig = DalCommon.GetSystemConfig(CONN_STRING, "Twilio", "User");
                 if (lstConfig == null || lstConfig.Count == 0)
                 {
-                    throw new Exception("Invalid System Configurations");
+                    return BadRequest(new { message = "Invalid System Configurations" });
                 }
 
                 SystemConfigInfo? mynumber = lstConfig.Find(x => x.Name.Equals("MyPhoneNumber"));
                 if (mynumber == null)
                 {
-                    throw new Exception("Invalid System Configurations");
+                    return BadRequest(new { message = "Invalid System Configurations" });
                 }
                 var toNumber = HttpContext.Request.Form["To"];
                 if (String.IsNullOrEmpty(toNumber)) { 
-                    return BadRequest("Invalid To Number"); 
+                    return BadRequest(new { message = "Invalid To Number" }); 
                 }
                 TwilioCommMgr commMgr = new TwilioCommMgr();
                 string res = commMgr.CallConnect(toNumber, mynumber.Value);
@@ -171,12 +172,12 @@ namespace RpmCloud.Controllers
                     //return resp;
                     return Ok(Content(res, "application/xml", Encoding.UTF8));
                 }
-                return Unauthorized("Not Found");
+                return Unauthorized(new { message = "Not Found" });
 
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -224,7 +225,7 @@ namespace RpmCloud.Controllers
                         List<SystemConfigInfo> lstConfig = DalCommon.GetSystemConfig(CONN_STRING, "Twilio", "User");
                         if (lstConfig == null || lstConfig.Count == 0)
                         {
-                            throw new Exception("Invalid System Configurations");
+                            return BadRequest(new { message = "Invalid System Configurations" });
                         }
                         SystemConfigInfo? Accountsid = lstConfig.Find(x => x.Name.Equals("AccountSID"));
                         SystemConfigInfo? AuthToken = lstConfig.Find(x => x.Name.Equals("AuthToken"));
@@ -233,7 +234,7 @@ namespace RpmCloud.Controllers
 
                         if (Accountsid == null || AuthToken == null || ApiKey == null || ApiSecret == null)
                         {
-                            throw new Exception("Invalid System Configurations");
+                            return BadRequest(new { message = "Invalid System Configurations" });
                         }
                         TwilioClient.Init(Accountsid.Value, AuthToken.Value);
 
@@ -297,7 +298,7 @@ namespace RpmCloud.Controllers
                    }
                    else
                     {
-                        return NotFound("Patient is not Online");
+                        return NotFound(new { message = "Patient is not Online" });
                     }
 
                 }
@@ -308,7 +309,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
 
         }
@@ -341,7 +342,7 @@ namespace RpmCloud.Controllers
                         List<SystemConfigInfo> lstConfig = DalCommon.GetSystemConfig(CONN_STRING, "Twilio", "User");
                         if (lstConfig == null || lstConfig.Count == 0)
                         {
-                            throw new Exception("Invalid System Configurations");
+                            return BadRequest(new { message = "Invalid System Configurations" });
                         }
                         SystemConfigInfo? Accountsid = lstConfig.Find(x => x.Name.Equals("AccountSID"));
                         SystemConfigInfo? AuthToken = lstConfig.Find(x => x.Name.Equals("AuthToken"));
@@ -350,7 +351,7 @@ namespace RpmCloud.Controllers
 
                         if (Accountsid == null || AuthToken == null || ApiKey == null || ApiSecret == null)
                         {
-                            throw new Exception("Invalid System Configurations");
+                            return BadRequest(new { message = "Invalid System Configurations" });
                         }
                         TwilioClient.Init(Accountsid.Value, AuthToken.Value);
                         VideoCallDetails roomdetails = new VideoCallDetails();
@@ -371,7 +372,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
 
         }
@@ -410,6 +411,29 @@ namespace RpmCloud.Controllers
                         chatdetails = RpmDalFacade.GenerateChatToken(chatdetails, UserName,app);
 
                     }
+                    else
+                    {
+                        DateTime? expiry = RpmDalFacade.GetExpiryFromJwt(chatdetails.token);
+                        if (expiry.HasValue)
+                        {
+                            Console.WriteLine("Token expiry (UTC): " + expiry.Value);
+                            if (expiry.Value < DateTime.UtcNow)
+                            {
+                                Console.WriteLine("Token is expired.");
+                                chatdetails.makeisactivezero = false;
+                                chatdetails = RpmDalFacade.GenerateChatToken(chatdetails, UserName, app);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Token is valid.");
+                            }
+                        }
+                        else
+                        {
+                            chatdetails.makeisactivezero = false;
+                            chatdetails = RpmDalFacade.GenerateChatToken(chatdetails, UserName, app);
+                        }
+                    }
                     return Ok( new { message = chatdetails.token });
                 }
                 else
@@ -419,7 +443,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [HttpPost]
@@ -487,7 +511,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -528,7 +552,7 @@ namespace RpmCloud.Controllers
                 }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -557,13 +581,13 @@ namespace RpmCloud.Controllers
                         return Unauthorized(new { message = "Invalid session." });
                     }
                     bool ischatresurceupdated = RpmDalFacade.UpdateChatResource(chatresource);
-                    if(ischatresurceupdated)
+                    if (ischatresurceupdated)
                     {
-                        return Ok();
+                        return Ok(new { message = "Success" });
                     }
                     else
                     {
-                        return NotFound("Could not save chat details");
+                        return NotFound(new { message = "Could not save chat details" });
                     }
                     
                 }
@@ -574,7 +598,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -606,7 +630,7 @@ namespace RpmCloud.Controllers
                     string ConversationSid = RpmDalFacade.GetChatResource(UserName, ToUser);
                     if (ConversationSid==null)
                     {
-                        return NotFound("No Conversation History Found");
+                        return NotFound(new { message = "No Conversation History Found" });
                         
                     }
                     return Ok(new { message = ConversationSid });
@@ -620,7 +644,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
 
             
@@ -648,13 +672,13 @@ namespace RpmCloud.Controllers
                     List<SystemConfigInfo> lstConf = DalCommon.GetSystemConfig(CONN_STRING, "Twilio", "User");
                     if (lstConf == null || lstConf.Count == 0)
                     {
-                        throw new Exception("Invalid System Configurations");
+                        return BadRequest(new { message = "Exception" });
                     }
                     SystemConfigInfo? AccountSID = lstConf.Find(x => x.Name.Equals("AccountSID"));
                     SystemConfigInfo? AuthToken = lstConf.Find(x => x.Name.Equals("AuthToken"));
                     if(AuthToken==null || AccountSID== null)
                     {
-                        throw new Exception("Invalid System Configurations");
+                        return BadRequest(new { message = "Exception" });
                     }
                     string AccountSIDValue = Convert.ToString(AccountSID.Value);
                     string AuthTokenValue = Convert.ToString(AuthToken.Value);
@@ -676,7 +700,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
 
 
@@ -684,7 +708,7 @@ namespace RpmCloud.Controllers
         [HttpPost]
         [Route("notifibyfirebase")]
 
-        public IActionResult NotificationbyFirebase([FromBody] string toUser, int tokenid, firebasenotificationmessage notify)
+        public IActionResult NotificationbyFirebase(string toUser, int tokenid, firebasenotificationmessage notify)
         {
             try
             {
@@ -717,7 +741,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
        
@@ -730,16 +754,16 @@ namespace RpmCloud.Controllers
                 bool ischatresurceupdated = RpmDalFacade.UpdateChatWebhook(hook);
                 if (ischatresurceupdated)
                 {
-                    return Ok();
+                    return Ok((new { message = "Success" }));
                 }
                 else
                 {
-                    return NotFound(new { message = "" });
-                }               
+                    return NotFound(new { message = "Not Found" });
+                }
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -750,12 +774,12 @@ namespace RpmCloud.Controllers
             try
             {
                 RpmDalFacade.UpdateIncomingSmsDetails(hook);
-                return Ok();
-                
+                return Ok((new { message = "Success" }));
+
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -803,7 +827,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [HttpPost]
@@ -831,7 +855,7 @@ namespace RpmCloud.Controllers
                     }
 
                     RpmDalFacade.NotifyConversation(conv.ConversationSid, UserName, conv.ToUser,conv.Message);
-                    return Ok();
+                    return Ok((new { message = "Success" }));
                 }
                 else
                 {
@@ -840,7 +864,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
 

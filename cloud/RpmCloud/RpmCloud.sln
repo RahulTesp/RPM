@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.ProcessVitals", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.MissingAlerts", "..\RPM.Job.MissingAlerts\RPM.Job.MissingAlerts.csproj", "{149F9A1E-F95B-4957-B878-9A98EDF962B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.CriticalAlert", "..\RPM.Job.CriticalAlert\RPM.Job.CriticalAlert.csproj", "{471AD340-1C51-4FF4-899C-C558E906F2C5}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPMWeb.Common", "..\RPMWeb.Common\RPMWeb.Common.csproj", "{AFAC6E4C-5926-462A-A543-EDEEE8BDA253}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Lib.Billing.Clynx", "..\RPM.Lib.Billing.Clynx\RPM.Lib.Billing.Clynx.csproj", "{67197E1A-0CD1-44E5-9DE0-E6E84881C516}"
@@ -69,10 +67,6 @@ Global
 		{149F9A1E-F95B-4957-B878-9A98EDF962B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{149F9A1E-F95B-4957-B878-9A98EDF962B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{149F9A1E-F95B-4957-B878-9A98EDF962B6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{471AD340-1C51-4FF4-899C-C558E906F2C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{471AD340-1C51-4FF4-899C-C558E906F2C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{471AD340-1C51-4FF4-899C-C558E906F2C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{471AD340-1C51-4FF4-899C-C558E906F2C5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AFAC6E4C-5926-462A-A543-EDEEE8BDA253}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AFAC6E4C-5926-462A-A543-EDEEE8BDA253}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFAC6E4C-5926-462A-A543-EDEEE8BDA253}.Release|Any CPU.ActiveCfg = Release|Any CPU

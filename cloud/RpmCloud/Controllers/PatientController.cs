@@ -72,7 +72,7 @@ namespace RpmCloud.Controllers
 
         [Route("addimage")]
         [HttpPost]
-        public async Task<IActionResult> ImageUpload([FromBody] int PatientId)
+        public async Task<IActionResult> ImageUpload([FromQuery] int PatientId)
         {
             try
             {
@@ -113,7 +113,11 @@ namespace RpmCloud.Controllers
                     }
                     if (upload == true)
                     {
-                        return Created();
+                        //return Created(new { message = "Image Added to Patient" });
+                        return Created(
+                            uri: $"", // Location header
+                            value: new { message = "Image Added to Patient" } // Response body
+                        );
                     }
                     else
                     {
@@ -360,7 +364,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -401,7 +405,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getdraftpatientDetails")]
@@ -441,7 +445,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getPatientInfoForProgramInsert")]
@@ -481,7 +485,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -524,7 +528,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getprogramdetailsmasterdataaddpatient")]
@@ -566,7 +570,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getavailabledevices")]
@@ -608,7 +612,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -652,7 +656,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getallnonactivepatients")]
@@ -694,7 +698,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getallpatientslist")]
@@ -735,7 +739,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getallpatientsSmslist")]
@@ -776,7 +780,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientlastpgmstatus")]
@@ -818,7 +822,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("addpatientprogram")]
@@ -836,7 +840,6 @@ namespace RpmCloud.Controllers
                         return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
-                    Info.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
                         return Unauthorized(new { message = "Invalid session." });
@@ -845,7 +848,7 @@ namespace RpmCloud.Controllers
                     {
                         return Unauthorized(new { message = "Invalid session." });
                     }
-                    var id = RpmDalFacade.SavePatientProgram(Info);
+                    var id = RpmDalFacade.SavePatientProgram(Info, UserName);
                     if (!id.Equals(0))
                     {
                         return Ok(new { message = id });
@@ -859,7 +862,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -879,7 +882,6 @@ namespace RpmCloud.Controllers
                         return Unauthorized(new { message = "Invalid session." });
                     }
                     string UserName = RpmDalFacade.IsSessionValid(s);
-                    Info.CreatedBy = UserName;
                     if (string.IsNullOrEmpty(UserName))
                     {
                         return Unauthorized(new { message = "Invalid session." });
@@ -888,7 +890,7 @@ namespace RpmCloud.Controllers
                     {
                         return Unauthorized(new { message = "Invalid session." });
                     }
-                    var id = RpmDalFacade.AddNewPatientProgram(Info);
+                    var id = RpmDalFacade.AddNewPatientProgram(Info, UserName);
                     if (!id.Equals(0))
                     {
                         return Ok(new { message = id });
@@ -902,7 +904,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("updatepatientprogramdetails")]
@@ -943,7 +945,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("updatepatientprogram")]
@@ -984,7 +986,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -1027,7 +1029,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("renewpatientprogram")]
@@ -1068,7 +1070,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("addpatientsymptoms")]
@@ -1109,7 +1111,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -1152,7 +1154,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("updatepatientsymptoms")]
@@ -1192,7 +1194,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientsymptoms")]
@@ -1234,7 +1236,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("addpatientmedication")]
@@ -1279,7 +1281,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("updatepatientmedication")]
@@ -1319,7 +1321,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientmedication")]
@@ -1361,7 +1363,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientcallnotes")]
@@ -1403,7 +1405,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -1446,7 +1448,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientnotesbyprogram")]
@@ -1488,7 +1490,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -1573,7 +1575,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientreviewnotes")]
@@ -1615,7 +1617,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         //List<GetAllNotes> GetPatientNotes(int PatientId, int PatientProgramId, string NoteType, DateTime StartDate, DateTime EndDate, string CreatedBy)
@@ -1658,7 +1660,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientreviewnotesbyid")]
@@ -1700,7 +1702,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientvitalreadings")]
@@ -1742,7 +1744,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientvitalreadingsv1")]
@@ -1784,7 +1786,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -1831,7 +1833,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientschedules")]
@@ -1873,7 +1875,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientAlertandtask")]
@@ -1915,7 +1917,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientcriticalalerts")]
@@ -2097,7 +2099,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getVitalSummaryDetails")]
@@ -2141,7 +2143,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientprofile")]
@@ -2182,7 +2184,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientuploads")]
@@ -2223,7 +2225,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientbillingreport")]
@@ -2271,7 +2273,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -2354,7 +2356,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getRecentPatientVitalSummary/{dayCount:int=7}")]
@@ -2396,7 +2398,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getbillinginfobyPatientId")]
@@ -2480,7 +2482,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -2529,7 +2531,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -2574,7 +2576,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getpatientbillinginfoCounts")]
@@ -2830,7 +2832,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
 
 
@@ -2880,7 +2882,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -2928,7 +2930,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -2977,7 +2979,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getmissingbillingreportdetails")]
@@ -3025,7 +3027,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -3068,7 +3070,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 

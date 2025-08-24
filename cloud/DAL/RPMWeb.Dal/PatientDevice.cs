@@ -780,5 +780,30 @@ namespace RPMWeb.Dal
                 throw ex;
             }
         }
+		public bool MakeDeviceAvailable(string deviceNumber, string ConnectionString)
+        {
+            bool response = false;
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                SqlCommand command = new SqlCommand("usp_MakeDeviceAvailable", con);
+
+                command.CommandType = CommandType.StoredProcedure;
+
+
+                command.Parameters.AddWithValue("@deviceNumber", deviceNumber);
+                con.Open();
+                SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
+                returnParameter.Direction = ParameterDirection.ReturnValue;
+
+                command.ExecuteNonQuery();
+                int id = (int)returnParameter.Value;
+                if (!id.Equals(0))
+                {
+                    response = true;
+                }
+                con.Close();
+                return response;
+            }
+        }
     }
 }

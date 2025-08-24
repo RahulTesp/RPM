@@ -14,6 +14,8 @@ namespace RpmCloud.Controllers
         {
             CONN_STRING = configuration.GetSection("RPM:ConnectionString").Value ?? throw new ArgumentNullException(nameof(CONN_STRING));
         }
+        public static string Blob_Conn_String = String.Empty;
+        public static string ContainerName = "rpmprofilepictures";
         [Route("getuserprofiles")]
         [HttpGet]
         public IActionResult Getuserprofiles(int UserId)
@@ -52,7 +54,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
 
@@ -94,7 +96,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("adduser")]
@@ -184,7 +186,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getallusers")]
@@ -225,7 +227,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("getmyprofileandprogram")]
@@ -266,7 +268,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("updateuserpassword")]
@@ -428,7 +430,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Exception" });
             }
 
         }
@@ -477,6 +479,74 @@ namespace RpmCloud.Controllers
                 if (ex.Message.Contains("Lifetime validation failed"))
                 {
                     return BadRequest(new { message = "Invalid session." });
+                }
+                return BadRequest(new { message = "Unexpected Error." });
+            }
+        }
+        [Route("addimage")]
+        [HttpPost]
+        public async Task<IActionResult> ImageUpload([FromQuery] int UserId)
+        {
+            try
+            {
+                if (Request.Headers.ContainsKey("Bearer"))
+                {
+                    string? s = Request.Headers["Bearer"].FirstOrDefault();
+                    RpmDalFacade.ConnectionString = CONN_STRING;
+                    if (string.IsNullOrEmpty(s))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    string UserName = RpmDalFacade.IsSessionValid(s);
+                    if (string.IsNullOrEmpty(UserName))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    if (!RpmDalFacade.ValidateTkn(s))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+
+                    List<SystemConfigInfo> igc = DalCommon.GetSystemConfig(CONN_STRING, "Storage", "User");
+                    if (igc != null && igc.Count > 0)
+                    {
+                        SystemConfigInfo si = igc.Find(x => x.Name.Equals("ConnString"));
+                        if (si == null) return NotFound("Storage string not found.");
+                        Blob_Conn_String = si.Value;
+                    }
+
+                    var httpRequest = HttpContext.Request;
+                    bool upload = false;
+                    if (httpRequest.Form.Files.Count > 0)
+                    {
+                        foreach (var file in httpRequest.Form.Files)
+                        {
+                            upload = RpmDalFacade.UploadUserProfilePicture(UserId, file, file.FileName, Blob_Conn_String, ContainerName, UserName);
+                        }
+                    }
+                    if (upload == true)
+                    {
+                        //return Created(new { message = "Image Added to Patient" });
+                        return Created(
+                            uri: $"", // Location header
+                            value: new { message = "Image Added to User" } // Response body
+                        );
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = "Not a valid image file(support jpg and png) or size (100KB)" });
+                    }
+                }
+                else
+                {
+                    return Unauthorized(new { message = "Invalid session." });
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("Lifetime validation failed"))
+                {
+                    return BadRequest(new { message = "Invalid session." }); ;
                 }
                 return BadRequest(new { message = "Unexpected Error." });
             }
