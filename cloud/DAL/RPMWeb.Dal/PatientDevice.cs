@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Encodings.Web;
 
 namespace RPMWeb.Dal
 {
