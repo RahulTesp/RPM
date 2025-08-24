@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
@@ -99,7 +100,7 @@ namespace RPMWeb.Dal
         {
             return new PatientDevice().AddDevice(info, ConnectionString);
         }
-        public static bool StagingTableInsert(DeviceTelemetry dev, string DeviceType)
+        public static bool StagingTableInsert(TranstekDeviceTelemetry dev, string DeviceType)
         {
             return new PatientDevice().StagingTableInsert(dev, DeviceType, ConnectionString);
         }
@@ -209,6 +210,10 @@ namespace RPMWeb.Dal
         {
             return new Patient().UploadProfilePicture(PatientId, httpPostedFile, filename, Blob_Conn_String, ContainerName, UserName, ConnectionString);
         }
+        public static bool UploadUserProfilePicture(int UserId, IFormFile httpPostedFile, string filename, string Blob_Conn_String, string ContainerName, string UserName)
+        {
+            return new User().UploadUserProfilePicture(UserId, httpPostedFile, filename, Blob_Conn_String, ContainerName, UserName, ConnectionString);
+        }
         public static bool UploadPatientDocument(UploadPatientDocument info, IFormFile httpPostedFile)
         {
             return new Patient().UploadPatientDocument(info, httpPostedFile, ConnectionString);
@@ -307,9 +312,9 @@ namespace RPMWeb.Dal
         {
             return new Patient().SearchPatient(PatientNumber, CreatedBy, ConnectionString);
         }
-        public static int SavePatientProgram(PatientProgramDetailsInsert Info)
+        public static int SavePatientProgram(PatientProgramDetailsInsert Info, string CreatedBy)
         {
-            return new PatientProgram().SavePatientProgram(Info,ConnectionString);
+            return new PatientProgram().SavePatientProgram(Info, CreatedBy,ConnectionString);
         }
         public static bool UpdatePatientProgram(PatientProgramDetailsUpdate Info)
         {
@@ -753,9 +758,9 @@ namespace RPMWeb.Dal
             }
             return ret;
         }
-        public static int AddNewPatientProgram(PatientProgramDetailsInsert data)
+        public static int AddNewPatientProgram(PatientProgramDetailsInsert data, string Createdby)
         {
-            return new PatientProgram().AddNewPatientProgram(data, ConnectionString);
+            return new PatientProgram().AddNewPatientProgram(data, Createdby, ConnectionString);
         }
         public static int UpdateProgram(UpdateProgramDetails data)
         {
@@ -998,6 +1003,10 @@ namespace RPMWeb.Dal
         {
             return new CommServices().GenerateChatToken(chatdetails, UserName, Application, ConnectionString);
         }
+        public static DateTime? GetExpiryFromJwt(string token)
+        {
+            return new CommServices().GetExpiryFromJwt(token);
+        }
         public static bool UpdateUserConversationActivity(string username, string activeConversationSid, DateTimeOffset lastActiveAt, string actor)
         {
             return new User().UpdateUserConversationActivity(username, activeConversationSid, lastActiveAt, actor, ConnectionString);
@@ -1005,6 +1014,14 @@ namespace RPMWeb.Dal
         public static void NotifyConversation(string activeConversationSid, string FromUser, string ToUser, string Message)
         {
             new User().NotifyConversation(activeConversationSid, FromUser, ToUser, Message, ConnectionString);
+        }
+		 public static string GetDeviceType(string DeviceModel)
+        {
+            return new PatientDevice().GetDeviceType(DeviceModel, ConnectionString);
+        }
+        public static bool MakeDeviceAvailable(string deviceNumber)
+        {
+            return new PatientDevice().MakeDeviceAvailable(deviceNumber, ConnectionString);
         }
 
     }

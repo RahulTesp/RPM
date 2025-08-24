@@ -11,7 +11,7 @@ namespace RPMWeb.Dal
 {
     public sealed class PatientProgram
     {
-        public int SavePatientProgram(PatientProgramDetailsInsert data, string ConnectionString)
+        public int SavePatientProgram(PatientProgramDetailsInsert data, string CreatedBy, string ConnectionString)
         {
 
             try
@@ -26,7 +26,7 @@ namespace RPMWeb.Dal
                 {
                     foreach (int vitalId in vitalids)
                     {
-                        string insertvalues = "('PATIENTPROGRAMIDXXX'," + data.ProgramId + "," + vitalId + ",'" + data.CreatedBy + "'),";
+                        string insertvalues = "('PATIENTPROGRAMIDXXX'," + data.ProgramId + "," + vitalId + ",'" + CreatedBy + "'),";
                         ProgramVitalsinserts = ProgramVitalsinserts + insertvalues;
                     }
                     string scriptV = ProgramVitals + ProgramVitalsinserts;
@@ -37,7 +37,7 @@ namespace RPMWeb.Dal
                 ProgramDiagnostics[] details2 = data.ProgramDiagnosis;
                 foreach (ProgramDiagnostics details in details2)
                 {
-                    string insertvalues = "('PATIENTPROGRAMIDXXX','" + details.DiagnosisName + "','" + details.DiagnosisCode + "','" + data.CreatedBy + "'),";
+                    string insertvalues = "('PATIENTPROGRAMIDXXX','" + details.DiagnosisName + "','" + details.DiagnosisCode + "','" + CreatedBy + "'),";
                     ProgramDiagnosticsinserts = ProgramDiagnosticsinserts + insertvalues;
                 }
                 string script2 = ProgramDiagnostics + ProgramDiagnosticsinserts;
@@ -47,7 +47,7 @@ namespace RPMWeb.Dal
                 GoalDetails[] details1 = data.GoalDetails;
                 foreach (GoalDetails details in details1)
                 {
-                    string insertvalues = "('PATIENTPROGRAMIDXXX','" + details.Goal + "','" + details.Description + "','" + data.CreatedBy + "'),";
+                    string insertvalues = "('PATIENTPROGRAMIDXXX','" + details.Goal + "','" + details.Description + "','" + CreatedBy + "'),";
                     ProgramGoalsinserts = ProgramGoalsinserts + insertvalues;
                 }
                 string script = ProgramGoals + ProgramGoalsinserts;
@@ -69,7 +69,7 @@ namespace RPMWeb.Dal
                     command.Parameters.AddWithValue("@VitalIds", ProgramVitalsInput);//ccm change
                     command.Parameters.AddWithValue("@ProgramDiagnostics", ProgramDiagnosticsInput);
                     command.Parameters.AddWithValue("@ProgramGoals", ProgramGoalsInput);
-                    command.Parameters.AddWithValue("@CreatedBy", data.CreatedBy);
+                    command.Parameters.AddWithValue("@CreatedBy", CreatedBy);
                     SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
                     returnParameter.Direction = ParameterDirection.ReturnValue;
                     connection.Open();
@@ -88,7 +88,7 @@ namespace RPMWeb.Dal
                 throw;
             }
         }
-        public int AddNewPatientProgram(PatientProgramDetailsInsert data, string ConnectionString)
+        public int AddNewPatientProgram(PatientProgramDetailsInsert data, string CreatedBy, string ConnectionString)
         {
 
             try
@@ -99,7 +99,7 @@ namespace RPMWeb.Dal
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@PatientId", data.PatientId);
                     command.Parameters.AddWithValue("@PatientProgramId", data.PatientProgramId);
-                    command.Parameters.AddWithValue("@ModifiedBy", data.CreatedBy);
+                    command.Parameters.AddWithValue("@ModifiedBy", CreatedBy);
                     SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
                     returnParameter.Direction = ParameterDirection.ReturnValue;
                     connection.Open();
@@ -118,7 +118,7 @@ namespace RPMWeb.Dal
                             {
                                 foreach (int vitalId in vitalids)
                                 {
-                                    string insertvalues = "('PATIENTPROGRAMIDXXX'," + data.ProgramId + "," + vitalId + ",'" + data.CreatedBy + "'),";
+                                    string insertvalues = "('PATIENTPROGRAMIDXXX'," + data.ProgramId + "," + vitalId + ",'" + CreatedBy + "'),";
                                     ProgramVitalsinserts = ProgramVitalsinserts + insertvalues;
                                 }
                                 string scriptV = ProgramVitals + ProgramVitalsinserts;
@@ -129,7 +129,7 @@ namespace RPMWeb.Dal
                         ProgramDiagnostics[] details2 = data.ProgramDiagnosis;
                         foreach (ProgramDiagnostics details in details2)
                         {
-                            string insertvalues = "('PATIENTPROGRAMIDXXX','" + details.DiagnosisName + "','" + details.DiagnosisCode + "','" + data.CreatedBy + "'),";
+                            string insertvalues = "('PATIENTPROGRAMIDXXX','" + details.DiagnosisName + "','" + details.DiagnosisCode + "','" + CreatedBy + "'),";
                             ProgramDiagnosticsinserts = ProgramDiagnosticsinserts + insertvalues;
                         }
                         string script2 = ProgramDiagnostics + ProgramDiagnosticsinserts;
@@ -139,7 +139,7 @@ namespace RPMWeb.Dal
                         GoalDetails[] details1 = data.GoalDetails;
                         foreach (GoalDetails details in details1)
                         {
-                            string insertvalues = "('PATIENTPROGRAMIDXXX','" + details.Goal + "','" + details.Description + "','" + data.CreatedBy + "'),";
+                            string insertvalues = "('PATIENTPROGRAMIDXXX','" + details.Goal + "','" + details.Description + "','" + CreatedBy + "'),";
                             ProgramGoalsinserts = ProgramGoalsinserts + insertvalues;
                         }
                         string script = ProgramGoals + ProgramGoalsinserts;
@@ -161,7 +161,7 @@ namespace RPMWeb.Dal
                             command1.Parameters.AddWithValue("@EndDate", data.EndDate);
                             command1.Parameters.AddWithValue("@ProgramDiagnostics", ProgramDiagnosticsInput);
                             command1.Parameters.AddWithValue("@ProgramGoals", ProgramGoalsInput);
-                            command1.Parameters.AddWithValue("@CreatedBy", data.CreatedBy);
+                            command1.Parameters.AddWithValue("@CreatedBy", CreatedBy);
                             SqlParameter returnParameter1 = command1.Parameters.Add("RetVal", SqlDbType.Int);
                             returnParameter1.Direction = ParameterDirection.ReturnValue;
                             connection1.Open();
