@@ -938,7 +938,7 @@ namespace RpmCloud.Controllers
                         msg.Status = "Password Updated";
                         return Ok(msg);
                     }
-                    msg.Status = "Invalid Password";
+                    msg.Status = "Failed to Update Password";
                     return NotFound(msg);
                 }
                 else
@@ -950,7 +950,7 @@ namespace RpmCloud.Controllers
             catch (Exception ex)
             {
                 msg.Status = ex.Message;
-                return BadRequest(msg);
+                return BadRequest("Exception");
             }
         }
         [Route("operationalmasterdata")]

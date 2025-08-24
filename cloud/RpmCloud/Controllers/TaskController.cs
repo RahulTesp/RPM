@@ -100,7 +100,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception" });
             }
         }
         [Route("worklistgettasks")]

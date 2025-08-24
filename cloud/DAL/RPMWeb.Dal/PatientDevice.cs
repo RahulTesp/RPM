@@ -679,119 +679,39 @@ namespace RPMWeb.Dal
             
             return ret;
         }
-        public bool StagingTableInsert(DeviceTelemetry dev, string DeviceType,string ConnectionString)
+        public bool StagingTableInsert(TranstekDeviceTelemetry dev, string DeviceType, string ConnectionString)
         {
-            bool ret = true;
-            JObject obj = JObject.Parse(dev.data.ToString());
-            if (DeviceType == "Blood Pressure Monitor")
+            bool ret;
+
+            var options = new JsonSerializerOptions
             {
-                StagingInput blood_pressuresystolic = new StagingInput();
-                StagingInput blood_pressurediastolic = new StagingInput();
-                StagingInput blood_pressurepulse = new StagingInput();
-                blood_pressuresystolic.reading_id = obj["ts"].ToString();
-                blood_pressurediastolic.reading_id = obj["ts"].ToString();
-                blood_pressurepulse.reading_id = obj["ts"].ToString();
-                blood_pressuresystolic.device_id = dev.deviceId;
-                blood_pressurediastolic.device_id = dev.deviceId;
-                blood_pressurepulse.device_id = dev.deviceId;
-                blood_pressuresystolic.device_model = "";
-                blood_pressurediastolic.device_model = "";
-                blood_pressurepulse.device_model = "";
-                var dateTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(obj["ts"])).DateTime;
-                blood_pressuresystolic.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-                blood_pressurediastolic.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-                blood_pressurepulse.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-                var dateTimeRx = DateTimeOffset.FromUnixTimeSeconds(dev.createdAt).DateTime;
-                blood_pressuresystolic.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
-                blood_pressurediastolic.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
-                blood_pressurepulse.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
-                blood_pressuresystolic.reading_type = "blood_pressure";
-                blood_pressurediastolic.reading_type = "blood_pressure";
-                blood_pressurepulse.reading_type = "blood_pressure";
-                blood_pressuresystolic.battery = 0;
-                blood_pressurediastolic.battery = 0;
-                blood_pressurepulse.battery = 0;
-                blood_pressuresystolic.time_zone_offset = "";
-                blood_pressurediastolic.time_zone_offset = "";
-                blood_pressurepulse.time_zone_offset = "";
-                blood_pressuresystolic.before_meal = false;
-                blood_pressurediastolic.before_meal = false;
-                blood_pressurepulse.before_meal = false;
-                blood_pressuresystolic.event_flag  = "";
-                blood_pressurediastolic.event_flag = "";
-                blood_pressurepulse.event_flag = "";
-                blood_pressuresystolic.irregular = false;
-                blood_pressurediastolic.irregular = false;
-                blood_pressurepulse.irregular = false;
-                blood_pressuresystolic.data_type = "systolic";
-                blood_pressuresystolic.data_unit = "mmHg";
-                blood_pressuresystolic.data_value = Convert.ToDouble(obj["sys"]);
-                blood_pressurediastolic.data_type = "diastolic";
-                blood_pressurediastolic.data_unit = "mmHg";
-                blood_pressurediastolic.data_value = Convert.ToDouble(obj["dia"]);
-                Console.WriteLine("Added to queue:" + blood_pressurediastolic.device_id);
-                blood_pressurepulse.data_type = "pulse";
-                blood_pressurepulse.data_unit = "bps";
-                blood_pressurepulse.data_value = Convert.ToDouble(obj["pul"]);
-                string Json = "Insert into JsonStg1(Json)values(" + blood_pressuresystolic + "," + blood_pressurediastolic + "," + blood_pressurepulse + ")";
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+
+            string json = System.Text.Json.JsonSerializer.Serialize(dev, options);
+            ret = StagingTableInsertJson(json, ConnectionString);
+            return ret;
+        }
+        private bool StagingTableInsertJson(string jsonData, string ConnectionString)
+        {
+            bool ret;
+            try
+            {
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {
-                    SqlCommand cmd = new SqlCommand("[usp_InsJsonStg1]", con);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.Add("@Json", SqlDbType.NVarChar).Value = Json;
-                    cmd.Parameters.Add("@CreatedBy", SqlDbType.NVarChar).Value = "sa";
-                    SqlParameter returnParameter = cmd.Parameters.Add("RetVal", SqlDbType.Int);
-                    returnParameter.Direction = ParameterDirection.ReturnValue;
+                    SqlCommand command = new SqlCommand("usp_InsJsonStg_Transtek", con);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@Json", jsonData);
+                    command.Parameters.AddWithValue("@CreatedBy", DateTime.Now.ToUniversalTime());
                     con.Open();
-                    cmd.ExecuteNonQuery();
+                    command.ExecuteScalar();
                     con.Close();
-                    int id = (int)returnParameter.Value;
-                    if (id.Equals(0))
-                    {
-                        ret = false;
-                    }
                 }
+                ret = true;
             }
-            else if (DeviceType == "Body Weight Monitor")
+            catch (Exception ex)
             {
-                StagingInput weight = new StagingInput();
-                weight.reading_id = obj["ts"].ToString();
-                weight.device_id = dev.deviceId;
-                weight.device_model = "";
-                var dateTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(obj["ts"])).DateTime;
-                weight.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-                var dateTimeRx = DateTimeOffset.FromUnixTimeSeconds(dev.createdAt).DateTime;
-                weight.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
-                weight.reading_type = "Weight";
-                weight.battery = 0;
-                weight.time_zone_offset = "";
-                weight.before_meal = false;
-                weight.event_flag = "";
-                weight.irregular = false;
-                weight.data_type = "Weight";
-                weight.data_unit = "grams";
-                weight.data_value = Convert.ToDouble(obj["wt"]);
-                //JavaScriptSerializer js = new JavaScriptSerializer();
-                //string jsonData = js.Serialize(weight);
-                string jsonData = JsonConvert.SerializeObject(weight);
-                string Json = "Insert into JsonStg1(Json)values('" + jsonData + "')";
-                using (SqlConnection con = new SqlConnection(ConnectionString))
-                {
-                    SqlCommand cmd = new SqlCommand("[usp_InsJsonStg1]", con);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.Add("@Json", SqlDbType.NVarChar).Value = Json;
-                    cmd.Parameters.Add("@CreatedBy", SqlDbType.NVarChar).Value = "sa";
-                    SqlParameter returnParameter = cmd.Parameters.Add("RetVal", SqlDbType.Int);
-                    returnParameter.Direction = ParameterDirection.ReturnValue;
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                    con.Close();
-                    int id = (int)returnParameter.Value;
-                    if (id.Equals(0))
-                    {
-                        ret = false;
-                    }
-                }
+                throw ex;
             }
             return ret;
         }
@@ -819,6 +739,63 @@ namespace RPMWeb.Dal
             }
 
             return ret;
+        }
+		public string GetDeviceType(string deviceModel, string ConnectionString)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConnectionString))
+                {
+                    using (SqlCommand command = new SqlCommand("usp_GetDeviceType", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@DeviceModel", deviceModel);
+
+                        connection.Open();
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                return reader["DeviceTypeName"].ToString();
+                            }
+                            else
+                            {
+                                return null;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public bool MakeDeviceAvailable(string deviceNumber, string ConnectionString)
+        {
+            bool response = false;
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                SqlCommand command = new SqlCommand("usp_MakeDeviceAvailable", con);
+
+                command.CommandType = CommandType.StoredProcedure;
+
+
+                command.Parameters.AddWithValue("@deviceNumber", deviceNumber);
+                con.Open();
+                SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
+                returnParameter.Direction = ParameterDirection.ReturnValue;
+
+                command.ExecuteNonQuery();
+                int id = (int)returnParameter.Value;
+                if (!id.Equals(0))
+                {
+                    response = true;
+                }
+                con.Close();
+                return response;
+            }
         }
     }
 }
