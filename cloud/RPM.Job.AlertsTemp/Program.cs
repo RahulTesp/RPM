@@ -51,9 +51,9 @@ class Program
             using (SqlConnection connection = new SqlConnection(CONN_STRING))
             {
                 connection.Open();
-                SqlCommand command = new SqlCommand("usp_InsPatientVitalMeasures", connection);
-                command.CommandType = CommandType.StoredProcedure;
-                command.ExecuteNonQuery();
+                SqlCommand command1 = new SqlCommand("usp_InsAlertsTemp", connection);
+                command1.CommandType = CommandType.StoredProcedure;
+                command1.ExecuteNonQuery();
                 connection.Close();
             }
         }

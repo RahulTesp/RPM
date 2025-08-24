@@ -51,9 +51,14 @@ class Program
             using (SqlConnection connection = new SqlConnection(CONN_STRING))
             {
                 connection.Open();
-                SqlCommand command = new SqlCommand("usp_InsPatientVitalMeasures", connection);
-                command.CommandType = CommandType.StoredProcedure;
-                command.ExecuteNonQuery();
+                SqlCommand command2 = new SqlCommand("usp_InsPatientProgramPriority", connection);
+                command2.CommandTimeout = 900000;
+                command2.CommandType = CommandType.StoredProcedure;
+                command2.ExecuteNonQuery();
+                SqlCommand command3 = new SqlCommand("usp_InsAlertSummary", connection);
+                command3.CommandTimeout = 900000;
+                command3.CommandType = CommandType.StoredProcedure;
+                command3.ExecuteNonQuery();
                 connection.Close();
             }
         }
