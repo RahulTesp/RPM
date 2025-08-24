@@ -23,11 +23,11 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
     // Declare globally to track last notification ID
     var lastProcessedNotificationID: String?
     private var shownSessionIds = Set<String>()
-    
+    private var alertDismissTimer: Timer?
+
 
     override init() {
         super.init()
-        //   UNUserNotificationCenter.current().delegate = self
         print("currentdelegate")
     }
     
@@ -44,75 +44,91 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
 
     }
 
-
+    
     func handleForegroundNotification(title: String, body: String, userInfo: [AnyHashable: Any]) {
-        print(" Handling Foreground Notification")
-        
+        print("Handling Foreground Notification")
         NotificationCenter.default.post(name: Notification.Name("RefreshNotifications"), object: nil)
-           print(" Notification posted: RefreshNotifications")
-        
+
         var extractedRoomName = ""
         var callRejectToUserName = ""
         var callRejectTokenId = ""
-        var shouldShowAlert = false // Temporarily store it outside the main queue
-        
+        var shouldShowAlert = false
+
         if let atSymbolIndex = body.firstIndex(of: "@"),
            let hashSymbolIndex = body.firstIndex(of: "#") {
-            
+
             let beforeAt = body[..<atSymbolIndex]
-            extractedRoomName = String(beforeAt)  //  exact same as Android
-            
+            extractedRoomName = String(beforeAt)
+
             let tokenStart = body.index(after: atSymbolIndex)
             let tokenEnd = body.index(before: hashSymbolIndex)
             callRejectTokenId = String(body[tokenStart...tokenEnd])
-            
+
             let userNameParts = extractedRoomName.split(separator: "_", maxSplits: 2)
             if userNameParts.count >= 2 {
                 callRejectToUserName = "\(userNameParts[0])_\(userNameParts[1])"
             }
-            
+
             let afterHash = body[body.index(after: hashSymbolIndex)...]
             shouldShowAlert = afterHash.caseInsensitiveCompare("True") == .orderedSame
-        } else {
-            shouldShowAlert = false
         }
+
         DispatchQueue.main.async {
             self.notificationTitle = title
             self.roomName = extractedRoomName
             self.callRejectToUserName = callRejectToUserName
             self.callRejectTokenId = callRejectTokenId
-            self.showAlert = shouldShowAlert //  UI update moved here
-        }
-            print(" Background Notification Parsed")
-            print("Room: \(self.roomName ?? "nil")")
-            print("User: \(self.callRejectToUserName)")
-            print("Token ID: \(self.callRejectTokenId)")
-            print("self.showAlert : \(self.showAlert)")
+            self.showAlert = shouldShowAlert
 
-            if self.showAlert {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 120) {
-                    if self.showAlert {
-                        print("Auto-dismissing alert after 2 minutes")
-                        self.showAlert = false
-                    }
+            print("showAlert updated to: \(shouldShowAlert)")
+
+            // Case 1: Alert should be shown → schedule auto-dismiss
+            if shouldShowAlert {
+                self.scheduleAutoDismissAlert()
+            }
+            // Case 2: Alert should be hidden immediately
+            else {
+                self.alertDismissTimer?.invalidate()
+                self.showAlert = false
+            }
+        }
+
+        print("Notification Parsed")
+        print("Room: \(self.roomName ?? "nil")")
+        print("User: \(self.callRejectToUserName)")
+        print("Token ID: \(self.callRejectTokenId)")
+        print("self.showAlert: \(self.showAlert)")
+
+        NetworkManager.shared.fetchVideoCallToken(roomName: extractedRoomName) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let token):
+                    print("Token Fetched: \(token)")
+                    UserDefaults.standard.set(token, forKey: "videoCallToken")
+                    UserDefaults.standard.set(extractedRoomName, forKey: "roomName")
+                    UserDefaults.standard.set(callRejectToUserName, forKey: "callRejectToUserName")
+                    UserDefaults.standard.set(callRejectTokenId, forKey: "callRejectTokenId")
+                case .failure(let error):
+                    print("Token Fetch Failed: \(error)")
                 }
             }
+        }
+    }
 
-            NetworkManager.shared.fetchVideoCallToken(roomName: extractedRoomName) { result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success(let token):
-                        print(" Token Fetched: \(token)")
-                        UserDefaults.standard.set(token, forKey: "videoCallToken")
-                        print("NOTIvideoCallToken: \(UserDefaults.standard.string(forKey: "videoCallToken"))")
-                        UserDefaults.standard.set(extractedRoomName, forKey: "roomName")
-                        UserDefaults.standard.set(callRejectToUserName, forKey: "callRejectToUserName")
-                        UserDefaults.standard.set(callRejectTokenId, forKey: "callRejectTokenId")
-                      
-                    case .failure(let error):
-                        print(" Token Fetch Failed: \(error)")
-                    }
-                }
+    func scheduleAutoDismissAlert() {
+        print("scheduleAutoDismissAlert.")
+        alertDismissTimer?.invalidate()
+
+        alertDismissTimer = Timer(timeInterval: 120, repeats: false) { [weak self] _ in
+            print("Auto-dismissing alert after 2 minutes via Timer")
+            DispatchQueue.main.async {
+                self?.showAlert = false
+            }
+        }
+
+        if let timer = alertDismissTimer {
+            RunLoop.main.add(timer, forMode: .common)
+            print("Timer manually added to main run loop.")
         }
     }
 
