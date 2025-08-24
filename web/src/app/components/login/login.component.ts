@@ -292,15 +292,18 @@ export class LoginComponent implements OnInit {
               }, 1000);
               this.auth.unauthorizedOTP();
             } else if (err.status == 503) {
-              alert(err.error);
+              let errorMsg = typeof err.error === 'object' && err.error.message ? err.error.message : err.error;
+              alert(errorMsg);
               window.location.reload();
               this.auth.unauthorized();
             } else if (err.status == 403) {
-              alert(err.error);
+              let errorMsg = typeof err.error === 'object' && err.error.message ? err.error.message : err.error;
+              alert(errorMsg);
               window.location.reload();
               this.auth.unauthorized();
             } else if (err.status == 404) {
-              alert(err.error);
+              let errorMsg = typeof err.error === 'object' && err.error.message ? err.error.message : err.error;
+              alert(errorMsg);
               window.location.reload();
               this.auth.unauthorized();
             }
@@ -607,7 +610,9 @@ export class LoginComponent implements OnInit {
           },
           (err) => {
             //show error patient id creation failed
-            alert(err.error);
+            // alert(err.error);
+            let errorMsg = typeof err.error === 'object' && err.error.message ? err.error.message : err.error;
+            alert(errorMsg);
             this.loading_otp = false;
           }
         );
@@ -676,7 +681,9 @@ export class LoginComponent implements OnInit {
               }, 800);
               this.setResetEmtyOTPFields();
             } else if (err.status == 403) {
-              alert(err.error);
+              // alert(err.error);
+              let errorMsg = typeof err.error === 'object' && err.error.message ? err.error.message : err.error;
+              alert(errorMsg);
               window.location.reload();
               this.auth.unauthorized();
             }

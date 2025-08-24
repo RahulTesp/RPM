@@ -1513,6 +1513,7 @@ export class EditpatientComponent implements OnInit {
           this.loading = false;
           if (this.variable != 2) {
             this.dialog.closeAll();
+            this.submitImage(that.pid);
             this.redirect_patient();
           }
         },
@@ -2483,6 +2484,7 @@ export class EditpatientComponent implements OnInit {
 
       this.rpm.rpm_post('/api/device/resetdevice', req_body).then(
         (data) => {
+          console.log(data)
           // this.openDialogWindow('Success', `Device Removed Successfully.`);
           this.showconfirmDialog.showConfirmDialog(
             'Device Removed Successfully.',
@@ -2497,6 +2499,7 @@ export class EditpatientComponent implements OnInit {
           );
         },
         (err) => {
+          console.log(err)
           // this.openDialogWindow('Error',`Device not removed from user assets.`);
           this.showconfirmDialog.showConfirmDialog(
             'Device not removed from user assets.',
@@ -2714,10 +2717,20 @@ export class EditpatientComponent implements OnInit {
     // a[0].setAttribute("style", "background-image:"+this.image.name);
     // a[0].setAttribute("style", "background: url(\"https://rpmstorage123.blob.core.windows.net/rpmprofilepictures/CL500626\"); background-repeat: no-repeat;  background-size: 100% 100%;");
   }
+  pdfTypeStatus = false;
   openFileData(e: any) {
     this.Doc = e.target.files[0];
     this.documentType = this.Doc.type;
-    this.file = this.Doc.name;
+    if(this.documentType != 'application/pdf')
+    {
+     this.Doc = null;
+     this.pdfTypeStatus = true
+    }else{
+      this.pdfTypeStatus = false;
+    }
+     this.file = this.Doc.name;
+
+
   }
   submitDocument(pid: any) {
     var formData: any = new FormData();
@@ -2732,13 +2745,9 @@ export class EditpatientComponent implements OnInit {
       this.docDesc != null &&
       this.docDesc != undefined &&
       this.docType != null &&
-      this.Doc != undefined
+      this.Doc != undefined &&  this.docDesc != ''
     ) {
-      if (this.documentType != 'application/pdf') {
-        alert('Please Select Pdf File Type');
-        this.DownloadStatus = false;
-        return;
-      } else {
+
         this.rpm.rpm_post(`/api/patient/adddocument`, formData).then(
           (data) => {
             alert('Document Added Successfully');
@@ -2753,7 +2762,7 @@ export class EditpatientComponent implements OnInit {
             this.DownloadStatus = false;
           }
         );
-      }
+
     } else {
       alert('Please Complete the Form');
       this.DownloadStatus = false;
@@ -2773,6 +2782,7 @@ export class EditpatientComponent implements OnInit {
     this.docDesc = null;
     this.Doc = null;
     this.documentAddFlag = false;
+    this.file=null;
   }
   downloadDoc(doc: any) {
     // alert(doc);
@@ -2787,7 +2797,7 @@ export class EditpatientComponent implements OnInit {
     this.image = e.target.files[0];
     var a = document.getElementsByClassName('uploadPhoto');
     this.profilePic = this.image.name;
-    this.submitImage(this.pid);
+    //this.submitImage(this.pid);
   }
   submitImage(pid: any) {
     const myPhoto = uuid.v4();
@@ -2802,8 +2812,8 @@ export class EditpatientComponent implements OnInit {
         //   { onlySelf: true }
         // );
       },
-      (err) => {
-        alert('Error While Adding Image....!');
+      (err:any) => {
+        alert(err.error.message);
       }
     );
   }

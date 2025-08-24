@@ -879,8 +879,12 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.resetCallTimer();
     this.stopCallEditTimer();
     this.callDisConnected();
+    if(this.videoOnVariable == true)
+    {
+      this.disconnectVideo();
+    }
     this.videoOnVariable = false;
-    this.disconnectVideo();
+    //this.disconnectVideo();
   }
   NoteData: any;
   NoteTypeId: any;
@@ -1184,7 +1188,13 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       (err) => {
         // this.dialog.closeAll();
         this.smsCancel(); // close the panel
-        alert('Failed to Sent Message..!');
+        if(err.status == 400)
+        {
+          alert(err.error);
+        }else{
+          alert('SMS Sent Failed')
+        }
+        console.log(err.error);
         this.loading_sms = false;
       }
     );
@@ -3741,7 +3751,12 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
           this.incomingCallVal = false;
           this.incomingVariableDisable = false;
           this.callDisConnected();
-          this.disconnectVideo();
+          this.showNoteModal=false;
+          if(this.videoOnVariable == true)
+            {
+              this.disconnectVideo();
+            }
+          //this.disconnectVideo();
           this.billingReload();
           this.loading_note = false;
           this.resetCallPanel();
@@ -4073,13 +4088,17 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   OnpreviewCancel() {
     this.stopCallEditTimer();
     this.showNoteModal=false;
-    this.callVariable = false;
+    //this.callVariable = false;
     this.callDisConnected();
     this.incomingCallVal = false;
     this.incomingVariableDisable = false;
     //25/07/2023
+    if(this.videoOnVariable == true)
+    {
+      this.disconnectVideo();
+    }
     this.videoOnVariable = false;
-    this.disconnectVideo();
+    //this.disconnectVideo();
 
   }
   closenoterDialogModal()
@@ -4581,6 +4600,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       .then(
         async (body) => {},
         (error: any) => {
+          console.log('error')
           alert(error.error);
         }
       );

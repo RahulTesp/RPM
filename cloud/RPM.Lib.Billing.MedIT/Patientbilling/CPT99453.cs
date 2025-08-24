@@ -1,5 +1,8 @@
 ﻿using RPMPatientBilling.Interface;
 using RPMPatientBilling.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 
@@ -138,20 +141,7 @@ namespace RPMPatientBilling.PatientBilling
 
                     SetData(patientProgramData, VitalCount, Convert.ToDateTime(Startdate),
                             billingCode.BillingCodeID, DaysCompleted+1,false, Enddate);
-                    /* if (Math.Abs(DateDiff.Days) > billingCode.BillingThreshold)
-                     {
-                         Startdate = EnddateTemp.AddDays(-billingCode.BillingThreshold);
-                         DaysCompleted = billingCode.BillingThreshold;
-                     }
-                     List<VitalReading> VitalReadings = billing.GetVitalReadings(patientProgramData, con).Where(s => s.ReadingDate >= Startdate && s.ReadingDate <= Enddate).ToList();
-                     if (VitalReadings == null)
-                     {
-                         SetData(patientProgramData, 0, Convert.ToDateTime(Startdate), billingCode.BillingCodeID, DaysCompleted);
-                     }
-                     else
-                     {
-                         SetData(patientProgramData, VitalReadings.Count, Convert.ToDateTime(Startdate), billingCode.BillingCodeID, DaysCompleted);
-                     }*/
+                    
                 }
             }
             catch (Exception ex)

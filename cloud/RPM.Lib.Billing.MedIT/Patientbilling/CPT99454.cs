@@ -1,5 +1,8 @@
 ﻿using RPMPatientBilling.Interface;
 using RPMPatientBilling.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace RPMPatientBilling.PatientBilling
@@ -261,7 +264,7 @@ namespace RPMPatientBilling.PatientBilling
                                 LastBilledDate = (DateTime?)NextEndDate,
                                 CreatedOn = DateTime.UtcNow
                              };
-                            RPMBilling rPMBilling = new RPMBilling();
+                            RPMDaysBasedBilling rPMBilling = new RPMDaysBasedBilling();
                             rPMBilling.UpdatePatientBilledData(patientDailyBillingData, billingCode, startDateNew, con);
                         }
 

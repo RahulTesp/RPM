@@ -1,0 +1,495 @@
+//
+//  ContentView.swift
+//  RPM
+//
+//  Created by Prajeesh Prabhakar on 30/05/22.
+//
+
+import SwiftUI
+
+
+struct RPMLoginView: View {
+    
+    @Environment(\.colorScheme) var colorScheme
+    @State private var shouldShowLoginAlert: Bool = false
+    @State private var showingAlerts = false
+    @State private var result = ""
+    @EnvironmentObject var loginViewModel: RPMLoginViewModel
+    @State private var alertItem: AlertItem?
+    @EnvironmentObject var appModel: AppModel
+    @EnvironmentObject var messagesManager: MessagesManager
+    @EnvironmentObject var conversationManager: ConversationManager
+    @EnvironmentObject var navigationHelper: NavigationHelper
+    @EnvironmentObject var callManager: CallManager
+    @EnvironmentObject var roomManager: RoomManager
+    @EnvironmentObject var localParticipant: LocalParticipantManager
+    @EnvironmentObject var mediaSetupViewModel: MediaSetupViewModel
+    @EnvironmentObject var homeViewModel: RPMHomeViewModel
+    @State private var showLoginErrorAlert = false
+    @State private var loginAlertTitle = ""
+    @State private var loginAlertMessage = ""
+
+    
+#if DEBUG
+//    @State private var username: String = "AHV01927"
+//    @State private var password: String = "cXPJKIWQ"
+    
+    @State private var username: String = "ARPL00116"
+    @State private var password: String = "TEsplabs@123"
+    
+//    
+//    @State private var username: String = "WSPC02061"
+//    @State private var password: String = "TO5SV452"
+    
+//    @State private var username: String = "WSPC00385"
+//    @State private var password: String = "GLXQUPcY"
+    //oxygen
+    //    @State private var username: String = "121501988"
+    //    @State private var password: String = "GI5T88YW"
+    
+//
+//    @State private var username: String = "19801972"
+//    @State private var password: String = "GSOX5NMM"
+//    @State private var password: String = "GSOX5NMM"
+    
+//    @State private var username: String = "SMD01846"
+//    @State private var password: String = "I5TOBWHB"
+//    
+//    @State private var username: String = "SMD01847"
+//    @State private var password: String = "PND6RM8L"
+    
+//    @State private var username: String = "ARPL00104"
+//    @State private var password: String = "BH5587GQ"
+    
+//    @State private var username: String = "123400033"
+//    @State private var password: String = "GcTQOHLV"
+    
+//    @State private var username: String = "154201932"
+//    @State private var password: String = "ODJVOBCB"
+//    @State private var username: String = "WSPC01933"
+//    @State private var password: String = "7YLDDXQF"
+
+//    @State private var username: String = "154201949"
+//    @State private var password: String = "RF3JVNNN"
+    
+//    @State private var username: String = "AFC01952"
+//    @State private var password: String = "J3bCBUI6"
+    
+//    @State private var username: String = "SPCP01554"
+//    @State private var password: String = "QTN4QNT7"
+    
+//    @State private var username: String = "19801970"
+//    @State private var password: String = "TKVTQNFN"
+    
+//    @State private var username: String = "154200183"
+//    @State private var password: String = "MUIbQJRJ"
+    
+//    @State private var username: String = "154200189"
+//    @State private var password: String = "O8DQO4RY"
+//    @State private var username: String = "154200224"
+//    @State private var password: String = "4UN53BX4"
+    
+//    @State private var username: String = "154200202"
+//    @State private var password: String = "MTSY68KU"
+//    
+//    @State private var username: String = "154200216"
+//    @State private var password: String = "5P7XTbWQ"
+    
+    
+//    @State private var username: String = "154200230"
+//    @State private var password: String = "IJSX7LOd"
+    
+//    @State private var username: String = "154200231"
+//    @State private var password: String = "5CWC4PWV"
+    
+//    @State private var username: String = "SUPC01979"
+//    @State private var password: String = "bL4KdW8M"
+    
+//        @State private var username: String = "121501944"
+//        @State private var password: String = "YEB8N6BU"
+    
+    
+//        @State private var username: String = "IIM02261"
+//        @State private var password: String = "EMSOdWBC"
+    
+    //multi
+//            @State private var username: String = "HKP02268"
+//            @State private var password: String = "UL67NWDL"
+//                @State private var username: String = "HKP02267"
+//                @State private var password: String = "NIXXWRTD"
+    
+//    @State private var username: String = "AFC01099"
+//    @State private var password: String = "FT5ObXIV"
+    
+//    @State private var username: String = "123400968"
+//    @State private var password: String = "HLGV5O6F"
+    
+//    @State private var username: String = "123400966"
+//    @State private var password: String = "KWIYYCbd"
+    
+//    @State private var username: String = "FCC002065"
+//    @State private var password: String = "5RcXTCC7"
+    
+//    @State private var username: String = "FCC002066"
+//    @State private var password: String = "JE4VRY6c"
+    
+//    @State private var username: String = "123401015"
+//    @State private var password: String = "ULU4GSWc"
+    
+//    @State private var username: String = "123401017"
+//    @State private var password: String = "7YTCGVSN"
+    
+//                @State private var username: String = "FCC002269"
+//                @State private var password: String = "ET8ddbPD"
+    
+//    @State private var username: String = "HKP02197"
+//    @State private var password: String = "7Y7VUMK2"
+    
+    //cx dev cindyj
+    
+//    @State private var username: String = "DLPC01997"
+//    @State private var password: String = "RB4HcRQ4"
+    
+//    @State private var username: String = ""
+//    @State private var password: String = ""
+    
+#else
+    @State private var username: String = ""
+    @State private var password: String = ""
+#endif
+
+    @State private var usr: String = ""
+    
+    var body: some View {
+        GeometryReader { geometry in
+                let width = geometry.size.width
+                let height = geometry.size.height
+  
+        VStack {
+
+                Group {
+                    Text("Log In")
+                        .font(Font.custom("Rubik-Regular", size: 16))
+                        .foregroundColor(.black)
+                        .multilineTextAlignment(.center)
+                        .padding(.vertical, 10)
+                    
+                    Spacer()
+                    
+                    Text("Hello,")
+                        .foregroundColor(Color("title1"))
+                        .font(Font.custom("Rubik-Regular", size: 24))
+                    
+                    Image("logoclynx")
+                        .resizable()
+                        .frame(width: 160.0, height: 150.0)
+                }
+                
+                TextField("", text: $username, prompt: Text("Enter Username").foregroundColor(Color("ColorGrey")))
+                    .colorScheme(.light)
+                    .textFieldStyle(MyTextFieldStyle())
+                    .cornerRadius(10)
+                    .disableAutocorrection(true)
+                    .frame(maxWidth: .infinity)
+                 
+                    .onTapGesture {
+                           print("Username tapped")
+                       }
+                SecureInputView("Enter Password", text: $password)
+                    .colorScheme(.light)
+                    .frame(maxWidth: .infinity)
+                    .disableAutocorrection(false)
+                    .textFieldStyle(MyTextFieldStyle())
+                    .cornerRadius(10)
+                
+                Spacer()
+             
+                Button(action: {
+                    // Push Forgot Password screen using navigationPath
+                    navigationHelper.path.append(.forgotPassword)
+                }) {
+                    Text("Forgot your Password ?")
+                        .padding(10)
+                        .foregroundColor(Color("title1"))
+                        .font(Font.custom("Rubik-Regular", size: 14))
+                }
+                
+                Button(action: handleLogin) {
+                    Text("LOG IN")
+                        .font(Font.custom("Rubik-Regular", size: 16))
+                        .frame(height: 50)
+                        .frame(maxWidth: .infinity)
+                        .background(Color("buttonColor"))
+                        .foregroundColor(.white)
+                        .cornerRadius(15)
+                       
+                }
+                .padding(.horizontal, 30)
+                
+                .alert(loginAlertTitle, isPresented: $showLoginErrorAlert) {
+                    Button("OK", role: .cancel) {
+                        showLoginErrorAlert = false
+                    }
+                } message: {
+                    Text(loginAlertMessage)
+                }
+
+                .padding(.horizontal, 22)
+      
+            Spacer()
+        }
+        .navigationBarBackButtonHidden(true)
+        .frame(width: width, height: height)
+        .background(Color("ChatBGcolor"))
+        .onAppear {
+            let systemTimeZone = TimeZone.current
+            print("NSTimeZone.default", NSTimeZone.default)
+            print("systemTimeZone", systemTimeZone)
+            print("geometry size:", width, height, "isNaN:", width.isNaN, height.isNaN)
+          
+            print("LoginView appeared, isAuthenticated = \(loginViewModel.isAuthenticated)")
+            print(" Path:", navigationHelper.path)
+        }
+    }
+}
+    
+    
+    func handleLogin() {
+        
+        print("handleLogin")
+        let validationResult = validateUsernamePassword(username, password)
+
+        guard validationResult == "Valid" else {
+
+            alertItem = AlertItem(
+                title: "Error",
+                message: validationResult,
+                dismissButton: .default(Text("OK"))
+            )
+
+            shouldShowLoginAlert = true
+            return
+        }
+
+        UserDefaults.standard.set(username, forKey: "pgmUserID")
+
+        loginViewModel.login(userName: username, password: password) { token, alert in
+            
+      
+            if let token = token {
+                // Successful login
+              
+                UserDefaults.standard.set(username, forKey: "usernameSaved")
+                UserDefaults.standard.set(password, forKey: "passwordSaved")
+
+                print("Checking MFA flag:", UserDefaults.standard.string(forKey: "MFAENABLEDFALSE") ?? "nil")
+
+                if UserDefaults.standard.string(forKey: "MFAENABLEDFALSE") == "MFAENABLEDFALSE" {
+                    print("mfafalse")
+                    signIn(chatacctoken: token)
+                    
+                }
+
+                print(" navigationHelper.pathlogin: \( navigationHelper.path)")
+                
+            } else {
+                // Login failed
+                shouldShowLoginAlert = true
+                
+            
+                loginAlertTitle = alert?.title ?? "Error"
+                loginAlertMessage = alert?.message ?? ""
+
+                showLoginErrorAlert = true
+
+                print("loginAlertTitle",loginAlertTitle)
+                print("loginAlertMessage",loginAlertMessage)
+              
+                
+                print(self.alertItem ?? "nil alertItem")
+                print("alertItem title")
+                print(self.alertItem?.title ?? "nil title")
+            }
+
+            username = ""
+            password = ""
+            dismissKeyboard()
+        }
+    }
+
+    
+    func signIn(chatacctoken: String) {
+        NSLog("ManualSignin")
+        print("ManualSignin")
+        appModel.client.create(chatacctoken: chatacctoken, delegate: appModel) { [self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    appModel.saveUser(appModel.client.conversationsClient?.user)
+              
+                    if let user = appModel.client.conversationsClient?.user {
+                        print("appModelconvClientuser", user)
+                    } else {
+                        print("appModelconvClientuser is nil")
+                    }
+
+                case .failure(let error):
+                    print("Sign in failed with error: \(error.localizedDescription)")
+                    if case .failure(LoginError.accessDenied) = result {
+                        
+                        if let user = appModel.client.conversationsClient?.user {
+                            print("appModelconvClientuserfail", user)
+                        } else {
+                            print("appModelconvClientuser is nil")
+                        }
+
+                        
+                        NSLog("Sign in failed, erasing credentials")
+                    } else {
+                        // Handle other error cases
+                    }
+                }
+            }
+        }
+    }
+
+    func validateUsernamePassword(_ username: String, _ password: String) -> String {
+        if username.isEmpty || password.isEmpty {
+            return "Username and Password is Required"
+        }
+        return "Valid"
+    }
+
+    
+    func dismissKeyboard() {
+        DispatchQueue.main.async {
+            UIApplication.shared
+                .connectedScenes
+                .compactMap { $0 as? UIWindowScene }
+                .flatMap { $0.windows }
+                .first { $0.isKeyWindow }?
+                .endEditing(true)
+        }
+    }
+
+}
+
+extension Text {
+    var string: String {
+        // Not fully accurate, but fallback if needed
+        "\(self)"
+    }
+}
+
+
+
+// MARK: UITextFieldViewRepresentable
+struct UITextFieldViewRepresentable: UIViewRepresentable {
+    
+    @Binding var text: String
+    typealias UIViewType = ProtectedTextField
+    
+    
+    func makeUIView(context: Context) -> ProtectedTextField {
+        let textField = ProtectedTextField()
+        textField.delegate = context.coordinator
+        return textField
+    }
+    
+    // From SwiftUI to UIKit
+    func updateUIView(_ uiView: ProtectedTextField, context: Context) {
+        uiView.text = text
+    }
+    
+    // From UIKit to SwiftUI
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(text: $text)
+    }
+    
+    class Coordinator: NSObject, UITextFieldDelegate {
+        @Binding var text: String
+        
+        init(text: Binding<String>) {
+            self._text = text
+        }
+        
+        func textFieldDidChangeSelection(_ textField: UITextField) {
+            text = textField.text ?? ""
+        }
+    }
+}
+
+// Custom TextField with disabling paste action
+class ProtectedTextField: UITextField {
+    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        
+        if action == #selector(paste(_:)) {
+            return false
+        }
+        if action == #selector(cut(_:)) {
+            return false
+        }
+        return super.canPerformAction(action, withSender: sender)
+    }
+}
+struct MyTextFieldStyle: TextFieldStyle {
+    func _body(configuration: TextField<Self._Label>) -> some View {
+        configuration
+            .padding(12)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color("textFieldBG"), lineWidth: 2)
+                    .background(Color("textFieldBG"))
+                    .foregroundColor(Color("TextColorGray"))
+                    .cornerRadius(10)
+                
+            )
+            .padding(.vertical,5)
+            .padding(.horizontal, 25)
+         
+    }
+}
+
+
+struct SecureInputView: View {
+    
+    @Binding private var text: String
+    @State private var isSecured: Bool = true
+    private var title: String
+    
+    init(_ title: String, text: Binding<String>) {
+        self.title = title
+        self._text = text
+    }
+    
+    var body: some View {
+        ZStack(alignment: .trailing) {
+     
+                if isSecured {
+             
+                    SecureField(title, text: $text)
+                        .textContentType(nil)
+                        .foregroundColor(.black)
+        
+                } else {
+                    TextField(title, text: $text)
+                        .textContentType(nil)
+
+                }
+      
+                Button(action: {
+                    isSecured.toggle()
+                }) {
+                  
+                    Image(systemName: self.isSecured ? "eye.slash" : "eye")
+                        .renderingMode(.template)
+                        .accentColor(Color("TextColorGray"))
+            
+                        .padding(.horizontal, 60)
+                }
+          
+        }
+    }
+}
+                      
+                      

@@ -7,6 +7,7 @@ import { StatusMessageComponent } from '../../shared/status-message/status-messa
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
+import * as uuid from 'uuid';
 
 @Component({
   selector: 'app-add-user',
@@ -16,6 +17,7 @@ import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/s
 export class AddUserComponent implements OnInit {
   @ViewChild(AdminComponent) private admincomponent: AdminComponent;
   public showCancelButton=false;
+  public file: any;
 
   checked = true;
   varData = true;
@@ -64,8 +66,8 @@ export class AddUserComponent implements OnInit {
   http_user_data: any;
 
   editVariable = false;
-
-
+//  imagePath :any;
+  public imagePath: string;
   GenderArray = [
     {
       value: 'M',
@@ -162,9 +164,10 @@ export class AddUserComponent implements OnInit {
       this.userbuttondisplay = this.editVariable;
       this.unlockAccountStatus = true;
       this.getUserAccountLockData();
+
     });
 
-    this.getUserInfo();
+  this.getUserInfo();
   }
   myDate = new Date();
   // Register User
@@ -220,6 +223,7 @@ export class AddUserComponent implements OnInit {
               this.router.navigate(['/admin/admin'], { queryParams: { page: 2 } });
               this.resetAddPateintMasterData();
               this.userVerifyCompleted = false;
+              this.submitImage(that.userId);
             },
             false
           );
@@ -241,7 +245,7 @@ export class AddUserComponent implements OnInit {
             that.result = data;
             that.userId = that.result.UserId;
             that.password = that.result.password;
-
+            this.submitImage(that.userId);
             // this.openDialog(
             //   'Message',
             //   `New User Added Successfully!! \n
@@ -308,6 +312,7 @@ export class AddUserComponent implements OnInit {
         .rpm_get(`/api/users/getuserprofiles?UserId=${this.put_user_id}`)
         .then((data) => {
           this.http_user_data = data;
+          console.log( this.http_user_data)
 
           if (this.http_user_data.HasPatients == 1) {
             this.userCountStatus = true;
@@ -371,6 +376,8 @@ export class AddUserComponent implements OnInit {
           }
           this.stateVariable = this.http_user_data.StateId;
           this.cityVariable = this.http_user_data.CityId;
+          this.imagePath = this.http_user_data.Picture;
+
         });
     }
   }
@@ -473,5 +480,32 @@ export class AddUserComponent implements OnInit {
       }
     );
   }
+  image: any;
+  openFile() {
+    var a = document.getElementById('image');
+    a?.click();
+  }
+  handle(e: any) {
+    this.image = e.target.files[0];
+    var a = document.getElementsByClassName('uploadPhoto');
+    this.file = this.image.name;
 
+    // a[0].setAttribute("style", "background-image:"+this.image.name);
+    // a[0].setAttribute("style", "background: url(\"https://rpmstorage123.blob.core.windows.net/rpmprofilepictures/CL500626\"); background-repeat: no-repeat;  background-size: 100% 100%;");
+  }
+  submitImage(pid: any) {
+    if (this.image) {
+      const myPhoto = uuid.v4();
+      var formData: any = new FormData();
+      formData.append(myPhoto, this.image);
+      this.rpm
+        .rpm_post(`/api/users/addimage?UserId=${pid}`, formData)
+        .then(
+          (data) => {},
+          (err:any) => {
+            alert(err.error.message);
+          }
+        );
+    }
+  }
 }

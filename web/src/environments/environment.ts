@@ -1,7 +1,7 @@
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 
-import { VAPID_KEY } from '@angular/fire/compat/messaging';
+// import { VAPID_KEY } from '@angular/fire/compat/messaging';
 
 // The list of file replacements can be found in `angular.json`.
 export const environment = {

@@ -1678,7 +1678,7 @@
                   {{ programStart | date : "mediumDate" }}
                 </p>
               </div>
-              <div class="program_overview_item">
+              <!-- <div class="program_overview_item">
                 <p class="program_overview_header">Duration</p>
                 <p class="program_overview_value">
                   {{
@@ -1687,7 +1687,7 @@
                   }}
                   Months
                 </p>
-              </div>
+              </div> -->
               <div class="program_overview_item program_overview_vital">
                 <p class="program_overview_header">
                   {{
@@ -1696,9 +1696,12 @@
                       : "Condition Monitored"
                   }}
                 </p>
-                <div *ngFor="let vital of patiantVital">
-                  <p class="program_overview_value">{{ vital.Vital }}</p>
+                <div  class="program_overview_value_panel">
+                  <div *ngFor="let vital of patiantVital" >
+                     <p class="program_overview_value">{{ vital.Vital }}</p>
                 </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -1761,7 +1764,9 @@
     </div>
     <div
       class="summary_graph_main"
-      *ngIf="patientProgramname != 'CCM' && patientProgramname != 'PCM'"
+      *ngIf="!loading && !loading_two && !loading3 && !loading4
+         && patientProgramname != 'CCM'
+         && patientProgramname != 'PCM'"
     >
       <div class="health-panel-btn">
         <p class="patient-detail-panel-heading">Health Trends</p>
@@ -2483,7 +2488,7 @@
                     <p class="program_data_value">
                       {{
                         http_rpm_patientList["PatientProgramdetails"].Duration
-                      }}
+                      }} Months
                     </p>
                   </div>
                 </div>
@@ -2602,9 +2607,9 @@
                     <p class="program_data_title">Date</p>
                     <p class="program_data_value">
                       {{
-                        http_rpm_patientList &&
-                          http_rpm_patientList["PatientPrescribtionDetails"]
-                            .PrescribedDate | date : "MMM d, y"
+                         convertToLocalTime(
+                        http_rpm_patientList.PatientPrescribtionDetails.PrescribedDate
+                      ) | date : "mediumDate"
                       }}
                     </p>
                   </div>
@@ -4163,7 +4168,9 @@
 <!-- healthTrendInfo Start Clinical activity Second   Sub-Menu -->
 <ng-template #healthTrendInfo>
   <div class="health-panel-btn"
-    *ngIf="patientProgramname != 'CCM' || patientProgramname != 'PCM'"
+    *ngIf="!loading && !loading_two && !loading3 && !loading4
+         && patientProgramname != 'CCM'
+         && patientProgramname != 'PCM'"
   >
     <p class="patient-detail-panel-heading">Health Trends</p>
 

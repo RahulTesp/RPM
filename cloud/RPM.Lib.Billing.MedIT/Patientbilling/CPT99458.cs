@@ -1,6 +1,10 @@
 ﻿using RPMPatientBilling.Interface;
 using RPMPatientBilling.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+
 
 
 namespace RPMPatientBilling.PatientBilling
@@ -183,9 +187,8 @@ namespace RPMPatientBilling.PatientBilling
                         DateTime startDateFinal = Dates.First().StartDate;
                         DateTime endDateFinal = Dates.Last().EndDate;
                         List<PatientInteraction> PatientInteractiontim = billing.GetPatientInteractiontime(patientProgramData, con, startDateFinal, endDateFinal).ToList();
-
-                        // Console.WriteLine(stDateTemp.ToString()+" "+ NextEndDate.ToString()+" "+ daysCompleted);
-                       // List<PatientInteraction> PatientInteractiontim = billing.GetPatientInteractiontime(patientProgramData, con).Where(s => s.Date >= stDateTemp && s.Date <= NextEndDate).ToList();
+                        int patientSmsCount = 0;
+                        patientSmsCount =patientSmsCount+billing.GetPatientSmsCount(patientProgramData, con, startDateFinal, startDateFinal);
                         if (PatientInteractiontim == null)
                         {
                             SetData(patientProgramData, 0, Convert.ToDateTime(startDateFinal), billingCode.BillingCodeID,
@@ -197,13 +200,15 @@ namespace RPMPatientBilling.PatientBilling
                             isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
                             if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
                             {
-                                PatientInteractiontim.Clear();
+                                if (patientSmsCount <= 0)
+                                    PatientInteractiontim.Clear();
                             }
                         }
                         int TotalReading = PatientInteractiontim.Sum(s => s.Duration);
                         if (PatientInteractiontim.Count == 0 || PatientInteractiontim ==null || isEstablishedExist.Count==0)
                         {
-                            TotalReading=0;
+                            if (patientSmsCount <= 0)
+                                TotalReading=0;
                         }
                         
                         int remainingREading = 0;
@@ -229,7 +234,7 @@ namespace RPMPatientBilling.PatientBilling
                                 LastBilledDate = (DateTime?)NextEndDate,
                                 CreatedOn = DateTime.UtcNow
                             };
-                            RPMBilling rPMBilling = new RPMBilling();
+                            RPMDaysBasedBilling rPMBilling = new RPMDaysBasedBilling();
                             rPMBilling.UpdatePatientBilledData(patientDailyBillingData, billingCode457, startDateFinal, con);
                         }
                         stDateTemp = BillingProcess.GetUTCFromLocalTime((DateTime)NextEndDate.AddDays(1), con);

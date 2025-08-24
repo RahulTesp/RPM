@@ -16,7 +16,12 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatSort, Sort } from '@angular/material/sort';
 import { DatePipe } from '@angular/common';
 import { AuthService } from 'src/app/services/auth.service';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 @Component({
   selector: 'app-patient-page',
   templateUrl: './patient-page.component.html',
@@ -129,6 +134,7 @@ export class PatientPageComponent implements OnInit {
         // this.searchPatientList_Name = false;
         // this.searchPatientList_Id = false;
         // this.searchPatientList_assign = false;
+
         this.dataSourceTableList = new MatTableDataSource(
           this.total_patient_list_tmp
         );
@@ -524,7 +530,7 @@ export class PatientPageComponent implements OnInit {
     data = data.trim();
 
     if (data != '') {
-      return this.datepipe.transform(data, 'MMM d, y');
+      return this.datepipe.transform(this.convertToLocalTime(data), 'MMM d, y');
     } else {
       return 'Not Enrolled';
     }
@@ -1316,6 +1322,8 @@ export class PatientPageComponent implements OnInit {
     this.SearchpatientBilling = '';
     this.searchPatientList_assign = true;
     this.searchValueName = false;
+    this.assigneeSerach = '';
+
   }
   refreshBillingData() {
     this.c1 = false;
@@ -1325,7 +1333,6 @@ export class PatientPageComponent implements OnInit {
   billing_tableCount: any;
   billingDataFilter() {
     var that = this;
-
     var searchbillingpgm;
     var searchtotalvitalfiltervalue;
     var searchinteractionfiltervalue;
@@ -2264,4 +2271,14 @@ export class PatientPageComponent implements OnInit {
     this.pageIndxValue = pageEvent.pageIndex;
     console.log(this.pageIndxValue);
   }
+   convertToLocalTime(stillUtc: any) {
+      if (stillUtc.includes('+')) {
+        var temp = stillUtc.split('+');
+
+        stillUtc = temp[0];
+      }
+      stillUtc = stillUtc + 'Z';
+       const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+      return local;
+    }
 }

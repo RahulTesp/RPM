@@ -43,6 +43,7 @@ export class HeaderComponent implements OnInit {
   current_day: any;
   current_month: any;
   current_year = this.today.getUTCFullYear();
+   private timerId: any;
   notificationBody: string | null = null;
   public notificationLists: { message: string; time: string }[] = [];
   // current_time = this.formatAMPM(this.today)
@@ -104,11 +105,10 @@ export class HeaderComponent implements OnInit {
   message1: any;
   ngOnInit(): void {
 
-  //  this.subscription = this.ms.notificationData$.subscribe(data => {
-  //   if (data && data.type === 'update') {
-  //     this.unread = data.count;
-  //   }
-  // });
+    this.timerId = setInterval(() => {
+      this.currentDate = new Date();
+    }, 1000); // Update every second
+
     this.subscription = this.ms.notificationData$.subscribe(data => {
       if (data && data.notification) {
         // Refresh notifications when we receive a new one
@@ -324,5 +324,8 @@ export class HeaderComponent implements OnInit {
   onChangeSearch(val: string) {
   }
   onFocused(e: any) {
+  }
+    ngOnDestroy() {
+    clearInterval(this.timerId); // Prevent memory leaks
   }
 }

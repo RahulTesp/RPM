@@ -1078,7 +1078,7 @@
               <div class="flex-program-details">
                 <div class="program_left_panel">
                   <div class="start_date">
-                    <div class="userInfoItem">
+                    <div class="userInfoItem" [ngClass]="{ 'disabled-div': true }">
                       <p class="main_input_title">*Program Name</p>
                       <select
                         class="userInfovalue"
@@ -3148,6 +3148,7 @@
               />
             </div>
           </div>
+          <span class="err" *ngIf="pdfTypeStatus">Please Select a Pdf Document</span>
         </div>
       </div>
 

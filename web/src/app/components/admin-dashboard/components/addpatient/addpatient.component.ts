@@ -141,7 +141,7 @@ export class AddpatientComponent implements OnInit {
   cities: any;
   image: any;
   openFile() {
-    this.image = null;
+   // this.image = null;
     var a = document.getElementById('image');
     a?.click();
   }
@@ -149,7 +149,7 @@ export class AddpatientComponent implements OnInit {
     this.image = e.target.files[0];
     var a = document.getElementsByClassName('uploadPhoto');
     this.file = this.image.name;
-
+    console.log(this.image)
     // a[0].setAttribute("style", "background-image:"+this.image.name);
     // a[0].setAttribute("style", "background: url(\"https://rpmstorage123.blob.core.windows.net/rpmprofilepictures/CL500626\"); background-repeat: no-repeat;  background-size: 100% 100%;");
   }
@@ -157,13 +157,14 @@ export class AddpatientComponent implements OnInit {
     if (this.image) {
       const myPhoto = uuid.v4();
       var formData: any = new FormData();
+      console.log(formData)
       formData.append(myPhoto, this.image);
       this.rpm
         .rpm_post(`/api/patient/addimage?PatientId=${pid}`, formData)
         .then(
           (data) => {},
-          (err) => {
-            console.log('Img error');
+          (err:any) => {
+             alert(err.error.message);
           }
         );
     }
@@ -174,6 +175,9 @@ export class AddpatientComponent implements OnInit {
   cityFlag: any;
   ngOnInit(): void {
     // this.todaty_date = new Date();
+    this.file = null;
+    this.image = null;
+
     this.todaty_date = this.datepipe.transform(new Date(), 'yyyy-MM-dd');
     this.cityFlag = false;
     this.timezonecalculation();

@@ -62,19 +62,19 @@ namespace RPMPatientBilling.Model
         public DateTime? StartDate { get; set; }
         public DateTime? LastBilledDate { get; set; }  
         public DateTime CreatedOn { get; set; }
-        
+
         public BillingData ToBillingData()
         {
             BillingData inst = new BillingData();
             inst.PatientId = this.PatientId;
-            inst.PatientProgramId = this.PatientProgramId;  
+            inst.PatientProgramId = this.PatientProgramId;
             inst.BillingCodeId  = this.BillingCodeId;
             inst.BilledDuration = 0;
-            inst.StartDate = this.StartDate != null ? this.StartDate:null;
-            inst.BilledDate = this.LastBilledDate != null ? this.LastBilledDate :null;
+            inst.StartDate = this.StartDate != null ? this.StartDate : null;
+            inst.BilledDate = this.LastBilledDate != null ? this.LastBilledDate : null;
             if (BillingCodeId == 1 || BillingCodeId == 2)
                 inst.Totalreadings = this.TotalVitalCount;
-            else if (BillingCodeId == 3 || BillingCodeId == 4)
+            else if (BillingCodeId == 3 || BillingCodeId == 4 ||BillingCodeId == 6 ||BillingCodeId == 7 ||BillingCodeId == 8 ||BillingCodeId == 9 ||BillingCodeId == 10 ||BillingCodeId == 11 ||BillingCodeId == 12 ||BillingCodeId == 13 ||BillingCodeId == 14 ||BillingCodeId == 15)
                 inst.Totalreadings = this.TotalDuration;
             else
                 inst.Totalreadings = 0;
