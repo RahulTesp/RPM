@@ -5,12 +5,11 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System.Data;
-
+//cron continuous
 class Program
 {
     static ConcurrentDictionary<string, DeviceIDs> deviceid_dictionary = new ConcurrentDictionary<string, DeviceIDs>();
-    static ConcurrentDictionary<string, string> vitalunits_dictionary = new ConcurrentDictionary<string, string>();
-    //static Timer _timerDeviceids;       
+    static ConcurrentDictionary<string, string> vitalunits_dictionary = new ConcurrentDictionary<string, string>();     
     static string readingid = string.Empty;
     static string acess_key = string.Empty;
     static string CONN_STRING = string.Empty;
@@ -18,19 +17,24 @@ class Program
     {
         // Set up configuration
         var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true)
-            .AddEnvironmentVariables() // Allows overriding via Azure App Settings
-            .Build();
-
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json", optional: true)
+        .AddEnvironmentVariables() // Allows overriding via Azure App Settings
+        .Build();
+        if (config == null)
+        {
+            Console.WriteLine("Configuration is null.");
+            return;
+        }
         // Access a specific config value
-        string connStr = config["RPM:ConnectionString"];
+        string? connStr = config["RPM:ConnectionString"];
         Console.WriteLine($"RPM Connection String: {connStr}");
-
-        // Optional: bind strongly-typed object
-        var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
-        Console.WriteLine($"RPM.ConnectionString (typed): {rpmSettings?.ConnectionString}");
-        CONN_STRING = rpmSettings?.ConnectionString;
+        if (connStr == null)
+        {
+            Console.WriteLine("Connection string is null in appsettings.json.");
+            return;
+        }
+        CONN_STRING = connStr;
         Console.WriteLine("WebJob started...");
         if(CONN_STRING == null)
         {
@@ -40,22 +44,21 @@ class Program
 
         List<SystemConfigInfo> igc = Data.GetSystemConfig(CONN_STRING, "iGlucose", "User");
 
-        SystemConfigInfo igckey = igc.Find(x => x.Name.Equals("ApiKey_iGlucose"));
+        SystemConfigInfo? igckey = igc.Find(x => x.Name.Equals("ApiKey_iGlucose"));
         acess_key = igckey.Value;
         Thread.Sleep(10000);
-        while (true)
+        try
         {
-            try
-            {
-                TimerDeviceIdCallback();
-                Thread.Sleep(1000);
-                TimerApiCallback();
-                Thread.Sleep(20000);
-            }
-            catch (Exception ex)
-            {
-            }
+            TimerDeviceIdCallback();
+            Thread.Sleep(1000);
+            TimerApiCallback();
+            Thread.Sleep(20000);
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine("exception:" + ex);
+        }
+        
         
     }
     private static void TimerDeviceIdCallback()
@@ -123,43 +126,14 @@ class Program
 
                 DeviceIDs val = item.Value;
                 DateTime lastRecodDate = val.ActivatedDate;
-
-                //using (SqlConnection con = new SqlConnection(CONN_STRING))
-                //{
-                //    try
-                //    {
-                //        con.Open();
-                //        SqlCommand objSqlCommand = new SqlCommand("usp_GetLastRecordedDate", con);
-                //        objSqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                //        objSqlCommand.Parameters.AddWithValue("@DeviceSerialNo", val.Deviceid);
-                //        objSqlCommand.Parameters.AddWithValue("@DeviceVendorName", "iGlucose");
-                //        using (SqlDataReader reader = objSqlCommand.ExecuteReader())
-                //        {
-                //            if (reader != null)
-                //            {
-                //                while (reader.Read())
-                //                {
-                //                    lastRecodDate = (DateTime)reader["DeviceActivatedDateTime"];
-                //                }
-                //            }
-                //        }
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //        con.Close();
-                //    }
-                //    Console.WriteLine("DeviceId: " + val.Deviceid + "; Lasted Recorded :" + lastRecodDate);
-                //}
                 Console.WriteLine("DeviceId: " + val.Deviceid + "; Lasted Recorded :" + lastRecodDate);
                 DateTime newstart = lastRecodDate.AddSeconds(2);
-                //Console.WriteLine("TimerApiCallback" + val.Deviceid);
                 string sdata = Data.CallRestMethod("HTTPS://api.iglucose.com/readings/", newstart, val.Deviceid, acess_key);
                 dynamic data = JObject.Parse(sdata);
                 JArray array = data.readings;
                 if (array.Count > 0)
                 {
                     StagingTableQueueInsert(array, val.Deviceid);
-                    //readings_queue.Enqueue(array);
                 }
                 else
                 {
@@ -193,7 +167,6 @@ class Program
                     }
 
                 }
-                //TimerStagingTableQueueInsert(null);
             }
             Console.WriteLine("TimerApiCallback end");
         }
@@ -207,12 +180,6 @@ class Program
 
         try
         {
-            //for (int i = 0; i <= readings_queue.Count; i++)
-            //{
-            //    Console.WriteLine("readings_queue.Count" + readings_queue.Count + " i:" + i);
-            //    JArray reading;
-            //    if (readings_queue.TryDequeue(out reading))
-            //    {
             string reading_type = string.Empty;
             foreach (JObject obj in array)
             {
@@ -243,7 +210,6 @@ class Program
                         ReceivedTimes.Add(Convert.ToDateTime(ig[j].date_received));
                         Console.WriteLine("deviceid:" + ig[j].device_id);
                         Console.WriteLine("date_recorded:" + ig[j].date_recorded);
-                        //Console.WriteLine("Reading: " + reading);
                         if (reading_type == "blood_glucose")
                         {
                             string Unitglucose;
@@ -286,7 +252,6 @@ class Program
                             blood_glucose.event_flag = ig[j].event_flag;
                             blood_glucose.irregular = ig[j].irregular;
                             TimerStagingTableInsert(blood_glucose);
-                            //tableInsert_queue.Enqueue(blood_glucose);
                             Console.WriteLine("Added to queue:" + blood_glucose.device_id);
 
                         }
@@ -349,18 +314,15 @@ class Program
                             blood_pressuresystolic.data_unit = Unitsystolic;
                             blood_pressuresystolic.data_value = ig[j].systolic_mmhg;
                             TimerStagingTableInsert(blood_pressuresystolic);
-                            //tableInsert_queue.Enqueue(blood_pressuresystolic);
                             blood_pressurediastolic.data_type = "diastolic";
                             blood_pressurediastolic.data_unit = Unitdiastolic;
                             blood_pressurediastolic.data_value = ig[j].diastolic_mmhg;
                             TimerStagingTableInsert(blood_pressurediastolic);
-                            //tableInsert_queue.Enqueue(blood_pressurediastolic);
                             Console.WriteLine("Added to queue:" + blood_pressurediastolic.device_id);
                             blood_pressurepulse.data_type = "pulse";
                             blood_pressurepulse.data_unit = Unitpulse;
                             blood_pressurepulse.data_value = ig[j].pulse_bpm;
                             TimerStagingTableInsert(blood_pressurepulse);
-                            //tableInsert_queue.Enqueue(blood_pressurepulse);
                             Console.WriteLine("Added to queue:" + blood_pressurepulse.device_id);
                         }
                         else if (reading_type == "weight")
@@ -398,7 +360,6 @@ class Program
                             weight.event_flag = ig[j].event_flag;
                             weight.irregular = ig[j].irregular;
                             TimerStagingTableInsert(weight);
-                            //tableInsert_queue.Enqueue(weight);
 
                         }
                         else if (reading_type == "pulse_ox")
@@ -455,8 +416,6 @@ class Program
                             pulse_ox_pulse.irregular = ig[j].irregular;
                             TimerStagingTableInsert(pulse_ox_spo2);
                             TimerStagingTableInsert(pulse_ox_pulse);
-                            //tableInsert_queue.Enqueue(pulse_ox_spo2);
-                            //tableInsert_queue.Enqueue(pulse_ox_pulse);
                         }
                         if (j == ig.Count - 1)
                         {
@@ -488,15 +447,9 @@ class Program
                         }
 
                     }
-
-
-
-                    // TimerStagingTableInsert(reading);
                 }
 
             }
-            //Console.WriteLine("TimerStagingTableQueueInsert end");
-
         }
         catch (Exception ex)
         {
@@ -506,17 +459,8 @@ class Program
     private static void TimerStagingTableInsert(DatabaseInput reading)
     {
 
-        //Console.WriteLine("TimerStagingTableInsert begin");
         try
         {
-            //for (int i = 0; i < tableInsert_queue.Count; i++)
-            //{
-            //    Console.WriteLine("tableInsert_queue.Count"+ tableInsert_queue.Count);
-            //    //DatabaseInput reading;
-            //    if (tableInsert_queue.TryDequeue(out reading))
-            //    {
-            //JavaScriptSerializer js = new JavaScriptSerializer();
-            //string jsonData = js.Serialize(reading);
             string jsonData = JsonConvert.SerializeObject(reading);
             
             Console.WriteLine("JsonStg Insert begin: " + jsonData);
@@ -530,8 +474,6 @@ class Program
                 command.ExecuteScalar();
                 connection.Close();
             }
-            //}
-            //}
         }
         catch (Exception ex)
         {
@@ -539,8 +481,4 @@ class Program
         }
         Console.WriteLine("TimerStagingTableInsert end");
     }
-}
-public class RpmSettings
-{
-    public string? ConnectionString { get; set; }
 }

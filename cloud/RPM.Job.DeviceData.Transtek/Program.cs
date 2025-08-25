@@ -44,19 +44,18 @@ namespace azuretranstekwebjob
                 return;
             }
             Thread.Sleep(10000);
-            while (true)
+            try
             {
-                try
-                {
-                    TimerDeviceIdCallback();
-                    Thread.Sleep(1000);
-                    TimerApiCallback();
-                    Thread.Sleep(20000);
-                }
-                catch (Exception ex)
-                {
-                }
+                TimerDeviceIdCallback();
+                Thread.Sleep(1000);
+                TimerApiCallback();
+                Thread.Sleep(20000);
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("exception:" + ex);
+            }
+            
         }
         private static void TimerDeviceIdCallback()
         {

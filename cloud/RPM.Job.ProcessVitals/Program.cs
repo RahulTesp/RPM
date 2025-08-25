@@ -1,70 +1,70 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
-
+//cron contiuous
 class Program
 {
-    static string CONN_STRING =string.Empty;
-    private static Timer _timer = null;
+    static string CONN_STRING = string.Empty;
+
     static async Task Main(string[] args)
     {
         // Set up configuration
         var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true)
-            .AddEnvironmentVariables() // Allows overriding via Azure App Settings
-            .Build();
-
-        // Access a specific config value
-        string connStr = config["RPM:ConnectionString"];
-        Console.WriteLine($"RPM Connection String: {connStr}");
-
-        // Optional: bind strongly-typed object
-        var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
-        Console.WriteLine($"RPM.ConnectionString (typed): {rpmSettings?.ConnectionString}");
-        CONN_STRING = rpmSettings?.ConnectionString;
-        Console.WriteLine("WebJob started...");
-        if(CONN_STRING == null)
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json", optional: true)
+        .AddEnvironmentVariables() // Allows overriding via Azure App Settings
+        .Build();
+        if (config == null)
         {
-            Console.WriteLine("Connection string is null.");
+            Console.WriteLine("Configuration is null.");
             return;
         }
-        while (true)
+        // Access a specific config value
+        string? connStr = config["RPM:ConnectionString"];
+        Console.WriteLine($"RPM Connection String: {connStr}");
+        if (connStr == null)
         {
-            try
-            {
-                _timer = new Timer(TimerCallback, null, 0, 30000);
-                Console.ReadLine();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("exception:" + ex);
-            }
-            
+            Console.WriteLine("Connection string is null in appsettings.json.");
+            return;
         }
+        CONN_STRING = connStr;
+        Console.WriteLine(CONN_STRING);
+        if (string.IsNullOrEmpty(CONN_STRING))
+        {
+            Console.WriteLine("Connection string is null or empty.");
+            return;
+        }
+
+        Console.WriteLine("WebJob started...");
+        await TimerCallback();
+        
     }
-    private static void TimerCallback(Object o)
+
+    private static async Task TimerCallback()
     {
         try
         {
-            Console.WriteLine("Timer Api call back");
-            using (SqlConnection connection = new SqlConnection(CONN_STRING))
-            {
-                connection.Open();
-                SqlCommand command = new SqlCommand("usp_InsPatientVitalMeasures", connection);
-                command.CommandType = CommandType.StoredProcedure;
-                command.ExecuteNonQuery();
-                connection.Close();
-            }
-        }
-        catch (Exception Ex)
-        {
-            Console.WriteLine(Ex);
-        }
+            Console.WriteLine($"[{DateTime.Now}] Timer triggered.");
 
+            using SqlConnection connection = new SqlConnection(CONN_STRING);
+            await connection.OpenAsync();
+            await ExecuteStoredProcedure(connection, "usp_InsPatientVitalMeasures");    
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[{DateTime.Now}] Exception: {ex.Message}");
+        }
     }
-}
-public class RpmSettings
-{
-    public string? ConnectionString { get; set; }
+
+    private static async Task ExecuteStoredProcedure(SqlConnection connection, string procedureName, int timeoutSeconds = 300)
+    {
+        using SqlCommand command = new SqlCommand(procedureName, connection)
+        {
+            CommandType = CommandType.StoredProcedure,
+            CommandTimeout = timeoutSeconds
+        };
+
+        await command.ExecuteNonQueryAsync();
+        Console.WriteLine($"Executed {procedureName} successfully.");
+    }
 }
