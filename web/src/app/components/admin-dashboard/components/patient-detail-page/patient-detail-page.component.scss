@@ -3662,10 +3662,13 @@ li + li {
   background-color: #6da86f !important;
   /* Green for completed */
 }
-
+.progress-target .custom-progress-bar-inner {
+  background-color: hsl(40, 74%, 60%) !important;
+  /* Green for completed */
+}
 /* Timer label */
 .progressvalue {
-  margin-top: 4px;
+  margin-top: 2px;
   font-size: 13px;
   color: #444;
 }

@@ -1094,8 +1094,14 @@ private async updateChatListUnreadCount(
       this.updateChatData(response);
 
       return response;
-    } catch (error) {
+    } catch (error:any) {
+      if(error.status == 404)
+      {
+        console.log(error.error.message)
+      }else{
       console.error('❌ Error in PatientChatService.getPatientChat:', error);
+
+      }
       throw error;
     }
   }

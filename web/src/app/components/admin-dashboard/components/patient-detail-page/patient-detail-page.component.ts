@@ -328,6 +328,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.isManagerProvider = false;
     }
     this.rpm.rpm_get(`/api/config/client`).then((data) => {
+      console.log('Phone number extension');
+      console.log(data);
       this.phoneExtension = data;
     });
 
@@ -669,6 +671,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.patiantVital = (programDetails.PatientVitalInfos || []).filter(
       (ds: { Selected: boolean }) => ds.Selected === true
     );
+    console.log('ProgramDetails vital info');
+    console.log(programDetails.PatientVitalInfos);
+    console.log('Patient Vitals:');
+    console.log(this.patiantVital);
     this.vitals =
       this.http_rpm_patientList.PatientProgramdetails.PatientVitalInfos;
     this.processAdditionalPatientData(programDetails);
@@ -1419,8 +1425,14 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
       // Call data source change method (kept from your original code)
       this.dataSourceChange(5, 5);
-    } catch (error) {
+    } catch (error:any) {
+      if(error.status == 404)
+      {
+        return;
+      }else{
       console.error('❌ Error fetching chat data:', error);
+
+      }
     }
   }
   async getCallNotes() {
@@ -3088,7 +3100,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                   this.patientInteractionSec) /
                   Totalval) *
                 100;
-
+               console.log('Interaction Progress');
+               console.log(this.interactionpercentValue);
               switch (that.BillingOverview[0].ProgramName) {
                 case 'CCM-C':
                   this.colorcodeval = 19;
@@ -3176,7 +3189,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         ((this.patientInteractionMin * 60 + this.patientInteractionSec) /
           3600) *
         100;
-
+    console.log('Interaction Progress');
+    console.log(this.interactionpercentValue);
       let patientInteractionMin = time / 60;
       this.patientInteractionMin = Math.trunc(patientInteractionMin);
       let patientInteractionSec = time % 60;
@@ -3191,6 +3205,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         ((this.patientInteractionMin * 60 + this.patientInteractionSec) /
           3600) *
         100;
+              console.log('Interaction Progress - 1');
+               console.log(this.interactionpercentValue);
       // that.interactionpercentValue = parseInt(that.interactionpercentValue)
       if (
         this.interactionpercentValue < 1 &&
