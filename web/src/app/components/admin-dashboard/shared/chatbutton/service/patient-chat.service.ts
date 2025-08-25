@@ -479,7 +479,8 @@ private removeMessageListeners(): void {
       );
       this.chatListSubject.next(updatedChatList);
     }
-    this.messageListenerRegistered = true;
+    // commenting this line because this is breaking chat count updation
+    //this.messageListenerRegistered = true;
     this.getPatientChat(this.currentPatientUser);
   };
 // Optimized version of the chat service methods

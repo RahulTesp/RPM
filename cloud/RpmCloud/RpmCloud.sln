@@ -35,6 +35,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Sync.Devices.Transt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Billing", "..\RPM.Job.Billing\RPM.Job.Billing.csproj", "{D430FE0B-081F-4FB8-9D42-569B555C1D8C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.AlertsTemp", "..\RPM.Job.AlertsTemp\RPM.Job.AlertsTemp.csproj", "{F5740723-F6FA-4B79-B5EF-AE9731083696}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.AlertsSummary.Priority", "..\RPM.Job.AlertsSummary.Priority\RPM.Job.AlertsSummary.Priority.csproj", "{21375139-6DE9-4F68-BB5C-1BEFEFB7C092}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +109,14 @@ Global
 		{D430FE0B-081F-4FB8-9D42-569B555C1D8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D430FE0B-081F-4FB8-9D42-569B555C1D8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D430FE0B-081F-4FB8-9D42-569B555C1D8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5740723-F6FA-4B79-B5EF-AE9731083696}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5740723-F6FA-4B79-B5EF-AE9731083696}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5740723-F6FA-4B79-B5EF-AE9731083696}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5740723-F6FA-4B79-B5EF-AE9731083696}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21375139-6DE9-4F68-BB5C-1BEFEFB7C092}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21375139-6DE9-4F68-BB5C-1BEFEFB7C092}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21375139-6DE9-4F68-BB5C-1BEFEFB7C092}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21375139-6DE9-4F68-BB5C-1BEFEFB7C092}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
