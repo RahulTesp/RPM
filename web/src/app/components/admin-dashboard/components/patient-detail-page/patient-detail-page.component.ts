@@ -2862,6 +2862,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       .then(
         (data) => {
           that.BillingOverview = data;
+          console.log('Billing Overview');
+          console.log(that.BillingOverview);
           that.progrss_billing_array = [];
           if (!that.BillingOverview) {
             that.BillingOverview = [];

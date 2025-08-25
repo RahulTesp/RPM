@@ -241,9 +241,10 @@ export class DownloadPatientReportService {
     textHeight = textHeight + 5;
     doc.text('Management Period : ', 20, textHeight);
     doc.setTextColor('black');
-    const pStart = this.datepipe.transform(
-      patientDetails['PatientProgramdetails'].StartDate
-    );
+    // const pStart = this.datepipe.transform(
+    //   patientDetails['PatientProgramdetails'].StartDate
+    // );
+    const pStart = this.datepipe.transform( this.convertToLocalFormat(patientDetails['PatientProgramdetails'].StartDate))
     const currentDay = this.datepipe.transform(new Date());
     doc.text(pStart + ' - ' + currentDay, 60, textHeight);
     textHeight = textHeight + 10;
