@@ -450,7 +450,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
     // Store previous Patient ID
     this.PatientIdOld = sessionStorage.getItem('PatientId');
-
+     this.CloseChatPanlBlock();
     // Close previous patient chat window
     this.CloseChatPanlBlock();
 
