@@ -2237,7 +2237,7 @@ export class EditpatientComponent implements OnInit {
             //show success popup patient is updated
           }
         },
-        (err) => {
+        (err:any) => {
           this.loading = false;
           if (this.variable != 1) {
             that.dialog.open(that.failureTemplate);

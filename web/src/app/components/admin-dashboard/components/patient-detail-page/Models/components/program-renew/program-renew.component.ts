@@ -53,6 +53,9 @@ constructor(  private auth: AuthService,private rpm: RPMService,private router: 
         let route = '/admin/patients_detail';
         if(this.newProgramid)
         {
+
+        if(this.newProgramid)
+        {
         this.router.navigate([route], {
           queryParams: { id: this.currentpPatientId, programId: this.newProgramid },
           skipLocationChange: true,
