@@ -4,8 +4,8 @@ using System.Data;
 //cron 0 0 7 * * *
 class Program
 {
-    static string CONN_STRING = string.Empty;
-
+    static string CONN_STRING =string.Empty;
+    private static Timer _timer = null;
     static async Task Main(string[] args)
     {
         // Set up configuration

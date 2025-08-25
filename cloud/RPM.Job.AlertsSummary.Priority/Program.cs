@@ -29,19 +29,16 @@ class Program
             Console.WriteLine("Connection string is null.");
             return;
         }
-        while (true)
+        try
         {
-            try
-            {
-                _timer = new Timer(TimerCallback, null, 0, 30000);
-                Console.ReadLine();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("exception:" + ex);
-            }
-            
+            _timer = new Timer(TimerCallback, null, 0, 30000);
+            Console.ReadLine();
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine("exception:" + ex);
+        }
+
     }
     private static void TimerCallback(Object o)
     {
