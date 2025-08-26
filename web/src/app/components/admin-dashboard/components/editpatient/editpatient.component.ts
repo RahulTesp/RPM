@@ -1579,6 +1579,8 @@ export class EditpatientComponent implements OnInit {
   ChangePatientStatus(status: any, timeofcall: number) {
     // var status = "Prescribed";
 
+    console.log('Status-Change Patient Status');
+    console.log(status);
     if (status == 'OnHold') {
       this.setOnHold();
       return;
@@ -2145,7 +2147,7 @@ export class EditpatientComponent implements OnInit {
       ),
       VitalIds: this.vitalList,
     };
-    if ((this.current_status_value = 'Prescribed')) {
+    if ((this.current_status_value == 'Prescribed')) {
       var datevalue = this.Auth.ConvertToUTCRangeInput(new Date());
       var dtArr = datevalue.split('T');
       req_body['EnrolledDate'] = this.Auth.ConvertToUTCRangeInput(
@@ -2348,7 +2350,8 @@ export class EditpatientComponent implements OnInit {
             false
           );
         },
-        (err) => {
+        (err:any) => {
+          console.log(err)
           // this.openDialogWindow('Error', `Device not added to user assets!!!`);
           this.showconfirmDialog.showConfirmDialog(
             'Device not added to user assets!!!',
@@ -2427,6 +2430,8 @@ export class EditpatientComponent implements OnInit {
 
       this.rpm.rpm_post('/api/device/removedevice/iglucose', req_body).then(
         (data) => {
+          console.log('Remove Device');
+          console.log(data)
           if (!this.ErrorFlag) {
             // this.openDialogWindow('Success', `Device Removed Successfully.`);
             this.showconfirmDialog.showConfirmDialog(
@@ -2555,6 +2560,8 @@ export class EditpatientComponent implements OnInit {
       .rpm_get('/api/patient/getavailabledevices?VitalId=' + vital_id)
       .then(
         (data) => {
+          console.log('vitalId');
+          console.log(data)
           switch (vital_id) {
             case 1:
               that.deviceListBP = data;
@@ -2857,6 +2864,8 @@ export class EditpatientComponent implements OnInit {
     // if (status == 'OnHold' && timeofcall == 2) {
     //   this.ImageStatus = false;
     // }
+    console.log('Status');
+    console.log(status);
     if (
       this.current_status_value == 'Prescribed' &&
       (status == 'Active' || status == 'ReadyToDischarge')
@@ -2895,6 +2904,8 @@ export class EditpatientComponent implements OnInit {
       return;
     }
     if (this.current_status_value == 'OnHold') {
+      console.log('Patient Status');
+      console.log(status);
       if (status == 'Discharged') {
         // this.dialogRef = this.dialog.open(ConfirmDialogComponent, {
         //   maxWidth: '400px',
@@ -3519,8 +3530,10 @@ export class EditpatientComponent implements OnInit {
       .rpm_get(
         `/api/patient/getpatientlastpgmstatus?PatientId=${this.pid}&PatientProgramId=${this.patientprogramid}`
       )
-      .then((data) => {
-        this.last_status = data;
+      .then((data:any) => {
+        console.log('LastPatientMaesage');
+        console.log(data)
+        this.last_status = data.message;
       });
   }
 
