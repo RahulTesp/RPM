@@ -1627,18 +1627,14 @@
                 /></span>
               </div>
 
-              <section class="progrssbar_container">
-                <section
+              <!-- <section class="progrssbar_container"> -->
+                <!-- <section
                   class="progrssbar_container"
                   [ngClass]="
                     patientInteractionMin > 19 ? 'completed-target' : ''
                   "
                 >
-                  <!-- <mat-progress-bar
-                    mode="determinate"
-                    strokeWidth="10"
-                    value="{{ interactionpercentValue }}"
-                  ></mat-progress-bar> -->
+
                   <div class="custom-progress-bar-outer">
                     <div
                       class="custom-progress-bar-inner"
@@ -1662,6 +1658,28 @@
                     {{ totalInteractionTime }} min
                   </div>
                 </section>
+              </section> -->
+              <section
+                class="progrssbar_container"
+                [ngClass]="patientInteractionMin > colorcodeval ? 'completed-target' : ''"
+              >
+                <!-- Custom Progress Bar -->
+                <div class="custom-progress-bar-outer">
+                  <div
+                    class="progress-fill-data"
+                    [style.width.%]="interactionpercentValue > 100 ? 100 : interactionpercentValue"
+                  ></div>
+                </div>
+
+                <!-- Time display -->
+                <div *ngIf="interactionpercentValue > 100" class="progressvalue">
+                  {{ patientInteractionMin }}:{{ patientInteractionSec }}
+                </div>
+
+                <div *ngIf="interactionpercentValue <= 100" class="progressvalue">
+                  {{ patientInteractionMin }}:{{ patientInteractionSec }} /
+                  {{ totalInteractionTime }} min
+                </div>
               </section>
             </div>
           </div>

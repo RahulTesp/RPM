@@ -3588,6 +3588,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.getScheduleData();
 
         alert('Schedule Status Changed Successfully!!');
+        this.scheduleSelected = []
       },
       (err:any) => {
         //show error patient id creation failed
