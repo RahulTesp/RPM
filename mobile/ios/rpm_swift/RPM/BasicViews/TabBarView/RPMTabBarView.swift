@@ -40,6 +40,7 @@ struct RPMTabBarView: View {
     @EnvironmentObject var accountListVM: RPMHomeViewModel
     @EnvironmentObject var loginViewModel: RPMLoginViewModel
     @EnvironmentObject var memberDetList: MembersListViewModel
+    @EnvironmentObject var sessionManager: SessionManager
     @State private var selectedTab = 0
 
     var body: some View {

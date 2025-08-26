@@ -236,6 +236,7 @@ struct ApplicationSwitcher: View {
     @EnvironmentObject var memberDetList: MembersListViewModel
     @EnvironmentObject var networkMonitor: NetworkMonitor
     @State private var showNoInternetAlert = false
+    @EnvironmentObject var sessionManager: SessionManager
     
     var body: some View {
   
@@ -255,7 +256,8 @@ struct ApplicationSwitcher: View {
                     .environmentObject(homeViewModel)
                     .environmentObject(loginViewModel)
                     .environmentObject(memberDetList)
-                
+                    .environmentObject(sessionManager)
+                    
                     .onAppear {
                         print("AppModel in RPMTabBarView:", appModel)
                         
