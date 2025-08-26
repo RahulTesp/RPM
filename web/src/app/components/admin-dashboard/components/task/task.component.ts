@@ -1530,6 +1530,7 @@ export class TaskComponent implements OnInit {
           alert('Schedule Status Changed Successfully!!');
           this.getTaskScheduleList();
           this.rightsidebar.calculateUpcomingSchedule();
+          this.scheduleSelected = []
         },
         (err:any) => {
           //show error patient id creation failed
