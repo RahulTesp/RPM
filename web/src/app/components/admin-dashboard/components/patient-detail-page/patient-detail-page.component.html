@@ -278,23 +278,20 @@
                     src="../../../../../assets/refresh.png"
                 /></span>
               </div>
-              <section
-                class="progrssbar_container">
+              
+             
+                         
+ <section
+                class="progrssbar_container"
+                [ngClass]="patientInteractionMin > colorcodeval ? 'completed-target' : ''"
+              >
                 <!-- Custom Progress Bar -->
-                <!-- <div class="custom-progress-bar-outer">
+                <div class="custom-progress-bar-outer">
                   <div
                     class="progress-fill-data"
                     [style.width.%]="interactionpercentValue > 100 ? 100 : interactionpercentValue"
                   ></div>
-                </div> -->
-                  <div class="custom-progress-bar-outer">
-                  <div
-                    class="progress-fill-data"
-                    [style.width.%]="patientInteractionMin > colorcodeval ? 100 : (interactionpercentValue > 100 ? 100 : interactionpercentValue)"
-                    [ngClass]="patientInteractionMin > colorcodeval ? 'completed-target-data' : ''"
-                  ></div>
                 </div>
-
 
                 <!-- Time display -->
                 <div *ngIf="interactionpercentValue > 100" class="progressvalue">
@@ -1607,16 +1604,20 @@
                 /></span>
               </div>
 
+             
 
-              <section
-                class="progrssbar_container"
+              
+                <div *ngIf="interactionpercentValue <= 100" class="progressvalue" >
+                  {{ patientInteractionMin }}:{{ patientInteractionSec }} /
+                  {{ totalInteractionTime }} min
+                </div>
+                [ngClass]="patientInteractionMin > colorcodeval ? 'completed-target' : ''"
               >
                 <!-- Custom Progress Bar -->
                 <div class="custom-progress-bar-outer">
                   <div
                     class="progress-fill-data"
-                    [style.width.%]="patientInteractionMin > colorcodeval ? 100 : (interactionpercentValue > 100 ? 100 : interactionpercentValue)"
-                    [ngClass]="patientInteractionMin > colorcodeval ? 'completed-target-data' : ''"
+                    [style.width.%]="interactionpercentValue > 100 ? 100 : interactionpercentValue"
                   ></div>
                 </div>
 
@@ -1625,7 +1626,7 @@
                   {{ patientInteractionMin }}:{{ patientInteractionSec }}
                 </div>
 
-                <div *ngIf="interactionpercentValue <= 100" class="progressvalue" >
+                <div *ngIf="interactionpercentValue <= 100" class="progressvalue">
                   {{ patientInteractionMin }}:{{ patientInteractionSec }} /
                   {{ totalInteractionTime }} min
                 </div>

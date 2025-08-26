@@ -521,6 +521,7 @@ p {
   align-items: center;
   height: fit-content;
   position: relative;
+  // background-color: #edeff5;
   // background-color: #223e92;
   padding: 2px;
   border-radius: 20px;
@@ -3655,7 +3656,11 @@ li + li {
   background-color: #6da86f !important;
   /* Green for completed */
 }
-
+.progress-fill-data {
+  height: 100%;
+  background-color:  hsl(40, 74%, 60%) ; /* progress color */
+  transition: width 0.3s ease; /* smooth animation */
+}
 .completed-target-data {
   background-color: #6da86f !important;
   /* Green for completed */

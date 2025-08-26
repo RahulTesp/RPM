@@ -813,12 +813,18 @@ export class EditpatientComponent implements OnInit {
         const rawDate = that.Patientdata.PatientPrescribtionDetails.ConsultationDate;
         if(rawDate != "")
         {
-        var  ConsultationDateIso  = new Date(rawDate);
-       // Convert to ISO string
+       var  ConsultationDateIso  = new Date(rawDate);
+      //  // Convert to ISO string
          const isoString = ConsultationDateIso.toISOString();
-          that.programForm.controls['consultdate'].setValue(
-          this.convertDate(isoString)
-       );
+      //     that.programForm.controls['consultdate'].setValue(
+      //     this.convertDate(isoString)
+      //  );
+        this.programForm.patchValue({
+          consultdate: rawDate &&
+                      rawDate !== '1/1/1970 12:00:00 AM'
+            ? this.convertDate(isoString)
+            : null
+        });
         }
 
 

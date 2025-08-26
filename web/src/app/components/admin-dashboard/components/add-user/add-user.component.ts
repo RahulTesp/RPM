@@ -208,6 +208,7 @@ export class AddUserComponent implements OnInit {
         req_body['Id'] = this.put_user_id;
         this.rpm.rpm_post('/api/users/updateuser', req_body).then(
           (data) => {
+          this.submitImage(this.put_user_id)
           this.confirmDialog.showConfirmDialog(
             'User Details Updated Successfully!!',
             'Success',
@@ -215,7 +216,7 @@ export class AddUserComponent implements OnInit {
               this.router.navigate(['/admin/admin'], { queryParams: { page: 2 } });
               this.resetAddPateintMasterData();
               this.userVerifyCompleted = false;
-              this.submitImage(that.userId);
+
             },
             false
           );
