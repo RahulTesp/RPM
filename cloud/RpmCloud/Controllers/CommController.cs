@@ -76,7 +76,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = "Exception" });
+                return BadRequest(new { message = "Exception While Sending Message" });
             }
 
         }
