@@ -766,10 +766,15 @@ export class EditpatientComponent implements OnInit {
           'MMM/dd/yyyy'
         );
 
-        that.programForm.controls['consultdate'].setValue(
-          this.convertDate(consultDateData)
-        );
-
+        // that.programForm.controls['consultdate'].setValue(
+        //   this.convertDate(consultDateData)
+        // );
+          this.programForm.patchValue({
+          consultdate: consultDateData &&
+                      consultDateData !== '1/1/1970 12:00:00 AM'
+            ? this.convertDate(consultDateData)
+            : null
+        });
         var prescribeDateData = this.datepipe.transform(
           this.convertToLocalTime(
             that.Patientdata.PatientPrescribtionDetails.PrescribedDate

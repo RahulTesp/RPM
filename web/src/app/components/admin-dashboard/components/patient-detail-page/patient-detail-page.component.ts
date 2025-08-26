@@ -1196,11 +1196,11 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.smsCancel(); // close the panel
         if(err.status == 400)
         {
-          alert(err.error);
+          alert(err.error.message);
         }else{
           alert('SMS Sent Failed')
         }
-        console.log(err.error);
+        console.log(err.error.message);
         this.loading_sms = false;
       }
     );
@@ -3098,10 +3098,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
               this.interactionpercentValue =
                 ((this.patientInteractionMin * 60 +
                   this.patientInteractionSec) /
-                  Totalval) *
-                100;
-               console.log('Interaction Progress');
-               console.log(this.interactionpercentValue);
+                  Totalval) * 100;
               switch (that.BillingOverview[0].ProgramName) {
                 case 'CCM-C':
                   this.colorcodeval = 19;
@@ -3187,10 +3184,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.getInteractionTime(this.patientInteractionMin);
       this.interactionpercentValue =
         ((this.patientInteractionMin * 60 + this.patientInteractionSec) /
-          3600) *
-        100;
-    console.log('Interaction Progress');
-    console.log(this.interactionpercentValue);
+          3600) * 100;
       let patientInteractionMin = time / 60;
       this.patientInteractionMin = Math.trunc(patientInteractionMin);
       let patientInteractionSec = time % 60;
@@ -3203,16 +3197,17 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.getInteractionTime(patientInteractionMin);
       this.interactionpercentValue =
         ((this.patientInteractionMin * 60 + this.patientInteractionSec) /
-          3600) *
-        100;
-              console.log('Interaction Progress - 1');
-               console.log(this.interactionpercentValue);
+          3600) * 100;
+       console.log('Interaction Progress - 1');
+       console.log(this.interactionpercentValue);
       // that.interactionpercentValue = parseInt(that.interactionpercentValue)
       if (
         this.interactionpercentValue < 1 &&
         this.interactionpercentValue > 0
       ) {
         this.interactionpercentValue = 1;
+      }else{
+        this.interactionpercentValue = this.interactionpercentValue;
       }
       if (this.patientInteractionSec < 10) {
         this.patientInteractionSec =
@@ -3594,9 +3589,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
         alert('Schedule Status Changed Successfully!!');
       },
-      (err) => {
+      (err:any) => {
         //show error patient id creation failed
-        alert('Something Went Wrong ');
+        alert(err.error.message);
       }
     );
   }

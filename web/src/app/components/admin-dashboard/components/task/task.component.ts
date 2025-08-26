@@ -1531,9 +1531,9 @@ export class TaskComponent implements OnInit {
           this.getTaskScheduleList();
           this.rightsidebar.calculateUpcomingSchedule();
         },
-        (err) => {
+        (err:any) => {
           //show error patient id creation failed
-          alert('Something Went Wrong ');
+          alert(err.error.message);
         }
       );
   }
