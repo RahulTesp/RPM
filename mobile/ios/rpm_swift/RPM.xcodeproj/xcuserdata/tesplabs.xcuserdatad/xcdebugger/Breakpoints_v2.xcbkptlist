@@ -336,8 +336,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1967"
             endingLineNumber = "1967"
-            landmarkName = "DashboardManager"
-            landmarkType = "3">
+            landmarkName = "chatHeartbeat(convSID:toUser:lastActiveAt:completed:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
