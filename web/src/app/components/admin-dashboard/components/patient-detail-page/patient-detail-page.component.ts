@@ -2405,10 +2405,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       menu_id: 4,
       menu_title: 'Reviews',
     },
-    // {
-    //   menu_id:5,
-    //   menu_title:'Chats'
-    // },
+    {
+      menu_id:5,
+      menu_title:'Chats'
+    },
     {
       menu_id: 6,
       menu_title: 'SMS',
