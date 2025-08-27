@@ -7,8 +7,8 @@ import { VAPID_KEY } from '@angular/fire/compat/messaging';
 export const environment = {
   production: false,
   //  host: 'rpm-demo-api.azurewebsites.net',
-  //host: 'cx-preprod-server.azurewebsites.net',
-  host: 'cx-dev-server.azurewebsites.net',
+  host: 'cx-preprod-server.azurewebsites.net',
+  //host: 'cx-dev-server.azurewebsites.net',
   //host: 'rpm-demo-api.azurewebsites.net',
   // host: 'cx-dev-server.azurewebsites.net',
   //host: 'md-preprod-server.azurewebsites.net',

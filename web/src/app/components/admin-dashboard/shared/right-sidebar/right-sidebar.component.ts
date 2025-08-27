@@ -2934,15 +2934,15 @@ export class RightSidebarComponent implements OnInit {
         this.registerDevice.controls.purchaseDate.value;
 
       this.rpmservice.rpm_post('/api/devices/adddevice', req_body).then(
-        (data) => {
+        (data:any) => {
           alert('New Device Added Successfully!!');
           this.registerVendor.reset();
           this.deviceReload();
           this.onClickVendorCancel();
         },
-        (err) => {
+        (err:any) => {
           //show error patient id creation failed
-          alert('Error, could not add Device..!, ' + err);
+          alert(err.error.message);
         }
       );
     } else {

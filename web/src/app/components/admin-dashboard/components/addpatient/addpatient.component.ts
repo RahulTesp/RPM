@@ -402,12 +402,17 @@ export class AddpatientComponent implements OnInit {
   }
 
   getPhysicianList() {
-    if (this.resp) {
+    console.log('this.resp');
+    console.log(this.resp)
+
+     if (this.resp) {
       this.physicianList = this.master_data.PhysicianDetails.filter(
         (phy: { ClinicID: any }) =>
           phy.ClinicID === parseInt(this.resp.OrganizationID)
       );
-    }
+     }
+    console.log('this.physicianList');
+    console.log(this.physicianList)
   }
 
   public get goals() {
@@ -991,7 +996,7 @@ export class AddpatientComponent implements OnInit {
         req_body['PatientId'] = this.pid;
         req_body['PatientProgramId'] = this.PatientPgmId;
         req_body['ProgramId'] = this.programForm.controls.programname.value;
-        req_body['PhysicianId'] = null;
+        req_body['PhysicianId'] = parseInt(this.programForm.controls.physician.value);;
         req_body['ConsultationDate'] = null;
         req_body['CareTeamUserId'] =
           this.programForm.controls.assignedMember.value;
