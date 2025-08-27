@@ -6030,7 +6030,7 @@ namespace RPMWeb.Dal
                         PatientBilldatas.ReadyTobill = 0;
                         return PatientBilldatas;
                     }
-                    else if (StartDateTemp > Today && PatientStartDate.Status.ToLower() == "active")
+                    else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
                     {
                         PatientBilldatas = new PatientBilldata();
                         PatientBilldatas.CPTCode = code.BillingCode;
@@ -6045,14 +6045,14 @@ namespace RPMWeb.Dal
                         DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
                         DateTime endDate = DateTime.UtcNow.Date;
                         DateTime stDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
-
-                        DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+                        DateTime Todayy = DateTime.UtcNow;
+                        DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)Todayy, connectionString);
 
                         // endDate = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
                         //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
                         //the patientbilling table and +1 day will come as next start day.. So we should   
                         // calcualte the start date with respect to the billing threshold
-                        if (stDatetemp > endDatetemp)
+                        if (stDate.Date > endDatetemp)
                         {
                             //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                             BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
