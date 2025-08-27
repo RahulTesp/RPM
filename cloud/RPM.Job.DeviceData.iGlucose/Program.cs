@@ -46,20 +46,16 @@ class Program
             return;
         }
         Thread.Sleep(10000);
-        while (true)
+        try
         {
-            try
-            {
-                TimerDeviceIdCallback();
-                Thread.Sleep(1000);
-                TimerApiCallback();
-                Thread.Sleep(20000);
-            }
-            catch (Exception)
-            {
-            }
+            TimerDeviceIdCallback();
+            Thread.Sleep(1000);
+            TimerApiCallback();
+            Thread.Sleep(20000);
         }
-
+        catch (Exception)
+        {
+        }
     }
     private static void TimerDeviceIdCallback()
     {
@@ -195,10 +191,6 @@ class Program
             if (newenddate <= DateTime.UtcNow)
             {
                 UpdateLastBatch(Deviceid, newenddate);
-            }
-            else
-            {
-                UpdateLastBatch(Deviceid, DateTime.UtcNow);
             }
         }
     }
