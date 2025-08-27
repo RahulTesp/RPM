@@ -108,9 +108,9 @@ namespace RPMWeb.Dal
                         dtstring = dtstring.Replace("-", "");
                         dtstring = dtstring.Replace("/", "");
                         dtstring = dtstring.Replace(":", "");
-                        var cli = containerClient.UploadBlob(filename + "_" + dtstring, stream);
+                        var cli = containerClient.UploadBlob(dtstring + "_" + filename, stream);
                         var uri = containerClient.Uri;
-                        string Uri = uri + "/" + filename + "_" + dtstring;
+                        string Uri = uri + "/" + dtstring + "_" + filename;
 
                         using (SqlConnection connection = new SqlConnection(ConnectionString))
                         {

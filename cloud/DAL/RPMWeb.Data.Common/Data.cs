@@ -589,7 +589,7 @@ namespace RPMWeb.Data.Common
         public int PatientProgramId { get; set; }
         public int ProgramId { get; set; }
         public List<int> VitalIds { get; set; }//ccm change
-        public string? PhysicianId { get; set; }
+        public int PhysicianId { get; set; }
         public string? ConsultationDate { get; set; }
         public int CareTeamUserId { get; set; }
         public string PatientStatus { get; set; }

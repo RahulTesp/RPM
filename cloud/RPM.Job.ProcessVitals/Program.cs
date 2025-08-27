@@ -37,7 +37,8 @@ class Program
 
         Console.WriteLine("WebJob started...");
         await TimerCallback();
-        
+        Thread.Sleep(20000);
+
     }
 
     private static async Task TimerCallback()
