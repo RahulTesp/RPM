@@ -2513,8 +2513,6 @@ export class EditpatientComponent implements OnInit {
           );
         },
         (err:any) => {
-          console.log(err)
-          // this.openDialogWindow('Error',`Device not removed from user assets.`);
           this.showconfirmDialog.showConfirmDialog(
             err.error.Message,
             'Error',

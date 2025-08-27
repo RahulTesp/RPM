@@ -4519,8 +4519,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         (err:any) => {
           this.showDialog = true;
           this.confirmDialog.showConfirmDialog(
-            `Device not removed from user assets`,
             err.error.message,
+            'Error',
             () => {
               null
             },
