@@ -2856,12 +2856,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       }
     );
   }
- addDays(dateStr: string, days: number): string {
-  const date = new Date(dateStr);
-  date.setDate(date.getDate() + days);
-  return date.toISOString().split(".")[0]; // removes milliseconds
-}
-
   retArr: Array<string>;
 
   BillingOverview: any;
