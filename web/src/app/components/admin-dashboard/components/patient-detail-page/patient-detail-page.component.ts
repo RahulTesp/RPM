@@ -2856,7 +2856,11 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       }
     );
   }
-
+ addDays(dateStr: string, days: number): string {
+  const date = new Date(dateStr);
+  date.setDate(date.getDate() + days);
+  return date.toISOString().split(".")[0]; // removes milliseconds
+}
 
   retArr: Array<string>;
 
@@ -2893,13 +2897,19 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
               this.pecentageValue = (x.Completed / x.Total) * 100;
             }
             if (this.pecentageValue >= 100) {
+              //  Cpt 99454
               if (x.CPTCode == '99454') {
                 this.displayText = x.Completed + '/' + x.Total;
                 this.BillingPeriodStart = this.convertDate(
-                  new Date(x.BillingStartDate)
+                  new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
-                this.BillingPeriodEnd = new Date(x.BillingStartDate);
+                console.log('BillingPeriodStart');
+                console.log(this.BillingPeriodStart);
+                this.BillingPeriodEnd = new Date(this.convertToLocalTime(x.BillingStartDate));
+                 console.log('BillingPeriodStart');
+                console.log(this.BillingPeriodStart);
                 if (this.billingtypeVariable == '30days') {
+
                   this.BillingPeriodEnd = this.convertDate(
                     new Date(
                       this.BillingPeriodEnd.setDate(
@@ -2946,9 +2956,15 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                     );
                   }
                 }
+
+
               } else if (x.CPTCode == '99453') {
+
+
                 this.displayText = 'Completed';
               } else if (x.CPTCode == '99457') {
+
+
                 var min = Math.trunc(x.Completed / 60);
                 var seconds = Math.trunc(x.Completed % 60);
                 if (x.Total < 60) {
@@ -2957,6 +2973,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                   this.displayText = min + ':' + seconds + '/' + x.Total / 60;
                 }
               } else if (x.CPTCode == '99458') {
+
                 var min = Math.trunc(x.Completed / 60);
                 var seconds = Math.trunc(x.Completed % 60);
                 if (x.Total < 60) {
@@ -2965,6 +2982,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                   this.displayText = min + ':' + seconds + '/' + x.Total / 60;
                 }
               } else {
+
                 // this.displayText = x.Total +'/'+ x.Total;
                 if (x.CPTCode == '99453' || x.CPTCode == '99454') {
                   this.displayText = x.Completed + '/' + x.Total;
@@ -2976,6 +2994,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
               }
             } else {
               if (x.CPTCode == '99457') {
+
                 var min = Math.trunc(x.Completed / 60);
                 var seconds = Math.trunc(x.Completed % 60);
                 if (x.Total < 60) {
@@ -2984,6 +3003,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                   this.displayText = min + ':' + seconds + '/' + x.Total / 60;
                 }
               } else if (x.CPTCode == '99458') {
+
                 var min = Math.trunc(x.Completed / 60);
                 var seconds = Math.trunc(x.Completed % 60);
                 if (x.Total < 60) {
@@ -2992,23 +3012,26 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                   this.displayText = min + ':' + seconds + '/' + x.Total / 60;
                 }
               } else {
+
                 if (x.CPTCode == '99453' || x.CPTCode == '99454') {
                   this.displayText = x.Completed + '/' + x.Total;
                 } else if (x.Total == null) {
+
                   // New Code 12/05/2023
                   var min = Math.trunc(x.Completed / 60);
                   var seconds = Math.trunc(x.Completed % 60);
                   this.displayText = min + ':' + seconds;
                 } else {
+
                   var min = Math.trunc(x.Completed / 60);
                   var seconds = Math.trunc(x.Completed % 60);
                   this.displayText = min + ':' + seconds + '/' + x.Total / 60;
                 }
 
                 this.BillingPeriodStart = this.convertDate(
-                  new Date(x.BillingStartDate)
+                  new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
-                this.BillingPeriodEnd = new Date(x.BillingStartDate);
+                this.BillingPeriodEnd = new Date(this.BillingPeriodStart);
                 if (this.billingtypeVariable == '30days') {
                   this.BillingPeriodEnd = this.convertDate(
                     new Date(
