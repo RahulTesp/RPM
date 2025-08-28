@@ -97,16 +97,22 @@ export class PatientDataDetailsService {
     sessionStorage.removeItem('viatls');
   }
 
-  private convertToISODate(date: Date | number): string {
-    if (typeof date === 'number') date = new Date(date);
-    return date.toISOString().split('T')[0];
-  }
-  private formatDateForQuery(date: any, isEndDate = false): string {
-    const formattedDate =
-      this.convertToISODate(date) + (isEndDate ? 'T23:59:59' : 'T00:00:00');
-    return this.auth.ConvertToUTCRangeInput(new Date(formattedDate));
-  }
+private convertToISODate(date: Date | number): string {
+  if (typeof date === 'number') date = new Date(date);
 
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`; // stays in local time
+}
+private formatDateForQuery(date: any, isEndDate = false): string {
+  const formattedDate =
+    this.convertToISODate(new Date(date)) + (isEndDate ? 'T23:59:59' : 'T00:00:00');
+
+  // return directly to keep local time fixed
+  return formattedDate;
+}
   async getVitalReading(
     patientId: string,
     programId: string,
@@ -115,6 +121,8 @@ export class PatientDataDetailsService {
   ) {
     const start = this.formatDateForQuery(startDate || this.ThirtyDaysAgo);
     const end = this.formatDateForQuery(endDate || this.today, true);
+
+ console.log(start)
     const url = `/api/patient/getpatientvitalreadingsv1?PatientId=${patientId}&PatientProgramId=${programId}&StartDate=${start}&EndDate=${end}`;
     try {
       const data = (await this.rpmService.rpm_get(url)) as any;
