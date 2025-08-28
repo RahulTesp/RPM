@@ -766,10 +766,15 @@ export class EditpatientComponent implements OnInit {
           'MMM/dd/yyyy'
         );
 
-        that.programForm.controls['consultdate'].setValue(
-          this.convertDate(consultDateData)
-        );
-
+        // that.programForm.controls['consultdate'].setValue(
+        //   this.convertDate(consultDateData)
+        // );
+          this.programForm.patchValue({
+          consultdate: consultDateData &&
+                      consultDateData !== '1/1/1970 12:00:00 AM'
+            ? this.convertDate(consultDateData)
+            : null
+        });
         var prescribeDateData = this.datepipe.transform(
           this.convertToLocalTime(
             that.Patientdata.PatientPrescribtionDetails.PrescribedDate
@@ -2333,10 +2338,10 @@ export class EditpatientComponent implements OnInit {
       };
 
       this.rpm.rpm_post('/api/device/account/create/iglucose', req_body).then(
-        (data) => {
+        (data:any) => {
           // this.openDialogWindow('Success', `Device Added Successfully!!!`);
           this.showconfirmDialog.showConfirmDialog(
-            'Device Added Successfully!!!',
+            data.Message,
             'Success',
             () => {
               this.ReloadDeviceList(1);
@@ -2351,10 +2356,10 @@ export class EditpatientComponent implements OnInit {
           );
         },
         (err:any) => {
-          console.log(err)
+          console.log(err.error.Message)
           // this.openDialogWindow('Error', `Device not added to user assets!!!`);
           this.showconfirmDialog.showConfirmDialog(
-            'Device not added to user assets!!!',
+            err.error.Message,
             'Error',
             () => {
               this.ReloadDeviceList(1);
@@ -2381,22 +2386,23 @@ export class EditpatientComponent implements OnInit {
       };
 
       this.rpm.rpm_post('/api/device/updatedevicestatus', req_body).then(
-        (data) => {
+        (data:any) => {
           this.showconfirmDialog.showConfirmDialog(
-            'Device Error Updated Successfully.',
+            data.message,
             'Success',
             () => {
               this.ReloadDeviceList(1);
               this.ReloadDeviceList(2);
               this.ReloadDeviceList(3);
               this.ReloadDeviceList(4);
+              this.UpdatePatient_Device(this.pid, this.patientprogramid);
             },
             false
           );
         },
-        (err) => {
+        (err:any) => {
           this.showconfirmDialog.showConfirmDialog(
-            'Failed to Update Device Error',
+            err.error.message,
             'Error',
             () => {
               this.ReloadDeviceList(1);
@@ -2429,7 +2435,7 @@ export class EditpatientComponent implements OnInit {
       };
 
       this.rpm.rpm_post('/api/device/removedevice/iglucose', req_body).then(
-        (data) => {
+        (data:any) => {
           console.log('Remove Device');
           console.log(data)
           if (!this.ErrorFlag) {
@@ -2448,13 +2454,15 @@ export class EditpatientComponent implements OnInit {
           this.ReloadDeviceList(2);
           this.ReloadDeviceList(3);
           this.ReloadDeviceList(4);
+          this.UpdatePatient_Device(this.pid, this.patientprogramid);
+
           //show success popup patient is updated
         },
-        (err) => {
+        (err:any) => {
+
           if (!this.ErrorFlag) {
             this.showconfirmDialog.showConfirmDialog(
-              'Device not removed from user assets.',
-              'Error',
+              err.error.Message,'Error' ,
               () => {
                 this.ErrorFlag = false;
               },
@@ -2489,7 +2497,6 @@ export class EditpatientComponent implements OnInit {
 
       this.rpm.rpm_post('/api/device/resetdevice', req_body).then(
         (data) => {
-          console.log(data)
           // this.openDialogWindow('Success', `Device Removed Successfully.`);
           this.showconfirmDialog.showConfirmDialog(
             'Device Removed Successfully.',
@@ -2499,15 +2506,15 @@ export class EditpatientComponent implements OnInit {
               this.ReloadDeviceList(2);
               this.ReloadDeviceList(3);
               this.ReloadDeviceList(4);
+              this.UpdatePatient_Device(this.pid, this.patientprogramid);
+
             },
             false
           );
         },
-        (err) => {
-          console.log(err)
-          // this.openDialogWindow('Error',`Device not removed from user assets.`);
+        (err:any) => {
           this.showconfirmDialog.showConfirmDialog(
-            'Device not removed from user assets.',
+            err.error.Message,
             'Error',
             () => {
               this.ReloadDeviceList(1);
@@ -2541,10 +2548,10 @@ export class EditpatientComponent implements OnInit {
           );
           //show success popup patient is updated
         },
-        (err) => {
+        (err:any) => {
           // this.openDialogWindow('Error', `Device Test Failed.`);
           this.showconfirmDialog.showConfirmDialog(
-            'Device Test Failed.',
+            err.error.message,
             'Error',
             () => {
             },
@@ -2807,22 +2814,23 @@ export class EditpatientComponent implements OnInit {
     //this.submitImage(this.pid);
   }
   submitImage(pid: any) {
+    console.log(this.image)
     const myPhoto = uuid.v4();
     var formData: any = new FormData();
     formData.append(myPhoto, this.image);
     var that = this;
-    this.rpm.rpm_post(`/api/patient/addimage?PatientId=${pid}`, formData).then(
+    if(this.image)
+    {
+      this.rpm.rpm_post(`/api/patient/addimage?PatientId=${pid}`, formData).then(
       (data) => {
         that.UpdatePatient_Image(this.pid, this.patientprogramid);
-        // that.PatientInfoForm.controls['clinicname'].setValue(
-        //   this.cname.toString(),
-        //   { onlySelf: true }
-        // );
       },
       (err:any) => {
         alert(err.error.message);
       }
     );
+    }
+
   }
 
   downloadFile(FileName: any) {

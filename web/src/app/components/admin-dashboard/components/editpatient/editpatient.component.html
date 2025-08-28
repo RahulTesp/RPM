@@ -1252,7 +1252,7 @@
                   class="goals_note_container"
                   *ngFor="let goal of Goals_Selected; let i = index"
                 >
-                  <form class="goal_list" [name]="i">
+                  <div class="goal_list" >
                     <div>
                       <div class="note_dropdown">
                         <div class="userInfoItem" style="width: 48%">
@@ -1280,13 +1280,13 @@
                       </mat-form-field> -->
                       <textarea
                         class="goal_description noteTextArea"
-                        formControlName="additionalnotes"
                         id="addPatientAdditionalNotes"
                         [(ngModel)]="goal.Description"
+                        [ngModelOptions]="{ standalone: true }"
                         maxlength="500"
                       ></textarea>
                     </div>
-                  </form>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2846,14 +2846,14 @@
         <div class="button">
           <button
             id="editfailCancelOk"
-            class="edit_cancel"
+            class="btn_cancel"
             [mat-dialog-close]="true"
           >
             CANCEL
           </button>
           <button
             id="editfailConfirmOk"
-            class="edit_save"
+            class="btn_save"
             (click)="redirect_patient()"
           >
             OK

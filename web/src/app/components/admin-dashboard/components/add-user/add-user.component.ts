@@ -216,6 +216,7 @@ export class AddUserComponent implements OnInit {
           //   this.router.navigate([route], { queryParams: { page: 2 } });
           //   this.resetAddPateintMasterData();
           //   this.userVerifyCompleted = false;
+          this.submitImage(this.put_user_id);
           this.confirmDialog.showConfirmDialog(
             'User Details Updated Successfully!!',
             'Success',
@@ -223,7 +224,6 @@ export class AddUserComponent implements OnInit {
               this.router.navigate(['/admin/admin'], { queryParams: { page: 2 } });
               this.resetAddPateintMasterData();
               this.userVerifyCompleted = false;
-              this.submitImage(that.userId);
             },
             false
           );
@@ -377,6 +377,7 @@ export class AddUserComponent implements OnInit {
           this.stateVariable = this.http_user_data.StateId;
           this.cityVariable = this.http_user_data.CityId;
           this.imagePath = this.http_user_data.Picture;
+          this.imagePath = encodeURI(this.imagePath)
 
         });
     }
