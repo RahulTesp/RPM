@@ -1,14 +1,14 @@
-// .activity_chatInfo_panel {
-//   margin-left: 2rem;;
-//   background-color: #164d61;
-//   padding: 0.5rem;
+.activity_chatInfo_panel {
+  margin-left: 2rem;;
+  background-color: #164d61;
+  padding: 0.5rem;
 
-//   height: 450px;
-//   padding: 1.2rem;
-//   min-width: 200px;
-//   overflow-y: scroll;
-//   position: relative;
-//}
+  height: 450px;
+  padding: 1.2rem;
+  min-width: 200px;
+  overflow-y: scroll;
+  position: relative;
+}
 .activity_chatInfo_panel1
 {
   background-color: #edeff5;
@@ -31,7 +31,10 @@
 }
 .chaticon {
   width: 1.25rem;
-  height: 1.25rem;
+  top: 0.5rem;
+  z-index: -1;
+
+  border: 1px solid #e1e6ed;
 }
 .incoming_msg {
   display: flex;
@@ -142,7 +145,7 @@ li + li {
   top: 0.5rem;
   z-index: -1;
 
-  border: 1px solid #e1e6ed;
+  border: 1px solid #cff4f5;
 }
 .timeblock::after {
   content: "";
@@ -190,7 +193,6 @@ li + li {
       width: 100%;
 			max-height: 350px;
 			overflow-y: auto;
-     // background-color: #164d61;
 			//max-height: calc(100vh - 50px);
 		}
 ::-webkit-scrollbar-track {

@@ -347,13 +347,13 @@ export class AddpatientComponent implements OnInit {
       emergencycontact1: new FormControl(''),
       emergencycontact2: new FormControl(null),
       relation1: new FormControl(null),
-      relation1_mobile: new FormControl('', [
+      relation1_mobile: new FormControl(null, [
         Validators.pattern('^[0-9]*$'),
         Validators.minLength(10),
         Validators.maxLength(10),
       ]),
       relation2: new FormControl(null),
-      relation2_mobile: new FormControl('', [
+      relation2_mobile: new FormControl(null, [
         Validators.pattern('^[0-9]*$'),
         Validators.minLength(10),
         Validators.maxLength(10),
@@ -402,17 +402,12 @@ export class AddpatientComponent implements OnInit {
   }
 
   getPhysicianList() {
-    console.log('this.resp');
-    console.log(this.resp)
-
      if (this.resp) {
       this.physicianList = this.master_data.PhysicianDetails.filter(
         (phy: { ClinicID: any }) =>
           phy.ClinicID === parseInt(this.resp.OrganizationID)
       );
      }
-    console.log('this.physicianList');
-    console.log(this.physicianList)
   }
 
   public get goals() {
@@ -761,6 +756,7 @@ export class AddpatientComponent implements OnInit {
   }
   resp: any;
   GetDraftedPatientInfo(PatientId: any, page: number) {
+    console.log('Draft Patient Info')
     //call on clicking on one patient row in the draft list, pass patient id from table to get the info
     var that = this;
     this.pid = PatientId;
@@ -991,12 +987,19 @@ export class AddpatientComponent implements OnInit {
     }
 
     if (this.newProgramVariable) {
+      console.log(this.programForm.valid);
+      console.log(this.PatientInfoForm.valid);
       if (this.programForm.valid && this.PatientInfoForm.valid) {
         this.loading = true;
         req_body['PatientId'] = this.pid;
         req_body['PatientProgramId'] = this.PatientPgmId;
         req_body['ProgramId'] = this.programForm.controls.programname.value;
-        req_body['PhysicianId'] = parseInt(this.programForm.controls.physician.value);;
+         if(this.programForm.controls.physician.value == null){
+          req_body['PhysicianId'] = 0;
+        }
+        else{
+          req_body['PhysicianId'] = parseInt(this.programForm.controls.physician.value);
+        }
         req_body['ConsultationDate'] = null;
         req_body['CareTeamUserId'] =
           this.programForm.controls.assignedMember.value;
@@ -1373,6 +1376,7 @@ export class AddpatientComponent implements OnInit {
   }
   http_rpm_patientList: any;
   http_ProgramData: any;
+  newProgramClinicCode:any;
   getPatientDetails(patientId: any, pgmId: any) {
     var that = this;
 
@@ -1452,6 +1456,11 @@ export class AddpatientComponent implements OnInit {
         this.PatientInfoForm.controls['relation1'].setValue(
           this.http_rpm_patientList.Contact1RelationName
         );
+        const isValidPhone1 = /^[0-9]{10}$/.test(this.http_rpm_patientList.Contact1Phone);
+         if(!isValidPhone1)
+         {
+           this.http_rpm_patientList.Contact2Phone = null;
+         }
         this.PatientInfoForm.controls['relation1_mobile'].setValue(
           this.http_rpm_patientList.Contact1Phone
         );
@@ -1461,9 +1470,15 @@ export class AddpatientComponent implements OnInit {
         this.PatientInfoForm.controls['relation2'].setValue(
           this.http_rpm_patientList.Contact2RelationName
         );
+         const isValidPhone = /^[0-9]{10}$/.test(this.http_rpm_patientList.Contact2Phone);
+         if(!isValidPhone)
+         {
+           this.http_rpm_patientList.Contact2Phone = null;
+         }
         this.PatientInfoForm.controls['relation2_mobile'].setValue(
-          this.http_rpm_patientList.Contact2Phone
+        this.http_rpm_patientList.Contact2Phone
         );
+
         this.PatientInfoForm.controls['calltime'].setValue(
           this.http_rpm_patientList.CallTime
         );
@@ -1505,26 +1520,31 @@ export class AddpatientComponent implements OnInit {
           this.http_rpm_patientList.OrganizationID,
           { onlySelf: true }
         );
-        this.getPhysicianList();
         that.programForm.controls['clinic'].setValue(PatientProgramData.Clinic);
+        var ClinicCode = null;
+        if(that.Clinic_Selected[0])
+        {
+         ClinicCode = that.Clinic_Selected[0].ClinicCode;
 
-        // that.Clinic_Selected = that.master_data.ClinicDetails.filter(
-        //   (clinic: { ClinicName: any }) => clinic.ClinicName === PatientProgramData.Clinic
-        // );
-
-        var ClinicCode = that.Clinic_Selected[0].ClinicCode;
+        }else{
+          ClinicCode = PatientProgramData.ClinicCode;
+        }
         that.programForm.controls['cliniccode'].setValue(ClinicCode);
+        const selectedPhysician = PatientProgramData.PhysicianId;
+        const match = this.master_data.PhysicianDetails.find(
+            (p: { UserId: any }) =>
+              p.UserId === selectedPhysician
+          );
+            if (match) {
+                this.programForm.controls['physician'].setValue(match.UserId);
+                const clinicId = match.ClinicID;
+                this.physicianList = this.master_data.PhysicianDetails.filter(
+                  (phy: { ClinicID: number }) => phy.ClinicID === clinicId
+                );
+              }
 
-        // that.programForm.controls['cliniccode'].setValue(
-        //  this.http_rpm_patientList.ClinicCode
-        // );
-
-        that.programForm.controls['physician'].setValue(
-          PatientProgramData.Physician
-        );
       });
   }
-
   heightFeetArray = [
     {
       id: 0,

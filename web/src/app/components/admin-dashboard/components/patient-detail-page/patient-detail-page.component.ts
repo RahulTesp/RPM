@@ -3599,7 +3599,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
   Billing_ConvertDate(dateval: string): string {
     if (!dateval) return '';
-
+     console.log(dateval)
     const months = [
       'Jan',
       'Feb',
