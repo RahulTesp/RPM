@@ -3,8 +3,12 @@ package com.rpm.clynx.fragments;
 import static android.content.Context.MODE_PRIVATE;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -355,23 +359,65 @@ public class ToDoListFragment extends Fragment  {
        curIndex =day;
        changeColour(day);
 
-       curDay.setText(getFormattedText(dayCompleteList.get(day-1)));
+       Date todayDate = dayCompleteList.get(day - 1);
+       String formattedText = getFormattedText(todayDate);
+
+// Check if this date is today
+       Calendar todayCal = Calendar.getInstance();
+       Calendar selectedCal = Calendar.getInstance();
+       selectedCal.setTime(todayDate);
+
+       if (todayCal.get(Calendar.YEAR) == selectedCal.get(Calendar.YEAR)
+               && todayCal.get(Calendar.DAY_OF_YEAR) == selectedCal.get(Calendar.DAY_OF_YEAR)) {
+
+           // Today → make only "TODAY -" bold
+           String todayPrefix = "TODAY - ";
+           String displayText = todayPrefix + formattedText;
+           SpannableString spannable = new SpannableString(displayText);
+           spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, todayPrefix.length(),
+                   Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+           curDay.setText(spannable);
+
+       } else {
+           curDay.setText(formattedText);
+
+       }
+
+
        Log.d("day56",dayCompleteList.toString());
    }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
+
     private void changeData(int index) throws ParseException {
-        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
-        curDay.setText(getFormattedText(dayCompleteList.get(index-1)));
-        Log.d("tododf", String.valueOf(df));
-        Log.d("tododatevl", String.valueOf(dayCompleteList.get(index-1)));
-        Log.d("todoformattedtxt",getFormattedText(dayCompleteList.get(index-1)));
-        Log.d("todoFornattedy",getFornattedDay(dayCompleteList.get(index-1)));
+        Date selectedDate = dayCompleteList.get(index - 1);
+        String formattedText = getFormattedText(selectedDate);
+
+        // Check if selectedDate is today
+        Calendar todayCal = Calendar.getInstance();
+        Calendar selectedCal = Calendar.getInstance();
+        selectedCal.setTime(selectedDate);
+
+        if (todayCal.get(Calendar.YEAR) == selectedCal.get(Calendar.YEAR)
+                && todayCal.get(Calendar.DAY_OF_YEAR) == selectedCal.get(Calendar.DAY_OF_YEAR)) {
+
+            // Today → make only "TODAY -" bold
+            String todayPrefix = "TODAY - ";
+            String displayText = todayPrefix + formattedText;
+            SpannableString spannable = new SpannableString(displayText);
+            spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, todayPrefix.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            curDay.setText(spannable);
+        } else {
+            curDay.setText(formattedText);
+
+        }
+
         SimpleDateFormat inputFormat = new SimpleDateFormat("EEEE, MMM d, yyyy", Locale.US);
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         try {
-            Date date = inputFormat.parse(getFormattedText(dayCompleteList.get(index-1)));
+            Date date = inputFormat.parse(formattedText);
             formattedDate = outputFormat.format(date);
             System.out.println("FormattedDate:" + formattedDate);
         } catch (ParseException e) {
@@ -380,6 +426,7 @@ public class ToDoListFragment extends Fragment  {
 
         checkToDoListItems(formattedDate);
     }
+
     private void removeColour(int index) {
         listOfTextView.get(curIndex).setBackground(null);
         listOfTextView.get(curIndex).setTextColor(ContextCompat.getColor(getActivity(), R.color.todolist_color1));

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background1"
- >
+    >
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -45,42 +45,42 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
         app:layout_constraintVertical_bias="1.0">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/myinfo_tablayout"
-        style="@style/RoundedTabLayoutStyle"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:background="@color/background_grey1"
-        app:layout_constraintCircleRadius="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.476"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintVertical_bias="1.0"
-        app:tabPaddingStart="1dp"
-        app:tabPaddingEnd="1dp"
-        app:tabTextAppearance="@style/CustomTextAppearanceTab"
-        app:tabBackground="@drawable/tab_layout_bg">
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/myinfo_tablayout"
+            style="@style/RoundedTabLayoutStyle"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:background="@color/background_grey1"
+            app:layout_constraintCircleRadius="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.476"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            app:layout_constraintVertical_bias="1.0"
+            app:tabPaddingStart="1dp"
+            app:tabPaddingEnd="1dp"
+            app:tabTextAppearance="@style/CustomTextAppearanceTab"
+            app:tabBackground="@drawable/tab_layout_bg">
 
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:text="Personal" />
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="Personal" />
 
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:text="Communication" />
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="Communication" />
 
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:text="Preference" />
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="Preference" />
 
-    </com.google.android.material.tabs.TabLayout>
+        </com.google.android.material.tabs.TabLayout>
 
     </androidx.cardview.widget.CardView>
 

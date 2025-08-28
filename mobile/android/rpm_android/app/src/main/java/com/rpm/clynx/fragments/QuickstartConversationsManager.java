@@ -85,7 +85,7 @@ class QuickstartConversationsManager extends  AppCompatActivity {
     // This is the unique name of the conversation  we are using
     private static String CONVERSATION_SID = "";
     private static String Patent_Id;
-    private String savedUserName, lastMessageText;
+    private String savedUserName, PatientId, lastMessageText;
     final private ArrayList<Message> messages = new ArrayList<>();
     private ConversationsClient conversationsClient;
     public Conversation conversation;
@@ -521,35 +521,6 @@ class QuickstartConversationsManager extends  AppCompatActivity {
         };
 
 
-//        StringRequest stringRequest = new StringRequest(
-//                Request.Method.POST,
-//                API_URL,
-//                response -> {
-//                    Log.d("NotifyConversationStatus", "Response: " + response); // even if empty
-//                    FileLogger.d("NotifyConversationStatus", "Response: " + response);
-//                },
-//                error -> {
-//                    Log.e("NotifyConversationStatus", "Error: " + error.toString());
-//                }
-//        ) {
-//            @Override
-//            public byte[] getBody() throws AuthFailureError {
-//                return jsonBody.toString().getBytes();
-//            }
-//
-//            @Override
-//            public String getBodyContentType() {
-//                return "application/json";
-//            }
-//
-//            @Override
-//            public Map<String, String> getHeaders() throws AuthFailureError {
-//                Map<String, String> headers = new HashMap<>();
-//                headers.put("Bearer", token);
-//                return headers;
-//            }
-//        };
-
         // Creating a request queue and adding the request to the queue
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, -1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
@@ -747,6 +718,61 @@ class QuickstartConversationsManager extends  AppCompatActivity {
         return null;
     }
 
+    public void updateChatMetaData(ConversationsClient client, List<Chat> chatList, ChatListAdapter adapter) {
+        if (chatList == null || chatList.isEmpty()) {
+            Log.d("updateChatMetaData", "No chats loaded yet, skipping update.");
+            return;
+        }
+
+        for (Chat chatModel : chatList) {
+            Conversation conversation = chatModel.getConversation();
+            if (conversation == null) continue;
+
+            // Update unread count
+            conversation.getUnreadMessagesCount(new CallbackListener<Long>() {
+                @Override
+                public void onSuccess(Long unreadMsgCount) {
+                    chatModel.setUnreadCount(unreadMsgCount != null ? Math.toIntExact(unreadMsgCount) : 0);
+                    refreshChatUI(chatList, adapter);
+                }
+
+                @Override
+                public void onError(ErrorInfo errorInfo) {
+                    chatModel.setUnreadCount(0);
+                    refreshChatUI(chatList, adapter);
+                }
+            });
+
+            // Update last message
+            conversation.getLastMessages(1, new CallbackListener<List<Message>>() {
+                @Override
+                public void onSuccess(List<Message> messages) {
+                    if (!messages.isEmpty()) {
+                        Message lastMessage = messages.get(0);
+                        Date lastMsgDate = lastMessage.getDateCreatedAsDate();
+                        chatModel.setTimeStampMillis(lastMsgDate != null ? lastMsgDate.getTime() : System.currentTimeMillis());
+                        chatModel.setTimeStamp(lastMsgDate != null
+                                ? TimeFormatter.formatTimestampFromLog(lastMsgDate.toString())
+                                : "Just Now");
+                        chatModel.setLastMsgText(lastMessage.getBody());
+                    }
+                    refreshChatUI(chatList, adapter);
+                }
+
+                @Override
+                public void onError(ErrorInfo errorInfo) {
+                    chatModel.setTimeStampMillis(System.currentTimeMillis());
+                    refreshChatUI(chatList, adapter);
+                }
+            });
+        }
+    }
+
+    private void refreshChatUI(List<Chat> chatList, ChatListAdapter adapter) {
+        Collections.sort(chatList, (c1, c2) -> Long.compare(c2.getTimestampMillis(), c1.getTimestampMillis()));
+        new Handler(Looper.getMainLooper()).post(() -> adapter.notifyDataSetChanged());
+    }
+
     public void loadAllConversations(ConversationsClient conversationsClient, Context contx, RecyclerView chatRs, ChatListAdapter chatListAdapter, List<Chat> chatList, ProgressBar progressBar, boolean isChatLoad, String PatientId) {
         this.chatRs = chatRs;
         this.chatListAdapter = chatListAdapter;
@@ -778,60 +804,111 @@ class QuickstartConversationsManager extends  AppCompatActivity {
             Log.d("conversationList", "Total conversations fetched: " + conversationList.size());
             Log.d("conversationListfull", "conversationListfull " + conversationList);
             for (Conversation conversation : conversationList) {
+
+                Log.d("ConvStatusCheck", "Conversation SID: " + conversation.getSid() +
+                        " | FriendlyName: " + conversation.getFriendlyName() +
+                        " | SyncStatus: " + conversation.getSynchronizationStatus());
+
                 // Remove existing listeners before adding a new one
                 conversation.removeAllListeners();
                 // Fetch unread messages initially
+                if (conversation.getSynchronizationStatus() == Conversation.SynchronizationStatus.ALL) {
+                    Log.d("ConvStatusCheck", " Processing conversation: " + conversation.getSid());
                 conversation.getUnreadMessagesCount(new CallbackListener<Long>() {
                     @Override
                     public void onSuccess(Long unreadMsgCount) {
                         Log.d("unreadMsgCountloadAllConversations", String.valueOf(unreadMsgCount));
-                        if (unreadMsgCount == null) {
-                            unreadMsgCount = 0L; // Default value
-                            Log.d("unreadMsgCountloadAllConversations1", String.valueOf(unreadMsgCount));
-                        }
-                        handleInitialUnreadMessages(conversation, unreadMsgCount, contx, chatRs);
-                        progressBarChat.setVisibility(View.GONE);
-                    }
-
-                    @Override
-                    public void onError(ErrorInfo errorInfo) {
-                        Log.d("Error fetching unread count", errorInfo.toString());
-                    }
-                });
-
-                // Add a listener for message updates
-                conversation.addListener(new ConversationListener() {
-                    @Override
-                    public void onMessageAdded(Message message) {
-                        Log.d("TwilioChatMain", "New message received: " + message.getBody());
-                        Log.d("DashonMessageAdded", "DashonMessageAdded");
-                        String sender = message.getAuthor();
-                        String loggedInUser = conversationsClient.getMyIdentity();
-                        Log.d("sender", sender);
-                        Log.d("loggedInUser", loggedInUser);
-                        Log.d("Patent_Id", PatientId);
-                        updateLastMessageUI(conversation, message); // Update UI with the new message
-
-                        // Only update unread count if the sender is NOT the logged-in user
-                        if (!loggedInUser.equals(sender) && !PatientId.equals(sender)) {
-                            Log.d("MESSAGESEND", "MESSAGESEND");
-                            // Fetch the unread count and update UI
-                            conversation.getUnreadMessagesCount(new CallbackListener<Long>() {
+                        if (unreadMsgCount != null) {
+                            // Use unread count as is (including 0)
+                            Log.d("unreadMsgCount", "From SDK: " + unreadMsgCount);
+                            handleInitialUnreadMessages(conversation, unreadMsgCount, contx, chatRs);
+                        } else {
+                            // unreadMsgCount is null → fallback to total message count
+                            conversation.getLastMessages(1, new CallbackListener<List<Message>>() {
                                 @Override
-                                public void onSuccess(Long unreadMsgCount) {
-                                    Log.d("unreadMsgCountonMessageAdded", String.valueOf(unreadMsgCount));
-                                    if (unreadMsgCount == null || unreadMsgCount == 0) {
-                                        unreadMsgCount = 1L; // Ensure the first message gets counted
-                                        Log.d("unreadMsgCountonMessageAdded1", String.valueOf(unreadMsgCount));
+                                public void onSuccess(List<Message> messages) {
+                                    if (!messages.isEmpty()) {
+                                        Message lastMessage = messages.get(0);
+                                        long totalMessagesCount = lastMessage.getMessageIndex() + 1; // zero-based index +1
+                                        Log.d("FallbackUnread", "Unread count fallback to total messages: " + totalMessagesCount);
+                                        handleInitialUnreadMessages(conversation, totalMessagesCount, contx, chatRs);
+                                    } else {
+                                        Log.d("FallbackUnread", "No messages found, unread count = 0");
+                                        handleInitialUnreadMessages(conversation, 0L, contx, chatRs);
                                     }
-                                    handleUnreadMessages(conversation, unreadMsgCount, contx, chatRs, sender);
                                 }
 
                                 @Override
                                 public void onError(ErrorInfo errorInfo) {
-                                    Log.d("Error fetching unread count", errorInfo.toString());
+                                    Log.e("FallbackUnreadError", "Error fetching last message: " + errorInfo.toString());
+                                    // Conservative fallback
+                                    handleInitialUnreadMessages(conversation, 1L, contx, chatRs);
                                 }
                             });
+                        }
+                    }
+
+                    @Override
+                    public void onError(ErrorInfo errorInfo) {
+                        Log.e("UnreadCountError", "Error fetching unread count: " + errorInfo.toString());
+                        // Conservative fallback
+                        handleInitialUnreadMessages(conversation, 1L, contx, chatRs);
+                    }
+                });
+            }
+
+                else {
+                    Log.d("ConvStatusCheck", " Skipping conversation (not synced yet): " + conversation.getSid());
+                }
+
+                // Add a listener for message updates
+                conversation.addListener(new ConversationListener() {
+                    @Override
+
+                    public void onMessageAdded(Message message) {
+                        Log.d("TwilioChatMain", "New message received: " + message.getBody());
+                        String sender = message.getAuthor();
+                        String loggedInUser = conversationsClient.getMyIdentity();
+
+                        updateLastMessageUI(conversation, message); // updates current chat screen
+
+                        if (!loggedInUser.equals(sender) && !PatientId.equals(sender)) {
+                            //  Incoming message → update unread count
+                            conversation.getUnreadMessagesCount(new CallbackListener<Long>() {
+                                @Override
+                                public void onSuccess(Long unreadMsgCount) {
+                                    long count = unreadMsgCount != null ? unreadMsgCount : 0L;
+                                    handleUnreadMessages(conversation, count, contx, chatRs, sender);
+                                }
+
+                                @Override
+                                public void onError(ErrorInfo errorInfo) {
+                                    handleUnreadMessages(conversation, 1L, contx, chatRs, sender);
+                                }
+                            });
+                        } else {
+                            //  Outgoing message → update chat list (last message + timestamp) + sort
+                            Log.d("OutgoingUpdate", "Updating chat list for my sent message");
+
+                            long timestamp = message.getDateCreatedAsDate() != null
+                                    ? message.getDateCreatedAsDate().getTime()
+                                    : System.currentTimeMillis();
+
+                            String formattedTime = message.getDateCreatedAsDate() != null
+                                    ? TimeFormatter.formatTimestampFromLog(message.getDateCreatedAsDate().toString())
+                                    : "Just Now";
+
+                            updateChatList(
+                                    loggedInUser,                       // friendly username
+                                    conversation.getFriendlyName(),     // friendly name
+                                    formattedTime,
+                                    0,                                  // unread = 0 for own messages
+                                    timestamp,
+                                    contx,
+                                    conversation.getSid(),
+                                    message.getBody(),
+                                    conversation
+                            );
                         }
                     }
 
@@ -1058,24 +1135,29 @@ class QuickstartConversationsManager extends  AppCompatActivity {
             public void onSuccess(List<Message> messages) {
                 String lastMessageText = (!messages.isEmpty()) ? messages.get(0).getBody() : "";
 
-                updateChatList(friendlyUserName, friendlyName, formattedTime, unreadMessages, timestamp, context, convSid, lastMessageText);
+                updateChatList(friendlyUserName, friendlyName, formattedTime, unreadMessages, timestamp, context, convSid, lastMessageText,conversation);
             }
 
             @Override
             public void onError(ErrorInfo errorInfo) {
                 Log.e("LastMessageError", "Failed to fetch last message: " + errorInfo);
-                updateChatList(friendlyUserName, friendlyName, formattedTime, unreadMessages, timestamp, context, convSid, "");
+                updateChatList(friendlyUserName, friendlyName, formattedTime, unreadMessages, timestamp, context, convSid, "", conversation);
             }
         });
     }
 
-    private void updateChatList(String friendlyUserName,String friendlyName, String formattedTime, int unreadMessages, long timestamp, Context context, String sid, String lastMessageText) {
+    private void updateChatList(String friendlyUserName,String friendlyName, String formattedTime, int unreadMessages, long timestamp, Context context, String sid, String lastMessageText, Conversation conversation) {
         boolean chatUpdated = false;
         Log.d("updateChatList1","updateChatList1");
+
+        Log.d("ChatCheck", "Adding conversation to list: " + conversation.getFriendlyName() + " | SID: " + conversation.getSid());
+        Log.d("ChatCheck", "Current chatList size: " + chatList.size());
+
+
         for (Chat chat : chatList) {
-            if (chat.getChatMemberName().equals(friendlyName)) {
-                chat.setUnreadCount(unreadMessages); // Update unread count
-                chat.setTimeStamp(formattedTime); // Update time
+            if (chat.getSID().equals(sid)) {  // Use SID to uniquely identify a conversation
+                chat.setUnreadCount(unreadMessages);
+                chat.setTimeStamp(formattedTime);
                 chat.setSID(sid);
                 chat.setTimeStampMillis(timestamp);
                 chat.setFriendlyUsername(friendlyUserName);
@@ -1084,11 +1166,12 @@ class QuickstartConversationsManager extends  AppCompatActivity {
                 break;
             }
         }
+
         Log.d("chatListONMAIN", String.valueOf(chatList.size()));
         Log.d("chatListONMAIN", String.valueOf(chatList));
         if (!chatUpdated) {
             // Add new chat entry if not found
-            chatList.add(new Chat(friendlyUserName,friendlyName, formattedTime, unreadMessages, timestamp,false, lastMessageText, sid));
+            chatList.add(new Chat(friendlyUserName,friendlyName, formattedTime, unreadMessages, timestamp,false, lastMessageText, sid, conversation));
             Log.d("AddedtoChatModel", friendlyName + formattedTime + unreadMessages + timestamp+ lastMessageText );
         }
 
@@ -1143,22 +1226,22 @@ class QuickstartConversationsManager extends  AppCompatActivity {
                 String loggedInUser = conversationsClient.getMyIdentity();
 
                 for (Chat chat : chatList) {
-                    if (chat.getChatMemberName().equals(friendlyName)) {
-                        Log.d("sender", sender != null ? sender : "null");
-                        Log.d("loggedInUser", loggedInUser);
+                    Log.d("CheckSIDs", "Chat: " + chat.getFriendlyUsername() + ", SID: " + chat.getSID() + ", Unread: " + chat.getUnreadCount());
+                    if (chat.getSID().equals(convSid)) {  // Use SID to uniquely identify a conversation
                         chat.setUnreadCount(unreadMessages);
+                        chat.setTimeStamp(formattedTime);
+                        chat.setSID(convSid);
                         chat.setTimeStamp(formattedTime);
                         chat.setTimeStampMillis(timestamp);
                         chat.setFriendlyUsername(friendlyUserName);
-                        chat.setLastMsgText(lastMessageText); //  updated
-                        chat.setSID(convSid);
+                        chat.setLastMsgText(lastMessageText);
                         chatUpdated = true;
                         break;
                     }
                 }
 
                 if (!chatUpdated) {
-                    chatList.add(new Chat(friendlyUserName, friendlyName, formattedTime, unreadMessages, timestamp, false, lastMessageText, convSid));
+                    chatList.add(new Chat(friendlyUserName, friendlyName, formattedTime, unreadMessages, timestamp, false, lastMessageText, convSid,conversation));
                     Log.d("AddedtoChatModel", friendlyName + formattedTime + unreadMessages + timestamp + lastMessageText);
                 }
 
@@ -1713,12 +1796,14 @@ class QuickstartConversationsManager extends  AppCompatActivity {
 
         @Override
         public void onMessageAdded(final Message message) {
-            Log.d("Messageadded", String.valueOf(message));
-            Log.d("MessageaddgetAuthor", String.valueOf(message.getAuthor()));
+            Log.d("MessageaddedmDefault", String.valueOf(message));
+            Log.d("MessageaddgetAuthormDefault", String.valueOf(message.getAuthor()));
 
             pref = contextValue.getSharedPreferences("RPMUserApp", MODE_PRIVATE);
             editor = pref.edit();
             savedUserName = pref.getString("UserName", null);
+            PatientId = pref.getString("Patent_id", null);
+
             String capitalizedUsername = savedUserName.toUpperCase();
 
             if (!message.getAuthor().equals(capitalizedUsername)) {  // Message from someone else (Received)
@@ -1731,6 +1816,8 @@ class QuickstartConversationsManager extends  AppCompatActivity {
             if (conversationsManagerListener != null) {
                 conversationsManagerListener.receivedNewMessage(message.getAuthor().equals(capitalizedUsername));
             }
+
+
         }
 
         @Override

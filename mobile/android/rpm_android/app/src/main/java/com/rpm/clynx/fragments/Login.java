@@ -24,6 +24,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +36,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -251,6 +254,27 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
             //bundle must contain all info sent in "data" field of the notification
         }
 
+// Disable button initially
+        login_btn.setEnabled(false);
+        login_btn.setTextColor(ContextCompat.getColor(Login.this, R.color.accent3)); // inactive color
+
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                checkFields();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
+
+        login_UsernameTV.addTextChangedListener(textWatcher);
+        login_PasswordTV.addTextChangedListener(textWatcher);
+
+
         forgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -297,6 +321,21 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
         });
     }
 
+    // Add this method inside your Login class
+    private void checkFields() {
+        String username = login_UsernameTV.getText().toString().trim();
+        String password = login_PasswordTV.getText().toString().trim();
+
+        if (!username.isEmpty() && !password.isEmpty()) {
+            login_btn.setEnabled(true);
+            login_btn.setTextColor(ContextCompat.getColor(Login.this, R.color.white));
+            login_btn.setBackgroundResource(R.drawable.button_inactive); // optional active bg
+        } else {
+            login_btn.setEnabled(false);
+            login_btn.setTextColor(ContextCompat.getColor(Login.this, R.color.accent3)); // inactive color
+            login_btn.setBackgroundResource(R.drawable.button_inactive);
+        }
+    }
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelId = "NOTIFICATION";
