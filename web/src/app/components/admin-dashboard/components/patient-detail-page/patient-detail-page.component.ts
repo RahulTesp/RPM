@@ -1527,6 +1527,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       const patientId = sessionStorage.getItem('PatientId');
       const programId = sessionStorage.getItem('ProgramId');
 
+
       if (patientId != null && programId != null) {
         const result = await this.patientService.getVitalReading(
           patientId,
@@ -2898,10 +2899,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
             if (this.pecentageValue >= 100) {
               if (x.CPTCode == '99454') {
                 this.displayText = x.Completed + '/' + x.Total;
-                this.BillingPeriodStart = this.convertDate(
-                  new Date(x.BillingStartDate)
+                  this.BillingPeriodStart = this.convertDate(
+                  new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
-                this.BillingPeriodEnd = new Date(x.BillingStartDate);
+               this.BillingPeriodEnd = new Date(this.convertToLocalTime(x.BillingStartDate));
                 if (this.billingtypeVariable == '30days') {
                   this.BillingPeriodEnd = this.convertDate(
                     new Date(
@@ -3009,9 +3010,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                 }
 
                 this.BillingPeriodStart = this.convertDate(
-                  new Date(x.BillingStartDate)
+                  new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
-                this.BillingPeriodEnd = new Date(x.BillingStartDate);
+                this.BillingPeriodEnd = new Date( this.BillingPeriodStart);
                 if (this.billingtypeVariable == '30days') {
                   this.BillingPeriodEnd = this.convertDate(
                     new Date(

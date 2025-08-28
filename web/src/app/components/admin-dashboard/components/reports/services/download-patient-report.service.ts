@@ -592,6 +592,7 @@ export class DownloadPatientReportService {
   }
 
   generateCallNotesReport(doc: jsPDF, data: any[]): void {
+
     this.Notesh = 30;
     this.setSubHeadingStyle(doc);
 
@@ -610,6 +611,7 @@ export class DownloadPatientReportService {
 
       this.setPages(doc, formattedDate, 20);
       this.drawLine(doc, formattedDate, 20);
+      this.checkPageBreak(doc);
 
       this.setContentStyle(doc);
       this.Notesh += 5;
@@ -618,12 +620,16 @@ export class DownloadPatientReportService {
         `Duration : ${this.patientReportService.timeConvert(notes.Duration)}`,
         20
       );
+      this.checkPageBreak(doc);
       this.Notesh += 5;
       this.setPages(doc, `Completed By : ${notes.CompletedBy}`, 20);
+      this.checkPageBreak(doc);
       this.Notesh += 5;
       this.setPages(doc, `Note Type : ${notes.NoteType}`, 20);
+      this.checkPageBreak(doc);
       this.Notesh += 5;
       this.setPages(doc, `Type : ${notes.Type}`, 20);
+      this.checkPageBreak(doc);
       this.Notesh += 5;
 
       if (notes.Type !== 'REVIEW') {
@@ -632,17 +638,20 @@ export class DownloadPatientReportService {
           `Call Established : ${notes.IsEstablished ? 'Yes' : 'No'}`,
           20
         );
+        this.checkPageBreak(doc);
         this.Notesh += 5;
         this.setPages(
           doc,
           `Care Giver : ${notes.IsCareGiver ? 'Yes' : 'No'}`,
           20
         );
+        this.checkPageBreak(doc);
         this.Notesh += 5;
       }
 
       this.Notesh += 5;
       this.processNoteDetails(doc, notes);
+      this.checkPageBreak(doc);
       this.Notesh += 3;
     }
 
@@ -650,6 +659,21 @@ export class DownloadPatientReportService {
     this.setMainHeadingStyle(doc);
     // this.Report_HealthTrends();
   }
+
+
+//  find page break 
+checkPageBreak(doc: jsPDF) {
+  const pageHeight = doc.internal.pageSize.height;
+  if (this.Notesh > pageHeight - 20) {
+    doc.addPage();
+    this.Notesh = 30; // Reset to top margin
+    this.setSubHeadingStyle(doc); 
+  }
+}
+
+
+
+
 
   // ✅ Process Note Details
   private processNoteDetails(doc: jsPDF, notes: any): void {
