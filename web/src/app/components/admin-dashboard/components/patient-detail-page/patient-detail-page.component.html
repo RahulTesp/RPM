@@ -278,18 +278,16 @@
                     src="../../../../../assets/refresh.png"
                 /></span>
               </div>
-              
-             
-                         
- <section
+
+              <section
                 class="progrssbar_container"
-                [ngClass]="patientInteractionMin > colorcodeval ? 'completed-target' : ''"
               >
                 <!-- Custom Progress Bar -->
                 <div class="custom-progress-bar-outer">
                   <div
                     class="progress-fill-data"
-                    [style.width.%]="interactionpercentValue > 100 ? 100 : interactionpercentValue"
+                    [style.width.%]="patientInteractionMin > colorcodeval ? 100 : (interactionpercentValue > 100 ? 100 : interactionpercentValue)"
+                    [ngClass]="patientInteractionMin > colorcodeval ? 'completed-target-data' : ''"
                   ></div>
                 </div>
 
@@ -1604,20 +1602,17 @@
                 /></span>
               </div>
 
-             
 
-              
-                <div *ngIf="interactionpercentValue <= 100" class="progressvalue" >
-                  {{ patientInteractionMin }}:{{ patientInteractionSec }} /
-                  {{ totalInteractionTime }} min
-                </div>
+            <section
+                class="progrssbar_container"
                 [ngClass]="patientInteractionMin > colorcodeval ? 'completed-target' : ''"
               >
                 <!-- Custom Progress Bar -->
                 <div class="custom-progress-bar-outer">
-                  <div
+                   <div
                     class="progress-fill-data"
-                    [style.width.%]="interactionpercentValue > 100 ? 100 : interactionpercentValue"
+                    [style.width.%]="patientInteractionMin > colorcodeval ? 100 : (interactionpercentValue > 100 ? 100 : interactionpercentValue)"
+                    [ngClass]="patientInteractionMin > colorcodeval ? 'completed-target-data' : ''"
                   ></div>
                 </div>
 
@@ -4417,7 +4412,7 @@
 
             <mat-cell *matCellDef="let element">
               <span *ngIf="element.StartDate">{{
-                datepipe.transform(element.StartDate, "MMM d,y")
+                datepipe.transform(this.convertToLocalTime(element.StartDate), "MMM d,y")
               }}</span>
             </mat-cell>
           </ng-container>
@@ -4427,7 +4422,7 @@
 
             <mat-cell *matCellDef="let element">
               <span *ngIf="element.EndDate">{{
-                datepipe.transform(element.EndDate , "MMM d,y")
+                datepipe.transform(this.convertToLocalTime(element.EndDate), "MMM d,y")
               }}</span>
             </mat-cell>
           </ng-container>

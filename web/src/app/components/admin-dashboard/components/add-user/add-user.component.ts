@@ -216,7 +216,6 @@ export class AddUserComponent implements OnInit {
               this.router.navigate(['/admin/admin'], { queryParams: { page: 2 } });
               this.resetAddPateintMasterData();
               this.userVerifyCompleted = false;
-
             },
             false
           );
@@ -237,14 +236,6 @@ export class AddUserComponent implements OnInit {
             that.result = data;
             that.userId = that.result.UserId;
             that.password = that.result.password;
-            this.submitImage(that.userId);
-            // this.openDialog(
-            //   'Message',
-            //   `New User Added Successfully!! \n
-            //    Password:${that.password}
-            //   `
-            // );
-            // this.showDialog = true;
               this.confirmDialog.showConfirmDialog(
                 `New User Added Successfully!! \n
                Password:${that.password}
@@ -490,7 +481,7 @@ export class AddUserComponent implements OnInit {
     const formData: any = new FormData();
     formData.append(myPhoto, this.image);
 
-    // ? return the Promise
+    // ✅ return the Promise
     return this.rpm
       .rpm_post(`/api/users/addimage?UserId=${pid}`, formData)
       .then((data) => {
@@ -502,10 +493,8 @@ export class AddUserComponent implements OnInit {
         throw err;
       });
   } else {
-    // ? always return a promise
+    // ✅ always return a promise
     return Promise.resolve(null);
   }
 }
-  }
-
-
+}

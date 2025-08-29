@@ -1623,7 +1623,7 @@
               <div class="frequency_sub_panel">
                 <div class="schedule_week_item">
                   <input
-                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    [readonly]="AssigneeMemberStatus ? true : null"
                     class="schedule_checkbox"
                     type="checkbox"
                     formControlName="scheduleMonday"
@@ -1649,7 +1649,7 @@
 
                 <div class="schedule_week_item">
                   <input
-                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    [readonly]="AssigneeMemberStatus ? true : null"
                     class="schedule_checkbox"
                     type="checkbox"
                     formControlName="scheduleWednesday"
@@ -1664,7 +1664,7 @@
               <div class="frequency_sub_panel">
                 <div class="schedule_week_item">
                   <input
-                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    [readonly]="AssigneeMemberStatus ? true : null"
                     class="schedule_checkbox"
                     type="checkbox"
                     formControlName="scheduleThursday"
@@ -1676,7 +1676,7 @@
                 </div>
                 <div class="schedule_week_item">
                   <input
-                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    [readonly]="AssigneeMemberStatus ? true : null"
                     class="schedule_checkbox"
                     type="checkbox"
                     formControlName="scheduleFriday"
@@ -1688,7 +1688,7 @@
                 </div>
                 <div class="schedule_week_item">
                   <input
-                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    [readonly]="AssigneeMemberStatus ? true : null"
                     class="schedule_checkbox"
                     type="checkbox"
                     formControlName="scheduleSaturday"
@@ -1701,7 +1701,7 @@
               </div>
               <div class="schedule_week_item">
                 <input
-                  [attr.disabled]="AssigneeMemberStatus ? true : null"
+                  [readonly]="AssigneeMemberStatus ? true : null"
                   class="schedule_checkbox"
                   type="checkbox"
                   formControlName="scheduleSunday"
@@ -1712,28 +1712,32 @@
                 <label for="sun" class="common_content_title"> Sun </label>
               </div>
             </div>
+
             <div *ngIf="frequencyValue == 'Monthly'" class="frequency_monthly">
+
               <div class="frequency_monthly_panel">
-                <p class="common_content_title">Week Selection</p>
-                <select
-                  [attr.disabled]="AssigneeMemberStatus ? true : null"
+                 <fieldset [disabled]="AssigneeMemberStatus">
+                  <p class="common_content_title">Week Selection</p>
+                   <select
                   class="schedule_monthy_dropdown"
                   formControlName="weekSelectionFrequency"
                   id="Sch_updateMonthFrequency"
-                >
+                  >
                   <option [ngValue]="undefined" hidden>
                     Select Frequency Type
                   </option>
                   <option *ngFor="let freq of weekFrequency" [value]="freq.id">
                     {{ freq.weekPeriod }}
                   </option>
-                </select>
+                  </select>
+              </fieldset>
+
 
                 <div class="frequency_week">
                   <div class="frequency_sub_panel">
                     <div class="schedule_week_item">
                       <input
-                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        [readonly]="AssigneeMemberStatus ? true : null"
                         class="schedule_checkbox"
                         type="checkbox"
                         formControlName="scheduleSubMonday"
@@ -1748,7 +1752,7 @@
 
                     <div class="schedule_week_item">
                       <input
-                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        [readonly]="AssigneeMemberStatus ? true : null"
                         class="schedule_checkbox"
                         type="checkbox"
                         formControlName="scheduleSubTuesday"
@@ -1763,7 +1767,7 @@
 
                     <div class="schedule_week_item">
                       <input
-                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        [readonly]="AssigneeMemberStatus ? true : null"
                         class="schedule_checkbox"
                         type="checkbox"
                         formControlName="scheduleSubWednesday"
@@ -1780,7 +1784,7 @@
                   <div class="frequency_sub_panel">
                     <div class="schedule_week_item">
                       <input
-                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        [readonly="AssigneeMemberStatus ? true : null"
                         class="schedule_checkbox"
                         type="checkbox"
                         formControlName="scheduleSubThursday"
@@ -1794,7 +1798,7 @@
                     </div>
                     <div class="schedule_week_item">
                       <input
-                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        [readonly]="AssigneeMemberStatus ? true : null"
                         class="schedule_checkbox"
                         type="checkbox"
                         formControlName="scheduleSubFriday"
@@ -1808,7 +1812,7 @@
                     </div>
                     <div class="schedule_week_item">
                       <input
-                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        [readonly="AssigneeMemberStatus ? true : null"
                         class="schedule_checkbox"
                         type="checkbox"
                         formControlName="scheduleSubSaturday"
@@ -1823,7 +1827,7 @@
                   </div>
                   <div class="schedule_week_item">
                     <input
-                      [attr.disabled]="AssigneeMemberStatus ? true : null"
+                      [readonly]="AssigneeMemberStatus ? true : null"
                       class="schedule_checkbox"
                       type="checkbox"
                       formControlName="scheduleSubSunday"

@@ -3862,3 +3862,12 @@ canvas.charttrends {
   -webkit-box-shadow: inset 0 0 6px #98c7c8;
   background-color: #edeff5;
 }
+.completed-target-data {
+  background-color: #6da86f !important;
+  /* Green for completed */
+}
+.last-billing-col {
+  min-width: 220px;
+  width: 220px;
+  flex: 0 0 220px; /* Prevent shrinking */
+}

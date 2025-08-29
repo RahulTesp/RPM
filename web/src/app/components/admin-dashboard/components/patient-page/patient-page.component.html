@@ -857,7 +857,7 @@
               /><input
                 class="search_input input_panel"
                 [(ngModel)]="SearchpatientBilling"
-                (keyup.enter)="billingDataFilter()"
+                (ngModelChange)="billingDataFilter()"
               />
             </div>
             <div class="search_heading_default" *ngIf="!searchValueName">

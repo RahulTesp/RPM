@@ -1640,7 +1640,6 @@ export class EditpatientComponent implements OnInit {
         (data) => {
           this.loading = false;
           if (this.variable != 2) {
-            this.submitImage(that.pid);
             this.dialog.closeAll();
             this.redirect_patient();
 
@@ -2855,8 +2854,8 @@ export class EditpatientComponent implements OnInit {
     this.profilePic = this.image.name;
     //this.submitImage(this.pid);
   }
-
-submitImage(pid: any) {
+ submitImage(pid: any) {
+  console.log(this.image);
   const myPhoto = uuid.v4();
   const formData: any = new FormData();
   formData.append(myPhoto, this.image);
@@ -2864,12 +2863,12 @@ submitImage(pid: any) {
     return this.rpm.rpm_post(`/api/patient/addimage?PatientId=${pid}`, formData)
       .then((data) => {
         this.UpdatePatient_Image(this.pid, this.patientprogramid);
-        return data; // ? forward result
+        return data; // ✅ forward result
       })
       .catch((err: any) => {
          this.profilePic  = null;
          this.image = null;
-        throw err; // ? forward error
+        throw err; // ✅ forward error
       });
   } else {
     return Promise.resolve(null); // nothing to upload
