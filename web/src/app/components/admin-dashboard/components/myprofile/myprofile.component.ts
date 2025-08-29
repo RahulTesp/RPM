@@ -408,6 +408,8 @@ closeDropdown() {
 
   confirm() {
     var req_body: any = {};
+
+    this.passwordForm.controls.username?.setValue(this.userName);
     if (this.passwordForm.valid) {
       req_body['UserName'] = this.passwordForm.controls.username.value;
       req_body['OldPassword'] = this.passwordForm.controls.oldpw.value;

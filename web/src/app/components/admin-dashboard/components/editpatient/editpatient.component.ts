@@ -1459,13 +1459,14 @@ export class EditpatientComponent implements OnInit {
     }
   }
   confirm_action() {
-    if (this.variable == 1) {
-      this.UpdatePatientInfo();
-      this.editPatientProgram();
-    } else if (this.variable == 2) {
-      this.UpdatePatientInfo();
-      this.editPatientProgram();
-    }
+      this.submitImage(this.pid).then((res) => {
+        if (this.variable === 1 || this.variable === 2) {
+          this.UpdatePatientInfo();
+          this.editPatientProgram();
+        }
+      }).catch((err) => {
+        alert(err.error.message);
+      });
   }
   UpdatePatientInfo() {
     this.markFormGroupTouched(this.PatientInfoForm);
@@ -1518,8 +1519,8 @@ export class EditpatientComponent implements OnInit {
           this.loading = false;
           if (this.variable != 2) {
             this.dialog.closeAll();
-            this.submitImage(that.pid);
             this.redirect_patient();
+
           }
         },
         (err) => {
@@ -2813,26 +2814,27 @@ export class EditpatientComponent implements OnInit {
     this.profilePic = this.image.name;
     //this.submitImage(this.pid);
   }
-  submitImage(pid: any) {
-    console.log(this.image)
-    const myPhoto = uuid.v4();
-    var formData: any = new FormData();
-    formData.append(myPhoto, this.image);
-    var that = this;
-    if(this.image)
-    {
-      this.rpm.rpm_post(`/api/patient/addimage?PatientId=${pid}`, formData).then(
-      (data) => {
-        that.UpdatePatient_Image(this.pid, this.patientprogramid);
-      },
-      (err:any) => {
-        alert(err.error.message);
-      }
-    );
-    }
 
+submitImage(pid: any) {
+  console.log(this.image);
+  const myPhoto = uuid.v4();
+  const formData: any = new FormData();
+  formData.append(myPhoto, this.image);
+  if (this.image) {
+    return this.rpm.rpm_post(`/api/patient/addimage?PatientId=${pid}`, formData)
+      .then((data) => {
+        this.UpdatePatient_Image(this.pid, this.patientprogramid);
+        return data; // ✅ forward result
+      })
+      .catch((err: any) => {
+         this.profilePic  = null;
+         this.image = null;
+        throw err; // ✅ forward error
+      });
+  } else {
+    return Promise.resolve(null); // nothing to upload
   }
-
+}
   downloadFile(FileName: any) {
     // FileSaver.saveAs("ConsentForm", FileName);
     const a = document.createElement('a');
@@ -3010,17 +3012,17 @@ export class EditpatientComponent implements OnInit {
     }
 
     // listen to response
-    this.dialogRef.afterClosed().subscribe((dialogResult: any) => {
-      // if user pressed yes dialogResult will be true,
-      // if he pressed no - it will be false
+    // this.dialogRef.afterClosed().subscribe((dialogResult: any) => {
+    //   // if user pressed yes dialogResult will be true,
+    //   // if he pressed no - it will be false
 
-      if (dialogResult) {
-        this.ChangePatientStatus(status, timeofcall);
-        // this.paneldialogVariable = true;
-      } else {
-        return;
-      }
-    });
+    //   if (dialogResult) {
+    //     this.ChangePatientStatus(status, timeofcall);
+
+    //   } else {
+    //     return;
+    //   }
+    // });
   }
 
   MarkDeviceErrorDialog(index: any) {
