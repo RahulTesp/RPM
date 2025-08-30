@@ -1052,6 +1052,8 @@ export class RightSidebarComponent implements OnInit {
         this.schedule_assignedId = this.ScheduleDatabyId.AssignedBy;
         this.main_schedule_id = this.ScheduleDatabyId.Id;
         this.AssigneeMemberStatus = this.ScheduleDatabyId.IsCompleted;
+        console.log('this.ScheduleDatabyId.IsCompleted');
+        console.log(this.ScheduleDatabyId.IsCompleted)
 
         var careTeamList = this.http_getSchedulemasterdata.AssigneeList;
 

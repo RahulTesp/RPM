@@ -352,8 +352,15 @@ private formatDateForQuery(date: any, isEndDate = false): string {
       return await this.rpmService.rpm_get(
         `/api/patient/getpatientlastbilledcycle?patientId=${patientId}&patientProgramId=${programId}&status=${status}`
       );
-    } catch (error) {
-      console.error('Error fetching patient billing data:', error);
+    } catch (error:any) {
+      if(error.status == 404)
+      {
+        console.log('Not found');
+        return;
+      }else{
+        console.log(error.error.message);
+      }
+
       // Return empty array on error for consistent handling
       return [];
     }

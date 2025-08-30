@@ -2132,8 +2132,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.program_id,
         this.patientStatusData || ''
       );
-    } catch (error) {
-      console.error('Error in getBillingData:', error);
+    } catch (error:any) {
+      console.log('Error in getBillingData:', error);
       this.BillingInfo = [];
     }
   }
@@ -2899,9 +2899,12 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
             if (this.pecentageValue >= 100) {
               if (x.CPTCode == '99454') {
                 this.displayText = x.Completed + '/' + x.Total;
+                 var billingStartDate  = this.convertDate(x.BillingStartDate);
                   this.BillingPeriodStart = this.convertDate(
                   new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
+                console.log('BillingStartDate1');
+                console.log(billingStartDate);
                this.BillingPeriodEnd = new Date(this.convertToLocalTime(x.BillingStartDate));
                 if (this.billingtypeVariable == '30days') {
                   this.BillingPeriodEnd = this.convertDate(
@@ -2911,7 +2914,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                       )
                     )
                   );
-                  if (this.BillingPeriodStart == '1-01-01') {
+                  if (billingStartDate == '1-01-01') {
                     this.BillingPeriodStart = undefined;
                     this.BillingPeriodEnd = undefined;
                   } else {
@@ -2937,8 +2940,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                   this.BillingPeriodEnd = this.convertDate(
                     this.BillingPeriodEnd
                   );
+                  console.log('BillingStartDate2');
+                console.log(this.BillingPeriodStart);
                   // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
-                  if (this.BillingPeriodStart == '1-01-01') {
+                  if (billingStartDate == '1-01-01') {
                     this.BillingPeriodStart = undefined;
                     this.BillingPeriodEnd = undefined;
                   } else {
@@ -3008,7 +3013,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                   var seconds = Math.trunc(x.Completed % 60);
                   this.displayText = min + ':' + seconds + '/' + x.Total / 60;
                 }
-
+                var billingStartDate  = this.convertDate(x.BillingStartDate);
                 this.BillingPeriodStart = this.convertDate(
                   new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
@@ -3021,7 +3026,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                       )
                     )
                   );
-                  if (this.BillingPeriodStart == '1-01-01') {
+                  console.log('BillingStartDate3');
+                console.log(billingStartDate);
+                  if (billingStartDate == '1-01-01') {
                     this.BillingPeriodStart = undefined;
                     this.BillingPeriodEnd = undefined;
                   } else {
@@ -3047,8 +3054,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                   this.BillingPeriodEnd = this.convertDate(
                     this.BillingPeriodEnd
                   );
+                  console.log('BillingStartDate4');
+                console.log(this.BillingPeriodStart);
                   // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
-                  if (this.BillingPeriodStart == '1-01-01') {
+                  if (billingStartDate == '1-01-01') {
                     this.BillingPeriodStart = undefined;
                     this.BillingPeriodEnd = undefined;
                   } else {
@@ -3084,6 +3093,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
             };
             this.progrss_billing_array.push(obj);
           }
+          console.log('Interaction Time Progress');
           if (that.BillingOverview.length > 0) {
             if (that.BillingOverview[0].ProgramName == 'RPM') {
               this.CalculateInteractionTime(interactionTime);
@@ -4619,7 +4629,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         async (body) => {},
         (error: any) => {
           console.log('error')
-          alert(error.error);
+          alert(error.error.message);
         }
       );
 
@@ -4724,7 +4734,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
           }
         },
         (error: any) => {
-          alert(error.error);
+          alert(error.error.message);
         }
       );
   }
@@ -4761,7 +4771,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
             }
           },
           (error: any) => {
-            alert(error.error);
+            alert(error.error.message);
           }
         );
     } else {
@@ -4867,9 +4877,11 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   async loadPatientReportData() {
     this.selectedPatient = sessionStorage.getItem('PatientId');
     this.selectedProgram = sessionStorage.getItem('ProgramId');
-    var startDate = this.convertDate(this.ThirtyDaysAgo);
-    var endDate = this.convertDate(this.Today);
-
+    const today = new Date();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    var startDate = this.convertDate(thirtyDaysAgo);
+    var endDate = this.convertDate(today);
     startDate = startDate + 'T00:00:00';
     endDate = endDate + 'T23:59:59';
     try {

@@ -1403,14 +1403,14 @@
                         id="editOrderDate"
                         (ngModelChange)="checkDateValidity($event)"
                       />
-                      <small
+                      <!-- <small
                         class="text-danger"
                         *ngIf="
                           programForm.get('consultdate')?.invalid &&
                           programForm.get('consultdate')?.touched
                         "
                         >Consultdate is required</small
-                      >
+                      > -->
                       <div class="warn">
                         <ng-container *ngIf="futureDateError">
                           Please Enter valid Date
