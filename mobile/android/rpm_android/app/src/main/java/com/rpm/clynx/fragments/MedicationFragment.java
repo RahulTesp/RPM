@@ -63,8 +63,6 @@ public class MedicationFragment extends Fragment {
         medR.setLayoutManager(layoutManager);
         medR.setAdapter(adapter);
 
-        checkmeddet();
-
         Log.d("medfrg","medfrg");
         return  view;
     }
@@ -94,7 +92,7 @@ public class MedicationFragment extends Fragment {
                             emptyView.setVisibility(View.GONE);
 
                             String endDateStr = jsonArrayData.getJSONObject(i).getString("EndDate");
-                            boolean isExpired = DateUtils.isPastDate(endDateStr); // Implement this if not already
+                            boolean isExpired = DateUtils.isPastDate(endDateStr);
 
 
                             nim.add(new MedicationItemModel(jsonArrayData.getJSONObject(i).getString("Medicinename"),
