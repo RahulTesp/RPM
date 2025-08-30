@@ -933,6 +933,7 @@ namespace RPMWeb.Data.Common
         public string ProgramName { get; set; }
         public string Program { get; set; }
         public string EnrolledDate { get; set; }
+        public string EnrolledDateTime { get; set; }
         public string PhysicianName { get; set; }
         public string AssignedMember { get; set; }
         public string PatientType { get; set; }
