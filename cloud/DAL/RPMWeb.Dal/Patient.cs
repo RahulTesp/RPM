@@ -1,26 +1,27 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using iText.Forms.Form.Element;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using RPMWeb.Data.Common;
 using System.Data;
-using Microsoft.Data.SqlClient;
+using System.Globalization;
 using System.Reflection;
-using DataTable = System.Data.DataTable;
-using Font = iTextSharp.text.Font;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Workbook = DocumentFormat.OpenXml.Spreadsheet.Workbook;
-using Worksheet = DocumentFormat.OpenXml.Spreadsheet.Worksheet;
-using Sheets = DocumentFormat.OpenXml.Spreadsheet.Sheets;
-using Values = RPMWeb.Data.Common.Values;
+using System.Text.RegularExpressions;
 using Border = DocumentFormat.OpenXml.Spreadsheet.Border;
 using Borders = DocumentFormat.OpenXml.Spreadsheet.Borders;
 using CellFormat = DocumentFormat.OpenXml.Spreadsheet.CellFormat;
-using System.Globalization;
-using iText.Forms.Form.Element;
-using Microsoft.AspNetCore.Http;
+using DataTable = System.Data.DataTable;
+using Font = iTextSharp.text.Font;
+using Sheets = DocumentFormat.OpenXml.Spreadsheet.Sheets;
+using Values = RPMWeb.Data.Common.Values;
+using Workbook = DocumentFormat.OpenXml.Spreadsheet.Workbook;
+using Worksheet = DocumentFormat.OpenXml.Spreadsheet.Worksheet;
 
 namespace RPMWeb.Dal
 {
@@ -1295,6 +1296,20 @@ namespace RPMWeb.Dal
                             info.ProgramName = reader["ProgramName"].ToString();
                             info.Program= reader["Program"].ToString();
                             info.EnrolledDate = reader["EnrolledDate"].ToString();
+                            if (!string.IsNullOrWhiteSpace(info.EnrolledDateTime))
+                            {
+                                info.EnrolledDateTime = Regex.Replace(info.EnrolledDateTime, @"\s+", " ").Trim();
+                                DateTime parsedDate = DateTime.ParseExact(info.EnrolledDateTime, "MMM d yyyy h:mmtt", CultureInfo.InvariantCulture);
+
+
+
+                                // Convert to ISO 8601 format
+                                string formattedDate = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
+
+                                // Assign to your object
+                                info.EnrolledDateTime = formattedDate;
+                                info.EnrolledDate = parsedDate.ToString("MMM dd yyyy");
+                            }
                             info.PhysicianName = reader["PhysicianName"].ToString();
                             info.AssignedMember = reader["AssignedMember"].ToString();
                             info.PatientType = reader["PatientType"].ToString();
@@ -1344,6 +1359,24 @@ namespace RPMWeb.Dal
                             info.ProgramName = reader["ProgramName"].ToString();
                             info.Program = reader["Program"].ToString();
                             info.EnrolledDate = reader["EnrolledDate"].ToString();
+                            info.EnrolledDateTime = info.EnrolledDate;
+
+                            if (!string.IsNullOrWhiteSpace(info.EnrolledDateTime))
+                            { 
+                                info.EnrolledDateTime = Regex.Replace(info.EnrolledDateTime, @"\s+", " ").Trim();
+                                DateTime parsedDate = DateTime.ParseExact(info.EnrolledDateTime, "MMM d yyyy h:mmtt", CultureInfo.InvariantCulture);
+
+                                
+
+                                // Convert to ISO 8601 format
+                                string formattedDate = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
+
+                                // Assign to your object
+                                info.EnrolledDateTime = formattedDate;
+                                info.EnrolledDate = parsedDate.ToString("MMM dd yyyy");
+                            }
+                            
+
                             info.PhysicianName = reader["PhysicianName"].ToString();
                             info.AssignedMember = reader["AssignedMember"].ToString();
                             info.PatientType = reader["PatientType"].ToString();
@@ -1356,7 +1389,7 @@ namespace RPMWeb.Dal
                 }
                 return list;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
                 throw;
