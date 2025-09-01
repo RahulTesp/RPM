@@ -356,7 +356,6 @@ initPasswordForm(){
   ChangePassword() {
     this.isChangePasswordVisible = true;
     this.showPassword = false;
-    console.log('Show Password'+this.showPassword)
     this.closeDropdown();
   }
 

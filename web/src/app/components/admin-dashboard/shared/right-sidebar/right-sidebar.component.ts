@@ -1052,8 +1052,6 @@ export class RightSidebarComponent implements OnInit {
         this.schedule_assignedId = this.ScheduleDatabyId.AssignedBy;
         this.main_schedule_id = this.ScheduleDatabyId.Id;
         this.AssigneeMemberStatus = this.ScheduleDatabyId.IsCompleted;
-        console.log('this.ScheduleDatabyId.IsCompleted');
-        console.log(this.ScheduleDatabyId.IsCompleted)
 
         var careTeamList = this.http_getSchedulemasterdata.AssigneeList;
 
@@ -1851,11 +1849,8 @@ export class RightSidebarComponent implements OnInit {
           (data) => {
             this.worklistgettaskbyid = data;
             this.alertAssigneeName = this.worklistgettaskbyid.CareTeamId;
-            console.log('this.alertAssigneeName');
-            console.log(this.alertAssigneeName);
             this.WorkListTaskArrayList = this.worklistgettaskbyid.Members;
-            console.log('WorkList Task');
-            console.log(this.WorkListTaskArrayList);
+
 
             this.task_pname = this.worklistgettaskbyid.PatientName;
             this.task_pid = this.worklistgettaskbyid.PatientId;
