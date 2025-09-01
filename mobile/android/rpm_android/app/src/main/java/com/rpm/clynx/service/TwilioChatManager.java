@@ -166,7 +166,7 @@ public class TwilioChatManager {
 
                     if (chatViewModel != null) {
 
-                        chatViewModel.addChatMessage(new Chat("","Sender", message.getBody(), 0, 0, false,"",""));
+                        chatViewModel.addChatMessage(new Chat("","Sender", message.getBody(), 0, 0, false,"","", conversation));
 
                     } else {
 
@@ -242,22 +242,6 @@ public class TwilioChatManager {
     public void setChatList(List<Chat> newList) {
 
         chatList = newList;
-
-    }
-
-    public static void addNewMessage(String senderName, String messageText, String sid, long timestampMillis, boolean isTyping, int unreadCount) {
-
-        String formattedTimestamp = formatTimestamp(timestampMillis);  // Helper function to format timestamp
-
-        // Create a new Chat object
-
-        Chat newChat = new Chat(senderName, senderName, formattedTimestamp, unreadCount, timestampMillis, isTyping, messageText, sid);
-
-        // Add to the list
-
-        chatList.add(newChat);
-
-        Log.d("TwilioChatManager", "New chat added: " + senderName);
 
     }
 

@@ -328,8 +328,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.isManagerProvider = false;
     }
     this.rpm.rpm_get(`/api/config/client`).then((data) => {
-      console.log('Phone number extension');
-      console.log(data);
       this.phoneExtension = data;
     });
 
@@ -674,10 +672,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.patiantVital = (programDetails.PatientVitalInfos || []).filter(
       (ds: { Selected: boolean }) => ds.Selected === true
     );
-    console.log('ProgramDetails vital info');
-    console.log(programDetails.PatientVitalInfos);
-    console.log('Patient Vitals:');
-    console.log(this.patiantVital);
     this.vitals =
       this.http_rpm_patientList.PatientProgramdetails.PatientVitalInfos;
     this.processAdditionalPatientData(programDetails);
@@ -2133,7 +2127,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.patientStatusData || ''
       );
     } catch (error:any) {
-      console.log('Error in getBillingData:', error);
       this.BillingInfo = [];
     }
   }
@@ -2878,8 +2871,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       .then(
         (data) => {
           that.BillingOverview = data;
-          console.log('Billing Overview');
-          console.log(that.BillingOverview);
           that.progrss_billing_array = [];
           if (!that.BillingOverview) {
             that.BillingOverview = [];
@@ -2903,8 +2894,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                   this.BillingPeriodStart = this.convertDate(
                   new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
-                console.log('BillingStartDate1');
-                console.log(billingStartDate);
+
                this.BillingPeriodEnd = new Date(this.convertToLocalTime(x.BillingStartDate));
                 if (this.billingtypeVariable == '30days') {
                   this.BillingPeriodEnd = this.convertDate(
@@ -2940,8 +2930,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                   this.BillingPeriodEnd = this.convertDate(
                     this.BillingPeriodEnd
                   );
-                  console.log('BillingStartDate2');
-                console.log(this.BillingPeriodStart);
+
                   // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
                   if (billingStartDate == '1-01-01') {
                     this.BillingPeriodStart = undefined;
@@ -3026,8 +3015,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                       )
                     )
                   );
-                  console.log('BillingStartDate3');
-                console.log(billingStartDate);
                   if (billingStartDate == '1-01-01') {
                     this.BillingPeriodStart = undefined;
                     this.BillingPeriodEnd = undefined;
@@ -3054,8 +3041,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                   this.BillingPeriodEnd = this.convertDate(
                     this.BillingPeriodEnd
                   );
-                  console.log('BillingStartDate4');
-                console.log(this.BillingPeriodStart);
                   // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
                   if (billingStartDate == '1-01-01') {
                     this.BillingPeriodStart = undefined;
@@ -3093,7 +3078,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
             };
             this.progrss_billing_array.push(obj);
           }
-          console.log('Interaction Time Progress');
           if (that.BillingOverview.length > 0) {
             if (that.BillingOverview[0].ProgramName == 'RPM') {
               this.CalculateInteractionTime(interactionTime);
@@ -3212,8 +3196,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.interactionpercentValue =
         ((this.patientInteractionMin * 60 + this.patientInteractionSec) /
           3600) * 100;
-       console.log('Interaction Progress - 1');
-       console.log(this.interactionpercentValue);
       // that.interactionpercentValue = parseInt(that.interactionpercentValue)
       if (
         this.interactionpercentValue < 1 &&
@@ -4948,7 +4930,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         endDate
       );
 
-      console.log('✅ Patient data loaded successfully');
       this.downloadPatientReport();
     } catch (error) {
       console.error('🚨 Error loading patient data:', error);

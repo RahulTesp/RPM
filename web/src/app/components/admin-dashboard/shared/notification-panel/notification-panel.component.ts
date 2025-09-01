@@ -25,7 +25,6 @@ private _addNotification(notification: Notification) {
 
   ngOnInit() {
     this._subscription = this._notificationSvc.getObservable().subscribe(notification => this._addNotification(notification));
-     console.log("Notifications:" +this.notifications);
   }
 
   ngOnDestroy() {

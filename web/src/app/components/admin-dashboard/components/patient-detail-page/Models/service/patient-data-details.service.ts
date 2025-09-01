@@ -122,7 +122,6 @@ private formatDateForQuery(date: any, isEndDate = false): string {
     const start = this.formatDateForQuery(startDate || this.ThirtyDaysAgo);
     const end = this.formatDateForQuery(endDate || this.today, true);
 
- console.log(start)
     const url = `/api/patient/getpatientvitalreadingsv1?PatientId=${patientId}&PatientProgramId=${programId}&StartDate=${start}&EndDate=${end}`;
     try {
       const data = (await this.rpmService.rpm_get(url)) as any;

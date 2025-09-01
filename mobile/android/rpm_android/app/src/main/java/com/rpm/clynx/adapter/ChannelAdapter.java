@@ -66,9 +66,9 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ChannelV
                     Context context = v.getContext();
                     Intent intent = new Intent(context, MessageActivity.class);
                     intent.putExtra("memberName",memberNmText.getText().toString());
-                    intent.putExtra("memberUsername",memberNmText.getText().toString());
+                    intent.putExtra("memberUsername", memberUsrnmText.getText().toString()); // for backend use (Twilio)
+                    intent.putExtra("memberFullName", memberNmText.getText().toString()); // for display
                     intent.putExtra("FriendlyUsername", memberUsrnmText.getText().toString() + "-" + memberUsrnmText.getText().toString());
-
                     intent.putExtra("channel","channel");
 
                     String memberName = memberNmText.getText().toString();

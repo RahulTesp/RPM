@@ -24,6 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_20dp"
+            android:layout_marginLeft="@dimen/margin_10dp"
             android:text="Vital Monitoring"
             android:textColor="@color/Primary_dark"
             android:textSize="14sp"
@@ -66,6 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_20dp"
+                android:layout_marginLeft="@dimen/margin_10dp"
                 android:text="Device ID"
                 android:textColor="@color/Primary_dark"
                 android:textSize="14sp"
@@ -110,32 +112,35 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_20dp"
+
                 android:text="Device Type"
                 android:textColor="@color/Primary_dark"
                 android:textSize="14sp"
                 app:fontFamily="@font/rubik_regular" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/pgm_info_bg"
-                android:gravity="center">
+                android:gravity="center_vertical">
 
                 <TextView
                     android:id="@+id/itemDeviceComm"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/margin_10dp"
                     android:layout_marginRight="@dimen/margin_10dp"
                     android:backgroundTint="@android:color/transparent"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:singleLine="true"
                     android:textColor="@color/black"
                     android:textColorHint="@color/text_light"
                     android:textSize="16sp"
-                    app:fontFamily="@font/rubik_regular" />
+                    app:fontFamily="@font/rubik_regular"/>
             </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
 
@@ -143,6 +148,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_20dp"
+        android:layout_marginLeft="@dimen/margin_10dp"
         android:text="Device"
         android:textColor="@color/Primary_dark"
         android:textSize="14sp"
@@ -173,6 +179,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_20dp"
+        android:layout_marginLeft="@dimen/margin_10dp"
         android:text="Device Status"
         android:textColor="@color/Primary_dark"
         android:textSize="14sp"
