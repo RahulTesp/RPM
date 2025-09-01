@@ -747,7 +747,7 @@ export class RightSidebarComponent implements OnInit {
           },
           (err) => {
             //show error patient id creation failed
-            alert('Error, could not add task..!, ' + err);
+            alert(err.error.message);
             this.loading = false;
           }
         );
@@ -2883,7 +2883,7 @@ export class RightSidebarComponent implements OnInit {
 
           (err) => {
             this.verificationStatus = false;
-            alert(err.error);
+            alert(err.error.message);
           }
         );
       }
@@ -3003,8 +3003,8 @@ export class RightSidebarComponent implements OnInit {
           req_body
         )
         .then(
-          (data) => {
-            this.verificationStatus = data;
+          (data:any) => {
+            this.verificationStatus = data.message;
           },
           (err) => {
             //show error patient id creation failed
