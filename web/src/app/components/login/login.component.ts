@@ -491,9 +491,6 @@ export class LoginComponent implements OnInit {
   validateOTP(url: any, params: any, tkn: any) {
     let headers = new HttpHeaders();
     headers = headers.append('Bearer', tkn);
-    console.log(url);
-    console.log(params);
-    console.log(tkn);
     let promise = new Promise((resolve, reject) => {
       this.http
         .post<any>(this.SERVER_URL + url, params, { headers: headers })

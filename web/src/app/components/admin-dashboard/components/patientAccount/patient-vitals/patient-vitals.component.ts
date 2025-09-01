@@ -794,7 +794,6 @@ export class PatientVitalsComponent implements OnInit {
       .then(
         (data) => {
           that.http_getDocument = data;
-          console.log(that.http_getDocument);
           this.docType = that.http_getDocument.DocumentType;
           this.fileName = that.http_getDocument.DocumentName;
           this.documentviewSrc = that.http_getDocument.DocumentUNC;
@@ -945,7 +944,6 @@ export class PatientVitalsComponent implements OnInit {
       // this.callTimerEnabled=false;
       this.Stop();
 
-      console.log(this.call_connected);
     }
   }
 

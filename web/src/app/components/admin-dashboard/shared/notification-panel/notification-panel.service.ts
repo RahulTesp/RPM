@@ -22,9 +22,6 @@ export class NotificationPanelService {
 
   success(title: string, message: string, timeout = 3000) {
     this._subject.next(new Notification(this._idx++, NotificationType.success, title, message, timeout));
-    console.log("Success")
-    console.log(title);
-    console.log(message);
   }
 
   warning(title: string, message: string, timeout = 3000) {
