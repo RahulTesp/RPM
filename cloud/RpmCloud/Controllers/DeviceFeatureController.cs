@@ -300,7 +300,7 @@ namespace RpmCloud.Controllers
                 return BadRequest(new { message = "Unexpected Error." });
             }
         }
-        [Route("isvalidvendorcode/{Code}")]
+        [Route("isvalidvendorcode")]
         [HttpPost]
         public IActionResult IsValidVendorCode([FromQuery] string Code)
         {
