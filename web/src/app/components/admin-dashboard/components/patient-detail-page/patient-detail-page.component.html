@@ -4707,7 +4707,7 @@
                 *ngIf="index === 0"
                 [attr.rowspan]="scheduleitem.SchedueInfos.length"
               >
-                {{ datepipe.transform(convertToLocalTime(scheduleitem.ScheduleDate), "MMM d, y") }}
+                {{ datepipe.transform(scheduleitem.ScheduleDate, "MMM d, y") }}
               </td>
               <td [ngStyle]="{ 'border-radius': '8px 0px 0px 8px' }">
                 {{ schedule_data.ScheduleTime }}

@@ -419,7 +419,7 @@ export class EditpatientComponent implements OnInit {
       ]),
       clinic: new UntypedFormControl({ value: '' }, [Validators.required]),
       cliniccode: new UntypedFormControl({ value: '' }),
-      consultdate: new UntypedFormControl('', [Validators.required]),
+      consultdate: new UntypedFormControl('',null),
       assignedMember: new UntypedFormControl('', [Validators.required]),
       PrescribedDate: new UntypedFormControl({ value: '' }, [Validators.required]),
       EntrolledDate: new UntypedFormControl({ value: '' }, [Validators.required]),
