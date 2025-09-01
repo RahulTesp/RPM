@@ -103,6 +103,13 @@ namespace RPMWeb.Data.Common
         public string OTP { get; set; }
         public string token { get; set; }
     }
+    public class UserLoginVerify
+    {
+        public string UserName { get; set; }
+     
+        public string OTP { get; set; }
+      
+    }
     public class RPMLogin
     {
         [Required]
