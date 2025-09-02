@@ -591,7 +591,7 @@ export class DownloadPatientReportService {
     return notes;
   }
 
-  generateCallNotesReport(doc: jsPDF, data: any[]): void {
+ /* generateCallNotesReport(doc: jsPDF, data: any[]): void {
 
     this.Notesh = 30;
     this.setSubHeadingStyle(doc);
@@ -659,27 +659,198 @@ export class DownloadPatientReportService {
     this.setMainHeadingStyle(doc);
     // this.Report_HealthTrends();
   }
+*/
+
+
+generateCallNotesReport(doc: jsPDF, data: any[]): void {
+
+  const marginLeft = 20;
+  const maxWidth = 170;
+  const lineHeight = 6;
+  const pageHeight = doc.internal.pageSize.height;
+  this.Notesh = 30;
+  this.setSubHeadingStyle(doc);
+  this.setPages(doc, 'Notes', 15);
+  this.drawLine(doc, 'Notes', 15);
+  this.Notesh += 10;
+  doc.setFontSize(14);
+  
+  for (const notes of data) {
+    this.Notesh += 10;
+      this.setSubHeadingStyle(doc);
+      const formattedDate = this.datepipe.transform(
+        this.convertToLocalTime(notes.CreatedOn)
+      ) as string;
+
+    this.setPages(doc, formattedDate, 20);
+    this.drawLine(doc, formattedDate, 20);
+    this.setContentStyle(doc);
+    this.Notesh += 5;
+    
+    this.addTextWithBreak(
+      doc,
+      `Duration : ${this.patientReportService.timeConvert(notes.Duration)}`,
+      marginLeft,
+      maxWidth,
+      lineHeight
+    );
+
+    this.addTextWithBreak(doc, `Completed By : ${notes.CompletedBy}`, marginLeft, maxWidth, lineHeight);
+    this.addTextWithBreak(doc, `Note Type : ${notes.NoteType}`, marginLeft, maxWidth, lineHeight);
+    this.addTextWithBreak(doc, `Type : ${notes.Type}`, marginLeft, maxWidth, lineHeight);
+
+    if (notes.Type !== 'REVIEW') {
+      this.addTextWithBreak(
+        doc,
+        `Call Established : ${notes.IsEstablished ? 'Yes' : 'No'}`,
+        marginLeft,
+        maxWidth,
+        lineHeight
+      );
+      this.addTextWithBreak(
+        doc,
+        `Care Giver : ${notes.IsCareGiver ? 'Yes' : 'No'}`,
+        marginLeft,
+        maxWidth,
+        lineHeight
+      );
+    }
+
+    this.Notesh += 5;
+    this.processNoteDetails(doc, notes); // Make sure this method also uses splitTextToSize
+    this.checkPageBreak(doc);
+    this.Notesh += 3;
+  }
+
+  
+  this.Notesh += 20; // Add bottom spacing
+  doc.addPage();
+  //this.setMainHeadingStyle(doc);
+
+}
+
+private addTextWithBreak(
+  doc: jsPDF,
+  text: string,
+  x: number,
+  maxWidth: number,
+  lineHeight: number
+): void {
+  const lines = doc.splitTextToSize(text, maxWidth);
+  const pageHeight = doc.internal.pageSize.height;
+
+  // Reset font and color before adding text
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(0, 0, 0);
+
+  if (this.Notesh + lines.length * lineHeight > pageHeight) {
+    doc.addPage();
+    this.Notesh = 30;
+  }
+
+  doc.text(lines, x, this.Notesh);
+  this.Notesh += lines.length * lineHeight;
+}
 
 
 
-
-
-//  find page break
+/*find page break 
 checkPageBreak(doc: jsPDF) {
   const pageHeight = doc.internal.pageSize.height;
   if (this.Notesh > pageHeight - 20) {
     doc.addPage();
     this.Notesh = 30; // Reset to top margin
-    this.setSubHeadingStyle(doc);
+    //this.setSubHeadingStyle(doc); 
+  }
+}*/
+
+
+
+private checkPageBreak(doc: jsPDF): void {
+  const pageHeight = doc.internal.pageSize.height;
+  const bottomMargin = 20; // Reserve 20 units at bottom
+
+  if (this.Notesh + bottomMargin > pageHeight) {
+    doc.addPage();
+    this.Notesh = 30; // Reset to top margin
   }
 }
 
+private processNoteDetails(doc: jsPDF, notes: any): void {
+  if (!notes.NoteDetails) return;
 
+  for (let mainQuestion of notes.NoteDetails.MainQuestions) {
+    this.Notesh += 5;
+    this.setPages(doc, mainQuestion.Question, 20);
+    this.drawLine(doc, mainQuestion.Question, 20);
+    this.checkPageBreak(doc);
 
+    this.Notesh += 5;
+    const checkedAnswers = mainQuestion.AnswerTypes.filter(
+      (answer: { Checked: boolean }) => answer.Checked
+    );
+
+    if (checkedAnswers.length > 0) {
+      checkedAnswers.forEach((answer: { Answer: string }) => {
+        this.setPages(doc, `- ${answer.Answer}`, 25);
+        this.Notesh += 5;
+        this.checkPageBreak(doc);
+      });
+    } else {
+      this.setPages(doc, '- None', 25);
+      this.Notesh += 5;
+      this.checkPageBreak(doc);
+    }
+
+    this.processSubQuestions(doc, mainQuestion.SubQuestions);
+
+    if (mainQuestion.Notes) {
+      this.addWrappedText(doc, `Extra Notes : ${mainQuestion.Notes}`, 25);
+    }
+  }
+
+  if (notes.NoteDetails.Notes) {
+      this.Notesh += 5;
+      this.setPages(doc, 'Additional Notes', 20);
+      this.drawLine(doc, 'Additional Notes', 20);
+      this.Notesh += 5;
+      //this.setPages(doc, notes.NoteDetails.Notes, 25);
+      //this.Notesh += 15;
+      const wrappedNotes = doc.splitTextToSize(notes.NoteDetails.Notes, 170); // Adjust width as needed
+      const pageHeight = doc.internal.pageSize.height;
+      const lineHeight = 6;
+      if (this.Notesh + wrappedNotes.length * lineHeight > pageHeight - 20) {
+        doc.addPage();
+        this.Notesh = 30;
+      }
+      doc.text(wrappedNotes, 25, this.Notesh);
+      this.Notesh += wrappedNotes.length * lineHeight;
+      this.checkPageBreak(doc);
+    }
+}
+private addWrappedText(doc: jsPDF, text: string, x: number): void {
+  const maxWidth = 170;
+  const lineHeight = 6;
+  const lines = doc.splitTextToSize(text, maxWidth);
+  const pageHeight = doc.internal.pageSize.height;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+
+  if (this.Notesh + lines.length * lineHeight > pageHeight - 20) {
+    doc.addPage();
+    this.Notesh = 30;
+  }
+
+  doc.text(lines, x, this.Notesh);
+  this.Notesh += lines.length * lineHeight;
+  this.checkPageBreak(doc);
+}
 
 
   // ✅ Process Note Details
-  private processNoteDetails(doc: jsPDF, notes: any): void {
+  /*private processNoteDetails(doc: jsPDF, notes: any): void {
     if (!notes.NoteDetails) return;
 
     for (let mainQuestion of notes.NoteDetails.MainQuestions) {
@@ -720,7 +891,7 @@ checkPageBreak(doc: jsPDF) {
       this.Notesh += 15;
     }
   }
-
+*/
   // ✅ Process Sub Questions
   private processSubQuestions(doc: jsPDF, subQuestions: any[]): void {
     subQuestions.forEach((subQuestion) => {
@@ -966,11 +1137,11 @@ checkPageBreak(doc: jsPDF) {
       med.MedicineSchedule,
       this.ProcessSchedules(med),
       this.datepipe.transform(
-        med.StartDate,
+        this.convertToLocalTime(med.StartDate)!,
         'MMM d, y'
       ),
       this.datepipe.transform(
-        med.EndDate,
+        this.convertToLocalTime(med.EndDate)!,
         'MMM d, y'
       ),
     ]);
