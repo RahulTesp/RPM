@@ -1586,9 +1586,11 @@ export class RightSidebarComponent implements OnInit {
     return this.registerSchedule.valid;
   }
   private buildSingleScheduleUpdatePayload(): any {
+    const [scheduleyear, schedulemonth, scheduleday] = this.registerSchedule.controls.startDate.value.split('-').map(Number);
+    var scheduleDate = new Date(scheduleyear, schedulemonth - 1, scheduleday, 0, 0, 0);
     return {
       CurrentScheduleId: this.schedule_edit_id,
-      ScheduleDate: this.convertDate(this.registerSchedule.controls.startDate.value),
+      ScheduleDate: this.convertDate(scheduleDate),
       StartTime: this.registerSchedule.controls.startTime.value,
       Duration: this.durationValue,
       Comments: this.registerSchedule.controls.scheduleDescription.value,

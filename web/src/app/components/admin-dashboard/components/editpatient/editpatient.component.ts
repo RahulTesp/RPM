@@ -2110,6 +2110,9 @@ export class EditpatientComponent implements OnInit {
         }
       }
     }
+
+    console.log('Consultation Date confirm');
+    console.log(this.programForm.controls.consultdate.value)
     // var diagnostics = this.processDiagnostics(this.programForm.controls.diagnosisDataList.value);
     var diagnosis = this.Diagnosis_List;
     // var insuranceDeails = this.processInsurance(this.programForm_3.controls.insurance1.value,this.programForm_3.controls.insurance2.value,this.programForm_3.controls.insurance3.value)

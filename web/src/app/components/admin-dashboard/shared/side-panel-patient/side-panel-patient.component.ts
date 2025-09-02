@@ -1676,7 +1676,11 @@ export class SidePanelPatientComponent implements OnInit {
   }
 
   convertDate(dateval: any) {
+    console.log('convert Date');
+    console.log(dateval)
     let today = new Date(dateval);
+       console.log('convert Date After');
+    console.log(today)
     let dd = today.getDate();
     let dd2;
     if (dd < 10) {
@@ -1996,9 +2000,11 @@ export class SidePanelPatientComponent implements OnInit {
   private updateSingleSchedule() {
     if (!this.registerSchedule.valid) return this.showWarning('Please complete the form');
 
+    const [scheduleyear, schedulemonth, scheduleday] = this.registerSchedule.controls.startDate.value.split('-').map(Number);
+    var scheduleDate = new Date(scheduleyear, schedulemonth - 1, scheduleday, 0, 0, 0);
     const req_body = {
       CurrentScheduleId: this.schedule_edit_id,
-      ScheduleDate: this.convertDate(this.registerSchedule.controls.startDate.value),
+      ScheduleDate: this.convertDate(scheduleDate),
       StartTime: this.registerSchedule.controls.startTime.value,
       Duration: this.durationValue,
       Comments: this.registerSchedule.controls.scheduleDescription.value,
