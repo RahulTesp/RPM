@@ -4323,7 +4323,7 @@
 
             <mat-cell *matCellDef="let element">
               <span *ngIf="element.StartDate">{{
-                datepipe.transform(this.convertToLocalTime(element.StartDate), "MMM d,y")
+                datepipe.transform(element.StartDate, "MMM d,y")
               }}</span>
             </mat-cell>
           </ng-container>
@@ -4333,7 +4333,7 @@
 
             <mat-cell *matCellDef="let element">
               <span *ngIf="element.EndDate">{{
-                datepipe.transform(this.convertToLocalTime(element.EndDate), "MMM d,y")
+                datepipe.transform(element.EndDate , "MMM d,y")
               }}</span>
             </mat-cell>
           </ng-container>
