@@ -6,7 +6,7 @@ export const environment = {
   //host: 'c-lynxapi.azurewebsites.net',
   //host: 'cx-preprod-server.azurewebsites.net',
   // host: 'rpm-demo-api.azurewebsites.net',
-  // host: 'meditprodapi.azurewebsites.net',
+  //host: 'meditprodapi.azurewebsites.net',
   // host: 'md-preprod-server.azurewebsites.net',
   // host: 'md-dev-server.azurewebsites.net',
   //host:'rpm-dev-tespcare.azurewebsites.net',

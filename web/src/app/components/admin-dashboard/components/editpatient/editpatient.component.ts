@@ -1033,8 +1033,6 @@ export class EditpatientComponent implements OnInit {
         that.InsuranceInfo =
           that.Patientdata.PatientInsurenceDetails.PatientInsurenceInfos;
         that.EnrolmentDetails = that.Patientdata.PatientEnrolledDetails;
-        console.log("EnrolmentDetails");
-        console.log(that.EnrolmentDetails);
         that.ActiveDetails = that.Patientdata.ActivePatientDetails;
         that.ReadyToDischarge =
           that.Patientdata.ReadyForDischargePatientDetails;
@@ -1585,8 +1583,7 @@ export class EditpatientComponent implements OnInit {
   ChangePatientStatus(status: any, timeofcall: number) {
     // var status = "Prescribed";
 
-    console.log('Status-Change Patient Status');
-    console.log(status);
+
     if (status == 'OnHold') {
       this.setOnHold();
       return;
@@ -2357,7 +2354,6 @@ export class EditpatientComponent implements OnInit {
           );
         },
         (err:any) => {
-          console.log(err.error.Message)
           // this.openDialogWindow('Error', `Device not added to user assets!!!`);
           this.showconfirmDialog.showConfirmDialog(
             err.error.Message,
@@ -2437,8 +2433,7 @@ export class EditpatientComponent implements OnInit {
 
       this.rpm.rpm_post('/api/device/removedevice/iglucose', req_body).then(
         (data:any) => {
-          console.log('Remove Device');
-          console.log(data)
+
           if (!this.ErrorFlag) {
             // this.openDialogWindow('Success', `Device Removed Successfully.`);
             this.showconfirmDialog.showConfirmDialog(
@@ -2568,8 +2563,6 @@ export class EditpatientComponent implements OnInit {
       .rpm_get('/api/patient/getavailabledevices?VitalId=' + vital_id)
       .then(
         (data) => {
-          console.log('vitalId');
-          console.log(data)
           switch (vital_id) {
             case 1:
               that.deviceListBP = data;
@@ -2816,7 +2809,6 @@ export class EditpatientComponent implements OnInit {
   }
 
 submitImage(pid: any) {
-  console.log(this.image);
   const myPhoto = uuid.v4();
   const formData: any = new FormData();
   formData.append(myPhoto, this.image);
@@ -2874,8 +2866,6 @@ submitImage(pid: any) {
     // if (status == 'OnHold' && timeofcall == 2) {
     //   this.ImageStatus = false;
     // }
-    console.log('Status');
-    console.log(status);
     if (
       this.current_status_value == 'Prescribed' &&
       (status == 'Active' || status == 'ReadyToDischarge')
@@ -2914,8 +2904,7 @@ submitImage(pid: any) {
       return;
     }
     if (this.current_status_value == 'OnHold') {
-      console.log('Patient Status');
-      console.log(status);
+
       if (status == 'Discharged') {
         // this.dialogRef = this.dialog.open(ConfirmDialogComponent, {
         //   maxWidth: '400px',
@@ -3541,8 +3530,6 @@ submitImage(pid: any) {
         `/api/patient/getpatientlastpgmstatus?PatientId=${this.pid}&PatientProgramId=${this.patientprogramid}`
       )
       .then((data:any) => {
-        console.log('LastPatientMaesage');
-        console.log(data)
         this.last_status = data.message;
       });
   }
@@ -3661,12 +3648,6 @@ submitImage(pid: any) {
         for (let y of this.diaganosisMainList) {
           found = false;
           for (let x of this.editProgramDiagoList) {
-            console.log(
-              'x.DiagnosisCode: ' +
-                x.DiagnosisCode +
-                'y.DiagnosisCode: ' +
-                y.DiagnosisCode
-            );
             if (
               x.DiagnosisCode == y.DiagnosisCode &&
               y.DiagnosisCode.trim() != ''

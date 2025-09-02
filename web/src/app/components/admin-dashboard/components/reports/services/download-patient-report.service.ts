@@ -661,13 +661,16 @@ export class DownloadPatientReportService {
   }
 
 
-//  find page break 
+
+
+
+//  find page break
 checkPageBreak(doc: jsPDF) {
   const pageHeight = doc.internal.pageSize.height;
   if (this.Notesh > pageHeight - 20) {
     doc.addPage();
     this.Notesh = 30; // Reset to top margin
-    this.setSubHeadingStyle(doc); 
+    this.setSubHeadingStyle(doc);
   }
 }
 
