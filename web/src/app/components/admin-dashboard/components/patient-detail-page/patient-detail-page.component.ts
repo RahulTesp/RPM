@@ -2887,8 +2887,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                 this.BillingPeriodStart = this.convertDate(
                   new Date(x.BillingStartDate)
                 );
-                this.BillingPeriodEnd = new Date(x.BillingStartDate);
+                
                 if (this.billingtypeVariable == '30days') {
+                  const [Billingyear, Billingmonth, Billingday] = this.BillingPeriodStart.split('-').map(Number);
+                  this.BillingPeriodEnd = new Date(Billingyear, Billingmonth - 1, Billingday, 0, 0, 0);
                   this.BillingPeriodEnd = this.convertDate(
                     new Date(
                       this.BillingPeriodEnd.setDate(
@@ -2908,6 +2910,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                     );
                   }
                 } else {
+                  this.BillingPeriodEnd = new Date(x.BillingStartDate);
                   this.BillingPeriodEnd = new Date(
                     this.BillingPeriodEnd.setMonth(
                       this.BillingPeriodEnd.getMonth() + 1
@@ -2997,8 +3000,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                 this.BillingPeriodStart = this.convertDate(
                   new Date(x.BillingStartDate)
                 );
-                this.BillingPeriodEnd = new Date(x.BillingStartDate);
+                
                 if (this.billingtypeVariable == '30days') {
+                  const [Billingyear, Billingmonth, Billingday] = this.BillingPeriodStart.split('-').map(Number);
+                  this.BillingPeriodEnd = new Date(Billingyear, Billingmonth - 1, Billingday, 0, 0, 0);
                   this.BillingPeriodEnd = this.convertDate(
                     new Date(
                       this.BillingPeriodEnd.setDate(
@@ -3018,6 +3023,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                     );
                   }
                 } else {
+                  this.BillingPeriodEnd = new Date(x.BillingStartDate);
                   this.BillingPeriodEnd = new Date(
                     this.BillingPeriodEnd.setMonth(
                       this.BillingPeriodEnd.getMonth() + 1
