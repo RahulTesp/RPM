@@ -2918,34 +2918,45 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                     );
                   }
                 } else {
-                  this.BillingPeriodEnd = new Date(x.BillingStartDate);
-                  this.BillingPeriodEnd = new Date(
-                    this.BillingPeriodEnd.setMonth(
-                      this.BillingPeriodEnd.getMonth() + 1
-                    )
-                  );
-                  var day = this.BillingPeriodEnd.getDate();
-                  if (day <= 15) {
-                    this.BillingPeriodEnd.setDate(1);
-                  } else {
-                    this.BillingPeriodEnd.setDate(16);
-                  }
-                  this.BillingPeriodEnd = this.convertDate(
-                    this.BillingPeriodEnd
-                  );
+                      let endDate = new Date(this.BillingPeriodStart);
+                      endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
+                      endDate.setMonth(endDate.getMonth()+1);
+                      if (billingStartDate == '1-01-01') {
+                        this.BillingPeriodStart = undefined;
+                        this.BillingPeriodEnd = undefined;
+                      } 
+                      else {                        
+                        this.BillingPeriodEnd = this.Billing_ConvertDate(this.convertDate(endDate));
+                        this.BillingPeriodStart = this.Billing_ConvertDate(this.BillingPeriodStart);
+                      }
+                  // this.BillingPeriodEnd = new Date(x.BillingStartDate);
+                  // this.BillingPeriodEnd = new Date(
+                  //   this.BillingPeriodEnd.setMonth(
+                  //     this.BillingPeriodEnd.getMonth() + 1
+                  //   )
+                  // );
+                  // var day = this.BillingPeriodEnd.getDate();
+                  // if (day <= 15) {
+                  //   this.BillingPeriodEnd.setDate(1);
+                  // } else {
+                  //   this.BillingPeriodEnd.setDate(16);
+                  // }
+                  // this.BillingPeriodEnd = this.convertDate(
+                  //   this.BillingPeriodEnd
+                  // );
 
-                  // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
-                  if (billingStartDate == '1-01-01') {
-                    this.BillingPeriodStart = undefined;
-                    this.BillingPeriodEnd = undefined;
-                  } else {
-                    this.BillingPeriodStart = this.Billing_ConvertDate(
-                      this.BillingPeriodStart
-                    );
-                    this.BillingPeriodEnd = this.Billing_ConvertDate(
-                      this.BillingPeriodEnd
-                    );
-                  }
+                  // // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
+                  // if (billingStartDate == '1-01-01') {
+                  //   this.BillingPeriodStart = undefined;
+                  //   this.BillingPeriodEnd = undefined;
+                  // } else {
+                  //   this.BillingPeriodStart = this.Billing_ConvertDate(
+                  //     this.BillingPeriodStart
+                  //   );
+                  //   this.BillingPeriodEnd = this.Billing_ConvertDate(
+                  //     this.BillingPeriodEnd
+                  //   );
+                  // }
                 }
               } else if (x.CPTCode == '99453') {
                 this.displayText = 'Completed';
@@ -3031,33 +3042,44 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                     );
                   }
                 } else {
-                  this.BillingPeriodEnd = new Date(x.BillingStartDate);
-                  this.BillingPeriodEnd = new Date(
-                    this.BillingPeriodEnd.setMonth(
-                      this.BillingPeriodEnd.getMonth() + 1
-                    )
-                  );
-                  var day = this.BillingPeriodEnd.getDate();
-                  if (day <= 15) {
-                    this.BillingPeriodEnd.setDate(1);
-                  } else {
-                    this.BillingPeriodEnd.setDate(16);
-                  }
-                  this.BillingPeriodEnd = this.convertDate(
-                    this.BillingPeriodEnd
-                  );
-                  // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
-                  if (billingStartDate == '1-01-01') {
-                    this.BillingPeriodStart = undefined;
-                    this.BillingPeriodEnd = undefined;
-                  } else {
-                    this.BillingPeriodStart = this.Billing_ConvertDate(
-                      this.BillingPeriodStart
-                    );
-                    this.BillingPeriodEnd = this.Billing_ConvertDate(
-                      this.BillingPeriodEnd
-                    );
-                  }
+                      let endDate = new Date(this.BillingPeriodStart);
+                      endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
+                      endDate.setMonth(endDate.getMonth()+1);
+                      if (billingStartDate == '1-01-01') {
+                        this.BillingPeriodStart = undefined;
+                        this.BillingPeriodEnd = undefined;
+                      } 
+                      else {                        
+                        this.BillingPeriodEnd = this.Billing_ConvertDate(this.convertDate(endDate));
+                        this.BillingPeriodStart = this.Billing_ConvertDate(this.BillingPeriodStart);
+                      }
+                  // this.BillingPeriodEnd = new Date(x.BillingStartDate);
+                  // this.BillingPeriodEnd = new Date(
+                  //   this.BillingPeriodEnd.setMonth(
+                  //     this.BillingPeriodEnd.getMonth() + 1
+                  //   )
+                  // );
+                  // var day = this.BillingPeriodEnd.getDate();
+                  // if (day <= 15) {
+                  //   this.BillingPeriodEnd.setDate(1);
+                  // } else {
+                  //   this.BillingPeriodEnd.setDate(16);
+                  // }
+                  // this.BillingPeriodEnd = this.convertDate(
+                  //   this.BillingPeriodEnd
+                  // );
+                  // // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
+                  // if (billingStartDate == '1-01-01') {
+                  //   this.BillingPeriodStart = undefined;
+                  //   this.BillingPeriodEnd = undefined;
+                  // } else {
+                  //   this.BillingPeriodStart = this.Billing_ConvertDate(
+                  //     this.BillingPeriodStart
+                  //   );
+                  //   this.BillingPeriodEnd = this.Billing_ConvertDate(
+                  //     this.BillingPeriodEnd
+                  //   );
+                  // }
                 }
               }
             }
