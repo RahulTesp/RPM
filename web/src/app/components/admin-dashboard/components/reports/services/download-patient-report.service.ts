@@ -966,11 +966,11 @@ checkPageBreak(doc: jsPDF) {
       med.MedicineSchedule,
       this.ProcessSchedules(med),
       this.datepipe.transform(
-        this.convertToLocalTime(med.StartDate)!,
+        med.StartDate,
         'MMM d, y'
       ),
       this.datepipe.transform(
-        this.convertToLocalTime(med.EndDate)!,
+        med.EndDate,
         'MMM d, y'
       ),
     ]);
