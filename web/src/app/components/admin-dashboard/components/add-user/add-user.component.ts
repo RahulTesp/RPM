@@ -208,14 +208,6 @@ export class AddUserComponent implements OnInit {
         req_body['Id'] = this.put_user_id;
         this.rpm.rpm_post('/api/users/updateuser', req_body).then(
           (data) => {
-            // this.openDialog('Message', `User Detials Updated Successfully!!`);
-           // this.showDialog = true;
-
-          //   let route = '/admin/admin';
-          //  this.dialog.closeAll();
-          //   this.router.navigate([route], { queryParams: { page: 2 } });
-          //   this.resetAddPateintMasterData();
-          //   this.userVerifyCompleted = false;
           this.confirmDialog.showConfirmDialog(
             'User Details Updated Successfully!!',
             'Success',
@@ -223,7 +215,6 @@ export class AddUserComponent implements OnInit {
               this.router.navigate(['/admin/admin'], { queryParams: { page: 2 } });
               this.resetAddPateintMasterData();
               this.userVerifyCompleted = false;
-              this.submitImage(that.userId);
             },
             false
           );
@@ -236,7 +227,6 @@ export class AddUserComponent implements OnInit {
               null ,
               false// No action on confirm
             );
-            // this.openDialog('Error', `Something Went Wrong ${err}`);
           }
         );
       } else {
@@ -245,14 +235,6 @@ export class AddUserComponent implements OnInit {
             that.result = data;
             that.userId = that.result.UserId;
             that.password = that.result.password;
-            this.submitImage(that.userId);
-            // this.openDialog(
-            //   'Message',
-            //   `New User Added Successfully!! \n
-            //    Password:${that.password}
-            //   `
-            // );
-            // this.showDialog = true;
               this.confirmDialog.showConfirmDialog(
                 `New User Added Successfully!! \n
                Password:${that.password}
@@ -266,18 +248,8 @@ export class AddUserComponent implements OnInit {
                 },
                 false
               );
-            // let route = '/admin/admin';
-            //  this.dialog.closeAll();
-            // this.userVerifyCompleted = false;
-
-            // this.router.navigate([route], { queryParams: { page: 2 } });
-            // this.resetAddPateintMasterData();
-            // this.admincomponent.getAllUser();
           },
           (err) => {
-            //show error patient id creation failed
-            // this.showDialog = true;
-            // this.openDialog('Error', `Something Went Wrong ${err}`);
             this.confirmDialog.showConfirmDialog(
               'Something Went Wrong',
               'Error',
@@ -288,8 +260,6 @@ export class AddUserComponent implements OnInit {
         );
       }
     } else if (!this.successUser && !this.editVariable) {
-      // this.openDialog('Error', `Please verify user`);
-      // this.showDialog = true;
       this.confirmDialog.showConfirmDialog(
         'Please verify user',
         'Error',
@@ -377,6 +347,7 @@ export class AddUserComponent implements OnInit {
           this.stateVariable = this.http_user_data.StateId;
           this.cityVariable = this.http_user_data.CityId;
           this.imagePath = this.http_user_data.Picture;
+          this.imagePath = encodeURI(this.imagePath)
 
         });
     }
@@ -493,19 +464,35 @@ export class AddUserComponent implements OnInit {
     // a[0].setAttribute("style", "background-image:"+this.image.name);
     // a[0].setAttribute("style", "background: url(\"https://rpmstorage123.blob.core.windows.net/rpmprofilepictures/CL500626\"); background-repeat: no-repeat;  background-size: 100% 100%;");
   }
-  submitImage(pid: any) {
-    if (this.image) {
-      const myPhoto = uuid.v4();
-      var formData: any = new FormData();
-      formData.append(myPhoto, this.image);
-      this.rpm
-        .rpm_post(`/api/users/addimage?UserId=${pid}`, formData)
-        .then(
-          (data) => {},
-          (err:any) => {
-            alert(err.error.message);
-          }
-        );
-    }
+  async saveUserFlow() {
+  try {
+    await this.submitImage(this.put_user_id);  // wait until upload completes
+    this.registerUser();               // run only if upload succeeded
+  } catch (err:any) {
+   alert(`${err.error.message} Registration aborted.`);
   }
+}
+
+  submitImage(pid: any) {
+  if (this.image) {
+    const myPhoto = uuid.v4();
+    const formData: any = new FormData();
+    formData.append(myPhoto, this.image);
+
+    // ✅ return the Promise
+    return this.rpm
+      .rpm_post(`/api/users/addimage?UserId=${pid}`, formData)
+      .then((data) => {
+        return data;
+      })
+      .catch((err: any) => {
+       this.image = null;
+       this.file = null;
+        throw err;
+      });
+  } else {
+    // ✅ always return a promise
+    return Promise.resolve(null);
+  }
+}
 }

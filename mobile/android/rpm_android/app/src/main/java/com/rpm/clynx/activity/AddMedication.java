@@ -248,10 +248,20 @@ public class AddMedication extends AppCompatActivity {
     }
 
     private void initToolbar() {
-        androidx.appcompat.widget.Toolbar toolbar = (androidx.appcompat.widget.Toolbar) findViewById(R.id.toolbar);
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar();
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);  // shows the arrow, though your XML already sets it
+        }
+
+        // Handle the back arrow click
+        toolbar.setNavigationOnClickListener(v -> {
+            // This will finish your activity and go back
+            finish();
+        });
     }
+
     public void addmedication(View view) throws ParseException {
         if (ValidateData(valid1 == false)) {
             Log.d("validfalse","validfalse");

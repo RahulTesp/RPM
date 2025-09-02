@@ -1,26 +1,27 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using iText.Forms.Form.Element;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using RPMWeb.Data.Common;
 using System.Data;
-using Microsoft.Data.SqlClient;
+using System.Globalization;
 using System.Reflection;
-using DataTable = System.Data.DataTable;
-using Font = iTextSharp.text.Font;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Workbook = DocumentFormat.OpenXml.Spreadsheet.Workbook;
-using Worksheet = DocumentFormat.OpenXml.Spreadsheet.Worksheet;
-using Sheets = DocumentFormat.OpenXml.Spreadsheet.Sheets;
-using Values = RPMWeb.Data.Common.Values;
+using System.Text.RegularExpressions;
 using Border = DocumentFormat.OpenXml.Spreadsheet.Border;
 using Borders = DocumentFormat.OpenXml.Spreadsheet.Borders;
 using CellFormat = DocumentFormat.OpenXml.Spreadsheet.CellFormat;
-using System.Globalization;
-using iText.Forms.Form.Element;
-using Microsoft.AspNetCore.Http;
+using DataTable = System.Data.DataTable;
+using Font = iTextSharp.text.Font;
+using Sheets = DocumentFormat.OpenXml.Spreadsheet.Sheets;
+using Values = RPMWeb.Data.Common.Values;
+using Workbook = DocumentFormat.OpenXml.Spreadsheet.Workbook;
+using Worksheet = DocumentFormat.OpenXml.Spreadsheet.Worksheet;
 
 namespace RPMWeb.Dal
 {
@@ -530,7 +531,7 @@ namespace RPMWeb.Dal
         }
         public bool UpdatePatient(PatientDetails Info, string ConnectionString)
         {
-            
+
             bool ret = true;
             try
             {
@@ -1012,8 +1013,8 @@ namespace RPMWeb.Dal
                                         getPatientPrescribtionDetails.PhysicianId = (!DBNull.Value.Equals(ds.Tables[3].Rows[0]["PhysicianId"])) ? Convert.ToInt32(ds.Tables[3].Rows[0]["PhysicianId"]) : 0;
                                         getPatientPrescribtionDetails.Physician = ds.Tables[3].Rows[0]["Physician"].ToString();
                                         getPatientPrescribtionDetails.ConsultationDate = ds.Tables[3].Rows[0]["ConsultationDate"].ToString(); //fix
-                                       // getPatientPrescribtionDetails.ConsultationDate = (DateTime)ds.Tables[3].Rows[0]["ConsultationDate"];
-                                       // getPatientPrescribtionDetails.ConsultationDate= (!DBNull.Value.Equals(ds.Tables[0].Rows[0]["ConsultationDate"]) ? (DateTime)ds.Tables[3].Rows[0]["ConsultationDate"] : (DateTime)ds.Tables[3].Rows[0]["PrescribedDate"]);
+                                                                                                                                              // getPatientPrescribtionDetails.ConsultationDate = (DateTime)ds.Tables[3].Rows[0]["ConsultationDate"];
+                                                                                                                                              // getPatientPrescribtionDetails.ConsultationDate= (!DBNull.Value.Equals(ds.Tables[0].Rows[0]["ConsultationDate"]) ? (DateTime)ds.Tables[3].Rows[0]["ConsultationDate"] : (DateTime)ds.Tables[3].Rows[0]["PrescribedDate"]);
                                         getPatientPrescribtionDetails.ClinicCode = ds.Tables[3].Rows[0]["ClinicCode"].ToString();
                                         getPatientPrescribtionDetails.Clinic= ds.Tables[3].Rows[0]["Clinic"].ToString();
                                         getPatientPrescribtionDetails.Branch = ds.Tables[3].Rows[0]["Branch"].ToString();
@@ -1295,6 +1296,20 @@ namespace RPMWeb.Dal
                             info.ProgramName = reader["ProgramName"].ToString();
                             info.Program= reader["Program"].ToString();
                             info.EnrolledDate = reader["EnrolledDate"].ToString();
+                            if (!string.IsNullOrWhiteSpace(info.EnrolledDateTime))
+                            {
+                                info.EnrolledDateTime = Regex.Replace(info.EnrolledDateTime, @"\s+", " ").Trim();
+                                DateTime parsedDate = DateTime.ParseExact(info.EnrolledDateTime, "MMM d yyyy h:mmtt", CultureInfo.InvariantCulture);
+
+
+
+                                // Convert to ISO 8601 format
+                                string formattedDate = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
+
+                                // Assign to your object
+                                info.EnrolledDateTime = formattedDate;
+                                info.EnrolledDate = parsedDate.ToString("MMM dd yyyy");
+                            }
                             info.PhysicianName = reader["PhysicianName"].ToString();
                             info.AssignedMember = reader["AssignedMember"].ToString();
                             info.PatientType = reader["PatientType"].ToString();
@@ -1344,6 +1359,24 @@ namespace RPMWeb.Dal
                             info.ProgramName = reader["ProgramName"].ToString();
                             info.Program = reader["Program"].ToString();
                             info.EnrolledDate = reader["EnrolledDate"].ToString();
+                            info.EnrolledDateTime = info.EnrolledDate;
+
+                            if (!string.IsNullOrWhiteSpace(info.EnrolledDateTime))
+                            { 
+                                info.EnrolledDateTime = Regex.Replace(info.EnrolledDateTime, @"\s+", " ").Trim();
+                                DateTime parsedDate = DateTime.ParseExact(info.EnrolledDateTime, "MMM d yyyy h:mmtt", CultureInfo.InvariantCulture);
+
+                                
+
+                                // Convert to ISO 8601 format
+                                string formattedDate = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
+
+                                // Assign to your object
+                                info.EnrolledDateTime = formattedDate;
+                                info.EnrolledDate = parsedDate.ToString("MMM dd yyyy");
+                            }
+                            
+
                             info.PhysicianName = reader["PhysicianName"].ToString();
                             info.AssignedMember = reader["AssignedMember"].ToString();
                             info.PatientType = reader["PatientType"].ToString();
@@ -1356,7 +1389,7 @@ namespace RPMWeb.Dal
                 }
                 return list;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
                 throw;
@@ -1364,7 +1397,7 @@ namespace RPMWeb.Dal
 
         }
 
-        public List<GetAllPatientSmsInfo> GetAllPatientsSmsList( int RoleId, string CreatedBy, string ConnectionString)
+        public List<GetAllPatientSmsInfo> GetAllPatientsSmsList(int RoleId, string CreatedBy, string ConnectionString)
         {
             List<GetAllPatientSmsInfo> list = new List<GetAllPatientSmsInfo>();
             try
@@ -1388,7 +1421,7 @@ namespace RPMWeb.Dal
                             info.ProgramName = reader["ProgramName"].ToString();
                             info.Senddate = reader["SentDate"].ToString();
                             DateTime parsedDate;
-                            DateTime.TryParse(info.Senddate,out parsedDate);
+                            DateTime.TryParse(info.Senddate, out parsedDate);
                             string formattedDate = parsedDate.ToString("yyyy-MM-dd HH:mm:ss");
                             info.Senddate = formattedDate;
                             info.Senddate = info.Senddate.ToString();
@@ -1782,8 +1815,8 @@ namespace RPMWeb.Dal
                                 }
                                 else
                                 {
-                                    if(sDate.Date == EndDate.Date) { sDate=sDate.AddSeconds(-1);}
-                                    xAxisInfo.Add(sDate); 
+                                    if (sDate.Date == EndDate.Date) { sDate=sDate.AddSeconds(-1); }
+                                    xAxisInfo.Add(sDate);
                                 }
                             }
                             string sVitalName = string.Empty;
@@ -1830,12 +1863,13 @@ namespace RPMWeb.Dal
                                 ret.Values.Add(v);
                             }
                         }
-                        else {
+                        else
+                        {
                             VitalMeasure vitaldata = new VitalMeasure();
-                            vitaldata = GetLatestReading(username, 7, ConnectionString,null);
+                            vitaldata = GetLatestReading(username, 7, ConnectionString, null);
                             ret.LatestVitalMeasure = vitaldata;
                         }
-                        
+
                     }
                 }
                 return ret;
@@ -2175,37 +2209,37 @@ namespace RPMWeb.Dal
                                     }
                                 }
 
-                               /* int i = 0;
-                                List<DateTime> DateTimeAdded = data.Measurements[i].Time;
+                                /* int i = 0;
+                                 List<DateTime> DateTimeAdded = data.Measurements[i].Time;
 
-                                List<DateTime> newDateList = dateTimeAll.Except(DateTimeAdded).ToList();
-                                /* foreach (DateTime datee in dateTimeAll)
+                                 List<DateTime> newDateList = dateTimeAll.Except(DateTimeAdded).ToList();
+                                 /* foreach (DateTime datee in dateTimeAll)
+                                  {
+
+                                      bool alreadyExists = DateTimeAdded.Any(x => x.Date==datee.Date);
+                                      if (!alreadyExists)
+                                      {
+                                          foreach(var vitals in data.Measurements)
+                                          {
+                                              data.Measurements[i].Time.Add(datee);
+                                              data.Measurements[i].Value.Add("null");
+
+                                          }
+
+
+                                      }
+
+
+                                  }
+                                  i++;
+                                 foreach (DateTime datee in newDateList)
                                  {
+                                     vitals.Time.Add(datee);
+                                     vitals.Value.Add("null");
+                                 }*/
 
-                                     bool alreadyExists = DateTimeAdded.Any(x => x.Date==datee.Date);
-                                     if (!alreadyExists)
-                                     {
-                                         foreach(var vitals in data.Measurements)
-                                         {
-                                             data.Measurements[i].Time.Add(datee);
-                                             data.Measurements[i].Value.Add("null");
-
-                                         }
-
-
-                                     }
-
-
-                                 }
-                                 i++;
-                                foreach (DateTime datee in newDateList)
-                                {
-                                    vitals.Time.Add(datee);
-                                    vitals.Value.Add("null");
-                                }*/
-                                
                             }
-                            
+
                         }
 
                         /*DateTime[] dates = dt.AsEnumerable().Select(s => s.Field<DateTime>("CreatedOn").Date).Distinct().ToArray<DateTime>();
@@ -2237,7 +2271,7 @@ namespace RPMWeb.Dal
                             lstSummery.Add(ret);
                         }*/
 
-                        
+
                         return lstSummery;
                     }
                 }
@@ -2443,9 +2477,9 @@ namespace RPMWeb.Dal
                                     list.vitals.Add(vitalslistpulse);
 
                                 }
-                               // list.vitals.Add(vitalslist);
+                                // list.vitals.Add(vitalslist);
                             }
-       
+
                         }
 
                         return list;
@@ -2643,8 +2677,8 @@ namespace RPMWeb.Dal
                                     Reportlist.Add(info);
                                 }
                             }
-                        
-                    }
+
+                        }
                         reader.Close();
                         /*if (list.Count > 0)
                         {
@@ -2703,8 +2737,8 @@ namespace RPMWeb.Dal
                 {
                     Reportlist = (List<PatientBillReport>)Reportlist.Where(s => s.clinic == clinic).ToList();
                     isClinic = true;
-                    if(Reportlist.Count > 0)
-                    clinic = Reportlist[0].ClinicName.ToString();
+                    if (Reportlist.Count > 0)
+                        clinic = Reportlist[0].ClinicName.ToString();
                 }
                 else if (!string.IsNullOrEmpty(cptCode) && string.IsNullOrEmpty(clinic))
                 {
@@ -2774,7 +2808,7 @@ namespace RPMWeb.Dal
                             info.CPT99437 = "NA";
                             info.CPT99487 = "NA";
                             info.CPT99489 = "NA";
-                            if ( ApplicableCPTCodes.Contains("99490"))
+                            if (ApplicableCPTCodes.Contains("99490"))
                             {
                                 info.CPT99490 = reader["99490"].ToString();
                                 info.CPT99490 =  Convert.ToString(ConvertSecondsToMinutes(Convert.ToInt32(info.CPT99490)));
@@ -2804,13 +2838,13 @@ namespace RPMWeb.Dal
                                 info.CPT99489 = reader["99489"].ToString();
                                 info.CPT99489 = Convert.ToString(ConvertSecondsToMinutes(Convert.ToInt32(info.CPT99489)));
                             }
-                           
 
-                            
-                            
-                            
-                            
-                            
+
+
+
+
+
+
                             info.EnrolledDate = Convert.ToDateTime(reader["ENROLL DATE"]);
                             info.clinic = reader["CLINIC"].ToString();
                             info.clinicname = reader["clinicname"].ToString();
@@ -3027,9 +3061,9 @@ namespace RPMWeb.Dal
                                 info.CPT99427 = reader["99427"].ToString();
                                 info.CPT99427 =  Convert.ToString(ConvertSecondsToMinutes(Convert.ToInt32(info.CPT99427)));
                             }
-                            
 
-                            
+
+
 
                             info.EnrolledDate = Convert.ToDateTime(reader["ENROLL DATE"]);
                             info.clinic = reader["CLINIC"].ToString();
@@ -3919,7 +3953,7 @@ namespace RPMWeb.Dal
                         if (result != null)
                         {
                             var pulse = dt.AsEnumerable().Where(p => p.Field<string>("MeasureName") == "Pulse").OrderByDescending(y => y.Field<DateTime>("CreatedOn")).FirstOrDefault();
-                            if(vitalname== null)
+                            if (vitalname== null)
                             {
                                 vitalname = result["Name"].ToString();
                             }
@@ -3948,7 +3982,7 @@ namespace RPMWeb.Dal
                                 string[] myString = Values.ToArray();
                                 ret.Value = string.Join(" / ", myString);
 
-                            } 
+                            }
                             else
                             {
                                 ret.Value = result["MeasureValue"].ToString();
@@ -6030,7 +6064,7 @@ namespace RPMWeb.Dal
                         PatientBilldatas.ReadyTobill = 0;
                         return PatientBilldatas;
                     }
-                    else if (StartDateTemp > Today && PatientStartDate.Status.ToLower() == "active")
+                    else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
                     {
                         PatientBilldatas = new PatientBilldata();
                         PatientBilldatas.CPTCode = code.BillingCode;
@@ -6045,14 +6079,14 @@ namespace RPMWeb.Dal
                         DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
                         DateTime endDate = DateTime.UtcNow.Date;
                         DateTime stDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
-
-                        DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+                        DateTime Todayy = DateTime.UtcNow;
+                        DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)Todayy, connectionString);
 
                         // endDate = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
                         //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
                         //the patientbilling table and +1 day will come as next start day.. So we should   
                         // calcualte the start date with respect to the billing threshold
-                        if (stDatetemp > endDatetemp)
+                        if (stDate.Date > endDatetemp)
                         {
                             //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                             BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
@@ -8615,7 +8649,7 @@ namespace RPMWeb.Dal
             {
                 Console.WriteLine("Exception occured - class Name :" + this.GetType().Name + ",  Method Name : " + MethodBase.GetCurrentMethod().Name + ", Error Message :" + ex.Message + "");
                 return null;
-        }
+            }
 
 
 
@@ -10320,7 +10354,7 @@ namespace RPMWeb.Dal
 
 
         }
-        
+
         public List<VitalReading> GetVitalReadingsLocal(int patientProgramId, string connectionString, DateTime startDate, DateTime endDate)
         {
 
@@ -12023,7 +12057,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string datss = stDate.ToString();
+                        datss = datss.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(datss);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12042,7 +12078,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string datess = stDate.ToString();
+                        datess = datess.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(datess);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12051,7 +12089,9 @@ namespace RPMWeb.Dal
                     {
                         TotalReading = code.TargetReadings * 60;
                     }
-                    pbd.BillingStartDate = (DateTime)stDate;
+                    string dates = stDate.ToString();
+                    dates = dates.Replace("Z", "");
+                    pbd.BillingStartDate = DateTime.Parse(dates);
                     pbd.CPTCode = code.BillingCode;
                     pbd.Completed = TotalReading;
                     pbd.Total = code.TargetReadings * 60;
@@ -12135,7 +12175,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string datss = stDate.ToString();
+                        datss = datss.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(datss);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12154,7 +12196,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string datess = stDate.ToString();
+                        datess = datess.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(datess);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12164,7 +12208,9 @@ namespace RPMWeb.Dal
                         TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
                         TotalReading = (int)(t1.TotalSeconds - (code490.TargetReadings * 60));
 
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dates = stDate.ToString();
+                        dates = dates.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dates);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = TotalReading;
                         if (TotalReading < code490.TargetReadings * 60)
@@ -12184,7 +12230,9 @@ namespace RPMWeb.Dal
                     else
                     {
                         //Target reading 20
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dats = stDate.ToString();
+                        dats = dats.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dats);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = 0;
                         pbd.Total = code490.TargetReadings * 60;
@@ -12278,7 +12326,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dats = stDate.ToString();
+                        dats = dats.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dats);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12297,7 +12347,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dates = stDate.ToString();
+                        dates = dates.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dates);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12306,7 +12358,9 @@ namespace RPMWeb.Dal
                     {
                         TotalReading = code.TargetReadings * 60;
                     }
-                    pbd.BillingStartDate = (DateTime)stDate;
+                    string datess = stDate.ToString();
+                    datess = datess.Replace("Z", "");
+                    pbd.BillingStartDate = DateTime.Parse(datess);
                     pbd.CPTCode = code.BillingCode;
                     pbd.Completed = TotalReading;
                     pbd.Total = code.TargetReadings * 60;
@@ -12391,7 +12445,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string datess = stDate.ToString();
+                        datess = datess.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(datess);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12410,7 +12466,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dates = stDate.ToString();
+                        dates = dates.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dates);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12420,7 +12478,9 @@ namespace RPMWeb.Dal
                         TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
                         TotalReading = (int)(t1.TotalSeconds - (code491.TargetReadings * 60));
 
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string date = stDate.ToString();
+                        date = date.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(date);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = TotalReading;
                         if (TotalReading < code491.TargetReadings * 60)
@@ -12440,7 +12500,9 @@ namespace RPMWeb.Dal
                     else
                     {
                         //Target reading 20
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateN = stDate.ToString();
+                        dateN = dateN.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateN);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = 0;
                         pbd.Total = code491.TargetReadings * 60;
@@ -12532,7 +12594,11 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
+
+
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12551,7 +12617,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string date = stDate.ToString();
+                        date = date.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(date);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12560,7 +12628,9 @@ namespace RPMWeb.Dal
                     {
                         TotalReading = code.TargetReadings * 60;
                     }
-                    pbd.BillingStartDate = (DateTime)stDate;
+                    string Newdate = stDate.ToString();
+                    Newdate = Newdate.Replace("Z", "");
+                    pbd.BillingStartDate = DateTime.Parse(Newdate);
                     pbd.CPTCode = code.BillingCode;
                     pbd.Completed = TotalReading;
                     pbd.Total = code.TargetReadings * 60;
@@ -12644,7 +12714,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12663,7 +12735,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string date = stDate.ToString();
+                        date = date.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(date);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12673,7 +12747,9 @@ namespace RPMWeb.Dal
                         TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
                         TotalReading = (int)(t1.TotalSeconds - (code487.TargetReadings * 60));
 
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = TotalReading;
 
@@ -12778,7 +12854,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12797,7 +12875,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string date = stDate.ToString();
+                        date = date.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(date);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12806,7 +12886,9 @@ namespace RPMWeb.Dal
                     {
                         TotalReading = code.TargetReadings * 60;
                     }
-                    pbd.BillingStartDate = (DateTime)stDate;
+                    string Newdate = stDate.ToString();
+                    Newdate = Newdate.Replace("Z", "");
+                    pbd.BillingStartDate = DateTime.Parse(Newdate);
                     pbd.CPTCode = code.BillingCode;
                     pbd.Completed = TotalReading;
                     pbd.Total = code.TargetReadings * 60;
@@ -12890,7 +12972,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string Newdate = stDate.ToString();
+                        Newdate = Newdate.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(Newdate);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12909,7 +12993,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string date = stDate.ToString();
+                        date = date.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(date);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12919,7 +13005,9 @@ namespace RPMWeb.Dal
                         TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
                         TotalReading = (int)(t1.TotalSeconds - (code424.TargetReadings * 60));
 
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = TotalReading;
                         if (TotalReading < code424.TargetReadings * 60)
@@ -12939,7 +13027,9 @@ namespace RPMWeb.Dal
                     else
                     {
                         //Target reading 20
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNews = stDate.ToString();
+                        dateNews = dateNews.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNews);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = 0;
                         pbd.Total = code424.TargetReadings * 60;
@@ -13031,7 +13121,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNews = stDate.ToString();
+                        dateNews = dateNews.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNews);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -13050,7 +13142,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -13059,7 +13153,9 @@ namespace RPMWeb.Dal
                     {
                         TotalReading = code.TargetReadings * 60;
                     }
-                    pbd.BillingStartDate = (DateTime)stDate;
+                    string dates = stDate.ToString();
+                    dates = dates.Replace("Z", "");
+                    pbd.BillingStartDate = DateTime.Parse(dates);
                     pbd.CPTCode = code.BillingCode;
                     pbd.Completed = TotalReading;
                     pbd.Total = code.TargetReadings * 60;
@@ -13143,7 +13239,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dates = stDate.ToString();
+                        dates = dates.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dates);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -13162,7 +13260,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -13172,7 +13272,9 @@ namespace RPMWeb.Dal
                         TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
                         TotalReading = (int)(t1.TotalSeconds - (code426.TargetReadings * 60));
 
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNw = stDate.ToString();
+                        dateNw = dateNw.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNw);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = TotalReading;
                         if (TotalReading < code426.TargetReadings * 60)
@@ -13192,7 +13294,9 @@ namespace RPMWeb.Dal
                     else
                     {
                         //Target reading 20
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateN = stDate.ToString();
+                        dateN = dateN.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateN);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = 0;
                         pbd.Total = code426.TargetReadings * 60;
@@ -13210,7 +13314,7 @@ namespace RPMWeb.Dal
 
         }
 
-        public string DownloadInvoice(string Blob_Conn_String,string ContainerName, string ConnectionString)
+        public string DownloadInvoice(string Blob_Conn_String, string ContainerName, string ConnectionString)
         {
             string Uri = "";
             try
@@ -13409,8 +13513,8 @@ namespace RPMWeb.Dal
                     Reportlist = (List<PatientBillReportDetails>)Reportlist.Where(s => s.clinic == clinic).ToList();
                     isClinic = true;
                     isCptCode = true;
-                    if(Reportlist.Count>0)
-                    clinic = Reportlist[0].clinicname.ToString();
+                    if (Reportlist.Count>0)
+                        clinic = Reportlist[0].clinicname.ToString();
                 }
 
                 if (Reportlist.Count > 0)
@@ -13621,7 +13725,7 @@ namespace RPMWeb.Dal
             try
             {
                 string PatientNumber = dtblTable.Rows[0][2].ToString();
-               
+
                 PdfPTable table = new PdfPTable(dtblTable.Columns.Count);
                 System.IO.FileStream fs = new FileStream(strPdfPath, FileMode.Create, FileAccess.Write, FileShare.None);
                 Document document = new Document();
@@ -13682,8 +13786,8 @@ namespace RPMWeb.Dal
                 //Table header
                 BaseFont btnColumnHeader = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
                 Font fntColumnHeader = new Font(btnColumnHeader, 10, 1, BaseColor.WHITE);
-                
-                
+
+
                 for (int i = 0; i < dtblTable.Columns.Count; i++)
                 {
                     var cells = new PdfPCell() { HorizontalAlignment = Element.ALIGN_CENTER };
@@ -13753,7 +13857,7 @@ namespace RPMWeb.Dal
                         SqlDataReader reader = command.ExecuteReader();
 
                         PatientDocuments patientData = new PatientDocuments();
-       
+
                         while (reader.Read())
                         {
 
@@ -13789,12 +13893,12 @@ namespace RPMWeb.Dal
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {
                     SqlCommand command = new SqlCommand("usp_InsPatientSMSDetails", con);
-                    
+
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@CreatedBy", UserName);
-                    command.Parameters.AddWithValue("@PatientUserName",Info.PatientUserName);
-                    command.Parameters.AddWithValue("@fromNo",Info.fromNo);
-                    command.Parameters.AddWithValue("@toNo",Info.toNo);
+                    command.Parameters.AddWithValue("@PatientUserName", Info.PatientUserName);
+                    command.Parameters.AddWithValue("@fromNo", Info.fromNo);
+                    command.Parameters.AddWithValue("@toNo", Info.toNo);
                     command.Parameters.AddWithValue("@Body", Info.Body);
                     command.Parameters.AddWithValue("@SentDate", Info.SentDate);
                     command.Parameters.AddWithValue("@Direction", Info.Direction);
@@ -13833,9 +13937,9 @@ namespace RPMWeb.Dal
             }
             catch (Exception ex) { throw ex; }
         }
-        
+
         // for getting patient sms history (incoming and outgoing)
-        public List<GetSmsInfo> GetPatientSmsDetails(int PatientId, int PatientProgramId,DateTime StartDate, DateTime EndDate, string CreatedBy, string ConnectionString)
+        public List<GetSmsInfo> GetPatientSmsDetails(int PatientId, int PatientProgramId, DateTime StartDate, DateTime EndDate, string CreatedBy, string ConnectionString)
         {
             List<GetSmsInfo> fullsmsdetails = new List<GetSmsInfo>();
             try
@@ -13855,7 +13959,7 @@ namespace RPMWeb.Dal
                     returnParameter.Direction = ParameterDirection.ReturnValue;
                     con.Open();
                     SqlDataReader reader = command.ExecuteReader();
-                    
+
 
                     while (reader.Read())
                     {
@@ -13865,11 +13969,11 @@ namespace RPMWeb.Dal
                         info.Sender = reader["CreatedBy"].ToString();
                         info.Status = reader["Status"].ToString();
                         info.Direction = reader["Direction"].ToString();
-                        if(info.Direction== "inbound-api")
+                        if (info.Direction== "inbound-api")
                         {
                             info.Sender = "Patient";
                         }
-                        else if(info.Direction== "outbound-api")
+                        else if (info.Direction== "outbound-api")
                         {
                             info.Sender = "Care Team";
                         }
@@ -13925,7 +14029,7 @@ namespace RPMWeb.Dal
             return true;
         }
 
-  
+
     }
 
 

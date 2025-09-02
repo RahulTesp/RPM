@@ -2,14 +2,17 @@ package com.rpm.clynx.model;
 
 import android.util.Log;
 
+import com.twilio.conversations.Conversation;
+
 public class Chat {
     private String chatMemberName, sid;
     private String timestamp, lastMsgText, friendlyUserName; // Formatted timestamp for display
     private int unreadCount;
     private long timestampMillis; // Store raw timestamp for sorting
     private boolean isTyping;
+    private Conversation conversation;
 
-    public Chat(String friendlyUserName, String chatMemberName, String timestamp, int unreadCount, long timestampMillis, boolean isTyping, String lastMsgText, String sid) {
+    public Chat(String friendlyUserName, String chatMemberName, String timestamp, int unreadCount, long timestampMillis, boolean isTyping, String lastMsgText, String sid,Conversation conversation) {
         this.chatMemberName = chatMemberName;
         this.timestamp = timestamp;
         this.unreadCount = unreadCount;
@@ -18,6 +21,7 @@ public class Chat {
         this.lastMsgText = lastMsgText;
         this.sid = sid;
         this.friendlyUserName = friendlyUserName;
+        this.conversation = conversation;
         Log.d("Chat List Values",chatMemberName+timestamp+unreadCount+timestampMillis);
     }
     public String getChatMemberName() { return chatMemberName; }
@@ -49,4 +53,8 @@ public class Chat {
         Log.d("setTyping", String.valueOf(typing));
         isTyping = typing;
     }
+
+
+    public Conversation getConversation() { return conversation; }
+    public void setConversation(Conversation conversation) { this.conversation = conversation; }
 }

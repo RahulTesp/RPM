@@ -45,17 +45,20 @@ ngOnInit() {
     req_body['EndDate'] =
       this.renewProgramForm.controls.pgmendDate.value + 'T00:00:00';
     this.rpm.rpm_post('/api/patient/renewpatientprogram', req_body).then(
-      (data) => {
+      (data:any) => {
         this.auth.reloadPatientList('PatientList Updated');
         alert('Program Renewed Successfully !!');
-        this.newProgramid = data;
+        this.newProgramid = data.message;
 
         let route = '/admin/patients_detail';
-
+        if(this.newProgramid)
+        {
         this.router.navigate([route], {
           queryParams: { id: this.currentpPatientId, programId: this.newProgramid },
           skipLocationChange: true,
         });
+        }
+
 
         this.cancelRenew.emit();
        // this.showProgramRenewModal=false;

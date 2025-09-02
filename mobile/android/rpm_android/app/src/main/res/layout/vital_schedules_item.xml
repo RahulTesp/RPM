@@ -7,7 +7,7 @@
     android:background="@drawable/pgm_info_bg"
     android:orientation="vertical"
     android:layout_marginVertical="@dimen/spacing_medium"
-    android:padding="10dp">
+  >
 
     <LinearLayout
         android:layout_width="match_parent"

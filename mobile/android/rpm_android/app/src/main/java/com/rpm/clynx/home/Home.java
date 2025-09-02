@@ -24,9 +24,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.rpm.clynx.activity.MoreActivity;
 import com.rpm.clynx.fragments.DashboardFragment;
 import com.rpm.clynx.fragments.Login;
+import com.rpm.clynx.fragments.MoreFragment;
 import com.rpm.clynx.fragments.ToDoListFragment;
 import com.rpm.clynx.fragments.VitalHealthTrends;
 import com.rpm.clynx.utility.DataBaseHelper;
@@ -277,8 +277,7 @@ public class Home extends AppCompatActivity {
                     replaceFragment(new VitalHealthTrends());
                     return true;
                 } else if (itemId == R.id.More) {
-                    Intent more = new Intent(Home.this, MoreActivity.class);
-                    startActivity(more);
+                    replaceFragment(new MoreFragment());
                     return true;
                 }
                 return false;

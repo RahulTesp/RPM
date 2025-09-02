@@ -20,14 +20,14 @@ namespace RPMPatientBillingJob
                     if (provider.Value == "30days")
                     {
                         RPMPatientBilling.PatientBilling.RPMDaysBasedBilling rpmDays = new RPMPatientBilling.PatientBilling.RPMDaysBasedBilling();
-                        rpm.GenaratePateintBillingCount(cs);
+                        rpmDays.GenaratePateintBillingCount(cs);
                         rpmDays.UpdatePatientBilling(cs);
                         Console.WriteLine(@"BillingProcess Initializing  - Running finish time" + DateTime.UtcNow);
                     }
                     else if (provider.Value == "cycle")
                     {
                         RPMPatientBilling.PatientBilling.RPMCycleBasedBilling rpmCycle = new RPMPatientBilling.PatientBilling.RPMCycleBasedBilling();
-                        rpm.GenaratePateintBillingCount(cs);
+                        rpmCycle.GenaratePateintBillingCount(cs);
                         rpmCycle.UpdatePatientBilling(cs);
                         Console.WriteLine(@"BillingProcess Initializing  - Running finish time" + DateTime.UtcNow);
                     }

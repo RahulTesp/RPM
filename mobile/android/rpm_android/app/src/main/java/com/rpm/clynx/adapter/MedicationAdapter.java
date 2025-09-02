@@ -1,7 +1,10 @@
 package com.rpm.clynx.adapter;
 
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -48,17 +51,11 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
         setCardBackground(holder.mcardEve,Boolean.parseBoolean(String.valueOf(gValues.get(position).getEvening())));
         setCardBackground(holder.mcardNgt, Boolean.parseBoolean(String.valueOf(gValues.get(position).getNight())));
 
-        // Set expired background color
         if (holder.mItem.isExpired()) {
-            holder.cardContainer.setBackgroundColor(
-                    cxt.getResources().getColor(R.color.background4)
-            );
+            holder.cardContainer.setBackgroundResource(R.drawable.rounded_expired_bg);
         } else {
-            holder.cardContainer.setBackgroundColor(
-                    cxt.getResources().getColor(R.color.white)
-            );
+            holder.cardContainer.setBackgroundResource(R.drawable.rounded_white_bg);
         }
-
     }
 
     // Helper method to set card background based on a condition

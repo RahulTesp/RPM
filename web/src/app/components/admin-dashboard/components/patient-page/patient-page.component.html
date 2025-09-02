@@ -397,7 +397,7 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let element">
               <span>{{
-                getEntrollDate(element.EnrolledDate)
+                getEntrollDate(element.EnrolledDateTime)
               }}</span>
             </mat-cell>
           </ng-container>
@@ -947,17 +947,12 @@
                 src="../../../../../assets/04-Icons/Icons_Cancel.svg"
                 (click)="searchAssigneeClose()"
               />
-              <!-- <input
+              <input
                 class="search_input input_panel"
                 [(ngModel)]="billingAssigneeName"
-                (keyup.enter)="billingDataFilter()"
-              /> -->
-              <input
-                  class="search_input input_panel"
-                  (keyup)="applyDataFilter($event)"
-                  id="p_AssignedSearchInput"
-                  (focus)="setupFilter('AssignedMemeber')"
-                  [value]="assigneeSerach" autocomplete="off"/>
+                (ngModelChange)="billingDataFilter()"
+              />
+
             </div>
             <div
               class="search_heading_default"

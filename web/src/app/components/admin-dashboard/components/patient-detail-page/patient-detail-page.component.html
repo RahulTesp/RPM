@@ -199,8 +199,9 @@
                     <img
                       class="device_img"
                       src="../../../../../assets/04-Icons/Icons_Video A.svg"
-                      (click)="getVideoconnection(false)"
+
                     />
+                    <!-- (click)="getVideoconnection(false)" -->
                   </div>
                 </div>
 
@@ -218,8 +219,9 @@
                     <img
                       class="device_img"
                       src="../../../../../assets/04-Icons/Icons_Chat A.svg"
-                      (click)="openChatPanel()"
+
                     />
+                     <!-- (click)="openChatPanel()" -->
                   </div>
                 </div>
                 <div
@@ -277,36 +279,30 @@
                 /></span>
               </div>
               <section
-                class="progrssbar_container"
-                [ngClass]="
-                  patientInteractionMin > colorcodeval ? 'completed-target' : ''
-                "
-              >
-                <!-- <mat-progress-bar
-                  mode="determinate"
-                  strokeWidth="10"
-                  value="{{ interactionpercentValue }}"
-                ></mat-progress-bar> -->
-                <div class="custom-progress-bar-outer">
+                class="progrssbar_container">
+                <!-- Custom Progress Bar -->
+                <!-- <div class="custom-progress-bar-outer">
                   <div
-                    class="custom-progress-bar-inner"
+                    class="progress-fill-data"
                     [style.width.%]="interactionpercentValue > 100 ? 100 : interactionpercentValue"
+                  ></div>
+                </div> -->
+                  <div class="custom-progress-bar-outer">
+                  <div
+                    class="progress-fill-data"
+                    [style.width.%]="patientInteractionMin > colorcodeval ? 100 : (interactionpercentValue > 100 ? 100 : interactionpercentValue)"
+                    [ngClass]="patientInteractionMin > colorcodeval ? 'completed-target-data' : ''"
                   ></div>
                 </div>
 
-                <div
-                  *ngIf="interactionpercentValue > 100"
-                  class="progressvalue"
-                >
+
+                <!-- Time display -->
+                <div *ngIf="interactionpercentValue > 100" class="progressvalue">
                   {{ patientInteractionMin }}:{{ patientInteractionSec }}
                 </div>
 
-                <div
-                  *ngIf="interactionpercentValue <= 100"
-                  class="progressvalue"
-                >
+                <div *ngIf="interactionpercentValue <= 100" class="progressvalue">
                   {{ patientInteractionMin }}:{{ patientInteractionSec }} /
-
                   {{ totalInteractionTime }} min
                 </div>
               </section>
@@ -1533,8 +1529,9 @@
                 <img
                   class="device_img"
                   src="../../../../../assets/04-Icons/Icons_Video A.svg"
-                  (click)="getVideoconnection(false)"
+
                 />
+                 <!-- (click)="getVideoconnection(false)" -->
               </div>
             </div>
             <div
@@ -1552,8 +1549,9 @@
                   class="device_img"
                   id="pd_chat"
                   src="../../../../../assets/04-Icons/Icons_Chat A.svg"
-                  (click)="openChatPanel()"
+
                 />
+                  <!-- (click)="openChatPanel()" -->
               </div>
             </div>
             <div
@@ -1609,41 +1607,28 @@
                 /></span>
               </div>
 
-              <section class="progrssbar_container">
-                <section
-                  class="progrssbar_container"
-                  [ngClass]="
-                    patientInteractionMin > 19 ? 'completed-target' : ''
-                  "
-                >
-                  <!-- <mat-progress-bar
-                    mode="determinate"
-                    strokeWidth="10"
-                    value="{{ interactionpercentValue }}"
-                  ></mat-progress-bar> -->
-                  <div class="custom-progress-bar-outer">
-                    <div
-                      class="custom-progress-bar-inner"
-                      [style.width.%]="interactionpercentValue > 100 ? 100 : interactionpercentValue"
-                    ></div>
-                  </div>
 
+              <section
+                class="progrssbar_container"
+              >
+                <!-- Custom Progress Bar -->
+                <div class="custom-progress-bar-outer">
                   <div
-                    *ngIf="interactionpercentValue > 100"
-                    class="progressvalue"
-                  >
-                    {{ patientInteractionMin }}:{{ patientInteractionSec }}
-                  </div>
+                    class="progress-fill-data"
+                    [style.width.%]="patientInteractionMin > colorcodeval ? 100 : (interactionpercentValue > 100 ? 100 : interactionpercentValue)"
+                    [ngClass]="patientInteractionMin > colorcodeval ? 'completed-target-data' : ''"
+                  ></div>
+                </div>
 
-                  <div
-                    *ngIf="interactionpercentValue <= 100"
-                    class="progressvalue"
-                  >
-                    {{ patientInteractionMin }}:{{ patientInteractionSec }} /
+                <!-- Time display -->
+                <div *ngIf="interactionpercentValue > 100" class="progressvalue">
+                  {{ patientInteractionMin }}:{{ patientInteractionSec }}
+                </div>
 
-                    {{ totalInteractionTime }} min
-                  </div>
-                </section>
+                <div *ngIf="interactionpercentValue <= 100" class="progressvalue" >
+                  {{ patientInteractionMin }}:{{ patientInteractionSec }} /
+                  {{ totalInteractionTime }} min
+                </div>
               </section>
             </div>
           </div>
@@ -3109,10 +3094,10 @@
                   </ng-container>
 
                   <ng-container matColumnDef="Last_Billing_Cycle">
-                    <mat-header-cell *matHeaderCellDef
+                    <mat-header-cell class="last-billing-col" *matHeaderCellDef
                       >Last Billing Cycle</mat-header-cell
                     >
-                    <mat-cell *matCellDef="let element"
+                    <mat-cell class="last-billing-col" *matCellDef="let element"
                       ><span>{{
                         element.Last_Billing_Cycle == null
                           ? "Not available"
@@ -4348,7 +4333,7 @@
 
             <mat-cell *matCellDef="let element">
               <span *ngIf="element.EndDate">{{
-                datepipe.transform(element.EndDate, "MMM d,y")
+                datepipe.transform(element.EndDate , "MMM d,y")
               }}</span>
             </mat-cell>
           </ng-container>
@@ -4726,7 +4711,7 @@
                 *ngIf="index === 0"
                 [attr.rowspan]="scheduleitem.SchedueInfos.length"
               >
-                {{ datepipe.transform(convertToLocalTime(scheduleitem.ScheduleDate), "MMM d, y") }}
+                {{ datepipe.transform(scheduleitem.ScheduleDate, "MMM d, y") }}
               </td>
               <td [ngStyle]="{ 'border-radius': '8px 0px 0px 8px' }">
                 {{ schedule_data.ScheduleTime }}
