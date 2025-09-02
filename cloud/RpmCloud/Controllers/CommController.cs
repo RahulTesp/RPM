@@ -167,10 +167,6 @@ namespace RpmCloud.Controllers
                 string res = commMgr.CallConnect(toNumber, mynumber.Value);
                 if (!string.IsNullOrEmpty(res))
                 {
-                    //resp.StatusCode = HttpStatusCode.OK;
-                    //resp.Content = new StringContent(res, Encoding.UTF8, "application/xml");
-                    //return resp;
-                    //return Ok(Content(res, "application/xml", Encoding.UTF8));
                     return Content(res, "application/xml", Encoding.UTF8);
                 }
                 return Unauthorized(new { message = "Not Found" });
