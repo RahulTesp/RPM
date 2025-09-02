@@ -2898,7 +2898,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                 );
               console.log('Billing Start Date After');
                  console.log(this.BillingPeriodStart);
-               this.BillingPeriodEnd = new Date(this.convertToLocalTime(x.BillingStartDate));
+               this.BillingPeriodEnd = this.convertDate(
+                  new Date(this.convertToLocalTime(x.BillingStartDate))
+                );
                 if (this.billingtypeVariable == '30days') {
                   this.BillingPeriodEnd = this.convertDate(
                     new Date(
@@ -3005,11 +3007,16 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                   var seconds = Math.trunc(x.Completed % 60);
                   this.displayText = min + ':' + seconds + '/' + x.Total / 60;
                 }
+
                 var billingStartDate  = this.convertDate(x.BillingStartDate);
                 this.BillingPeriodStart = this.convertDate(
                   new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
-                this.BillingPeriodEnd = this.BillingPeriodStart;
+                this.BillingPeriodEnd = this.convertDate(
+                  new Date(this.convertToLocalTime(x.BillingStartDate))
+                );
+                console.log('Billing Period 2');
+                console.log(this.BillingPeriodEnd);
                 if (this.billingtypeVariable == '30days') {
                   this.BillingPeriodEnd = this.convertDate(
                     new Date(
