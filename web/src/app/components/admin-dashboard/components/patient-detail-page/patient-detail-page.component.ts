@@ -387,8 +387,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((params) => {
         this.handleQueryParams(params);
-        this.patientchatservice.setChatPanelOpen(this.chatVariable);
-        this.patientchatservice.ensureInitialized(params.patientUserName);
+       // this.patientchatservice.setChatPanelOpen(this.chatVariable);
+       // this.patientchatservice.ensureInitialized(params.patientUserName);
       });
 
     this.initializedocumentColumns();
@@ -2891,10 +2891,13 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
               if (x.CPTCode == '99454') {
                 this.displayText = x.Completed + '/' + x.Total;
                  var billingStartDate  = this.convertDate(x.BillingStartDate);
+                 console.log('Billing Start Date');
+                 console.log(x.BillingStartDate)
                   this.BillingPeriodStart = this.convertDate(
                   new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
-
+              console.log('Billing Start Date After');
+                 console.log(this.BillingPeriodStart);
                this.BillingPeriodEnd = new Date(this.convertToLocalTime(x.BillingStartDate));
                 if (this.billingtypeVariable == '30days') {
                   this.BillingPeriodEnd = this.convertDate(
@@ -3006,7 +3009,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                 this.BillingPeriodStart = this.convertDate(
                   new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
-                this.BillingPeriodEnd = new Date( this.BillingPeriodStart);
+                this.BillingPeriodEnd = this.BillingPeriodStart;
                 if (this.billingtypeVariable == '30days') {
                   this.BillingPeriodEnd = this.convertDate(
                     new Date(

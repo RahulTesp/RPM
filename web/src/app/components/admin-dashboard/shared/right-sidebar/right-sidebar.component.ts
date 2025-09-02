@@ -892,7 +892,7 @@ export class RightSidebarComponent implements OnInit {
     // Step 3: Prepare request body
     if (this.registerSchedule.valid) {
       const req_body: any = {
-        AssignedTo:  parseInt(this.schedule_careteam_id),
+        AssignedTo:  parseInt(this.Scheduled_user),
         ScheduleTypeId: parseInt(this.registerSchedule.controls.scheduleType.value),
         Schedule: this.registerSchedule.controls.frequency.value,
         Comments: this.registerSchedule.controls.scheduleDescription.value,
@@ -2309,6 +2309,8 @@ export class RightSidebarComponent implements OnInit {
 
   selectEvent_schedule(item: any) {
     // do something with selected item
+    console.log('Patient/Contact Selected');
+    console.log(item);
     if (typeof item != 'string') {
       this.Scheduled_user = item.Id;
       this.Scheduled_userName = item.Name;
@@ -2508,6 +2510,9 @@ export class RightSidebarComponent implements OnInit {
   schedule_careteam_name: any;
 
   selectEvent_schedule_careteam(item: any) {
+
+    console.log('Assigned Member Selection');
+    console.log(item);
     // do something with selected item
     if (typeof item != 'string') {
       this.schedule_careteam_id = item.Id;
