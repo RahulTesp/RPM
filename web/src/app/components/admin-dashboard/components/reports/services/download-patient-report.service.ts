@@ -1169,6 +1169,7 @@ private addWrappedText(doc: jsPDF, text: string, x: number): void {
         'MMM d, y'
       ),
       this.datepipe.transform(
+        this.convertToLocalTime(med.EndDate)!,
         med.EndDate!,
         'MMM d, y'
       ),

@@ -1999,11 +1999,13 @@ export class SidePanelPatientComponent implements OnInit {
 
 
   private updateSingleSchedule() {
+        const [scheduleyear, schedulemonth, scheduleday] = this.registerSchedule.controls.startDate.value.split('-').map(Number);
+    var scheduleDate = new Date(scheduleyear, schedulemonth - 1, scheduleday, 0, 0, 0);
     if (!this.registerSchedule.valid) return this.showWarning('Please complete the form');
     var scheduleDate = this.convertDate(this.DateConversionLogicFromStringToDate(this.registerSchedule.controls.startDate.value));
     const req_body = {
       CurrentScheduleId: this.schedule_edit_id,
-      ScheduleDate: scheduleDate,
+      ScheduleDate: this.convertDate(scheduleDate),
       StartTime: this.registerSchedule.controls.startTime.value,
       Duration: this.durationValue,
       Comments: this.registerSchedule.controls.scheduleDescription.value,
