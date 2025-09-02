@@ -2896,10 +2896,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                   this.BillingPeriodStart = this.convertDate(
                   new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
-              console.log('Billing Start Date After');
-                 console.log(this.BillingPeriodStart);
-               this.BillingPeriodEnd = new Date(this.convertToLocalTime(x.BillingStartDate));
                 if (this.billingtypeVariable == '30days') {
+                  const [Billingyear, Billingmonth, Billingday] = this.BillingPeriodStart.split('-').map(Number);
+                  this.BillingPeriodEnd = new Date(Billingyear, Billingmonth - 1, Billingday, 0, 0, 0);
                   this.BillingPeriodEnd = this.convertDate(
                     new Date(
                       this.BillingPeriodEnd.setDate(
@@ -2919,6 +2918,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                     );
                   }
                 } else {
+                  this.BillingPeriodEnd = new Date(x.BillingStartDate);
                   this.BillingPeriodEnd = new Date(
                     this.BillingPeriodEnd.setMonth(
                       this.BillingPeriodEnd.getMonth() + 1
@@ -3009,8 +3009,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                 this.BillingPeriodStart = this.convertDate(
                   new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
-                this.BillingPeriodEnd = new Date( this.BillingPeriodStart);
                 if (this.billingtypeVariable == '30days') {
+                  const [Billingyear, Billingmonth, Billingday] = this.BillingPeriodStart.split('-').map(Number);
+                  this.BillingPeriodEnd = new Date(Billingyear, Billingmonth - 1, Billingday, 0, 0, 0);
                   this.BillingPeriodEnd = this.convertDate(
                     new Date(
                       this.BillingPeriodEnd.setDate(
@@ -3030,6 +3031,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                     );
                   }
                 } else {
+                  this.BillingPeriodEnd = new Date(x.BillingStartDate);
                   this.BillingPeriodEnd = new Date(
                     this.BillingPeriodEnd.setMonth(
                       this.BillingPeriodEnd.getMonth() + 1
