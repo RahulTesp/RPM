@@ -2271,8 +2271,11 @@
                 </div>
                 <div class="state_timezone_right personal_content">
                   <p class="data_title">Time zone</p>
-                  <p *ngIf="timezone.length > 0" class="data_value">
+                  <!-- <p *ngIf="timezone.length > 0" class="data_value">
                     {{ timezone[0].Name }}
+                  </p> -->
+                  <p class="data_value">
+                    {{ http_rpm_patientList["PatientDetails"].TimeZone }}
                   </p>
                 </div>
               </div>
