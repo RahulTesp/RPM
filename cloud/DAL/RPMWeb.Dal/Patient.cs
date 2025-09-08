@@ -1,26 +1,27 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using iText.Forms.Form.Element;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using RPMWeb.Data.Common;
 using System.Data;
-using Microsoft.Data.SqlClient;
+using System.Globalization;
 using System.Reflection;
-using DataTable = System.Data.DataTable;
-using Font = iTextSharp.text.Font;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Workbook = DocumentFormat.OpenXml.Spreadsheet.Workbook;
-using Worksheet = DocumentFormat.OpenXml.Spreadsheet.Worksheet;
-using Sheets = DocumentFormat.OpenXml.Spreadsheet.Sheets;
-using Values = RPMWeb.Data.Common.Values;
+using System.Text.RegularExpressions;
 using Border = DocumentFormat.OpenXml.Spreadsheet.Border;
 using Borders = DocumentFormat.OpenXml.Spreadsheet.Borders;
 using CellFormat = DocumentFormat.OpenXml.Spreadsheet.CellFormat;
-using System.Globalization;
-using iText.Forms.Form.Element;
-using Microsoft.AspNetCore.Http;
+using DataTable = System.Data.DataTable;
+using Font = iTextSharp.text.Font;
+using Sheets = DocumentFormat.OpenXml.Spreadsheet.Sheets;
+using Values = RPMWeb.Data.Common.Values;
+using Workbook = DocumentFormat.OpenXml.Spreadsheet.Workbook;
+using Worksheet = DocumentFormat.OpenXml.Spreadsheet.Worksheet;
 
 namespace RPMWeb.Dal
 {
@@ -1291,6 +1292,22 @@ namespace RPMWeb.Dal
                             var patientInfo = list.FirstOrDefault(p => p.PatientId == patientId);
                             if (patientInfo == null)
                             {
+                                string enrolledDate = string.Empty;
+                                    string EnrolledDateTime = reader["EnrolledDate"].ToString();
+                                    if (!string.IsNullOrWhiteSpace(EnrolledDateTime))
+                                {
+                                    EnrolledDateTime = Regex.Replace(EnrolledDateTime, @"\s+", " ").Trim();
+                                    DateTime parsedDate = DateTime.ParseExact(EnrolledDateTime, "MMM d yyyy h:mmtt", CultureInfo.InvariantCulture);
+
+
+
+                                    // Convert to ISO 8601 format
+                                    string formattedDate = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
+
+                                    // Assign to your object
+                                    EnrolledDateTime = formattedDate;
+                                    enrolledDate = parsedDate.ToString("MMM dd yyyy");
+                                }
                                 patientInfo = new GetAllPatientInfo
                                 {
                                     PatientId = patientId,
@@ -1302,23 +1319,10 @@ namespace RPMWeb.Dal
                                     PatientName = reader["PatientName"].ToString(),
                                     ProgramName = reader["ProgramName"].ToString(),
                                     Program = reader["Program"].ToString(),
-                                    EnrolledDate = reader["EnrolledDate"].ToString(),
-                                    EnrolledDateTime = EnrolledDate;
-                                    if (!string.IsNullOrWhiteSpace(EnrolledDateTime))
-                                    {
-                                    EnrolledDateTime = Regex.Replace(EnrolledDateTime, @"\s+", " ").Trim();
-                                    DateTime parsedDate = DateTime.ParseExact(EnrolledDateTime, "MMM d yyyy h:mmtt", CultureInfo.InvariantCulture);
+                                    EnrolledDate = enrolledDate,
+                                    EnrolledDateTime = EnrolledDateTime,
 
-
-
-                                    // Convert to ISO 8601 format
-                                    string formattedDate = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
-
-                                    // Assign to your object
-                                    EnrolledDateTime = formattedDate;
-                                    EnrolledDate = parsedDate.ToString("MMM dd yyyy");
-                                    }
-                                PhysicianName = reader["PhysicianName"].ToString(),
+                                    PhysicianName = reader["PhysicianName"].ToString(),
                                     AssignedMember = reader["AssignedMember"].ToString(),
                                     PatientType = reader["PatientType"].ToString()
                                 };
@@ -1408,6 +1412,22 @@ namespace RPMWeb.Dal
                             var patientInfo = list.FirstOrDefault(p => p.PatientId == patientId);
                             if (patientInfo == null)
                             {
+                                string enrolledDate = string.Empty;
+                                string EnrolledDateTime = reader["EnrolledDate"].ToString();
+                                if (!string.IsNullOrWhiteSpace(EnrolledDateTime))
+                                {
+                                    EnrolledDateTime = Regex.Replace(EnrolledDateTime, @"\s+", " ").Trim();
+                                    DateTime parsedDate = DateTime.ParseExact(EnrolledDateTime, "MMM d yyyy h:mmtt", CultureInfo.InvariantCulture);
+
+
+
+                                    // Convert to ISO 8601 format
+                                    string formattedDate = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
+
+                                    // Assign to your object
+                                    EnrolledDateTime = formattedDate;
+                                    enrolledDate = parsedDate.ToString("MMM dd yyyy");
+                                }
                                 patientInfo = new GetAllPatientInfo
                                 {
                                     PatientId = patientId,
@@ -1419,26 +1439,14 @@ namespace RPMWeb.Dal
                                     PatientName = reader["PatientName"].ToString(),
                                     ProgramName = reader["ProgramName"].ToString(),
                                     Program = reader["Program"].ToString(),
-                                    EnrolledDate = reader["EnrolledDate"].ToString(),
-                                    EnrolledDateTime = EnrolledDate;
-                                    if (!string.IsNullOrWhiteSpace(EnrolledDateTime))
-                                    {
-                                        EnrolledDateTime = Regex.Replace(EnrolledDateTime, @"\s+", " ").Trim();
-                                        DateTime parsedDate = DateTime.ParseExact(EnrolledDateTime, "MMM d yyyy h:mmtt", CultureInfo.InvariantCulture);
+                                    EnrolledDate = enrolledDate,
+                                    EnrolledDateTime = EnrolledDateTime,
 
 
-
-                                        // Convert to ISO 8601 format
-                                        string formattedDate = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
-
-                                        // Assign to your object
-                                        EnrolledDateTime = formattedDate;
-                                        EnrolledDate = parsedDate.ToString("MMM dd yyyy");
-                                    }
                                     PhysicianName = reader["PhysicianName"].ToString(),
-                                                AssignedMember = reader["AssignedMember"].ToString(),
-                                                PatientType = reader["PatientType"].ToString()
-                                         };
+                                    AssignedMember = reader["AssignedMember"].ToString(),
+                                    PatientType = reader["PatientType"].ToString()
+                                };
 
                                 list.Add(patientInfo); // Add the patient to the list
                             }
