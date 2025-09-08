@@ -36,12 +36,8 @@ class Program
         }
 
         Console.WriteLine("WebJob started...");
-
-        using var periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(30));
-        while (await periodicTimer.WaitForNextTickAsync())
-        {
-            await TimerCallback();
-        }
+        await TimerCallback();
+        
     }
 
     private static async Task TimerCallback()
@@ -52,12 +48,7 @@ class Program
 
             using SqlConnection connection = new SqlConnection(CONN_STRING);
             await connection.OpenAsync();
-
-            // Execute stored procedures
-            await ExecuteStoredProcedure(connection, "usp_InsPatientVitalMeasures");
-            //await ExecuteStoredProcedure(connection, "usp_InsAlertsTemp");
-            //await ExecuteStoredProcedure(connection, "usp_InsPatientProgramPriority", 900);
-            //await ExecuteStoredProcedure(connection, "usp_InsAlertSummary", 900);
+            await ExecuteStoredProcedure(connection, "usp_InsPatientVitalMeasures");    
         }
         catch (Exception ex)
         {
