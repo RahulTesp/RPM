@@ -23,7 +23,7 @@ class Program
             .Build();
 
         // Access a specific config value
-        string? connStr = config["RPM:ConnectionString"];
+        string connStr = config["RPM:ConnectionString"];
         Console.WriteLine($"RPM Connection String: {connStr}");
         // Optional: bind strongly-typed object
         var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
@@ -396,8 +396,17 @@ class Program
     private static void StagingTableInsertProc(DatabaseInput reading)
     {
 
+        //Console.WriteLine("TimerStagingTableInsert begin");
         try
         {
+            //for (int i = 0; i < tableInsert_queue.Count; i++)
+            //{
+            //    Console.WriteLine("tableInsert_queue.Count"+ tableInsert_queue.Count);
+            //    //DatabaseInput reading;
+            //    if (tableInsert_queue.TryDequeue(out reading))
+            //    {
+            //JavaScriptSerializer js = new JavaScriptSerializer();
+            //string jsonData = js.Serialize(reading);
             string jsonData = JsonConvert.SerializeObject(reading);
             
             Console.WriteLine("JsonStg Insert begin: " + jsonData);
@@ -411,6 +420,8 @@ class Program
                 command.ExecuteScalar();
                 connection.Close();
             }
+            //}
+            //}
         }
         catch (Exception ex)
         {

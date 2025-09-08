@@ -7,7 +7,7 @@ using System.Net;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-
+//cron 0 0 7 * * *
 class Program
 {
     static string CONN_STRING =string.Empty;
@@ -30,120 +30,105 @@ class Program
     public static int TotalCount { get; set; }
     static async Task Main(string[] args)
     {
-        // Set up configuration
-        var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true)
-            .AddEnvironmentVariables() // Allows overriding via Azure App Settings
-            .Build();
-
-        // Access a specific config value
-        string connStr = config["RPM:ConnectionString"];
-        Console.WriteLine($"RPM Connection String: {connStr}");
-
-        // Optional: bind strongly-typed object
-        var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
-        Console.WriteLine($"RPM.ConnectionString (typed): {rpmSettings?.ConnectionString}");
-        CONN_STRING = rpmSettings?.ConnectionString;
-        API_KEY = rpmSettings?.APIKey;
-        USER = rpmSettings?.UserName;
-        PWD = rpmSettings?.Password;
-        DEVICE_URL = rpmSettings?.devices_url;
-        VALIDATE_URL = rpmSettings?.validate_url;
-        SERVER = rpmSettings?.Server;
-        SMTP = rpmSettings?.SMTP;
-        SMTP_ToMail = rpmSettings?.SMTP_ToMail;
-        Console.WriteLine("WebJob started...");
-        if(CONN_STRING == null)
+        string msg;
+        try
         {
-            Console.WriteLine("Connection string is null.");
-            return;
-        }
-        while (true)
-        {
-            string msg;
-            try
+            // Set up configuration
+            var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true)
+                .AddEnvironmentVariables() // Allows overriding via Azure App Settings
+                .Build();
+            // Optional: bind strongly-typed object
+            var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
+            Console.WriteLine($"RPM.ConnectionString (typed): {rpmSettings?.ConnectionString}");
+            CONN_STRING = rpmSettings?.ConnectionString;
+            API_KEY = rpmSettings?.APIKey;
+            USER = rpmSettings?.UserName;
+            PWD = rpmSettings?.Password;
+            DEVICE_URL = rpmSettings?.devices_url;
+            VALIDATE_URL = rpmSettings?.validate_url;
+            SERVER = rpmSettings?.Server;
+            SMTP = rpmSettings?.SMTP;
+            SMTP_ToMail = rpmSettings?.SMTP_ToMail;
+            Console.WriteLine("WebJob started...");
+            if (CONN_STRING == null)
             {
-
-                AddedCount = 0;
-                FailedCount = 0;
-                ExistingCount = 0;
-                var rpm_login_url = "https://" + SERVER + "/api/authorization/Userlogin";
-                var login_data = new login();
-                LoginResponse login_resp = new LoginResponse();
-                login_resp = LoginRPM(USER, PWD, rpm_login_url);
-                TKN = login_resp.tkn;
-                if (TKN == null)
-                {
-                    msg = "Login Failed for Sync Device Job, Please check Login Credentials. at server  " + SERVER;
-                    sendEmail(msg);
-                    return;
-                }
-                var deviceList = getDeviceList();
-                var devices = deviceList["devices"].Values();
-                if (devices != null)
-                {
-                    TotalCount = 0;
-                    foreach (string device in devices)
-                    {
-
-                        TotalCount = TotalCount + 1;
-                        Console.WriteLine("Device - " + device);
-                        bool deviceStatus = ValidateDeviceRequest(device, VALIDATE_URL);
-                        Console.WriteLine("Device Validate Status - " + deviceStatus);
-                        Console.WriteLine("Device Model - " + DeviceModel);
-
-                        if (deviceStatus)
-                        {
-                            ValidateDeviceModel(DeviceModel);
-                            var isDeviceAvailable = ValidateDeviceRPM(device, DeviceModel);
-
-                            if (isDeviceAvailable)
-                            {
-                                Console.WriteLine("Device Not Available in RPM");
-                                var DevAddStatus = SyncDeviceRPM(device, DeviceModel);
-                                if (DevAddStatus)
-                                {
-                                    Console.WriteLine(device + " - Added Successfully..!");
-                                    AddedCount++;
-                                }
-                                else
-                                {
-                                    Console.WriteLine(device + " - Failed to Add..!");
-                                    FailedCount++;
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Device already Available in RPM");
-                                ExistingCount = ExistingCount + 1;
-                            }
-
-                        }
-                        else
-                        {
-                            Console.WriteLine("Device validation failed in iGlucose");
-                        }
-                    }
-
-
-                }
-                Console.WriteLine("Added Device Count - " + AddedCount);
-                Console.WriteLine("Failed Device Count - " + FailedCount);
-                Console.WriteLine("Existing Device Count - " + ExistingCount);
-                Console.WriteLine("Total Device Count - " + TotalCount);
-
-
+                Console.WriteLine("Connection string is null.");
+                return;
             }
-            catch (Exception ex)
+            AddedCount = 0;
+            FailedCount = 0;
+            ExistingCount = 0;
+            var rpm_login_url = "https://" + SERVER + "/api/authorization/Userlogin";
+            var login_data = new login();
+            LoginResponse login_resp = new LoginResponse();
+            login_resp = LoginRPM(USER, PWD, rpm_login_url);
+            TKN = login_resp.tkn;
+            if (TKN == null)
             {
-                Console.WriteLine(ex);
-                msg = "Sync Device Job Failed at " + SERVER + " " + ex;
+                msg = "Login Failed for Sync Device Job, Please check Login Credentials. at server  " + SERVER;
                 sendEmail(msg);
                 return;
             }
+            var deviceList = getDeviceList();
+            var devices = deviceList["devices"].Values();
+            if (devices != null)
+            {
+                TotalCount = 0;
+                foreach (string device in devices)
+                {
 
+                    TotalCount = TotalCount + 1;
+                    Console.WriteLine("Device - " + device);
+                    bool deviceStatus = ValidateDeviceRequest(device, VALIDATE_URL);
+                    Console.WriteLine("Device Validate Status - " + deviceStatus);
+                    Console.WriteLine("Device Model - " + DeviceModel);
+                    if (deviceStatus)
+                    {
+                        ValidateDeviceModel(DeviceModel);
+                        var isDeviceAvailable = ValidateDeviceRPM(device, DeviceModel);
+                        if (isDeviceAvailable)
+                        {
+                            Console.WriteLine("Device Not Available in RPM");
+                            var DevAddStatus = SyncDeviceRPM(device, DeviceModel);
+                            if (DevAddStatus)
+                            {
+                                Console.WriteLine(device + " - Added Successfully..!");
+                                AddedCount++;
+                            }
+                            else
+                            {
+                                Console.WriteLine(device + " - Failed to Add..!");
+                                FailedCount++;
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Device already Available in RPM");
+                            ExistingCount = ExistingCount + 1;
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Device validation failed in iGlucose");
+                    }
+                }
+            }
+            Console.WriteLine("Added Device Count - " + AddedCount);
+            Console.WriteLine("Failed Device Count - " + FailedCount);
+            Console.WriteLine("Existing Device Count - " + ExistingCount);
+            Console.WriteLine("Total Device Count - " + TotalCount);
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            msg = "Sync Device Job Failed at " + SERVER + " " + ex;
+            sendEmail(msg);
+            return;
+        }
+
+
     }
     public static JObject getDeviceList()
     {
@@ -178,8 +163,9 @@ class Program
             }
 
         }
-        catch
+        catch(Exception ex)
         {
+            Console.WriteLine(ex);
             throw;
         }
         return ret;
@@ -411,14 +397,10 @@ class Program
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
-
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
-
-
                 streamWriter.Write(Reqdata);
             }
-
             var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
             using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
             {
@@ -436,6 +418,7 @@ class Program
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.ToString());   
             throw;
 
         }
@@ -467,31 +450,28 @@ class Program
                 }
             }
         }
-        catch
+        catch(Exception ex)
         {
+            Console.WriteLine(ex);
             throw;
         }
         return contactDetails;
     }
     public static string sendEmail(string body)
     {
-        ContactDetails contactDetails = new ContactDetails();
-        contactDetails = GetEmailDetails();
-        string toEmail = SMTP_ToMail;
-        string subject = "Sync Device Job Failure";
-
-
-        SmtpClient smtpClient = new SmtpClient(SMTP, 587);
-        smtpClient.EnableSsl = true;
-        smtpClient.Credentials = new NetworkCredential(contactDetails.FromMail, contactDetails.Password);
-
-
-        MailMessage mailMessage = new MailMessage(contactDetails.FromMail, toEmail, subject, body);
-
         try
         {
+            ContactDetails contactDetails = new ContactDetails();
+            contactDetails = GetEmailDetails();
+            string toEmail = SMTP_ToMail;
+            string subject = "Sync Device Job Failure";
+            SmtpClient smtpClient = new SmtpClient(SMTP, 587);
+            smtpClient.EnableSsl = true;
+            smtpClient.Credentials = new NetworkCredential(contactDetails.FromMail, contactDetails.Password);
+            MailMessage mailMessage = new MailMessage(contactDetails.FromMail, toEmail, subject, body);
             smtpClient.Send(mailMessage);
             return "Email Sent";
+
 
         }
         catch (Exception ex)

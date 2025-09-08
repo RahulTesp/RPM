@@ -108,6 +108,8 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
         ToUser = getIntent().getStringExtra("memberUsername") != null ? getIntent().getStringExtra("memberUsername") : "";
         FriendlyUsername = getIntent().getStringExtra("FriendlyUsername") != null ? getIntent().getStringExtra("FriendlyUsername") : "";
 
+        String fullName = getIntent().getStringExtra("memberFullName");
+
         if (FriendlyUsername.contains("-")) {
             FriendlyUsername = FriendlyUsername.split("-")[0];  // Take the part before "-"
         }
@@ -118,7 +120,8 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
 
         Log.d("memberusername", memberusername);
         chatMemberName = findViewById(R.id.chatMemName);
-        chatMemberName.setText(memberusername);
+
+        chatMemberName.setText(fullName != null ? fullName :memberusername);
 
         Log.d("ToUservalue:--", ToUser);
         Log.d("FriendlyUsernamevalue:-", FriendlyUsername);
@@ -670,11 +673,6 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
                         }
                         notifyDataSetChanged();
 
-//                        if (holder.editDeleteContainer.getVisibility() == View.VISIBLE) {
-//                            holder.editDeleteContainer.setVisibility(View.GONE);
-//                        } else {
-//                            holder.editDeleteContainer.setVisibility(View.VISIBLE);
-//                        }
                     }
                 });
 
@@ -719,11 +717,6 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
                         }
                         notifyDataSetChanged();
 
-//                        if (holder.editDeleteContainer.getVisibility() == View.VISIBLE) {
-//                            holder.editDeleteContainer.setVisibility(View.GONE);
-//                        } else {
-//                            holder.editDeleteContainer.setVisibility(View.VISIBLE);
-//                        }
                     }
                 });
 

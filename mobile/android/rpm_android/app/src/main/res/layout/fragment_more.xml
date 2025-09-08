@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/profile_body_bg"
-    tools:context="com.rpm.clynx.activity.MoreActivity">
+   >
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraint"
+        android:id="@+id/constraintMore"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/card_lower_background"
@@ -18,8 +18,8 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
-            android:layout_width="395dp"
-            android:layout_height="55dp"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
             android:background="@color/Primary_bg"
             android:labelFor="@id/constraint2"
             android:minHeight="?attr/actionBarSize"
@@ -41,7 +41,7 @@
 
         </androidx.appcompat.widget.Toolbar>
 
-        <LinearLayout
+        <LinearLayout android:layout_weight="2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -81,7 +81,8 @@
                             android:layout_height="wrap_content"
                             android:text="Hi, Sam Alexandar"
                             android:textColor="@color/black"
-                            android:textSize="18sp" />
+                            android:textSize="18sp"
+                            app:fontFamily="@font/rubik_regular" />
 
                         <TextView
                             android:id="@+id/act_more_userid"
@@ -90,13 +91,15 @@
                             android:layout_marginTop="10dp"
                             android:text="RPM12345678"
                             android:textColor="@color/black"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:textSize="16sp"
+                            app:fontFamily="@font/rubik_semibold" />
                     </LinearLayout>
                 </LinearLayout>
+
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/linmore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/card_lower_background"
@@ -117,7 +120,7 @@
                         android:layout_height="60dp"
                         android:background="@drawable/card_background_icon"
                         android:padding="10dp"
-                        android:src="@drawable/ic_icons_notification" />
+                        android:src="@drawable/icons_notification" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -141,7 +144,7 @@
                         android:layout_height="60dp"
                         android:background="@drawable/card_background_icon"
                         android:padding="10dp"
-                        android:src="@drawable/ic_icons_notification" />
+                        android:src="@drawable/icons_feedback" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -166,7 +169,7 @@
                         android:layout_height="60dp"
                         android:background="@drawable/card_background_icon"
                         android:padding="10dp"
-                        android:src="@drawable/ic_icons_help" />
+                        android:src="@drawable/icons_help" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -190,7 +193,7 @@
                         android:layout_height="60dp"
                         android:background="@drawable/card_background_icon"
                         android:padding="10dp"
-                        android:src="@drawable/ic_icons_settings" />
+                        android:src="@drawable/icons_settings" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -208,242 +211,156 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:labelFor="@+id/constraint"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraint">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/card_background_light"
-            android:onClick="pgminfo"
-            android:orientation="horizontal">
-
-            <com.google.android.material.imageview.ShapeableImageView
-                style="@style/Style.App.circleImageView"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:paddingStart="20dp"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp"
-                android:src="@drawable/ic_outline_spa_24" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Program Info"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    app:fontFamily="@font/rubik_regular" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="Your Core team &amp; Program Details"
-                    android:textColor="@color/Primary_dark"
-                    android:textSize="12sp"
-                    app:fontFamily="@font/rubik_regular" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/card_background_light"
-            android:orientation="horizontal">
-
-            <com.google.android.material.imageview.ShapeableImageView
-                style="@style/Style.App.circleImageView"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:paddingStart="20dp"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp"
-                android:src="@drawable/ic_outline_spa_24" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Clinical Info"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    app:fontFamily="@font/rubik_regular" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="All Clinical &amp;Medication data"
-                    android:textColor="@color/Primary_dark"
-                    android:textSize="12sp"
-                    app:fontFamily="@font/rubik_regular" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/card_background_light"
-            android:orientation="horizontal">
-
-            <com.google.android.material.imageview.ShapeableImageView
-                style="@style/Style.App.circleImageView"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:paddingStart="20dp"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp"
-                android:src="@drawable/ic_outline_spa_24" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Activity"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    app:fontFamily="@font/rubik_regular" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="Your Program activity records"
-                    android:textColor="@color/Primary_dark"
-                    android:textSize="12sp"
-                    app:fontFamily="@font/rubik_regular" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/card_background_light"
-            android:orientation="horizontal">
-
-            <com.google.android.material.imageview.ShapeableImageView
-                style="@style/Style.App.circleImageView"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:paddingStart="20dp"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp"
-                android:src="@drawable/ic_outline_spa_24" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Reports"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    app:fontFamily="@font/rubik_regular" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="Download your Program reports"
-                    android:textColor="@color/Primary_dark"
-                    android:textSize="12sp"
-                    app:fontFamily="@font/rubik_regular" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/card_background_light"
-            android:onClick="myinfo"
-            android:orientation="horizontal">
-
-            <com.google.android.material.imageview.ShapeableImageView
-                style="@style/Style.App.circleImageView"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:paddingStart="20dp"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp"
-                android:src="@drawable/ic_outline_spa_24" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="My Info"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    app:fontFamily="@font/rubik_regular" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="Update your Profile &amp; Password"
-                    android:textColor="@color/Primary_dark"
-                    android:textSize="12sp"
-                    app:fontFamily="@font/rubik_regular" />
-            </LinearLayout>
-        </LinearLayout>
-
-    </LinearLayout>
-
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/act_more_logoff"
-        android:onClick="logOff"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="40dp"
-        android:background="@drawable/button_inactive"
-        android:textColor="@color/white"
-        android:text="LOG OFF"
+    <ScrollView
+        android:id="@+id/scrollSection"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/margin_5dp"
+        android:layout_marginEnd="@dimen/margin_5dp"
+        app:layout_constraintTop_toBottomOf="@id/constraintMore"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:orientation="vertical">
+
+            <!-- Program Info -->
+            <LinearLayout
+                android:id="@+id/pgm_info_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/card_background_light"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="70dp"
+                    android:padding="10dp"
+                    android:src="@drawable/icons_program" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Program Info"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        app:fontFamily="@font/rubik_regular" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="Your Core team &amp; Program Details"
+                        android:textColor="@color/Primary_dark"
+                        android:textSize="12sp"
+                        app:fontFamily="@font/rubik_regular" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Clinical Info -->
+            <LinearLayout
+                android:id="@+id/clinical_info_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/card_background_light"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="70dp"
+                    android:padding="10dp"
+                    android:src="@drawable/icons_clinical" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Clinical Info"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        app:fontFamily="@font/rubik_regular" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="All Clinical &amp; Medication data"
+                        android:textColor="@color/Primary_dark"
+                        android:textSize="12sp"
+                        app:fontFamily="@font/rubik_regular" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- My Info -->
+            <LinearLayout
+                android:id="@+id/my_info_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/card_background_light"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="70dp"
+                    android:padding="10dp"
+                    android:src="@drawable/icons_myinfo" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="My Info"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        app:fontFamily="@font/rubik_regular" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="Update your Profile &amp; Password"
+                        android:textColor="@color/Primary_dark"
+                        android:textSize="12sp"
+                        app:fontFamily="@font/rubik_regular" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Log Off button -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/act_more_logoff"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/button_inactive"
+                android:onClick="logOff"
+                android:text="LOG OFF"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

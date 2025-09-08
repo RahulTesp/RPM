@@ -387,8 +387,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((params) => {
         this.handleQueryParams(params);
-        this.patientchatservice.setChatPanelOpen(this.chatVariable);
-        this.patientchatservice.ensureInitialized(params.patientUserName);
+       // this.patientchatservice.setChatPanelOpen(this.chatVariable);
+       // this.patientchatservice.ensureInitialized(params.patientUserName);
       });
 
     this.initializedocumentColumns();
@@ -1193,11 +1193,11 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.smsCancel(); // close the panel
         if(err.status == 400)
         {
-          alert(err.error);
+          alert(err.error.message);
         }else{
           alert('SMS Sent Failed')
         }
-        console.log(err.error);
+        console.log(err.error.message);
         this.loading_sms = false;
       }
     );
@@ -1422,8 +1422,14 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
       // Call data source change method (kept from your original code)
       this.dataSourceChange(5, 5);
-    } catch (error) {
+    } catch (error:any) {
+      if(error.status == 404)
+      {
+        return;
+      }else{
       console.error('❌ Error fetching chat data:', error);
+
+      }
     }
   }
   async getCallNotes() {
@@ -1514,6 +1520,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       }
       const patientId = sessionStorage.getItem('PatientId');
       const programId = sessionStorage.getItem('ProgramId');
+
 
       if (patientId != null && programId != null) {
         const result = await this.patientService.getVitalReading(
@@ -2119,8 +2126,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.program_id,
         this.patientStatusData || ''
       );
-    } catch (error) {
-      console.error('Error in getBillingData:', error);
+    } catch (error:any) {
       this.BillingInfo = [];
     }
   }
@@ -2396,10 +2402,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       menu_id: 4,
       menu_title: 'Reviews',
     },
-    // {
-    //   menu_id:5,
-    //   menu_title:'Chats'
-    // },
+    {
+      menu_id:5,
+      menu_title:'Chats'
+    },
     {
       menu_id: 6,
       menu_title: 'SMS',
@@ -2884,11 +2890,15 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
             if (this.pecentageValue >= 100) {
               if (x.CPTCode == '99454') {
                 this.displayText = x.Completed + '/' + x.Total;
-                this.BillingPeriodStart = this.convertDate(
-                  new Date(x.BillingStartDate)
+                 var billingStartDate  = this.convertDate(x.BillingStartDate);
+                 console.log('Billing Start Date');
+                 console.log(x.BillingStartDate)
+                  this.BillingPeriodStart = this.convertDate(
+                  new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
-                this.BillingPeriodEnd = new Date(x.BillingStartDate);
                 if (this.billingtypeVariable == '30days') {
+                  const [Billingyear, Billingmonth, Billingday] = this.BillingPeriodStart.split('-').map(Number);
+                  this.BillingPeriodEnd = new Date(Billingyear, Billingmonth - 1, Billingday, 0, 0, 0);
                   this.BillingPeriodEnd = this.convertDate(
                     new Date(
                       this.BillingPeriodEnd.setDate(
@@ -2896,7 +2906,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                       )
                     )
                   );
-                  if (this.BillingPeriodStart == '1-01-01') {
+                  if (billingStartDate == '1-01-01') {
                     this.BillingPeriodStart = undefined;
                     this.BillingPeriodEnd = undefined;
                   } else {
@@ -2908,32 +2918,45 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                     );
                   }
                 } else {
-                  this.BillingPeriodEnd = new Date(
-                    this.BillingPeriodEnd.setMonth(
-                      this.BillingPeriodEnd.getMonth() + 1
-                    )
-                  );
-                  var day = this.BillingPeriodEnd.getDate();
-                  if (day <= 15) {
-                    this.BillingPeriodEnd.setDate(1);
-                  } else {
-                    this.BillingPeriodEnd.setDate(16);
-                  }
-                  this.BillingPeriodEnd = this.convertDate(
-                    this.BillingPeriodEnd
-                  );
-                  // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
-                  if (this.BillingPeriodStart == '1-01-01') {
-                    this.BillingPeriodStart = undefined;
-                    this.BillingPeriodEnd = undefined;
-                  } else {
-                    this.BillingPeriodStart = this.Billing_ConvertDate(
-                      this.BillingPeriodStart
-                    );
-                    this.BillingPeriodEnd = this.Billing_ConvertDate(
-                      this.BillingPeriodEnd
-                    );
-                  }
+                      let endDate = new Date(this.BillingPeriodStart);
+                      endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
+                      endDate.setMonth(endDate.getMonth()+1);
+                      if (billingStartDate == '1-01-01') {
+                        this.BillingPeriodStart = undefined;
+                        this.BillingPeriodEnd = undefined;
+                      } 
+                      else {                        
+                        this.BillingPeriodEnd = this.Billing_ConvertDate(this.convertDate(endDate));
+                        this.BillingPeriodStart = this.Billing_ConvertDate(this.BillingPeriodStart);
+                      }
+                  // this.BillingPeriodEnd = new Date(x.BillingStartDate);
+                  // this.BillingPeriodEnd = new Date(
+                  //   this.BillingPeriodEnd.setMonth(
+                  //     this.BillingPeriodEnd.getMonth() + 1
+                  //   )
+                  // );
+                  // var day = this.BillingPeriodEnd.getDate();
+                  // if (day <= 15) {
+                  //   this.BillingPeriodEnd.setDate(1);
+                  // } else {
+                  //   this.BillingPeriodEnd.setDate(16);
+                  // }
+                  // this.BillingPeriodEnd = this.convertDate(
+                  //   this.BillingPeriodEnd
+                  // );
+
+                  // // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
+                  // if (billingStartDate == '1-01-01') {
+                  //   this.BillingPeriodStart = undefined;
+                  //   this.BillingPeriodEnd = undefined;
+                  // } else {
+                  //   this.BillingPeriodStart = this.Billing_ConvertDate(
+                  //     this.BillingPeriodStart
+                  //   );
+                  //   this.BillingPeriodEnd = this.Billing_ConvertDate(
+                  //     this.BillingPeriodEnd
+                  //   );
+                  // }
                 }
               } else if (x.CPTCode == '99453') {
                 this.displayText = 'Completed';
@@ -2993,12 +3016,13 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                   var seconds = Math.trunc(x.Completed % 60);
                   this.displayText = min + ':' + seconds + '/' + x.Total / 60;
                 }
-
+                var billingStartDate  = this.convertDate(x.BillingStartDate);
                 this.BillingPeriodStart = this.convertDate(
-                  new Date(x.BillingStartDate)
+                  new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
-                this.BillingPeriodEnd = new Date(x.BillingStartDate);
                 if (this.billingtypeVariable == '30days') {
+                  const [Billingyear, Billingmonth, Billingday] = this.BillingPeriodStart.split('-').map(Number);
+                  this.BillingPeriodEnd = new Date(Billingyear, Billingmonth - 1, Billingday, 0, 0, 0);
                   this.BillingPeriodEnd = this.convertDate(
                     new Date(
                       this.BillingPeriodEnd.setDate(
@@ -3006,7 +3030,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                       )
                     )
                   );
-                  if (this.BillingPeriodStart == '1-01-01') {
+                  if (billingStartDate == '1-01-01') {
                     this.BillingPeriodStart = undefined;
                     this.BillingPeriodEnd = undefined;
                   } else {
@@ -3018,32 +3042,44 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                     );
                   }
                 } else {
-                  this.BillingPeriodEnd = new Date(
-                    this.BillingPeriodEnd.setMonth(
-                      this.BillingPeriodEnd.getMonth() + 1
-                    )
-                  );
-                  var day = this.BillingPeriodEnd.getDate();
-                  if (day <= 15) {
-                    this.BillingPeriodEnd.setDate(1);
-                  } else {
-                    this.BillingPeriodEnd.setDate(16);
-                  }
-                  this.BillingPeriodEnd = this.convertDate(
-                    this.BillingPeriodEnd
-                  );
-                  // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
-                  if (this.BillingPeriodStart == '1-01-01') {
-                    this.BillingPeriodStart = undefined;
-                    this.BillingPeriodEnd = undefined;
-                  } else {
-                    this.BillingPeriodStart = this.Billing_ConvertDate(
-                      this.BillingPeriodStart
-                    );
-                    this.BillingPeriodEnd = this.Billing_ConvertDate(
-                      this.BillingPeriodEnd
-                    );
-                  }
+                      let endDate = new Date(this.BillingPeriodStart);
+                      endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
+                      endDate.setMonth(endDate.getMonth()+1);
+                      if (billingStartDate == '1-01-01') {
+                        this.BillingPeriodStart = undefined;
+                        this.BillingPeriodEnd = undefined;
+                      } 
+                      else {                        
+                        this.BillingPeriodEnd = this.Billing_ConvertDate(this.convertDate(endDate));
+                        this.BillingPeriodStart = this.Billing_ConvertDate(this.BillingPeriodStart);
+                      }
+                  // this.BillingPeriodEnd = new Date(x.BillingStartDate);
+                  // this.BillingPeriodEnd = new Date(
+                  //   this.BillingPeriodEnd.setMonth(
+                  //     this.BillingPeriodEnd.getMonth() + 1
+                  //   )
+                  // );
+                  // var day = this.BillingPeriodEnd.getDate();
+                  // if (day <= 15) {
+                  //   this.BillingPeriodEnd.setDate(1);
+                  // } else {
+                  //   this.BillingPeriodEnd.setDate(16);
+                  // }
+                  // this.BillingPeriodEnd = this.convertDate(
+                  //   this.BillingPeriodEnd
+                  // );
+                  // // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
+                  // if (billingStartDate == '1-01-01') {
+                  //   this.BillingPeriodStart = undefined;
+                  //   this.BillingPeriodEnd = undefined;
+                  // } else {
+                  //   this.BillingPeriodStart = this.Billing_ConvertDate(
+                  //     this.BillingPeriodStart
+                  //   );
+                  //   this.BillingPeriodEnd = this.Billing_ConvertDate(
+                  //     this.BillingPeriodEnd
+                  //   );
+                  // }
                 }
               }
             }
@@ -3087,9 +3123,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
               this.interactionpercentValue =
                 ((this.patientInteractionMin * 60 +
                   this.patientInteractionSec) /
-                  Totalval) *
-                100;
-
+                  Totalval) * 100;
               switch (that.BillingOverview[0].ProgramName) {
                 case 'CCM-C':
                   this.colorcodeval = 19;
@@ -3175,9 +3209,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.getInteractionTime(this.patientInteractionMin);
       this.interactionpercentValue =
         ((this.patientInteractionMin * 60 + this.patientInteractionSec) /
-          3600) *
-        100;
-
+          3600) * 100;
       let patientInteractionMin = time / 60;
       this.patientInteractionMin = Math.trunc(patientInteractionMin);
       let patientInteractionSec = time % 60;
@@ -3190,14 +3222,15 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.getInteractionTime(patientInteractionMin);
       this.interactionpercentValue =
         ((this.patientInteractionMin * 60 + this.patientInteractionSec) /
-          3600) *
-        100;
+          3600) * 100;
       // that.interactionpercentValue = parseInt(that.interactionpercentValue)
       if (
         this.interactionpercentValue < 1 &&
         this.interactionpercentValue > 0
       ) {
         this.interactionpercentValue = 1;
+      }else{
+        this.interactionpercentValue = this.interactionpercentValue;
       }
       if (this.patientInteractionSec < 10) {
         this.patientInteractionSec =
@@ -3578,17 +3611,18 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.getScheduleData();
 
         alert('Schedule Status Changed Successfully!!');
+        this.scheduleSelected = []
       },
-      (err) => {
+      (err:any) => {
         //show error patient id creation failed
-        alert('Something Went Wrong ');
+        alert(err.error.message);
       }
     );
   }
 
   Billing_ConvertDate(dateval: string): string {
     if (!dateval) return '';
-
+     console.log(dateval)
     const months = [
       'Jan',
       'Feb',
@@ -4505,11 +4539,11 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
           );
 
         },
-        (err) => {
+        (err:any) => {
           this.showDialog = true;
           this.confirmDialog.showConfirmDialog(
-            `Device not removed from user assets`,
-            'error',
+            err.error.message,
+            'Error',
             () => {
               null
             },
@@ -4604,7 +4638,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         async (body) => {},
         (error: any) => {
           console.log('error')
-          alert(error.error);
+          alert(error.error.message);
         }
       );
 
@@ -4709,7 +4743,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
           }
         },
         (error: any) => {
-          alert(error.error);
+          alert(error.error.message);
         }
       );
   }
@@ -4746,7 +4780,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
             }
           },
           (error: any) => {
-            alert(error.error);
+            alert(error.error.message);
           }
         );
     } else {
@@ -4852,9 +4886,11 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   async loadPatientReportData() {
     this.selectedPatient = sessionStorage.getItem('PatientId');
     this.selectedProgram = sessionStorage.getItem('ProgramId');
-    var startDate = this.convertDate(this.ThirtyDaysAgo);
-    var endDate = this.convertDate(this.Today);
-
+    const today = new Date();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    var startDate = this.convertDate(thirtyDaysAgo);
+    var endDate = this.convertDate(today);
     startDate = startDate + 'T00:00:00';
     endDate = endDate + 'T23:59:59';
     try {
@@ -4921,7 +4957,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         endDate
       );
 
-      console.log('✅ Patient data loaded successfully');
       this.downloadPatientReport();
     } catch (error) {
       console.error('🚨 Error loading patient data:', error);

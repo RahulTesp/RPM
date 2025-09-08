@@ -335,7 +335,7 @@ export class NotificationComponent implements OnInit {
         },
         (err) => {
           this.confirmDialog.showConfirmDialog(
-            err.error || 'Could not delete notifications.',
+            err.error.message || 'Could not delete notifications.',
             'Error',
             null,
             false

@@ -165,7 +165,7 @@ export class ProfileMenuButtonComponent implements OnInit {
 
   confirm() {
     var req_body: any = {};
-    console.log('Req Body'+req_body)
+    this.passwordForm.controls.username?.setValue(this.userName);
     if (this.passwordForm.valid) {
       req_body['UserName'] = this.passwordForm.controls.username.value;
       req_body['OldPassword'] = this.passwordForm.controls.oldpw.value;

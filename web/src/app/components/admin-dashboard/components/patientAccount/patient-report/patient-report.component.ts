@@ -343,7 +343,6 @@ export class PatientReportComponent implements OnInit {
 
   Patient_Health() {
     this.variable = 1;
-    console.log(this.variable);
     this.toggle = !this.toggle;
     this.toggle1 = true;
     this.toggle2 = true;
@@ -461,7 +460,6 @@ export class PatientReportComponent implements OnInit {
   }
   onClearSearchbilldetail(event: any) {
     this.selectedBillingDetailPatient = null;
-    console.log(this.selectedBillingDetailPatient);
   }
   onChangeSearch1(val: string) {
     this.selectedPatient = val;
@@ -472,7 +470,6 @@ export class PatientReportComponent implements OnInit {
   }
   onClearSearch(event: any) {
     this.selectedBillingPatient = null;
-    console.log(this.selectedBillingPatient);
   }
 
   onClearSearch1(event: any) {
@@ -555,7 +552,6 @@ export class PatientReportComponent implements OnInit {
           var i = 0;
           if (that.http_NewNoteList_C.length > 0) {
             this.getcallNotesbyIdAPI(i, that.http_NewNoteList_C);
-            console.log(that.http_NewNoteList_C);
           } else {
             var CombinedNotes = this.CombineNotes();
             that.printCallNotes(CombinedNotes);
@@ -991,7 +987,6 @@ export class PatientReportComponent implements OnInit {
     this.doc.line(15, goalh + 1, 15 + textWidth, goalh + 1);
     goalh = goalh + 10;
     this.Style_SetContent();
-    console.log(this.PatientCriticalAlerts);
     for (let alert of this.PatientCriticalAlerts) {
       var dt = this.Report_ConvertDate(alert.Time);
       this.doc.text(dt, 20, goalh);
@@ -2187,8 +2182,6 @@ export class PatientReportComponent implements OnInit {
     var that = this;
     that.rpmservice.rpm_get('/api/patient/getbillingCodes').then((data2) => {
       this.billingCode = data2;
-      console.log('this.billingCode = data2');
-      console.log(this.billingCode);
     });
   }
 

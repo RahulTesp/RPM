@@ -1,9 +1,9 @@
 export const environment = {
   production: true,
-  //host: 'cx-preprod-server.azurewebsites.net',
-  host: 'cx-dev-server.azurewebsites.net',
+  host: 'cx-preprod-server.azurewebsites.net',
+  //host: 'cx-dev-server.azurewebsites.net',
   // host: 'rpm-demo-api.azurewebsites.net',
-  //host: 'c-lynxapi.azurewebsites.net',
+  // host: 'c-lynxapi.azurewebsites.net',
   //host: 'cx-preprod-server.azurewebsites.net',
   // host: 'rpm-demo-api.azurewebsites.net',
   // host: 'meditprodapi.azurewebsites.net',

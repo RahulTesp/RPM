@@ -80,7 +80,7 @@ struct RPMHomeView: View {
     @State private var showAlertProxy: Bool = false
     @State private var showRejectionAlert = false
     @State private var rejectionMessage = ""
-    @ObservedObject var sessionManager = SessionManager.shared
+    @EnvironmentObject var sessionManager: SessionManager
     @EnvironmentObject var memberDetList: MembersListViewModel
     
     var body: some View {

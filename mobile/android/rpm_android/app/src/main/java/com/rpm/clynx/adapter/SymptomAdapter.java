@@ -1,10 +1,14 @@
 package com.rpm.clynx.adapter;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.rpm.clynx.R;
 import com.rpm.clynx.databinding.SymptomsItemBinding;
 import com.rpm.clynx.model.SymptomItemModel;
 import java.util.List;
@@ -38,6 +42,10 @@ public class SymptomAdapter extends RecyclerView.Adapter<SymptomAdapter.SymptomV
         holder.mSymptom.setText(gValues.get(position).getSymptom());
         holder.mSymptomStartDateTime.setText(gValues.get(position).getSymptomStartDateTime());
         holder.mDescription.setText(gValues.get(position).getDescription());
+
+        // Apply white background with rounded corners
+        holder.itemView.setBackgroundResource(R.drawable.rounded_white_bg);
+
     }
 
     @Override
@@ -48,6 +56,7 @@ public class SymptomAdapter extends RecyclerView.Adapter<SymptomAdapter.SymptomV
         public final TextView mSymptom;
         public final TextView mSymptomStartDateTime;
         public final TextView mDescription;
+        public final View cardContainer;
         public SymptomItemModel mItem;
 
         public SymptomViewHolder(SymptomsItemBinding binding) {
@@ -55,6 +64,7 @@ public class SymptomAdapter extends RecyclerView.Adapter<SymptomAdapter.SymptomV
             mSymptom = binding.itemSymp;
             mSymptomStartDateTime = binding.itemDate;
             mDescription = binding.itemDesc;
+            cardContainer = binding.symptomCardContainer;
         }
 
         @Override

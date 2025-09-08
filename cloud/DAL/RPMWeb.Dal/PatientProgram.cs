@@ -364,7 +364,7 @@ namespace RPMWeb.Dal
                 }
                 response.HttpRetCode = 200;
                 response.DevicUserId = reg.PatientNumber;
-                response.Message = "Device set to active without vendor activation.";
+                response.Message = "Device Added Successfully";
                 return response;
             }
            
@@ -458,7 +458,7 @@ namespace RPMWeb.Dal
                     con.Open();
                     cmd.ExecuteNonQuery();
                     con.Close();
-                           
+                   
                 }
             }
             return response;

@@ -1676,7 +1676,11 @@ export class SidePanelPatientComponent implements OnInit {
   }
 
   convertDate(dateval: any) {
+    console.log('convert Date');
+    console.log(dateval)
     let today = new Date(dateval);
+       console.log('convert Date After');
+    console.log(today)
     let dd = today.getDate();
     let dd2;
     if (dd < 10) {
@@ -1903,9 +1907,10 @@ export class SidePanelPatientComponent implements OnInit {
             that.registerSchedule.controls['scheduleDescription'].setValue(
               this.ScheduleDatabyId.CurrentScheduleComments
             );
-
+	    var CurrentScheduleDateVal = this.ScheduleDatabyId.CurrentScheduleDate;
+	    let CurrentScheduleDateFinalValue = Array.isArray(CurrentScheduleDateVal) ? CurrentScheduleDateVal[0] : CurrentScheduleDateVal;
             that.registerSchedule.controls['startDate'].setValue(
-              this.convertDateData(this.ScheduleDatabyId.CurrentScheduleDate)
+              this.convertDateData(CurrentScheduleDateFinalValue)
             );
             that.registerSchedule.controls['endDate'].setValue(
               this.ScheduleDatabyId.EndDate
@@ -1995,10 +2000,10 @@ export class SidePanelPatientComponent implements OnInit {
 
   private updateSingleSchedule() {
     if (!this.registerSchedule.valid) return this.showWarning('Please complete the form');
-
+    var scheduleDate = this.convertDate(this.DateConversionLogicFromStringToDate(this.registerSchedule.controls.startDate.value));
     const req_body = {
       CurrentScheduleId: this.schedule_edit_id,
-      ScheduleDate: this.convertDate(this.registerSchedule.controls.startDate.value),
+      ScheduleDate: scheduleDate,
       StartTime: this.registerSchedule.controls.startTime.value,
       Duration: this.durationValue,
       Comments: this.registerSchedule.controls.scheduleDescription.value,
@@ -2028,8 +2033,8 @@ export class SidePanelPatientComponent implements OnInit {
     if (!this.schedule_careteam_id)
       return this.showWarning('Please select a Assignee Name.');
 
-    const startDate = this.convertDate(this.registerSchedule.controls.startDate.value);
-    const endDate = this.convertDate(this.registerSchedule.controls.endDate.value);
+    const startDate = this.convertDate(this.DateConversionLogicFromStringToDate(this.registerSchedule.controls.startDate.value));
+    const endDate = this.convertDate(this.DateConversionLogicFromStringToDate(this.registerSchedule.controls.endDate.value));
 
     if (endDate <= startDate)
       return this.showWarning('Please select a valid Start Date and End Date.');
@@ -2770,5 +2775,18 @@ export class SidePanelPatientComponent implements OnInit {
   {
     this.showNoteModal=false;
   }
-
+  private DateConversionLogicFromStringToDate(rawDate: string) {
+    let year: number, month: number, day: number;
+    let rawDatefinalValue = Array.isArray(rawDate) ? rawDate[0] : rawDate;
+    const parts = rawDatefinalValue.split('-').map(Number);
+    if (parts[0] > 999) {
+      // Format: YYYY-MM-DD
+      [year, month, day] = parts;
+    } else {
+      // Format: MM-DD-YYYY
+      [month, day, year] = parts;
+    }
+    var scheduleDate = new Date(year, month - 1, day, 0, 0, 0);
+    return scheduleDate;
+  }
 }

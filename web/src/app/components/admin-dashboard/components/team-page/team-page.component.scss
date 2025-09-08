@@ -479,3 +479,11 @@ mat-progress-spinner {
     width: 0%;
   }
 }
+.task-type-desc {
+  max-width: 150px;       /* set width as per your layout */
+  white-space: nowrap;    /* keep text in one line */
+  overflow: hidden;       /* hide overflow */
+  text-overflow: ellipsis;/* show ... */
+  display: inline-block;  /* needed for ellipsis to work */
+  vertical-align: middle;
+}

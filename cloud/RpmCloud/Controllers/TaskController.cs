@@ -47,20 +47,20 @@ namespace RpmCloud.Controllers
                     {
                         return Ok(new { message = id });
                     }
-                    return BadRequest(new { message = "Could not save task details" });
+                    return BadRequest(new { message = "The task could not be added due to a problem with the information provided—please review the details and try again." });
                 }
                 else
                 {
-                    return Unauthorized(new { message = "Invalid session." });
+                    return Unauthorized(new { message = "Invalid User session." });
                 }
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("Lifetime validation failed"))
                 {
-                    return BadRequest(new { message = "Invalid session." });;
+                    return BadRequest(new { message = "The task could not be added due to a problem with the information provided—please review the details and try again." });;
                 }
-                return BadRequest(new { message = "Unexpected Error." });
+                return BadRequest(new { message = "The task could not be added due to a problem with the information provided—please review the details and try again." });
             }
         }
         [Route("updatetask")]
