@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Session.Validation"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Lib.Billing.MedIT", "..\RPM.Lib.Billing.MedIT\RPM.Lib.Billing.MedIT.csproj", "{BD639D22-9FF7-43ED-90C9-248FDE5C6E23}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Simulator.iGlucose", "..\RPM.Job.Simulator.iGlucose\RPM.Job.Simulator.iGlucose.csproj", "{36A1D03D-13B2-446D-ADCD-7FEB4C83928A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,8 +119,15 @@ Global
 		{BD639D22-9FF7-43ED-90C9-248FDE5C6E23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD639D22-9FF7-43ED-90C9-248FDE5C6E23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD639D22-9FF7-43ED-90C9-248FDE5C6E23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36A1D03D-13B2-446D-ADCD-7FEB4C83928A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36A1D03D-13B2-446D-ADCD-7FEB4C83928A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36A1D03D-13B2-446D-ADCD-7FEB4C83928A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36A1D03D-13B2-446D-ADCD-7FEB4C83928A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8D661698-E78C-4D3E-960C-AEFED4A2273F}
 	EndGlobalSection
 EndGlobal

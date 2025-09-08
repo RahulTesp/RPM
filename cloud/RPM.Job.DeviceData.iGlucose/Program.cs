@@ -5,38 +5,32 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System.Data;
-//cron continuous
+
 class Program
 {
     static ConcurrentDictionary<string, DeviceIDs> deviceid_dictionary = new ConcurrentDictionary<string, DeviceIDs>();
-    static ConcurrentDictionary<string, string> vitalunits_dictionary = new ConcurrentDictionary<string, string>();     
+    static ConcurrentDictionary<string, string> vitalunits_dictionary = new ConcurrentDictionary<string, string>();
     static string readingid = string.Empty;
-    static string acess_key = string.Empty;
-    static string CONN_STRING = string.Empty;
-    static async Task Main(string[] args)
+    static string? acess_key = string.Empty;
+    static string? CONN_STRING = string.Empty;
+    static void Main(string[] args)
     {
         // Set up configuration
         var config = new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json", optional: true)
-        .AddEnvironmentVariables() // Allows overriding via Azure App Settings
-        .Build();
-        if (config == null)
-        {
-            Console.WriteLine("Configuration is null.");
-            return;
-        }
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddEnvironmentVariables() // Allows overriding via Azure App Settings
+            .Build();
+
         // Access a specific config value
-        string? connStr = config["RPM:ConnectionString"];
+        string connStr = config["RPM:ConnectionString"];
         Console.WriteLine($"RPM Connection String: {connStr}");
-        if (connStr == null)
-        {
-            Console.WriteLine("Connection string is null in appsettings.json.");
-            return;
-        }
-        CONN_STRING = connStr;
+        // Optional: bind strongly-typed object
+        var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
+        Console.WriteLine($"RPM.ConnectionString (typed): {rpmSettings?.ConnectionString}");
+        CONN_STRING = rpmSettings?.ConnectionString;
         Console.WriteLine("WebJob started...");
-        if(CONN_STRING == null)
+        if (CONN_STRING == null)
         {
             Console.WriteLine("Connection string is null.");
             return;
@@ -45,7 +39,12 @@ class Program
         List<SystemConfigInfo> igc = Data.GetSystemConfig(CONN_STRING, "iGlucose", "User");
 
         SystemConfigInfo? igckey = igc.Find(x => x.Name.Equals("ApiKey_iGlucose"));
-        acess_key = igckey.Value;
+        acess_key = igckey?.Value;
+        if (acess_key == null)
+        {
+            Console.WriteLine("access key is null.");
+            return;
+        }
         Thread.Sleep(10000);
         try
         {
@@ -54,68 +53,103 @@ class Program
             TimerApiCallback();
             Thread.Sleep(20000);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine("exception:" + ex);
         }
-        
-        
     }
     private static void TimerDeviceIdCallback()
     {
         try
         {
-
-            Dictionary<string, DeviceIDs> temp_deviceid_dictionary = new Dictionary<string, DeviceIDs>();
             Console.WriteLine("Reading DeviceId and Vitals");
-            using (SqlConnection connection = new SqlConnection(CONN_STRING))
-            {
-                connection.Open();
-                SqlCommand command = new SqlCommand("usp_GetDeviceIds", connection);
-                command.CommandType = System.Data.CommandType.StoredProcedure;
-                command.Parameters.AddWithValue("@deviceVendorName", "iGlucose");
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        var Deviceid = reader["DeviceSerialNo"].ToString();
-                        var ActivatedDate = (DateTime)reader["DeviceActivatedDateTime"];
-                        temp_deviceid_dictionary.Add(Deviceid, new DeviceIDs(Deviceid, ActivatedDate));
-                        deviceid_dictionary.TryAdd(Deviceid, new DeviceIDs(Deviceid, ActivatedDate));
-                        foreach (var item in deviceid_dictionary)
-                        {
-                            if (!temp_deviceid_dictionary.ContainsKey(item.Key))
-                            {
-                                DeviceIDs removedItem;
-                                bool result = deviceid_dictionary.TryRemove(item.Key, out removedItem);
-                            }
-                            else
-                            {
-                                deviceid_dictionary[Deviceid] = new DeviceIDs(Deviceid, ActivatedDate);
-                            }
-                        }
-                    }
-                }
-                SqlCommand command1 = new SqlCommand("usp_GetVitalUnits", connection);
-                command1.CommandType = System.Data.CommandType.StoredProcedure;
-                using (SqlDataReader reader = command1.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        var MeasureName = reader["MeasureName"].ToString();
-                        var Unit = reader["UnitName"].ToString();
-                        vitalunits_dictionary.TryAdd(MeasureName, Unit);
-                    }
-                }
-            }
+
+            var latestDevices = LoadDeviceIds();
+            UpdateDeviceDictionary(latestDevices);
+
+            var vitalUnits = LoadVitalUnits();
+            UpdateVitalUnitsDictionary(vitalUnits);
 
             Console.WriteLine("Reading DeviceId and Vitals end");
         }
         catch (Exception ex)
         {
-            Console.WriteLine("exception:" + ex);
+            Console.WriteLine("Exception in TimerDeviceIdCallback: " + ex);
         }
     }
+    private static Dictionary<string, DeviceIDs> LoadDeviceIds()
+    {
+        var result = new Dictionary<string, DeviceIDs>();
+
+        using var connection = new SqlConnection(CONN_STRING);
+        using var command = new SqlCommand("usp_GetDeviceIds", connection)
+        {
+            CommandType = CommandType.StoredProcedure
+        };
+        command.Parameters.AddWithValue("@deviceVendorName", "iGlucose");
+
+        connection.Open();
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            string? deviceId = reader["DeviceSerialNo"].ToString();
+            DateTime activatedDate = (DateTime)reader["DeviceActivatedDateTime"];
+            if (!string.IsNullOrEmpty(deviceId))
+            {
+                result[deviceId] = new DeviceIDs(deviceId, activatedDate);
+            }
+        }
+        return result;
+    }
+
+    private static void UpdateDeviceDictionary(Dictionary<string, DeviceIDs> latestDevices)
+    {
+        // Add or update new devices
+        foreach (var kvp in latestDevices)
+        {
+            deviceid_dictionary.AddOrUpdate(kvp.Key, kvp.Value, (k, v) => kvp.Value);
+        }
+        // Remove old devices not present anymore
+        foreach (var existing in deviceid_dictionary.Keys)
+        {
+            if (!latestDevices.ContainsKey(existing))
+            {
+                deviceid_dictionary.TryRemove(existing, out _);
+            }
+        }
+    }
+
+    private static Dictionary<string, string> LoadVitalUnits()
+    {
+        var result = new Dictionary<string, string>();
+
+        using var connection = new SqlConnection(CONN_STRING);
+        using var command = new SqlCommand("usp_GetVitalUnits", connection)
+        {
+            CommandType = CommandType.StoredProcedure
+        };
+
+        connection.Open();
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            string? measureName = reader["MeasureName"].ToString();
+            string unit = reader["UnitName"].ToString()??"";
+            if (!string.IsNullOrEmpty(measureName))
+            {
+                result[measureName] = unit;
+            }
+        }
+        return result;
+    }
+
+    private static void UpdateVitalUnitsDictionary(Dictionary<string, string> latestUnits)
+    {
+        foreach (var kvp in latestUnits)
+        {
+            vitalunits_dictionary.AddOrUpdate(kvp.Key, kvp.Value, (k, v) => kvp.Value);
+        }
+    }
+
     private static void TimerApiCallback()
     {
         Console.WriteLine("TimerApiCallback begin");
@@ -126,47 +160,11 @@ class Program
 
                 DeviceIDs val = item.Value;
                 DateTime lastRecodDate = val.ActivatedDate;
+
                 Console.WriteLine("DeviceId: " + val.Deviceid + "; Lasted Recorded :" + lastRecodDate);
-                DateTime newstart = lastRecodDate.AddSeconds(2);
-                string sdata = Data.CallRestMethod("HTTPS://api.iglucose.com/readings/", newstart, val.Deviceid, acess_key);
-                dynamic data = JObject.Parse(sdata);
-                JArray array = data.readings;
-                if (array.Count > 0)
-                {
-                    StagingTableQueueInsert(array, val.Deviceid);
-                }
-                else
-                {
-                    DateTime newenddate = newstart.AddDays(2);
-                    if (newenddate <= DateTime.Now)
-                    {
-                        using (SqlConnection connection = new SqlConnection(CONN_STRING))
-                        {
-                            SqlCommand command = new SqlCommand("usp_AppJobLastBatch", connection);
-                            command.CommandType = CommandType.StoredProcedure;
-                            command.Parameters.AddWithValue("@DeviceSerialNo", val.Deviceid);
-                            command.Parameters.AddWithValue("@DeviceVendorName", "iGlucose");
-                            command.Parameters.AddWithValue("@DateRecorded", newstart.AddDays(2));
-                            SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
-                            returnParameter.Direction = ParameterDirection.ReturnValue;
-                            connection.Open();
-                            command.ExecuteNonQuery();
-                            int id = (int)returnParameter.Value;
-                            connection.Close();
-                            if (id.Equals(0))
-                            {
-
-                            }
-                            else
-                            {
-                                Console.WriteLine(val.Deviceid + " Lastupdated:" + newstart.AddDays(2));
-
-                            }
-
-                        }
-                    }
-
-                }
+                
+                GetDeviceDataFromAPI(lastRecodDate, val.Deviceid);
+                
             }
             Console.WriteLine("TimerApiCallback end");
         }
@@ -175,292 +173,238 @@ class Program
             Console.WriteLine("exception before StagingTableQueueInsert:" + ex);
         }
     }
+    private static void GetDeviceDataFromAPI(DateTime lastRecodDate,String Deviceid)
+    {
+        DateTime newstart = lastRecodDate.AddSeconds(2);
+        string sdata = Data.CallRestMethod("HTTPS://api.iglucose.com/readings/", newstart, Deviceid, acess_key);
+        dynamic data = JObject.Parse(sdata);
+        JArray array = data.readings;
+        if (array.Count > 0)
+        {
+            StagingTableQueueInsert(array, Deviceid);
+        }
+        else
+        {
+            DateTime newenddate = newstart.AddDays(2);
+            if (newenddate <= DateTime.UtcNow)
+            {
+                UpdateLastBatch(Deviceid, newenddate);
+            }
+        }
+    }
     private static void StagingTableQueueInsert(JArray array, string deviceId)
     {
-
         try
         {
-            string reading_type = string.Empty;
-            foreach (JObject obj in array)
+            if (array == null || array.Count == 0) return;
+
+            string? readingType = array.First?["reading_type"]?.ToString();
+            if (string.IsNullOrEmpty(readingType)) return;
+
+            dynamic? value = readingType switch
             {
-                reading_type = obj["reading_type"].ToString();
-                break;
+                "blood_glucose" => array.ToObject<List<iGlucoseBG>>(),
+                "blood_pressure" => array.ToObject<List<iGlucoseBP>>(),
+                "weight" => array.ToObject<List<iGlucoseW>>(),
+                "pulse_ox" => array.ToObject<List<iGlucosePulse>>(),
+                _ => null
+            };
+            dynamic? readings = value;
+
+            if (readings == null) return;
+
+            List<DateTime> receivedTimes = new();
+
+            foreach (var reading in readings)
+            {
+                if (deviceId != reading.device_id.ToString()) continue;
+
+                receivedTimes.Add(Convert.ToDateTime(reading.date_received));
+                Console.WriteLine($"deviceid: {reading.device_id}, date_recorded: {reading.date_recorded}");
+
+                switch (readingType)
+                {
+                    case "blood_glucose":
+                        HandleBloodGlucose(reading);
+                        break;
+                    case "blood_pressure":
+                        HandleBloodPressure(reading);
+                        break;
+                    case "weight":
+                        HandleWeight(reading);
+                        break;
+                    case "pulse_ox":
+                        HandlePulseOx(reading);
+                        break;
+                }
             }
-            if (!String.IsNullOrEmpty(reading_type))
+
+            if (receivedTimes.Count > 0)
             {
-                dynamic ig;
-                if (reading_type == "blood_glucose")
-                { ig = array.ToObject<List<iGlucoseBG>>(); }
-                else if (reading_type == "blood_pressure")
-                { ig = array.ToObject<List<iGlucoseBP>>(); }
-                else if (reading_type == "weight")
-                { ig = array.ToObject<List<iGlucoseW>>(); }
-                else if (reading_type == "pulse_ox")
-                { ig = array.ToObject<List<iGlucosePulse>>(); }
-
-                else
-                {
-                    ig = null;
-                }
-                List<DateTime> ReceivedTimes = new List<DateTime>();
-                for (int j = 0; j < ig.Count; j++)
-                {
-                    if (deviceId == ig[j].device_id.ToString())
-                    {
-                        ReceivedTimes.Add(Convert.ToDateTime(ig[j].date_received));
-                        Console.WriteLine("deviceid:" + ig[j].device_id);
-                        Console.WriteLine("date_recorded:" + ig[j].date_recorded);
-                        if (reading_type == "blood_glucose")
-                        {
-                            string Unitglucose;
-                            vitalunits_dictionary.TryGetValue("Fasting", out Unitglucose);
-                            DatabaseInput blood_glucose = new DatabaseInput();
-                            blood_glucose.reading_id = ig[j].reading_id;
-                            blood_glucose.device_id = ig[j].device_id;
-                            blood_glucose.device_model = ig[j].device_model;
-                            blood_glucose.date_recorded = ig[j].date_recorded.ToString("yyyy-MM-dd HH:mm:ss");
-                            blood_glucose.date_received = ig[j].date_received.ToString("yyyy-MM-dd HH:mm:ss");
-                            blood_glucose.reading_type = ig[j].reading_type;
-                            blood_glucose.battery = ig[j].battery;
-                            var time = ig[j].time_zone_offset;
-                            if (time != null)
-                            {
-                                blood_glucose.time_zone_offset = time.ToString();
-                            }
-                            else
-                            {
-                                blood_glucose.time_zone_offset = null;
-                            }
-                            blood_glucose.data_unit = Unitglucose;
-                            if (Unitglucose == "mgdl")
-                            {
-                                blood_glucose.data_value = ig[j].blood_glucose_mgdl;
-                            }
-                            else if (Unitglucose == "mmol")
-                            {
-                                blood_glucose.data_value = ig[j].blood_glucose_mmol;
-                            }
-                            blood_glucose.before_meal = ig[j].before_meal;
-                            if (ig[j].before_meal == true)
-                            {
-                                blood_glucose.data_type = "Fasting";
-                            }
-                            else
-                            {
-                                blood_glucose.data_type = "Non-Fasting";
-                            }
-                            blood_glucose.event_flag = ig[j].event_flag;
-                            blood_glucose.irregular = ig[j].irregular;
-                            TimerStagingTableInsert(blood_glucose);
-                            Console.WriteLine("Added to queue:" + blood_glucose.device_id);
-
-                        }
-                        else if (reading_type == "blood_pressure")
-                        {
-                            string Unitsystolic;
-                            vitalunits_dictionary.TryGetValue("systolic", out Unitsystolic);
-                            string Unitdiastolic;
-                            vitalunits_dictionary.TryGetValue("diastolic", out Unitdiastolic);
-                            string Unitpulse;
-                            vitalunits_dictionary.TryGetValue("pulse", out Unitpulse);
-                            DatabaseInput blood_pressuresystolic = new DatabaseInput();
-                            DatabaseInput blood_pressurediastolic = new DatabaseInput();
-                            DatabaseInput blood_pressurepulse = new DatabaseInput();
-                            blood_pressuresystolic.reading_id = ig[j].reading_id;
-                            blood_pressurediastolic.reading_id = ig[j].reading_id;
-                            blood_pressurepulse.reading_id = ig[j].reading_id;
-                            blood_pressuresystolic.device_id = ig[j].device_id;
-                            blood_pressurediastolic.device_id = ig[j].device_id;
-                            blood_pressurepulse.device_id = ig[j].device_id;
-                            blood_pressuresystolic.device_model = ig[j].device_model;
-                            blood_pressurediastolic.device_model = ig[j].device_model;
-                            blood_pressurepulse.device_model = ig[j].device_model;
-                            blood_pressuresystolic.date_recorded = ig[j].date_recorded.ToString("yyyy-MM-dd HH:mm:ss");
-                            blood_pressurediastolic.date_recorded = ig[j].date_recorded.ToString("yyyy-MM-dd HH:mm:ss");
-                            blood_pressurepulse.date_recorded = ig[j].date_recorded.ToString("yyyy-MM-dd HH:mm:ss");
-                            blood_pressuresystolic.date_received = ig[j].date_received.ToString("yyyy-MM-dd HH:mm:ss");
-                            blood_pressurediastolic.date_received = ig[j].date_received.ToString("yyyy-MM-dd HH:mm:ss");
-                            blood_pressurepulse.date_received = ig[j].date_received.ToString("yyyy-MM-dd HH:mm:ss");
-                            blood_pressuresystolic.reading_type = ig[j].reading_type;
-                            blood_pressurediastolic.reading_type = ig[j].reading_type;
-                            blood_pressurepulse.reading_type = ig[j].reading_type;
-                            blood_pressuresystolic.battery = 0;
-                            blood_pressurediastolic.battery = 0;
-                            blood_pressurepulse.battery = 0;
-                            var time = ig[j].time_zone_offset;
-                            if (time != null)
-                            {
-                                blood_pressuresystolic.time_zone_offset = time.ToString();
-                                blood_pressurediastolic.time_zone_offset = time.ToString();
-                                blood_pressurepulse.time_zone_offset = time.ToString();
-                            }
-                            else
-                            {
-                                blood_pressuresystolic.time_zone_offset = null;
-                                blood_pressurediastolic.time_zone_offset = null;
-                                blood_pressurepulse.time_zone_offset = null;
-                            }
-
-                            blood_pressuresystolic.before_meal = ig[j].before_meal;
-                            blood_pressurediastolic.before_meal = ig[j].before_meal;
-                            blood_pressurepulse.before_meal = ig[j].before_meal;
-                            blood_pressuresystolic.event_flag = ig[j].event_flag;
-                            blood_pressurediastolic.event_flag = ig[j].event_flag;
-                            blood_pressurepulse.event_flag = ig[j].event_flag;
-                            blood_pressuresystolic.irregular = ig[j].irregular;
-                            blood_pressurediastolic.irregular = ig[j].irregular;
-                            blood_pressurepulse.irregular = ig[j].irregular;
-                            blood_pressuresystolic.data_type = "systolic";
-                            blood_pressuresystolic.data_unit = Unitsystolic;
-                            blood_pressuresystolic.data_value = ig[j].systolic_mmhg;
-                            TimerStagingTableInsert(blood_pressuresystolic);
-                            blood_pressurediastolic.data_type = "diastolic";
-                            blood_pressurediastolic.data_unit = Unitdiastolic;
-                            blood_pressurediastolic.data_value = ig[j].diastolic_mmhg;
-                            TimerStagingTableInsert(blood_pressurediastolic);
-                            Console.WriteLine("Added to queue:" + blood_pressurediastolic.device_id);
-                            blood_pressurepulse.data_type = "pulse";
-                            blood_pressurepulse.data_unit = Unitpulse;
-                            blood_pressurepulse.data_value = ig[j].pulse_bpm;
-                            TimerStagingTableInsert(blood_pressurepulse);
-                            Console.WriteLine("Added to queue:" + blood_pressurepulse.device_id);
-                        }
-                        else if (reading_type == "weight")
-                        {
-                            string Unitweight;
-                            vitalunits_dictionary.TryGetValue("Weight", out Unitweight);
-                            DatabaseInput weight = new DatabaseInput();
-                            weight.reading_id = ig[j].reading_id;
-                            weight.device_id = ig[j].device_id;
-                            weight.device_model = ig[j].device_model;
-                            weight.date_recorded = ig[j].date_recorded.ToString("yyyy-MM-dd HH:mm:ss");
-                            weight.date_received = ig[j].date_received.ToString("yyyy-MM-dd HH:mm:ss");
-                            weight.reading_type = ig[j].reading_type;
-                            weight.battery = 0;
-                            var time = ig[j].time_zone_offset;
-                            if (time != null)
-                            {
-                                weight.time_zone_offset = time.ToString();
-                            }
-                            else
-                            {
-                                weight.time_zone_offset = null;
-                            }
-                            weight.data_type = "weight";
-                            weight.data_unit = Unitweight;
-                            if (Unitweight == "kg")
-                            {
-                                weight.data_value = ig[j].weight_kg;
-                            }
-                            else if (Unitweight == "lbs")
-                            {
-                                weight.data_value = ig[j].weight_lbs;
-                            }
-                            weight.before_meal = ig[j].before_meal;
-                            weight.event_flag = ig[j].event_flag;
-                            weight.irregular = ig[j].irregular;
-                            TimerStagingTableInsert(weight);
-
-                        }
-                        else if (reading_type == "pulse_ox")
-                        {
-                            string Unitpulse;
-                            vitalunits_dictionary.TryGetValue("Pulse", out Unitpulse);
-                            string Unitspo2;
-                            vitalunits_dictionary.TryGetValue("Oxygen", out Unitspo2);
-                            DatabaseInput pulse_ox_spo2 = new DatabaseInput();
-                            DatabaseInput pulse_ox_pulse = new DatabaseInput();
-                            pulse_ox_spo2.reading_id = ig[j].reading_id;
-                            pulse_ox_pulse.reading_id = ig[j].reading_id;
-                            pulse_ox_spo2.device_id = ig[j].device_id;
-                            pulse_ox_pulse.device_id = ig[j].device_id;
-                            pulse_ox_spo2.device_model = ig[j].device_model;
-                            pulse_ox_pulse.device_model = ig[j].device_model;
-                            pulse_ox_spo2.date_recorded = ig[j].date_recorded.ToString("yyyy-MM-dd HH:mm:ss");
-                            pulse_ox_pulse.date_recorded = ig[j].date_recorded.ToString("yyyy-MM-dd HH:mm:ss");
-                            pulse_ox_spo2.date_received = ig[j].date_received.ToString("yyyy-MM-dd HH:mm:ss");
-                            pulse_ox_pulse.date_received = ig[j].date_received.ToString("yyyy-MM-dd HH:mm:ss");
-                            pulse_ox_spo2.reading_type = ig[j].reading_type;
-                            pulse_ox_pulse.reading_type = ig[j].reading_type;
-                            pulse_ox_spo2.battery = 0;
-                            pulse_ox_pulse.battery = 0;
-                            var time = ig[j].time_zone_offset;
-                            if (time != null)
-                            {
-                                pulse_ox_spo2.time_zone_offset = time.ToString();
-                            }
-                            else
-                            {
-                                pulse_ox_spo2.time_zone_offset = null;
-                            }
-                            var time1 = ig[j].time_zone_offset;
-                            if (time != null)
-                            {
-                                pulse_ox_pulse.time_zone_offset = time1.ToString();
-                            }
-                            else
-                            {
-                                pulse_ox_pulse.time_zone_offset = null;
-                            }
-                            pulse_ox_spo2.data_type = "Oxygen";
-                            pulse_ox_pulse.data_type = "Pulse";
-                            pulse_ox_spo2.data_unit = Unitspo2;
-                            pulse_ox_pulse.data_unit = Unitpulse;
-                            pulse_ox_spo2.data_value = ig[j].spo2;
-                            pulse_ox_pulse.data_value = ig[j].pulse_bpm;
-                            pulse_ox_spo2.before_meal = ig[j].before_meal;
-                            pulse_ox_pulse.before_meal = ig[j].before_meal;
-                            pulse_ox_spo2.event_flag = ig[j].event_flag;
-                            pulse_ox_pulse.event_flag = ig[j].event_flag;
-                            pulse_ox_spo2.irregular = ig[j].irregular;
-                            pulse_ox_pulse.irregular = ig[j].irregular;
-                            TimerStagingTableInsert(pulse_ox_spo2);
-                            TimerStagingTableInsert(pulse_ox_pulse);
-                        }
-                        if (j == ig.Count - 1)
-                        {
-                            DateTime MaxDate = ReceivedTimes.Max();
-                            using (SqlConnection connection = new SqlConnection(CONN_STRING))
-                            {
-                                SqlCommand command = new SqlCommand("usp_AppJobLastBatch", connection);
-                                command.CommandType = CommandType.StoredProcedure;
-                                command.Parameters.AddWithValue("@DeviceSerialNo", ig[j].device_id);
-                                command.Parameters.AddWithValue("@DeviceVendorName", "iGlucose");
-                                command.Parameters.AddWithValue("@DateRecorded", MaxDate);
-                                SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
-                                returnParameter.Direction = ParameterDirection.ReturnValue;
-                                connection.Open();
-                                command.ExecuteNonQuery();
-                                int id = (int)returnParameter.Value;
-                                connection.Close();
-                                if (id.Equals(0))
-                                {
-
-                                }
-                                else
-                                {
-                                    Console.WriteLine(ig[j].device_id + " Lastupdated:" + ig[j].date_received);
-
-                                }
-
-                            }
-                        }
-
-                    }
-                }
-
+                DateTime maxDate = receivedTimes.Max();
+                UpdateLastBatch(deviceId, maxDate);
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
+            Console.WriteLine("Exception in StagingTableQueueInsert: " + ex);
         }
     }
-    private static void TimerStagingTableInsert(DatabaseInput reading)
+    private static void HandleBloodGlucose(iGlucoseBG reading)
+    {
+        vitalunits_dictionary.TryGetValue("Fasting", out string? unit);
+
+        var input = new DatabaseInput
+        {
+            reading_id = reading.reading_id,
+            device_id = reading.device_id,
+            device_model = reading.device_model,
+            date_recorded = reading.date_recorded.ToString("yyyy-MM-dd HH:mm:ss"),
+            date_received = reading.date_received.ToString("yyyy-MM-dd HH:mm:ss"),
+            reading_type = reading.reading_type,
+            battery = reading.battery,
+            time_zone_offset = reading.time_zone_offset.ToString(),
+            data_unit = unit??"",
+            data_value = unit == "mgdl" ? reading.blood_glucose_mgdl : reading.blood_glucose_mmol,
+            before_meal = reading.before_meal,
+            data_type = reading.before_meal ? "Fasting" : "Non-Fasting",
+            event_flag = reading.event_flag,
+            irregular = reading.irregular
+        };
+
+        StagingTableInsertProc(input);
+        Console.WriteLine("Added to queue: " + input.device_id);
+    }
+
+    private static void HandleBloodPressure(iGlucoseBP reading)
+    {
+        vitalunits_dictionary.TryGetValue("systolic", out string? unitSystolic);
+        vitalunits_dictionary.TryGetValue("diastolic", out string? unitDiastolic);
+        vitalunits_dictionary.TryGetValue("pulse", out string? unitPulse);
+
+        InsertBloodPressureRecord(reading, "systolic", unitSystolic, reading.systolic_mmhg);
+        InsertBloodPressureRecord(reading, "diastolic", unitDiastolic, reading.diastolic_mmhg);
+        InsertBloodPressureRecord(reading, "pulse", unitPulse, reading.pulse_bpm);
+    }
+
+    private static void InsertBloodPressureRecord(iGlucoseBP reading, string type, string? unit, double value)
+    {
+        var input = new DatabaseInput
+        {
+            reading_id = reading.reading_id,
+            device_id = reading.device_id,
+            device_model = reading.device_model,
+            date_recorded = reading.date_recorded.ToString("yyyy-MM-dd HH:mm:ss"),
+            date_received = reading.date_received.ToString("yyyy-MM-dd HH:mm:ss"),
+            reading_type = reading.reading_type,
+            battery = 0,
+            time_zone_offset = reading.time_zone_offset.ToString(),
+            data_type = type,
+            data_unit = unit ?? "",
+            data_value = value,
+            before_meal = reading.before_meal,
+            event_flag = reading.event_flag,
+            irregular = reading.irregular
+        };
+
+        StagingTableInsertProc(input);
+        Console.WriteLine("Added to queue: " + input.device_id);
+    }
+
+    private static void HandleWeight(iGlucoseW reading)
+    {
+        vitalunits_dictionary.TryGetValue("Weight", out string? unit);
+
+        var input = new DatabaseInput
+        {
+            reading_id = reading.reading_id,
+            device_id = reading.device_id,
+            device_model = reading.device_model,
+            date_recorded = reading.date_recorded.ToString("yyyy-MM-dd HH:mm:ss"),
+            date_received = reading.date_received.ToString("yyyy-MM-dd HH:mm:ss"),
+            reading_type = reading.reading_type,
+            battery = 0,
+            time_zone_offset = reading.time_zone_offset.ToString(),
+            data_type = "weight",
+            data_unit = unit ?? "",
+            data_value = unit == "kg" ? reading.weight_kg : reading.weight_lbs,
+            before_meal = reading.before_meal,
+            event_flag = reading.event_flag,
+            irregular = reading.irregular
+        };
+
+        StagingTableInsertProc(input);
+    }
+
+    private static void HandlePulseOx(iGlucosePulse reading)
+    {
+        vitalunits_dictionary.TryGetValue("Pulse", out string? unitPulse);
+        vitalunits_dictionary.TryGetValue("Oxygen", out string? unitOxygen);
+
+        InsertPulseOxRecord(reading, "Oxygen", unitOxygen, reading.spo2);
+        InsertPulseOxRecord(reading, "Pulse", unitPulse, reading.pulse_bpm);
+    }
+
+    private static void InsertPulseOxRecord(iGlucosePulse reading, string type, string? unit, double value)
+    {
+        var input = new DatabaseInput
+        {
+            reading_id = reading.reading_id,
+            device_id = reading.device_id,
+            device_model = reading.device_model,
+            date_recorded = reading.date_recorded.ToString("yyyy-MM-dd HH:mm:ss"),
+            date_received = reading.date_received.ToString("yyyy-MM-dd HH:mm:ss"),
+            reading_type = reading.reading_type,
+            battery = 0,
+            time_zone_offset = reading.time_zone_offset.ToString(),
+            data_type = type,
+            data_unit = unit ?? "",
+            data_value = value,
+            before_meal = reading.before_meal,
+            event_flag = reading.event_flag,
+            irregular = reading.irregular
+        };
+
+        StagingTableInsertProc(input);
+    }
+    private static void UpdateLastBatch(string deviceId, DateTime maxDate)
+    {
+        using SqlConnection connection = new(CONN_STRING);
+        using SqlCommand command = new("usp_AppJobLastBatch", connection)
+        {
+            CommandType = CommandType.StoredProcedure
+        };
+
+        command.Parameters.AddWithValue("@DeviceSerialNo", deviceId);
+        command.Parameters.AddWithValue("@DeviceVendorName", "iGlucose");
+        command.Parameters.AddWithValue("@DateRecorded", maxDate);
+
+        var returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
+        returnParameter.Direction = ParameterDirection.ReturnValue;
+
+        connection.Open();
+        command.ExecuteNonQuery();
+
+        if ((int)returnParameter.Value != 0)
+        {
+            Console.WriteLine($"{deviceId} Lastupdated: {maxDate}");
+        }
+    }
+
+    private static void StagingTableInsertProc(DatabaseInput reading)
     {
 
+        //Console.WriteLine("TimerStagingTableInsert begin");
         try
         {
+            //for (int i = 0; i < tableInsert_queue.Count; i++)
+            //{
+            //    Console.WriteLine("tableInsert_queue.Count"+ tableInsert_queue.Count);
+            //    //DatabaseInput reading;
+            //    if (tableInsert_queue.TryDequeue(out reading))
+            //    {
+            //JavaScriptSerializer js = new JavaScriptSerializer();
+            //string jsonData = js.Serialize(reading);
             string jsonData = JsonConvert.SerializeObject(reading);
             
             Console.WriteLine("JsonStg Insert begin: " + jsonData);
@@ -469,16 +413,22 @@ class Program
                 SqlCommand command = new SqlCommand("usp_InsJsonStg", connection);
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@json", jsonData);
-                command.Parameters.AddWithValue("@CreatedBy", DateTime.Now.ToUniversalTime());
+                command.Parameters.AddWithValue("@CreatedBy", DateTime.UtcNow);
                 connection.Open();
                 command.ExecuteScalar();
                 connection.Close();
             }
+            //}
+            //}
         }
         catch (Exception ex)
         {
-            Console.WriteLine("exception:TimerStagingTableInsert" + ex);
+            Console.WriteLine("exception:StagingTableInsertProc" + ex);
         }
-        Console.WriteLine("TimerStagingTableInsert end");
+        Console.WriteLine("StagingTableInsertProc end");
     }
+}
+public class RpmSettings
+{
+    public string? ConnectionString { get; set; }
 }
