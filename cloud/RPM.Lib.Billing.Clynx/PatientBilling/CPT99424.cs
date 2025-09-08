@@ -48,7 +48,7 @@ namespace RPMPatientBilling.PatientBilling
                     DateTime billedDate = DateTime.MinValue;
                     for (int n = 0; n < monthDiff; n++)
                     {
-                        billedDate = RPMBilling.GetNextBilledDate(startDate);
+                        billedDate = RPMCycleBasedBilling.GetNextBilledDate(startDate);
                         DateTime billedDateTemp = billedDate;
                         DateTime startDateTemp = startDate;
                         DateTime todayDate = DateTime.UtcNow;
@@ -105,7 +105,7 @@ namespace RPMPatientBilling.PatientBilling
                     DateTime newBilledDateTemp = DateTime.MinValue;
                     if (PatientStartDate.Status.ToLower() == "active")
                     {
-                        newBilledDate = RPMBilling.GetNextBilledDate((DateTime)PatientStartDate.StartDate);
+                        newBilledDate = RPMCycleBasedBilling.GetNextBilledDate((DateTime)PatientStartDate.StartDate);
                         newBilledDateTemp =newBilledDate;// BillingProcess.GetLocalTimeFromUTC((DateTime)newBilledDate, con);
                     }
                     else
@@ -229,8 +229,8 @@ namespace RPMPatientBilling.PatientBilling
                     LastBilledDate = (DateTime?)endDate,
                     CreatedOn = DateTime.UtcNow
                 };
-                RPMBilling rPMBilling = new RPMBilling();
-                rPMBilling.UpdatePatientBilledData(patientDailyBillingData, billingCode, stDateTemp, con);
+                RPMCycleBasedBilling RPMCycleBasedBilling = new RPMCycleBasedBilling();
+                RPMCycleBasedBilling.UpdatePatientBilledData(patientDailyBillingData, billingCode, stDateTemp, con);
             }
         }
         public void SetData(object PatientProgramDatas, int totalReadings, DateTime? startDate,

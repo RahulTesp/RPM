@@ -47,19 +47,18 @@ class Program
         SystemConfigInfo? igckey = igc.Find(x => x.Name.Equals("ApiKey_iGlucose"));
         acess_key = igckey.Value;
         Thread.Sleep(10000);
-        while (true)
+        try
         {
-            try
-            {
-                TimerDeviceIdCallback();
-                Thread.Sleep(1000);
-                TimerApiCallback();
-                Thread.Sleep(20000);
-            }
-            catch (Exception ex)
-            {
-            }
+            TimerDeviceIdCallback();
+            Thread.Sleep(1000);
+            TimerApiCallback();
+            Thread.Sleep(20000);
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine("exception:" + ex);
+        }
+        
         
     }
     private static void TimerDeviceIdCallback()

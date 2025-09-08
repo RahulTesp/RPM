@@ -103,6 +103,13 @@ namespace RPMWeb.Data.Common
         public string OTP { get; set; }
         public string token { get; set; }
     }
+    public class UserLoginVerify
+    {
+        public string UserName { get; set; }
+     
+        public string OTP { get; set; }
+      
+    }
     public class RPMLogin
     {
         [Required]
@@ -934,6 +941,7 @@ namespace RPMWeb.Data.Common
         public string ProgramName { get; set; }
         public string Program { get; set; }
         public string EnrolledDate { get; set; }
+        public string EnrolledDateTime { get; set; }
         public string PhysicianName { get; set; }
         public string AssignedMember { get; set; }
         public string PatientType { get; set; }

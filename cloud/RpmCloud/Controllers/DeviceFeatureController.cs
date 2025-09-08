@@ -48,9 +48,9 @@ namespace RpmCloud.Controllers
                     ReturnMsg resp = RpmDalFacade.AddDeviceProc(info);
                     if (resp.Val == 1)
                     {
-                        return Ok( resp.Msg);
+                        return Ok(new { message = resp.Msg });
                     }
-                    return BadRequest(resp.Msg);
+                    return BadRequest(new { message = resp.Msg });
                 }
                 else
                 {
@@ -93,9 +93,9 @@ namespace RpmCloud.Controllers
                     int resp = RpmDalFacade.UpdateDeviceProc(info);
                     if (resp != 0)
                     {
-                        return Ok( resp);
+                        return Ok(new { message = resp });
                     }
-                    return BadRequest("Cannot Update Device");
+                    return BadRequest(new { message = "Cannot Update Device" });
                 }
                 else
                 {
@@ -137,7 +137,7 @@ namespace RpmCloud.Controllers
                     {
                         return Ok(JsonConvert.SerializeObject(Device, Formatting.Indented));
                     }
-                    return NotFound("Could not find Device details");
+                    return NotFound(new { message = "Could not find Device details" });
                 }
                 else
                 {
@@ -184,11 +184,11 @@ namespace RpmCloud.Controllers
                     ReturnMsg resp = RpmDalFacade.AddDeviceVendor(info);
                     if (resp.Val == 1)
                     {
-                        return Ok( resp.Msg);
+                        return Ok(new { message = resp.Msg });
                     }
                     else
                     {
-                        return BadRequest(resp.Msg);
+                        return BadRequest(new { message = resp.Msg });
                     }
                     
                 }
@@ -233,11 +233,11 @@ namespace RpmCloud.Controllers
                     int resp = RpmDalFacade.UpdateDeviceVendor(info);
                     if (resp != 0)
                     {
-                        return Ok( resp);
+                        return Ok(new { message = resp });
                     }
                     else
                     {
-                        return BadRequest("Cannot Update DeviceVendor Details");
+                        return BadRequest(new { message = "Cannot Update DeviceVendor Details" });
                     }
                     
                 }
@@ -282,7 +282,7 @@ namespace RpmCloud.Controllers
                     }
                     else
                     {
-                        return NotFound("Could not find Device details");
+                        return NotFound(new { message = "Could not find Device details" });
                     }
                     
                 }
@@ -300,7 +300,7 @@ namespace RpmCloud.Controllers
                 return BadRequest(new { message = "Unexpected Error." });
             }
         }
-        [Route("isvalidvendorcode/{Code}")]
+        [Route("isvalidvendorcode")]
         [HttpPost]
         public IActionResult IsValidVendorCode([FromQuery] string Code)
         {

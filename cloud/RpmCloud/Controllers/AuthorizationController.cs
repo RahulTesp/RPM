@@ -383,7 +383,7 @@ namespace RpmCloud.Controllers
         }
         [Route("UserloginVerifiy")]
         [HttpPost]
-        public IActionResult LoginWithOtp([FromBody] RPMWeb.Data.Common.Login verPass)
+        public IActionResult LoginWithOtp([FromBody] RPMWeb.Data.Common.UserLoginVerify verPass)
         {
             try
             {
