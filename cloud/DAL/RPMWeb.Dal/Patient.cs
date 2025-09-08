@@ -530,7 +530,7 @@ namespace RPMWeb.Dal
         }
         public bool UpdatePatient(PatientDetails Info, string ConnectionString)
         {
-            
+
             bool ret = true;
             try
             {
@@ -1013,8 +1013,8 @@ namespace RPMWeb.Dal
                                         getPatientPrescribtionDetails.PhysicianId = (!DBNull.Value.Equals(ds.Tables[3].Rows[0]["PhysicianId"])) ? Convert.ToInt32(ds.Tables[3].Rows[0]["PhysicianId"]) : 0;
                                         getPatientPrescribtionDetails.Physician = ds.Tables[3].Rows[0]["Physician"].ToString();
                                         getPatientPrescribtionDetails.ConsultationDate = ds.Tables[3].Rows[0]["ConsultationDate"].ToString(); //fix
-                                       // getPatientPrescribtionDetails.ConsultationDate = (DateTime)ds.Tables[3].Rows[0]["ConsultationDate"];
-                                       // getPatientPrescribtionDetails.ConsultationDate= (!DBNull.Value.Equals(ds.Tables[0].Rows[0]["ConsultationDate"]) ? (DateTime)ds.Tables[3].Rows[0]["ConsultationDate"] : (DateTime)ds.Tables[3].Rows[0]["PrescribedDate"]);
+                                                                                                                                              // getPatientPrescribtionDetails.ConsultationDate = (DateTime)ds.Tables[3].Rows[0]["ConsultationDate"];
+                                                                                                                                              // getPatientPrescribtionDetails.ConsultationDate= (!DBNull.Value.Equals(ds.Tables[0].Rows[0]["ConsultationDate"]) ? (DateTime)ds.Tables[3].Rows[0]["ConsultationDate"] : (DateTime)ds.Tables[3].Rows[0]["PrescribedDate"]);
                                         getPatientPrescribtionDetails.ClinicCode = ds.Tables[3].Rows[0]["ClinicCode"].ToString();
                                         getPatientPrescribtionDetails.Clinic= ds.Tables[3].Rows[0]["Clinic"].ToString();
                                         getPatientPrescribtionDetails.Branch = ds.Tables[3].Rows[0]["Branch"].ToString();
@@ -1303,7 +1303,22 @@ namespace RPMWeb.Dal
                                     ProgramName = reader["ProgramName"].ToString(),
                                     Program = reader["Program"].ToString(),
                                     EnrolledDate = reader["EnrolledDate"].ToString(),
-                                    PhysicianName = reader["PhysicianName"].ToString(),
+                                    EnrolledDateTime = EnrolledDate;
+                                    if (!string.IsNullOrWhiteSpace(EnrolledDateTime))
+                                    {
+                                    EnrolledDateTime = Regex.Replace(EnrolledDateTime, @"\s+", " ").Trim();
+                                    DateTime parsedDate = DateTime.ParseExact(EnrolledDateTime, "MMM d yyyy h:mmtt", CultureInfo.InvariantCulture);
+
+
+
+                                    // Convert to ISO 8601 format
+                                    string formattedDate = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
+
+                                    // Assign to your object
+                                    EnrolledDateTime = formattedDate;
+                                    EnrolledDate = parsedDate.ToString("MMM dd yyyy");
+                                    }
+                                PhysicianName = reader["PhysicianName"].ToString(),
                                     AssignedMember = reader["AssignedMember"].ToString(),
                                     PatientType = reader["PatientType"].ToString()
                                 };
@@ -1405,10 +1420,25 @@ namespace RPMWeb.Dal
                                     ProgramName = reader["ProgramName"].ToString(),
                                     Program = reader["Program"].ToString(),
                                     EnrolledDate = reader["EnrolledDate"].ToString(),
+                                    EnrolledDateTime = EnrolledDate;
+                                    if (!string.IsNullOrWhiteSpace(EnrolledDateTime))
+                                    {
+                                        EnrolledDateTime = Regex.Replace(EnrolledDateTime, @"\s+", " ").Trim();
+                                        DateTime parsedDate = DateTime.ParseExact(EnrolledDateTime, "MMM d yyyy h:mmtt", CultureInfo.InvariantCulture);
+
+
+
+                                        // Convert to ISO 8601 format
+                                        string formattedDate = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
+
+                                        // Assign to your object
+                                        EnrolledDateTime = formattedDate;
+                                        EnrolledDate = parsedDate.ToString("MMM dd yyyy");
+                                    }
                                     PhysicianName = reader["PhysicianName"].ToString(),
-                                    AssignedMember = reader["AssignedMember"].ToString(),
-                                    PatientType = reader["PatientType"].ToString()
-                                };
+                                                AssignedMember = reader["AssignedMember"].ToString(),
+                                                PatientType = reader["PatientType"].ToString()
+                                         };
 
                                 list.Add(patientInfo); // Add the patient to the list
                             }
@@ -1490,7 +1520,7 @@ namespace RPMWeb.Dal
             }
             return type;
         }
-        public List<GetAllPatientSmsInfo> GetAllPatientsSmsList( int RoleId, string CreatedBy, string ConnectionString)
+        public List<GetAllPatientSmsInfo> GetAllPatientsSmsList(int RoleId, string CreatedBy, string ConnectionString)
         {
             List<GetAllPatientSmsInfo> list = new List<GetAllPatientSmsInfo>();
             try
@@ -1514,7 +1544,7 @@ namespace RPMWeb.Dal
                             info.ProgramName = reader["ProgramName"].ToString();
                             info.Senddate = reader["SentDate"].ToString();
                             DateTime parsedDate;
-                            DateTime.TryParse(info.Senddate,out parsedDate);
+                            DateTime.TryParse(info.Senddate, out parsedDate);
                             string formattedDate = parsedDate.ToString("yyyy-MM-dd HH:mm:ss");
                             info.Senddate = formattedDate;
                             info.Senddate = info.Senddate.ToString();
@@ -1925,8 +1955,8 @@ namespace RPMWeb.Dal
                                     {
                                         VitalName = row["VitalName"].ToString(),
                                         VitalId = Convert.ToInt32(row["VitalId"]),
-                                        Values = new List<Values>(), 
-                                        Time = new List<DateTime>() 
+                                        Values = new List<Values>(),
+                                        Time = new List<DateTime>()
                                     };
                                     allVitals.Add(vital);
                                 }
@@ -1949,12 +1979,12 @@ namespace RPMWeb.Dal
                                     if (existingVital == null)
                                     {
                                         vital.Values = new List<Values>();
-                                        vital.Time = new List<DateTime>(); 
+                                        vital.Time = new List<DateTime>();
                                         ret.Add(vital);
                                     }
                                 }
                             }
-                        }                                              
+                        }
                     }
                 }
                 return ret;
@@ -2011,7 +2041,7 @@ namespace RPMWeb.Dal
                         {
                             VitalMesureData vm = kv.Value.Find(x => x.ValueDate == sDate);
                             if (vm == null)
-                                v.data.Add(null); 
+                                v.data.Add(null);
                             else
                                 v.data.Add(vm.Value);
                         }
@@ -2019,7 +2049,7 @@ namespace RPMWeb.Dal
                     }
 
                     // Skip adding the vital if it has no data
-                    if (ret.Values.Any(v => v.data.Any(d => d != null)))  
+                    if (ret.Values.Any(v => v.data.Any(d => d != null)))
                     {
                         patientHealthTrends.Add(ret);
                     }
@@ -2032,7 +2062,7 @@ namespace RPMWeb.Dal
             }
         }
 
-        private Dictionary<string, List<VitalMesureData>> GetHealthTrendRowValue(DataTable table, ref int nVitalId,ref string sVitalName)
+        private Dictionary<string, List<VitalMesureData>> GetHealthTrendRowValue(DataTable table, ref int nVitalId, ref string sVitalName)
         {
             try
             {
@@ -2394,37 +2424,37 @@ namespace RPMWeb.Dal
                                     }
                                 }
 
-                               /* int i = 0;
-                                List<DateTime> DateTimeAdded = data.Measurements[i].Time;
+                                /* int i = 0;
+                                 List<DateTime> DateTimeAdded = data.Measurements[i].Time;
 
-                                List<DateTime> newDateList = dateTimeAll.Except(DateTimeAdded).ToList();
-                                /* foreach (DateTime datee in dateTimeAll)
+                                 List<DateTime> newDateList = dateTimeAll.Except(DateTimeAdded).ToList();
+                                 /* foreach (DateTime datee in dateTimeAll)
+                                  {
+
+                                      bool alreadyExists = DateTimeAdded.Any(x => x.Date==datee.Date);
+                                      if (!alreadyExists)
+                                      {
+                                          foreach(var vitals in data.Measurements)
+                                          {
+                                              data.Measurements[i].Time.Add(datee);
+                                              data.Measurements[i].Value.Add("null");
+
+                                          }
+
+
+                                      }
+
+
+                                  }
+                                  i++;
+                                 foreach (DateTime datee in newDateList)
                                  {
+                                     vitals.Time.Add(datee);
+                                     vitals.Value.Add("null");
+                                 }*/
 
-                                     bool alreadyExists = DateTimeAdded.Any(x => x.Date==datee.Date);
-                                     if (!alreadyExists)
-                                     {
-                                         foreach(var vitals in data.Measurements)
-                                         {
-                                             data.Measurements[i].Time.Add(datee);
-                                             data.Measurements[i].Value.Add("null");
-
-                                         }
-
-
-                                     }
-
-
-                                 }
-                                 i++;
-                                foreach (DateTime datee in newDateList)
-                                {
-                                    vitals.Time.Add(datee);
-                                    vitals.Value.Add("null");
-                                }*/
-                                
                             }
-                            
+
                         }
 
                         /*DateTime[] dates = dt.AsEnumerable().Select(s => s.Field<DateTime>("CreatedOn").Date).Distinct().ToArray<DateTime>();
@@ -2456,7 +2486,7 @@ namespace RPMWeb.Dal
                             lstSummery.Add(ret);
                         }*/
 
-                        
+
                         return lstSummery;
                     }
                 }
@@ -2662,9 +2692,9 @@ namespace RPMWeb.Dal
                                     list.vitals.Add(vitalslistpulse);
 
                                 }
-                               // list.vitals.Add(vitalslist);
+                                // list.vitals.Add(vitalslist);
                             }
-       
+
                         }
 
                         return list;
@@ -2862,8 +2892,8 @@ namespace RPMWeb.Dal
                                     Reportlist.Add(info);
                                 }
                             }
-                        
-                    }
+
+                        }
                         reader.Close();
                         /*if (list.Count > 0)
                         {
@@ -2922,8 +2952,8 @@ namespace RPMWeb.Dal
                 {
                     Reportlist = (List<PatientBillReport>)Reportlist.Where(s => s.clinic == clinic).ToList();
                     isClinic = true;
-                    if(Reportlist.Count > 0)
-                    clinic = Reportlist[0].ClinicName.ToString();
+                    if (Reportlist.Count > 0)
+                        clinic = Reportlist[0].ClinicName.ToString();
                 }
                 else if (!string.IsNullOrEmpty(cptCode) && string.IsNullOrEmpty(clinic))
                 {
@@ -2993,7 +3023,7 @@ namespace RPMWeb.Dal
                             info.CPT99437 = "NA";
                             info.CPT99487 = "NA";
                             info.CPT99489 = "NA";
-                            if ( ApplicableCPTCodes.Contains("99490"))
+                            if (ApplicableCPTCodes.Contains("99490"))
                             {
                                 info.CPT99490 = reader["99490"].ToString();
                                 info.CPT99490 =  Convert.ToString(ConvertSecondsToMinutes(Convert.ToInt32(info.CPT99490)));
@@ -3023,13 +3053,13 @@ namespace RPMWeb.Dal
                                 info.CPT99489 = reader["99489"].ToString();
                                 info.CPT99489 = Convert.ToString(ConvertSecondsToMinutes(Convert.ToInt32(info.CPT99489)));
                             }
-                           
 
-                            
-                            
-                            
-                            
-                            
+
+
+
+
+
+
                             info.EnrolledDate = Convert.ToDateTime(reader["ENROLL DATE"]);
                             info.clinic = reader["CLINIC"].ToString();
                             info.clinicname = reader["clinicname"].ToString();
@@ -3246,9 +3276,9 @@ namespace RPMWeb.Dal
                                 info.CPT99427 = reader["99427"].ToString();
                                 info.CPT99427 =  Convert.ToString(ConvertSecondsToMinutes(Convert.ToInt32(info.CPT99427)));
                             }
-                            
 
-                            
+
+
 
                             info.EnrolledDate = Convert.ToDateTime(reader["ENROLL DATE"]);
                             info.clinic = reader["CLINIC"].ToString();
@@ -4119,15 +4149,15 @@ namespace RPMWeb.Dal
                         SqlDataReader reader = command.ExecuteReader();
                         while (reader.Read())
                         {
-                            ret.Date= DBNull.Value.Equals(reader["Date"])? DateTime.MinValue:(DateTime)reader["Date"];
-                            ret.PulseUnit= DBNull.Value.Equals(reader["PulseUnit"])?"":reader["PulseUnit"].ToString();
-                            ret.PulseValue= DBNull.Value.Equals(reader["PulseValue"]) ? "" : reader["PulseValue"].ToString(); 
+                            ret.Date= DBNull.Value.Equals(reader["Date"]) ? DateTime.MinValue : (DateTime)reader["Date"];
+                            ret.PulseUnit= DBNull.Value.Equals(reader["PulseUnit"]) ? "" : reader["PulseUnit"].ToString();
+                            ret.PulseValue= DBNull.Value.Equals(reader["PulseValue"]) ? "" : reader["PulseValue"].ToString();
                             ret.unit= DBNull.Value.Equals(reader["Unit"]) ? "" : reader["Unit"].ToString();
-                            ret.Value= DBNull.Value.Equals(reader["Value"]) ? "" : reader["Value"].ToString(); 
+                            ret.Value= DBNull.Value.Equals(reader["Value"]) ? "" : reader["Value"].ToString();
                             ret.VitalName= DBNull.Value.Equals(reader["VitalName"]) ? "" : reader["VitalName"].ToString();
                             ret.time= DBNull.Value.Equals(reader["Time"]) ? "" : reader["Time"].ToString();
 
-                        }                  
+                        }
                         return ret;
 
                     }
@@ -4315,21 +4345,21 @@ namespace RPMWeb.Dal
                                     {
                                         if (provider.Value == "30days")
                                         {
-                                            PatientBilldata = ProcessCPT99453_medit(patientid, patientProgramid, code.TargetReadings, code, connectionString);
+                                            PatientBilldata = ProcessCPT99453_DaysBasedBilling(patientid, patientProgramid, code.TargetReadings, code, connectionString);
 
                                         }
                                         else if (provider.Value == "cycle")
                                         {
-                                            PatientBilldata = ProcessCPT99453_ClynxNew(patientid, patientProgramid, code.TargetReadings, code, connectionString);
+                                            PatientBilldata = ProcessCPT99453_CycleBasesBilling(patientid, patientProgramid, code.TargetReadings, code, connectionString);
                                         }
                                         else
                                         {
-                                            PatientBilldata = ProcessCPT99453_ClynxNew(patientid, patientProgramid, code.TargetReadings, code, connectionString);
+                                            PatientBilldata = ProcessCPT99453_CycleBasesBilling(patientid, patientProgramid, code.TargetReadings, code, connectionString);
                                         }
                                     }
                                     else
                                     {
-                                        PatientBilldata = ProcessCPT99453_ClynxNew(patientid, patientProgramid, code.TargetReadings, code, connectionString);
+                                        PatientBilldata = ProcessCPT99453_CycleBasesBilling(patientid, patientProgramid, code.TargetReadings, code, connectionString);
                                     }
 
                                 }
@@ -4355,20 +4385,20 @@ namespace RPMWeb.Dal
                                     {
                                         if (provider.Value == "30days")
                                         {
-                                            PatientBilldata54 = ProcessCPT99454_MedITNew(patientid, patientProgramid, code, connectionString);
+                                            PatientBilldata54 = ProcessCPT99454_DaysBasedBilling(patientid, patientProgramid, code, connectionString);
                                         }
                                         else if (provider.Value == "cycle")
                                         {
-                                            PatientBilldata54 = ProcessCPT99454_ClynxNew(patientid, patientProgramid, code, connectionString);
+                                            PatientBilldata54 = ProcessCPT99454_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
                                         }
                                         else
                                         {
-                                            PatientBilldata54 = ProcessCPT99454_ClynxNew(patientid, patientProgramid, code, connectionString);
+                                            PatientBilldata54 = ProcessCPT99454_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
                                         }
                                     }
                                     else
                                     {
-                                        PatientBilldata54 = ProcessCPT99454_ClynxNew(patientid, patientProgramid, code, connectionString);
+                                        PatientBilldata54 = ProcessCPT99454_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
                                     }
 
 
@@ -4395,20 +4425,20 @@ namespace RPMWeb.Dal
                                     {
                                         if (provider.Value == "30days")
                                         {
-                                            PatientBilldata57 = ProcessCPT99457_MedITNew(patientid, patientProgramid, code, connectionString);
+                                            PatientBilldata57 = ProcessCPT99457_DaysBasedBilling(patientid, patientProgramid, code, connectionString);
                                         }
                                         else if (provider.Value == "cycle")
                                         {
-                                            PatientBilldata57 = ProcessCPT99457_ClynxNew(patientid, patientProgramid, code, connectionString);
+                                            PatientBilldata57 = ProcessCPT99457_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
                                         }
                                         else
                                         {
-                                            PatientBilldata57 = ProcessCPT99457_ClynxNew(patientid, patientProgramid, code, connectionString);
+                                            PatientBilldata57 = ProcessCPT99457_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
                                         }
                                     }
                                     else
                                     {
-                                        PatientBilldata57 = ProcessCPT99457_ClynxNew(patientid, patientProgramid, code, connectionString);
+                                        PatientBilldata57 = ProcessCPT99457_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
                                     }
                                 }
                                 else
@@ -4435,24 +4465,24 @@ namespace RPMWeb.Dal
                                         if (provider.Value == "30days")
                                         {
                                             BillingCodesDetails billingCodesDetails457 = billingCodes.Find(x => x.BillingCode == "99457");
-                                            PatientBilldata58 = ProcessCPT99458_MedITNew(patientid, patientProgramid, code, billingCodesDetails457, connectionString);
+                                            PatientBilldata58 = ProcessCPT99458_DaysBasedBilling(patientid, patientProgramid, code, billingCodesDetails457, connectionString);
 
                                         }
                                         else if (provider.Value == "cycle")
                                         {
                                             BillingCodesDetails billingCodesDetails457 = billingCodes.Find(x => x.BillingCode == "99457");
-                                            PatientBilldata58 = ProcessCPT99458_ClynxNew(patientid, patientProgramid, code, billingCodesDetails457, connectionString);
+                                            PatientBilldata58 = ProcessCPT99458_CycleBasedBilling(patientid, patientProgramid, code, billingCodesDetails457, connectionString);
                                         }
                                         else
                                         {
                                             BillingCodesDetails billingCodesDetails457 = billingCodes.Find(x => x.BillingCode == "99457");
-                                            PatientBilldata58 = ProcessCPT99458_ClynxNew(patientid, patientProgramid, code, billingCodesDetails457, connectionString);
+                                            PatientBilldata58 = ProcessCPT99458_CycleBasedBilling(patientid, patientProgramid, code, billingCodesDetails457, connectionString);
                                         }
                                     }
                                     else
                                     {
                                         BillingCodesDetails billingCodesDetails457 = billingCodes.Find(x => x.BillingCode == "99457");
-                                        PatientBilldata58 = ProcessCPT99458_ClynxNew(patientid, patientProgramid, code, billingCodesDetails457, connectionString);
+                                        PatientBilldata58 = ProcessCPT99458_CycleBasedBilling(patientid, patientProgramid, code, billingCodesDetails457, connectionString);
                                     }
 
                                 }
@@ -4478,44 +4508,7 @@ namespace RPMWeb.Dal
                     {
                         switch (code.BillingCode)
                         {
-                            //case "G0506":
-                            //    PatientBilldata PatientBilldata = new PatientBilldata();
-                            //    if (patientProgramData.status == "Active" ||
-                            //       patientProgramData.status == "ReadyToDischarge" ||
-                            //       patientProgramData.status == "OnHold"||
-                            //       patientProgramData.status == "InActive")
-                            //    {
-                            //        if (lstConfig.Count > 0)
-                            //        {
-                            //            if (provider.Value == "cycle")
-                            //            {
-                            //                PatientBilldata = ProcessCPTG0506_Clynx(patientid, patientProgramid, code.TargetReadings, code, connectionString);
 
-                            //            }
-                            //            else
-                            //            {
-                            //                break;
-                            //            }
-
-                            //        }
-                            //        else
-                            //        {
-                            //            break;
-                            //        }
-
-
-                            //    }
-                            //    else
-                            //    {
-                            //        PatientBilldata.IsTargetMet = false;
-                            //        PatientBilldata.ReadyTobill = 0;
-                            //        PatientBilldata.Total = code.TargetReadings*60;
-                            //        PatientBilldata.Completed = 0;
-                            //        PatientBilldata.CPTCode = code.BillingCode;
-                            //    }
-                            //    PatientBilldata.ProgramName="CCM-C";
-                            //    PatientBilldateList.Add(PatientBilldata);
-                            //    break;
                             case "99490":
                                 PatientBilldata PatientBilldata490 = new PatientBilldata();
                                 if (patientProgramData.status == "Active" ||
@@ -4527,13 +4520,27 @@ namespace RPMWeb.Dal
                                     {
                                         if (provider.Value == "cycle")
                                         {
-                                            PatientBilldata490 = ProcessCPT99490_Clynx(patientid, patientProgramid, code, connectionString);
+                                            PatientBilldata490 = ProcessCPT99490_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
                                         }
 
+                                        else if (provider.Value == "30days")
+                                        {
+                                            PatientBilldata490 = ProcessCPT99490_DaysBasedBilling(patientid, patientProgramid, code, connectionString);
+                                        }
                                         else
                                         {
-                                            break;
+                                            PatientBilldata490 = ProcessCPT99490_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
                                         }
+
+                                        //if (provider.Value == "CycleBasedBilling")
+                                        //{
+                                        //    PatientBilldata490 = ProcessCPT99490_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
+                                        //}
+
+                                        //else
+                                        //{
+                                        //    break;
+                                        //}
                                     }
                                     else
                                     {
@@ -4562,16 +4569,25 @@ namespace RPMWeb.Dal
                                 {
                                     if (lstConfig.Count > 0)
                                     {
+
                                         if (provider.Value == "cycle")
                                         {
                                             BillingCodesDetails billingCodesDetails490 = billingCodes.Find(x => x.BillingCode == "99490");
-                                            PatientBilldata439 = ProcessCPT99439_Clynx(patientid, patientProgramid, code, billingCodesDetails490, connectionString);
+                                            PatientBilldata439 = ProcessCPT99439_CycleBasedBilling(patientid, patientProgramid, code, billingCodesDetails490, connectionString);
                                             PatientBilldata439.Total=null;
                                         }
 
+                                        else if (provider.Value=="30days")
+                                        {
+                                            BillingCodesDetails billingCodesDetails490 = billingCodes.Find(x => x.BillingCode == "99490");
+                                            PatientBilldata439 = ProcessCPT99439_DaysBasedBilling(patientid, patientProgramid, code, billingCodesDetails490, connectionString);
+                                            PatientBilldata439.Total=null;
+                                        }
                                         else
                                         {
-                                            break;
+                                            BillingCodesDetails billingCodesDetails490 = billingCodes.Find(x => x.BillingCode == "99490");
+                                            PatientBilldata439 = ProcessCPT99439_CycleBasedBilling(patientid, patientProgramid, code, billingCodesDetails490, connectionString);
+                                            PatientBilldata439.Total=null;
                                         }
                                     }
                                     else
@@ -4601,44 +4617,7 @@ namespace RPMWeb.Dal
                     {
                         switch (code.BillingCode)
                         {
-                            //case "G0506":
-                            //    PatientBilldata PatientBilldata = new PatientBilldata();
-                            //    if (patientProgramData.status == "Active" ||
-                            //       patientProgramData.status == "ReadyToDischarge" ||
-                            //       patientProgramData.status == "OnHold"||
-                            //       patientProgramData.status == "InActive")
-                            //    {
-                            //        if (lstConfig.Count > 0)
-                            //        {
-                            //            if (provider.Value == "cycle")
-                            //            {
-                            //                PatientBilldata = ProcessCPTG0506_Clynx(patientid, patientProgramid, code.TargetReadings, code, connectionString);
 
-                            //            }
-                            //            else
-                            //            {
-                            //                break;
-                            //            }
-
-                            //        }
-                            //        else
-                            //        {
-                            //            break;
-                            //        }
-
-
-                            //    }
-                            //    else
-                            //    {
-                            //        PatientBilldata.IsTargetMet = false;
-                            //        PatientBilldata.ReadyTobill = 0;
-                            //        PatientBilldata.Total = code.TargetReadings*60;
-                            //        PatientBilldata.Completed = 0;
-                            //        PatientBilldata.CPTCode = code.BillingCode;
-                            //    }
-                            //    PatientBilldata.ProgramName="CCM-P";
-                            //    PatientBilldateList.Add(PatientBilldata);
-                            //    break;
                             case "99491":
                                 PatientBilldata PatientBilldata491 = new PatientBilldata();
                                 if (patientProgramData.status == "Active" ||
@@ -4648,17 +4627,22 @@ namespace RPMWeb.Dal
                                 {
                                     if (lstConfig.Count > 0)
                                     {
+
                                         if (provider.Value == "cycle")
                                         {
 
-                                            PatientBilldata491 = ProcessCPT99491_Clynx(patientid, patientProgramid, code, connectionString);
+                                            PatientBilldata491 = ProcessCPT99491_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
 
                                         }
 
-                                        else
+                                        else if (provider.Value=="30days")
                                         {
 
-                                            break;
+                                            PatientBilldata491 = ProcessCPT99491_DaysBasedBilling(patientid, patientProgramid, code, connectionString);
+                                        }
+                                        else
+                                        {
+                                            PatientBilldata491 = ProcessCPT99491_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
                                         }
                                     }
                                     else
@@ -4688,18 +4672,27 @@ namespace RPMWeb.Dal
                                 {
                                     if (lstConfig.Count > 0)
                                     {
+
                                         if (provider.Value == "cycle")
                                         {
                                             BillingCodesDetails billingCodesDetails491 = billingCodes.Find(x => x.BillingCode == "99491");
-                                            PatientBilldata437 = ProcessCPT99437_Clynx(patientid, patientProgramid, code, billingCodesDetails491, connectionString);
+                                            PatientBilldata437 = ProcessCPT99437_CycleBasedBilling(patientid, patientProgramid, code, billingCodesDetails491, connectionString);
                                             PatientBilldata437.Total=null;
 
                                         }
 
-                                        else
+                                        else if (provider.Value == "30days")
                                         {
 
-                                            break;
+                                            BillingCodesDetails billingCodesDetails491 = billingCodes.Find(x => x.BillingCode == "99491");
+                                            PatientBilldata437 = ProcessCPT99437_DaysBasedBilling(patientid, patientProgramid, code, billingCodesDetails491, connectionString);
+                                            PatientBilldata437.Total=null;
+                                        }
+                                        else
+                                        {
+                                            BillingCodesDetails billingCodesDetails491 = billingCodes.Find(x => x.BillingCode == "99491");
+                                            PatientBilldata437 = ProcessCPT99437_CycleBasedBilling(patientid, patientProgramid, code, billingCodesDetails491, connectionString);
+                                            PatientBilldata437.Total=null;
                                         }
                                     }
                                     else
@@ -4739,14 +4732,21 @@ namespace RPMWeb.Dal
                                 {
                                     if (lstConfig.Count > 0)
                                     {
+
                                         if (provider.Value == "cycle")
                                         {
-                                            PatientBilldata = ProcessCPTG0506_Clynx(patientid, patientProgramid, code.TargetReadings, code, connectionString);
+                                            PatientBilldata = ProcessCPTG0506_CycleBasedBilling(patientid, patientProgramid, code.TargetReadings, code, connectionString);
 
+                                        }
+
+                                        else if (provider.Value == "30days")
+                                        {
+
+                                            PatientBilldata = ProcessCPTG0506_DaysBasedBilling(patientid, patientProgramid, code.TargetReadings, code, connectionString);
                                         }
                                         else
                                         {
-                                            break;
+                                            PatientBilldata = ProcessCPTG0506_CycleBasedBilling(patientid, patientProgramid, code.TargetReadings, code, connectionString);
                                         }
 
                                     }
@@ -4778,17 +4778,21 @@ namespace RPMWeb.Dal
                                 {
                                     if (lstConfig.Count > 0)
                                     {
+
                                         if (provider.Value == "cycle")
                                         {
-
-                                            PatientBilldata487 = ProcessCPT99487_Clynx(patientid, patientProgramid, code, connectionString);
+                                            PatientBilldata487 = ProcessCPT99487_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
 
                                         }
 
-                                        else
+                                        else if (provider.Value == "30days")
                                         {
 
-                                            break;
+                                            PatientBilldata487 = ProcessCPT99487_DaysBasedBilling(patientid, patientProgramid, code, connectionString);
+                                        }
+                                        else
+                                        {
+                                            PatientBilldata487 = ProcessCPT99487_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
                                         }
                                     }
                                     else
@@ -4818,17 +4822,27 @@ namespace RPMWeb.Dal
                                 {
                                     if (lstConfig.Count > 0)
                                     {
+
                                         if (provider.Value == "cycle")
                                         {
                                             BillingCodesDetails billingCodesDetails487 = billingCodes.Find(x => x.BillingCode == "99487");
-                                            PatientBilldata489 = ProcessCPT99489_Clynx(patientid, patientProgramid, code, billingCodesDetails487, connectionString);
+                                            PatientBilldata489 = ProcessCPT99489_CycleBasedBilling(patientid, patientProgramid, code, billingCodesDetails487, connectionString);
                                             PatientBilldata489.Total=null;
+
                                         }
 
-                                        else
+                                        else if (provider.Value == "30days")
                                         {
 
-                                            break;
+                                            BillingCodesDetails billingCodesDetails487 = billingCodes.Find(x => x.BillingCode == "99487");
+                                            PatientBilldata489 = ProcessCPT99489_DaysBasedBilling(patientid, patientProgramid, code, billingCodesDetails487, connectionString);
+                                            PatientBilldata489.Total=null;
+                                        }
+                                        else
+                                        {
+                                            BillingCodesDetails billingCodesDetails487 = billingCodes.Find(x => x.BillingCode == "99487");
+                                            PatientBilldata489 = ProcessCPT99489_CycleBasedBilling(patientid, patientProgramid, code, billingCodesDetails487, connectionString);
+                                            PatientBilldata489.Total=null;
                                         }
                                     }
                                     else
@@ -4868,14 +4882,21 @@ namespace RPMWeb.Dal
                                 {
                                     if (lstConfig.Count > 0)
                                     {
+
                                         if (provider.Value == "cycle")
                                         {
-                                            PatientBilldata424 = ProcessCPT99424_Clynx(patientid, patientProgramid, code, connectionString);
+                                            PatientBilldata424 = ProcessCPT99424_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
+
                                         }
 
+                                        else if (provider.Value == "30days")
+                                        {
+
+                                            PatientBilldata424 = ProcessCPT99424_DaysBasedBilling(patientid, patientProgramid, code, connectionString);
+                                        }
                                         else
                                         {
-                                            break;
+                                            PatientBilldata424 = ProcessCPT99424_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
                                         }
                                     }
                                     else
@@ -4905,16 +4926,27 @@ namespace RPMWeb.Dal
                                 {
                                     if (lstConfig.Count > 0)
                                     {
+
                                         if (provider.Value == "cycle")
                                         {
                                             BillingCodesDetails billingCodesDetails424 = billingCodes.Find(x => x.BillingCode == "99424");
-                                            PatientBilldata425 = ProcessCPT99425_Clynx(patientid, patientProgramid, code, billingCodesDetails424, connectionString);
+                                            PatientBilldata425 = ProcessCPT99425_CycleBasedBilling(patientid, patientProgramid, code, billingCodesDetails424, connectionString);
                                             PatientBilldata425.Total=null;
+
                                         }
 
+                                        else if (provider.Value == "30days")
+                                        {
+
+                                            BillingCodesDetails billingCodesDetails424 = billingCodes.Find(x => x.BillingCode == "99424");
+                                            PatientBilldata425 = ProcessCPT99425_DaysBasedBilling(patientid, patientProgramid, code, billingCodesDetails424, connectionString);
+                                            PatientBilldata425.Total=null;
+                                        }
                                         else
                                         {
-                                            break;
+                                            BillingCodesDetails billingCodesDetails424 = billingCodes.Find(x => x.BillingCode == "99424");
+                                            PatientBilldata425 = ProcessCPT99425_CycleBasedBilling(patientid, patientProgramid, code, billingCodesDetails424, connectionString);
+                                            PatientBilldata425.Total=null;
                                         }
                                     }
                                     else
@@ -4957,17 +4989,21 @@ namespace RPMWeb.Dal
                                 {
                                     if (lstConfig.Count > 0)
                                     {
+
                                         if (provider.Value == "cycle")
                                         {
-
-                                            PatientBilldata426 = ProcessCPT99426_Clynx(patientid, patientProgramid, code, connectionString);
+                                            PatientBilldata426 = ProcessCPT99426_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
 
                                         }
 
-                                        else
+                                        else if (provider.Value == "30days")
                                         {
 
-                                            break;
+                                            PatientBilldata426 = ProcessCPT99426_DaysBasedBilling(patientid, patientProgramid, code, connectionString);
+                                        }
+                                        else
+                                        {
+                                            PatientBilldata426 = ProcessCPT99426_CycleBasedBilling(patientid, patientProgramid, code, connectionString);
                                         }
                                     }
                                     else
@@ -4997,17 +5033,27 @@ namespace RPMWeb.Dal
                                 {
                                     if (lstConfig.Count > 0)
                                     {
+
                                         if (provider.Value == "cycle")
                                         {
                                             BillingCodesDetails billingCodesDetails426 = billingCodes.Find(x => x.BillingCode == "99426");
-                                            PatientBilldata427 = ProcessCPT99427_Clynx(patientid, patientProgramid, code, billingCodesDetails426, connectionString);
+                                            PatientBilldata427 = ProcessCPT99427_CycleBasedBilling(patientid, patientProgramid, code, billingCodesDetails426, connectionString);
                                             PatientBilldata427.Total=null;
+
                                         }
 
-                                        else
+                                        else if (provider.Value == "30days")
                                         {
 
-                                            break;
+                                            BillingCodesDetails billingCodesDetails426 = billingCodes.Find(x => x.BillingCode == "99426");
+                                            PatientBilldata427 = ProcessCPT99427_DaysBasedBilling(patientid, patientProgramid, code, billingCodesDetails426, connectionString);
+                                            PatientBilldata427.Total=null;
+                                        }
+                                        else
+                                        {
+                                            BillingCodesDetails billingCodesDetails426 = billingCodes.Find(x => x.BillingCode == "99426");
+                                            PatientBilldata427 = ProcessCPT99427_CycleBasedBilling(patientid, patientProgramid, code, billingCodesDetails426, connectionString);
+                                            PatientBilldata427.Total=null;
                                         }
                                     }
                                     else
@@ -5087,7 +5133,7 @@ namespace RPMWeb.Dal
                 return null;
             }
         }
-        public PatientBilldata ProcessCPT99453_medit(int patientId, int patientProgramId, int targetReading, BillingCodesDetails code, string connectionString)
+        public PatientBilldata ProcessCPT99453_DaysBasedBilling(int patientId, int patientProgramId, int targetReading, BillingCodesDetails code, string connectionString)
         {
             try
             {
@@ -5209,18 +5255,27 @@ namespace RPMWeb.Dal
                         DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
                         DateTime endDate = DateTime.UtcNow.Date;
                         DateTime stDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
-
-                        DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+                        DateTime today = DateTime.UtcNow;
+                        DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)today, connectionString);
 
                         // endDate = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
                         //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
                         //the patientbilling table and +1 day will come as next start day.. So we should   
                         // calcualte the start date with respect to the billing threshold
-                        if (stDatetemp > endDatetemp)
+                        if (stDate.Date > endDatetemp)
                         {
                             //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                             BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-
+                            if (bd == null)
+                            {
+                                PatientBilldata = new PatientBilldata();
+                                PatientBilldata.CPTCode = code.BillingCode;
+                                PatientBilldata.Completed = 0;
+                                PatientBilldata.Total = code.TargetReadings;
+                                PatientBilldata.IsTargetMet = false;
+                                PatientBilldata.ReadyTobill = 0;
+                                return PatientBilldata;
+                            }
                             stDatetemp = bd.StartDate;//GetLocalTimeFromUTC((DateTime)bd.StartDate, connectionString);
                             endDatetemp = bd.EndDate;// GetLocalTimeFromUTC((DateTime)bd.EndDate, connectionString);
                         }
@@ -5362,76 +5417,355 @@ namespace RPMWeb.Dal
                 return null;
             }
         }
-        public PatientBilldata ProcessCPT99453_Clynx(int patientId, int patientProgramId, int targetReading, BillingCodesDetails code, string connectionString)
+        public PatientBilldata ProcessCPT99453_CycleBasesBilling(int patientId, int patientProgramId, int targetReading, BillingCodesDetails code, string connectionString)
         {
             try
             {
-                PatientStartDate patientStartdate = GetBillingStartDateEx(patientId, patientProgramId,
-                                                          targetReading, connectionString);
-                if (patientStartdate == null || patientStartdate.Status.ToLower() == "invalid")
+                PatientBilldata PatientBilldatas = new PatientBilldata();
+                List<PatientDailyBillingData> lstDailyData = GetPatientBillingCounts(patientId, patientProgramId, connectionString);
+                if (lstDailyData == null || lstDailyData.Count == 0)
                 {
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    PatientBilldata.CPTCode = code.BillingCode;
-                    PatientBilldata.Completed = 0;
-                    PatientBilldata.Total = code.TargetReadings;
-                    PatientBilldata.IsTargetMet = false;
-                    PatientBilldata.ReadyTobill = 0;
-                    return PatientBilldata;
+
+                    PatientBilldatas.CPTCode = code.BillingCode;
+                    PatientBilldatas.Completed = 0;
+                    PatientBilldatas.Total = code.TargetReadings;
+                    PatientBilldatas.IsTargetMet = false;
+                    PatientBilldatas.ReadyTobill = 0;
+                    return PatientBilldatas;
                 }
-                /*else if (Startdate.Status.ToLower() == "invalid")
+
+                foreach (PatientDailyBillingData pdb in lstDailyData)
                 {
-                    SetData(patientProgramData, 0, null, billingCode.BillingCodeID, DaysCompleted, false, null);
-                }*/
-                else
-                {
-                    var Startdate = patientStartdate.StartDate;
-                    DateTime Enddate = DateTime.UtcNow;
-                    //var EnddateTemp = Enddate.AddDays(1);
-                    var DateDiff = Convert.ToDateTime(Startdate).Date - Enddate.Date;
-                    var DaysCompleted = Math.Abs(DateDiff.Days);
-                    // Counting the current day also for day of completion
-                    // No need to compate with threashold as its yearly data 
-                    DaysCompleted += 1;
-                    List<VitalReading> VitalReadings = GetVitalReadings(patientProgramId, connectionString).Where(s => s.ReadingDate >= Startdate && s.ReadingDate <= Enddate /*&& s.programId == patientProgramId*/).ToList();
-                    if (VitalReadings == null)
+                    if (pdb.BillingCodeId == code.BillingCodeID)
                     {
-                        PatientBilldata PatientBilldata = new PatientBilldata();
-                        PatientBilldata.BillingStartDate = (DateTime)patientStartdate.StartDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = 0;
-                        //PatientBilldata.Total = code.TargetReadings;
-                        PatientBilldata.Total = code.BillingThreshold;
-                        PatientBilldata.IsTargetMet = false;
-                        PatientBilldata.ReadyTobill = 0;
-                        return PatientBilldata;
-                    }
-                    if (VitalReadings.Count >= code.TargetReadings && DaysCompleted >= code.BillingThreshold)
-                    {
-                        PatientBilldata PatientBilldata = new PatientBilldata();
-                        PatientBilldata.BillingStartDate = (DateTime)patientStartdate.StartDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        //PatientBilldata.Completed = VitalReadings.Count;
-                        PatientBilldata.Completed = DaysCompleted;
-                        //PatientBilldata.Total = code.TargetReadings;
-                        PatientBilldata.Total = code.BillingThreshold;
-                        PatientBilldata.IsTargetMet = true;
-                        PatientBilldata.ReadyTobill = 1;
-                        return PatientBilldata;
+
+                        if (pdb.TotalVitalCount >= code.TargetReadings && pdb.DaysCompleted >= code.BillingThreshold)
+                        {
+                            PatientBilldatas = new PatientBilldata();
+                            PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;//(DateTime)patientStartdate.StartDate;
+                            PatientBilldatas.CPTCode = code.BillingCode;
+                            //PatientBilldata.Completed = VitalReadings.Count;
+                            PatientBilldatas.Completed = pdb.DaysCompleted;
+                            //PatientBilldata.Total = code.TargetReadings;
+                            PatientBilldatas.Total = code.BillingThreshold;
+                            PatientBilldatas.IsTargetMet = true;
+                            PatientBilldatas.ReadyTobill = 1;
+                            return PatientBilldatas;
+                        }
+
+                        else
+                        {
+                            PatientBilldatas = new PatientBilldata();
+                            PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;//(DateTime)patientStartdate.StartDate;
+                            PatientBilldatas.CPTCode = code.BillingCode;
+                            //PatientBilldata.Completed = VitalReadings.Count;
+                            PatientBilldatas.Completed = pdb.DaysCompleted;
+                            //PatientBilldata.Total = code.TargetReadings;
+                            PatientBilldatas.Total = code.BillingThreshold;
+                            PatientBilldatas.IsTargetMet = false;
+                            PatientBilldatas.ReadyTobill = 0;
+                            return PatientBilldatas;
+                        }
+
                     }
                     else
                     {
-                        PatientBilldata PatientBilldata = new PatientBilldata();
-                        PatientBilldata.BillingStartDate = (DateTime)patientStartdate.StartDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        //PatientBilldata.Completed = VitalReadings.Count;
-                        PatientBilldata.Completed = DaysCompleted;
-                        //PatientBilldata.Total = code.TargetReadings;
-                        PatientBilldata.Total = code.BillingThreshold;
-                        PatientBilldata.IsTargetMet = false;
-                        PatientBilldata.ReadyTobill = 0;
-                        return PatientBilldata;
+                        PatientBilldatas = null;
                     }
                 }
+                if (PatientBilldatas == null)
+                {
+                    PatientStartDate patientStartdate = GetBillingStartDateEx(patientId, patientProgramId,
+                                                              targetReading, connectionString);
+                    if (patientStartdate == null || patientStartdate.Status.ToLower() == "invalid")
+                    {
+                        PatientBilldatas = new PatientBilldata();
+                        PatientBilldatas.CPTCode = code.BillingCode;
+                        PatientBilldatas.Completed = 0;
+                        PatientBilldatas.Total = code.TargetReadings;
+                        PatientBilldatas.IsTargetMet = false;
+                        PatientBilldatas.ReadyTobill = 0;
+                        return PatientBilldatas;
+                    }
+                    /*else if (Startdate.Status.ToLower() == "invalid")
+                    {
+                        SetData(patientProgramData, 0, null, billingCode.BillingCodeID, DaysCompleted, false, null);
+                    }*/
+                    else
+                    {
+                        var Startdate = patientStartdate.StartDate;
+                        DateTime StartdateTemp = GetLocalTimeFromUTC((DateTime)Startdate, connectionString);
+                        DateTime startDateLoc = StartdateTemp;
+                        DateTime Enddate = DateTime.UtcNow;
+                        DateTime EndDateTemp = GetLocalTimeFromUTC((DateTime)Enddate, connectionString);
+                        DateTime endDateLoc = EndDateTemp;
+
+                        //var EnddateTemp = Enddate.AddDays(1);
+                        var DateDiff = Convert.ToDateTime(StartdateTemp).Date - EndDateTemp.Date;
+                        var DaysCompleted = Math.Abs(DateDiff.Days);
+                        // Counting the current day also for day of completion
+                        // No need to compate with threashold as its yearly data 
+
+
+                        List<Dates> Dates = new List<Dates>();
+                        List<Dates> DatesNew = new List<Dates>();
+
+                        for (int i = 0; i <= DaysCompleted; i++)
+                        {
+                            if (i == 0)
+                            {
+                                EndDateTemp = startDateLoc.AddDays(1).Date.AddSeconds(-1);
+
+                            }
+                            else if (i == DaysCompleted)
+                            {
+                                StartdateTemp = startDateLoc.AddDays(i).Date;
+                                EndDateTemp = endDateLoc;
+                            }
+                            else
+                            {
+                                StartdateTemp = startDateLoc.AddDays(i).Date;
+                                EndDateTemp = StartdateTemp.AddDays(1).Date.AddSeconds(-1);
+
+                            }
+
+                            StartdateTemp = GetUTCFromLocalTime((DateTime)StartdateTemp, connectionString);
+                            EndDateTemp = GetUTCFromLocalTime((DateTime)EndDateTemp, connectionString);
+
+
+                            Dates.Add(new Dates() { StartDate = (DateTime)StartdateTemp, EndDate = EndDateTemp, Totalreading = 0 });
+
+
+
+
+                        }
+
+                        if (Dates.Count > 0)
+                        {
+
+                            foreach (Dates date in Dates)
+                            {
+                                List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
+
+
+                                if (VitalReadings.Count > 0)
+                                {
+
+                                    DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading = 1 });
+
+                                }
+                                else
+                                {
+                                    DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading = 0 });
+                                }
+
+                            }
+
+
+                        }
+
+                        int VitalCount = DatesNew.Where(s => s.Totalreading == 1).Count();
+
+
+
+
+
+
+
+
+
+                        if (VitalCount == 0)
+                        {
+                            PatientBilldatas = new PatientBilldata();
+                            PatientBilldatas.BillingStartDate = (DateTime)Startdate;//(DateTime)patientStartdate.StartDate;
+                            PatientBilldatas.CPTCode = code.BillingCode;
+                            PatientBilldatas.Completed = 0;
+                            //PatientBilldata.Total = code.TargetReadings;
+                            PatientBilldatas.Total = code.BillingThreshold;
+                            PatientBilldatas.IsTargetMet = false;
+                            PatientBilldatas.ReadyTobill = 0;
+                            return PatientBilldatas;
+                        }
+                        if (VitalCount >= code.TargetReadings && DaysCompleted >= code.BillingThreshold)
+                        {
+                            PatientBilldatas = new PatientBilldata();
+                            PatientBilldatas.BillingStartDate = (DateTime)Startdate;//(DateTime)patientStartdate.StartDate;
+                            PatientBilldatas.CPTCode = code.BillingCode;
+                            //PatientBilldata.Completed = VitalReadings.Count;
+                            PatientBilldatas.Completed = DaysCompleted;
+                            //PatientBilldata.Total = code.TargetReadings;
+                            PatientBilldatas.Total = code.BillingThreshold;
+                            PatientBilldatas.IsTargetMet = true;
+                            PatientBilldatas.ReadyTobill = 1;
+                            return PatientBilldatas;
+                        }
+                        else
+                        {
+                            PatientBilldatas = new PatientBilldata();
+                            PatientBilldatas.BillingStartDate = (DateTime)Startdate;//(DateTime)patientStartdate.StartDate;
+                            PatientBilldatas.CPTCode = code.BillingCode;
+                            //PatientBilldata.Completed = VitalReadings.Count;
+                            PatientBilldatas.Completed = DaysCompleted;
+                            //PatientBilldata.Total = code.TargetReadings;
+                            PatientBilldatas.Total = code.BillingThreshold;
+                            PatientBilldatas.IsTargetMet = false;
+                            PatientBilldatas.ReadyTobill = 0;
+                            return PatientBilldatas;
+                        }
+                    }
+                }
+                return PatientBilldatas;
+
+
+
+
+
+
+
+
+
+
+
+
+
+                //PatientStartDate patientStartdate = GetBillingStartDateEx(patientId, patientProgramId,
+                //                                          targetReading, connectionString);
+                //if (patientStartdate == null || patientStartdate.Status.ToLower() == "invalid")
+                //{
+                //    PatientBilldata PatientBilldata = new PatientBilldata();
+                //    PatientBilldata.CPTCode = code.BillingCode;
+                //    PatientBilldata.Completed = 0;
+                //    PatientBilldata.Total = code.TargetReadings;
+                //    PatientBilldata.IsTargetMet = false;
+                //    PatientBilldata.ReadyTobill = 0;
+                //    return PatientBilldata;
+                //}
+                ///*else if (Startdate.Status.ToLower() == "invalid")
+                //{
+                //    SetData(patientProgramData, 0, null, billingCode.BillingCodeID, DaysCompleted, false, null);
+                //}*/
+                //else
+                //{
+                //    var Startdate = patientStartdate.StartDate;
+                //    DateTime StartdateTemp = GetLocalTimeFromUTC((DateTime)Startdate, connectionString);
+                //    DateTime startDateLoc = StartdateTemp;
+                //    DateTime Enddate = DateTime.UtcNow;
+                //    DateTime EndDateTemp = GetLocalTimeFromUTC((DateTime)Enddate, connectionString);
+                //    DateTime endDateLoc = EndDateTemp;
+
+                //    //var EnddateTemp = Enddate.AddDays(1);
+                //    var DateDiff = Convert.ToDateTime(StartdateTemp).Date - EndDateTemp.Date;
+                //    var DaysCompleted = Math.Abs(DateDiff.Days);
+                //    // Counting the current day also for day of completion
+                //    // No need to compate with threashold as its yearly data 
+
+
+                //    List<Dates> Dates = new List<Dates>();
+                //    List<Dates> DatesNew = new List<Dates>();
+
+                //    for (int i = 0; i<=DaysCompleted; i++)
+                //    {
+                //        if (i==0)
+                //        {
+                //            EndDateTemp = startDateLoc.AddDays(1).Date.AddSeconds(-1);
+
+                //        }
+                //        else if (i==DaysCompleted)
+                //        {
+                //            StartdateTemp = startDateLoc.AddDays(i).Date;
+                //            EndDateTemp = endDateLoc ;
+                //        }
+                //        else
+                //        {
+                //            StartdateTemp = startDateLoc.AddDays(i).Date;
+                //            EndDateTemp = StartdateTemp.AddDays(1).Date.AddSeconds(-1);
+
+                //        }
+
+                //        StartdateTemp = GetUTCFromLocalTime((DateTime)StartdateTemp, connectionString);
+                //        EndDateTemp = GetUTCFromLocalTime((DateTime)EndDateTemp, connectionString);
+
+
+                //        Dates.Add(new Dates() { StartDate = (DateTime)StartdateTemp, EndDate = EndDateTemp, Totalreading=0 });
+
+
+
+
+                //    }
+
+                //    if (Dates.Count>0)
+                //    {
+
+                //        foreach (Dates date in Dates)
+                //        {
+                //            List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString,date.StartDate,date.EndDate).ToList();
+
+
+                //            if (VitalReadings.Count>0)
+                //            {
+
+                //                DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading=1 });
+
+                //            }
+                //            else
+                //            {
+                //                DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading=0 });
+                //            }
+
+                //        }
+
+
+                //    }
+
+                //    int VitalCount = DatesNew.Where(s => s.Totalreading == 1).Count();
+
+
+
+
+
+
+
+
+
+                //    if (VitalCount == 0)
+                //    {
+                //        PatientBilldata PatientBilldata = new PatientBilldata();
+                //        PatientBilldata.BillingStartDate = (DateTime)Startdate;//(DateTime)patientStartdate.StartDate;
+                //        PatientBilldata.CPTCode = code.BillingCode;
+                //        PatientBilldata.Completed = 0;
+                //        //PatientBilldata.Total = code.TargetReadings;
+                //        PatientBilldata.Total = code.BillingThreshold;
+                //        PatientBilldata.IsTargetMet = false;
+                //        PatientBilldata.ReadyTobill = 0;
+                //        return PatientBilldata;
+                //    }
+                //    if (VitalCount >= code.TargetReadings && DaysCompleted>=code.BillingThreshold)
+                //    {
+                //        PatientBilldata PatientBilldata = new PatientBilldata();
+                //        PatientBilldata.BillingStartDate = (DateTime)Startdate;//(DateTime)patientStartdate.StartDate;
+                //        PatientBilldata.CPTCode = code.BillingCode;
+                //        //PatientBilldata.Completed = VitalReadings.Count;
+                //        PatientBilldata.Completed = DaysCompleted;
+                //        //PatientBilldata.Total = code.TargetReadings;
+                //        PatientBilldata.Total = code.BillingThreshold;
+                //        PatientBilldata.IsTargetMet = true;
+                //        PatientBilldata.ReadyTobill = 1;
+                //        return PatientBilldata;
+                //    }
+                //    else
+                //    {
+                //        PatientBilldata PatientBilldata = new PatientBilldata();
+                //        PatientBilldata.BillingStartDate = (DateTime)Startdate;//(DateTime)patientStartdate.StartDate;
+                //        PatientBilldata.CPTCode = code.BillingCode;
+                //        //PatientBilldata.Completed = VitalReadings.Count;
+                //        PatientBilldata.Completed = DaysCompleted;
+                //        //PatientBilldata.Total = code.TargetReadings;
+                //        PatientBilldata.Total = code.BillingThreshold;
+                //        PatientBilldata.IsTargetMet = false;
+                //        PatientBilldata.ReadyTobill = 0;
+                //        return PatientBilldata;
+                //    }
+                //}
             }
             catch (Exception ex)
             {
@@ -5440,345 +5774,694 @@ namespace RPMWeb.Dal
             }
 
         }
-        public PatientBilldata ProcessCPT99454_medit(int patientId, int patientProgramId, int targetreading, BillingCodesDetails code, string connectionString)
+        public PatientBilldata ProcessCPT99454_DaysBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
         {
             try
             {
-
-                DateTime? Startdate = GetPatientBillingStartDate(patientId, patientProgramId, code.BillingCodeID, connectionString);
-
-                if (Startdate == null)
+                PatientBilldata PatientBilldatas = new PatientBilldata();
+                List<PatientDailyBillingData> lstDailyData = GetPatientBillingCounts(patientId, patientProgramId, connectionString);
+                if (lstDailyData == null || lstDailyData.Count == 0)
                 {
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    PatientBilldata.BillingStartDate = (DateTime)Startdate;
-                    PatientBilldata.CPTCode = code.BillingCode;
-                    PatientBilldata.Completed = 0;
-                    PatientBilldata.Total = code.TargetReadings;
-                    PatientBilldata.IsTargetMet = false;
-                    PatientBilldata.ReadyTobill = 0;
-                    return PatientBilldata;
+
+                    PatientBilldatas = null;
                 }
-                DateTime stDate = Convert.ToDateTime(Startdate);
-                // DateTime Enddate = DateTime.Today;
-                DateTime Enddate = DateTime.UtcNow.Date;
-                //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-                //the patientbilling table and +1 day will come as next start day.. So we should   
-                // calcualte the start date with respect to the billing threshold
-                if (stDate > DateTime.UtcNow.Date)
+
+                foreach (PatientDailyBillingData pdb in lstDailyData)
                 {
-                    //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-                    BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                    stDate = bd.StartDate;
-                    Enddate = bd.EndDate;
-                }
-                var EnddateTemp = Enddate.AddDays(1);
-                var DateDiff = stDate - EnddateTemp;
-                if (Math.Abs(DateDiff.Days) >= code.BillingThreshold)
-                {
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    stDate = EnddateTemp.AddDays(-code.BillingThreshold);
-                    List<VitalReading> VitalReadings = GetVitalReadings(patientProgramId, connectionString).Where(s => s.ReadingDate >= stDate && s.ReadingDate <= Enddate).ToList();
-                    if (VitalReadings == null)
+                    if (pdb.BillingCodeId == code.BillingCodeID)
                     {
-                        PatientBilldata.BillingStartDate = (DateTime)stDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = 0;
-                        PatientBilldata.Total = targetreading;
-                        PatientBilldata.IsTargetMet = false;
-                        PatientBilldata.ReadyTobill = 0;
-                    }
-                    else if (VitalReadings.Count != 0 && VitalReadings.Count >= targetreading)
-                    {
-                        //set traget met and ready to bill as true
-                        PatientBilldata.BillingStartDate = (DateTime)stDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = VitalReadings.Count;
-                        PatientBilldata.Total = targetreading;
-                        PatientBilldata.IsTargetMet = true;
-                        PatientBilldata.ReadyTobill = 1;
+                        DateTime createdOn = pdb.CreatedOn;
+                        DateTime createdontemp = GetUTCFromLocalTime((DateTime)createdOn.Date, connectionString);
+                        bool flag = false;
 
 
-                    }
-                    else
-                    {
-                        PatientBilldata.BillingStartDate = (DateTime)stDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = VitalReadings.Count;
-                        PatientBilldata.Total = targetreading;
-                        PatientBilldata.IsTargetMet = false;
-                        PatientBilldata.ReadyTobill = 0;
-                    }
-                    return PatientBilldata;
-                }
-                else
-                {
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    List<VitalReading> VitalReadings = GetVitalReadings(patientProgramId, connectionString).Where(s => s.ReadingDate >= stDate && s.ReadingDate <= Enddate).ToList();
-                    if (VitalReadings == null)
-                    {
-                        PatientBilldata.BillingStartDate = (DateTime)stDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = 0;
-                        PatientBilldata.Total = targetreading;
-                        PatientBilldata.IsTargetMet = false;
-                        PatientBilldata.ReadyTobill = 0;
+                        DateTime createdEnd = GetUTCFromLocalTime((DateTime)createdOn.Date.AddDays(1).Date.AddSeconds(-1), connectionString);
+                        if (createdOn < createdontemp)
+                        {
+                            flag = true;
+                            createdontemp = GetUTCFromLocalTime((DateTime)createdOn.Date.AddDays(-1).Date, connectionString);
+                            createdEnd = GetUTCFromLocalTime((DateTime)createdOn.Date.AddSeconds(-1), connectionString);
+                        }
+                        List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString, createdontemp, createdOn).ToList();
+                        if (VitalReadings.Count == 0)
+                        {
+                            List<VitalReading> VitalReading = GetVitalReadingsLocal(patientProgramId, connectionString, createdOn, createdEnd).ToList();
+                            if (VitalReading.Count != 0)
+                            {
+                                pdb.TotalVitalCount = pdb.TotalVitalCount + 1;
+                            }
+                            //List<VitalReading> VitalReadingg = GetVitalReadingsLocal(patientProgramId, connectionString, pdb.CreatedOn, GetUTCFromLocalTime((DateTime)pdb.CreatedOn.AddDays(1).Date.AddSeconds(-1), connectionString)).ToList();
+                            //if (VitalReading.Count!=0)
+                            //{
+                            //    pdb.TotalVitalCount= pdb.TotalVitalCount +1;
+                            //}
+                        }
+                        else
+                        {
+                            if (flag)
+                            {
+                                createdontemp = GetUTCFromLocalTime((DateTime)createdOn.Date, connectionString);
+                                createdEnd = GetUTCFromLocalTime((DateTime)createdOn.Date.AddDays(1).AddSeconds(-1), connectionString);
+                                List<VitalReading> VitalReading = GetVitalReadingsLocal(patientProgramId, connectionString, pdb.CreatedOn, GetUTCFromLocalTime((DateTime)pdb.CreatedOn.AddDays(1).Date.AddSeconds(-1), connectionString)).ToList();
+                                if (VitalReading.Count != 0)
+                                {
+                                    pdb.TotalVitalCount = pdb.TotalVitalCount + 1;
+                                }
+                            }
 
-                    }
-                    else if (VitalReadings.Count != 0 && VitalReadings.Count >= targetreading)
-                    {
-                        PatientBilldata.BillingStartDate = (DateTime)stDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = VitalReadings.Count;
-                        PatientBilldata.Total = targetreading;
-                        PatientBilldata.IsTargetMet = true;
-                        PatientBilldata.ReadyTobill = 0;
+                        }
+                        PatientBilldatas = new PatientBilldata();
+                        PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;
+                        PatientBilldatas.CPTCode = code.BillingCode;
+                        PatientBilldatas.Completed = pdb.TotalVitalCount;
+                        PatientBilldatas.Total = code.TargetReadings;
+                        PatientBilldatas.IsTargetMet = pdb.TotalVitalCount >= code.TargetReadings ? true : false;
+                        PatientBilldatas.ReadyTobill = (pdb.TotalVitalCount >= code.TargetReadings && pdb.DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                        return PatientBilldatas;
+
 
 
 
                     }
                     else
                     {
-                        PatientBilldata.BillingStartDate = (DateTime)stDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = VitalReadings.Count;
-                        PatientBilldata.Total = targetreading;
-                        PatientBilldata.IsTargetMet = false;
-                        PatientBilldata.ReadyTobill = 0;
+                        PatientBilldatas = null;
                     }
-                    return PatientBilldata;
+
                 }
 
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception occured - class Name :" + this.GetType().Name + ",  Method Name : " + MethodBase.GetCurrentMethod().Name + ", Error Message :" + ex.Message + "");
-                return null;
-            }
-        }
-        public PatientBilldata ProcessCPT99454_Clynx(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
-        {
-            try
-            {
-                int DaysCompleted = 0;
-                PatientStartDate PatientStartDate = new PatientStartDate();
-                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                if (PatientStartDate == null || PatientStartDate.Status.ToLower() == "invalid")
+                if (PatientBilldatas == null)
                 {
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    PatientBilldata.CPTCode = code.BillingCode;
-                    PatientBilldata.Completed = 0;
-                    PatientBilldata.Total = code.TargetReadings;
-                    PatientBilldata.IsTargetMet = false;
-                    PatientBilldata.ReadyTobill = 0;
-                    return PatientBilldata;
-                }
-                else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
-                {
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    PatientBilldata.CPTCode = code.BillingCode;
-                    PatientBilldata.Completed = 0;
-                    PatientBilldata.Total = code.TargetReadings;
-                    PatientBilldata.IsTargetMet = false;
-                    PatientBilldata.ReadyTobill = 0;
-                    return PatientBilldata;
-                }
-                else
-                {
-                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-                    DateTime endDate = DateTime.UtcNow.Date;
-                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-                    //the patientbilling table and +1 day will come as next start day.. So we should   
-                    // calcualte the start date with respect to the billing threshold
-                    if (stDate > DateTime.UtcNow.Date)
+                    int DaysCompleted = 0;
+                    PatientStartDate PatientStartDate = new PatientStartDate();
+                    PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                    DateTime StartDateTemp = GetLocalTimeFromUTC((DateTime)PatientStartDate.StartDate, connectionString);
+                    DateTime Today = GetLocalTimeFromUTC(DateTime.UtcNow.Date, connectionString);
+                    if (PatientStartDate == null || PatientStartDate.Status.ToLower() == "invalid")
                     {
-                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                        stDate = bd.StartDate;
-                        endDate = bd.EndDate;
+                        PatientBilldatas = new PatientBilldata();
+                        PatientBilldatas.CPTCode = code.BillingCode;
+                        PatientBilldatas.Completed = 0;
+                        PatientBilldatas.Total = code.TargetReadings;
+                        PatientBilldatas.IsTargetMet = false;
+                        PatientBilldatas.ReadyTobill = 0;
+                        return PatientBilldatas;
                     }
-                    int nVitalCount = 0;
-                    List<VitalReading> VitalReadings = GetVitalReadings(patientProgramId, connectionString).Where(s => s.ReadingDate >= stDate && s.ReadingDate <= endDate).ToList();
-                    if (VitalReadings != null)
+                    else if (StartDateTemp > Today && PatientStartDate.Status.ToLower() == "active")
                     {
-                        nVitalCount = VitalReadings.Count;
+                        PatientBilldatas = new PatientBilldata();
+                        PatientBilldatas.CPTCode = code.BillingCode;
+                        PatientBilldatas.Completed = 0;
+                        PatientBilldatas.Total = code.TargetReadings;
+                        PatientBilldatas.IsTargetMet = false;
+                        PatientBilldatas.ReadyTobill = 0;
+                        return PatientBilldatas;
                     }
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    PatientBilldata.BillingStartDate = stDate;
-                    PatientBilldata.CPTCode = code.BillingCode;
-                    PatientBilldata.Completed = nVitalCount;
-                    PatientBilldata.Total = code.TargetReadings;
-                    PatientBilldata.IsTargetMet = (nVitalCount >= code.TargetReadings) ? true : false;
-                    PatientBilldata.ReadyTobill = (nVitalCount >= code.TargetReadings && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-                    return PatientBilldata;
+                    else
+                    {
+                        //DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
+                        DateTime stDate = DateTime.MinValue;
+                        if (PatientStartDate.Status.ToLower() == "active")
+                        {
+                            stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
+                        }
+                        else
+                        {
+                            stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                        }
+                        DateTime endDate = DateTime.UtcNow.Date;
+                        DateTime stDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
+
+                        DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+
+                        // endDate = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+                        //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                        //the patientbilling table and +1 day will come as next start day.. So we should   
+                        // calcualte the start date with respect to the billing threshold
+                        DateTime today = DateTime.UtcNow;
+                        DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
+                        if (stDatetemp.Date > endDateTempay)
+                        {
+                            //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                            BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                            if (bd== null)
+                            {
+                                PatientBilldata PatientBilldata = new PatientBilldata();
+                                PatientBilldata.CPTCode = code.BillingCode;
+                                PatientBilldata.Completed = 0;
+                                PatientBilldata.Total = code.TargetReadings;
+                                PatientBilldata.IsTargetMet = false;
+                                PatientBilldata.ReadyTobill = 0;
+                                return PatientBilldata;
+                            }
+                            stDatetemp = bd.StartDate;//GetLocalTimeFromUTC((DateTime)bd.StartDate, connectionString);
+                            endDatetemp = bd.EndDate;// GetLocalTimeFromUTC((DateTime)bd.EndDate, connectionString);
+                        }
+                        DateTime stDateLoc = stDatetemp;
+                        DateTime endDateLoc = endDatetemp;
+                        //DateTime Enddate1 = endDate;
+                        var DateDiff = Convert.ToDateTime(stDatetemp).Date - endDatetemp.Date;
+                        DaysCompleted = Math.Abs(DateDiff.Days) + 1;
+                        List<Dates> Dates = new List<Dates>();
+                        List<Dates> DatesNew = new List<Dates>();
+                        for (int i = 0; i <= DaysCompleted; i++)
+                        {
+                            if (i == 0)
+                            {
+                                endDatetemp = stDateLoc.AddDays(1).Date.AddSeconds(-1);
+
+                            }
+                            else if (i == DaysCompleted)
+                            {
+                                stDatetemp = stDateLoc.AddDays(i).Date;
+                                endDatetemp = endDateLoc;
+                            }
+                            else
+                            {
+                                stDatetemp = stDateLoc.AddDays(i).Date;
+                                endDatetemp = stDatetemp.AddDays(1).Date.AddSeconds(-1);
+
+                            }
+
+                            stDatetemp = GetUTCFromLocalTime((DateTime)stDatetemp, connectionString);
+                            endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
+
+
+                            Dates.Add(new Dates() { StartDate = (DateTime)stDatetemp, EndDate = endDatetemp, Totalreading = 0 });
+
+                        }
+                        if (Dates.Count > 0)
+                        {
+
+                            foreach (Dates date in Dates)
+                            {
+
+                                List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
+
+                                if (VitalReadings.Count > 0)
+                                {
+
+                                    DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading = 1 });
+
+                                }
+                                else
+                                {
+                                    DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading = 0 });
+                                }
+
+                            }
+
+
+                        }
+
+                        int VitalCount = DatesNew.Where(s => s.Totalreading == 1).Count();
+
+                        //int nVitalCount = 0;
+                        // List<VitalReading> VitalReadings = GetVitalReadings(patientProgramId, connectionString).Where(s => s.ReadingDate >= stDate && s.ReadingDate <= endDate).ToList();
+                        //if (VitalReadings != null)
+                        //{
+                        //    nVitalCount = VitalReadings.Count;
+                        //}
+                        PatientBilldatas = new PatientBilldata();
+                        PatientBilldatas.BillingStartDate = stDate;
+                        PatientBilldatas.CPTCode = code.BillingCode;
+                        PatientBilldatas.Completed = VitalCount;
+                        PatientBilldatas.Total = code.TargetReadings;
+                        PatientBilldatas.IsTargetMet = (VitalCount >= code.TargetReadings) ? true : false;
+                        PatientBilldatas.ReadyTobill = (VitalCount >= code.TargetReadings && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                        return PatientBilldatas;
+                    }
                 }
+                return PatientBilldatas;
+
+
+
+
+
+                //int DaysCompleted = 0;
+                //PatientStartDate PatientStartDate = new PatientStartDate();
+                //PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                //DateTime StartDateTemp = GetLocalTimeFromUTC((DateTime)PatientStartDate.StartDate, connectionString);
+                //DateTime Today = GetLocalTimeFromUTC(DateTime.UtcNow.Date, connectionString); 
+                //if (PatientStartDate == null || PatientStartDate.Status.ToLower() == "invalid")
+                //{
+                //    PatientBilldata PatientBilldata = new PatientBilldata();
+                //    PatientBilldata.CPTCode = code.BillingCode;
+                //    PatientBilldata.Completed = 0;
+                //    PatientBilldata.Total = code.TargetReadings;
+                //    PatientBilldata.IsTargetMet = false;
+                //    PatientBilldata.ReadyTobill = 0;
+                //    return PatientBilldata;
+                //}
+                //else if (StartDateTemp > Today && PatientStartDate.Status.ToLower() == "active")
+                //{
+                //    PatientBilldata PatientBilldata = new PatientBilldata();
+                //    PatientBilldata.CPTCode = code.BillingCode;
+                //    PatientBilldata.Completed = 0;
+                //    PatientBilldata.Total = code.TargetReadings;
+                //    PatientBilldata.IsTargetMet = false;
+                //    PatientBilldata.ReadyTobill = 0;
+                //    return PatientBilldata;
+                //}
+                //else
+                //{
+                //    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                //    DateTime endDate = DateTime.UtcNow.Date;
+                //    DateTime stDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
+
+                //    DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+
+                //   // endDate = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+                //    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                //    //the patientbilling table and +1 day will come as next start day.. So we should   
+                //    // calcualte the start date with respect to the billing threshold
+                //    if (stDatetemp > endDatetemp)
+                //    {
+                //        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                //        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+
+                //        stDatetemp = GetLocalTimeFromUTC((DateTime)bd.StartDate, connectionString);
+                //        stDatetemp = GetLocalTimeFromUTC((DateTime)bd.EndDate, connectionString); ;
+                //    }
+                //    DateTime stDateLoc = stDatetemp;
+                //    DateTime endDateLoc = endDatetemp;
+                //    //DateTime Enddate1 = endDate;
+                //    var DateDiff = Convert.ToDateTime(stDatetemp).Date - endDatetemp.Date;
+                //    DaysCompleted = Math.Abs(DateDiff.Days)+1;
+                //    List<Dates> Dates = new List<Dates>();
+                //    List<Dates> DatesNew = new List<Dates>();
+                //    for (int i = 0; i<=DaysCompleted; i++)
+                //    {
+                //        if (i==0)
+                //        {
+                //            endDatetemp = stDateLoc.AddDays(1).Date.AddSeconds(-1);
+
+                //        }
+                //        else if (i==DaysCompleted)
+                //        {
+                //            stDatetemp = stDateLoc.AddDays(i).Date;
+                //            endDatetemp = endDateLoc;
+                //        }
+                //        else
+                //        {
+                //            stDatetemp = stDateLoc.AddDays(i).Date;
+                //            endDatetemp = stDatetemp.AddDays(1).Date.AddSeconds(-1);
+
+                //        }
+
+                //        stDatetemp = GetUTCFromLocalTime((DateTime)stDatetemp, connectionString);
+                //        endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
+
+
+                //        Dates.Add(new Dates() { StartDate = (DateTime)stDatetemp, EndDate = endDatetemp, Totalreading=0 });
+
+                //    }
+                //    if (Dates.Count>0)
+                //    {
+
+                //        foreach (Dates date in Dates)
+                //        {
+
+                //            List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
+
+                //            if (VitalReadings.Count>0)
+                //            {
+
+                //                DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading=1 });
+
+                //            }
+                //            else
+                //            {
+                //                DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading=0 });
+                //            }
+
+                //        }
+
+
+                //    }
+
+                //    int VitalCount = DatesNew.Where(s => s.Totalreading == 1).Count();
+
+                //    //int nVitalCount = 0;
+                //   // List<VitalReading> VitalReadings = GetVitalReadings(patientProgramId, connectionString).Where(s => s.ReadingDate >= stDate && s.ReadingDate <= endDate).ToList();
+                //    //if (VitalReadings != null)
+                //    //{
+                //    //    nVitalCount = VitalReadings.Count;
+                //    //}
+                //    PatientBilldata PatientBilldata = new PatientBilldata();
+                //    PatientBilldata.BillingStartDate = stDate;
+                //    PatientBilldata.CPTCode = code.BillingCode;
+                //    PatientBilldata.Completed = VitalCount;
+                //    PatientBilldata.Total = code.TargetReadings;
+                //    PatientBilldata.IsTargetMet = (VitalCount >= code.TargetReadings) ? true : false;
+                //    PatientBilldata.ReadyTobill = (VitalCount >= code.TargetReadings && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                //    return PatientBilldata;
+                //}
             }
             catch (Exception ex)
             {
                 throw;
             }
         }
-        public PatientBilldata ProcessCPT99457_medit(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
+        public PatientBilldata ProcessCPT99454_CycleBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
         {
             try
             {
-                DateTime? LastBilledDate = GetPatientBillingStartDate(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                if (LastBilledDate == null)
+                PatientBilldata PatientBilldatas = new PatientBilldata();
+                List<PatientDailyBillingData> lstDailyData = GetPatientBillingCounts(patientId, patientProgramId, connectionString);
+                if (lstDailyData == null || lstDailyData.Count == 0)
                 {
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
-                    PatientBilldata.CPTCode = code.BillingCode;
-                    PatientBilldata.Completed = 0;
-                    PatientBilldata.Total = code.TargetReadings*60;
-                    PatientBilldata.IsTargetMet = false;
-                    PatientBilldata.ReadyTobill = 0;
-                    return PatientBilldata;
+
+                    PatientBilldatas = null;
                 }
-                DateTime lstBilleddate = Convert.ToDateTime(LastBilledDate);
-                var startOfMonth = new DateTime(lstBilleddate.Year, lstBilleddate.Month, 1);
-                DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
-                DateTime Enddate = DateTime.Today;
 
-                if (endOfMonth == Enddate)
+                foreach (PatientDailyBillingData pdb in lstDailyData)
                 {
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    List<PatientInteraction> PatientInteractiontimes = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= lstBilleddate && s.Date <= Enddate).ToList();
-                    if (PatientInteractiontimes == null)
+                    if (pdb.BillingCodeId == code.BillingCodeID)
                     {
-                        PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = 0;
-                        PatientBilldata.Total = code.TargetReadings*60;
-                        PatientBilldata.IsTargetMet = false;
-                        PatientBilldata.ReadyTobill = 0;
+                        DateTime createdOn = pdb.CreatedOn;
+                        DateTime createdontemp = GetUTCFromLocalTime((DateTime)createdOn.Date, connectionString);
+                        bool flag = false;
 
-                    }
-                    var isEstablishedExist = PatientInteractiontimes.Where(s => s.IsCallNote == 1).ToList();
-                    if (isEstablishedExist.Count() > 0)
-                    {
-                        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-                        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+
+                        DateTime createdEnd = GetUTCFromLocalTime((DateTime)createdOn.Date.AddDays(1).Date.AddSeconds(-1), connectionString);
+                        if (createdOn < createdontemp)
                         {
-                            PatientInteractiontimes.Clear();
+                            flag = true;
+                            createdontemp = GetUTCFromLocalTime((DateTime)createdOn.Date.AddDays(-1).Date, connectionString);
+                            createdEnd = GetUTCFromLocalTime((DateTime)createdOn.Date.AddSeconds(-1), connectionString);
                         }
-                    }
-                    if (PatientInteractiontimes.Count == 0 || PatientInteractiontimes == null || isEstablishedExist.Count == 0)
-                    {
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = 0;
-                        PatientBilldata.Total = code.TargetReadings*60;
-                        PatientBilldata.IsTargetMet = false;
-                        PatientBilldata.ReadyTobill = 0;
-                        return PatientBilldata;
-                    }
-                    TimeSpan t1 = TimeSpan.FromSeconds(PatientInteractiontimes.Sum(s => s.Duration));
-                    if (Convert.ToInt32(t1.Minutes) >= code.TargetReadings || (Convert.ToInt32(t1.Hours) >= 1))
-                    {
-                        //set target met and readytoBill as true entry in db
-                        PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = t1.Minutes >= code.TargetReadings ? code.TargetReadings : t1.Minutes;
-                        PatientBilldata.Completed = t1.Hours >= 1 ? code.TargetReadings : PatientBilldata.Completed;
-                        PatientBilldata.Total = code.TargetReadings*60;
-                        PatientBilldata.IsTargetMet = t1.Minutes >= code.TargetReadings ? true : false;
-                        PatientBilldata.IsTargetMet = t1.Hours >= 1 ? true : PatientBilldata.IsTargetMet;
-                        PatientBilldata.ReadyTobill = 1;
+                        List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString, createdontemp, createdOn).ToList();
+                        if (VitalReadings.Count == 0)
+                        {
+                            List<VitalReading> VitalReading = GetVitalReadingsLocal(patientProgramId, connectionString, createdOn, createdEnd).ToList();
+                            if (VitalReading.Count != 0)
+                            {
+                                pdb.TotalVitalCount = pdb.TotalVitalCount + 1;
+                            }
+                            //List<VitalReading> VitalReadingg = GetVitalReadingsLocal(patientProgramId, connectionString, pdb.CreatedOn, GetUTCFromLocalTime((DateTime)pdb.CreatedOn.AddDays(1).Date.AddSeconds(-1), connectionString)).ToList();
+                            //if (VitalReading.Count!=0)
+                            //{
+                            //    pdb.TotalVitalCount= pdb.TotalVitalCount +1;
+                            //}
+                        }
+                        else
+                        {
+                            if (flag)
+                            {
+                                createdontemp = GetUTCFromLocalTime((DateTime)createdOn.Date, connectionString);
+                                createdEnd = GetUTCFromLocalTime((DateTime)createdOn.Date.AddDays(1).AddSeconds(-1), connectionString);
+                                List<VitalReading> VitalReading = GetVitalReadingsLocal(patientProgramId, connectionString, pdb.CreatedOn, GetUTCFromLocalTime((DateTime)pdb.CreatedOn.AddDays(1).Date.AddSeconds(-1), connectionString)).ToList();
+                                if (VitalReading.Count != 0)
+                                {
+                                    pdb.TotalVitalCount = pdb.TotalVitalCount + 1;
+                                }
+                            }
+
+                        }
+                        PatientBilldatas = new PatientBilldata();
+                        PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;
+                        PatientBilldatas.CPTCode = code.BillingCode;
+                        PatientBilldatas.Completed = pdb.TotalVitalCount;
+                        PatientBilldatas.Total = code.TargetReadings;
+                        PatientBilldatas.IsTargetMet = pdb.TotalVitalCount >= code.TargetReadings ? true : false;
+                        PatientBilldatas.ReadyTobill = (pdb.TotalVitalCount >= code.TargetReadings && pdb.DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                        return PatientBilldatas;
+
+
 
 
                     }
                     else
                     {
-                        PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = t1.Minutes >= code.TargetReadings ? code.TargetReadings : t1.Minutes;
-                        PatientBilldata.Total = code.TargetReadings*60;
-                        PatientBilldata.IsTargetMet = t1.Minutes >= code.TargetReadings ? true : false;
-                        PatientBilldata.ReadyTobill = 0;
+                        PatientBilldatas = null;
                     }
-                    return PatientBilldata;
+
                 }
-                else
+
+                if (PatientBilldatas == null)
                 {
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    var stOfMonth = new DateTime(Enddate.Year, Enddate.Month, 1);
-                    DateTime endMonth = stOfMonth.AddMonths(1).AddDays(-1);
-
-
-                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stOfMonth && s.Date <= endMonth).ToList();
-                    if (PatientInteractiontim == null)
+                    int DaysCompleted = 0;
+                    PatientStartDate PatientStartDate = new PatientStartDate();
+                    PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                    DateTime StartDateTemp = GetLocalTimeFromUTC((DateTime)PatientStartDate.StartDate, connectionString);
+                    DateTime Today = GetLocalTimeFromUTC(DateTime.UtcNow.Date, connectionString);
+                    if (PatientStartDate == null || PatientStartDate.Status.ToLower() == "invalid")
                     {
-                        PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = 0;
-                        PatientBilldata.Total = code.TargetReadings*60;
-                        PatientBilldata.IsTargetMet = false;
-                        PatientBilldata.ReadyTobill = 0;
-
+                        PatientBilldatas = new PatientBilldata();
+                        PatientBilldatas.CPTCode = code.BillingCode;
+                        PatientBilldatas.Completed = 0;
+                        PatientBilldatas.Total = code.TargetReadings;
+                        PatientBilldatas.IsTargetMet = false;
+                        PatientBilldatas.ReadyTobill = 0;
+                        return PatientBilldatas;
                     }
-                    var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
-                    if (isEstablishedExist.Count() > 0)
+                    else if (StartDateTemp > Today && PatientStartDate.Status.ToLower() == "active")
                     {
-                        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-                        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-                        {
-                            PatientInteractiontim.Clear();
-                        }
-                    }
-                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null || isEstablishedExist.Count == 0)
-                    {
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = 0;
-                        PatientBilldata.Total = code.TargetReadings*60;
-                        PatientBilldata.IsTargetMet = false;
-                        PatientBilldata.ReadyTobill = 0;
-                        return PatientBilldata;
-                    }
-                    TimeSpan t1 = TimeSpan.FromSeconds(PatientInteractiontim.Sum(s => s.Duration));
-                    if ((Convert.ToInt32(t1.Minutes) >= code.TargetReadings && endMonth == Enddate) || (Convert.ToInt32(t1.Hours) >= 1 && endMonth == Enddate))
-                    {
-                        //set target met and ready to bill as true entry in db
-                        PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = t1.Minutes >= code.TargetReadings ? code.TargetReadings : t1.Minutes;
-                        PatientBilldata.Completed = t1.Hours >= 1 ? code.TargetReadings : PatientBilldata.Completed;
-                        PatientBilldata.Total = code.TargetReadings*60;
-                        PatientBilldata.IsTargetMet = t1.Minutes >= code.TargetReadings ? true : false;
-                        PatientBilldata.IsTargetMet = t1.Hours >= 1 ? true : PatientBilldata.IsTargetMet;
-                        PatientBilldata.ReadyTobill = 1;
-
-
-                    }
-                    else if ((Convert.ToInt32(t1.Minutes) >= code.TargetReadings && endMonth != Enddate) || (Convert.ToInt32(t1.Hours) >= 1 && endMonth != Enddate))
-                    {
-                        //set target met  as true entry in db
-                        PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = t1.Minutes >= code.TargetReadings ? code.TargetReadings : t1.Minutes;
-                        PatientBilldata.Completed = t1.Hours >= 1 ? code.TargetReadings : PatientBilldata.Completed;
-                        PatientBilldata.Total = code.TargetReadings*60;
-                        PatientBilldata.IsTargetMet = t1.Minutes >= code.TargetReadings ? true : false;
-                        PatientBilldata.IsTargetMet = t1.Hours >= 1 ? true : PatientBilldata.IsTargetMet;
-                        PatientBilldata.ReadyTobill = 0;
-
+                        PatientBilldatas = new PatientBilldata();
+                        PatientBilldatas.CPTCode = code.BillingCode;
+                        PatientBilldatas.Completed = 0;
+                        PatientBilldatas.Total = code.TargetReadings;
+                        PatientBilldatas.IsTargetMet = false;
+                        PatientBilldatas.ReadyTobill = 0;
+                        return PatientBilldatas;
                     }
                     else
                     {
-                        PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = t1.Minutes >= code.TargetReadings ? code.TargetReadings : t1.Minutes;
-                        PatientBilldata.Total = code.TargetReadings*60;
-                        PatientBilldata.IsTargetMet = t1.Minutes >= code.TargetReadings ? true : false;
-                        PatientBilldata.ReadyTobill = 0;
+                        DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                        DateTime endDate = DateTime.UtcNow.Date;
+                        DateTime stDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
+
+                        DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+
+                        // endDate = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+                        //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                        //the patientbilling table and +1 day will come as next start day.. So we should   
+                        // calcualte the start date with respect to the billing threshold
+                        if (stDatetemp > endDatetemp)
+                        {
+                            //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                            BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                            if (bd == null)
+                            {
+                                PatientBilldatas = new PatientBilldata();
+                                PatientBilldatas.CPTCode = code.BillingCode;
+                                PatientBilldatas.Completed = 0;
+                                PatientBilldatas.Total = code.TargetReadings;
+                                PatientBilldatas.IsTargetMet = false;
+                                PatientBilldatas.ReadyTobill = 0;
+                                return PatientBilldatas;
+                            }
+                            stDatetemp = bd.StartDate;//GetLocalTimeFromUTC((DateTime)bd.StartDate, connectionString);
+                            endDatetemp = bd.EndDate;// GetLocalTimeFromUTC((DateTime)bd.EndDate, connectionString);
+                        }
+                        DateTime stDateLoc = stDatetemp;
+                        DateTime endDateLoc = endDatetemp;
+                        //DateTime Enddate1 = endDate;
+                        var DateDiff = Convert.ToDateTime(stDatetemp).Date - endDatetemp.Date;
+                        DaysCompleted = Math.Abs(DateDiff.Days) + 1;
+                        List<Dates> Dates = new List<Dates>();
+                        List<Dates> DatesNew = new List<Dates>();
+                        for (int i = 0; i <= DaysCompleted; i++)
+                        {
+                            if (i == 0)
+                            {
+                                endDatetemp = stDateLoc.AddDays(1).Date.AddSeconds(-1);
+
+                            }
+                            else if (i == DaysCompleted)
+                            {
+                                stDatetemp = stDateLoc.AddDays(i).Date;
+                                endDatetemp = endDateLoc;
+                            }
+                            else
+                            {
+                                stDatetemp = stDateLoc.AddDays(i).Date;
+                                endDatetemp = stDatetemp.AddDays(1).Date.AddSeconds(-1);
+
+                            }
+
+                            stDatetemp = GetUTCFromLocalTime((DateTime)stDatetemp, connectionString);
+                            endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
+
+
+                            Dates.Add(new Dates() { StartDate = (DateTime)stDatetemp, EndDate = endDatetemp, Totalreading = 0 });
+
+                        }
+                        if (Dates.Count > 0)
+                        {
+
+                            foreach (Dates date in Dates)
+                            {
+
+                                List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
+
+                                if (VitalReadings.Count > 0)
+                                {
+
+                                    DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading = 1 });
+
+                                }
+                                else
+                                {
+                                    DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading = 0 });
+                                }
+
+                            }
+
+
+                        }
+
+                        int VitalCount = DatesNew.Where(s => s.Totalreading == 1).Count();
+
+                        //int nVitalCount = 0;
+                        // List<VitalReading> VitalReadings = GetVitalReadings(patientProgramId, connectionString).Where(s => s.ReadingDate >= stDate && s.ReadingDate <= endDate).ToList();
+                        //if (VitalReadings != null)
+                        //{
+                        //    nVitalCount = VitalReadings.Count;
+                        //}
+                        PatientBilldatas = new PatientBilldata();
+                        PatientBilldatas.BillingStartDate = stDate;
+                        PatientBilldatas.CPTCode = code.BillingCode;
+                        PatientBilldatas.Completed = VitalCount;
+                        PatientBilldatas.Total = code.TargetReadings;
+                        PatientBilldatas.IsTargetMet = (VitalCount >= code.TargetReadings) ? true : false;
+                        PatientBilldatas.ReadyTobill = (VitalCount >= code.TargetReadings && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                        return PatientBilldatas;
                     }
-                    return PatientBilldata;
                 }
+                return PatientBilldatas;
+
+
+
+
+
+                //int DaysCompleted = 0;
+                //PatientStartDate PatientStartDate = new PatientStartDate();
+                //PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                //DateTime StartDateTemp = GetLocalTimeFromUTC((DateTime)PatientStartDate.StartDate, connectionString);
+                //DateTime Today = GetLocalTimeFromUTC(DateTime.UtcNow.Date, connectionString); 
+                //if (PatientStartDate == null || PatientStartDate.Status.ToLower() == "invalid")
+                //{
+                //    PatientBilldata PatientBilldata = new PatientBilldata();
+                //    PatientBilldata.CPTCode = code.BillingCode;
+                //    PatientBilldata.Completed = 0;
+                //    PatientBilldata.Total = code.TargetReadings;
+                //    PatientBilldata.IsTargetMet = false;
+                //    PatientBilldata.ReadyTobill = 0;
+                //    return PatientBilldata;
+                //}
+                //else if (StartDateTemp > Today && PatientStartDate.Status.ToLower() == "active")
+                //{
+                //    PatientBilldata PatientBilldata = new PatientBilldata();
+                //    PatientBilldata.CPTCode = code.BillingCode;
+                //    PatientBilldata.Completed = 0;
+                //    PatientBilldata.Total = code.TargetReadings;
+                //    PatientBilldata.IsTargetMet = false;
+                //    PatientBilldata.ReadyTobill = 0;
+                //    return PatientBilldata;
+                //}
+                //else
+                //{
+                //    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                //    DateTime endDate = DateTime.UtcNow.Date;
+                //    DateTime stDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
+
+                //    DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+
+                //   // endDate = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+                //    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                //    //the patientbilling table and +1 day will come as next start day.. So we should   
+                //    // calcualte the start date with respect to the billing threshold
+                //    if (stDatetemp > endDatetemp)
+                //    {
+                //        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                //        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+
+                //        stDatetemp = GetLocalTimeFromUTC((DateTime)bd.StartDate, connectionString);
+                //        stDatetemp = GetLocalTimeFromUTC((DateTime)bd.EndDate, connectionString); ;
+                //    }
+                //    DateTime stDateLoc = stDatetemp;
+                //    DateTime endDateLoc = endDatetemp;
+                //    //DateTime Enddate1 = endDate;
+                //    var DateDiff = Convert.ToDateTime(stDatetemp).Date - endDatetemp.Date;
+                //    DaysCompleted = Math.Abs(DateDiff.Days)+1;
+                //    List<Dates> Dates = new List<Dates>();
+                //    List<Dates> DatesNew = new List<Dates>();
+                //    for (int i = 0; i<=DaysCompleted; i++)
+                //    {
+                //        if (i==0)
+                //        {
+                //            endDatetemp = stDateLoc.AddDays(1).Date.AddSeconds(-1);
+
+                //        }
+                //        else if (i==DaysCompleted)
+                //        {
+                //            stDatetemp = stDateLoc.AddDays(i).Date;
+                //            endDatetemp = endDateLoc;
+                //        }
+                //        else
+                //        {
+                //            stDatetemp = stDateLoc.AddDays(i).Date;
+                //            endDatetemp = stDatetemp.AddDays(1).Date.AddSeconds(-1);
+
+                //        }
+
+                //        stDatetemp = GetUTCFromLocalTime((DateTime)stDatetemp, connectionString);
+                //        endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
+
+
+                //        Dates.Add(new Dates() { StartDate = (DateTime)stDatetemp, EndDate = endDatetemp, Totalreading=0 });
+
+                //    }
+                //    if (Dates.Count>0)
+                //    {
+
+                //        foreach (Dates date in Dates)
+                //        {
+
+                //            List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
+
+                //            if (VitalReadings.Count>0)
+                //            {
+
+                //                DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading=1 });
+
+                //            }
+                //            else
+                //            {
+                //                DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading=0 });
+                //            }
+
+                //        }
+
+
+                //    }
+
+                //    int VitalCount = DatesNew.Where(s => s.Totalreading == 1).Count();
+
+                //    //int nVitalCount = 0;
+                //   // List<VitalReading> VitalReadings = GetVitalReadings(patientProgramId, connectionString).Where(s => s.ReadingDate >= stDate && s.ReadingDate <= endDate).ToList();
+                //    //if (VitalReadings != null)
+                //    //{
+                //    //    nVitalCount = VitalReadings.Count;
+                //    //}
+                //    PatientBilldata PatientBilldata = new PatientBilldata();
+                //    PatientBilldata.BillingStartDate = stDate;
+                //    PatientBilldata.CPTCode = code.BillingCode;
+                //    PatientBilldata.Completed = VitalCount;
+                //    PatientBilldata.Total = code.TargetReadings;
+                //    PatientBilldata.IsTargetMet = (VitalCount >= code.TargetReadings) ? true : false;
+                //    PatientBilldata.ReadyTobill = (VitalCount >= code.TargetReadings && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                //    return PatientBilldata;
+                //}
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception occured - class Name :" + this.GetType().Name + ",  Method Name : " + MethodBase.GetCurrentMethod().Name + ", Error Message :" + ex.Message + "");
-                return null;
+                throw;
             }
         }
-        public PatientBilldata ProcessCPT99457_Clynx(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
+        public PatientBilldata ProcessCPT99457_DaysBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
         {
             PatientBilldata pbd = new PatientBilldata();
             try
@@ -5808,18 +6491,48 @@ namespace RPMWeb.Dal
                 }
                 else
                 {
-                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-                    DateTime endDate = DateTime.UtcNow.Date;
 
+                    //DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
+                    DateTime stDate = DateTime.MinValue;
+                    if (PatientStartDate.Status.ToLower() == "active")
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
+                    }
+                    else
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    }
+                    DateTime endDate = DateTime.UtcNow;
+                    DateTime today = DateTime.UtcNow;
+                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
                     //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
                     //the patientbilling table and +1 day will come as next start day.. So we should   
                     // calcualte the start date with respect to the billing threshold
-                    if (stDate > DateTime.UtcNow.Date)
+                    if (stDate.Date > endDateTempay)
                     {
                         //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                         BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                        if (bd== null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
                         stDate = bd.StartDate;
-                        endDate = bd.EndDate;
+
+                    }
+
+
+
+                    if (PatientStartDate.Status.ToLower() == "billeddate")
+                    {
+                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
+                        endDate =DateTime.UtcNow;
+
                     }
 
 
@@ -5829,11 +6542,7 @@ namespace RPMWeb.Dal
 
 
 
-
-
-
-
-                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
+                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
                     if (PatientInteractiontim == null)
                     {
                         pbd.CPTCode = code.BillingCode;
@@ -5882,129 +6591,398 @@ namespace RPMWeb.Dal
             {
                 throw;
             }
+            //PatientBilldata pbd = new PatientBilldata();
+            //try
+            //{
+            //    PatientBilldata PatientBilldatas = new PatientBilldata();
+            //    List<PatientDailyBillingData> lstDailyData = GetPatientBillingCounts(patientId, patientProgramId, connectionString);
+            //    if (lstDailyData == null || lstDailyData.Count == 0)
+            //    {
+
+            //        //PatientBilldatas.CPTCode = code.BillingCode;
+            //        //PatientBilldatas.Completed = 0;
+            //        //PatientBilldatas.Total = code.TargetReadings;
+            //        //PatientBilldatas.IsTargetMet = false;
+            //        //PatientBilldatas.ReadyTobill = 0;
+            //        //return PatientBilldatas;
+            //        PatientBilldatas=null;
+            //    }
+
+            //    foreach (PatientDailyBillingData pdb in lstDailyData)
+            //    {
+            //        if (pdb.BillingCodeId == code.BillingCodeID)
+            //        {
+            //            DateTime createdOn = pdb.CreatedOn;
+            //            DateTime createdOnEnd = DateTime.UtcNow;
+            //            List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, createdOn, createdOnEnd).ToList();
+            //            if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
+            //            {
+            //                var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+            //                if (isEstablishedExist.Count() > 0)
+            //                {
+            //                    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+            //                    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+            //                    {
+            //                        PatientInteractiontim.Clear();
+            //                    }
+            //                }
+            //                if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
+            //                {
+            //                    int TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+            //                    pdb.TotalDuration = pdb.TotalDuration + TotalReading;
+            //                }
+
+            //                //if (PatientInteractiontim.Count==0 || PatientInteractiontim==null || isEstablishedExist.Count==0)
+            //                //{
+            //                //    TotalReading = 0;
+            //                //}
+
+            //            }
+            //            PatientBilldatas = new PatientBilldata();
+            //            PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;
+            //            PatientBilldatas.CPTCode = code.BillingCode;
+            //            PatientBilldatas.Completed = pdb.TotalDuration;
+            //            PatientBilldatas.Total = code.TargetReadings;
+            //            PatientBilldatas.IsTargetMet = (pdb.TotalDuration >= code.TargetReadings * 60) ? true : false;
+            //            PatientBilldatas.ReadyTobill = (pdb.TotalDuration >= (code.TargetReadings * 60) && pdb.DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //            return PatientBilldatas;
+
+            //        }
+            //        else
+            //        {
+            //            PatientBilldatas = null;
+            //        }
+            //    }
+
+            //    if (PatientBilldatas == null)
+            //    {
+            //        int DaysCompleted = 0; int TotalReading = 0;
+            //        PatientStartDate PatientStartDate = new PatientStartDate();
+            //        PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //        if (PatientStartDate == null ||
+            //            PatientStartDate.Status.ToLower() == "invalid")
+            //        {
+            //            pbd.CPTCode = code.BillingCode;
+            //            pbd.Completed = 0;
+            //            pbd.Total = code.TargetReadings;
+            //            pbd.IsTargetMet = false;
+            //            pbd.ReadyTobill = 0;
+            //            return pbd;
+            //        }
+            //        else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
+            //        {
+            //            PatientBilldatas = new PatientBilldata();
+            //            PatientBilldatas.CPTCode = code.BillingCode;
+            //            PatientBilldatas.Completed = 0;
+            //            PatientBilldatas.Total = code.TargetReadings;
+            //            PatientBilldatas.IsTargetMet = false;
+            //            PatientBilldatas.ReadyTobill = 0;
+            //            return PatientBilldatas;
+            //        }
+            //        else
+            //        {
+            //            DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+            //            DateTime endDate = DateTime.UtcNow.Date;
+            //            DateTime startDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
+            //            DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+            //            //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+            //            //the patientbilling table and +1 day will come as next start day.. So we should   
+            //            // calcualte the start date with respect to the billing threshold
+            //            if (stDate > DateTime.UtcNow.Date)
+            //            {
+            //                //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+            //                BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //                startDatetemp = bd.StartDate;
+            //                endDatetemp = bd.EndDate;
+            //            }
+
+
+            //            DateTime startDateLoc = startDatetemp;
+            //            DateTime enddateLoc = endDatetemp;
+            //            int nTotDays = Math.Abs((startDatetemp - endDatetemp).Days) + 1;
+            //            DaysCompleted = nTotDays;
+            //            List<Dates> Dates = new List<Dates>();
+            //            for (int i = 0; i <= DaysCompleted; i++)
+            //            {
+            //                if (i == 0)
+            //                {
+            //                    endDatetemp = startDateLoc.AddDays(1).Date.AddSeconds(-1);
+
+            //                }
+            //                else if (i == DaysCompleted)
+            //                {
+            //                    startDatetemp = startDateLoc.AddDays(i).Date;
+            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
+            //                }
+            //                else
+            //                {
+            //                    startDatetemp = startDateLoc.AddDays(i).Date;
+            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
+
+            //                }
+
+            //                startDatetemp = GetUTCFromLocalTime((DateTime)startDatetemp, connectionString);
+            //                endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
+
+
+            //                Dates.Add(new Dates() { StartDate = (DateTime)startDatetemp, EndDate = endDatetemp, Totalreading = 0 });
+
+            //            }
+            //            List<PatientInteraction> PatientInteractiontimList = new List<PatientInteraction>();
+            //            if (Dates.Count > 0)
+            //            {
+
+            //                foreach (Dates date in Dates)
+            //                {
+
+            //                    List<PatientInteraction> PatientInteractiontims = GetPatientInteractiontime(patientId, patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
+            //                    //List<VitalReading> VitalReadings = billing.GetVitalReadings(patientProgramData, con).Where(s => s.ReadingDate >= date.StartDate && s.ReadingDate <= date.EndDate).ToList();
+
+            //                    if (PatientInteractiontims != null && PatientInteractiontims.Count > 0)
+            //                    {
+            //                        foreach (var list in PatientInteractiontims)
+            //                        {
+            //                            PatientInteractiontimList.Add(list);
+            //                        }
+
+            //                    }
+
+            //                }
+
+
+            //            }
+
+
+
+
+
+
+
+
+
+            //            // List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
+            //            if (PatientInteractiontimList == null)
+            //            {
+            //                PatientBilldatas = new PatientBilldata();
+            //                PatientBilldatas.CPTCode = code.BillingCode;
+            //                PatientBilldatas.Completed = 0;
+            //                PatientBilldatas.Total = code.TargetReadings;
+            //                PatientBilldatas.IsTargetMet = false;
+            //                PatientBilldatas.ReadyTobill = 0;
+            //                return PatientBilldatas;
+            //            }
+            //            var isEstablishedExist = PatientInteractiontimList.Where(s => s.IsCallNote == 1).ToList();
+            //            if (isEstablishedExist.Count() > 0)
+            //            {
+            //                isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+            //                if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+            //                {
+            //                    PatientInteractiontimList.Clear();
+            //                }
+            //            }
+            //            if (PatientInteractiontimList.Count == 0 || PatientInteractiontimList == null || isEstablishedExist.Count == 0)
+            //            {
+            //                PatientBilldatas = new PatientBilldata();
+            //                PatientBilldatas.CPTCode = code.BillingCode;
+            //                PatientBilldatas.Completed = 0;
+            //                PatientBilldatas.Total = code.TargetReadings;
+            //                PatientBilldatas.IsTargetMet = false;
+            //                PatientBilldatas.ReadyTobill = 0;
+            //                return PatientBilldatas;
+            //            }
+            //            TotalReading = PatientInteractiontimList.Sum(s => s.Duration);
+
+            //            if (TotalReading >= code.TargetReadings * 60)
+            //            {
+            //                TotalReading = code.TargetReadings * 60;
+            //            }
+            //            PatientBilldatas = new PatientBilldata();
+            //            PatientBilldatas.BillingStartDate = stDate;
+            //            PatientBilldatas.CPTCode = code.BillingCode;
+            //            PatientBilldatas.Completed = TotalReading;
+            //            PatientBilldatas.Total = code.TargetReadings * 60;
+            //            PatientBilldatas.IsTargetMet = (TotalReading >= code.TargetReadings * 60) ? true : false;
+            //            PatientBilldatas.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //            return PatientBilldatas;
+            //        }
+            //    }
+
+            //    return PatientBilldatas;
+
+
+
+
+
+            //int DaysCompleted = 0; int TotalReading = 0;
+            //PatientStartDate PatientStartDate = new PatientStartDate();
+            //PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //if (PatientStartDate == null ||
+            //    PatientStartDate.Status.ToLower() == "invalid")
+            //{
+            //    pbd.CPTCode = code.BillingCode;
+            //    pbd.Completed = 0;
+            //    pbd.Total = code.TargetReadings;
+            //    pbd.IsTargetMet = false;
+            //    pbd.ReadyTobill = 0;
+            //    return pbd;
+            //}
+            //else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
+            //{
+            //    PatientBilldata PatientBilldata = new PatientBilldata();
+            //    PatientBilldata.CPTCode = code.BillingCode;
+            //    PatientBilldata.Completed = 0;
+            //    PatientBilldata.Total = code.TargetReadings;
+            //    PatientBilldata.IsTargetMet = false;
+            //    PatientBilldata.ReadyTobill = 0;
+            //    return PatientBilldata;
+            //}
+            //else
+            //{
+            //    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+            //    DateTime endDate = DateTime.UtcNow.Date;
+
+            //    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+            //    //the patientbilling table and +1 day will come as next start day.. So we should   
+            //    // calcualte the start date with respect to the billing threshold
+            //    if (stDate > DateTime.UtcNow.Date)
+            //    {
+            //        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+            //        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //        stDate = bd.StartDate;
+            //        endDate = bd.EndDate;
+            //    }
+            //    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
+            //    if (PatientInteractiontim == null)
+            //    {
+            //        pbd.CPTCode = code.BillingCode;
+            //        pbd.Completed = 0;
+            //        pbd.Total = code.TargetReadings;
+            //        pbd.IsTargetMet = false;
+            //        pbd.ReadyTobill = 0;
+            //        return pbd;
+            //    }
+            //    var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+            //    if (isEstablishedExist.Count() > 0)
+            //    {
+            //        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+            //        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+            //        {
+            //            PatientInteractiontim.Clear();
+            //        }
+            //    }
+            //    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null || isEstablishedExist.Count==0)
+            //    {
+            //        pbd.CPTCode = code.BillingCode;
+            //        pbd.Completed = 0;
+            //        pbd.Total = code.TargetReadings;
+            //        pbd.IsTargetMet = false;
+            //        pbd.ReadyTobill = 0;
+            //        return pbd;
+            //    }
+            //    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+            //    if (TotalReading>= code.TargetReadings * 60)
+            //    {
+            //        TotalReading = code.TargetReadings * 60;
+            //    }
+            //    pbd.BillingStartDate = stDate;
+            //    pbd.CPTCode = code.BillingCode;
+            //    pbd.Completed = TotalReading;
+            //    pbd.Total = code.TargetReadings * 60;
+            //    pbd.IsTargetMet = (TotalReading >= code.TargetReadings*60) ? true : false;
+            //    pbd.ReadyTobill = (TotalReading >= (code.TargetReadings*60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //    return pbd;
+            //}
+            //}
+            //    catch (Exception ex)
+            //    {
+            //        throw;
+            //    }
         }
-        public PatientBilldata ProcessCPT99458_medit(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
+        public PatientBilldata ProcessCPT99457_CycleBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
         {
+            PatientBilldata pbd = new PatientBilldata();
             try
             {
-
-                DateTime? LastBilledDate = GetPatientBillingStartDate(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                if (LastBilledDate == null)
+                int DaysCompleted = 0; int TotalReading = 0;
+                PatientStartDate PatientStartDate = new PatientStartDate();
+                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                if (PatientStartDate == null ||
+                    PatientStartDate.Status.ToLower() == "invalid")
+                {
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = 0;
+                    pbd.Total = code.TargetReadings*60;
+                    pbd.IsTargetMet = false;
+                    pbd.ReadyTobill = 0;
+                    return pbd;
+                }
+                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
                 {
                     PatientBilldata PatientBilldata = new PatientBilldata();
-                    PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
                     PatientBilldata.CPTCode = code.BillingCode;
                     PatientBilldata.Completed = 0;
-                    PatientBilldata.Total = 20;
+                    PatientBilldata.Total = code.TargetReadings*60;
                     PatientBilldata.IsTargetMet = false;
                     PatientBilldata.ReadyTobill = 0;
                     return PatientBilldata;
                 }
-                DateTime lstBilleddate = Convert.ToDateTime(LastBilledDate);
-                var startOfMonth = new DateTime(lstBilleddate.Year, lstBilleddate.Month, 1);
-                DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
-                DateTime Enddate = DateTime.Today;
-
-                if (endOfMonth == Enddate)
-                {
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    List<PatientInteraction> PatientInteractiontimes = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= lstBilleddate && s.Date <= Enddate).ToList();
-                    if (PatientInteractiontimes == null)
-                    {
-                        PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = 0;
-                        PatientBilldata.Total = 20;
-                        PatientBilldata.IsTargetMet = false;
-                        PatientBilldata.ReadyTobill = 0;
-                    }
-                    var isEstablishedExist = PatientInteractiontimes.Where(s => s.IsCallNote == 1).ToList();
-                    if (isEstablishedExist.Count() > 0)
-                    {
-                        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-                        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-                        {
-                            PatientInteractiontimes.Clear();
-                        }
-                    }
-
-                    if (PatientInteractiontimes.Count == 0 || PatientInteractiontimes == null || isEstablishedExist.Count == 0)
-                    {
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = 0;
-                        PatientBilldata.Total = 20;
-                        PatientBilldata.IsTargetMet = false;
-                        PatientBilldata.ReadyTobill = 0;
-                        return PatientBilldata;
-
-                    }
-                    TimeSpan t1 = TimeSpan.FromSeconds(PatientInteractiontimes.Sum(s => s.Duration));
-                    int TargetReadinginSec = code.TargetReadings * 60;
-
-                    int BilledDuration = 20;
-                    int TargetTime = 20 * 60;
-                    if (t1.TotalSeconds >= TargetReadinginSec)
-                    {
-                        if (t1.TotalSeconds >= (TargetReadinginSec + (BilledDuration * 60)))
-                        {
-                            BilledDuration += 20;
-                            TargetTime = BilledDuration * 60;
-                        }
-                        TimeSpan t2;
-                        if (BilledDuration > 20)
-                        {
-                            TargetTime = Convert.ToInt32(t1.TotalSeconds) - TargetTime;
-                            TargetTime = TargetTime >= 20 * 60 ? 40 * 60 : TargetTime;
-                            t2 = TimeSpan.FromSeconds(TargetTime);
-                        }
-                        else
-                        {
-                            TargetTime = Convert.ToInt32(t1.TotalSeconds) - TargetTime;
-                            TargetTime = TargetTime >= code.TargetReadings * 60 ? code.TargetReadings * 60 : TargetTime;
-                            t2 = TimeSpan.FromSeconds(TargetTime);
-                        }
-
-                        //TargetTime = Convert.ToInt32(t1.TotalSeconds) - TargetTime;
-                        //TargetTime = TargetTime >= 20 * 60 ? 20 * 60 : TargetTime;
-                        //TimeSpan t2 = TimeSpan.FromSeconds(TargetTime);
-                        PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = t2.Minutes;
-                        PatientBilldata.Total = Convert.ToInt32(t2.Minutes) > BilledDuration ? code.TargetReadings*60 : BilledDuration;
-                        PatientBilldata.IsTargetMet = t2.Minutes >= BilledDuration ? true : false;
-                        PatientBilldata.ReadyTobill = 1;
-
-                    }
-                    else
-                    {
-                        TargetTime = Convert.ToInt32(t1.TotalSeconds) < TargetTime ? 0 : Convert.ToInt32(t1.TotalSeconds) - TargetTime;
-                        TargetTime = TargetTime >= 20 * 60 ? 20 * 60 : TargetTime;
-                        TimeSpan t2 = TimeSpan.FromSeconds(TargetTime);
-                        PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = t2.Minutes;
-                        PatientBilldata.Total = 20;
-                        PatientBilldata.IsTargetMet = t2.Minutes >= 20 ? true : false;
-                        PatientBilldata.ReadyTobill = 0;
-                    }
-                    return PatientBilldata;
-                }
                 else
                 {
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    var stOfMonth = new DateTime(Enddate.Year, Enddate.Month, 1);
-                    DateTime endMonth = stOfMonth.AddMonths(1).AddDays(-1);
+
+                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime endDate = DateTime.UtcNow;//.AddMinutes(10);
+
+                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                    //the patientbilling table and +1 day will come as next start day.. So we should   
+                    // calcualte the start date with respect to the billing threshold
+                    DateTime today = DateTime.UtcNow;
+                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
+                    if (stDate.Date > endDateTempay)
+                    {
+                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                        if (bd == null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
+
+                    }
 
 
-                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stOfMonth && s.Date <= endMonth).ToList();
+
+                    if (PatientStartDate.Status.ToLower() == "billeddate")
+                    {
+                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
+                        endDate = DateTime.UtcNow;//.AddMinutes(10);
+
+                    }
+
+
+
+
+
+
+
+                    int patientSmsCount = 0;
+                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
+                    patientSmsCount =GetPatientSmsCount(patientId, connectionString, stDate, endDate);
                     if (PatientInteractiontim == null)
                     {
-                        PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = 0;
-                        PatientBilldata.Total = 20;
-                        PatientBilldata.IsTargetMet = false;
-                        PatientBilldata.ReadyTobill = 0;
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        pbd.BillingStartDate = stDate;
+                        return pbd;
                     }
                     var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
                     if (isEstablishedExist.Count() > 0)
@@ -6012,109 +6990,355 @@ namespace RPMWeb.Dal
                         isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
                         if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
                         {
-                            PatientInteractiontim.Clear();
+                            if (patientSmsCount <= 0)
+                            {
+                                PatientInteractiontim.Clear();
+                            }
+
                         }
                     }
                     if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null || isEstablishedExist.Count == 0)
                     {
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = 0;
-                        PatientBilldata.Total = 20;
-                        PatientBilldata.IsTargetMet = false;
-                        PatientBilldata.ReadyTobill = 0;
-                        return PatientBilldata;
+                        if (patientSmsCount <= 0)
+                        {
+                            pbd.CPTCode = code.BillingCode;
+                            pbd.Completed = 0;
+                            pbd.Total = code.TargetReadings*60;
+                            pbd.IsTargetMet = false;
+                            pbd.ReadyTobill = 0;
+                            pbd.BillingStartDate = stDate;
+                            return pbd;
+                        }
+
                     }
-                    TimeSpan t1 = TimeSpan.FromSeconds(PatientInteractiontim.Sum(s => s.Duration));
-                    int TargetReadinginSec = code.TargetReadings * 60;
-                    int BilledDuration = 20;
-                    int TargetTime = 20 * 60;
-                    if (t1.TotalSeconds >= TargetReadinginSec && endMonth == Enddate)
+                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+                    if (TotalReading >= code.TargetReadings * 60)
                     {
-                        if (t1.TotalSeconds >= (TargetReadinginSec + (BilledDuration * 60)))
-                        {
-                            BilledDuration += 20;
-                            TargetTime = BilledDuration * 60;
-                        }
-                        TimeSpan t2;
-                        if (BilledDuration > 20)
-                        {
-                            TargetTime = Convert.ToInt32(t1.TotalSeconds) - TargetTime;
-                            TargetTime = TargetTime >= 20 * 60 ? 40 * 60 : TargetTime;
-                            t2 = TimeSpan.FromSeconds(TargetTime);
-                        }
-                        else
-                        {
-                            TargetTime = Convert.ToInt32(t1.TotalSeconds) - TargetTime;
-                            TargetTime = TargetTime >= code.TargetReadings * 60 ? code.TargetReadings * 60 : TargetTime;
-                            t2 = TimeSpan.FromSeconds(TargetTime);
-                        }
-
-                        //TargetTime = Convert.ToInt32(t1.TotalSeconds) - TargetTime;
-                        //TargetTime = TargetTime >= 20 * 60 ? 20 * 60 : TargetTime;
-                        //TimeSpan t2 = TimeSpan.FromSeconds(TargetTime);
-                        PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = t2.Minutes;
-                        PatientBilldata.Total = Convert.ToInt32(t2.Minutes) > BilledDuration ? code.TargetReadings*60 : BilledDuration;
-                        PatientBilldata.IsTargetMet = t2.Minutes >= BilledDuration ? true : false;
-                        PatientBilldata.ReadyTobill = 1;
-
+                        TotalReading = code.TargetReadings * 60;
                     }
-                    else if (t1.TotalSeconds >= TargetReadinginSec && endMonth != Enddate)
-                    {
-                        if (t1.TotalSeconds >= (TargetReadinginSec + (BilledDuration * 60)))
-                        {
-                            BilledDuration += 20;
-                            TargetTime = BilledDuration * 60;
-                        }
-                        TimeSpan t2;
-                        if (BilledDuration > 20)
-                        {
-                            TargetTime = Convert.ToInt32(t1.TotalSeconds) - TargetTime;
-                            TargetTime = TargetTime >= 20 * 60 ? 40 * 60 : TargetTime;
-                            t2 = TimeSpan.FromSeconds(TargetTime);
-                        }
-                        else
-                        {
-                            TargetTime = Convert.ToInt32(t1.TotalSeconds) - TargetTime;
-                            TargetTime = TargetTime >= code.TargetReadings * 60 ? code.TargetReadings * 60 : TargetTime;
-                            t2 = TimeSpan.FromSeconds(TargetTime);
-                        }
-
-                        //TargetTime = Convert.ToInt32(t1.TotalSeconds) - TargetTime;
-                        //TargetTime = TargetTime >= 20 * 60 ? 20 * 60 : TargetTime;
-                        //TimeSpan t2 = TimeSpan.FromSeconds(TargetTime);
-                        PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = t2.Minutes;
-                        PatientBilldata.Total = Convert.ToInt32(t2.Minutes) > BilledDuration ? code.TargetReadings*60 : BilledDuration;
-                        PatientBilldata.IsTargetMet = t2.Minutes >= BilledDuration ? true : false;
-                        PatientBilldata.ReadyTobill = 0;
-
-                    }
-                    else
-                    {
-                        TargetTime = Convert.ToInt32(t1.TotalSeconds) < TargetTime ? 0 : Convert.ToInt32(t1.TotalSeconds) - TargetTime;
-                        TargetTime = TargetTime >= 20 * 60 ? 20 * 60 : TargetTime;
-                        TimeSpan t2 = TimeSpan.FromSeconds(TargetTime);
-                        PatientBilldata.BillingStartDate = (DateTime)LastBilledDate;
-                        PatientBilldata.CPTCode = code.BillingCode;
-                        PatientBilldata.Completed = t2.Minutes;
-                        PatientBilldata.Total = 20;
-                        PatientBilldata.IsTargetMet = t2.Minutes >= 20 ? true : false;
-                        PatientBilldata.ReadyTobill = 0;
-                    }
-                    return PatientBilldata;
-
+                    pbd.BillingStartDate = stDate;
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = TotalReading;
+                    pbd.Total = code.TargetReadings * 60;
+                    pbd.IsTargetMet = (TotalReading >= code.TargetReadings * 60) ? true : false;
+                    pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                    return pbd;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception occured - class Name :" + this.GetType().Name + ",  Method Name : " + MethodBase.GetCurrentMethod().Name + ", Error Message :" + ex.Message + "");
-                return null;
+                throw;
             }
+            //PatientBilldata pbd = new PatientBilldata();
+            //try
+            //{
+            //    PatientBilldata PatientBilldatas = new PatientBilldata();
+            //    List<PatientDailyBillingData> lstDailyData = GetPatientBillingCounts(patientId, patientProgramId, connectionString);
+            //    if (lstDailyData == null || lstDailyData.Count == 0)
+            //    {
+
+            //        //PatientBilldatas.CPTCode = code.BillingCode;
+            //        //PatientBilldatas.Completed = 0;
+            //        //PatientBilldatas.Total = code.TargetReadings;
+            //        //PatientBilldatas.IsTargetMet = false;
+            //        //PatientBilldatas.ReadyTobill = 0;
+            //        //return PatientBilldatas;
+            //        PatientBilldatas=null;
+            //    }
+
+            //    foreach (PatientDailyBillingData pdb in lstDailyData)
+            //    {
+            //        if (pdb.BillingCodeId == code.BillingCodeID)
+            //        {
+            //            DateTime createdOn = pdb.CreatedOn;
+            //            DateTime createdOnEnd = DateTime.UtcNow;
+            //            List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, createdOn, createdOnEnd).ToList();
+            //            if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
+            //            {
+            //                var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+            //                if (isEstablishedExist.Count() > 0)
+            //                {
+            //                    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+            //                    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+            //                    {
+            //                        PatientInteractiontim.Clear();
+            //                    }
+            //                }
+            //                if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
+            //                {
+            //                    int TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+            //                    pdb.TotalDuration = pdb.TotalDuration + TotalReading;
+            //                }
+
+            //                //if (PatientInteractiontim.Count==0 || PatientInteractiontim==null || isEstablishedExist.Count==0)
+            //                //{
+            //                //    TotalReading = 0;
+            //                //}
+
+            //            }
+            //            PatientBilldatas = new PatientBilldata();
+            //            PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;
+            //            PatientBilldatas.CPTCode = code.BillingCode;
+            //            PatientBilldatas.Completed = pdb.TotalDuration;
+            //            PatientBilldatas.Total = code.TargetReadings;
+            //            PatientBilldatas.IsTargetMet = (pdb.TotalDuration >= code.TargetReadings * 60) ? true : false;
+            //            PatientBilldatas.ReadyTobill = (pdb.TotalDuration >= (code.TargetReadings * 60) && pdb.DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //            return PatientBilldatas;
+
+            //        }
+            //        else
+            //        {
+            //            PatientBilldatas = null;
+            //        }
+            //    }
+
+            //    if (PatientBilldatas == null)
+            //    {
+            //        int DaysCompleted = 0; int TotalReading = 0;
+            //        PatientStartDate PatientStartDate = new PatientStartDate();
+            //        PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //        if (PatientStartDate == null ||
+            //            PatientStartDate.Status.ToLower() == "invalid")
+            //        {
+            //            pbd.CPTCode = code.BillingCode;
+            //            pbd.Completed = 0;
+            //            pbd.Total = code.TargetReadings;
+            //            pbd.IsTargetMet = false;
+            //            pbd.ReadyTobill = 0;
+            //            return pbd;
+            //        }
+            //        else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
+            //        {
+            //            PatientBilldatas = new PatientBilldata();
+            //            PatientBilldatas.CPTCode = code.BillingCode;
+            //            PatientBilldatas.Completed = 0;
+            //            PatientBilldatas.Total = code.TargetReadings;
+            //            PatientBilldatas.IsTargetMet = false;
+            //            PatientBilldatas.ReadyTobill = 0;
+            //            return PatientBilldatas;
+            //        }
+            //        else
+            //        {
+            //            DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+            //            DateTime endDate = DateTime.UtcNow.Date;
+            //            DateTime startDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
+            //            DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+            //            //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+            //            //the patientbilling table and +1 day will come as next start day.. So we should   
+            //            // calcualte the start date with respect to the billing threshold
+            //            if (stDate > DateTime.UtcNow.Date)
+            //            {
+            //                //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+            //                BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //                startDatetemp = bd.StartDate;
+            //                endDatetemp = bd.EndDate;
+            //            }
+
+
+            //            DateTime startDateLoc = startDatetemp;
+            //            DateTime enddateLoc = endDatetemp;
+            //            int nTotDays = Math.Abs((startDatetemp - endDatetemp).Days) + 1;
+            //            DaysCompleted = nTotDays;
+            //            List<Dates> Dates = new List<Dates>();
+            //            for (int i = 0; i <= DaysCompleted; i++)
+            //            {
+            //                if (i == 0)
+            //                {
+            //                    endDatetemp = startDateLoc.AddDays(1).Date.AddSeconds(-1);
+
+            //                }
+            //                else if (i == DaysCompleted)
+            //                {
+            //                    startDatetemp = startDateLoc.AddDays(i).Date;
+            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
+            //                }
+            //                else
+            //                {
+            //                    startDatetemp = startDateLoc.AddDays(i).Date;
+            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
+
+            //                }
+
+            //                startDatetemp = GetUTCFromLocalTime((DateTime)startDatetemp, connectionString);
+            //                endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
+
+
+            //                Dates.Add(new Dates() { StartDate = (DateTime)startDatetemp, EndDate = endDatetemp, Totalreading = 0 });
+
+            //            }
+            //            List<PatientInteraction> PatientInteractiontimList = new List<PatientInteraction>();
+            //            if (Dates.Count > 0)
+            //            {
+
+            //                foreach (Dates date in Dates)
+            //                {
+
+            //                    List<PatientInteraction> PatientInteractiontims = GetPatientInteractiontime(patientId, patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
+            //                    //List<VitalReading> VitalReadings = billing.GetVitalReadings(patientProgramData, con).Where(s => s.ReadingDate >= date.StartDate && s.ReadingDate <= date.EndDate).ToList();
+
+            //                    if (PatientInteractiontims != null && PatientInteractiontims.Count > 0)
+            //                    {
+            //                        foreach (var list in PatientInteractiontims)
+            //                        {
+            //                            PatientInteractiontimList.Add(list);
+            //                        }
+
+            //                    }
+
+            //                }
+
+
+            //            }
+
+
+
+
+
+
+
+
+
+            //            // List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
+            //            if (PatientInteractiontimList == null)
+            //            {
+            //                PatientBilldatas = new PatientBilldata();
+            //                PatientBilldatas.CPTCode = code.BillingCode;
+            //                PatientBilldatas.Completed = 0;
+            //                PatientBilldatas.Total = code.TargetReadings;
+            //                PatientBilldatas.IsTargetMet = false;
+            //                PatientBilldatas.ReadyTobill = 0;
+            //                return PatientBilldatas;
+            //            }
+            //            var isEstablishedExist = PatientInteractiontimList.Where(s => s.IsCallNote == 1).ToList();
+            //            if (isEstablishedExist.Count() > 0)
+            //            {
+            //                isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+            //                if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+            //                {
+            //                    PatientInteractiontimList.Clear();
+            //                }
+            //            }
+            //            if (PatientInteractiontimList.Count == 0 || PatientInteractiontimList == null || isEstablishedExist.Count == 0)
+            //            {
+            //                PatientBilldatas = new PatientBilldata();
+            //                PatientBilldatas.CPTCode = code.BillingCode;
+            //                PatientBilldatas.Completed = 0;
+            //                PatientBilldatas.Total = code.TargetReadings;
+            //                PatientBilldatas.IsTargetMet = false;
+            //                PatientBilldatas.ReadyTobill = 0;
+            //                return PatientBilldatas;
+            //            }
+            //            TotalReading = PatientInteractiontimList.Sum(s => s.Duration);
+
+            //            if (TotalReading >= code.TargetReadings * 60)
+            //            {
+            //                TotalReading = code.TargetReadings * 60;
+            //            }
+            //            PatientBilldatas = new PatientBilldata();
+            //            PatientBilldatas.BillingStartDate = stDate;
+            //            PatientBilldatas.CPTCode = code.BillingCode;
+            //            PatientBilldatas.Completed = TotalReading;
+            //            PatientBilldatas.Total = code.TargetReadings * 60;
+            //            PatientBilldatas.IsTargetMet = (TotalReading >= code.TargetReadings * 60) ? true : false;
+            //            PatientBilldatas.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //            return PatientBilldatas;
+            //        }
+            //    }
+
+            //    return PatientBilldatas;
+
+
+
+
+
+            //int DaysCompleted = 0; int TotalReading = 0;
+            //PatientStartDate PatientStartDate = new PatientStartDate();
+            //PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //if (PatientStartDate == null ||
+            //    PatientStartDate.Status.ToLower() == "invalid")
+            //{
+            //    pbd.CPTCode = code.BillingCode;
+            //    pbd.Completed = 0;
+            //    pbd.Total = code.TargetReadings;
+            //    pbd.IsTargetMet = false;
+            //    pbd.ReadyTobill = 0;
+            //    return pbd;
+            //}
+            //else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
+            //{
+            //    PatientBilldata PatientBilldata = new PatientBilldata();
+            //    PatientBilldata.CPTCode = code.BillingCode;
+            //    PatientBilldata.Completed = 0;
+            //    PatientBilldata.Total = code.TargetReadings;
+            //    PatientBilldata.IsTargetMet = false;
+            //    PatientBilldata.ReadyTobill = 0;
+            //    return PatientBilldata;
+            //}
+            //else
+            //{
+            //    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+            //    DateTime endDate = DateTime.UtcNow.Date;
+
+            //    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+            //    //the patientbilling table and +1 day will come as next start day.. So we should   
+            //    // calcualte the start date with respect to the billing threshold
+            //    if (stDate > DateTime.UtcNow.Date)
+            //    {
+            //        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+            //        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //        stDate = bd.StartDate;
+            //        endDate = bd.EndDate;
+            //    }
+            //    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
+            //    if (PatientInteractiontim == null)
+            //    {
+            //        pbd.CPTCode = code.BillingCode;
+            //        pbd.Completed = 0;
+            //        pbd.Total = code.TargetReadings;
+            //        pbd.IsTargetMet = false;
+            //        pbd.ReadyTobill = 0;
+            //        return pbd;
+            //    }
+            //    var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+            //    if (isEstablishedExist.Count() > 0)
+            //    {
+            //        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+            //        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+            //        {
+            //            PatientInteractiontim.Clear();
+            //        }
+            //    }
+            //    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null || isEstablishedExist.Count==0)
+            //    {
+            //        pbd.CPTCode = code.BillingCode;
+            //        pbd.Completed = 0;
+            //        pbd.Total = code.TargetReadings;
+            //        pbd.IsTargetMet = false;
+            //        pbd.ReadyTobill = 0;
+            //        return pbd;
+            //    }
+            //    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+            //    if (TotalReading>= code.TargetReadings * 60)
+            //    {
+            //        TotalReading = code.TargetReadings * 60;
+            //    }
+            //    pbd.BillingStartDate = stDate;
+            //    pbd.CPTCode = code.BillingCode;
+            //    pbd.Completed = TotalReading;
+            //    pbd.Total = code.TargetReadings * 60;
+            //    pbd.IsTargetMet = (TotalReading >= code.TargetReadings*60) ? true : false;
+            //    pbd.ReadyTobill = (TotalReading >= (code.TargetReadings*60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //    return pbd;
+            //}
+            //}
+            //    catch (Exception ex)
+            //    {
+            //        throw;
+            //    }
         }
-        public PatientBilldata ProcessCPT99458_Clynx(int patientId, int patientProgramId, BillingCodesDetails code,
+        public PatientBilldata ProcessCPT99458_DaysBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code,
                                                      BillingCodesDetails code457, string connectionString)
         {
             PatientBilldata pbd = new PatientBilldata();
@@ -6145,19 +7369,47 @@ namespace RPMWeb.Dal
                 }
                 else
                 {
-                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-                    DateTime endDate = DateTime.UtcNow.Date;
+                    //DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime stDate = DateTime.MinValue;
+                    if (PatientStartDate.Status.ToLower() == "active")
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
+                    }
+                    else
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    }
+                    DateTime endDate = DateTime.UtcNow;
                     //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
                     //the patientbilling table and +1 day will come as next start day.. So we should   
                     // calcualte the start date with respect to the billing threshold
-                    if (stDate > DateTime.UtcNow.Date)
+                    DateTime today = DateTime.UtcNow;
+                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
+                    if (stDate.Date > endDateTempay)
                     {
                         //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                         BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                        if (bd == null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+
                         stDate = bd.StartDate;
                         endDate = bd.EndDate;
                     }
-                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
+
+                    if (PatientStartDate.Status.ToLower() == "billeddate")
+                    {
+                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
+                        endDate =DateTime.UtcNow;
+                    }
+                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
                     if (PatientInteractiontim == null)
                     {
                         pbd.CPTCode = code.BillingCode;
@@ -6229,6 +7481,843 @@ namespace RPMWeb.Dal
             {
                 throw;
             }
+            //PatientBilldata pbd = new PatientBilldata();
+            //try
+            //{
+
+            //    PatientBilldata PatientBilldatas = new PatientBilldata();
+            //    List<PatientDailyBillingData> lstDailyData = GetPatientBillingCounts(patientId, patientProgramId, connectionString);
+            //    if (lstDailyData == null || lstDailyData.Count == 0)
+            //    {
+
+            //        //PatientBilldatas.CPTCode = code.BillingCode;
+            //        //PatientBilldatas.Completed = 0;
+            //        //PatientBilldatas.Total = code.TargetReadings;
+            //        //PatientBilldatas.IsTargetMet = false;
+            //        //PatientBilldatas.ReadyTobill = 0;
+            //        //return PatientBilldatas;
+            //        PatientBilldatas=null;
+            //    }
+
+            //    foreach (PatientDailyBillingData pdb in lstDailyData)
+            //    {
+            //        if (pdb.BillingCodeId == code.BillingCodeID)
+            //        {
+            //            DateTime createdOn = pdb.CreatedOn;
+            //            DateTime createdOnEnd = DateTime.UtcNow;
+            //            List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, createdOn, createdOnEnd).ToList();
+            //            if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
+            //            {
+            //                var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+            //                if (isEstablishedExist.Count() > 0)
+            //                {
+            //                    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+            //                    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+            //                    {
+            //                        PatientInteractiontim.Clear();
+            //                    }
+            //                }
+            //                if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
+            //                {
+            //                    int TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+            //                    pdb.TotalDuration = pdb.TotalDuration + TotalReading;
+            //                }
+
+            //                //if (PatientInteractiontim.Count==0 || PatientInteractiontim==null || isEstablishedExist.Count==0)
+            //                //{
+            //                //    TotalReading = 0;
+            //                //}
+
+            //            }
+            //            PatientBilldatas = new PatientBilldata();
+            //            PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;
+            //            PatientBilldatas.CPTCode = code.BillingCode;
+            //            PatientBilldatas.Completed = pdb.TotalDuration;
+            //            PatientBilldatas.Total = code.TargetReadings;
+            //            PatientBilldatas.IsTargetMet = (pdb.TotalDuration >= code.TargetReadings * 60) ? true : false;
+            //            PatientBilldatas.ReadyTobill = (pdb.TotalDuration >= (code.TargetReadings * 60) && pdb.DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //            return PatientBilldatas;
+
+            //        }
+            //        else
+            //        {
+            //            PatientBilldatas = null;
+            //        }
+            //    }
+            //    if (PatientBilldatas == null)
+            //    {
+            //        int DaysCompleted = 0; int TotalReading = 0;
+            //        PatientStartDate PatientStartDate = new PatientStartDate();
+            //        PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //        if (PatientStartDate == null ||
+            //            PatientStartDate.Status.ToLower() == "invalid")
+            //        {
+            //            PatientBilldatas = new PatientBilldata();
+            //            PatientBilldatas = new PatientBilldata();
+            //            PatientBilldatas.CPTCode = code.BillingCode;
+            //            PatientBilldatas.Completed = 0;
+            //            PatientBilldatas.Total = code.TargetReadings;
+            //            PatientBilldatas.IsTargetMet = false;
+            //            PatientBilldatas.ReadyTobill = 0;
+            //            return PatientBilldatas;
+            //        }
+            //        else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
+            //        {
+            //            PatientBilldatas = new PatientBilldata();
+            //            PatientBilldatas.CPTCode = code.BillingCode;
+            //            PatientBilldatas.Completed = 0;
+            //            PatientBilldatas.Total = code.TargetReadings;
+            //            PatientBilldatas.IsTargetMet = false;
+            //            PatientBilldatas.ReadyTobill = 0;
+            //            return PatientBilldatas;
+            //        }
+            //        else
+            //        {
+            //            DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+            //            DateTime endDate = DateTime.UtcNow.Date;
+            //            DateTime startDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
+            //            DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+            //            //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+            //            //the patientbilling table and +1 day will come as next start day.. So we should   
+            //            // calcualte the start date with respect to the billing threshold
+            //            if (stDate > DateTime.UtcNow.Date)
+            //            {
+            //                //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+            //                BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //                startDatetemp = bd.StartDate;
+            //                endDatetemp = bd.EndDate;
+            //            }
+
+
+            //            DateTime startDateLoc = startDatetemp;
+            //            DateTime enddateLoc = endDatetemp;
+            //            int nTotDays = Math.Abs((startDatetemp - endDatetemp).Days) + 1;
+            //            DaysCompleted = nTotDays;
+            //            List<Dates> Dates = new List<Dates>();
+            //            for (int i = 0; i <= DaysCompleted; i++)
+            //            {
+            //                if (i == 0)
+            //                {
+            //                    endDatetemp = startDateLoc.AddDays(1).Date.AddSeconds(-1);
+
+            //                }
+            //                else if (i == DaysCompleted)
+            //                {
+            //                    startDatetemp = startDateLoc.AddDays(i).Date;
+            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
+            //                }
+            //                else
+            //                {
+            //                    startDatetemp = startDateLoc.AddDays(i).Date;
+            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
+
+            //                }
+
+            //                startDatetemp = GetUTCFromLocalTime((DateTime)startDatetemp, connectionString);
+            //                endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
+
+
+            //                Dates.Add(new Dates() { StartDate = (DateTime)startDatetemp, EndDate = endDatetemp, Totalreading = 0 });
+
+            //            }
+            //            List<PatientInteraction> PatientInteractiontimList = new List<PatientInteraction>();
+            //            if (Dates.Count > 0)
+            //            {
+
+            //                foreach (Dates date in Dates)
+            //                {
+
+            //                    List<PatientInteraction> PatientInteractiontims = GetPatientInteractiontime(patientId, patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
+            //                    //List<VitalReading> VitalReadings = billing.GetVitalReadings(patientProgramData, con).Where(s => s.ReadingDate >= date.StartDate && s.ReadingDate <= date.EndDate).ToList();
+
+            //                    if (PatientInteractiontims != null && PatientInteractiontims.Count > 0)
+            //                    {
+            //                        foreach (var list in PatientInteractiontims)
+            //                        {
+            //                            PatientInteractiontimList.Add(list);
+            //                        }
+
+            //                    }
+
+            //                }
+
+
+            //            }
+
+
+
+
+
+
+
+
+            //            //List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
+            //            if (PatientInteractiontimList == null)
+            //            {
+            //                PatientBilldatas = new PatientBilldata();
+            //                PatientBilldatas.CPTCode = code.BillingCode;
+            //                PatientBilldatas.Completed = 0;
+            //                PatientBilldatas.Total = code.TargetReadings;
+            //                PatientBilldatas.IsTargetMet = false;
+            //                PatientBilldatas.ReadyTobill = 0;
+            //                return PatientBilldatas;
+            //            }
+            //            var isEstablishedExist = PatientInteractiontimList.Where(s => s.IsCallNote == 1).ToList();
+            //            if (isEstablishedExist.Count() > 0)
+            //            {
+            //                isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+            //                if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+            //                {
+            //                    PatientInteractiontimList.Clear();
+            //                }
+            //            }
+            //            if (PatientInteractiontimList.Count == 0 || PatientInteractiontimList == null || isEstablishedExist.Count == 0)
+            //            {
+            //                PatientBilldatas = new PatientBilldata();
+            //                PatientBilldatas.CPTCode = code.BillingCode;
+            //                PatientBilldatas.Completed = 0;
+            //                PatientBilldatas.Total = code.TargetReadings;
+            //                PatientBilldatas.IsTargetMet = false;
+            //                PatientBilldatas.ReadyTobill = 0;
+            //                return PatientBilldatas;
+            //            }
+            //            TotalReading = PatientInteractiontimList.Sum(s => s.Duration);
+
+            //            if (TotalReading > code457.TargetReadings * 60)
+            //            {
+            //                TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
+            //                TotalReading = (int)(t1.TotalSeconds - (code457.TargetReadings * 60));
+            //                PatientBilldatas = new PatientBilldata();
+            //                PatientBilldatas.BillingStartDate = endDate;
+            //                PatientBilldatas.CPTCode = code.BillingCode;
+            //                PatientBilldatas.Completed = TotalReading;
+            //                if (TotalReading < code457.TargetReadings * 60)
+            //                {
+            //                    // base 20
+            //                    PatientBilldatas.Total = code457.TargetReadings * 60;
+            //                    PatientBilldatas.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //                }
+            //                else
+            //                {
+            //                    //base 40
+            //                    PatientBilldatas.Total = code.TargetReadings * 60;
+            //                    PatientBilldatas.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //                }
+            //                PatientBilldatas.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
+            //            }
+            //            else
+            //            {
+            //                PatientBilldatas = new PatientBilldata();
+            //                //Target reading 20
+            //                PatientBilldatas.BillingStartDate = stDate;
+            //                PatientBilldatas.CPTCode = code.BillingCode;
+            //                PatientBilldatas.Completed = 0;
+            //                PatientBilldatas.Total = code457.TargetReadings * 60;
+            //                PatientBilldatas.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
+            //                PatientBilldatas.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+
+            //            }
+            //            return PatientBilldatas;
+            //        }
+            //    }
+            //    return PatientBilldatas;
+            //int DaysCompleted = 0; int TotalReading = 0;
+            //PatientStartDate PatientStartDate = new PatientStartDate();
+            //PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //if (PatientStartDate == null ||
+            //    PatientStartDate.Status.ToLower() == "invalid")
+            //{
+            //    pbd.CPTCode = code.BillingCode;
+            //    pbd.Completed = 0;
+            //    pbd.Total = code.TargetReadings;
+            //    pbd.IsTargetMet = false;
+            //    pbd.ReadyTobill = 0;
+            //    return pbd;
+            //}
+            //else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
+            //{
+            //    PatientBilldata PatientBilldata = new PatientBilldata();
+            //    PatientBilldata.CPTCode = code.BillingCode;
+            //    PatientBilldata.Completed = 0;
+            //    PatientBilldata.Total = code.TargetReadings;
+            //    PatientBilldata.IsTargetMet = false;
+            //    PatientBilldata.ReadyTobill = 0;
+            //    return PatientBilldata;
+            //}
+            //else
+            //{
+            //    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+            //    DateTime endDate = DateTime.UtcNow.Date;
+            //    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+            //    //the patientbilling table and +1 day will come as next start day.. So we should   
+            //    // calcualte the start date with respect to the billing threshold
+            //    if (stDate > DateTime.UtcNow.Date)
+            //    {
+            //        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+            //        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //        stDate = bd.StartDate;
+            //        endDate = bd.EndDate;
+            //    }
+            //    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
+            //    if (PatientInteractiontim == null)
+            //    {
+            //        pbd.CPTCode = code.BillingCode;
+            //        pbd.Completed = 0;
+            //        pbd.Total = code.TargetReadings;
+            //        pbd.IsTargetMet = false;
+            //        pbd.ReadyTobill = 0;
+            //        return pbd;
+            //    }
+            //    var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+            //    if (isEstablishedExist.Count() > 0)
+            //    {
+            //        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+            //        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+            //        {
+            //            PatientInteractiontim.Clear();
+            //        }
+            //    }
+            //    if (PatientInteractiontim.Count == 0 || PatientInteractiontim ==null || isEstablishedExist.Count==0)
+            //    {
+            //        pbd.CPTCode = code.BillingCode;
+            //        pbd.Completed = 0;
+            //        pbd.Total = code.TargetReadings;
+            //        pbd.IsTargetMet = false;
+            //        pbd.ReadyTobill = 0;
+            //        return pbd;
+            //    }
+            //    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+            //    if (TotalReading > code457.TargetReadings*60)
+            //    {
+            //        TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
+            //        TotalReading = (int)(t1.TotalSeconds - (code457.TargetReadings * 60));
+
+            //        pbd.BillingStartDate = endDate;
+            //        pbd.CPTCode = code.BillingCode;
+            //        pbd.Completed = TotalReading;
+            //        if (TotalReading<code457.TargetReadings*60)
+            //        {
+            //            // base 20
+            //            pbd.Total = code457.TargetReadings * 60;
+            //            pbd.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //        }
+            //        else
+            //        {
+            //            //base 40
+            //            pbd.Total = code.TargetReadings * 60;
+            //            pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //        }
+            //        pbd.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
+            //    }
+            //    else
+            //    {
+            //        //Target reading 20
+            //        pbd.BillingStartDate = endDate;
+            //        pbd.CPTCode = code.BillingCode;
+            //        pbd.Completed = 0;
+            //        pbd.Total = code457.TargetReadings * 60;
+            //        pbd.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
+            //        pbd.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+
+            //    }
+            //    return pbd;
+            //}
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw;
+            //}
+        }
+        public PatientBilldata ProcessCPT99458_CycleBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code,
+                                                     BillingCodesDetails code457, string connectionString)
+        {
+            PatientBilldata pbd = new PatientBilldata();
+            try
+            {
+                int DaysCompleted = 0; int TotalReading = 0;
+                PatientStartDate PatientStartDate = new PatientStartDate();
+                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                if (PatientStartDate == null ||
+                    PatientStartDate.Status.ToLower() == "invalid")
+                {
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = 0;
+                    pbd.Total = code.TargetReadings*60;
+                    pbd.IsTargetMet = false;
+                    pbd.ReadyTobill = 0;
+                    return pbd;
+                }
+                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                {
+                    PatientBilldata PatientBilldata = new PatientBilldata();
+                    PatientBilldata.CPTCode = code.BillingCode;
+                    PatientBilldata.Completed = 0;
+                    PatientBilldata.Total = code.TargetReadings*60;
+                    PatientBilldata.IsTargetMet = false;
+                    PatientBilldata.ReadyTobill = 0;
+                    return PatientBilldata;
+                }
+                else
+                {
+                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime endDate = DateTime.UtcNow;//.AddMinutes(10);
+                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                    //the patientbilling table and +1 day will come as next start day.. So we should   
+                    // calcualte the start date with respect to the billing threshold
+                    DateTime today = DateTime.UtcNow;
+                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
+                    if (stDate.Date > endDateTempay)
+                    {
+                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                        if (bd == null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
+                        endDate = bd.EndDate;
+                    }
+
+                    if (PatientStartDate.Status.ToLower() == "billeddate")
+                    {
+                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
+                        endDate = DateTime.UtcNow;//.AddMinutes(10);
+                    }
+                    int patientSmsCount = 0;
+                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
+                    patientSmsCount =GetPatientSmsCount(patientId, connectionString, stDate, endDate);
+                    if (PatientInteractiontim == null)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        pbd.BillingStartDate = stDate;
+                        return pbd;
+                    }
+                    var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+                    if (isEstablishedExist.Count() > 0)
+                    {
+                        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+                        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+                        {
+                            if (patientSmsCount <= 0)
+                            {
+                                PatientInteractiontim.Clear();
+                            }
+
+                        }
+                    }
+                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null || isEstablishedExist.Count == 0)
+                    {
+                        if (patientSmsCount <= 0)
+                        {
+                            pbd.CPTCode = code.BillingCode;
+                            pbd.Completed = 0;
+                            pbd.Total = code.TargetReadings*60;
+                            pbd.IsTargetMet = false;
+                            pbd.ReadyTobill = 0;
+                            pbd.BillingStartDate = stDate;
+                            return pbd;
+                        }
+                    }
+                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+                    if (TotalReading > code457.TargetReadings * 60)
+                    {
+                        TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
+                        TotalReading = (int)(t1.TotalSeconds - (code457.TargetReadings * 60));
+
+                        pbd.BillingStartDate = endDate;
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = TotalReading;
+                        if (TotalReading < code457.TargetReadings * 60)
+                        {
+                            // base 20
+                            pbd.Total = code457.TargetReadings * 60;
+                            pbd.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                        }
+                        else
+                        {
+                            //base 40
+                            pbd.Total = code.TargetReadings * 60;
+                            pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                        }
+                        pbd.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
+                    }
+                    else
+                    {
+                        //Target reading 20
+                        pbd.BillingStartDate = endDate;
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code457.TargetReadings * 60;
+                        pbd.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
+                        pbd.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+
+                    }
+                    return pbd;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            //PatientBilldata pbd = new PatientBilldata();
+            //try
+            //{
+
+            //    PatientBilldata PatientBilldatas = new PatientBilldata();
+            //    List<PatientDailyBillingData> lstDailyData = GetPatientBillingCounts(patientId, patientProgramId, connectionString);
+            //    if (lstDailyData == null || lstDailyData.Count == 0)
+            //    {
+
+            //        //PatientBilldatas.CPTCode = code.BillingCode;
+            //        //PatientBilldatas.Completed = 0;
+            //        //PatientBilldatas.Total = code.TargetReadings;
+            //        //PatientBilldatas.IsTargetMet = false;
+            //        //PatientBilldatas.ReadyTobill = 0;
+            //        //return PatientBilldatas;
+            //        PatientBilldatas=null;
+            //    }
+
+            //    foreach (PatientDailyBillingData pdb in lstDailyData)
+            //    {
+            //        if (pdb.BillingCodeId == code.BillingCodeID)
+            //        {
+            //            DateTime createdOn = pdb.CreatedOn;
+            //            DateTime createdOnEnd = DateTime.UtcNow;
+            //            List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, createdOn, createdOnEnd).ToList();
+            //            if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
+            //            {
+            //                var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+            //                if (isEstablishedExist.Count() > 0)
+            //                {
+            //                    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+            //                    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+            //                    {
+            //                        PatientInteractiontim.Clear();
+            //                    }
+            //                }
+            //                if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
+            //                {
+            //                    int TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+            //                    pdb.TotalDuration = pdb.TotalDuration + TotalReading;
+            //                }
+
+            //                //if (PatientInteractiontim.Count==0 || PatientInteractiontim==null || isEstablishedExist.Count==0)
+            //                //{
+            //                //    TotalReading = 0;
+            //                //}
+
+            //            }
+            //            PatientBilldatas = new PatientBilldata();
+            //            PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;
+            //            PatientBilldatas.CPTCode = code.BillingCode;
+            //            PatientBilldatas.Completed = pdb.TotalDuration;
+            //            PatientBilldatas.Total = code.TargetReadings;
+            //            PatientBilldatas.IsTargetMet = (pdb.TotalDuration >= code.TargetReadings * 60) ? true : false;
+            //            PatientBilldatas.ReadyTobill = (pdb.TotalDuration >= (code.TargetReadings * 60) && pdb.DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //            return PatientBilldatas;
+
+            //        }
+            //        else
+            //        {
+            //            PatientBilldatas = null;
+            //        }
+            //    }
+            //    if (PatientBilldatas == null)
+            //    {
+            //        int DaysCompleted = 0; int TotalReading = 0;
+            //        PatientStartDate PatientStartDate = new PatientStartDate();
+            //        PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //        if (PatientStartDate == null ||
+            //            PatientStartDate.Status.ToLower() == "invalid")
+            //        {
+            //            PatientBilldatas = new PatientBilldata();
+            //            PatientBilldatas = new PatientBilldata();
+            //            PatientBilldatas.CPTCode = code.BillingCode;
+            //            PatientBilldatas.Completed = 0;
+            //            PatientBilldatas.Total = code.TargetReadings;
+            //            PatientBilldatas.IsTargetMet = false;
+            //            PatientBilldatas.ReadyTobill = 0;
+            //            return PatientBilldatas;
+            //        }
+            //        else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
+            //        {
+            //            PatientBilldatas = new PatientBilldata();
+            //            PatientBilldatas.CPTCode = code.BillingCode;
+            //            PatientBilldatas.Completed = 0;
+            //            PatientBilldatas.Total = code.TargetReadings;
+            //            PatientBilldatas.IsTargetMet = false;
+            //            PatientBilldatas.ReadyTobill = 0;
+            //            return PatientBilldatas;
+            //        }
+            //        else
+            //        {
+            //            DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+            //            DateTime endDate = DateTime.UtcNow.Date;
+            //            DateTime startDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
+            //            DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+            //            //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+            //            //the patientbilling table and +1 day will come as next start day.. So we should   
+            //            // calcualte the start date with respect to the billing threshold
+            //            if (stDate > DateTime.UtcNow.Date)
+            //            {
+            //                //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+            //                BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //                startDatetemp = bd.StartDate;
+            //                endDatetemp = bd.EndDate;
+            //            }
+
+
+            //            DateTime startDateLoc = startDatetemp;
+            //            DateTime enddateLoc = endDatetemp;
+            //            int nTotDays = Math.Abs((startDatetemp - endDatetemp).Days) + 1;
+            //            DaysCompleted = nTotDays;
+            //            List<Dates> Dates = new List<Dates>();
+            //            for (int i = 0; i <= DaysCompleted; i++)
+            //            {
+            //                if (i == 0)
+            //                {
+            //                    endDatetemp = startDateLoc.AddDays(1).Date.AddSeconds(-1);
+
+            //                }
+            //                else if (i == DaysCompleted)
+            //                {
+            //                    startDatetemp = startDateLoc.AddDays(i).Date;
+            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
+            //                }
+            //                else
+            //                {
+            //                    startDatetemp = startDateLoc.AddDays(i).Date;
+            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
+
+            //                }
+
+            //                startDatetemp = GetUTCFromLocalTime((DateTime)startDatetemp, connectionString);
+            //                endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
+
+
+            //                Dates.Add(new Dates() { StartDate = (DateTime)startDatetemp, EndDate = endDatetemp, Totalreading = 0 });
+
+            //            }
+            //            List<PatientInteraction> PatientInteractiontimList = new List<PatientInteraction>();
+            //            if (Dates.Count > 0)
+            //            {
+
+            //                foreach (Dates date in Dates)
+            //                {
+
+            //                    List<PatientInteraction> PatientInteractiontims = GetPatientInteractiontime(patientId, patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
+            //                    //List<VitalReading> VitalReadings = billing.GetVitalReadings(patientProgramData, con).Where(s => s.ReadingDate >= date.StartDate && s.ReadingDate <= date.EndDate).ToList();
+
+            //                    if (PatientInteractiontims != null && PatientInteractiontims.Count > 0)
+            //                    {
+            //                        foreach (var list in PatientInteractiontims)
+            //                        {
+            //                            PatientInteractiontimList.Add(list);
+            //                        }
+
+            //                    }
+
+            //                }
+
+
+            //            }
+
+
+
+
+
+
+
+
+            //            //List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
+            //            if (PatientInteractiontimList == null)
+            //            {
+            //                PatientBilldatas = new PatientBilldata();
+            //                PatientBilldatas.CPTCode = code.BillingCode;
+            //                PatientBilldatas.Completed = 0;
+            //                PatientBilldatas.Total = code.TargetReadings;
+            //                PatientBilldatas.IsTargetMet = false;
+            //                PatientBilldatas.ReadyTobill = 0;
+            //                return PatientBilldatas;
+            //            }
+            //            var isEstablishedExist = PatientInteractiontimList.Where(s => s.IsCallNote == 1).ToList();
+            //            if (isEstablishedExist.Count() > 0)
+            //            {
+            //                isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+            //                if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+            //                {
+            //                    PatientInteractiontimList.Clear();
+            //                }
+            //            }
+            //            if (PatientInteractiontimList.Count == 0 || PatientInteractiontimList == null || isEstablishedExist.Count == 0)
+            //            {
+            //                PatientBilldatas = new PatientBilldata();
+            //                PatientBilldatas.CPTCode = code.BillingCode;
+            //                PatientBilldatas.Completed = 0;
+            //                PatientBilldatas.Total = code.TargetReadings;
+            //                PatientBilldatas.IsTargetMet = false;
+            //                PatientBilldatas.ReadyTobill = 0;
+            //                return PatientBilldatas;
+            //            }
+            //            TotalReading = PatientInteractiontimList.Sum(s => s.Duration);
+
+            //            if (TotalReading > code457.TargetReadings * 60)
+            //            {
+            //                TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
+            //                TotalReading = (int)(t1.TotalSeconds - (code457.TargetReadings * 60));
+            //                PatientBilldatas = new PatientBilldata();
+            //                PatientBilldatas.BillingStartDate = endDate;
+            //                PatientBilldatas.CPTCode = code.BillingCode;
+            //                PatientBilldatas.Completed = TotalReading;
+            //                if (TotalReading < code457.TargetReadings * 60)
+            //                {
+            //                    // base 20
+            //                    PatientBilldatas.Total = code457.TargetReadings * 60;
+            //                    PatientBilldatas.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //                }
+            //                else
+            //                {
+            //                    //base 40
+            //                    PatientBilldatas.Total = code.TargetReadings * 60;
+            //                    PatientBilldatas.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //                }
+            //                PatientBilldatas.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
+            //            }
+            //            else
+            //            {
+            //                PatientBilldatas = new PatientBilldata();
+            //                //Target reading 20
+            //                PatientBilldatas.BillingStartDate = stDate;
+            //                PatientBilldatas.CPTCode = code.BillingCode;
+            //                PatientBilldatas.Completed = 0;
+            //                PatientBilldatas.Total = code457.TargetReadings * 60;
+            //                PatientBilldatas.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
+            //                PatientBilldatas.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+
+            //            }
+            //            return PatientBilldatas;
+            //        }
+            //    }
+            //    return PatientBilldatas;
+            //int DaysCompleted = 0; int TotalReading = 0;
+            //PatientStartDate PatientStartDate = new PatientStartDate();
+            //PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //if (PatientStartDate == null ||
+            //    PatientStartDate.Status.ToLower() == "invalid")
+            //{
+            //    pbd.CPTCode = code.BillingCode;
+            //    pbd.Completed = 0;
+            //    pbd.Total = code.TargetReadings;
+            //    pbd.IsTargetMet = false;
+            //    pbd.ReadyTobill = 0;
+            //    return pbd;
+            //}
+            //else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
+            //{
+            //    PatientBilldata PatientBilldata = new PatientBilldata();
+            //    PatientBilldata.CPTCode = code.BillingCode;
+            //    PatientBilldata.Completed = 0;
+            //    PatientBilldata.Total = code.TargetReadings;
+            //    PatientBilldata.IsTargetMet = false;
+            //    PatientBilldata.ReadyTobill = 0;
+            //    return PatientBilldata;
+            //}
+            //else
+            //{
+            //    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+            //    DateTime endDate = DateTime.UtcNow.Date;
+            //    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+            //    //the patientbilling table and +1 day will come as next start day.. So we should   
+            //    // calcualte the start date with respect to the billing threshold
+            //    if (stDate > DateTime.UtcNow.Date)
+            //    {
+            //        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+            //        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+            //        stDate = bd.StartDate;
+            //        endDate = bd.EndDate;
+            //    }
+            //    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
+            //    if (PatientInteractiontim == null)
+            //    {
+            //        pbd.CPTCode = code.BillingCode;
+            //        pbd.Completed = 0;
+            //        pbd.Total = code.TargetReadings;
+            //        pbd.IsTargetMet = false;
+            //        pbd.ReadyTobill = 0;
+            //        return pbd;
+            //    }
+            //    var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+            //    if (isEstablishedExist.Count() > 0)
+            //    {
+            //        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+            //        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+            //        {
+            //            PatientInteractiontim.Clear();
+            //        }
+            //    }
+            //    if (PatientInteractiontim.Count == 0 || PatientInteractiontim ==null || isEstablishedExist.Count==0)
+            //    {
+            //        pbd.CPTCode = code.BillingCode;
+            //        pbd.Completed = 0;
+            //        pbd.Total = code.TargetReadings;
+            //        pbd.IsTargetMet = false;
+            //        pbd.ReadyTobill = 0;
+            //        return pbd;
+            //    }
+            //    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+            //    if (TotalReading > code457.TargetReadings*60)
+            //    {
+            //        TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
+            //        TotalReading = (int)(t1.TotalSeconds - (code457.TargetReadings * 60));
+
+            //        pbd.BillingStartDate = endDate;
+            //        pbd.CPTCode = code.BillingCode;
+            //        pbd.Completed = TotalReading;
+            //        if (TotalReading<code457.TargetReadings*60)
+            //        {
+            //            // base 20
+            //            pbd.Total = code457.TargetReadings * 60;
+            //            pbd.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //        }
+            //        else
+            //        {
+            //            //base 40
+            //            pbd.Total = code.TargetReadings * 60;
+            //            pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+            //        }
+            //        pbd.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
+            //    }
+            //    else
+            //    {
+            //        //Target reading 20
+            //        pbd.BillingStartDate = endDate;
+            //        pbd.CPTCode = code.BillingCode;
+            //        pbd.Completed = 0;
+            //        pbd.Total = code457.TargetReadings * 60;
+            //        pbd.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
+            //        pbd.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+
+            //    }
+            //    return pbd;
+            //}
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw;
+            //}
         }
         public List<PatientInteraction> GetPatientInteractiontime(int patientid, int patientprogramid, string connectionString)
         {
@@ -6712,7 +8801,7 @@ namespace RPMWeb.Dal
             {
                 Console.WriteLine("Exception occured - class Name :" + this.GetType().Name + ",  Method Name : " + MethodBase.GetCurrentMethod().Name + ", Error Message :" + ex.Message + "");
                 return null;
-        }
+            }
 
 
 
@@ -6786,7 +8875,7 @@ namespace RPMWeb.Dal
                 return null;
             }
         }
-        public PatientBilldataList GetPatientBillingDataList(string patientType, string patientFilter, string patientId, string patientName, string program, string assignedmember, int Index, string readingFilter, string interactionFilter, int RoleId, string Createdby, string ConnectionString,string ProgramType)
+        public PatientBilldataList GetPatientBillingDataList(string patientType, string patientFilter, string patientId, string patientName, string program, string assignedmember, int Index, string readingFilter, string interactionFilter, int RoleId, string Createdby, string ConnectionString, string ProgramType)
         {
             List<SystemConfigInfo> lstConfig = DalCommon.GetSystemConfig(ConnectionString, "Billing", "User");
             SystemConfigInfo provider = lstConfig.Find(x => x.Name.Equals("BillingType"));
@@ -6795,37 +8884,48 @@ namespace RPMWeb.Dal
             {
                 if (provider.Value == "30days")
                 {
-                    patientBilldataList = GetPatientBillingDataListMedIT(patientType, patientFilter, patientId, patientName, program, assignedmember, Index, readingFilter, interactionFilter, RoleId, Createdby, ConnectionString);
+                    if (ProgramType.ToUpper()=="RPM")
+                    {
+                        patientBilldataList = GetPatientBillingDataListDaysBasedBilling(patientType, patientFilter, patientId, patientName, program, assignedmember, Index, readingFilter, interactionFilter, RoleId, Createdby, ConnectionString);
 
+                    }
+                    else if (ProgramType.ToUpper()=="CCM")
+                    {
+                        patientBilldataList = GetPatientBillingDataListCCMDaysBasedBilling(patientType, patientFilter, patientId, patientName, program, assignedmember, Index, readingFilter, interactionFilter, RoleId, Createdby, ConnectionString);
+                    }
+                    else if (ProgramType.ToUpper()=="PCM")
+                    {
+                        patientBilldataList = GetPatientBillingDataListPCMDaysBasedBilling(patientType, patientFilter, patientId, patientName, program, assignedmember, Index, readingFilter, interactionFilter, RoleId, Createdby, ConnectionString);
+                    }
                 }
                 else if (provider.Value == "cycle")
                 {
                     if (ProgramType.ToUpper()=="RPM")
                     {
-                    patientBilldataList = GetPatientBillingDataListCylnx(patientType, patientFilter, patientId, patientName, program, assignedmember, Index, readingFilter, interactionFilter, RoleId, Createdby, ConnectionString);
-                }
+                        patientBilldataList = GetPatientBillingDataListCycleBasedBilling(patientType, patientFilter, patientId, patientName, program, assignedmember, Index, readingFilter, interactionFilter, RoleId, Createdby, ConnectionString);
+                    }
                     else if (ProgramType.ToUpper()=="CCM")
                     {
-                        patientBilldataList = GetPatientBillingDataListCCMCylnx(patientType, patientFilter, patientId, patientName, program, assignedmember, Index, readingFilter, interactionFilter, RoleId, Createdby, ConnectionString);
+                        patientBilldataList = GetPatientBillingDataListCCMCycleBasedBilling(patientType, patientFilter, patientId, patientName, program, assignedmember, Index, readingFilter, interactionFilter, RoleId, Createdby, ConnectionString);
                     }
                     else if (ProgramType.ToUpper()=="PCM")
                     {
-                        patientBilldataList = GetPatientBillingDataListPCMCylnx(patientType, patientFilter, patientId, patientName, program, assignedmember, Index, readingFilter, interactionFilter, RoleId, Createdby, ConnectionString);
+                        patientBilldataList = GetPatientBillingDataListPCMCycleBasedBilling(patientType, patientFilter, patientId, patientName, program, assignedmember, Index, readingFilter, interactionFilter, RoleId, Createdby, ConnectionString);
                     }
                 }
                 else
                 {
-                    patientBilldataList = GetPatientBillingDataListCylnx(patientType, patientFilter, patientId, patientName, program, assignedmember, Index, readingFilter, interactionFilter, RoleId, Createdby, ConnectionString);
+                    patientBilldataList = GetPatientBillingDataListCycleBasedBilling(patientType, patientFilter, patientId, patientName, program, assignedmember, Index, readingFilter, interactionFilter, RoleId, Createdby, ConnectionString);
                 }
             }
             else
             {
-                patientBilldataList = GetPatientBillingDataListCylnx(patientType, patientFilter, patientId, patientName, program, assignedmember, Index, readingFilter, interactionFilter, RoleId, Createdby, ConnectionString);
+                patientBilldataList = GetPatientBillingDataListCycleBasedBilling(patientType, patientFilter, patientId, patientName, program, assignedmember, Index, readingFilter, interactionFilter, RoleId, Createdby, ConnectionString);
             }
             return patientBilldataList;
         }
 
-        public PatientBilldataList GetPatientBillingDataListCylnx(string patientType, string patientFilter, string patientId, string patientName, string program, string assignedmember, int Index, string readingFilter, string interactionFilter, int RoleId, string Createdby, string ConnectionString)
+        public PatientBilldataList GetPatientBillingDataListCycleBasedBilling(string patientType, string patientFilter, string patientId, string patientName, string program, string assignedmember, int Index, string readingFilter, string interactionFilter, int RoleId, string Createdby, string ConnectionString)
         {
             try
             {
@@ -6834,7 +8934,7 @@ namespace RPMWeb.Dal
                 {
                     con.Open();
 
-                    using (SqlCommand command = new SqlCommand("GetPatientBillingDataList", con))
+                    using (SqlCommand command = new SqlCommand("GetPatientBillingDataList_CycleBasedBilling", con))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.Add("@patientType", SqlDbType.NVarChar).Value = patientType;
@@ -6924,7 +9024,7 @@ namespace RPMWeb.Dal
 
         }
 
-        public PatientBilldataList GetPatientBillingDataListCCMCylnx(string patientType, string patientFilter, string patientId, string patientName, string program, string assignedmember, int Index, string readingFilter, string interactionFilter, int RoleId, string Createdby, string ConnectionString)
+        public PatientBilldataList GetPatientBillingDataListCCMCycleBasedBilling(string patientType, string patientFilter, string patientId, string patientName, string program, string assignedmember, int Index, string readingFilter, string interactionFilter, int RoleId, string Createdby, string ConnectionString)
         {
             try
             {
@@ -6965,7 +9065,7 @@ namespace RPMWeb.Dal
                 {
                     con.Open();
 
-                    using (SqlCommand command = new SqlCommand("GetPatientBillingDataListCCM", con))
+                    using (SqlCommand command = new SqlCommand("GetPatientBillingDataListCCM_CycleBasedBilling", con))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.Add("@patientType", SqlDbType.NVarChar).Value = patientType;
@@ -7056,7 +9156,138 @@ namespace RPMWeb.Dal
 
 
         }
-        public PatientBilldataList GetPatientBillingDataListPCMCylnx(string patientType, string patientFilter, string patientId, string patientName, string program, string assignedmember, int Index, string readingFilter, string interactionFilter, int RoleId, string Createdby, string ConnectionString)
+        public PatientBilldataList GetPatientBillingDataListCCMDaysBasedBilling(string patientType, string patientFilter, string patientId, string patientName, string program, string assignedmember, int Index, string readingFilter, string interactionFilter, int RoleId, string Createdby, string ConnectionString)
+        {
+            try
+            {
+                double startDuration;
+                double endDuration;
+                if (interactionFilter == "0-19")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(19.99);
+                    startDuration = 0;
+                    endDuration=t1.TotalSeconds;
+                }
+                else if (interactionFilter == "20-39")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(20);
+                    TimeSpan t2 = TimeSpan.FromMinutes(39.99);
+                    startDuration = t1.TotalSeconds;
+                    endDuration=t2.TotalSeconds;
+                }
+                else if (interactionFilter == "40-59")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(40);
+                    TimeSpan t2 = TimeSpan.FromMinutes(59.99);
+                    startDuration = t1.TotalSeconds;
+                    endDuration=t2.TotalSeconds;
+                }
+                else if (interactionFilter == "60")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(60);
+                    startDuration = t1.TotalSeconds;
+                    endDuration=0;
+                }
+                else
+                {
+                    startDuration = 0;
+                    endDuration=0;
+                }
+                using (SqlConnection con = new SqlConnection(ConnectionString))
+                {
+                    con.Open();
+
+                    using (SqlCommand command = new SqlCommand("GetPatientBillingDataListCCM_DaysBasedBilling", con))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.Add("@patientType", SqlDbType.NVarChar).Value = patientType;
+                        command.Parameters.Add("@patientFilter", SqlDbType.NVarChar).Value = patientFilter ?? String.Empty;
+                        command.Parameters.Add("@patientId", SqlDbType.NVarChar).Value = patientId ?? String.Empty;
+                        command.Parameters.Add("@patientName", SqlDbType.NVarChar).Value = patientName ?? String.Empty;
+                        command.Parameters.Add("@program", SqlDbType.NVarChar).Value = program;
+                        command.Parameters.Add("@assignedmember", SqlDbType.NVarChar).Value = assignedmember ?? String.Empty;
+                        command.Parameters.Add("@index", SqlDbType.Int).Value = Index;
+                        command.Parameters.Add("@readingFilter", SqlDbType.NVarChar).Value = readingFilter;
+                        command.Parameters.Add("@InteractionFilter", SqlDbType.NVarChar).Value = interactionFilter;
+                        command.Parameters.Add("@Createdby", SqlDbType.NVarChar).Value = Createdby;
+                        command.Parameters.Add("@RoleId", SqlDbType.Int).Value = RoleId;
+                        command.Parameters.Add("@startDuration", SqlDbType.Int).Value = startDuration;
+                        command.Parameters.Add("@endDuration", SqlDbType.Int).Value = endDuration;
+                        SqlDataReader reader = command.ExecuteReader();
+
+                        List<PatientBilldataList> PatientBilldateList = new List<PatientBilldataList>();
+                        List<int> roleids = new List<int>();
+                        TotalCounts counts = new TotalCounts();
+                        PatientBilldataList PatientBilldata = new PatientBilldataList();
+                        PatientBilldata.PatientBilldataRecords = new List<PatientBilldataRecords>();
+
+                        while (reader.Read())
+                        {
+                            bool val = false;
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+
+                                if (reader.GetName(i).Equals("PatientNumber", StringComparison.InvariantCultureIgnoreCase))
+                                    val = true;
+                            }
+                            if (val)
+                            {
+                                PatientBilldataRecords patientBilldataRecords = new PatientBilldataRecords();
+                                patientBilldataRecords.PatientNumber = reader["PatientNumber"].ToString();
+                                patientBilldataRecords.patientId = Convert.ToInt32(reader["patientId"]);
+                                patientBilldataRecords.PatientProgramId = Convert.ToInt32(reader["PatientProgramId"]);
+                                patientBilldataRecords.PatientName = Convert.ToString(reader["FirstName"].ToString());
+                                patientBilldataRecords.Program = Convert.ToString(reader["Name"].ToString());
+                                patientBilldataRecords.AssignedMemeber = Convert.ToString(reader["Assignedmember"]) + ' ' + Convert.ToString(reader["AssignedLastName"]);
+                                patientBilldataRecords.TortalVitalCount = Convert.ToInt32(reader["totalVitalCount"]);
+                                patientBilldataRecords.interaction = Convert.ToInt32(reader["TotalDuration"]);
+                                patientBilldataRecords.DaysCompleted = Convert.ToInt32(reader["DaysCompleted"]);
+                                patientBilldataRecords.ClinicName = Convert.ToString(reader["ClinicName"]);
+                                patientBilldataRecords.Code = Convert.ToString(reader["Code"]);
+                                DateTime dateTime = Convert.ToDateTime(reader["NextBillingDate"]);
+                                patientBilldataRecords.NextBillingDate = dateTime.ToString("yyyy-MM-dd");
+                                counts.Total = Convert.ToInt32(reader["Total"]);
+                                counts.TotalCount = Convert.ToInt32(reader["TotalCount"]);
+                                counts.C1Total = null;
+                                counts.C2Total = null;
+                                counts.TodayCount = Convert.ToInt32(reader["TodayCount"]);
+                                counts.Next7DaysCount = Convert.ToInt32(reader["Next7DaysCount"]);
+
+                                PatientBilldata.PatientBilldataRecords.Add(patientBilldataRecords);
+                            }
+                            else
+                            {
+                                counts.Total = Convert.ToInt32(reader["Total"]);
+                                counts.TotalCount = Convert.ToInt32(reader["TotalCount"]);
+                                counts.C1Total = null;
+                                counts.C2Total = null;
+                                counts.TodayCount = Convert.ToInt32(reader["TodayCount"]);
+                                counts.Next7DaysCount = Convert.ToInt32(reader["Next7DaysCount"]);
+                            }
+
+                        }
+                        PatientBilldata.TotalCounts = counts;
+                        // PatientBilldateList.Add(PatientBilldata);
+                        //if (reader.FieldCount == 0)
+                        //{
+                        //    con.Close();
+                        //    return null;
+                        //}
+                        con.Close();
+                        return PatientBilldata;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occured - class Name :" + this.GetType().Name + ",  Method Name : " + MethodBase.GetCurrentMethod().Name + ", Error Message :" + ex.Message + "");
+                return null;
+            }
+
+
+
+        }
+        public PatientBilldataList GetPatientBillingDataListPCMCycleBasedBilling(string patientType, string patientFilter, string patientId, string patientName, string program, string assignedmember, int Index, string readingFilter, string interactionFilter, int RoleId, string Createdby, string ConnectionString)
         {
             try
             {
@@ -7098,7 +9329,7 @@ namespace RPMWeb.Dal
                 {
                     con.Open();
 
-                    using (SqlCommand command = new SqlCommand("GetPatientBillingDataListPCM", con))
+                    using (SqlCommand command = new SqlCommand("GetPatientBillingDataListPCM_CycleBasedBilling", con))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.Add("@patientType", SqlDbType.NVarChar).Value = patientType;
@@ -7189,7 +9420,138 @@ namespace RPMWeb.Dal
 
 
         }
-        public PatientBilldataList GetPatientBillingDataListMedIT(string patientType, string patientFilter, string patientId, string patientName, string program, string assignedmember, int Index, string readingFilter, string interactionFilter, int RoleId, string Createdby, string ConnectionString)
+        public PatientBilldataList GetPatientBillingDataListPCMDaysBasedBilling(string patientType, string patientFilter, string patientId, string patientName, string program, string assignedmember, int Index, string readingFilter, string interactionFilter, int RoleId, string Createdby, string ConnectionString)
+        {
+            try
+            {
+                double startDuration;
+                double endDuration;
+                if (interactionFilter == "0-19")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(19.99);
+                    startDuration = 0;
+                    endDuration=t1.TotalSeconds;
+                }
+                else if (interactionFilter == "20-39")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(20);
+                    TimeSpan t2 = TimeSpan.FromMinutes(39.99);
+                    startDuration = t1.TotalSeconds;
+                    endDuration=t2.TotalSeconds;
+                }
+                else if (interactionFilter == "40-59")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(40);
+                    TimeSpan t2 = TimeSpan.FromMinutes(59.99);
+                    startDuration = t1.TotalSeconds;
+                    endDuration=t2.TotalSeconds;
+                }
+                else if (interactionFilter == "60")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(60);
+                    startDuration = t1.TotalSeconds;
+                    endDuration=0;
+                }
+                else
+                {
+                    startDuration = 0;
+                    endDuration=0;
+                }
+                using (SqlConnection con = new SqlConnection(ConnectionString))
+                {
+                    con.Open();
+
+                    using (SqlCommand command = new SqlCommand("GetPatientBillingDataListPCM_DaysBasedBilling", con))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.Add("@patientType", SqlDbType.NVarChar).Value = patientType;
+                        command.Parameters.Add("@patientFilter", SqlDbType.NVarChar).Value = patientFilter ?? String.Empty;
+                        command.Parameters.Add("@patientId", SqlDbType.NVarChar).Value = patientId ?? String.Empty;
+                        command.Parameters.Add("@patientName", SqlDbType.NVarChar).Value = patientName ?? String.Empty;
+                        command.Parameters.Add("@program", SqlDbType.NVarChar).Value = program;
+                        command.Parameters.Add("@assignedmember", SqlDbType.NVarChar).Value = assignedmember ?? String.Empty;
+                        command.Parameters.Add("@index", SqlDbType.Int).Value = Index;
+                        command.Parameters.Add("@readingFilter", SqlDbType.NVarChar).Value = readingFilter;
+                        command.Parameters.Add("@InteractionFilter", SqlDbType.NVarChar).Value = interactionFilter;
+                        command.Parameters.Add("@Createdby", SqlDbType.NVarChar).Value = Createdby;
+                        command.Parameters.Add("@RoleId", SqlDbType.Int).Value = RoleId;
+                        command.Parameters.Add("@startDuration", SqlDbType.Int).Value = startDuration;
+                        command.Parameters.Add("@endDuration", SqlDbType.Int).Value = endDuration;
+                        SqlDataReader reader = command.ExecuteReader();
+
+                        List<PatientBilldataList> PatientBilldateList = new List<PatientBilldataList>();
+                        List<int> roleids = new List<int>();
+                        TotalCounts counts = new TotalCounts();
+                        PatientBilldataList PatientBilldata = new PatientBilldataList();
+                        PatientBilldata.PatientBilldataRecords = new List<PatientBilldataRecords>();
+
+                        while (reader.Read())
+                        {
+                            bool val = false;
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+
+                                if (reader.GetName(i).Equals("PatientNumber", StringComparison.InvariantCultureIgnoreCase))
+                                    val = true;
+                            }
+                            if (val)
+                            {
+                                PatientBilldataRecords patientBilldataRecords = new PatientBilldataRecords();
+                                patientBilldataRecords.PatientNumber = reader["PatientNumber"].ToString();
+                                patientBilldataRecords.patientId = Convert.ToInt32(reader["patientId"]);
+                                patientBilldataRecords.PatientProgramId = Convert.ToInt32(reader["PatientProgramId"]);
+                                patientBilldataRecords.PatientName = Convert.ToString(reader["FirstName"].ToString());
+                                patientBilldataRecords.Program = Convert.ToString(reader["Name"].ToString());
+                                patientBilldataRecords.AssignedMemeber = Convert.ToString(reader["Assignedmember"]) + ' ' + Convert.ToString(reader["AssignedLastName"]);
+                                patientBilldataRecords.TortalVitalCount = Convert.ToInt32(reader["totalVitalCount"]);
+                                patientBilldataRecords.interaction = Convert.ToInt32(reader["TotalDuration"]);
+                                patientBilldataRecords.DaysCompleted = Convert.ToInt32(reader["DaysCompleted"]);
+                                patientBilldataRecords.ClinicName = Convert.ToString(reader["ClinicName"]);
+                                patientBilldataRecords.Code = Convert.ToString(reader["Code"]);
+                                DateTime dateTime = Convert.ToDateTime(reader["NextBillingDate"]);
+                                patientBilldataRecords.NextBillingDate = dateTime.ToString("yyyy-MM-dd");
+                                counts.Total = Convert.ToInt32(reader["Total"]);
+                                counts.TotalCount = Convert.ToInt32(reader["TotalCount"]);
+                                counts.C1Total = null;
+                                counts.C2Total = null;
+                                counts.TodayCount = Convert.ToInt32(reader["TodayCount"]);
+                                counts.Next7DaysCount = Convert.ToInt32(reader["Next7DaysCount"]);
+
+                                PatientBilldata.PatientBilldataRecords.Add(patientBilldataRecords);
+                            }
+                            else
+                            {
+                                counts.Total = Convert.ToInt32(reader["Total"]);
+                                counts.TotalCount = Convert.ToInt32(reader["TotalCount"]);
+                                counts.C1Total = null;
+                                counts.C2Total = null;
+                                counts.TodayCount = Convert.ToInt32(reader["TodayCount"]);
+                                counts.Next7DaysCount = Convert.ToInt32(reader["Next7DaysCount"]);
+                            }
+
+                        }
+                        PatientBilldata.TotalCounts = counts;
+                        // PatientBilldateList.Add(PatientBilldata);
+                        //if (reader.FieldCount == 0)
+                        //{
+                        //    con.Close();
+                        //    return null;
+                        //}
+                        con.Close();
+                        return PatientBilldata;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occured - class Name :" + this.GetType().Name + ",  Method Name : " + MethodBase.GetCurrentMethod().Name + ", Error Message :" + ex.Message + "");
+                return null;
+            }
+
+
+
+        }
+        public PatientBilldataList GetPatientBillingDataListDaysBasedBilling(string patientType, string patientFilter, string patientId, string patientName, string program, string assignedmember, int Index, string readingFilter, string interactionFilter, int RoleId, string Createdby, string ConnectionString)
         {
             try
             {
@@ -7198,7 +9560,7 @@ namespace RPMWeb.Dal
                 {
                     con.Open();
 
-                    using (SqlCommand command = new SqlCommand("GetPatientBillingDataList_30Days", con))
+                    using (SqlCommand command = new SqlCommand("GetPatientBillingDataList_DaysBasedBilling", con))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.Add("@patientType", SqlDbType.NVarChar).Value = patientType;
@@ -7336,21 +9698,21 @@ namespace RPMWeb.Dal
             {
                 if (provider.Value == "30days")
                 {
-                    lastBilleddata = GetPatientlastBilledCycleMedIT(patientId, patientProgramId, status, ConnectionString);
+                    lastBilleddata = GetPatientlastBilledCycleDaysBasedBilling(patientId, patientProgramId, status, ConnectionString);
 
                 }
                 else if (provider.Value == "cycle")
                 {
-                    lastBilleddata = GetPatientlastBilledCycleCylnx(patientId, patientProgramId, status, ConnectionString);
+                    lastBilleddata = GetPatientlastBilledCycleCycleBasedBilling(patientId, patientProgramId, status, ConnectionString);
                 }
                 else
                 {
-                    lastBilleddata = GetPatientlastBilledCycleCylnx(patientId, patientProgramId, status, ConnectionString);
+                    lastBilleddata = GetPatientlastBilledCycleCycleBasedBilling(patientId, patientProgramId, status, ConnectionString);
                 }
             }
             else
             {
-                lastBilleddata = GetPatientlastBilledCycleCylnx(patientId, patientProgramId, status, ConnectionString);
+                lastBilleddata = GetPatientlastBilledCycleCycleBasedBilling(patientId, patientProgramId, status, ConnectionString);
             }
             return lastBilleddata;
         }
@@ -7363,107 +9725,25 @@ namespace RPMWeb.Dal
             {
                 if (provider.Value == "30days")
                 {
-                    lastBilleddata = GetPatientlastBilledCycleByDateMedIT(patientId, patientProgramId, billeddate, ConnectionString);
+                    lastBilleddata = GetPatientlastBilledCycleByDateDaysBasedBilling(patientId, patientProgramId, billeddate, ConnectionString);
 
                 }
                 else if (provider.Value == "cycle")
                 {
-                    lastBilleddata = GetPatientlastBilledCycleByDateCylnx(patientId, patientProgramId, billeddate, ConnectionString);
+                    lastBilleddata = GetPatientlastBilledCycleByDateCycleBasedBilling(patientId, patientProgramId, billeddate, ConnectionString);
                 }
                 else
                 {
-                    lastBilleddata = GetPatientlastBilledCycleByDateCylnx(patientId, patientProgramId, billeddate, ConnectionString);
+                    lastBilleddata = GetPatientlastBilledCycleByDateCycleBasedBilling(patientId, patientProgramId, billeddate, ConnectionString);
                 }
             }
             else
             {
-                lastBilleddata = GetPatientlastBilledCycleByDateCylnx(patientId, patientProgramId, billeddate, ConnectionString);
+                lastBilleddata = GetPatientlastBilledCycleByDateCycleBasedBilling(patientId, patientProgramId, billeddate, ConnectionString);
             }
             return lastBilleddata;
         }
-        public List<LastBilleddata> GetPatientlastBilledCycleByDateMedIT(int patientId, int patientProgramId, DateTime billeddate, string ConnectionString)
-        {
-            try
-            {
-                using (SqlConnection con = new SqlConnection(ConnectionString))
-                {
-                    con.Open();
-
-                    using (SqlCommand command = new SqlCommand("usp_GetLastBilledCycleByDate", con))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.AddWithValue("@patientid", patientId);
-                        command.Parameters.AddWithValue("@patientprogramid", patientProgramId);
-                        command.Parameters.AddWithValue("@billeddate", billeddate);
-                        SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
-                        returnParameter.Direction = ParameterDirection.ReturnValue;
-                        SqlDataReader reader = command.ExecuteReader();
-                        List<LastBilleddata> list = new List<LastBilleddata>();
-                        List<BillingCodesDetails> billingCodes = GetBillingCodeDetails(ConnectionString);
-                        while (reader.Read())
-                        {
-                            LastBilleddata ret = new LastBilleddata();
-                            ret.CPTCode = Convert.ToString(reader["BillingCode"]);
-
-                            int targetMet = Convert.ToInt32(reader["TargetMet"]);
-                            var startdate = Convert.ToDateTime(reader["StartDate"]);
-                            // (!DBNull.Value.Equals(Convert.ToDateTime(reader["Billeddate"]))) ? Convert.ToInt32(reader["OrganizationId"]) : 0;
-                            string Billeddate = Convert.ToString(reader["Billeddate"]);
-                            string jointString = string.Empty;
-                            if (Billeddate != null && Billeddate != String.Empty)
-                            {
-                                string date = Convert.ToDateTime(Billeddate).ToString("MMM dd, yyyy");
-                                jointString = " to " + date;
-                            }
-                            ret.Last_Billing_Cycle = startdate.ToString("MMM dd, yyyy") + jointString;
-                            ret.reading = Convert.ToString(reader["Totalreadings"]);
-                            ret.status = targetMet == 1 ? "Billed" : "Not Billed";
-                            list.Add(ret);
-
-
-
-                        }
-                        List<LastBilleddata> list1 = new List<LastBilleddata>();
-                        foreach (var code in billingCodes)
-                        {
-                            LastBilleddata ret = new LastBilleddata();
-                            var result = list.Where(s => s.CPTCode == Convert.ToString(code.BillingCodeID)).FirstOrDefault();
-                            if (result != null)
-                            {
-                                ret.CPTCode = code.BillingCode;
-                                ret.Last_Billing_Cycle = result.Last_Billing_Cycle;
-                                ret.reading = result.reading;
-                                ret.status = result.status;
-                            }
-                            else
-                            {
-                                ret.CPTCode = code.BillingCode;
-                                ret.Last_Billing_Cycle = null;
-                                ret.reading = "0";
-                                ret.status = "Not Billed";
-                            }
-                            list1.Add(ret);
-
-                        }
-
-
-                        if (reader.FieldCount == 0)
-                        {
-                            return null;
-                        }
-                        return list1;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-
-
-                throw;
-            }
-        }
-
-        public List<LastBilleddata> GetPatientlastBilledCycleByDateCylnx(int patientId, int patientProgramId, DateTime billeddate, string ConnectionString)
+        public List<LastBilleddata> GetPatientlastBilledCycleByDateDaysBasedBilling(int patientId, int patientProgramId, DateTime billeddate, string ConnectionString)
         {
             try
             {
@@ -7545,7 +9825,8 @@ namespace RPMWeb.Dal
                 throw;
             }
         }
-        public List<LastBilleddata> GetPatientlastBilledCycleMedIT(int patientId, int patientProgramId, string status, string ConnectionString)
+
+        public List<LastBilleddata> GetPatientlastBilledCycleByDateCycleBasedBilling(int patientId, int patientProgramId, DateTime billeddate, string ConnectionString)
         {
             try
             {
@@ -7553,7 +9834,89 @@ namespace RPMWeb.Dal
                 {
                     con.Open();
 
-                    using (SqlCommand command = new SqlCommand("Usp_GetpatientLastBilledcycle_30Days", con))
+                    using (SqlCommand command = new SqlCommand("usp_GetLastBilledCycleByDate", con))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@patientid", patientId);
+                        command.Parameters.AddWithValue("@patientprogramid", patientProgramId);
+                        command.Parameters.AddWithValue("@billeddate", billeddate);
+                        SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
+                        returnParameter.Direction = ParameterDirection.ReturnValue;
+                        SqlDataReader reader = command.ExecuteReader();
+                        List<LastBilleddata> list = new List<LastBilleddata>();
+                        string programName = GetProgramName(ConnectionString, patientProgramId);
+                        List<BillingCodesDetails> billingCodes = GetBillingCodeDetailsByProgram(ConnectionString, programName);
+                        while (reader.Read())
+                        {
+                            LastBilleddata ret = new LastBilleddata();
+                            ret.CPTCode = Convert.ToString(reader["BillingCode"]);
+
+                            int targetMet = Convert.ToInt32(reader["TargetMet"]);
+                            var startdate = Convert.ToDateTime(reader["StartDate"]);
+                            // (!DBNull.Value.Equals(Convert.ToDateTime(reader["Billeddate"]))) ? Convert.ToInt32(reader["OrganizationId"]) : 0;
+                            string Billeddate = Convert.ToString(reader["Billeddate"]);
+                            string jointString = string.Empty;
+                            if (Billeddate != null && Billeddate != String.Empty)
+                            {
+                                string date = Convert.ToDateTime(Billeddate).ToString("MMM dd, yyyy");
+                                jointString = " to " + date;
+                            }
+                            ret.Last_Billing_Cycle = startdate.ToString("MMM dd, yyyy") + jointString;
+                            ret.reading = Convert.ToString(reader["Totalreadings"]);
+                            ret.status = targetMet == 1 ? "Billed" : "Not Billed";
+                            list.Add(ret);
+
+
+
+                        }
+                        List<LastBilleddata> list1 = new List<LastBilleddata>();
+                        foreach (var code in billingCodes)
+                        {
+                            LastBilleddata ret = new LastBilleddata();
+                            var result = list.Where(s => s.CPTCode == Convert.ToString(code.BillingCodeID)).FirstOrDefault();
+                            if (result != null)
+                            {
+                                ret.CPTCode = code.BillingCode;
+                                ret.Last_Billing_Cycle = result.Last_Billing_Cycle;
+                                ret.reading = result.reading;
+                                ret.status = result.status;
+                            }
+                            else
+                            {
+                                ret.CPTCode = code.BillingCode;
+                                ret.Last_Billing_Cycle = null;
+                                ret.reading = "0";
+                                ret.status = "Not Billed";
+                            }
+                            list1.Add(ret);
+
+                        }
+
+
+                        if (reader.FieldCount == 0)
+                        {
+                            return null;
+                        }
+                        return list1;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+
+                throw;
+            }
+        }
+        public List<LastBilleddata> GetPatientlastBilledCycleDaysBasedBilling(int patientId, int patientProgramId, string status, string ConnectionString)
+        {
+            try
+            {
+                using (SqlConnection con = new SqlConnection(ConnectionString))
+                {
+                    con.Open();
+
+                    using (SqlCommand command = new SqlCommand("Usp_GetpatientLastBilledcycle_DaysBasedBilling", con))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@PatientId", patientId);
@@ -7563,7 +9926,8 @@ namespace RPMWeb.Dal
                         returnParameter.Direction = ParameterDirection.ReturnValue;
                         SqlDataReader reader = command.ExecuteReader();
                         List<LastBilleddata> list = new List<LastBilleddata>();
-                        List<BillingCodesDetails> billingCodes = GetBillingCodeDetails(ConnectionString);
+                        string programName = GetProgramName(ConnectionString, patientProgramId);
+                        List<BillingCodesDetails> billingCodes = GetBillingCodeDetailsByProgram(ConnectionString, programName);
                         while (reader.Read())
                         {
                             LastBilleddata ret = new LastBilleddata();
@@ -7710,7 +10074,7 @@ namespace RPMWeb.Dal
 
 
         }
-        public List<LastBilleddata> GetPatientlastBilledCycleCylnx(int patientId, int patientProgramId, string status, string ConnectionString)
+        public List<LastBilleddata> GetPatientlastBilledCycleCycleBasedBilling(int patientId, int patientProgramId, string status, string ConnectionString)
         {
             try
             {
@@ -7718,7 +10082,7 @@ namespace RPMWeb.Dal
                 {
                     con.Open();
 
-                    using (SqlCommand command = new SqlCommand("Usp_GetpatientLastBilledcycle", con))
+                    using (SqlCommand command = new SqlCommand("Usp_GetpatientLastBilledcycle_CycleBasedBilling", con))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@PatientId", patientId);
@@ -7748,13 +10112,13 @@ namespace RPMWeb.Dal
                             }
                             if (ret.CPTCode == "G0506")
                             {
-                               // string billdate = Convert.ToString(reader["Billeddate"]);
+                                // string billdate = Convert.ToString(reader["Billeddate"]);
                                 if (Billeddate != null && Billeddate != String.Empty)
                                 {
                                     ret.Last_Billing_Cycle = Convert.ToDateTime(Billeddate).ToString("MMM dd, yyyy");
                                 }
-                                    
-                                
+
+
                             }
                             else
                             {
@@ -7860,25 +10224,25 @@ namespace RPMWeb.Dal
             {
                 if (provider.Value == "30days")
                 {
-                    billingInfoCounts = GetPatientBillingInfoCountsMedIT(billingCode, cycle, RoleId, CreatedBy, ConnectionString);
+                    billingInfoCounts = GetPatientBillingInfoCountsDaysBasedBilling(billingCode, cycle, RoleId, CreatedBy, ConnectionString);
 
                 }
                 else if (provider.Value == "cycle")
                 {
-                    billingInfoCounts = GetPatientBillingInfoCountsCylnx(billingCode, cycle, RoleId, CreatedBy, ConnectionString);
+                    billingInfoCounts = GetPatientBillingInfoCountsCycleBasedBilling(billingCode, cycle, RoleId, CreatedBy, ConnectionString);
                 }
                 else
                 {
-                    billingInfoCounts = GetPatientBillingInfoCountsCylnx(billingCode, cycle, RoleId, CreatedBy, ConnectionString);
+                    billingInfoCounts = GetPatientBillingInfoCountsCycleBasedBilling(billingCode, cycle, RoleId, CreatedBy, ConnectionString);
                 }
             }
             else
             {
-                billingInfoCounts = GetPatientBillingInfoCountsCylnx(billingCode, cycle, RoleId, CreatedBy, ConnectionString);
+                billingInfoCounts = GetPatientBillingInfoCountsCycleBasedBilling(billingCode, cycle, RoleId, CreatedBy, ConnectionString);
             }
             return billingInfoCounts;
         }
-        public List<BillingInfoCounts> GetPatientBillingInfoCountsCylnx(string billingCode, string cycle, int RoleId, string CreatedBy, string ConnectionString)
+        public List<BillingInfoCounts> GetPatientBillingInfoCountsCycleBasedBilling(string billingCode, string cycle, int RoleId, string CreatedBy, string ConnectionString)
         {
             List<BillingInfoCounts> list = new List<BillingInfoCounts>();
             try
@@ -7890,12 +10254,12 @@ namespace RPMWeb.Dal
                     string procedureName = string.Empty;
                     if (ProgramName=="RPM")
                     {
-                        procedureName = "usp_GetPatientBillingInfo";
+                        procedureName = "usp_GetPatientBillingInfo_CycleBasedBilling";
                     }
                     else
                     {
                         //for ccm,pcm patients
-                        procedureName = "usp_GetPatientBillingInfoCCM";
+                        procedureName = "usp_GetPatientBillingInfoCCM_CycleBasedBilling";
 
                     }
                     using (SqlCommand command = new SqlCommand(procedureName, con))
@@ -7931,7 +10295,7 @@ namespace RPMWeb.Dal
             }
 
         }
-        public List<BillingInfoCounts> GetPatientBillingInfoCountsMedIT(string billingCode, string cycle, int RoleId, string CreatedBy, string ConnectionString)
+        public List<BillingInfoCounts> GetPatientBillingInfoCountsDaysBasedBilling(string billingCode, string cycle, int RoleId, string CreatedBy, string ConnectionString)
         {
             List<BillingInfoCounts> list = new List<BillingInfoCounts>();
             try
@@ -7939,8 +10303,19 @@ namespace RPMWeb.Dal
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {
                     con.Open();
+                    string ProgramName = GetProgramNameByBillingCode(ConnectionString, billingCode);
+                    string procedureName = string.Empty;
+                    if (ProgramName=="RPM")
+                    {
+                        procedureName = "usp_GetPatientBillingInfo_DaysBasedBilling";
+                    }
+                    else
+                    {
+                        //for ccm,pcm patients
+                        procedureName = "usp_GetPatientBillingInfoCCM_DaysBasedBilling";
 
-                    using (SqlCommand command = new SqlCommand("usp_GetPatientBillingInfo_30Days", con))
+                    }
+                    using (SqlCommand command = new SqlCommand(procedureName, con))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.Add("@BillingCode", SqlDbType.NVarChar).Value = billingCode;
@@ -8132,2851 +10507,7 @@ namespace RPMWeb.Dal
 
 
         }
-        public PatientBilldata ProcessCPT99458_ClynxNew(int patientId, int patientProgramId, BillingCodesDetails code,
-                                                     BillingCodesDetails code457, string connectionString)
-        {
-            PatientBilldata pbd = new PatientBilldata();
-            try
-            {
-                int DaysCompleted = 0; int TotalReading = 0;
-                PatientStartDate PatientStartDate = new PatientStartDate();
-                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                if (PatientStartDate == null ||
-                    PatientStartDate.Status.ToLower() == "invalid")
-                {
-                    pbd.CPTCode = code.BillingCode;
-                    pbd.Completed = 0;
-                    pbd.Total = code.TargetReadings*60;
-                    pbd.IsTargetMet = false;
-                    pbd.ReadyTobill = 0;
-                    return pbd;
-                }
-                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
-                {
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    PatientBilldata.CPTCode = code.BillingCode;
-                    PatientBilldata.Completed = 0;
-                    PatientBilldata.Total = code.TargetReadings*60;
-                    PatientBilldata.IsTargetMet = false;
-                    PatientBilldata.ReadyTobill = 0;
-                    return PatientBilldata;
-                }
-                else
-                {
-                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-                    DateTime endDate = DateTime.UtcNow;//.AddMinutes(10);
-                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-                    //the patientbilling table and +1 day will come as next start day.. So we should   
-                    // calcualte the start date with respect to the billing threshold
-                    DateTime today = DateTime.UtcNow;
-                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
-                    if (stDate.Date > endDateTempay)
-                    {
-                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                        stDate = bd.StartDate;
-                        endDate = bd.EndDate;
-                    }
 
-                    if (PatientStartDate.Status.ToLower() == "billeddate")
-                    {
-                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
-                        endDate = DateTime.UtcNow;//.AddMinutes(10);
-                    }
-                    int patientSmsCount = 0;
-                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
-                    patientSmsCount =GetPatientSmsCount(patientId, connectionString, stDate, endDate);
-                    if (PatientInteractiontim == null)
-                    {
-                        pbd.CPTCode = code.BillingCode;
-                        pbd.Completed = 0;
-                        pbd.Total = code.TargetReadings*60;
-                        pbd.IsTargetMet = false;
-                        pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = stDate;
-                        return pbd;
-                    }
-                    var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
-                    if (isEstablishedExist.Count() > 0)
-                    {
-                        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-                        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-                        {
-                            if (patientSmsCount <= 0)
-                            {
-                                PatientInteractiontim.Clear();
-                            }
-                                
-                        }
-                    }
-                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null || isEstablishedExist.Count == 0)
-                    {
-                        if (patientSmsCount <= 0)
-                        {
-                            pbd.CPTCode = code.BillingCode;
-                            pbd.Completed = 0;
-                            pbd.Total = code.TargetReadings*60;
-                            pbd.IsTargetMet = false;
-                            pbd.ReadyTobill = 0;
-                            pbd.BillingStartDate = stDate;
-                            return pbd;
-                        }
-                    }
-                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
-
-                    if (TotalReading > code457.TargetReadings * 60)
-                    {
-                        TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
-                        TotalReading = (int)(t1.TotalSeconds - (code457.TargetReadings * 60));
-
-                        pbd.BillingStartDate = endDate;
-                        pbd.CPTCode = code.BillingCode;
-                        pbd.Completed = TotalReading;
-                        if (TotalReading < code457.TargetReadings * 60)
-                        {
-                            // base 20
-                            pbd.Total = code457.TargetReadings * 60;
-                            pbd.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-                        }
-                        else
-                        {
-                            //base 40
-                            pbd.Total = code.TargetReadings * 60;
-                            pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-                        }
-                        pbd.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
-                    }
-                    else
-                    {
-                        //Target reading 20
-                        pbd.BillingStartDate = endDate;
-                        pbd.CPTCode = code.BillingCode;
-                        pbd.Completed = 0;
-                        pbd.Total = code457.TargetReadings * 60;
-                        pbd.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
-                        pbd.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-
-                    }
-                    return pbd;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            //PatientBilldata pbd = new PatientBilldata();
-            //try
-            //{
-
-            //    PatientBilldata PatientBilldatas = new PatientBilldata();
-            //    List<PatientDailyBillingData> lstDailyData = GetPatientBillingCounts(patientId, patientProgramId, connectionString);
-            //    if (lstDailyData == null || lstDailyData.Count == 0)
-            //    {
-
-            //        //PatientBilldatas.CPTCode = code.BillingCode;
-            //        //PatientBilldatas.Completed = 0;
-            //        //PatientBilldatas.Total = code.TargetReadings;
-            //        //PatientBilldatas.IsTargetMet = false;
-            //        //PatientBilldatas.ReadyTobill = 0;
-            //        //return PatientBilldatas;
-            //        PatientBilldatas=null;
-            //    }
-
-            //    foreach (PatientDailyBillingData pdb in lstDailyData)
-            //    {
-            //        if (pdb.BillingCodeId == code.BillingCodeID)
-            //        {
-            //            DateTime createdOn = pdb.CreatedOn;
-            //            DateTime createdOnEnd = DateTime.UtcNow;
-            //            List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, createdOn, createdOnEnd).ToList();
-            //            if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
-            //            {
-            //                var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
-            //                if (isEstablishedExist.Count() > 0)
-            //                {
-            //                    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-            //                    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-            //                    {
-            //                        PatientInteractiontim.Clear();
-            //                    }
-            //                }
-            //                if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
-            //                {
-            //                    int TotalReading = PatientInteractiontim.Sum(s => s.Duration);
-            //                    pdb.TotalDuration = pdb.TotalDuration + TotalReading;
-            //                }
-
-            //                //if (PatientInteractiontim.Count==0 || PatientInteractiontim==null || isEstablishedExist.Count==0)
-            //                //{
-            //                //    TotalReading = 0;
-            //                //}
-
-            //            }
-            //            PatientBilldatas = new PatientBilldata();
-            //            PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;
-            //            PatientBilldatas.CPTCode = code.BillingCode;
-            //            PatientBilldatas.Completed = pdb.TotalDuration;
-            //            PatientBilldatas.Total = code.TargetReadings;
-            //            PatientBilldatas.IsTargetMet = (pdb.TotalDuration >= code.TargetReadings * 60) ? true : false;
-            //            PatientBilldatas.ReadyTobill = (pdb.TotalDuration >= (code.TargetReadings * 60) && pdb.DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //            return PatientBilldatas;
-
-            //        }
-            //        else
-            //        {
-            //            PatientBilldatas = null;
-            //        }
-            //    }
-            //    if (PatientBilldatas == null)
-            //    {
-            //        int DaysCompleted = 0; int TotalReading = 0;
-            //        PatientStartDate PatientStartDate = new PatientStartDate();
-            //        PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //        if (PatientStartDate == null ||
-            //            PatientStartDate.Status.ToLower() == "invalid")
-            //        {
-            //            PatientBilldatas = new PatientBilldata();
-            //            PatientBilldatas = new PatientBilldata();
-            //            PatientBilldatas.CPTCode = code.BillingCode;
-            //            PatientBilldatas.Completed = 0;
-            //            PatientBilldatas.Total = code.TargetReadings;
-            //            PatientBilldatas.IsTargetMet = false;
-            //            PatientBilldatas.ReadyTobill = 0;
-            //            return PatientBilldatas;
-            //        }
-            //        else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
-            //        {
-            //            PatientBilldatas = new PatientBilldata();
-            //            PatientBilldatas.CPTCode = code.BillingCode;
-            //            PatientBilldatas.Completed = 0;
-            //            PatientBilldatas.Total = code.TargetReadings;
-            //            PatientBilldatas.IsTargetMet = false;
-            //            PatientBilldatas.ReadyTobill = 0;
-            //            return PatientBilldatas;
-            //        }
-            //        else
-            //        {
-            //            DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-            //            DateTime endDate = DateTime.UtcNow.Date;
-            //            DateTime startDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
-            //            DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
-            //            //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-            //            //the patientbilling table and +1 day will come as next start day.. So we should   
-            //            // calcualte the start date with respect to the billing threshold
-            //            if (stDate > DateTime.UtcNow.Date)
-            //            {
-            //                //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-            //                BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //                startDatetemp = bd.StartDate;
-            //                endDatetemp = bd.EndDate;
-            //            }
-
-
-            //            DateTime startDateLoc = startDatetemp;
-            //            DateTime enddateLoc = endDatetemp;
-            //            int nTotDays = Math.Abs((startDatetemp - endDatetemp).Days) + 1;
-            //            DaysCompleted = nTotDays;
-            //            List<Dates> Dates = new List<Dates>();
-            //            for (int i = 0; i <= DaysCompleted; i++)
-            //            {
-            //                if (i == 0)
-            //                {
-            //                    endDatetemp = startDateLoc.AddDays(1).Date.AddSeconds(-1);
-
-            //                }
-            //                else if (i == DaysCompleted)
-            //                {
-            //                    startDatetemp = startDateLoc.AddDays(i).Date;
-            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
-            //                }
-            //                else
-            //                {
-            //                    startDatetemp = startDateLoc.AddDays(i).Date;
-            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
-
-            //                }
-
-            //                startDatetemp = GetUTCFromLocalTime((DateTime)startDatetemp, connectionString);
-            //                endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
-
-
-            //                Dates.Add(new Dates() { StartDate = (DateTime)startDatetemp, EndDate = endDatetemp, Totalreading = 0 });
-
-            //            }
-            //            List<PatientInteraction> PatientInteractiontimList = new List<PatientInteraction>();
-            //            if (Dates.Count > 0)
-            //            {
-
-            //                foreach (Dates date in Dates)
-            //                {
-
-            //                    List<PatientInteraction> PatientInteractiontims = GetPatientInteractiontime(patientId, patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
-            //                    //List<VitalReading> VitalReadings = billing.GetVitalReadings(patientProgramData, con).Where(s => s.ReadingDate >= date.StartDate && s.ReadingDate <= date.EndDate).ToList();
-
-            //                    if (PatientInteractiontims != null && PatientInteractiontims.Count > 0)
-            //                    {
-            //                        foreach (var list in PatientInteractiontims)
-            //                        {
-            //                            PatientInteractiontimList.Add(list);
-            //                        }
-
-            //                    }
-
-            //                }
-
-
-            //            }
-
-
-
-
-
-
-
-
-            //            //List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
-            //            if (PatientInteractiontimList == null)
-            //            {
-            //                PatientBilldatas = new PatientBilldata();
-            //                PatientBilldatas.CPTCode = code.BillingCode;
-            //                PatientBilldatas.Completed = 0;
-            //                PatientBilldatas.Total = code.TargetReadings;
-            //                PatientBilldatas.IsTargetMet = false;
-            //                PatientBilldatas.ReadyTobill = 0;
-            //                return PatientBilldatas;
-            //            }
-            //            var isEstablishedExist = PatientInteractiontimList.Where(s => s.IsCallNote == 1).ToList();
-            //            if (isEstablishedExist.Count() > 0)
-            //            {
-            //                isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-            //                if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-            //                {
-            //                    PatientInteractiontimList.Clear();
-            //                }
-            //            }
-            //            if (PatientInteractiontimList.Count == 0 || PatientInteractiontimList == null || isEstablishedExist.Count == 0)
-            //            {
-            //                PatientBilldatas = new PatientBilldata();
-            //                PatientBilldatas.CPTCode = code.BillingCode;
-            //                PatientBilldatas.Completed = 0;
-            //                PatientBilldatas.Total = code.TargetReadings;
-            //                PatientBilldatas.IsTargetMet = false;
-            //                PatientBilldatas.ReadyTobill = 0;
-            //                return PatientBilldatas;
-            //            }
-            //            TotalReading = PatientInteractiontimList.Sum(s => s.Duration);
-
-            //            if (TotalReading > code457.TargetReadings * 60)
-            //            {
-            //                TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
-            //                TotalReading = (int)(t1.TotalSeconds - (code457.TargetReadings * 60));
-            //                PatientBilldatas = new PatientBilldata();
-            //                PatientBilldatas.BillingStartDate = endDate;
-            //                PatientBilldatas.CPTCode = code.BillingCode;
-            //                PatientBilldatas.Completed = TotalReading;
-            //                if (TotalReading < code457.TargetReadings * 60)
-            //                {
-            //                    // base 20
-            //                    PatientBilldatas.Total = code457.TargetReadings * 60;
-            //                    PatientBilldatas.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //                }
-            //                else
-            //                {
-            //                    //base 40
-            //                    PatientBilldatas.Total = code.TargetReadings * 60;
-            //                    PatientBilldatas.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //                }
-            //                PatientBilldatas.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
-            //            }
-            //            else
-            //            {
-            //                PatientBilldatas = new PatientBilldata();
-            //                //Target reading 20
-            //                PatientBilldatas.BillingStartDate = stDate;
-            //                PatientBilldatas.CPTCode = code.BillingCode;
-            //                PatientBilldatas.Completed = 0;
-            //                PatientBilldatas.Total = code457.TargetReadings * 60;
-            //                PatientBilldatas.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
-            //                PatientBilldatas.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-
-            //            }
-            //            return PatientBilldatas;
-            //        }
-            //    }
-            //    return PatientBilldatas;
-            //int DaysCompleted = 0; int TotalReading = 0;
-            //PatientStartDate PatientStartDate = new PatientStartDate();
-            //PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //if (PatientStartDate == null ||
-            //    PatientStartDate.Status.ToLower() == "invalid")
-            //{
-            //    pbd.CPTCode = code.BillingCode;
-            //    pbd.Completed = 0;
-            //    pbd.Total = code.TargetReadings;
-            //    pbd.IsTargetMet = false;
-            //    pbd.ReadyTobill = 0;
-            //    return pbd;
-            //}
-            //else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
-            //{
-            //    PatientBilldata PatientBilldata = new PatientBilldata();
-            //    PatientBilldata.CPTCode = code.BillingCode;
-            //    PatientBilldata.Completed = 0;
-            //    PatientBilldata.Total = code.TargetReadings;
-            //    PatientBilldata.IsTargetMet = false;
-            //    PatientBilldata.ReadyTobill = 0;
-            //    return PatientBilldata;
-            //}
-            //else
-            //{
-            //    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-            //    DateTime endDate = DateTime.UtcNow.Date;
-            //    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-            //    //the patientbilling table and +1 day will come as next start day.. So we should   
-            //    // calcualte the start date with respect to the billing threshold
-            //    if (stDate > DateTime.UtcNow.Date)
-            //    {
-            //        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-            //        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //        stDate = bd.StartDate;
-            //        endDate = bd.EndDate;
-            //    }
-            //    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
-            //    if (PatientInteractiontim == null)
-            //    {
-            //        pbd.CPTCode = code.BillingCode;
-            //        pbd.Completed = 0;
-            //        pbd.Total = code.TargetReadings;
-            //        pbd.IsTargetMet = false;
-            //        pbd.ReadyTobill = 0;
-            //        return pbd;
-            //    }
-            //    var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
-            //    if (isEstablishedExist.Count() > 0)
-            //    {
-            //        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-            //        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-            //        {
-            //            PatientInteractiontim.Clear();
-            //        }
-            //    }
-            //    if (PatientInteractiontim.Count == 0 || PatientInteractiontim ==null || isEstablishedExist.Count==0)
-            //    {
-            //        pbd.CPTCode = code.BillingCode;
-            //        pbd.Completed = 0;
-            //        pbd.Total = code.TargetReadings;
-            //        pbd.IsTargetMet = false;
-            //        pbd.ReadyTobill = 0;
-            //        return pbd;
-            //    }
-            //    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
-
-            //    if (TotalReading > code457.TargetReadings*60)
-            //    {
-            //        TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
-            //        TotalReading = (int)(t1.TotalSeconds - (code457.TargetReadings * 60));
-
-            //        pbd.BillingStartDate = endDate;
-            //        pbd.CPTCode = code.BillingCode;
-            //        pbd.Completed = TotalReading;
-            //        if (TotalReading<code457.TargetReadings*60)
-            //        {
-            //            // base 20
-            //            pbd.Total = code457.TargetReadings * 60;
-            //            pbd.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //        }
-            //        else
-            //        {
-            //            //base 40
-            //            pbd.Total = code.TargetReadings * 60;
-            //            pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //        }
-            //        pbd.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
-            //    }
-            //    else
-            //    {
-            //        //Target reading 20
-            //        pbd.BillingStartDate = endDate;
-            //        pbd.CPTCode = code.BillingCode;
-            //        pbd.Completed = 0;
-            //        pbd.Total = code457.TargetReadings * 60;
-            //        pbd.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
-            //        pbd.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-
-            //    }
-            //    return pbd;
-            //}
-            //}
-            //catch (Exception ex)
-            //{
-            //    throw;
-            //}
-        }
-
-        public PatientBilldata ProcessCPT99458_MedITNew(int patientId, int patientProgramId, BillingCodesDetails code,
-                                                     BillingCodesDetails code457, string connectionString)
-        {
-            PatientBilldata pbd = new PatientBilldata();
-            try
-            {
-                int DaysCompleted = 0; int TotalReading = 0;
-                PatientStartDate PatientStartDate = new PatientStartDate();
-                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                if (PatientStartDate == null ||
-                    PatientStartDate.Status.ToLower() == "invalid")
-                {
-                    pbd.CPTCode = code.BillingCode;
-                    pbd.Completed = 0;
-                    pbd.Total = code.TargetReadings*60;
-                    pbd.IsTargetMet = false;
-                    pbd.ReadyTobill = 0;
-                    return pbd;
-                }
-                else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
-                {
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    PatientBilldata.CPTCode = code.BillingCode;
-                    PatientBilldata.Completed = 0;
-                    PatientBilldata.Total = code.TargetReadings*60;
-                    PatientBilldata.IsTargetMet = false;
-                    PatientBilldata.ReadyTobill = 0;
-                    return PatientBilldata;
-                }
-                else
-                {
-                    //DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-                    DateTime stDate = DateTime.MinValue;
-                    if (PatientStartDate.Status.ToLower() == "active")
-                    {
-                        stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
-                    }
-                    else
-                    {
-                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-                    }
-                    DateTime endDate = DateTime.UtcNow;
-                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-                    //the patientbilling table and +1 day will come as next start day.. So we should   
-                    // calcualte the start date with respect to the billing threshold
-                    DateTime today = DateTime.UtcNow;
-                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
-                    if (stDate.Date > endDateTempay)
-                    {
-                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                        stDate = bd.StartDate;
-                        endDate = bd.EndDate;
-                    }
-
-                    if (PatientStartDate.Status.ToLower() == "billeddate")
-                    {
-                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
-                        endDate =DateTime.UtcNow;
-                    }
-                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
-                    if (PatientInteractiontim == null)
-                    {
-                        pbd.CPTCode = code.BillingCode;
-                        pbd.Completed = 0;
-                        pbd.Total = code.TargetReadings*60;
-                        pbd.IsTargetMet = false;
-                        pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = stDate;
-                        return pbd;
-                    }
-                    var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
-                    if (isEstablishedExist.Count() > 0)
-                    {
-                        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-                        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-                        {
-                            PatientInteractiontim.Clear();
-                        }
-                    }
-                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null || isEstablishedExist.Count == 0)
-                    {
-                        pbd.CPTCode = code.BillingCode;
-                        pbd.Completed = 0;
-                        pbd.Total = code.TargetReadings*60;
-                        pbd.IsTargetMet = false;
-                        pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = stDate;
-                        return pbd;
-                    }
-                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
-
-                    if (TotalReading > code457.TargetReadings * 60)
-                    {
-                        TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
-                        TotalReading = (int)(t1.TotalSeconds - (code457.TargetReadings * 60));
-
-                        pbd.BillingStartDate = endDate;
-                        pbd.CPTCode = code.BillingCode;
-                        pbd.Completed = TotalReading;
-                        if (TotalReading < code457.TargetReadings * 60)
-                        {
-                            // base 20
-                            pbd.Total = code457.TargetReadings * 60;
-                            pbd.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-                        }
-                        else
-                        {
-                            //base 40
-                            pbd.Total = code.TargetReadings * 60;
-                            pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-                        }
-                        pbd.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
-                    }
-                    else
-                    {
-                        //Target reading 20
-                        pbd.BillingStartDate = endDate;
-                        pbd.CPTCode = code.BillingCode;
-                        pbd.Completed = 0;
-                        pbd.Total = code457.TargetReadings * 60;
-                        pbd.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
-                        pbd.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-
-                    }
-                    return pbd;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            //PatientBilldata pbd = new PatientBilldata();
-            //try
-            //{
-
-            //    PatientBilldata PatientBilldatas = new PatientBilldata();
-            //    List<PatientDailyBillingData> lstDailyData = GetPatientBillingCounts(patientId, patientProgramId, connectionString);
-            //    if (lstDailyData == null || lstDailyData.Count == 0)
-            //    {
-
-            //        //PatientBilldatas.CPTCode = code.BillingCode;
-            //        //PatientBilldatas.Completed = 0;
-            //        //PatientBilldatas.Total = code.TargetReadings;
-            //        //PatientBilldatas.IsTargetMet = false;
-            //        //PatientBilldatas.ReadyTobill = 0;
-            //        //return PatientBilldatas;
-            //        PatientBilldatas=null;
-            //    }
-
-            //    foreach (PatientDailyBillingData pdb in lstDailyData)
-            //    {
-            //        if (pdb.BillingCodeId == code.BillingCodeID)
-            //        {
-            //            DateTime createdOn = pdb.CreatedOn;
-            //            DateTime createdOnEnd = DateTime.UtcNow;
-            //            List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, createdOn, createdOnEnd).ToList();
-            //            if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
-            //            {
-            //                var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
-            //                if (isEstablishedExist.Count() > 0)
-            //                {
-            //                    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-            //                    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-            //                    {
-            //                        PatientInteractiontim.Clear();
-            //                    }
-            //                }
-            //                if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
-            //                {
-            //                    int TotalReading = PatientInteractiontim.Sum(s => s.Duration);
-            //                    pdb.TotalDuration = pdb.TotalDuration + TotalReading;
-            //                }
-
-            //                //if (PatientInteractiontim.Count==0 || PatientInteractiontim==null || isEstablishedExist.Count==0)
-            //                //{
-            //                //    TotalReading = 0;
-            //                //}
-
-            //            }
-            //            PatientBilldatas = new PatientBilldata();
-            //            PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;
-            //            PatientBilldatas.CPTCode = code.BillingCode;
-            //            PatientBilldatas.Completed = pdb.TotalDuration;
-            //            PatientBilldatas.Total = code.TargetReadings;
-            //            PatientBilldatas.IsTargetMet = (pdb.TotalDuration >= code.TargetReadings * 60) ? true : false;
-            //            PatientBilldatas.ReadyTobill = (pdb.TotalDuration >= (code.TargetReadings * 60) && pdb.DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //            return PatientBilldatas;
-
-            //        }
-            //        else
-            //        {
-            //            PatientBilldatas = null;
-            //        }
-            //    }
-            //    if (PatientBilldatas == null)
-            //    {
-            //        int DaysCompleted = 0; int TotalReading = 0;
-            //        PatientStartDate PatientStartDate = new PatientStartDate();
-            //        PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //        if (PatientStartDate == null ||
-            //            PatientStartDate.Status.ToLower() == "invalid")
-            //        {
-            //            PatientBilldatas = new PatientBilldata();
-            //            PatientBilldatas = new PatientBilldata();
-            //            PatientBilldatas.CPTCode = code.BillingCode;
-            //            PatientBilldatas.Completed = 0;
-            //            PatientBilldatas.Total = code.TargetReadings;
-            //            PatientBilldatas.IsTargetMet = false;
-            //            PatientBilldatas.ReadyTobill = 0;
-            //            return PatientBilldatas;
-            //        }
-            //        else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
-            //        {
-            //            PatientBilldatas = new PatientBilldata();
-            //            PatientBilldatas.CPTCode = code.BillingCode;
-            //            PatientBilldatas.Completed = 0;
-            //            PatientBilldatas.Total = code.TargetReadings;
-            //            PatientBilldatas.IsTargetMet = false;
-            //            PatientBilldatas.ReadyTobill = 0;
-            //            return PatientBilldatas;
-            //        }
-            //        else
-            //        {
-            //            DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-            //            DateTime endDate = DateTime.UtcNow.Date;
-            //            DateTime startDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
-            //            DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
-            //            //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-            //            //the patientbilling table and +1 day will come as next start day.. So we should   
-            //            // calcualte the start date with respect to the billing threshold
-            //            if (stDate > DateTime.UtcNow.Date)
-            //            {
-            //                //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-            //                BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //                startDatetemp = bd.StartDate;
-            //                endDatetemp = bd.EndDate;
-            //            }
-
-
-            //            DateTime startDateLoc = startDatetemp;
-            //            DateTime enddateLoc = endDatetemp;
-            //            int nTotDays = Math.Abs((startDatetemp - endDatetemp).Days) + 1;
-            //            DaysCompleted = nTotDays;
-            //            List<Dates> Dates = new List<Dates>();
-            //            for (int i = 0; i <= DaysCompleted; i++)
-            //            {
-            //                if (i == 0)
-            //                {
-            //                    endDatetemp = startDateLoc.AddDays(1).Date.AddSeconds(-1);
-
-            //                }
-            //                else if (i == DaysCompleted)
-            //                {
-            //                    startDatetemp = startDateLoc.AddDays(i).Date;
-            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
-            //                }
-            //                else
-            //                {
-            //                    startDatetemp = startDateLoc.AddDays(i).Date;
-            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
-
-            //                }
-
-            //                startDatetemp = GetUTCFromLocalTime((DateTime)startDatetemp, connectionString);
-            //                endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
-
-
-            //                Dates.Add(new Dates() { StartDate = (DateTime)startDatetemp, EndDate = endDatetemp, Totalreading = 0 });
-
-            //            }
-            //            List<PatientInteraction> PatientInteractiontimList = new List<PatientInteraction>();
-            //            if (Dates.Count > 0)
-            //            {
-
-            //                foreach (Dates date in Dates)
-            //                {
-
-            //                    List<PatientInteraction> PatientInteractiontims = GetPatientInteractiontime(patientId, patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
-            //                    //List<VitalReading> VitalReadings = billing.GetVitalReadings(patientProgramData, con).Where(s => s.ReadingDate >= date.StartDate && s.ReadingDate <= date.EndDate).ToList();
-
-            //                    if (PatientInteractiontims != null && PatientInteractiontims.Count > 0)
-            //                    {
-            //                        foreach (var list in PatientInteractiontims)
-            //                        {
-            //                            PatientInteractiontimList.Add(list);
-            //                        }
-
-            //                    }
-
-            //                }
-
-
-            //            }
-
-
-
-
-
-
-
-
-            //            //List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
-            //            if (PatientInteractiontimList == null)
-            //            {
-            //                PatientBilldatas = new PatientBilldata();
-            //                PatientBilldatas.CPTCode = code.BillingCode;
-            //                PatientBilldatas.Completed = 0;
-            //                PatientBilldatas.Total = code.TargetReadings;
-            //                PatientBilldatas.IsTargetMet = false;
-            //                PatientBilldatas.ReadyTobill = 0;
-            //                return PatientBilldatas;
-            //            }
-            //            var isEstablishedExist = PatientInteractiontimList.Where(s => s.IsCallNote == 1).ToList();
-            //            if (isEstablishedExist.Count() > 0)
-            //            {
-            //                isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-            //                if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-            //                {
-            //                    PatientInteractiontimList.Clear();
-            //                }
-            //            }
-            //            if (PatientInteractiontimList.Count == 0 || PatientInteractiontimList == null || isEstablishedExist.Count == 0)
-            //            {
-            //                PatientBilldatas = new PatientBilldata();
-            //                PatientBilldatas.CPTCode = code.BillingCode;
-            //                PatientBilldatas.Completed = 0;
-            //                PatientBilldatas.Total = code.TargetReadings;
-            //                PatientBilldatas.IsTargetMet = false;
-            //                PatientBilldatas.ReadyTobill = 0;
-            //                return PatientBilldatas;
-            //            }
-            //            TotalReading = PatientInteractiontimList.Sum(s => s.Duration);
-
-            //            if (TotalReading > code457.TargetReadings * 60)
-            //            {
-            //                TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
-            //                TotalReading = (int)(t1.TotalSeconds - (code457.TargetReadings * 60));
-            //                PatientBilldatas = new PatientBilldata();
-            //                PatientBilldatas.BillingStartDate = endDate;
-            //                PatientBilldatas.CPTCode = code.BillingCode;
-            //                PatientBilldatas.Completed = TotalReading;
-            //                if (TotalReading < code457.TargetReadings * 60)
-            //                {
-            //                    // base 20
-            //                    PatientBilldatas.Total = code457.TargetReadings * 60;
-            //                    PatientBilldatas.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //                }
-            //                else
-            //                {
-            //                    //base 40
-            //                    PatientBilldatas.Total = code.TargetReadings * 60;
-            //                    PatientBilldatas.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //                }
-            //                PatientBilldatas.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
-            //            }
-            //            else
-            //            {
-            //                PatientBilldatas = new PatientBilldata();
-            //                //Target reading 20
-            //                PatientBilldatas.BillingStartDate = stDate;
-            //                PatientBilldatas.CPTCode = code.BillingCode;
-            //                PatientBilldatas.Completed = 0;
-            //                PatientBilldatas.Total = code457.TargetReadings * 60;
-            //                PatientBilldatas.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
-            //                PatientBilldatas.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-
-            //            }
-            //            return PatientBilldatas;
-            //        }
-            //    }
-            //    return PatientBilldatas;
-            //int DaysCompleted = 0; int TotalReading = 0;
-            //PatientStartDate PatientStartDate = new PatientStartDate();
-            //PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //if (PatientStartDate == null ||
-            //    PatientStartDate.Status.ToLower() == "invalid")
-            //{
-            //    pbd.CPTCode = code.BillingCode;
-            //    pbd.Completed = 0;
-            //    pbd.Total = code.TargetReadings;
-            //    pbd.IsTargetMet = false;
-            //    pbd.ReadyTobill = 0;
-            //    return pbd;
-            //}
-            //else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
-            //{
-            //    PatientBilldata PatientBilldata = new PatientBilldata();
-            //    PatientBilldata.CPTCode = code.BillingCode;
-            //    PatientBilldata.Completed = 0;
-            //    PatientBilldata.Total = code.TargetReadings;
-            //    PatientBilldata.IsTargetMet = false;
-            //    PatientBilldata.ReadyTobill = 0;
-            //    return PatientBilldata;
-            //}
-            //else
-            //{
-            //    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-            //    DateTime endDate = DateTime.UtcNow.Date;
-            //    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-            //    //the patientbilling table and +1 day will come as next start day.. So we should   
-            //    // calcualte the start date with respect to the billing threshold
-            //    if (stDate > DateTime.UtcNow.Date)
-            //    {
-            //        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-            //        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //        stDate = bd.StartDate;
-            //        endDate = bd.EndDate;
-            //    }
-            //    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
-            //    if (PatientInteractiontim == null)
-            //    {
-            //        pbd.CPTCode = code.BillingCode;
-            //        pbd.Completed = 0;
-            //        pbd.Total = code.TargetReadings;
-            //        pbd.IsTargetMet = false;
-            //        pbd.ReadyTobill = 0;
-            //        return pbd;
-            //    }
-            //    var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
-            //    if (isEstablishedExist.Count() > 0)
-            //    {
-            //        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-            //        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-            //        {
-            //            PatientInteractiontim.Clear();
-            //        }
-            //    }
-            //    if (PatientInteractiontim.Count == 0 || PatientInteractiontim ==null || isEstablishedExist.Count==0)
-            //    {
-            //        pbd.CPTCode = code.BillingCode;
-            //        pbd.Completed = 0;
-            //        pbd.Total = code.TargetReadings;
-            //        pbd.IsTargetMet = false;
-            //        pbd.ReadyTobill = 0;
-            //        return pbd;
-            //    }
-            //    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
-
-            //    if (TotalReading > code457.TargetReadings*60)
-            //    {
-            //        TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
-            //        TotalReading = (int)(t1.TotalSeconds - (code457.TargetReadings * 60));
-
-            //        pbd.BillingStartDate = endDate;
-            //        pbd.CPTCode = code.BillingCode;
-            //        pbd.Completed = TotalReading;
-            //        if (TotalReading<code457.TargetReadings*60)
-            //        {
-            //            // base 20
-            //            pbd.Total = code457.TargetReadings * 60;
-            //            pbd.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //        }
-            //        else
-            //        {
-            //            //base 40
-            //            pbd.Total = code.TargetReadings * 60;
-            //            pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //        }
-            //        pbd.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
-            //    }
-            //    else
-            //    {
-            //        //Target reading 20
-            //        pbd.BillingStartDate = endDate;
-            //        pbd.CPTCode = code.BillingCode;
-            //        pbd.Completed = 0;
-            //        pbd.Total = code457.TargetReadings * 60;
-            //        pbd.IsTargetMet = (TotalReading >= code457.TargetReadings * 60) ? true : false;
-            //        pbd.ReadyTobill = (TotalReading >= (code457.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-
-            //    }
-            //    return pbd;
-            //}
-            //}
-            //catch (Exception ex)
-            //{
-            //    throw;
-            //}
-        }
-        public PatientBilldata ProcessCPT99457_MedITNew(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
-        {
-            PatientBilldata pbd = new PatientBilldata();
-            try
-            {
-                int DaysCompleted = 0; int TotalReading = 0;
-                PatientStartDate PatientStartDate = new PatientStartDate();
-                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                if (PatientStartDate == null ||
-                    PatientStartDate.Status.ToLower() == "invalid")
-                {
-                    pbd.CPTCode = code.BillingCode;
-                    pbd.Completed = 0;
-                    pbd.Total = code.TargetReadings*60;
-                    pbd.IsTargetMet = false;
-                    pbd.ReadyTobill = 0;
-                    return pbd;
-                }
-                else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
-                {
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    PatientBilldata.CPTCode = code.BillingCode;
-                    PatientBilldata.Completed = 0;
-                    PatientBilldata.Total = code.TargetReadings*60;
-                    PatientBilldata.IsTargetMet = false;
-                    PatientBilldata.ReadyTobill = 0;
-                    return PatientBilldata;
-                }
-                else
-                {
-
-                    //DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
-                    DateTime stDate = DateTime.MinValue;
-                    if (PatientStartDate.Status.ToLower() == "active")
-                    {
-                        stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
-                    }
-                    else
-                    {
-                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-                    }
-                    DateTime endDate = DateTime.UtcNow;
-                    DateTime today = DateTime.UtcNow;
-                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
-                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-                    //the patientbilling table and +1 day will come as next start day.. So we should   
-                    // calcualte the start date with respect to the billing threshold
-                    if (stDate.Date > endDateTempay)
-                    {
-                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                        stDate = bd.StartDate;
-
-                    }
-
-
-
-                    if (PatientStartDate.Status.ToLower() == "billeddate")
-                    {
-                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
-                        endDate =DateTime.UtcNow;
-
-                    }
-
-
-
-
-
-
-
-
-                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
-                    if (PatientInteractiontim == null)
-                    {
-                        pbd.CPTCode = code.BillingCode;
-                        pbd.Completed = 0;
-                        pbd.Total = code.TargetReadings*60;
-                        pbd.IsTargetMet = false;
-                        pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = stDate;
-                        return pbd;
-                    }
-                    var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
-                    if (isEstablishedExist.Count() > 0)
-                    {
-                        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-                        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-                        {
-                            PatientInteractiontim.Clear();
-                        }
-                    }
-                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null || isEstablishedExist.Count == 0)
-                    {
-                        pbd.CPTCode = code.BillingCode;
-                        pbd.Completed = 0;
-                        pbd.Total = code.TargetReadings*60;
-                        pbd.IsTargetMet = false;
-                        pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = stDate;
-                        return pbd;
-                    }
-                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
-
-                    if (TotalReading >= code.TargetReadings * 60)
-                    {
-                        TotalReading = code.TargetReadings * 60;
-                    }
-                    pbd.BillingStartDate = stDate;
-                    pbd.CPTCode = code.BillingCode;
-                    pbd.Completed = TotalReading;
-                    pbd.Total = code.TargetReadings * 60;
-                    pbd.IsTargetMet = (TotalReading >= code.TargetReadings * 60) ? true : false;
-                    pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-                    return pbd;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            //PatientBilldata pbd = new PatientBilldata();
-            //try
-            //{
-            //    PatientBilldata PatientBilldatas = new PatientBilldata();
-            //    List<PatientDailyBillingData> lstDailyData = GetPatientBillingCounts(patientId, patientProgramId, connectionString);
-            //    if (lstDailyData == null || lstDailyData.Count == 0)
-            //    {
-
-            //        //PatientBilldatas.CPTCode = code.BillingCode;
-            //        //PatientBilldatas.Completed = 0;
-            //        //PatientBilldatas.Total = code.TargetReadings;
-            //        //PatientBilldatas.IsTargetMet = false;
-            //        //PatientBilldatas.ReadyTobill = 0;
-            //        //return PatientBilldatas;
-            //        PatientBilldatas=null;
-            //    }
-
-            //    foreach (PatientDailyBillingData pdb in lstDailyData)
-            //    {
-            //        if (pdb.BillingCodeId == code.BillingCodeID)
-            //        {
-            //            DateTime createdOn = pdb.CreatedOn;
-            //            DateTime createdOnEnd = DateTime.UtcNow;
-            //            List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, createdOn, createdOnEnd).ToList();
-            //            if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
-            //            {
-            //                var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
-            //                if (isEstablishedExist.Count() > 0)
-            //                {
-            //                    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-            //                    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-            //                    {
-            //                        PatientInteractiontim.Clear();
-            //                    }
-            //                }
-            //                if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
-            //                {
-            //                    int TotalReading = PatientInteractiontim.Sum(s => s.Duration);
-            //                    pdb.TotalDuration = pdb.TotalDuration + TotalReading;
-            //                }
-
-            //                //if (PatientInteractiontim.Count==0 || PatientInteractiontim==null || isEstablishedExist.Count==0)
-            //                //{
-            //                //    TotalReading = 0;
-            //                //}
-
-            //            }
-            //            PatientBilldatas = new PatientBilldata();
-            //            PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;
-            //            PatientBilldatas.CPTCode = code.BillingCode;
-            //            PatientBilldatas.Completed = pdb.TotalDuration;
-            //            PatientBilldatas.Total = code.TargetReadings;
-            //            PatientBilldatas.IsTargetMet = (pdb.TotalDuration >= code.TargetReadings * 60) ? true : false;
-            //            PatientBilldatas.ReadyTobill = (pdb.TotalDuration >= (code.TargetReadings * 60) && pdb.DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //            return PatientBilldatas;
-
-            //        }
-            //        else
-            //        {
-            //            PatientBilldatas = null;
-            //        }
-            //    }
-
-            //    if (PatientBilldatas == null)
-            //    {
-            //        int DaysCompleted = 0; int TotalReading = 0;
-            //        PatientStartDate PatientStartDate = new PatientStartDate();
-            //        PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //        if (PatientStartDate == null ||
-            //            PatientStartDate.Status.ToLower() == "invalid")
-            //        {
-            //            pbd.CPTCode = code.BillingCode;
-            //            pbd.Completed = 0;
-            //            pbd.Total = code.TargetReadings;
-            //            pbd.IsTargetMet = false;
-            //            pbd.ReadyTobill = 0;
-            //            return pbd;
-            //        }
-            //        else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
-            //        {
-            //            PatientBilldatas = new PatientBilldata();
-            //            PatientBilldatas.CPTCode = code.BillingCode;
-            //            PatientBilldatas.Completed = 0;
-            //            PatientBilldatas.Total = code.TargetReadings;
-            //            PatientBilldatas.IsTargetMet = false;
-            //            PatientBilldatas.ReadyTobill = 0;
-            //            return PatientBilldatas;
-            //        }
-            //        else
-            //        {
-            //            DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-            //            DateTime endDate = DateTime.UtcNow.Date;
-            //            DateTime startDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
-            //            DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
-            //            //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-            //            //the patientbilling table and +1 day will come as next start day.. So we should   
-            //            // calcualte the start date with respect to the billing threshold
-            //            if (stDate > DateTime.UtcNow.Date)
-            //            {
-            //                //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-            //                BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //                startDatetemp = bd.StartDate;
-            //                endDatetemp = bd.EndDate;
-            //            }
-
-
-            //            DateTime startDateLoc = startDatetemp;
-            //            DateTime enddateLoc = endDatetemp;
-            //            int nTotDays = Math.Abs((startDatetemp - endDatetemp).Days) + 1;
-            //            DaysCompleted = nTotDays;
-            //            List<Dates> Dates = new List<Dates>();
-            //            for (int i = 0; i <= DaysCompleted; i++)
-            //            {
-            //                if (i == 0)
-            //                {
-            //                    endDatetemp = startDateLoc.AddDays(1).Date.AddSeconds(-1);
-
-            //                }
-            //                else if (i == DaysCompleted)
-            //                {
-            //                    startDatetemp = startDateLoc.AddDays(i).Date;
-            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
-            //                }
-            //                else
-            //                {
-            //                    startDatetemp = startDateLoc.AddDays(i).Date;
-            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
-
-            //                }
-
-            //                startDatetemp = GetUTCFromLocalTime((DateTime)startDatetemp, connectionString);
-            //                endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
-
-
-            //                Dates.Add(new Dates() { StartDate = (DateTime)startDatetemp, EndDate = endDatetemp, Totalreading = 0 });
-
-            //            }
-            //            List<PatientInteraction> PatientInteractiontimList = new List<PatientInteraction>();
-            //            if (Dates.Count > 0)
-            //            {
-
-            //                foreach (Dates date in Dates)
-            //                {
-
-            //                    List<PatientInteraction> PatientInteractiontims = GetPatientInteractiontime(patientId, patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
-            //                    //List<VitalReading> VitalReadings = billing.GetVitalReadings(patientProgramData, con).Where(s => s.ReadingDate >= date.StartDate && s.ReadingDate <= date.EndDate).ToList();
-
-            //                    if (PatientInteractiontims != null && PatientInteractiontims.Count > 0)
-            //                    {
-            //                        foreach (var list in PatientInteractiontims)
-            //                        {
-            //                            PatientInteractiontimList.Add(list);
-            //                        }
-
-            //                    }
-
-            //                }
-
-
-            //            }
-
-
-
-
-
-
-
-
-
-            //            // List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
-            //            if (PatientInteractiontimList == null)
-            //            {
-            //                PatientBilldatas = new PatientBilldata();
-            //                PatientBilldatas.CPTCode = code.BillingCode;
-            //                PatientBilldatas.Completed = 0;
-            //                PatientBilldatas.Total = code.TargetReadings;
-            //                PatientBilldatas.IsTargetMet = false;
-            //                PatientBilldatas.ReadyTobill = 0;
-            //                return PatientBilldatas;
-            //            }
-            //            var isEstablishedExist = PatientInteractiontimList.Where(s => s.IsCallNote == 1).ToList();
-            //            if (isEstablishedExist.Count() > 0)
-            //            {
-            //                isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-            //                if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-            //                {
-            //                    PatientInteractiontimList.Clear();
-            //                }
-            //            }
-            //            if (PatientInteractiontimList.Count == 0 || PatientInteractiontimList == null || isEstablishedExist.Count == 0)
-            //            {
-            //                PatientBilldatas = new PatientBilldata();
-            //                PatientBilldatas.CPTCode = code.BillingCode;
-            //                PatientBilldatas.Completed = 0;
-            //                PatientBilldatas.Total = code.TargetReadings;
-            //                PatientBilldatas.IsTargetMet = false;
-            //                PatientBilldatas.ReadyTobill = 0;
-            //                return PatientBilldatas;
-            //            }
-            //            TotalReading = PatientInteractiontimList.Sum(s => s.Duration);
-
-            //            if (TotalReading >= code.TargetReadings * 60)
-            //            {
-            //                TotalReading = code.TargetReadings * 60;
-            //            }
-            //            PatientBilldatas = new PatientBilldata();
-            //            PatientBilldatas.BillingStartDate = stDate;
-            //            PatientBilldatas.CPTCode = code.BillingCode;
-            //            PatientBilldatas.Completed = TotalReading;
-            //            PatientBilldatas.Total = code.TargetReadings * 60;
-            //            PatientBilldatas.IsTargetMet = (TotalReading >= code.TargetReadings * 60) ? true : false;
-            //            PatientBilldatas.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //            return PatientBilldatas;
-            //        }
-            //    }
-
-            //    return PatientBilldatas;
-
-
-
-
-
-            //int DaysCompleted = 0; int TotalReading = 0;
-            //PatientStartDate PatientStartDate = new PatientStartDate();
-            //PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //if (PatientStartDate == null ||
-            //    PatientStartDate.Status.ToLower() == "invalid")
-            //{
-            //    pbd.CPTCode = code.BillingCode;
-            //    pbd.Completed = 0;
-            //    pbd.Total = code.TargetReadings;
-            //    pbd.IsTargetMet = false;
-            //    pbd.ReadyTobill = 0;
-            //    return pbd;
-            //}
-            //else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
-            //{
-            //    PatientBilldata PatientBilldata = new PatientBilldata();
-            //    PatientBilldata.CPTCode = code.BillingCode;
-            //    PatientBilldata.Completed = 0;
-            //    PatientBilldata.Total = code.TargetReadings;
-            //    PatientBilldata.IsTargetMet = false;
-            //    PatientBilldata.ReadyTobill = 0;
-            //    return PatientBilldata;
-            //}
-            //else
-            //{
-            //    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-            //    DateTime endDate = DateTime.UtcNow.Date;
-
-            //    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-            //    //the patientbilling table and +1 day will come as next start day.. So we should   
-            //    // calcualte the start date with respect to the billing threshold
-            //    if (stDate > DateTime.UtcNow.Date)
-            //    {
-            //        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-            //        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //        stDate = bd.StartDate;
-            //        endDate = bd.EndDate;
-            //    }
-            //    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
-            //    if (PatientInteractiontim == null)
-            //    {
-            //        pbd.CPTCode = code.BillingCode;
-            //        pbd.Completed = 0;
-            //        pbd.Total = code.TargetReadings;
-            //        pbd.IsTargetMet = false;
-            //        pbd.ReadyTobill = 0;
-            //        return pbd;
-            //    }
-            //    var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
-            //    if (isEstablishedExist.Count() > 0)
-            //    {
-            //        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-            //        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-            //        {
-            //            PatientInteractiontim.Clear();
-            //        }
-            //    }
-            //    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null || isEstablishedExist.Count==0)
-            //    {
-            //        pbd.CPTCode = code.BillingCode;
-            //        pbd.Completed = 0;
-            //        pbd.Total = code.TargetReadings;
-            //        pbd.IsTargetMet = false;
-            //        pbd.ReadyTobill = 0;
-            //        return pbd;
-            //    }
-            //    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
-
-            //    if (TotalReading>= code.TargetReadings * 60)
-            //    {
-            //        TotalReading = code.TargetReadings * 60;
-            //    }
-            //    pbd.BillingStartDate = stDate;
-            //    pbd.CPTCode = code.BillingCode;
-            //    pbd.Completed = TotalReading;
-            //    pbd.Total = code.TargetReadings * 60;
-            //    pbd.IsTargetMet = (TotalReading >= code.TargetReadings*60) ? true : false;
-            //    pbd.ReadyTobill = (TotalReading >= (code.TargetReadings*60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //    return pbd;
-            //}
-            //}
-            //    catch (Exception ex)
-            //    {
-            //        throw;
-            //    }
-        }
-        public PatientBilldata ProcessCPT99457_ClynxNew(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
-        {
-            PatientBilldata pbd = new PatientBilldata();
-            try
-            {
-                int DaysCompleted = 0; int TotalReading = 0;
-                PatientStartDate PatientStartDate = new PatientStartDate();
-                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                if (PatientStartDate == null ||
-                    PatientStartDate.Status.ToLower() == "invalid")
-                {
-                    pbd.CPTCode = code.BillingCode;
-                    pbd.Completed = 0;
-                    pbd.Total = code.TargetReadings*60;
-                    pbd.IsTargetMet = false;
-                    pbd.ReadyTobill = 0;
-                    return pbd;
-                }
-                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
-                {
-                    PatientBilldata PatientBilldata = new PatientBilldata();
-                    PatientBilldata.CPTCode = code.BillingCode;
-                    PatientBilldata.Completed = 0;
-                    PatientBilldata.Total = code.TargetReadings*60;
-                    PatientBilldata.IsTargetMet = false;
-                    PatientBilldata.ReadyTobill = 0;
-                    return PatientBilldata;
-                }
-                else
-                {
-
-                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-                    DateTime endDate = DateTime.UtcNow;//.AddMinutes(10);
-
-                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-                    //the patientbilling table and +1 day will come as next start day.. So we should   
-                    // calcualte the start date with respect to the billing threshold
-                    DateTime today = DateTime.UtcNow;
-                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
-                    if (stDate.Date > endDateTempay)
-                    {
-                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                        stDate = bd.StartDate;
-
-                    }
-
-
-
-                    if (PatientStartDate.Status.ToLower() == "billeddate")
-                    {
-                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
-                        endDate = DateTime.UtcNow;//.AddMinutes(10);
-
-                    }
-
-
-
-
-
-
-
-                    int patientSmsCount = 0;
-                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
-                    patientSmsCount =GetPatientSmsCount(patientId, connectionString, stDate, endDate);
-                    if (PatientInteractiontim == null)
-                    {
-                        pbd.CPTCode = code.BillingCode;
-                        pbd.Completed = 0;
-                        pbd.Total = code.TargetReadings*60;
-                        pbd.IsTargetMet = false;
-                        pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = stDate;
-                        return pbd;
-                    }
-                    var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
-                    if (isEstablishedExist.Count() > 0)
-                    {
-                        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-                        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-                        {
-                            if (patientSmsCount <= 0)
-                            {
-                                PatientInteractiontim.Clear();
-                            }
-                                
-                        }
-                    }
-                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null || isEstablishedExist.Count == 0)
-                    {
-                        if (patientSmsCount <= 0)
-                        {
-                            pbd.CPTCode = code.BillingCode;
-                            pbd.Completed = 0;
-                            pbd.Total = code.TargetReadings*60;
-                            pbd.IsTargetMet = false;
-                            pbd.ReadyTobill = 0;
-                            pbd.BillingStartDate = stDate;
-                            return pbd;
-                        }
-                        
-                    }
-                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
-
-                    if (TotalReading >= code.TargetReadings * 60)
-                    {
-                        TotalReading = code.TargetReadings * 60;
-                    }
-                    pbd.BillingStartDate = stDate;
-                    pbd.CPTCode = code.BillingCode;
-                    pbd.Completed = TotalReading;
-                    pbd.Total = code.TargetReadings * 60;
-                    pbd.IsTargetMet = (TotalReading >= code.TargetReadings * 60) ? true : false;
-                    pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-                    return pbd;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            //PatientBilldata pbd = new PatientBilldata();
-            //try
-            //{
-            //    PatientBilldata PatientBilldatas = new PatientBilldata();
-            //    List<PatientDailyBillingData> lstDailyData = GetPatientBillingCounts(patientId, patientProgramId, connectionString);
-            //    if (lstDailyData == null || lstDailyData.Count == 0)
-            //    {
-
-            //        //PatientBilldatas.CPTCode = code.BillingCode;
-            //        //PatientBilldatas.Completed = 0;
-            //        //PatientBilldatas.Total = code.TargetReadings;
-            //        //PatientBilldatas.IsTargetMet = false;
-            //        //PatientBilldatas.ReadyTobill = 0;
-            //        //return PatientBilldatas;
-            //        PatientBilldatas=null;
-            //    }
-
-            //    foreach (PatientDailyBillingData pdb in lstDailyData)
-            //    {
-            //        if (pdb.BillingCodeId == code.BillingCodeID)
-            //        {
-            //            DateTime createdOn = pdb.CreatedOn;
-            //            DateTime createdOnEnd = DateTime.UtcNow;
-            //            List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, createdOn, createdOnEnd).ToList();
-            //            if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
-            //            {
-            //                var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
-            //                if (isEstablishedExist.Count() > 0)
-            //                {
-            //                    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-            //                    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-            //                    {
-            //                        PatientInteractiontim.Clear();
-            //                    }
-            //                }
-            //                if (PatientInteractiontim != null && PatientInteractiontim.Count > 0)
-            //                {
-            //                    int TotalReading = PatientInteractiontim.Sum(s => s.Duration);
-            //                    pdb.TotalDuration = pdb.TotalDuration + TotalReading;
-            //                }
-
-            //                //if (PatientInteractiontim.Count==0 || PatientInteractiontim==null || isEstablishedExist.Count==0)
-            //                //{
-            //                //    TotalReading = 0;
-            //                //}
-
-            //            }
-            //            PatientBilldatas = new PatientBilldata();
-            //            PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;
-            //            PatientBilldatas.CPTCode = code.BillingCode;
-            //            PatientBilldatas.Completed = pdb.TotalDuration;
-            //            PatientBilldatas.Total = code.TargetReadings;
-            //            PatientBilldatas.IsTargetMet = (pdb.TotalDuration >= code.TargetReadings * 60) ? true : false;
-            //            PatientBilldatas.ReadyTobill = (pdb.TotalDuration >= (code.TargetReadings * 60) && pdb.DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //            return PatientBilldatas;
-
-            //        }
-            //        else
-            //        {
-            //            PatientBilldatas = null;
-            //        }
-            //    }
-
-            //    if (PatientBilldatas == null)
-            //    {
-            //        int DaysCompleted = 0; int TotalReading = 0;
-            //        PatientStartDate PatientStartDate = new PatientStartDate();
-            //        PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //        if (PatientStartDate == null ||
-            //            PatientStartDate.Status.ToLower() == "invalid")
-            //        {
-            //            pbd.CPTCode = code.BillingCode;
-            //            pbd.Completed = 0;
-            //            pbd.Total = code.TargetReadings;
-            //            pbd.IsTargetMet = false;
-            //            pbd.ReadyTobill = 0;
-            //            return pbd;
-            //        }
-            //        else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
-            //        {
-            //            PatientBilldatas = new PatientBilldata();
-            //            PatientBilldatas.CPTCode = code.BillingCode;
-            //            PatientBilldatas.Completed = 0;
-            //            PatientBilldatas.Total = code.TargetReadings;
-            //            PatientBilldatas.IsTargetMet = false;
-            //            PatientBilldatas.ReadyTobill = 0;
-            //            return PatientBilldatas;
-            //        }
-            //        else
-            //        {
-            //            DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-            //            DateTime endDate = DateTime.UtcNow.Date;
-            //            DateTime startDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
-            //            DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
-            //            //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-            //            //the patientbilling table and +1 day will come as next start day.. So we should   
-            //            // calcualte the start date with respect to the billing threshold
-            //            if (stDate > DateTime.UtcNow.Date)
-            //            {
-            //                //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-            //                BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //                startDatetemp = bd.StartDate;
-            //                endDatetemp = bd.EndDate;
-            //            }
-
-
-            //            DateTime startDateLoc = startDatetemp;
-            //            DateTime enddateLoc = endDatetemp;
-            //            int nTotDays = Math.Abs((startDatetemp - endDatetemp).Days) + 1;
-            //            DaysCompleted = nTotDays;
-            //            List<Dates> Dates = new List<Dates>();
-            //            for (int i = 0; i <= DaysCompleted; i++)
-            //            {
-            //                if (i == 0)
-            //                {
-            //                    endDatetemp = startDateLoc.AddDays(1).Date.AddSeconds(-1);
-
-            //                }
-            //                else if (i == DaysCompleted)
-            //                {
-            //                    startDatetemp = startDateLoc.AddDays(i).Date;
-            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
-            //                }
-            //                else
-            //                {
-            //                    startDatetemp = startDateLoc.AddDays(i).Date;
-            //                    endDatetemp = startDatetemp.AddDays(1).Date.AddSeconds(-1);
-
-            //                }
-
-            //                startDatetemp = GetUTCFromLocalTime((DateTime)startDatetemp, connectionString);
-            //                endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
-
-
-            //                Dates.Add(new Dates() { StartDate = (DateTime)startDatetemp, EndDate = endDatetemp, Totalreading = 0 });
-
-            //            }
-            //            List<PatientInteraction> PatientInteractiontimList = new List<PatientInteraction>();
-            //            if (Dates.Count > 0)
-            //            {
-
-            //                foreach (Dates date in Dates)
-            //                {
-
-            //                    List<PatientInteraction> PatientInteractiontims = GetPatientInteractiontime(patientId, patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
-            //                    //List<VitalReading> VitalReadings = billing.GetVitalReadings(patientProgramData, con).Where(s => s.ReadingDate >= date.StartDate && s.ReadingDate <= date.EndDate).ToList();
-
-            //                    if (PatientInteractiontims != null && PatientInteractiontims.Count > 0)
-            //                    {
-            //                        foreach (var list in PatientInteractiontims)
-            //                        {
-            //                            PatientInteractiontimList.Add(list);
-            //                        }
-
-            //                    }
-
-            //                }
-
-
-            //            }
-
-
-
-
-
-
-
-
-
-            //            // List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
-            //            if (PatientInteractiontimList == null)
-            //            {
-            //                PatientBilldatas = new PatientBilldata();
-            //                PatientBilldatas.CPTCode = code.BillingCode;
-            //                PatientBilldatas.Completed = 0;
-            //                PatientBilldatas.Total = code.TargetReadings;
-            //                PatientBilldatas.IsTargetMet = false;
-            //                PatientBilldatas.ReadyTobill = 0;
-            //                return PatientBilldatas;
-            //            }
-            //            var isEstablishedExist = PatientInteractiontimList.Where(s => s.IsCallNote == 1).ToList();
-            //            if (isEstablishedExist.Count() > 0)
-            //            {
-            //                isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-            //                if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-            //                {
-            //                    PatientInteractiontimList.Clear();
-            //                }
-            //            }
-            //            if (PatientInteractiontimList.Count == 0 || PatientInteractiontimList == null || isEstablishedExist.Count == 0)
-            //            {
-            //                PatientBilldatas = new PatientBilldata();
-            //                PatientBilldatas.CPTCode = code.BillingCode;
-            //                PatientBilldatas.Completed = 0;
-            //                PatientBilldatas.Total = code.TargetReadings;
-            //                PatientBilldatas.IsTargetMet = false;
-            //                PatientBilldatas.ReadyTobill = 0;
-            //                return PatientBilldatas;
-            //            }
-            //            TotalReading = PatientInteractiontimList.Sum(s => s.Duration);
-
-            //            if (TotalReading >= code.TargetReadings * 60)
-            //            {
-            //                TotalReading = code.TargetReadings * 60;
-            //            }
-            //            PatientBilldatas = new PatientBilldata();
-            //            PatientBilldatas.BillingStartDate = stDate;
-            //            PatientBilldatas.CPTCode = code.BillingCode;
-            //            PatientBilldatas.Completed = TotalReading;
-            //            PatientBilldatas.Total = code.TargetReadings * 60;
-            //            PatientBilldatas.IsTargetMet = (TotalReading >= code.TargetReadings * 60) ? true : false;
-            //            PatientBilldatas.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //            return PatientBilldatas;
-            //        }
-            //    }
-
-            //    return PatientBilldatas;
-
-
-
-
-
-            //int DaysCompleted = 0; int TotalReading = 0;
-            //PatientStartDate PatientStartDate = new PatientStartDate();
-            //PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //if (PatientStartDate == null ||
-            //    PatientStartDate.Status.ToLower() == "invalid")
-            //{
-            //    pbd.CPTCode = code.BillingCode;
-            //    pbd.Completed = 0;
-            //    pbd.Total = code.TargetReadings;
-            //    pbd.IsTargetMet = false;
-            //    pbd.ReadyTobill = 0;
-            //    return pbd;
-            //}
-            //else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
-            //{
-            //    PatientBilldata PatientBilldata = new PatientBilldata();
-            //    PatientBilldata.CPTCode = code.BillingCode;
-            //    PatientBilldata.Completed = 0;
-            //    PatientBilldata.Total = code.TargetReadings;
-            //    PatientBilldata.IsTargetMet = false;
-            //    PatientBilldata.ReadyTobill = 0;
-            //    return PatientBilldata;
-            //}
-            //else
-            //{
-            //    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-            //    DateTime endDate = DateTime.UtcNow.Date;
-
-            //    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-            //    //the patientbilling table and +1 day will come as next start day.. So we should   
-            //    // calcualte the start date with respect to the billing threshold
-            //    if (stDate > DateTime.UtcNow.Date)
-            //    {
-            //        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-            //        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-            //        stDate = bd.StartDate;
-            //        endDate = bd.EndDate;
-            //    }
-            //    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString).Where(s => s.Date >= stDate && s.Date <= endDate).ToList();
-            //    if (PatientInteractiontim == null)
-            //    {
-            //        pbd.CPTCode = code.BillingCode;
-            //        pbd.Completed = 0;
-            //        pbd.Total = code.TargetReadings;
-            //        pbd.IsTargetMet = false;
-            //        pbd.ReadyTobill = 0;
-            //        return pbd;
-            //    }
-            //    var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
-            //    if (isEstablishedExist.Count() > 0)
-            //    {
-            //        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-            //        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-            //        {
-            //            PatientInteractiontim.Clear();
-            //        }
-            //    }
-            //    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null || isEstablishedExist.Count==0)
-            //    {
-            //        pbd.CPTCode = code.BillingCode;
-            //        pbd.Completed = 0;
-            //        pbd.Total = code.TargetReadings;
-            //        pbd.IsTargetMet = false;
-            //        pbd.ReadyTobill = 0;
-            //        return pbd;
-            //    }
-            //    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
-
-            //    if (TotalReading>= code.TargetReadings * 60)
-            //    {
-            //        TotalReading = code.TargetReadings * 60;
-            //    }
-            //    pbd.BillingStartDate = stDate;
-            //    pbd.CPTCode = code.BillingCode;
-            //    pbd.Completed = TotalReading;
-            //    pbd.Total = code.TargetReadings * 60;
-            //    pbd.IsTargetMet = (TotalReading >= code.TargetReadings*60) ? true : false;
-            //    pbd.ReadyTobill = (TotalReading >= (code.TargetReadings*60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-            //    return pbd;
-            //}
-            //}
-            //    catch (Exception ex)
-            //    {
-            //        throw;
-            //    }
-        }
-        public PatientBilldata ProcessCPT99454_ClynxNew(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
-        {
-            try
-            {
-                PatientBilldata PatientBilldatas = new PatientBilldata();
-                List<PatientDailyBillingData> lstDailyData = GetPatientBillingCounts(patientId, patientProgramId, connectionString);
-                if (lstDailyData == null || lstDailyData.Count == 0)
-                {
-
-                    PatientBilldatas = null;
-                }
-
-                foreach (PatientDailyBillingData pdb in lstDailyData)
-                {
-                    if (pdb.BillingCodeId == code.BillingCodeID)
-                    {
-                        DateTime createdOn = pdb.CreatedOn;
-                        DateTime createdontemp = GetUTCFromLocalTime((DateTime)createdOn.Date, connectionString);
-                        bool flag = false;
-
-
-                        DateTime createdEnd = GetUTCFromLocalTime((DateTime)createdOn.Date.AddDays(1).Date.AddSeconds(-1), connectionString);
-                        if (createdOn < createdontemp)
-                        {
-                            flag = true;
-                            createdontemp = GetUTCFromLocalTime((DateTime)createdOn.Date.AddDays(-1).Date, connectionString);
-                            createdEnd = GetUTCFromLocalTime((DateTime)createdOn.Date.AddSeconds(-1), connectionString);
-                        }
-                        List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString, createdontemp, createdOn).ToList();
-                        if (VitalReadings.Count == 0)
-                        {
-                            List<VitalReading> VitalReading = GetVitalReadingsLocal(patientProgramId, connectionString, createdOn, createdEnd).ToList();
-                            if (VitalReading.Count != 0)
-                            {
-                                pdb.TotalVitalCount = pdb.TotalVitalCount + 1;
-                            }
-                            //List<VitalReading> VitalReadingg = GetVitalReadingsLocal(patientProgramId, connectionString, pdb.CreatedOn, GetUTCFromLocalTime((DateTime)pdb.CreatedOn.AddDays(1).Date.AddSeconds(-1), connectionString)).ToList();
-                            //if (VitalReading.Count!=0)
-                            //{
-                            //    pdb.TotalVitalCount= pdb.TotalVitalCount +1;
-                            //}
-                        }
-                        else
-                        {
-                            if (flag)
-                            {
-                                createdontemp = GetUTCFromLocalTime((DateTime)createdOn.Date, connectionString);
-                                createdEnd = GetUTCFromLocalTime((DateTime)createdOn.Date.AddDays(1).AddSeconds(-1), connectionString);
-                                List<VitalReading> VitalReading = GetVitalReadingsLocal(patientProgramId, connectionString, pdb.CreatedOn, GetUTCFromLocalTime((DateTime)pdb.CreatedOn.AddDays(1).Date.AddSeconds(-1), connectionString)).ToList();
-                                if (VitalReading.Count != 0)
-                                {
-                                    pdb.TotalVitalCount = pdb.TotalVitalCount + 1;
-                                }
-                            }
-
-                        }
-                        PatientBilldatas = new PatientBilldata();
-                        PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;
-                        PatientBilldatas.CPTCode = code.BillingCode;
-                        PatientBilldatas.Completed = pdb.TotalVitalCount;
-                        PatientBilldatas.Total = code.TargetReadings;
-                        PatientBilldatas.IsTargetMet = pdb.TotalVitalCount >= code.TargetReadings ? true : false;
-                        PatientBilldatas.ReadyTobill = (pdb.TotalVitalCount >= code.TargetReadings && pdb.DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-                        return PatientBilldatas;
-
-
-
-
-                    }
-                    else
-                    {
-                        PatientBilldatas = null;
-                    }
-
-                }
-
-                if (PatientBilldatas == null)
-                {
-                    int DaysCompleted = 0;
-                    PatientStartDate PatientStartDate = new PatientStartDate();
-                    PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                    DateTime StartDateTemp = GetLocalTimeFromUTC((DateTime)PatientStartDate.StartDate, connectionString);
-                    DateTime Today = GetLocalTimeFromUTC(DateTime.UtcNow.Date, connectionString);
-                    if (PatientStartDate == null || PatientStartDate.Status.ToLower() == "invalid")
-                    {
-                        PatientBilldatas = new PatientBilldata();
-                        PatientBilldatas.CPTCode = code.BillingCode;
-                        PatientBilldatas.Completed = 0;
-                        PatientBilldatas.Total = code.TargetReadings;
-                        PatientBilldatas.IsTargetMet = false;
-                        PatientBilldatas.ReadyTobill = 0;
-                        return PatientBilldatas;
-                    }
-                    else if (StartDateTemp > Today && PatientStartDate.Status.ToLower() == "active")
-                    {
-                        PatientBilldatas = new PatientBilldata();
-                        PatientBilldatas.CPTCode = code.BillingCode;
-                        PatientBilldatas.Completed = 0;
-                        PatientBilldatas.Total = code.TargetReadings;
-                        PatientBilldatas.IsTargetMet = false;
-                        PatientBilldatas.ReadyTobill = 0;
-                        return PatientBilldatas;
-                    }
-                    else
-                    {
-                        DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-                        DateTime endDate = DateTime.UtcNow.Date;
-                        DateTime stDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
-
-                        DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
-
-                        // endDate = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
-                        //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-                        //the patientbilling table and +1 day will come as next start day.. So we should   
-                        // calcualte the start date with respect to the billing threshold
-                        if (stDatetemp > endDatetemp)
-                        {
-                            //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-                            BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-
-                            stDatetemp = bd.StartDate;//GetLocalTimeFromUTC((DateTime)bd.StartDate, connectionString);
-                            endDatetemp = bd.EndDate;// GetLocalTimeFromUTC((DateTime)bd.EndDate, connectionString);
-                        }
-                        DateTime stDateLoc = stDatetemp;
-                        DateTime endDateLoc = endDatetemp;
-                        //DateTime Enddate1 = endDate;
-                        var DateDiff = Convert.ToDateTime(stDatetemp).Date - endDatetemp.Date;
-                        DaysCompleted = Math.Abs(DateDiff.Days) + 1;
-                        List<Dates> Dates = new List<Dates>();
-                        List<Dates> DatesNew = new List<Dates>();
-                        for (int i = 0; i <= DaysCompleted; i++)
-                        {
-                            if (i == 0)
-                            {
-                                endDatetemp = stDateLoc.AddDays(1).Date.AddSeconds(-1);
-
-                            }
-                            else if (i == DaysCompleted)
-                            {
-                                stDatetemp = stDateLoc.AddDays(i).Date;
-                                endDatetemp = endDateLoc;
-                            }
-                            else
-                            {
-                                stDatetemp = stDateLoc.AddDays(i).Date;
-                                endDatetemp = stDatetemp.AddDays(1).Date.AddSeconds(-1);
-
-                            }
-
-                            stDatetemp = GetUTCFromLocalTime((DateTime)stDatetemp, connectionString);
-                            endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
-
-
-                            Dates.Add(new Dates() { StartDate = (DateTime)stDatetemp, EndDate = endDatetemp, Totalreading = 0 });
-
-                        }
-                        if (Dates.Count > 0)
-                        {
-
-                            foreach (Dates date in Dates)
-                            {
-
-                                List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
-
-                                if (VitalReadings.Count > 0)
-                                {
-
-                                    DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading = 1 });
-
-                                }
-                                else
-                                {
-                                    DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading = 0 });
-                                }
-
-                            }
-
-
-                        }
-
-                        int VitalCount = DatesNew.Where(s => s.Totalreading == 1).Count();
-
-                        //int nVitalCount = 0;
-                        // List<VitalReading> VitalReadings = GetVitalReadings(patientProgramId, connectionString).Where(s => s.ReadingDate >= stDate && s.ReadingDate <= endDate).ToList();
-                        //if (VitalReadings != null)
-                        //{
-                        //    nVitalCount = VitalReadings.Count;
-                        //}
-                        PatientBilldatas = new PatientBilldata();
-                        PatientBilldatas.BillingStartDate = stDate;
-                        PatientBilldatas.CPTCode = code.BillingCode;
-                        PatientBilldatas.Completed = VitalCount;
-                        PatientBilldatas.Total = code.TargetReadings;
-                        PatientBilldatas.IsTargetMet = (VitalCount >= code.TargetReadings) ? true : false;
-                        PatientBilldatas.ReadyTobill = (VitalCount >= code.TargetReadings && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-                        return PatientBilldatas;
-                    }
-                }
-                return PatientBilldatas;
-
-
-
-
-
-                //int DaysCompleted = 0;
-                //PatientStartDate PatientStartDate = new PatientStartDate();
-                //PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                //DateTime StartDateTemp = GetLocalTimeFromUTC((DateTime)PatientStartDate.StartDate, connectionString);
-                //DateTime Today = GetLocalTimeFromUTC(DateTime.UtcNow.Date, connectionString); 
-                //if (PatientStartDate == null || PatientStartDate.Status.ToLower() == "invalid")
-                //{
-                //    PatientBilldata PatientBilldata = new PatientBilldata();
-                //    PatientBilldata.CPTCode = code.BillingCode;
-                //    PatientBilldata.Completed = 0;
-                //    PatientBilldata.Total = code.TargetReadings;
-                //    PatientBilldata.IsTargetMet = false;
-                //    PatientBilldata.ReadyTobill = 0;
-                //    return PatientBilldata;
-                //}
-                //else if (StartDateTemp > Today && PatientStartDate.Status.ToLower() == "active")
-                //{
-                //    PatientBilldata PatientBilldata = new PatientBilldata();
-                //    PatientBilldata.CPTCode = code.BillingCode;
-                //    PatientBilldata.Completed = 0;
-                //    PatientBilldata.Total = code.TargetReadings;
-                //    PatientBilldata.IsTargetMet = false;
-                //    PatientBilldata.ReadyTobill = 0;
-                //    return PatientBilldata;
-                //}
-                //else
-                //{
-                //    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-                //    DateTime endDate = DateTime.UtcNow.Date;
-                //    DateTime stDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
-
-                //    DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
-
-                //   // endDate = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
-                //    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-                //    //the patientbilling table and +1 day will come as next start day.. So we should   
-                //    // calcualte the start date with respect to the billing threshold
-                //    if (stDatetemp > endDatetemp)
-                //    {
-                //        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-                //        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-
-                //        stDatetemp = GetLocalTimeFromUTC((DateTime)bd.StartDate, connectionString);
-                //        stDatetemp = GetLocalTimeFromUTC((DateTime)bd.EndDate, connectionString); ;
-                //    }
-                //    DateTime stDateLoc = stDatetemp;
-                //    DateTime endDateLoc = endDatetemp;
-                //    //DateTime Enddate1 = endDate;
-                //    var DateDiff = Convert.ToDateTime(stDatetemp).Date - endDatetemp.Date;
-                //    DaysCompleted = Math.Abs(DateDiff.Days)+1;
-                //    List<Dates> Dates = new List<Dates>();
-                //    List<Dates> DatesNew = new List<Dates>();
-                //    for (int i = 0; i<=DaysCompleted; i++)
-                //    {
-                //        if (i==0)
-                //        {
-                //            endDatetemp = stDateLoc.AddDays(1).Date.AddSeconds(-1);
-
-                //        }
-                //        else if (i==DaysCompleted)
-                //        {
-                //            stDatetemp = stDateLoc.AddDays(i).Date;
-                //            endDatetemp = endDateLoc;
-                //        }
-                //        else
-                //        {
-                //            stDatetemp = stDateLoc.AddDays(i).Date;
-                //            endDatetemp = stDatetemp.AddDays(1).Date.AddSeconds(-1);
-
-                //        }
-
-                //        stDatetemp = GetUTCFromLocalTime((DateTime)stDatetemp, connectionString);
-                //        endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
-
-
-                //        Dates.Add(new Dates() { StartDate = (DateTime)stDatetemp, EndDate = endDatetemp, Totalreading=0 });
-
-                //    }
-                //    if (Dates.Count>0)
-                //    {
-
-                //        foreach (Dates date in Dates)
-                //        {
-
-                //            List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
-
-                //            if (VitalReadings.Count>0)
-                //            {
-
-                //                DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading=1 });
-
-                //            }
-                //            else
-                //            {
-                //                DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading=0 });
-                //            }
-
-                //        }
-
-
-                //    }
-
-                //    int VitalCount = DatesNew.Where(s => s.Totalreading == 1).Count();
-
-                //    //int nVitalCount = 0;
-                //   // List<VitalReading> VitalReadings = GetVitalReadings(patientProgramId, connectionString).Where(s => s.ReadingDate >= stDate && s.ReadingDate <= endDate).ToList();
-                //    //if (VitalReadings != null)
-                //    //{
-                //    //    nVitalCount = VitalReadings.Count;
-                //    //}
-                //    PatientBilldata PatientBilldata = new PatientBilldata();
-                //    PatientBilldata.BillingStartDate = stDate;
-                //    PatientBilldata.CPTCode = code.BillingCode;
-                //    PatientBilldata.Completed = VitalCount;
-                //    PatientBilldata.Total = code.TargetReadings;
-                //    PatientBilldata.IsTargetMet = (VitalCount >= code.TargetReadings) ? true : false;
-                //    PatientBilldata.ReadyTobill = (VitalCount >= code.TargetReadings && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-                //    return PatientBilldata;
-                //}
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
-
-        public PatientBilldata ProcessCPT99454_MedITNew(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
-        {
-            try
-            {
-                PatientBilldata PatientBilldatas = new PatientBilldata();
-                List<PatientDailyBillingData> lstDailyData = GetPatientBillingCounts(patientId, patientProgramId, connectionString);
-                if (lstDailyData == null || lstDailyData.Count == 0)
-                {
-
-                    PatientBilldatas = null;
-                }
-
-                foreach (PatientDailyBillingData pdb in lstDailyData)
-                {
-                    if (pdb.BillingCodeId == code.BillingCodeID)
-                    {
-                        DateTime createdOn = pdb.CreatedOn;
-                        DateTime createdontemp = GetUTCFromLocalTime((DateTime)createdOn.Date, connectionString);
-                        bool flag = false;
-
-
-                        DateTime createdEnd = GetUTCFromLocalTime((DateTime)createdOn.Date.AddDays(1).Date.AddSeconds(-1), connectionString);
-                        if (createdOn < createdontemp)
-                        {
-                            flag = true;
-                            createdontemp = GetUTCFromLocalTime((DateTime)createdOn.Date.AddDays(-1).Date, connectionString);
-                            createdEnd = GetUTCFromLocalTime((DateTime)createdOn.Date.AddSeconds(-1), connectionString);
-                        }
-                        List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString, createdontemp, createdOn).ToList();
-                        if (VitalReadings.Count == 0)
-                        {
-                            List<VitalReading> VitalReading = GetVitalReadingsLocal(patientProgramId, connectionString, createdOn, createdEnd).ToList();
-                            if (VitalReading.Count != 0)
-                            {
-                                pdb.TotalVitalCount = pdb.TotalVitalCount + 1;
-                            }
-                            //List<VitalReading> VitalReadingg = GetVitalReadingsLocal(patientProgramId, connectionString, pdb.CreatedOn, GetUTCFromLocalTime((DateTime)pdb.CreatedOn.AddDays(1).Date.AddSeconds(-1), connectionString)).ToList();
-                            //if (VitalReading.Count!=0)
-                            //{
-                            //    pdb.TotalVitalCount= pdb.TotalVitalCount +1;
-                            //}
-                        }
-                        else
-                        {
-                            if (flag)
-                            {
-                                createdontemp = GetUTCFromLocalTime((DateTime)createdOn.Date, connectionString);
-                                createdEnd = GetUTCFromLocalTime((DateTime)createdOn.Date.AddDays(1).AddSeconds(-1), connectionString);
-                                List<VitalReading> VitalReading = GetVitalReadingsLocal(patientProgramId, connectionString, pdb.CreatedOn, GetUTCFromLocalTime((DateTime)pdb.CreatedOn.AddDays(1).Date.AddSeconds(-1), connectionString)).ToList();
-                                if (VitalReading.Count != 0)
-                                {
-                                    pdb.TotalVitalCount = pdb.TotalVitalCount + 1;
-                                }
-                            }
-
-                        }
-                        PatientBilldatas = new PatientBilldata();
-                        PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;
-                        PatientBilldatas.CPTCode = code.BillingCode;
-                        PatientBilldatas.Completed = pdb.TotalVitalCount;
-                        PatientBilldatas.Total = code.TargetReadings;
-                        PatientBilldatas.IsTargetMet = pdb.TotalVitalCount >= code.TargetReadings ? true : false;
-                        PatientBilldatas.ReadyTobill = (pdb.TotalVitalCount >= code.TargetReadings && pdb.DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-                        return PatientBilldatas;
-
-
-
-
-                    }
-                    else
-                    {
-                        PatientBilldatas = null;
-                    }
-
-                }
-
-                if (PatientBilldatas == null)
-                {
-                    int DaysCompleted = 0;
-                    PatientStartDate PatientStartDate = new PatientStartDate();
-                    PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                    DateTime StartDateTemp = GetLocalTimeFromUTC((DateTime)PatientStartDate.StartDate, connectionString);
-                    DateTime Today = GetLocalTimeFromUTC(DateTime.UtcNow.Date, connectionString);
-                    if (PatientStartDate == null || PatientStartDate.Status.ToLower() == "invalid")
-                    {
-                        PatientBilldatas = new PatientBilldata();
-                        PatientBilldatas.CPTCode = code.BillingCode;
-                        PatientBilldatas.Completed = 0;
-                        PatientBilldatas.Total = code.TargetReadings;
-                        PatientBilldatas.IsTargetMet = false;
-                        PatientBilldatas.ReadyTobill = 0;
-                        return PatientBilldatas;
-                    }
-                    else if (StartDateTemp > Today && PatientStartDate.Status.ToLower() == "active")
-                    {
-                        PatientBilldatas = new PatientBilldata();
-                        PatientBilldatas.CPTCode = code.BillingCode;
-                        PatientBilldatas.Completed = 0;
-                        PatientBilldatas.Total = code.TargetReadings;
-                        PatientBilldatas.IsTargetMet = false;
-                        PatientBilldatas.ReadyTobill = 0;
-                        return PatientBilldatas;
-                    }
-                    else
-                    {
-                        //DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
-                        DateTime stDate = DateTime.MinValue;
-                        if (PatientStartDate.Status.ToLower() == "active")
-                        {
-                            stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
-                        }
-                        else
-                        {
-                            stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-                        }
-                        DateTime endDate = DateTime.UtcNow.Date;
-                        DateTime stDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
-
-                        DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
-
-                        // endDate = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
-                        //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-                        //the patientbilling table and +1 day will come as next start day.. So we should   
-                        // calcualte the start date with respect to the billing threshold
-                        DateTime today = DateTime.UtcNow;
-                        DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
-                        if (stDatetemp.Date > endDateTempay)
-                        {
-                            //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-                            BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-
-                            stDatetemp = bd.StartDate;//GetLocalTimeFromUTC((DateTime)bd.StartDate, connectionString);
-                            endDatetemp = bd.EndDate;// GetLocalTimeFromUTC((DateTime)bd.EndDate, connectionString);
-                        }
-                        DateTime stDateLoc = stDatetemp;
-                        DateTime endDateLoc = endDatetemp;
-                        //DateTime Enddate1 = endDate;
-                        var DateDiff = Convert.ToDateTime(stDatetemp).Date - endDatetemp.Date;
-                        DaysCompleted = Math.Abs(DateDiff.Days) + 1;
-                        List<Dates> Dates = new List<Dates>();
-                        List<Dates> DatesNew = new List<Dates>();
-                        for (int i = 0; i <= DaysCompleted; i++)
-                        {
-                            if (i == 0)
-                            {
-                                endDatetemp = stDateLoc.AddDays(1).Date.AddSeconds(-1);
-
-                            }
-                            else if (i == DaysCompleted)
-                            {
-                                stDatetemp = stDateLoc.AddDays(i).Date;
-                                endDatetemp = endDateLoc;
-                            }
-                            else
-                            {
-                                stDatetemp = stDateLoc.AddDays(i).Date;
-                                endDatetemp = stDatetemp.AddDays(1).Date.AddSeconds(-1);
-
-                            }
-
-                            stDatetemp = GetUTCFromLocalTime((DateTime)stDatetemp, connectionString);
-                            endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
-
-
-                            Dates.Add(new Dates() { StartDate = (DateTime)stDatetemp, EndDate = endDatetemp, Totalreading = 0 });
-
-                        }
-                        if (Dates.Count > 0)
-                        {
-
-                            foreach (Dates date in Dates)
-                            {
-
-                                List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
-
-                                if (VitalReadings.Count > 0)
-                                {
-
-                                    DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading = 1 });
-
-                                }
-                                else
-                                {
-                                    DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading = 0 });
-                                }
-
-                            }
-
-
-                        }
-
-                        int VitalCount = DatesNew.Where(s => s.Totalreading == 1).Count();
-
-                        //int nVitalCount = 0;
-                        // List<VitalReading> VitalReadings = GetVitalReadings(patientProgramId, connectionString).Where(s => s.ReadingDate >= stDate && s.ReadingDate <= endDate).ToList();
-                        //if (VitalReadings != null)
-                        //{
-                        //    nVitalCount = VitalReadings.Count;
-                        //}
-                        PatientBilldatas = new PatientBilldata();
-                        PatientBilldatas.BillingStartDate = stDate;
-                        PatientBilldatas.CPTCode = code.BillingCode;
-                        PatientBilldatas.Completed = VitalCount;
-                        PatientBilldatas.Total = code.TargetReadings;
-                        PatientBilldatas.IsTargetMet = (VitalCount >= code.TargetReadings) ? true : false;
-                        PatientBilldatas.ReadyTobill = (VitalCount >= code.TargetReadings && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-                        return PatientBilldatas;
-                    }
-                }
-                return PatientBilldatas;
-
-
-
-
-
-                //int DaysCompleted = 0;
-                //PatientStartDate PatientStartDate = new PatientStartDate();
-                //PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                //DateTime StartDateTemp = GetLocalTimeFromUTC((DateTime)PatientStartDate.StartDate, connectionString);
-                //DateTime Today = GetLocalTimeFromUTC(DateTime.UtcNow.Date, connectionString); 
-                //if (PatientStartDate == null || PatientStartDate.Status.ToLower() == "invalid")
-                //{
-                //    PatientBilldata PatientBilldata = new PatientBilldata();
-                //    PatientBilldata.CPTCode = code.BillingCode;
-                //    PatientBilldata.Completed = 0;
-                //    PatientBilldata.Total = code.TargetReadings;
-                //    PatientBilldata.IsTargetMet = false;
-                //    PatientBilldata.ReadyTobill = 0;
-                //    return PatientBilldata;
-                //}
-                //else if (StartDateTemp > Today && PatientStartDate.Status.ToLower() == "active")
-                //{
-                //    PatientBilldata PatientBilldata = new PatientBilldata();
-                //    PatientBilldata.CPTCode = code.BillingCode;
-                //    PatientBilldata.Completed = 0;
-                //    PatientBilldata.Total = code.TargetReadings;
-                //    PatientBilldata.IsTargetMet = false;
-                //    PatientBilldata.ReadyTobill = 0;
-                //    return PatientBilldata;
-                //}
-                //else
-                //{
-                //    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
-                //    DateTime endDate = DateTime.UtcNow.Date;
-                //    DateTime stDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
-
-                //    DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
-
-                //   // endDate = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
-                //    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-                //    //the patientbilling table and +1 day will come as next start day.. So we should   
-                //    // calcualte the start date with respect to the billing threshold
-                //    if (stDatetemp > endDatetemp)
-                //    {
-                //        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
-                //        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-
-                //        stDatetemp = GetLocalTimeFromUTC((DateTime)bd.StartDate, connectionString);
-                //        stDatetemp = GetLocalTimeFromUTC((DateTime)bd.EndDate, connectionString); ;
-                //    }
-                //    DateTime stDateLoc = stDatetemp;
-                //    DateTime endDateLoc = endDatetemp;
-                //    //DateTime Enddate1 = endDate;
-                //    var DateDiff = Convert.ToDateTime(stDatetemp).Date - endDatetemp.Date;
-                //    DaysCompleted = Math.Abs(DateDiff.Days)+1;
-                //    List<Dates> Dates = new List<Dates>();
-                //    List<Dates> DatesNew = new List<Dates>();
-                //    for (int i = 0; i<=DaysCompleted; i++)
-                //    {
-                //        if (i==0)
-                //        {
-                //            endDatetemp = stDateLoc.AddDays(1).Date.AddSeconds(-1);
-
-                //        }
-                //        else if (i==DaysCompleted)
-                //        {
-                //            stDatetemp = stDateLoc.AddDays(i).Date;
-                //            endDatetemp = endDateLoc;
-                //        }
-                //        else
-                //        {
-                //            stDatetemp = stDateLoc.AddDays(i).Date;
-                //            endDatetemp = stDatetemp.AddDays(1).Date.AddSeconds(-1);
-
-                //        }
-
-                //        stDatetemp = GetUTCFromLocalTime((DateTime)stDatetemp, connectionString);
-                //        endDatetemp = GetUTCFromLocalTime((DateTime)endDatetemp, connectionString);
-
-
-                //        Dates.Add(new Dates() { StartDate = (DateTime)stDatetemp, EndDate = endDatetemp, Totalreading=0 });
-
-                //    }
-                //    if (Dates.Count>0)
-                //    {
-
-                //        foreach (Dates date in Dates)
-                //        {
-
-                //            List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
-
-                //            if (VitalReadings.Count>0)
-                //            {
-
-                //                DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading=1 });
-
-                //            }
-                //            else
-                //            {
-                //                DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading=0 });
-                //            }
-
-                //        }
-
-
-                //    }
-
-                //    int VitalCount = DatesNew.Where(s => s.Totalreading == 1).Count();
-
-                //    //int nVitalCount = 0;
-                //   // List<VitalReading> VitalReadings = GetVitalReadings(patientProgramId, connectionString).Where(s => s.ReadingDate >= stDate && s.ReadingDate <= endDate).ToList();
-                //    //if (VitalReadings != null)
-                //    //{
-                //    //    nVitalCount = VitalReadings.Count;
-                //    //}
-                //    PatientBilldata PatientBilldata = new PatientBilldata();
-                //    PatientBilldata.BillingStartDate = stDate;
-                //    PatientBilldata.CPTCode = code.BillingCode;
-                //    PatientBilldata.Completed = VitalCount;
-                //    PatientBilldata.Total = code.TargetReadings;
-                //    PatientBilldata.IsTargetMet = (VitalCount >= code.TargetReadings) ? true : false;
-                //    PatientBilldata.ReadyTobill = (VitalCount >= code.TargetReadings && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
-                //    return PatientBilldata;
-                //}
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
-        public PatientBilldata ProcessCPT99453_ClynxNew(int patientId, int patientProgramId, int targetReading, BillingCodesDetails code, string connectionString)
-        {
-            try
-            {
-                PatientBilldata PatientBilldatas = new PatientBilldata();
-                List<PatientDailyBillingData> lstDailyData = GetPatientBillingCounts(patientId, patientProgramId, connectionString);
-                if (lstDailyData == null || lstDailyData.Count == 0)
-                {
-
-                    PatientBilldatas.CPTCode = code.BillingCode;
-                    PatientBilldatas.Completed = 0;
-                    PatientBilldatas.Total = code.TargetReadings;
-                    PatientBilldatas.IsTargetMet = false;
-                    PatientBilldatas.ReadyTobill = 0;
-                    return PatientBilldatas;
-                }
-
-                foreach (PatientDailyBillingData pdb in lstDailyData)
-                {
-                    if (pdb.BillingCodeId == code.BillingCodeID)
-                    {
-
-                        if (pdb.TotalVitalCount >= code.TargetReadings && pdb.DaysCompleted >= code.BillingThreshold)
-                        {
-                            PatientBilldatas = new PatientBilldata();
-                            PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;//(DateTime)patientStartdate.StartDate;
-                            PatientBilldatas.CPTCode = code.BillingCode;
-                            //PatientBilldata.Completed = VitalReadings.Count;
-                            PatientBilldatas.Completed = pdb.DaysCompleted;
-                            //PatientBilldata.Total = code.TargetReadings;
-                            PatientBilldatas.Total = code.BillingThreshold;
-                            PatientBilldatas.IsTargetMet = true;
-                            PatientBilldatas.ReadyTobill = 1;
-                            return PatientBilldatas;
-                        }
-
-                        else
-                        {
-                            PatientBilldatas = new PatientBilldata();
-                            PatientBilldatas.BillingStartDate = (DateTime)pdb.StartDate;//(DateTime)patientStartdate.StartDate;
-                            PatientBilldatas.CPTCode = code.BillingCode;
-                            //PatientBilldata.Completed = VitalReadings.Count;
-                            PatientBilldatas.Completed = pdb.DaysCompleted;
-                            //PatientBilldata.Total = code.TargetReadings;
-                            PatientBilldatas.Total = code.BillingThreshold;
-                            PatientBilldatas.IsTargetMet = false;
-                            PatientBilldatas.ReadyTobill = 0;
-                            return PatientBilldatas;
-                        }
-
-                    }
-                    else
-                    {
-                        PatientBilldatas = null;
-                    }
-                }
-                if (PatientBilldatas == null)
-                {
-                    PatientStartDate patientStartdate = GetBillingStartDateEx(patientId, patientProgramId,
-                                                              targetReading, connectionString);
-                    if (patientStartdate == null || patientStartdate.Status.ToLower() == "invalid")
-                    {
-                        PatientBilldatas = new PatientBilldata();
-                        PatientBilldatas.CPTCode = code.BillingCode;
-                        PatientBilldatas.Completed = 0;
-                        PatientBilldatas.Total = code.TargetReadings;
-                        PatientBilldatas.IsTargetMet = false;
-                        PatientBilldatas.ReadyTobill = 0;
-                        return PatientBilldatas;
-                    }
-                    /*else if (Startdate.Status.ToLower() == "invalid")
-                    {
-                        SetData(patientProgramData, 0, null, billingCode.BillingCodeID, DaysCompleted, false, null);
-                    }*/
-                    else
-                    {
-                        var Startdate = patientStartdate.StartDate;
-                        DateTime StartdateTemp = GetLocalTimeFromUTC((DateTime)Startdate, connectionString);
-                        DateTime startDateLoc = StartdateTemp;
-                        DateTime Enddate = DateTime.UtcNow;
-                        DateTime EndDateTemp = GetLocalTimeFromUTC((DateTime)Enddate, connectionString);
-                        DateTime endDateLoc = EndDateTemp;
-
-                        //var EnddateTemp = Enddate.AddDays(1);
-                        var DateDiff = Convert.ToDateTime(StartdateTemp).Date - EndDateTemp.Date;
-                        var DaysCompleted = Math.Abs(DateDiff.Days);
-                        // Counting the current day also for day of completion
-                        // No need to compate with threashold as its yearly data 
-
-
-                        List<Dates> Dates = new List<Dates>();
-                        List<Dates> DatesNew = new List<Dates>();
-
-                        for (int i = 0; i <= DaysCompleted; i++)
-                        {
-                            if (i == 0)
-                            {
-                                EndDateTemp = startDateLoc.AddDays(1).Date.AddSeconds(-1);
-
-                            }
-                            else if (i == DaysCompleted)
-                            {
-                                StartdateTemp = startDateLoc.AddDays(i).Date;
-                                EndDateTemp = endDateLoc;
-                            }
-                            else
-                            {
-                                StartdateTemp = startDateLoc.AddDays(i).Date;
-                                EndDateTemp = StartdateTemp.AddDays(1).Date.AddSeconds(-1);
-
-                            }
-
-                            StartdateTemp = GetUTCFromLocalTime((DateTime)StartdateTemp, connectionString);
-                            EndDateTemp = GetUTCFromLocalTime((DateTime)EndDateTemp, connectionString);
-
-
-                            Dates.Add(new Dates() { StartDate = (DateTime)StartdateTemp, EndDate = EndDateTemp, Totalreading = 0 });
-
-
-
-
-                        }
-
-                        if (Dates.Count > 0)
-                        {
-
-                            foreach (Dates date in Dates)
-                            {
-                                List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString, date.StartDate, date.EndDate).ToList();
-
-
-                                if (VitalReadings.Count > 0)
-                                {
-
-                                    DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading = 1 });
-
-                                }
-                                else
-                                {
-                                    DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading = 0 });
-                                }
-
-                            }
-
-
-                        }
-
-                        int VitalCount = DatesNew.Where(s => s.Totalreading == 1).Count();
-
-
-
-
-
-
-
-
-
-                        if (VitalCount == 0)
-                        {
-                            PatientBilldatas = new PatientBilldata();
-                            PatientBilldatas.BillingStartDate = (DateTime)Startdate;//(DateTime)patientStartdate.StartDate;
-                            PatientBilldatas.CPTCode = code.BillingCode;
-                            PatientBilldatas.Completed = 0;
-                            //PatientBilldata.Total = code.TargetReadings;
-                            PatientBilldatas.Total = code.BillingThreshold;
-                            PatientBilldatas.IsTargetMet = false;
-                            PatientBilldatas.ReadyTobill = 0;
-                            return PatientBilldatas;
-                        }
-                        if (VitalCount >= code.TargetReadings && DaysCompleted >= code.BillingThreshold)
-                        {
-                            PatientBilldatas = new PatientBilldata();
-                            PatientBilldatas.BillingStartDate = (DateTime)Startdate;//(DateTime)patientStartdate.StartDate;
-                            PatientBilldatas.CPTCode = code.BillingCode;
-                            //PatientBilldata.Completed = VitalReadings.Count;
-                            PatientBilldatas.Completed = DaysCompleted;
-                            //PatientBilldata.Total = code.TargetReadings;
-                            PatientBilldatas.Total = code.BillingThreshold;
-                            PatientBilldatas.IsTargetMet = true;
-                            PatientBilldatas.ReadyTobill = 1;
-                            return PatientBilldatas;
-                        }
-                        else
-                        {
-                            PatientBilldatas = new PatientBilldata();
-                            PatientBilldatas.BillingStartDate = (DateTime)Startdate;//(DateTime)patientStartdate.StartDate;
-                            PatientBilldatas.CPTCode = code.BillingCode;
-                            //PatientBilldata.Completed = VitalReadings.Count;
-                            PatientBilldatas.Completed = DaysCompleted;
-                            //PatientBilldata.Total = code.TargetReadings;
-                            PatientBilldatas.Total = code.BillingThreshold;
-                            PatientBilldatas.IsTargetMet = false;
-                            PatientBilldatas.ReadyTobill = 0;
-                            return PatientBilldatas;
-                        }
-                    }
-                }
-                return PatientBilldatas;
-
-
-
-
-
-
-
-
-
-
-
-
-
-                //PatientStartDate patientStartdate = GetBillingStartDateEx(patientId, patientProgramId,
-                //                                          targetReading, connectionString);
-                //if (patientStartdate == null || patientStartdate.Status.ToLower() == "invalid")
-                //{
-                //    PatientBilldata PatientBilldata = new PatientBilldata();
-                //    PatientBilldata.CPTCode = code.BillingCode;
-                //    PatientBilldata.Completed = 0;
-                //    PatientBilldata.Total = code.TargetReadings;
-                //    PatientBilldata.IsTargetMet = false;
-                //    PatientBilldata.ReadyTobill = 0;
-                //    return PatientBilldata;
-                //}
-                ///*else if (Startdate.Status.ToLower() == "invalid")
-                //{
-                //    SetData(patientProgramData, 0, null, billingCode.BillingCodeID, DaysCompleted, false, null);
-                //}*/
-                //else
-                //{
-                //    var Startdate = patientStartdate.StartDate;
-                //    DateTime StartdateTemp = GetLocalTimeFromUTC((DateTime)Startdate, connectionString);
-                //    DateTime startDateLoc = StartdateTemp;
-                //    DateTime Enddate = DateTime.UtcNow;
-                //    DateTime EndDateTemp = GetLocalTimeFromUTC((DateTime)Enddate, connectionString);
-                //    DateTime endDateLoc = EndDateTemp;
-
-                //    //var EnddateTemp = Enddate.AddDays(1);
-                //    var DateDiff = Convert.ToDateTime(StartdateTemp).Date - EndDateTemp.Date;
-                //    var DaysCompleted = Math.Abs(DateDiff.Days);
-                //    // Counting the current day also for day of completion
-                //    // No need to compate with threashold as its yearly data 
-
-
-                //    List<Dates> Dates = new List<Dates>();
-                //    List<Dates> DatesNew = new List<Dates>();
-
-                //    for (int i = 0; i<=DaysCompleted; i++)
-                //    {
-                //        if (i==0)
-                //        {
-                //            EndDateTemp = startDateLoc.AddDays(1).Date.AddSeconds(-1);
-
-                //        }
-                //        else if (i==DaysCompleted)
-                //        {
-                //            StartdateTemp = startDateLoc.AddDays(i).Date;
-                //            EndDateTemp = endDateLoc ;
-                //        }
-                //        else
-                //        {
-                //            StartdateTemp = startDateLoc.AddDays(i).Date;
-                //            EndDateTemp = StartdateTemp.AddDays(1).Date.AddSeconds(-1);
-
-                //        }
-
-                //        StartdateTemp = GetUTCFromLocalTime((DateTime)StartdateTemp, connectionString);
-                //        EndDateTemp = GetUTCFromLocalTime((DateTime)EndDateTemp, connectionString);
-
-
-                //        Dates.Add(new Dates() { StartDate = (DateTime)StartdateTemp, EndDate = EndDateTemp, Totalreading=0 });
-
-
-
-
-                //    }
-
-                //    if (Dates.Count>0)
-                //    {
-
-                //        foreach (Dates date in Dates)
-                //        {
-                //            List<VitalReading> VitalReadings = GetVitalReadingsLocal(patientProgramId, connectionString,date.StartDate,date.EndDate).ToList();
-
-
-                //            if (VitalReadings.Count>0)
-                //            {
-
-                //                DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading=1 });
-
-                //            }
-                //            else
-                //            {
-                //                DatesNew.Add(new Dates() { StartDate = (DateTime)date.StartDate, EndDate = date.EndDate, Totalreading=0 });
-                //            }
-
-                //        }
-
-
-                //    }
-
-                //    int VitalCount = DatesNew.Where(s => s.Totalreading == 1).Count();
-
-
-
-
-
-
-
-
-
-                //    if (VitalCount == 0)
-                //    {
-                //        PatientBilldata PatientBilldata = new PatientBilldata();
-                //        PatientBilldata.BillingStartDate = (DateTime)Startdate;//(DateTime)patientStartdate.StartDate;
-                //        PatientBilldata.CPTCode = code.BillingCode;
-                //        PatientBilldata.Completed = 0;
-                //        //PatientBilldata.Total = code.TargetReadings;
-                //        PatientBilldata.Total = code.BillingThreshold;
-                //        PatientBilldata.IsTargetMet = false;
-                //        PatientBilldata.ReadyTobill = 0;
-                //        return PatientBilldata;
-                //    }
-                //    if (VitalCount >= code.TargetReadings && DaysCompleted>=code.BillingThreshold)
-                //    {
-                //        PatientBilldata PatientBilldata = new PatientBilldata();
-                //        PatientBilldata.BillingStartDate = (DateTime)Startdate;//(DateTime)patientStartdate.StartDate;
-                //        PatientBilldata.CPTCode = code.BillingCode;
-                //        //PatientBilldata.Completed = VitalReadings.Count;
-                //        PatientBilldata.Completed = DaysCompleted;
-                //        //PatientBilldata.Total = code.TargetReadings;
-                //        PatientBilldata.Total = code.BillingThreshold;
-                //        PatientBilldata.IsTargetMet = true;
-                //        PatientBilldata.ReadyTobill = 1;
-                //        return PatientBilldata;
-                //    }
-                //    else
-                //    {
-                //        PatientBilldata PatientBilldata = new PatientBilldata();
-                //        PatientBilldata.BillingStartDate = (DateTime)Startdate;//(DateTime)patientStartdate.StartDate;
-                //        PatientBilldata.CPTCode = code.BillingCode;
-                //        //PatientBilldata.Completed = VitalReadings.Count;
-                //        PatientBilldata.Completed = DaysCompleted;
-                //        //PatientBilldata.Total = code.TargetReadings;
-                //        PatientBilldata.Total = code.BillingThreshold;
-                //        PatientBilldata.IsTargetMet = false;
-                //        PatientBilldata.ReadyTobill = 0;
-                //        return PatientBilldata;
-                //    }
-                //}
-            }
-            catch (Exception ex)
-            {
-                //Console.WriteLine("Exception occured - class Name :" + this.GetType().Name + ",  Method Name : " + MethodBase.GetCurrentMethod().Name + ", Error Message :" + ex.Message + "");
-                throw ex;
-            }
-
-        }
         public List<VitalReading> GetVitalReadingsLocal(int patientProgramId, string connectionString, DateTime startDate, DateTime endDate)
         {
 
@@ -11086,7 +10617,7 @@ namespace RPMWeb.Dal
             }
             return ret;
         }
-        public PatientBilldata ProcessCPTG0506_Clynx(int patientId, int patientProgramId, int targetReading, BillingCodesDetails code, string connectionString)
+        public PatientBilldata ProcessCPTG0506_DaysBasedBilling(int patientId, int patientProgramId, int targetReading, BillingCodesDetails code, string connectionString)
         {
             try
             {
@@ -11160,7 +10691,7 @@ namespace RPMWeb.Dal
             }
         }
 
-        public PatientBilldata ProcessCPT99490_Clynx(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
+        public PatientBilldata ProcessCPT99490_DaysBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
         {
             PatientBilldata pbd = new PatientBilldata();
             try
@@ -11178,7 +10709,7 @@ namespace RPMWeb.Dal
                     pbd.ReadyTobill = 0;
                     return pbd;
                 }
-                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
                 {
                     PatientBilldata PatientBilldata = new PatientBilldata();
                     PatientBilldata.CPTCode = code.BillingCode;
@@ -11191,7 +10722,16 @@ namespace RPMWeb.Dal
                 else
                 {
 
-                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime stDate = DateTime.MinValue;
+                    if (PatientStartDate.Status.ToLower() == "active")
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
+                    }
+                    else
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    }
                     DateTime endDate = DateTime.UtcNow;
 
                     //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
@@ -11203,6 +10743,17 @@ namespace RPMWeb.Dal
                     {
                         //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                         BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+
+                        if (bd== null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
                         stDate = bd.StartDate;
 
                     }
@@ -11268,7 +10819,7 @@ namespace RPMWeb.Dal
             }
 
         }
-        public PatientBilldata ProcessCPT99439_Clynx(int patientId, int patientProgramId, BillingCodesDetails code,
+        public PatientBilldata ProcessCPT99439_DaysBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code,
                                                      BillingCodesDetails code490, string connectionString)
         {
             PatientBilldata pbd = new PatientBilldata();
@@ -11287,7 +10838,7 @@ namespace RPMWeb.Dal
                     pbd.ReadyTobill = 0;
                     return pbd;
                 }
-                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
                 {
                     PatientBilldata PatientBilldata = new PatientBilldata();
                     PatientBilldata.CPTCode = code.BillingCode;
@@ -11299,7 +10850,16 @@ namespace RPMWeb.Dal
                 }
                 else
                 {
-                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime stDate = DateTime.MinValue;
+                    if (PatientStartDate.Status.ToLower() == "active")
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
+                    }
+                    else
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    }
                     DateTime endDate = DateTime.UtcNow;
                     //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
                     //the patientbilling table and +1 day will come as next start day.. So we should   
@@ -11310,7 +10870,20 @@ namespace RPMWeb.Dal
                     {
                         //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                         BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                        stDate = bd.StartDate;
+
+                        //BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+
+                        if (bd== null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate; stDate = bd.StartDate;
                         endDate = bd.EndDate;
                     }
 
@@ -11395,7 +10968,7 @@ namespace RPMWeb.Dal
         }
 
 
-        public PatientBilldata ProcessCPT99491_Clynx(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
+        public PatientBilldata ProcessCPT99491_DaysBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
         {
             PatientBilldata pbd = new PatientBilldata();
             try
@@ -11413,7 +10986,7 @@ namespace RPMWeb.Dal
                     pbd.ReadyTobill = 0;
                     return pbd;
                 }
-                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
                 {
                     PatientBilldata PatientBilldata = new PatientBilldata();
                     PatientBilldata.CPTCode = code.BillingCode;
@@ -11426,7 +10999,15 @@ namespace RPMWeb.Dal
                 else
                 {
 
-                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime stDate = DateTime.MinValue;
+                    if (PatientStartDate.Status.ToLower() == "active")
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
+                    }
+                    else
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    }
                     DateTime endDate = DateTime.UtcNow;
 
                     //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
@@ -11438,6 +11019,19 @@ namespace RPMWeb.Dal
                     {
                         //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                         BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+
+
+                        if (bd== null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
                         stDate = bd.StartDate;
 
                     }
@@ -11504,7 +11098,7 @@ namespace RPMWeb.Dal
 
         }
 
-        public PatientBilldata ProcessCPT99437_Clynx(int patientId, int patientProgramId, BillingCodesDetails code,
+        public PatientBilldata ProcessCPT99437_DaysBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code,
                                                     BillingCodesDetails code491, string connectionString)
         {
             PatientBilldata pbd = new PatientBilldata();
@@ -11523,7 +11117,7 @@ namespace RPMWeb.Dal
                     pbd.ReadyTobill = 0;
                     return pbd;
                 }
-                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
                 {
                     PatientBilldata PatientBilldata = new PatientBilldata();
                     PatientBilldata.CPTCode = code.BillingCode;
@@ -11535,7 +11129,15 @@ namespace RPMWeb.Dal
                 }
                 else
                 {
-                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime stDate = DateTime.MinValue;
+                    if (PatientStartDate.Status.ToLower() == "active")
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
+                    }
+                    else
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    }
                     DateTime endDate = DateTime.UtcNow;
                     //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
                     //the patientbilling table and +1 day will come as next start day.. So we should   
@@ -11546,6 +11148,19 @@ namespace RPMWeb.Dal
                     {
                         //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                         BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+
+
+                        if (bd== null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
                         stDate = bd.StartDate;
                         endDate = bd.EndDate;
                     }
@@ -11629,7 +11244,7 @@ namespace RPMWeb.Dal
             }
 
         }
-        public PatientBilldata ProcessCPT99487_Clynx(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
+        public PatientBilldata ProcessCPT99487_DaysBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
         {
             PatientBilldata pbd = new PatientBilldata();
             try
@@ -11647,7 +11262,7 @@ namespace RPMWeb.Dal
                     pbd.ReadyTobill = 0;
                     return pbd;
                 }
-                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
                 {
                     PatientBilldata PatientBilldata = new PatientBilldata();
                     PatientBilldata.CPTCode = code.BillingCode;
@@ -11660,7 +11275,15 @@ namespace RPMWeb.Dal
                 else
                 {
 
-                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime stDate = DateTime.MinValue;
+                    if (PatientStartDate.Status.ToLower() == "active")
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
+                    }
+                    else
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    }
                     DateTime endDate = DateTime.UtcNow;
 
                     //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
@@ -11672,6 +11295,19 @@ namespace RPMWeb.Dal
                     {
                         //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                         BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+
+
+                        if (bd== null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
                         stDate = bd.StartDate;
 
                     }
@@ -11737,7 +11373,7 @@ namespace RPMWeb.Dal
             }
 
         }
-        public PatientBilldata ProcessCPT99489_Clynx(int patientId, int patientProgramId, BillingCodesDetails code,
+        public PatientBilldata ProcessCPT99489_DaysBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code,
                                                     BillingCodesDetails code487, string connectionString)
         {
             PatientBilldata pbd = new PatientBilldata();
@@ -11756,7 +11392,7 @@ namespace RPMWeb.Dal
                     pbd.ReadyTobill = 0;
                     return pbd;
                 }
-                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
                 {
                     PatientBilldata PatientBilldata = new PatientBilldata();
                     PatientBilldata.CPTCode = code.BillingCode;
@@ -11768,7 +11404,15 @@ namespace RPMWeb.Dal
                 }
                 else
                 {
-                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime stDate = DateTime.MinValue;
+                    if (PatientStartDate.Status.ToLower() == "active")
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
+                    }
+                    else
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    }
                     DateTime endDate = DateTime.UtcNow;
                     //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
                     //the patientbilling table and +1 day will come as next start day.. So we should   
@@ -11779,7 +11423,20 @@ namespace RPMWeb.Dal
                     {
                         //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                         BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
-                        stDate = bd.StartDate;
+
+
+
+                        if (bd== null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate; stDate = bd.StartDate;
                         endDate = bd.EndDate;
                     }
 
@@ -11855,7 +11512,7 @@ namespace RPMWeb.Dal
             }
 
         }
-        public PatientBilldata ProcessCPT99424_Clynx(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
+        public PatientBilldata ProcessCPT99424_DaysBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
         {
             PatientBilldata pbd = new PatientBilldata();
             try
@@ -11873,7 +11530,7 @@ namespace RPMWeb.Dal
                     pbd.ReadyTobill = 0;
                     return pbd;
                 }
-                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
                 {
                     PatientBilldata PatientBilldata = new PatientBilldata();
                     PatientBilldata.CPTCode = code.BillingCode;
@@ -11886,7 +11543,15 @@ namespace RPMWeb.Dal
                 else
                 {
 
-                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime stDate = DateTime.MinValue;
+                    if (PatientStartDate.Status.ToLower() == "active")
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
+                    }
+                    else
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    }
                     DateTime endDate = DateTime.UtcNow;
 
                     //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
@@ -11898,6 +11563,18 @@ namespace RPMWeb.Dal
                     {
                         //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                         BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+
+                        if (bd== null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
                         stDate = bd.StartDate;
 
                     }
@@ -11963,7 +11640,7 @@ namespace RPMWeb.Dal
             }
 
         }
-        public PatientBilldata ProcessCPT99425_Clynx(int patientId, int patientProgramId, BillingCodesDetails code,
+        public PatientBilldata ProcessCPT99425_DaysBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code,
                                                     BillingCodesDetails code424, string connectionString)
         {
             PatientBilldata pbd = new PatientBilldata();
@@ -11982,7 +11659,7 @@ namespace RPMWeb.Dal
                     pbd.ReadyTobill = 0;
                     return pbd;
                 }
-                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
                 {
                     PatientBilldata PatientBilldata = new PatientBilldata();
                     PatientBilldata.CPTCode = code.BillingCode;
@@ -11994,7 +11671,15 @@ namespace RPMWeb.Dal
                 }
                 else
                 {
-                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime stDate = DateTime.MinValue;
+                    if (PatientStartDate.Status.ToLower() == "active")
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
+                    }
+                    else
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    }
                     DateTime endDate = DateTime.UtcNow;
                     //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
                     //the patientbilling table and +1 day will come as next start day.. So we should   
@@ -12005,6 +11690,19 @@ namespace RPMWeb.Dal
                     {
                         //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                         BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+
+
+                        if (bd== null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
                         stDate = bd.StartDate;
                         endDate = bd.EndDate;
                     }
@@ -12088,7 +11786,7 @@ namespace RPMWeb.Dal
             }
 
         }
-        public PatientBilldata ProcessCPT99426_Clynx(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
+        public PatientBilldata ProcessCPT99426_DaysBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
         {
             PatientBilldata pbd = new PatientBilldata();
             try
@@ -12106,7 +11804,7 @@ namespace RPMWeb.Dal
                     pbd.ReadyTobill = 0;
                     return pbd;
                 }
-                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
                 {
                     PatientBilldata PatientBilldata = new PatientBilldata();
                     PatientBilldata.CPTCode = code.BillingCode;
@@ -12119,7 +11817,15 @@ namespace RPMWeb.Dal
                 else
                 {
 
-                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime stDate = DateTime.MinValue;
+                    if (PatientStartDate.Status.ToLower() == "active")
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
+                    }
+                    else
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    }
                     DateTime endDate = DateTime.UtcNow;
 
                     //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
@@ -12131,6 +11837,19 @@ namespace RPMWeb.Dal
                     {
                         //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                         BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+
+
+                        if (bd== null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
                         stDate = bd.StartDate;
 
                     }
@@ -12196,7 +11915,7 @@ namespace RPMWeb.Dal
             }
 
         }
-        public PatientBilldata ProcessCPT99427_Clynx(int patientId, int patientProgramId, BillingCodesDetails code,
+        public PatientBilldata ProcessCPT99427_DaysBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code,
                                                     BillingCodesDetails code426, string connectionString)
         {
             PatientBilldata pbd = new PatientBilldata();
@@ -12215,7 +11934,7 @@ namespace RPMWeb.Dal
                     pbd.ReadyTobill = 0;
                     return pbd;
                 }
-                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
                 {
                     PatientBilldata PatientBilldata = new PatientBilldata();
                     PatientBilldata.CPTCode = code.BillingCode;
@@ -12227,7 +11946,15 @@ namespace RPMWeb.Dal
                 }
                 else
                 {
-                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime stDate = DateTime.MinValue;
+                    if (PatientStartDate.Status.ToLower() == "active")
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
+                    }
+                    else
+                    {
+                        stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    }
                     DateTime endDate = DateTime.UtcNow;
                     //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
                     //the patientbilling table and +1 day will come as next start day.. So we should   
@@ -12238,6 +11965,19 @@ namespace RPMWeb.Dal
                     {
                         //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                         BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+
+
+                        if (bd== null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
                         stDate = bd.StartDate;
                         endDate = bd.EndDate;
                     }
@@ -12321,8 +12061,1413 @@ namespace RPMWeb.Dal
             }
 
         }
+        public PatientBilldata ProcessCPTG0506_CycleBasedBilling(int patientId, int patientProgramId, int targetReading, BillingCodesDetails code, string connectionString)
+        {
+            try
+            {
+                PatientBilldata PatientBilldata = new PatientBilldata();
+                PatientStartDate patientStartdate = GetBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                //Startdate is null means already billed in the patient billing table for 53 code.
+                if (patientStartdate.Status == "BilledDate")
+                {
 
-        public string DownloadInvoice(string Blob_Conn_String,string ContainerName, string ConnectionString)
+                    PatientBilldata.BillingStartDate = (DateTime)patientStartdate.StartDate;
+                    PatientBilldata.CPTCode = code.BillingCode;
+                    PatientBilldata.Completed = targetReading;
+                    PatientBilldata.Total = targetReading;
+                    PatientBilldata.IsTargetMet = true;
+                    PatientBilldata.ReadyTobill = 1;
+                    return PatientBilldata;
+                }
+
+                List<PatientDailyBillingData> lstDailyData = GetPatientBillingCounts(patientId, patientProgramId, connectionString);
+                if (lstDailyData == null || lstDailyData.Count == 0)
+                {
+
+                    PatientBilldata = null;
+                }
+
+                foreach (PatientDailyBillingData pdb in lstDailyData)
+                {
+                    if (pdb.BillingCodeId == code.BillingCodeID)
+                    {
+                        PatientBilldata = new PatientBilldata();
+                        PatientBilldata.BillingStartDate = (DateTime)pdb.StartDate;
+                        PatientBilldata.CPTCode = code.BillingCode;
+                        PatientBilldata.Completed = pdb.TotalDuration;
+                        PatientBilldata.Total = code.TargetReadings*60;
+                        PatientBilldata.IsTargetMet = pdb.TotalVitalCount >= code.TargetReadings ? true : false; ;
+                        PatientBilldata.ReadyTobill = (pdb.TotalVitalCount >= code.TargetReadings && pdb.DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                        return PatientBilldata;
+
+                    }
+                    else
+                    {
+                        PatientBilldata = null;
+                    }
+
+                }
+
+                if (PatientBilldata == null)
+                {
+
+                    PatientBilldata = new PatientBilldata();
+                    PatientBilldata.BillingStartDate = Convert.ToDateTime(patientStartdate.StartDate);
+                    PatientBilldata.CPTCode = code.BillingCode;
+                    int VitalCount = 0;
+                    int DaysCompleted = 0;
+                    PatientBilldata.Completed = VitalCount;
+                    PatientBilldata.Total = code.TargetReadings*60;
+                    PatientBilldata.IsTargetMet = (VitalCount >= code.TargetReadings) ? true : false;
+                    PatientBilldata.ReadyTobill = (VitalCount >= code.TargetReadings && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                    return PatientBilldata;
+
+                }
+
+                return PatientBilldata;
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occured - class Name :" + this.GetType().Name + ",  Method Name : " + MethodBase.GetCurrentMethod().Name + ", Error Message :" + ex.Message + "");
+                return null;
+            }
+        }
+
+        public PatientBilldata ProcessCPT99490_CycleBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
+        {
+            PatientBilldata pbd = new PatientBilldata();
+            try
+            {
+                int DaysCompleted = 0; int TotalReading = 0;
+                PatientStartDate PatientStartDate = new PatientStartDate();
+                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                if (PatientStartDate == null ||
+                    PatientStartDate.Status.ToLower() == "invalid")
+                {
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = 0;
+                    pbd.Total = code.TargetReadings*60;
+                    pbd.IsTargetMet = false;
+                    pbd.ReadyTobill = 0;
+                    return pbd;
+                }
+                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                {
+                    PatientBilldata PatientBilldata = new PatientBilldata();
+                    PatientBilldata.CPTCode = code.BillingCode;
+                    PatientBilldata.Completed = 0;
+                    PatientBilldata.Total = code.TargetReadings*60;
+                    PatientBilldata.IsTargetMet = false;
+                    PatientBilldata.ReadyTobill = 0;
+                    return PatientBilldata;
+                }
+                else
+                {
+
+                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime endDate = DateTime.UtcNow;
+
+                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                    //the patientbilling table and +1 day will come as next start day.. So we should   
+                    // calcualte the start date with respect to the billing threshold
+                    DateTime today = DateTime.UtcNow;
+                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
+                    if (stDate.Date > endDateTempay)
+                    {
+                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                        if (bd== null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
+
+                    }
+
+
+
+                    if (PatientStartDate.Status.ToLower() == "billeddate")
+                    {
+                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
+                        endDate =DateTime.UtcNow;
+
+                    }
+
+
+                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
+                    if (PatientInteractiontim == null)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string datss = stDate.ToString();
+                        datss = datss.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(datss);
+                        return pbd;
+                    }
+                    //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+                    //if (isEstablishedExist.Count() > 0)
+                    //{
+                    //    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+                    //    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+                    //    {
+                    //        PatientInteractiontim.Clear();
+                    //    }
+                    //}
+                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null /*|| isEstablishedExist.Count == 0*/)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string datess = stDate.ToString();
+                        datess = datess.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(datess);
+                        return pbd;
+                    }
+                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+                    if (TotalReading >= code.TargetReadings * 60)
+                    {
+                        TotalReading = code.TargetReadings * 60;
+                    }
+                    string dates = stDate.ToString();
+                    dates = dates.Replace("Z", "");
+                    pbd.BillingStartDate = DateTime.Parse(dates);
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = TotalReading;
+                    pbd.Total = code.TargetReadings * 60;
+                    pbd.IsTargetMet = (TotalReading >= code.TargetReadings * 60) ? true : false;
+                    pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                    return pbd;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+        public PatientBilldata ProcessCPT99439_CycleBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code,
+                                                     BillingCodesDetails code490, string connectionString)
+        {
+            PatientBilldata pbd = new PatientBilldata();
+            try
+            {
+                int DaysCompleted = 0; int TotalReading = 0;
+                PatientStartDate PatientStartDate = new PatientStartDate();
+                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                if (PatientStartDate == null ||
+                    PatientStartDate.Status.ToLower() == "invalid")
+                {
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = 0;
+                    pbd.Total = code.TargetReadings*60;
+                    pbd.IsTargetMet = false;
+                    pbd.ReadyTobill = 0;
+                    return pbd;
+                }
+                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                {
+                    PatientBilldata PatientBilldata = new PatientBilldata();
+                    PatientBilldata.CPTCode = code.BillingCode;
+                    PatientBilldata.Completed = 0;
+                    PatientBilldata.Total = code.TargetReadings;
+                    PatientBilldata.IsTargetMet = false;
+                    PatientBilldata.ReadyTobill = 0;
+                    return PatientBilldata;
+                }
+                else
+                {
+                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime endDate = DateTime.UtcNow;
+                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                    //the patientbilling table and +1 day will come as next start day.. So we should   
+                    // calcualte the start date with respect to the billing threshold
+                    DateTime today = DateTime.UtcNow;
+                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
+                    if (stDate.Date > endDateTempay)
+                    {
+                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                        if (bd == null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
+                        endDate = bd.EndDate;
+                    }
+
+                    if (PatientStartDate.Status.ToLower() == "billeddate")
+                    {
+                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
+                        endDate =DateTime.UtcNow;
+                    }
+                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
+                    if (PatientInteractiontim == null)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string datss = stDate.ToString();
+                        datss = datss.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(datss);
+                        return pbd;
+                    }
+                    //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+                    //if (isEstablishedExist.Count() > 0)
+                    //{
+                    //    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+                    //    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+                    //    {
+                    //        PatientInteractiontim.Clear();
+                    //    }
+                    //}
+                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null /*|| isEstablishedExist.Count == 0*/)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string datess = stDate.ToString();
+                        datess = datess.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(datess);
+                        return pbd;
+                    }
+                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+                    if (TotalReading > code490.TargetReadings * 60)
+                    {
+                        TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
+                        TotalReading = (int)(t1.TotalSeconds - (code490.TargetReadings * 60));
+
+                        string dates = stDate.ToString();
+                        dates = dates.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dates);
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = TotalReading;
+                        if (TotalReading < code490.TargetReadings * 60)
+                        {
+                            // base 20
+                            pbd.Total = code490.TargetReadings * 60;
+                            pbd.ReadyTobill = (TotalReading >= (code490.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                        }
+                        else
+                        {
+                            //base 40
+                            pbd.Total = code.TargetReadings * 60;
+                            pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                        }
+                        pbd.IsTargetMet = (TotalReading >= code490.TargetReadings * 60) ? true : false;
+                    }
+                    else
+                    {
+                        //Target reading 20
+                        string dats = stDate.ToString();
+                        dats = dats.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dats);
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code490.TargetReadings * 60;
+                        pbd.IsTargetMet = (TotalReading >= code490.TargetReadings * 60) ? true : false;
+                        pbd.ReadyTobill = (TotalReading >= (code490.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+
+                    }
+                    return pbd;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+
+
+        public PatientBilldata ProcessCPT99491_CycleBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
+        {
+            PatientBilldata pbd = new PatientBilldata();
+            try
+            {
+                int DaysCompleted = 0; int TotalReading = 0;
+                PatientStartDate PatientStartDate = new PatientStartDate();
+                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                if (PatientStartDate == null ||
+                    PatientStartDate.Status.ToLower() == "invalid")
+                {
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = 0;
+                    pbd.Total = code.TargetReadings*60;
+                    pbd.IsTargetMet = false;
+                    pbd.ReadyTobill = 0;
+                    return pbd;
+                }
+                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                {
+                    PatientBilldata PatientBilldata = new PatientBilldata();
+                    PatientBilldata.CPTCode = code.BillingCode;
+                    PatientBilldata.Completed = 0;
+                    PatientBilldata.Total = code.TargetReadings*60;
+                    PatientBilldata.IsTargetMet = false;
+                    PatientBilldata.ReadyTobill = 0;
+                    return PatientBilldata;
+                }
+                else
+                {
+
+                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime endDate = DateTime.UtcNow;
+
+                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                    //the patientbilling table and +1 day will come as next start day.. So we should   
+                    // calcualte the start date with respect to the billing threshold
+                    DateTime today = DateTime.UtcNow;
+                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
+                    if (stDate.Date > endDateTempay)
+                    {
+                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                        if (bd == null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
+
+                    }
+
+
+
+                    if (PatientStartDate.Status.ToLower() == "billeddate")
+                    {
+                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
+                        endDate =DateTime.UtcNow;
+
+                    }
+
+
+                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
+                    if (PatientInteractiontim == null)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string dats = stDate.ToString();
+                        dats = dats.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dats);
+                        return pbd;
+                    }
+                    //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+                    //if (isEstablishedExist.Count() > 0)
+                    //{
+                    //    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+                    //    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+                    //    {
+                    //        PatientInteractiontim.Clear();
+                    //    }
+                    //}
+                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null /*|| isEstablishedExist.Count == 0*/)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string dates = stDate.ToString();
+                        dates = dates.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dates);
+                        return pbd;
+                    }
+                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+                    if (TotalReading >= code.TargetReadings * 60)
+                    {
+                        TotalReading = code.TargetReadings * 60;
+                    }
+                    string datess = stDate.ToString();
+                    datess = datess.Replace("Z", "");
+                    pbd.BillingStartDate = DateTime.Parse(datess);
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = TotalReading;
+                    pbd.Total = code.TargetReadings * 60;
+                    pbd.IsTargetMet = (TotalReading >= code.TargetReadings * 60) ? true : false;
+                    pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                    return pbd;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+
+        public PatientBilldata ProcessCPT99437_CycleBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code,
+                                                    BillingCodesDetails code491, string connectionString)
+        {
+            PatientBilldata pbd = new PatientBilldata();
+            try
+            {
+                int DaysCompleted = 0; int TotalReading = 0;
+                PatientStartDate PatientStartDate = new PatientStartDate();
+                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                if (PatientStartDate == null ||
+                    PatientStartDate.Status.ToLower() == "invalid")
+                {
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = 0;
+                    pbd.Total = code.TargetReadings*60;
+                    pbd.IsTargetMet = false;
+                    pbd.ReadyTobill = 0;
+                    return pbd;
+                }
+                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                {
+                    PatientBilldata PatientBilldata = new PatientBilldata();
+                    PatientBilldata.CPTCode = code.BillingCode;
+                    PatientBilldata.Completed = 0;
+                    PatientBilldata.Total = code.TargetReadings*60;
+                    PatientBilldata.IsTargetMet = false;
+                    PatientBilldata.ReadyTobill = 0;
+                    return PatientBilldata;
+                }
+                else
+                {
+                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime endDate = DateTime.UtcNow;
+                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                    //the patientbilling table and +1 day will come as next start day.. So we should   
+                    // calcualte the start date with respect to the billing threshold
+                    DateTime today = DateTime.UtcNow;
+                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
+                    if (stDate.Date > endDateTempay)
+                    {
+                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                        if (bd == null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
+                        endDate = bd.EndDate;
+                    }
+
+                    if (PatientStartDate.Status.ToLower() == "billeddate")
+                    {
+                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
+                        endDate =DateTime.UtcNow;
+                    }
+                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
+                    if (PatientInteractiontim == null)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string datess = stDate.ToString();
+                        datess = datess.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(datess);
+                        return pbd;
+                    }
+                    //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+                    //if (isEstablishedExist.Count() > 0)
+                    //{
+                    //    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+                    //    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+                    //    {
+                    //        PatientInteractiontim.Clear();
+                    //    }
+                    //}
+                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null /*|| isEstablishedExist.Count == 0*/)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string dates = stDate.ToString();
+                        dates = dates.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dates);
+                        return pbd;
+                    }
+                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+                    if (TotalReading > code491.TargetReadings * 60)
+                    {
+                        TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
+                        TotalReading = (int)(t1.TotalSeconds - (code491.TargetReadings * 60));
+
+                        string date = stDate.ToString();
+                        date = date.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(date);
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = TotalReading;
+                        if (TotalReading < code491.TargetReadings * 60)
+                        {
+                            // base 20
+                            pbd.Total = code491.TargetReadings * 60;
+                            pbd.ReadyTobill = (TotalReading >= (code491.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                        }
+                        else
+                        {
+                            //base 40
+                            pbd.Total = code.TargetReadings * 60;
+                            pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                        }
+                        pbd.IsTargetMet = (TotalReading >= code491.TargetReadings * 60) ? true : false;
+                    }
+                    else
+                    {
+                        //Target reading 20
+                        string dateN = stDate.ToString();
+                        dateN = dateN.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateN);
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code491.TargetReadings * 60;
+                        pbd.IsTargetMet = (TotalReading >= code491.TargetReadings * 60) ? true : false;
+                        pbd.ReadyTobill = (TotalReading >= (code491.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+
+                    }
+                    return pbd;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+        public PatientBilldata ProcessCPT99487_CycleBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
+        {
+            PatientBilldata pbd = new PatientBilldata();
+            try
+            {
+                int DaysCompleted = 0; int TotalReading = 0;
+                PatientStartDate PatientStartDate = new PatientStartDate();
+                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                if (PatientStartDate == null ||
+                    PatientStartDate.Status.ToLower() == "invalid")
+                {
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = 0;
+                    pbd.Total = code.TargetReadings*60;
+                    pbd.IsTargetMet = false;
+                    pbd.ReadyTobill = 0;
+                    return pbd;
+                }
+                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                {
+                    PatientBilldata PatientBilldata = new PatientBilldata();
+                    PatientBilldata.CPTCode = code.BillingCode;
+                    PatientBilldata.Completed = 0;
+                    PatientBilldata.Total = code.TargetReadings*60;
+                    PatientBilldata.IsTargetMet = false;
+                    PatientBilldata.ReadyTobill = 0;
+                    return PatientBilldata;
+                }
+                else
+                {
+
+                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime endDate = DateTime.UtcNow;
+
+                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                    //the patientbilling table and +1 day will come as next start day.. So we should   
+                    // calcualte the start date with respect to the billing threshold
+                    DateTime today = DateTime.UtcNow;
+                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
+                    if (stDate.Date > endDateTempay)
+                    {
+                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                        if (bd == null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
+
+                    }
+
+
+
+                    if (PatientStartDate.Status.ToLower() == "billeddate")
+                    {
+                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
+                        endDate =DateTime.UtcNow;
+
+                    }
+
+
+                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
+                    if (PatientInteractiontim == null)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
+
+
+                        return pbd;
+                    }
+                    //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+                    //if (isEstablishedExist.Count() > 0)
+                    //{
+                    //    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+                    //    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+                    //    {
+                    //        PatientInteractiontim.Clear();
+                    //    }
+                    //}
+                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null /*|| isEstablishedExist.Count == 0*/)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string date = stDate.ToString();
+                        date = date.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(date);
+                        return pbd;
+                    }
+                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+                    if (TotalReading >= code.TargetReadings * 60)
+                    {
+                        TotalReading = code.TargetReadings * 60;
+                    }
+                    string Newdate = stDate.ToString();
+                    Newdate = Newdate.Replace("Z", "");
+                    pbd.BillingStartDate = DateTime.Parse(Newdate);
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = TotalReading;
+                    pbd.Total = code.TargetReadings * 60;
+                    pbd.IsTargetMet = (TotalReading >= code.TargetReadings * 60) ? true : false;
+                    pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                    return pbd;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+        public PatientBilldata ProcessCPT99489_CycleBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code,
+                                                    BillingCodesDetails code487, string connectionString)
+        {
+            PatientBilldata pbd = new PatientBilldata();
+            try
+            {
+                int DaysCompleted = 0; int TotalReading = 0;
+                PatientStartDate PatientStartDate = new PatientStartDate();
+                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                if (PatientStartDate == null ||
+                    PatientStartDate.Status.ToLower() == "invalid")
+                {
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = 0;
+                    pbd.Total = code.TargetReadings*60;
+                    pbd.IsTargetMet = false;
+                    pbd.ReadyTobill = 0;
+                    return pbd;
+                }
+                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                {
+                    PatientBilldata PatientBilldata = new PatientBilldata();
+                    PatientBilldata.CPTCode = code.BillingCode;
+                    PatientBilldata.Completed = 0;
+                    PatientBilldata.Total = code.TargetReadings*60;
+                    PatientBilldata.IsTargetMet = false;
+                    PatientBilldata.ReadyTobill = 0;
+                    return PatientBilldata;
+                }
+                else
+                {
+                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime endDate = DateTime.UtcNow;
+                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                    //the patientbilling table and +1 day will come as next start day.. So we should   
+                    // calcualte the start date with respect to the billing threshold
+                    DateTime today = DateTime.UtcNow;
+                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
+                    if (stDate.Date > endDateTempay)
+                    {
+                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                        if (bd == null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
+                        endDate = bd.EndDate;
+                    }
+
+                    if (PatientStartDate.Status.ToLower() == "billeddate")
+                    {
+                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
+                        endDate =DateTime.UtcNow;
+                    }
+                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
+                    if (PatientInteractiontim == null)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
+                        return pbd;
+                    }
+                    //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+                    //if (isEstablishedExist.Count() > 0)
+                    //{
+                    //    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+                    //    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+                    //    {
+                    //        PatientInteractiontim.Clear();
+                    //    }
+                    //}
+                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null /*|| isEstablishedExist.Count == 0*/)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string date = stDate.ToString();
+                        date = date.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(date);
+                        return pbd;
+                    }
+                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+                    if (TotalReading > code487.TargetReadings * 60)
+                    {
+                        TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
+                        TotalReading = (int)(t1.TotalSeconds - (code487.TargetReadings * 60));
+
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = TotalReading;
+
+                        //base 40
+                        pbd.Total = code.TargetReadings * 60;
+                        pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+
+                        pbd.IsTargetMet = (TotalReading >= code.TargetReadings * 60) ? true : false;
+                    }
+                    else
+                    {
+                        //Target reading 20
+                        pbd.BillingStartDate = (DateTime)stDate;
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings * 60;
+                        pbd.IsTargetMet = (TotalReading >= code.TargetReadings * 60) ? true : false;
+                        pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+
+                    }
+                    return pbd;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+        public PatientBilldata ProcessCPT99424_CycleBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
+        {
+            PatientBilldata pbd = new PatientBilldata();
+            try
+            {
+                int DaysCompleted = 0; int TotalReading = 0;
+                PatientStartDate PatientStartDate = new PatientStartDate();
+                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                if (PatientStartDate == null ||
+                    PatientStartDate.Status.ToLower() == "invalid")
+                {
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = 0;
+                    pbd.Total = code.TargetReadings*60;
+                    pbd.IsTargetMet = false;
+                    pbd.ReadyTobill = 0;
+                    return pbd;
+                }
+                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                {
+                    PatientBilldata PatientBilldata = new PatientBilldata();
+                    PatientBilldata.CPTCode = code.BillingCode;
+                    PatientBilldata.Completed = 0;
+                    PatientBilldata.Total = code.TargetReadings*60;
+                    PatientBilldata.IsTargetMet = false;
+                    PatientBilldata.ReadyTobill = 0;
+                    return PatientBilldata;
+                }
+                else
+                {
+
+                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime endDate = DateTime.UtcNow;
+
+                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                    //the patientbilling table and +1 day will come as next start day.. So we should   
+                    // calcualte the start date with respect to the billing threshold
+                    DateTime today = DateTime.UtcNow;
+                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
+                    if (stDate.Date > endDateTempay)
+                    {
+                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                        if (bd == null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
+
+                    }
+
+
+
+                    if (PatientStartDate.Status.ToLower() == "billeddate")
+                    {
+                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
+                        endDate =DateTime.UtcNow;
+
+                    }
+
+
+                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
+                    if (PatientInteractiontim == null)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
+                        return pbd;
+                    }
+                    //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+                    //if (isEstablishedExist.Count() > 0)
+                    //{
+                    //    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+                    //    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+                    //    {
+                    //        PatientInteractiontim.Clear();
+                    //    }
+                    //}
+                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null /*|| isEstablishedExist.Count == 0*/)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string date = stDate.ToString();
+                        date = date.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(date);
+                        return pbd;
+                    }
+                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+                    if (TotalReading >= code.TargetReadings * 60)
+                    {
+                        TotalReading = code.TargetReadings * 60;
+                    }
+                    string Newdate = stDate.ToString();
+                    Newdate = Newdate.Replace("Z", "");
+                    pbd.BillingStartDate = DateTime.Parse(Newdate);
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = TotalReading;
+                    pbd.Total = code.TargetReadings * 60;
+                    pbd.IsTargetMet = (TotalReading >= code.TargetReadings * 60) ? true : false;
+                    pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                    return pbd;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+        public PatientBilldata ProcessCPT99425_CycleBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code,
+                                                    BillingCodesDetails code424, string connectionString)
+        {
+            PatientBilldata pbd = new PatientBilldata();
+            try
+            {
+                int DaysCompleted = 0; int TotalReading = 0;
+                PatientStartDate PatientStartDate = new PatientStartDate();
+                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                if (PatientStartDate == null ||
+                    PatientStartDate.Status.ToLower() == "invalid")
+                {
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = 0;
+                    pbd.Total = code.TargetReadings*60;
+                    pbd.IsTargetMet = false;
+                    pbd.ReadyTobill = 0;
+                    return pbd;
+                }
+                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                {
+                    PatientBilldata PatientBilldata = new PatientBilldata();
+                    PatientBilldata.CPTCode = code.BillingCode;
+                    PatientBilldata.Completed = 0;
+                    PatientBilldata.Total = code.TargetReadings*60;
+                    PatientBilldata.IsTargetMet = false;
+                    PatientBilldata.ReadyTobill = 0;
+                    return PatientBilldata;
+                }
+                else
+                {
+                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime endDate = DateTime.UtcNow;
+                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                    //the patientbilling table and +1 day will come as next start day.. So we should   
+                    // calcualte the start date with respect to the billing threshold
+                    DateTime today = DateTime.UtcNow;
+                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
+                    if (stDate.Date > endDateTempay)
+                    {
+                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                        if (bd == null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
+                        endDate = bd.EndDate;
+                    }
+
+                    if (PatientStartDate.Status.ToLower() == "billeddate")
+                    {
+                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
+                        endDate =DateTime.UtcNow;
+                    }
+                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
+                    if (PatientInteractiontim == null)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string Newdate = stDate.ToString();
+                        Newdate = Newdate.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(Newdate);
+                        return pbd;
+                    }
+                    //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+                    //if (isEstablishedExist.Count() > 0)
+                    //{
+                    //    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+                    //    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+                    //    {
+                    //        PatientInteractiontim.Clear();
+                    //    }
+                    //}
+                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null /*|| isEstablishedExist.Count == 0*/)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string date = stDate.ToString();
+                        date = date.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(date);
+                        return pbd;
+                    }
+                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+                    if (TotalReading > code424.TargetReadings * 60)
+                    {
+                        TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
+                        TotalReading = (int)(t1.TotalSeconds - (code424.TargetReadings * 60));
+
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = TotalReading;
+                        if (TotalReading < code424.TargetReadings * 60)
+                        {
+                            // base 20
+                            pbd.Total = code424.TargetReadings * 60;
+                            pbd.ReadyTobill = (TotalReading >= (code424.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                        }
+                        else
+                        {
+                            //base 40
+                            pbd.Total = code.TargetReadings * 60;
+                            pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                        }
+                        pbd.IsTargetMet = (TotalReading >= code424.TargetReadings * 60) ? true : false;
+                    }
+                    else
+                    {
+                        //Target reading 20
+                        string dateNews = stDate.ToString();
+                        dateNews = dateNews.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNews);
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code424.TargetReadings * 60;
+                        pbd.IsTargetMet = (TotalReading >= code424.TargetReadings * 60) ? true : false;
+                        pbd.ReadyTobill = (TotalReading >= (code424.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+
+                    }
+                    return pbd;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+        public PatientBilldata ProcessCPT99426_CycleBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code, string connectionString)
+        {
+            PatientBilldata pbd = new PatientBilldata();
+            try
+            {
+                int DaysCompleted = 0; int TotalReading = 0;
+                PatientStartDate PatientStartDate = new PatientStartDate();
+                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                if (PatientStartDate == null ||
+                    PatientStartDate.Status.ToLower() == "invalid")
+                {
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = 0;
+                    pbd.Total = code.TargetReadings*60;
+                    pbd.IsTargetMet = false;
+                    pbd.ReadyTobill = 0;
+                    return pbd;
+                }
+                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                {
+                    PatientBilldata PatientBilldata = new PatientBilldata();
+                    PatientBilldata.CPTCode = code.BillingCode;
+                    PatientBilldata.Completed = 0;
+                    PatientBilldata.Total = code.TargetReadings*60;
+                    PatientBilldata.IsTargetMet = false;
+                    PatientBilldata.ReadyTobill = 0;
+                    return PatientBilldata;
+                }
+                else
+                {
+
+                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime endDate = DateTime.UtcNow;
+
+                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                    //the patientbilling table and +1 day will come as next start day.. So we should   
+                    // calcualte the start date with respect to the billing threshold
+                    DateTime today = DateTime.UtcNow;
+                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
+                    if (stDate.Date > endDateTempay)
+                    {
+                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                        if (bd == null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
+
+                    }
+
+
+
+                    if (PatientStartDate.Status.ToLower() == "billeddate")
+                    {
+                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
+                        endDate =DateTime.UtcNow;
+
+                    }
+
+
+                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
+                    if (PatientInteractiontim == null)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string dateNews = stDate.ToString();
+                        dateNews = dateNews.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNews);
+                        return pbd;
+                    }
+                    //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+                    //if (isEstablishedExist.Count() > 0)
+                    //{
+                    //    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+                    //    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+                    //    {
+                    //        PatientInteractiontim.Clear();
+                    //    }
+                    //}
+                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null /*|| isEstablishedExist.Count == 0*/)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
+                        return pbd;
+                    }
+                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+                    if (TotalReading >= code.TargetReadings * 60)
+                    {
+                        TotalReading = code.TargetReadings * 60;
+                    }
+                    string dates = stDate.ToString();
+                    dates = dates.Replace("Z", "");
+                    pbd.BillingStartDate = DateTime.Parse(dates);
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = TotalReading;
+                    pbd.Total = code.TargetReadings * 60;
+                    pbd.IsTargetMet = (TotalReading >= code.TargetReadings * 60) ? true : false;
+                    pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                    return pbd;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+        public PatientBilldata ProcessCPT99427_CycleBasedBilling(int patientId, int patientProgramId, BillingCodesDetails code,
+                                                    BillingCodesDetails code426, string connectionString)
+        {
+            PatientBilldata pbd = new PatientBilldata();
+            try
+            {
+                int DaysCompleted = 0; int TotalReading = 0;
+                PatientStartDate PatientStartDate = new PatientStartDate();
+                PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                if (PatientStartDate == null ||
+                    PatientStartDate.Status.ToLower() == "invalid")
+                {
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = 0;
+                    pbd.Total = code.TargetReadings*60;
+                    pbd.IsTargetMet = false;
+                    pbd.ReadyTobill = 0;
+                    return pbd;
+                }
+                else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
+                {
+                    PatientBilldata PatientBilldata = new PatientBilldata();
+                    PatientBilldata.CPTCode = code.BillingCode;
+                    PatientBilldata.Completed = 0;
+                    PatientBilldata.Total = code.TargetReadings*60;
+                    PatientBilldata.IsTargetMet = false;
+                    PatientBilldata.ReadyTobill = 0;
+                    return PatientBilldata;
+                }
+                else
+                {
+                    DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
+                    DateTime endDate = DateTime.UtcNow;
+                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
+                    //the patientbilling table and +1 day will come as next start day.. So we should   
+                    // calcualte the start date with respect to the billing threshold
+                    DateTime today = DateTime.UtcNow;
+                    DateTime endDateTempay = GetLocalTimeFromUTC((DateTime)today, connectionString);
+                    if (stDate.Date > endDateTempay)
+                    {
+                        //stDate = stDate.AddDays(-1 * code.BillingThreshold);
+                        BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
+                        if (bd == null)
+                        {
+                            PatientBilldata PatientBilldata = new PatientBilldata();
+                            PatientBilldata.CPTCode = code.BillingCode;
+                            PatientBilldata.Completed = 0;
+                            PatientBilldata.Total = code.TargetReadings*60;
+                            PatientBilldata.IsTargetMet = false;
+                            PatientBilldata.ReadyTobill = 0;
+                            return PatientBilldata;
+                        }
+                        stDate = bd.StartDate;
+                        endDate = bd.EndDate;
+                    }
+
+                    if (PatientStartDate.Status.ToLower() == "billeddate")
+                    {
+                        stDate = GetUTCFromLocalTime((DateTime)stDate, connectionString);
+                        endDate =DateTime.UtcNow;
+                    }
+                    List<PatientInteraction> PatientInteractiontim = GetPatientInteractiontime(patientId, patientProgramId, connectionString, stDate, endDate).ToList();
+                    if (PatientInteractiontim == null)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string dates = stDate.ToString();
+                        dates = dates.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dates);
+                        return pbd;
+                    }
+                    //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
+                    //if (isEstablishedExist.Count() > 0)
+                    //{
+                    //    isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
+                    //    if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
+                    //    {
+                    //        PatientInteractiontim.Clear();
+                    //    }
+                    //}
+                    if (PatientInteractiontim.Count == 0 || PatientInteractiontim == null /*|| isEstablishedExist.Count == 0*/)
+                    {
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code.TargetReadings*60;
+                        pbd.IsTargetMet = false;
+                        pbd.ReadyTobill = 0;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
+                        return pbd;
+                    }
+                    TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
+                    if (TotalReading > code426.TargetReadings * 60)
+                    {
+                        TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
+                        TotalReading = (int)(t1.TotalSeconds - (code426.TargetReadings * 60));
+
+                        string dateNw = stDate.ToString();
+                        dateNw = dateNw.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNw);
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = TotalReading;
+                        if (TotalReading < code426.TargetReadings * 60)
+                        {
+                            // base 20
+                            pbd.Total = code426.TargetReadings * 60;
+                            pbd.ReadyTobill = (TotalReading >= (code426.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                        }
+                        else
+                        {
+                            //base 40
+                            pbd.Total = code.TargetReadings * 60;
+                            pbd.ReadyTobill = (TotalReading >= (code.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+                        }
+                        pbd.IsTargetMet = (TotalReading >= code426.TargetReadings * 60) ? true : false;
+                    }
+                    else
+                    {
+                        //Target reading 20
+                        string dateN = stDate.ToString();
+                        dateN = dateN.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateN);
+                        pbd.CPTCode = code.BillingCode;
+                        pbd.Completed = 0;
+                        pbd.Total = code426.TargetReadings * 60;
+                        pbd.IsTargetMet = (TotalReading >= code426.TargetReadings * 60) ? true : false;
+                        pbd.ReadyTobill = (TotalReading >= (code426.TargetReadings * 60) && DaysCompleted >= code.BillingThreshold) ? 1 : 0;
+
+                    }
+                    return pbd;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+
+        public string DownloadInvoice(string Blob_Conn_String, string ContainerName, string ConnectionString)
         {
             string Uri = "";
             try
@@ -12521,8 +13666,8 @@ namespace RPMWeb.Dal
                     Reportlist = (List<PatientBillReportDetails>)Reportlist.Where(s => s.clinic == clinic).ToList();
                     isClinic = true;
                     isCptCode = true;
-                    if(Reportlist.Count>0)
-                    clinic = Reportlist[0].clinicname.ToString();
+                    if (Reportlist.Count>0)
+                        clinic = Reportlist[0].clinicname.ToString();
                 }
 
                 if (Reportlist.Count > 0)
@@ -12733,7 +13878,7 @@ namespace RPMWeb.Dal
             try
             {
                 string PatientNumber = dtblTable.Rows[0][2].ToString();
-               
+
                 PdfPTable table = new PdfPTable(dtblTable.Columns.Count);
                 System.IO.FileStream fs = new FileStream(strPdfPath, FileMode.Create, FileAccess.Write, FileShare.None);
                 Document document = new Document();
@@ -12794,8 +13939,8 @@ namespace RPMWeb.Dal
                 //Table header
                 BaseFont btnColumnHeader = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
                 Font fntColumnHeader = new Font(btnColumnHeader, 10, 1, BaseColor.WHITE);
-                
-                
+
+
                 for (int i = 0; i < dtblTable.Columns.Count; i++)
                 {
                     var cells = new PdfPCell() { HorizontalAlignment = Element.ALIGN_CENTER };
@@ -12865,7 +14010,7 @@ namespace RPMWeb.Dal
                         SqlDataReader reader = command.ExecuteReader();
 
                         PatientDocuments patientData = new PatientDocuments();
-       
+
                         while (reader.Read())
                         {
 
@@ -12901,12 +14046,12 @@ namespace RPMWeb.Dal
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {
                     SqlCommand command = new SqlCommand("usp_InsPatientSMSDetails", con);
-                    
+
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@CreatedBy", UserName);
-                    command.Parameters.AddWithValue("@PatientUserName",Info.PatientUserName);
-                    command.Parameters.AddWithValue("@fromNo",Info.fromNo);
-                    command.Parameters.AddWithValue("@toNo",Info.toNo);
+                    command.Parameters.AddWithValue("@PatientUserName", Info.PatientUserName);
+                    command.Parameters.AddWithValue("@fromNo", Info.fromNo);
+                    command.Parameters.AddWithValue("@toNo", Info.toNo);
                     command.Parameters.AddWithValue("@Body", Info.Body);
                     command.Parameters.AddWithValue("@SentDate", Info.SentDate);
                     command.Parameters.AddWithValue("@Direction", Info.Direction);
@@ -12945,9 +14090,9 @@ namespace RPMWeb.Dal
             }
             catch (Exception ex) { throw ex; }
         }
-        
+
         // for getting patient sms history (incoming and outgoing)
-        public List<GetSmsInfo> GetPatientSmsDetails(int PatientId, int PatientProgramId,DateTime StartDate, DateTime EndDate, string CreatedBy, string ConnectionString)
+        public List<GetSmsInfo> GetPatientSmsDetails(int PatientId, int PatientProgramId, DateTime StartDate, DateTime EndDate, string CreatedBy, string ConnectionString)
         {
             List<GetSmsInfo> fullsmsdetails = new List<GetSmsInfo>();
             try
@@ -12967,7 +14112,7 @@ namespace RPMWeb.Dal
                     returnParameter.Direction = ParameterDirection.ReturnValue;
                     con.Open();
                     SqlDataReader reader = command.ExecuteReader();
-                    
+
 
                     while (reader.Read())
                     {
@@ -12977,11 +14122,11 @@ namespace RPMWeb.Dal
                         info.Sender = reader["CreatedBy"].ToString();
                         info.Status = reader["Status"].ToString();
                         info.Direction = reader["Direction"].ToString();
-                        if(info.Direction== "inbound-api")
+                        if (info.Direction== "inbound-api")
                         {
                             info.Sender = "Patient";
                         }
-                        else if(info.Direction== "outbound-api")
+                        else if (info.Direction== "outbound-api")
                         {
                             info.Sender = "Care Team";
                         }
@@ -13037,7 +14182,7 @@ namespace RPMWeb.Dal
             return true;
         }
 
-  
+
     }
 
 
