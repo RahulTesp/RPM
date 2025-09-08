@@ -162,11 +162,9 @@ class Program
                 DateTime lastRecodDate = val.ActivatedDate;
 
                 Console.WriteLine("DeviceId: " + val.Deviceid + "; Lasted Recorded :" + lastRecodDate);
-                TimeSpan difference = (lastRecodDate - DateTime.UtcNow).Duration();
-                if (difference.TotalMinutes > 30)
-                {
-                    GetDeviceDataFromAPI(lastRecodDate, val.Deviceid);
-                }
+                
+                GetDeviceDataFromAPI(lastRecodDate, val.Deviceid);
+                
             }
             Console.WriteLine("TimerApiCallback end");
         }
