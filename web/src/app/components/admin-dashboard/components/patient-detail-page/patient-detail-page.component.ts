@@ -387,8 +387,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((params) => {
         this.handleQueryParams(params);
-       // this.patientchatservice.setChatPanelOpen(this.chatVariable);
-       // this.patientchatservice.ensureInitialized(params.patientUserName);
+       this.patientchatservice.setChatPanelOpen(this.chatVariable);
+       this.patientchatservice.ensureInitialized(params.patientUserName);
       });
 
     this.initializedocumentColumns();
