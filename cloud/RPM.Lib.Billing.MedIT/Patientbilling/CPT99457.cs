@@ -1,6 +1,12 @@
-﻿using RPMPatientBilling.Interface;
+﻿
+using RPMPatientBilling.Interface;
 using RPMPatientBilling.Model;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Reflection;
+
 
 
 namespace RPMPatientBilling.PatientBilling
@@ -22,12 +28,10 @@ namespace RPMPatientBilling.PatientBilling
             bool flagFirstCycle = true;
             BillingCountTaskData bctd = inst as BillingCountTaskData;
             if (bctd == null) return;
-           // Console.WriteLine("Task 457 Executing " + ((PatientProgramData)bctd.patientProgramDatas).PatienttId);
             try
             {
                 object patientProgramData = bctd.patientProgramDatas;
                 if (patientProgramData == null) return;
-
                 int DaysCompleted = 0;
                 PatientStartDate PatientStartDate = new PatientStartDate();
                 PatientStartDate = billing.GetPatientBillingStartDate(patientProgramData, billingCode.BillingCodeID, con);
@@ -50,12 +54,7 @@ namespace RPMPatientBilling.PatientBilling
                     {
                         stDate = Convert.ToDateTime(PatientStartDate.StartDate);
                     }
-                   // DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate).AddDays(1);
-                    //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
-                    //the patientbilling table and +1 day will come as next start day.. So we should   
-                    // calcualte the start date with respect to the billing threshold
                     int d = ((PatientProgramData)patientProgramData).PatienttId;
-
                     DateTime today = DateTime.UtcNow;
                     DateTime endDateTempay = BillingProcess.GetLocalTimeFromUTC((DateTime)today, con);
                     if (stDate.Date >endDateTempay && PatientStartDate.Status.ToLower()=="billeddate")
@@ -68,15 +67,11 @@ namespace RPMPatientBilling.PatientBilling
                     {
                         return;
                     }
-
                     DateTime Enddate = endDateTempay.Date;
                     var EnddateTemp = Enddate.AddDays(1);
                     var DateDiff = stDate - EnddateTemp;
                     DaysCompleted = Math.Abs(DateDiff.Days);
-
                     var NextEndDate = DateTime.MinValue;
-
-                    //int TotalDateRange = Math.Abs(DateDiff.Days / billingCode.BillingThreshold);
                     int TotalDateRange = 1;
                     if (Math.Abs(DateDiff.Days) > billingCode.BillingThreshold)
                     {
@@ -94,33 +89,21 @@ namespace RPMPatientBilling.PatientBilling
                             stDateTemp=BillingProcess.GetUTCFromLocalTime((DateTime)stDateTemp, con);
                             startDateNew = stDateTemp;
                         }
-
                         if (stDateTemp >DateTime.UtcNow)
                         {
                             break;
                         }
                         stDateTemp=BillingProcess.GetLocalTimeFromUTC((DateTime)stDateTemp, con);
                         DateTime stdateloc = stDateTemp;
-
-
-
-
                         NextEndDate = stDateTemp.Date.AddDays(billingCode.BillingThreshold-1);
-                        /*if (stDateTemp.Date > DateTime.UtcNow.Date)
-                        {
-                            stDateTemp = DateTime.UtcNow.Date;
-                        }*/
                         if (NextEndDate > DateTime.UtcNow.Date)
                         {
                             NextEndDate = stDateTemp.AddDays((DateTime.UtcNow - startDateNew).Days);
                             bCycleCompleted = false;
                         }
-
                         DateTime nextEndDatetemp = BillingProcess.GetLocalTimeFromUTC((DateTime)NextEndDate, con);
                         DateTime nextEndDateNew = NextEndDate.AddDays(1).Date.AddSeconds(-1);
                         nextEndDateNew = BillingProcess.GetUTCFromLocalTime((DateTime)nextEndDateNew, con);
-                        //DaysCompleted = Math.Abs((int)(NextEndDate - stDateTemp).TotalDays);
-                       // DaysCompleted = Math.Abs((int)(startDateNew.Date - NextEndDate.Date).Days);
                         DaysCompleted = Math.Abs((int)(startDateNew - nextEndDateNew).Days);
                         int daysDiff = DaysCompleted;
 
@@ -137,17 +120,6 @@ namespace RPMPatientBilling.PatientBilling
                         {
                             bCycleCompleted = false;
                         }
-                        // Counting the current day also for day of completion
-                        
-                        //DaysCompleted = Math.Abs((int)(NextEndDate - stDateTemp).TotalDays);
-                        //DaysCompleted = Math.Abs((int)(stDateTemp - NextEndDate.Date).Days);
-                        // Counting the current day also for day of completion
-                        //if (DaysCompleted < billingCode.BillingThreshold)
-                        //{
-                        //    DaysCompleted += 1;
-                        //}
-
-
                         List<Dates> Dates = new List<Dates>();
                         List<Dates> DatesNew = new List<Dates>();
                         for (int i = 0; i<daysDiff; i++)
@@ -155,7 +127,6 @@ namespace RPMPatientBilling.PatientBilling
                             if (i==0)
                             {
                                 nextEndDatetemp = stdateloc.AddDays(1).Date.AddSeconds(-1);
-
                             }
                             else if (i==DaysCompleted)
                             {
@@ -166,29 +137,16 @@ namespace RPMPatientBilling.PatientBilling
                             {
                                 stDateTemp = stdateloc.AddDays(i).Date;
                                 nextEndDatetemp = stDateTemp.AddDays(1).Date.AddSeconds(-1);
-
                             }
-
                             stDateTemp = BillingProcess.GetUTCFromLocalTime((DateTime)stDateTemp, con);
                             nextEndDatetemp = BillingProcess.GetUTCFromLocalTime((DateTime)nextEndDatetemp, con);
-
-
                             Dates.Add(new Dates() { StartDate = (DateTime)stDateTemp, EndDate = nextEndDatetemp, Totalreading=0 });
-
-
                         }
-
-
-
-
-
-
-
-
-
                         DateTime startDateFinal = Dates.First().StartDate;
                         DateTime endDateFinal = Dates.Last().EndDate;
                         List<PatientInteraction> PatientInteractiontim = billing.GetPatientInteractiontime(patientProgramData, con, startDateFinal, endDateFinal).ToList();
+                        int patientSmsCount = 0;
+                        patientSmsCount =patientSmsCount+billing.GetPatientSmsCount(patientProgramData, con, startDateFinal, endDateFinal);
                         if (PatientInteractiontim == null)
                         {
                             SetData(patientProgramData, 0, Convert.ToDateTime(startDateFinal), billingCode.BillingCodeID, DaysCompleted+1, bCycleCompleted, null);
@@ -199,13 +157,16 @@ namespace RPMPatientBilling.PatientBilling
                             isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
                             if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
                             {
-                                PatientInteractiontim.Clear(); ;
+                                if (patientSmsCount <= 0)
+                                    PatientInteractiontim.Clear();
                             }
                         }
                         int TotalReading = PatientInteractiontim.Sum(s => s.Duration);
+
                         if (PatientInteractiontim.Count==0  || PatientInteractiontim==null || isEstablishedExist.Count==0)
                         {
-                            TotalReading=0;
+                            if (patientSmsCount <= 0)
+                                TotalReading=0;
                         }
                         
                         if (TotalReading >= billingCode.TargetReadings * 60)
@@ -228,45 +189,13 @@ namespace RPMPatientBilling.PatientBilling
                                 LastBilledDate = (DateTime?)NextEndDate,
                                 CreatedOn = DateTime.UtcNow
                             };
-                            RPMBilling rPMBilling = new RPMBilling();
+                            RPMDaysBasedBilling rPMBilling = new RPMDaysBasedBilling();
                             rPMBilling.UpdatePatientBilledData(patientDailyBillingData, billingCode, startDateFinal, con);
                         }
                         stDateTemp = BillingProcess.GetUTCFromLocalTime((DateTime)NextEndDate.AddDays(1), con);
                         flagFirstCycle = false;
                     }
-
-                    /*
-                    DateTime Enddate = DateTime.Today;
-                    var stOfMonth = new DateTime(Enddate.Year, Enddate.Month, 1);
-
-                    if (stOfMonth.Month == Convert.ToDateTime(PatientStartDate.StartDate).Month)
-                    {
-                        stOfMonth = Convert.ToDateTime(PatientStartDate.StartDate);
-                    }
-
-
-                    DateTime endMonth = stOfMonth.AddMonths(1).AddDays(-1);
-                    var DaysDiff = endMonth - Enddate;
-                    DaysCompleted = Math.Abs(DaysDiff.Days);
-
-                    List<PatientInteraction> PatientInteractiontim = billing.GetPatientInteractiontime(patientProgramData, con).Where(s => s.Date >= stOfMonth && s.Date <= Enddate).ToList();
-                    if (PatientInteractiontim == null)
-                    {
-                        SetData(patientProgramData, 0, Convert.ToDateTime(stOfMonth), billingCode.BillingCodeID, DaysCompleted);
-                    }
-                    var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
-                    if (isEstablishedExist.Count() > 0)
-                    {
-                        isEstablishedExist = isEstablishedExist.Where(s => s.IsEstablishedCall == 1).ToList();
-                        if (isEstablishedExist != null && isEstablishedExist.Count() == 0)
-                        {
-                            PatientInteractiontim.RemoveAll(s => s.IsCallNote == 1);
-                        }
-                    }
-                    SetData(patientProgramData, PatientInteractiontim.Sum(s => s.Duration), Convert.ToDateTime(stOfMonth), billingCode.BillingCodeID, DaysCompleted);
-                    */
                 }
-
             }
             catch (Exception ex)
             {
@@ -277,16 +206,12 @@ namespace RPMPatientBilling.PatientBilling
                 if (bctd.manualResetEvent != null)
                 {
                     bctd.manualResetEvent.Set();
-                 //   Console.WriteLine("Task 457 Triggered event " + ((PatientProgramData)bctd.patientProgramDatas).PatienttId);
                 }
             }
-         //   Console.WriteLine("Task 457 Execution over " + ((PatientProgramData)bctd.patientProgramDatas).PatienttId);
-
-
         }
 
 
-
+        
         public void SetData(object PatientProgramDatas, int totalReadings, DateTime? startDate,
                             int billingCodeId,int daysCompleted, bool CycleCompleted, DateTime? LastBilledDate)
         {

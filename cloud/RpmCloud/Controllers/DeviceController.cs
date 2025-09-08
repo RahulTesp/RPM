@@ -43,7 +43,7 @@ namespace RpmCloud.Controllers
                     {
                         return Ok( tz);
                     }
-                    return NotFound();
+                    return NotFound(new { message = "Not Found." });
                 }
                 else
                 {
@@ -88,7 +88,7 @@ namespace RpmCloud.Controllers
                     {
                         return StatusCode(resp.HttpRetCode, resp);
                     }
-                    return NotFound();
+                    return NotFound(new { message = "Not Found." });
                 }
                 else
                 {
@@ -129,7 +129,7 @@ namespace RpmCloud.Controllers
                         return Unauthorized(new { message = "Invalid session." });
                     }
                     bool result = RpmDalFacade.ValidateDevice(deviceid);
-                    return Ok( result);
+                    return Ok(new { status = result });
                 }
                 else
                 {
@@ -174,7 +174,7 @@ namespace RpmCloud.Controllers
                     {
                         return StatusCode(resp.HttpRetCode, resp);
                     }
-                    return NotFound();
+                    return NotFound(new { message = "Not Found." });
                 }
                 else
                 {
@@ -219,7 +219,7 @@ namespace RpmCloud.Controllers
                     {
                         return StatusCode(resp.HttpRetCode, resp);
                     }
-                    return NotFound();
+                    return NotFound(new { message = "Not Found." });
                 }
                 else
                 {
@@ -263,9 +263,9 @@ namespace RpmCloud.Controllers
                     bool resp = RpmDalFacade.UpdateDeviceStatus(devstat);
                     if (resp == true)
                     {
-                        return Ok( "Device Status updated");
+                        return Ok(new { message = "Device Status updated" });
                     }
-                    return BadRequest("Cannot update Device Status updated");
+                    return BadRequest(new { message = "Cannot update Device Status updated" });
                 }
                 else
                 {
@@ -309,9 +309,9 @@ namespace RpmCloud.Controllers
                     bool resp = RpmDalFacade.IsDeviceAvailable(info);
                     if (resp == true)
                     {
-                        return Ok( resp);
+                        return Ok(new { response = resp });
                     }
-                        return NotFound(resp);                    
+                    return NotFound(new { response = resp });                    
                 }
                 else
                 {
@@ -356,9 +356,9 @@ namespace RpmCloud.Controllers
                     bool resp = RpmDalFacade.IsDeviceModelAvailable(info);
                     if (resp == true)
                     {
-                        return Ok( resp);
+                        return Ok(new { response = resp });
                     }
-                    return NotFound(resp);
+                    return NotFound(new { response = resp });
                 }
                 else
                 {
@@ -401,9 +401,9 @@ namespace RpmCloud.Controllers
                     int resp = RpmDalFacade.AddDevice(info);
                     if (resp >0)
                     {
-                        return Ok( resp);
+                        return Ok(new { response = resp });
                     }
-                    return NotFound(resp);
+                    return NotFound(new { response = resp });
                 }
                 else
                 {
@@ -428,16 +428,16 @@ namespace RpmCloud.Controllers
                     string DeviceType = RpmDalFacade.IsValidlifesenseDevice(dev.deviceId);
                     if (DeviceType == null)
                     {
-                        return Unauthorized("Unknown Device");
+                        return Unauthorized(new { message = "Unknown Device" });
                     }
                     if (!RpmDalFacade.StagingTableInsert(dev, DeviceType))
                     {
-                        return BadRequest("Unexcepted error");
+                        return BadRequest(new { message = "Unexcepted error" });
                     }                   
-                    return Ok( "Sucess");
+                    return Ok(new { message = "Sucess" });
                 }                
             }
-            return BadRequest("fail");
+            return BadRequest(new { message = "fail" });
         }
         //InsertPatienVendorConnectivity
         [Route("addpatientvendorconnectivity")]
@@ -447,9 +447,9 @@ namespace RpmCloud.Controllers
             RpmDalFacade.ConnectionString = CONN_STRING;           
             if (!RpmDalFacade.InsertPatienVendorConnectivity(dev))
             {
-                return BadRequest("Unexcepted error");
+                return BadRequest(new { message = "Unexcepted error" });
             }
-            return Ok( "Sucess");
+            return Ok(new { message = "Sucess" });
         }
         //bodytracedataInsert
         [Route("bodytrace")]
@@ -461,9 +461,9 @@ namespace RpmCloud.Controllers
             //bodytraceweight output1 = JsonConvert.DeserializeObject<bodytraceweight>(output);
             if (!RpmDalFacade.bodytracedataInsert(dev))
             {
-                return BadRequest("Unexcepted error");
+                return BadRequest(new { message = "Unexcepted error" });
             }
-            return Ok( "Sucess");
+            return Ok(new { message = "Sucess" });
         }
 
         [Route("account/forwardstatus")]
@@ -476,10 +476,10 @@ namespace RpmCloud.Controllers
                 if (apikey == "123456789")
                 {
 
-                    return Ok( "Sucess");
+                    return Ok(new { message = "Sucess" });
                 }
             }
-            return BadRequest("fail");
+            return BadRequest(new { message = "fail" });
         }
         [Route("validatedevice/{deviceid}")]
         [HttpPost]
@@ -487,7 +487,7 @@ namespace RpmCloud.Controllers
         {
             if (string.IsNullOrEmpty(deviceid))
             {
-                return BadRequest("Invalid input data");
+                return BadRequest(new { message = "Invalid input data" });
             }
             try
             {
@@ -509,7 +509,7 @@ namespace RpmCloud.Controllers
                         return Unauthorized(new { message = "Invalid session." });
                     }
                     bool result = RpmDalFacade.ValidateDevice(deviceid);
-                    return Ok( result);
+                    return Ok( new { status = result });
                 }
                 else
                 {
@@ -595,9 +595,9 @@ namespace RpmCloud.Controllers
                     string DeviceType = RpmDalFacade.GetDeviceType(deviceModel);
                     if (!DeviceType.Equals(null))
                     {
-                        return Ok(DeviceType);
+                        return Ok(new { message = DeviceType });
                     }
-                    return NotFound(DeviceType);
+                    return NotFound(new { message = DeviceType });
                 }
                 else
                 {
@@ -606,7 +606,7 @@ namespace RpmCloud.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Exception." });
             }
         }
     }

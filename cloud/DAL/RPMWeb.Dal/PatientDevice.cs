@@ -89,7 +89,7 @@ namespace RPMWeb.Dal
                             }
                             response.HttpRetCode = 200;//added
                             response.DevicUserId = dr.PatientNumber;//added
-                            response.Message = "Device set to active without vendor activation.";//added
+                            response.Message = "Device Added Successfully";//added
                             return response;
                         }
 

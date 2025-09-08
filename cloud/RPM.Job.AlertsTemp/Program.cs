@@ -31,6 +31,7 @@ class Program
         }
         try
         {
+            Thread.Sleep(20000);
             _timer = new Timer(TimerCallback, null, 0, 30000);
             Console.ReadLine();
         }
