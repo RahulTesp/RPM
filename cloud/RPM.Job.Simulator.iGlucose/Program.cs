@@ -3,7 +3,8 @@ using RPM.Job.Simulator.iGlucose;
 
 class Program
     {
-        static void Main(string[] args)
+    static string CONN_STRING = string.Empty;
+    static void Main(string[] args)
         {
             try
             {
@@ -12,19 +13,23 @@ class Program
                     .AddEnvironmentVariables()
                     .Build();
 
-                // connection string
-                string connectionString = config.GetConnectionString("DefaultConnection")
-                                          ?? Environment.GetEnvironmentVariable("SqlConnectionString");
+            if (config == null)
+            {
+                Console.WriteLine("Configuration is null.");
+                return;
+            }
+            // Access a specific config value
+            string? connStr = config["RPM:ConnectionString"];
+            Console.WriteLine($"RPM Connection String: {connStr}");
+            if (connStr == null)
+            {
+                Console.WriteLine("Connection string is null in appsettings.json.");
+                return;
+            }
+            CONN_STRING = connStr;
+            Console.WriteLine("Started Device Readings WebJob");
 
-                if (string.IsNullOrEmpty(connectionString))
-                {
-                    Console.WriteLine("Connection string not found. Configure it in appsettings.json file or Azure App Settings.");
-                    return;
-                }
-
-                Console.WriteLine("Started Device Readings WebJob");
-
-                var readingService = new ReadingService(connectionString);
+                var readingService = new ReadingService(CONN_STRING);
                 readingService.getandProcessActiveDevices();
 
                 Console.WriteLine("job Completed successfully");
