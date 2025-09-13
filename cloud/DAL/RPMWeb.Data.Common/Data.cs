@@ -2378,8 +2378,9 @@ namespace RPMWeb.Data.Common
     }
 
 
-    public class chathook {
-        public string author { get; set; }
+    public class chathook
+    {
+        public string Author { get; set; }
         public string Body { get; set; }
         public string Attributes { get; set; }
         public string AccountSid { get; set; }
@@ -2388,29 +2389,20 @@ namespace RPMWeb.Data.Common
         public string Source { get; set; }
         public string ConversationSid { get; set; }
         public string ParticipantSid { get; set; }
-        //public string DateCreated { get; set; }
-
-
     }
 
     public class smshook
     {
-        public string MessageSid { get; set; }
-        public string SmsSid { get; set; }
+        public string SmsSid { get; set; }          
         public string AccountSid { get; set; }
-        public string MessagingServiceSid { get; set; }
-
         public string From { get; set; }
         public string To { get; set; }
-
         public string Body { get; set; }
-
         public string SmsStatus { get; set; }
 
-
-
-
+        //public string SentDateUTC { get; set; }  // ❌ Twilio doesn’t send this
     }
+
     public class commUserNamesforVideoCall
     {
         public string CommUserNameCareTeam { get; set; }

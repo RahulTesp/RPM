@@ -744,10 +744,12 @@ namespace RpmCloud.Controllers
        
         [HttpPost]
         [Route("updatechatwebhook")]
-        public IActionResult UpdateChatWebhook([FromBody] chathook hook)
+        [Consumes("application/x-www-form-urlencoded")]
+        public IActionResult UpdateChatWebhook([FromForm] chathook hook)
         {
             try
             {
+                RpmDalFacade.ConnectionString = CONN_STRING;
                 bool ischatresurceupdated = RpmDalFacade.UpdateChatWebhook(hook);
                 if (ischatresurceupdated)
                 {
@@ -766,8 +768,10 @@ namespace RpmCloud.Controllers
 
         [HttpPost]
         [Route("updatesmswebhook")]
-        public IActionResult UpdatesmsWebhook([FromBody] smshook hook)
+        [Consumes("application/x-www-form-urlencoded")]
+        public IActionResult UpdatesmsWebhook([FromForm] smshook hook)
         {
+            RpmDalFacade.ConnectionString = CONN_STRING;
             try
             {
                 RpmDalFacade.UpdateIncomingSmsDetails(hook);

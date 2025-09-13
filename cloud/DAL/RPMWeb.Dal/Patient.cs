@@ -14002,7 +14002,7 @@ namespace RPMWeb.Dal
                     string insertQuery = "INSERT INTO twiliochatwebhook (author,Body,Attributes,AccountSid,ClientIdentity,EventType,Source,ConversationSid,ParticipantSid) VALUES (@author,@Body,@Attributes,@AccountSid,@ClientIdentity,@EventType,@Source,@ConversationSid,@ParticipantSid)";
                     using (SqlCommand command = new SqlCommand(insertQuery, con))
                     {
-                        command.Parameters.AddWithValue("@author", hook.author);
+                        command.Parameters.AddWithValue("@author", hook.Author);
                         command.Parameters.AddWithValue("@Body", hook.Body);
                         command.Parameters.AddWithValue("@Attributes", hook.Attributes);
 
