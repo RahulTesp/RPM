@@ -55,7 +55,9 @@
           </button>
         </div>
       </div>
-
+      <div class="panel-change-pass-btn">
+        <button class="btn-change-password" (click)= "ChangePassword()">Change Password</button>
+      </div>
       <form
         [formGroup]="registerprofile"
         class="registerprofile"
@@ -76,11 +78,20 @@
             <div class="userInfoContent">
               <div class="userInfoContLeft">
                 <div class="uploadPhoto">
-                  <img
-                    class="icon_camera"
-                    src="../../../assets/04-Icons/Icons_Camera.svg"
-                  />
-                </div>
+                   {{ file }}
+                      <img
+                         id="btnaddPatientImg"
+                         (click)="openFile()"
+                          class="icon_camera"
+                          src="../../../assets/04-Icons/Icons_Camera.svg"
+                         />
+                        <input
+                          id="image"
+                          type="file"
+                          style="display: none"
+                          (change)="handle($event)"
+                        />
+                  </div>
                 <div class="userInfoItem">
                   <p class="userInfoTitle">*Email ID</p>
                   <input
@@ -438,3 +449,153 @@
     </div>
   </div>
 </ng-template>
+
+<ng-container
+  *ngIf="isChangePasswordVisible"
+  [ngTemplateOutlet]="ChangePasswordPanel"
+></ng-container>
+
+<!-- Change Password component -->
+<ng-template #ChangePasswordPanel>
+  <div class="overlay-password">
+    <div class="change-password-panel">
+      <div class="change-password-container">
+        <span class="change-password-title">Reset Password</span>
+        <span class="change-password-first-para">
+          In Order to protect your account,<br />
+          make sure your password:
+        </span>
+        <p>
+          - Is longer than 8 characters<br />
+          - Does not match or significantly contain your username,<br />
+          eg.does not use 'username123' <br />
+          - Minimum of 2 Uppercase letters <br />
+          - Minimum of 2 Numbers <br />
+          - At least 1 special character, eg. &#64; - # & $ % <br />
+          - New password should not contain username
+        </p>
+        <form [formGroup]="passwordForm">
+          <div class="password_panel">
+            <div class="password_subPanel">
+              <label>Old Password</label>
+              <div class="input-panel-password">
+                <input
+                  placeholder="Enter Old Password"
+                  required
+                  formControlName="oldpw"
+                  id="oldpw"
+                  type="password"
+                />
+              </div>
+             <div class="err" [class.visible] ="NewTextEntered['oldpw'].invalid && (NewTextEntered['oldpw'].touched || NewTextEntered['oldpw'].dirty)">
+                  <div  [class.visible]="NewTextEntered['oldpw'].hasError('required')">
+                    Old password is required
+                  </div>
+                </div>
+            </div>
+
+            <div class="password_subPanel">
+              <label>New Password</label>
+              <div class="iinput-panel-password">
+                <div class="input-panel">
+                  <img
+                    class="icon-check"
+                    src="../../../../../assets/04-Icons/Icons_Check_password.svg"
+                    [ngClass]="{ 'password-match': isPasswordMatching() }"
+                  />
+                  <input
+                    placeholder="Enter New Password"
+                    required
+                    formControlName="newpw"
+                    id="newpw"
+                    [type]="showPassword ? 'text' : 'password'"
+                  />
+                  <img
+                    *ngIf="!showPassword"
+                    class="icon-view"
+                    src="../../../../../assets/04-Icons/Icons_View_password.svg"
+                    (click)="showPasswordVisible()"
+                  />
+
+                  <img
+                    *ngIf="showPassword"
+                    class="icon-view"
+                    src="../../../assets/04-Icons/eye-hid.svg"
+                    (click)="showPasswordVisible()"
+                  />
+                </div>
+              </div>
+              <div class="error-container">
+                <span
+                  class="err"
+                  [class.visible]="passwordErrors && passwordErrors.length > 0"
+                >
+                  Please Enter Valid Password
+                </span>
+              </div>
+            </div>
+            <div class="password_subPanel">
+              <label>Confirm New Password</label>
+              <div class="input-panel-password">
+                <div class="input-panel">
+                  <img
+                    class="icon-check"
+                    [ngClass]="{ 'password-match': isPasswordMatching() }"
+                    src="../../../../../assets/04-Icons/Icons_Check_password.svg"
+                  />
+                  <input
+                    placeholder="Re-Enter New Password"
+                    required
+                    formControlName="confirmpw"
+                    id="confirmpw"
+                    [type]="showConfirmPassword ? 'text' : 'password'"
+                  />
+                  <img
+                    *ngIf="!showConfirmPassword"
+                    class="icon-view"
+                    src="../../../../../assets/04-Icons/Icons_View_password.svg"
+                    (click)="showConfirmPasswordVisible()"
+                  />
+
+                  <img
+                    *ngIf="showConfirmPassword"
+                    class="icon-view"
+                    src="../../../assets/04-Icons/eye-hid.svg"
+                    (click)="showConfirmPasswordVisible()"
+                  />
+                </div>
+              </div>
+
+              <span
+                class="err"
+                [class.visible]="
+                  NewTextEntered['confirmpw'].getError('MustMatch') != null
+                "
+              >
+                Password Mismatch
+              </span>
+            </div>
+          </div>
+        </form>
+        <div class="button_panel">
+          <button
+            id="PasswordCnagecancel"
+            class="btn_cancel"
+            (click)="CloseChangePasswordDialog()"
+          >
+            CANCEL
+          </button>
+          <button
+            id="PasswordCnageconfirm"
+            class="btn_save"
+            (click)="confirm()"
+          >
+            CONFIRM
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<app-status-dialog-box  #statusDialog  (dialogClosed)="onDialogClosed()">
+</app-status-dialog-box>

@@ -95,6 +95,7 @@ export class DashboardComponent implements OnInit {
   menuState: string = 'in';
 
   toggleMenu(value: any) {
+
     this.menuState = value;
 
     this.menuState = this.menuState === 'out' ? 'in' : 'out';

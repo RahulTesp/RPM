@@ -91,7 +91,6 @@ export class ActivityinfoChatComponent implements OnInit, OnDestroy, AfterViewIn
 
   // Method to refresh data and update UI
   refreshData(): void {
-    console.log('Refreshing data and UI...');
 
     // For async operations
     setTimeout(() => {
@@ -131,7 +130,6 @@ export class ActivityinfoChatComponent implements OnInit, OnDestroy, AfterViewIn
 
   getMessagesByConversationSid(conversationSid: string): Message[] {
     this.showMessagePanel = false;
-
     const convo = this.http_chat_data.find((c: { ConversationSid: string; }) => c.ConversationSid === conversationSid);
 
     this.dataSourceChatPaneldata = convo;

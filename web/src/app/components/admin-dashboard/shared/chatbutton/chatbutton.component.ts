@@ -185,7 +185,6 @@ async sendMessage() {
     this.chatVariable = true;
     this.currentTime = new Date();
     this.isLoading = true;
-
     try {
       // Clear existing data first
       this.patientChatService.chatListSubject.next([]);
@@ -193,21 +192,21 @@ async sendMessage() {
       this.patientChatService.messagesSubject.next([]);
       this.messages = [];
       this.currentConversation = null;
-
       // Initialize chat service
       await this.patientChatService.ensureInitialized(this.currentuserName);
-
+      // Explicitly tell the service which user's conversations to load
+      console.log('Loading conversations for user:', this.currentuserName);
       try {
         // Get the current SID for this specific user
         this.currentSid = await this.patientChatService.getChatId(
           this.currentuserName
         );
 
+        this.patientChatService.setError('');
+        this.patientChatService.LoginStatus = true;
         // Force a fresh load of conversations
         await this.patientChatService.fetchUserChats(this.currentSid);
         this.startChatHeartBeat( this.currentSid,this.userName);
-        this.patientChatService.setError('');
-        this.patientChatService.LoginStatus = true;
       } catch (error: any) {
         if (error.status === 404) {
           //console.error('this Patient is not logged in to Mobile App yet, please ask him to Login for Establishing a conversation.');
@@ -241,6 +240,8 @@ chatHeartBeat(currentSid: string, username: string) {
       hour12: true
     }) + " +05:30"
   };
+
+  console.log("Sending heartbeat with payload:", payload);
 
   this.rpm.rpm_post('/api/comm/chatheartbeat', payload)
     .then(data => {
@@ -276,6 +277,8 @@ chatHeartBeat(currentSid: string, username: string) {
   async newChat() {
     // Wait for getUserName to complete
     await this.getUserName();
+    console.log('Username');
+    console.log(this.userName);
     await this.patientChatService.createNewChat(
       this.currentuserName,
       this.userName

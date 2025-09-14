@@ -1,11 +1,8 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Resolve, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-
 // import { Options } from '@angular-slider/ngx-slider';
 import { AuthService } from 'src/app/services/auth.service';
-
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { RightSidebarComponent } from '../../../shared/right-sidebar/right-sidebar.component';
@@ -291,13 +288,44 @@ export class PatientHomeComponent implements OnInit {
     this.rolelist = JSON.parse(this.rolelist);
     var programrole = this.rolelist[0].ProgramName;
 
+    // this.lineChartLabels = [
+    //   'Oct-29,Sat-08:00AM',
+    //   'Oct-30,Sun-08:00AM',
+    //   'Oct-31,Mon-08:00AM',
+    //   'Nov-1,Tue-08:00AM',
+    //   'Nov-2,Wed-08:00AM',
+    //   'Nov-3,Thu-08:00AM',
+    //   'Nov-4,Fri-08:00AM',
+    // ];
+
+    // this.ProgramHistory = [];
+    // this.chatMessage = [
+    //   {
+    //     text: 'Hi',
+    //     id: '1',
+    //     chat: 'receiver',
+    //   },
+    //   { text: 'Hello', id: '2', chat: 'sender' },
+    //   {
+    //     text: 'What Knid of problem facing',
+    //     id: '2',
+    //     chat: 'sender',
+    //   },
+    //   {
+    //     text: 'Nothing',
+    //     id: '1',
+    //     chat: 'receiver',
+    //   },
+    // ];
     this.CurrentProgramSelected = undefined;
     this._route.queryParams.subscribe((params) => {
       this.getHealthTrends();
     });
     this.getSymptom();
   }
-
+  // onProgramHstoryChange(programId: any) {
+  //   this.CurrentProgramSelected = programId;
+  // }
 
   public lineChartData: Array<any> = [
     {
@@ -345,11 +373,19 @@ export class PatientHomeComponent implements OnInit {
       enabled: true,
       drag: false,
 
+      // Drag-to-zoom rectangle style can be customized
+      // drag: {
+      // 	 borderColor: 'rgba(225,225,225,0.3)'
+      // 	 borderWidth: 5,
+      // 	 backgroundColor: 'rgb(225,225,225)'
+      // },
 
+      // Zooming directions. Remove the appropriate direction to disable
+      // Eg. 'y' would only allow zooming in the y direction
       mode: 'xy',
 
       rangeMin: {
-
+        // Format of min zoom range depends on scale type
         x: null,
         y: null,
       },
@@ -716,7 +752,7 @@ export class PatientHomeComponent implements OnInit {
     }
 
     stillUtc = stillUtc + 'Z'; // ensure UTC format
-   const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
 

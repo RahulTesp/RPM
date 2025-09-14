@@ -19,9 +19,9 @@ p {
 .main_panel {
   position: relative;
 }
-// .charttrends {
-//   padding-top: 2rem;
-// }
+.charttrends {
+  padding-top: 2rem;
+}
 .content-panel {
   width: 100%;
 }
@@ -521,7 +521,7 @@ p {
   align-items: center;
   height: fit-content;
   position: relative;
-  // background-color: #edeff5;
+  // background-color: #223e92;
   padding: 2px;
   border-radius: 20px;
   width: 100%;
@@ -971,6 +971,13 @@ p {
 }
 .summary_schedule {
   padding-bottom: 1.5rem;
+}
+.summary_graph_container {
+  height: 20rem !important;
+  width: 100% !important;
+  margin-bottom: 1.87rem;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
 }
 .summary_core_team {
   padding-top: 1.87rem;
@@ -2272,10 +2279,15 @@ td.mat-cell:last-child {
     font-size: 12px;
   }
 }
+@media only screen and (min-width: 980px) and (max-width: 1280px) {
+  .summaryInfo {
+    width: 98%;
+  }
 
+}
 @media only screen and (max-width: 980px) {
-   .middle_panel {
-    width: 100% ;
+.middle_panel {
+    width: 100%;
   }
   .programInfo_menu_item button {
     padding-right: 0px ;
@@ -3597,7 +3609,7 @@ li + li {
   border-radius: 5px;
 }
 .progress-fill-success {
-  background-color: #6da86f;
+  background-color: #6da86f !important;
   height: 100%;
 
   transition: width 0.3s ease-in-out;
@@ -3651,9 +3663,18 @@ li + li {
   /* Green for completed */
 }
 
+.completed-target-data {
+  background-color: #6da86f !important;
+  /* Green for completed */
+}
+.progress-fill-data {
+  height: 100%;
+  background-color:  hsl(40, 74%, 60%) ; /* progress color */
+  transition: width 0.3s ease; /* smooth animation */
+}
 /* Timer label */
 .progressvalue {
-  margin-top: 4px;
+  margin-top: 2px;
   font-size: 13px;
   color: #444;
 }
@@ -3722,77 +3743,29 @@ li + li {
   border: 1px solid #e0e0e0;
   background-color: #f5f5f5;
 }
-// Manjusha code change
-.vital-buttons-item {
-  width: fit-content;
-  height: 2rem;
-  padding: 0.4rem 1.5rem 0.43rem 1.5rem;
+.program_overview_value_panel{
+  max-height:100px;
+  overflow-y: auto;
+
+}
+.program_overview_value_panel::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px #e0e0e0 !important;
+  border-radius: 10px !important;
+  background-color: #f5f5f5 !important;
+}
+
+.program_overview_value_panel::-webkit-scrollbar {
+  width: 6px !important;
+  background-color: #f5f5f5 !important;
+}
+
+.program_overview_value_panel::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px #98c7c8;
   background-color: #edeff5;
-  border: 1px solid #d8dce5;
-  margin-right: 2px;
-  border-radius: 0.5rem;
-  color: #164d61;
-  font-size: 0.8rem;
 }
-.vital-buttons {
-  background-color: #fff;
-  padding: 8px;
-  border-radius: 0.5rem;
-}
-.activeVital {
-  background-color: #164d61;
-  color: #d8dce5;
-  border: 1px solid #164d61;
-  font-size: 0.8rem;
-  font-family: "Rubik";
-}
-
-.hidden-for-pdf {
-  opacity: 0;
-  height: auto;
-  width: auto;
-  position: absolute;
-  z-index: -1;
-  pointer-events: none;
-}
-.chart-wrapper-scrollfix {
-  position: relative;
-  overflow: hidden;
-  height: 0;
-}
-.summary_graph_container {
-  height: 20rem !important;
-  width: 100% !important;
-  margin-bottom: 1.87rem;
-  background-color: #ffffff;
-  border-radius: 0.5rem;
-  position: relative;
-  box-sizing: border-box;
-  padding: 1rem; /* Gives space for axis labels */
-}
-
-#pdfGraph {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-canvas.charttrends {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-}
-
-.vital_selected_ {
-  background-color: #164d61;
-  color: #ffffff;
-  outline: none;
-}
-.vital_not_selected {
-  background-color: #e1e6ed;
-  color: #164d61;
-  outline: none;
-}
-.vital_not_selected:hover {
-  background-color: #d8dce5;
+.last-billing-col {
+  min-width: 220px;
+  width: 220px;
+  flex: 0 0 220px; /* Prevent shrinking */
 }

@@ -165,8 +165,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   loading3: any;
   loading4: boolean;
   onHoldDate: any;
-  healthtrendVitalNameArray: any;
-  public http_healthtrends_current_data: any;
   dateCompare = 'undefined';
   public unreadCount: number = 0;
   @ViewChild(MatSort) sort = new MatSort();
@@ -237,7 +235,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   cid: any;
   ptime: any;
   heath_trends_frequency: number;
-  heath_trends_frequencies: number[] = []; // one per chart
   interval1: NodeJS.Timeout;
   interval: NodeJS.Timeout;
   interval2: NodeJS.Timeout;
@@ -248,7 +245,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   public pageLabel!: string;
   private unreadSubscription: Subscription | null = null;
   private destroy$ = new Subject<void>();
-  currentY: number=15;
   public showDialog = false;
   public showProgramRenewModal = false;
   public smsdialogpanel=false;
@@ -293,8 +289,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   QuestionArrayBase: any;
   patientProgramName: any;
   ProgramHistory: any;
-  patientProgramId: any;
-  selectedVital: string = '';
   private chatHistoryDataSubscription: Subscription;
 
   constructor(
@@ -312,8 +306,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     private patientchatservice: PatientChatService,
     private PatientReportapi: PatientReportApiService,
     private patientdownloadService: DownloadPatientReportService,
-    private confirmDialog:ConfirmDialogServiceService,
-    private cdr: ChangeDetectorRef
+    private confirmDialog:ConfirmDialogServiceService
   ) {
     var that = this;
 
@@ -323,7 +316,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     that.master_data = JSON.parse(that.master_data);
     that.StatesAndCities = sessionStorage.getItem('states_cities');
     that.StatesAndCities = JSON.parse(that.StatesAndCities);
-    that.programDetails = that.master_data?.ProgramDetailsMasterData;
+    that.programDetails = that.master_data.ProgramDetailsMasterData;
     this.rolelist = sessionStorage.getItem('Roles');
     this.billingtypeVariable = sessionStorage.getItem('billingType');
     this.rolelist = JSON.parse(this.rolelist);
@@ -394,8 +387,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((params) => {
         this.handleQueryParams(params);
-        this.patientchatservice.setChatPanelOpen(this.chatVariable);
-        this.patientchatservice.ensureInitialized(params.patientUserName);
+       this.patientchatservice.setChatPanelOpen(this.chatVariable);
+       this.patientchatservice.ensureInitialized(params.patientUserName);
       });
 
     this.initializedocumentColumns();
@@ -426,7 +419,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       //   enableRingingState: true,
       //   debug: true,
       // });
-       const deviceOptions = {
+
+      const deviceOptions = {
        edge: 'umatilla',
       //codecPreferences: ['opus', 'pcmu'],
        fakeLocalDTMF: true,
@@ -435,7 +429,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       };
 
     this.device = new Device( this.data_json.token, deviceOptions);
-    this.device.register();
+
+
+// Don't forget to register in v2.x
+      this.device.register();
       this.setupHandlers(this.device);
     });
   }
@@ -448,6 +445,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
     // Store previous Patient ID
     this.PatientIdOld = sessionStorage.getItem('PatientId');
+
+    // Close previous patient chat window
+    this.CloseChatPanlBlock();
 
     // Clear any existing timers/intervals
     this.clearIntervals();
@@ -486,7 +486,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
     // Fetch Health Trends
     this.getHealthTrends(this.heath_trends_frequency);
-    this.getVitalHealthTrendDataGraph(this.heath_trends_frequency);
   }
 
   async loadPatientInfo() {
@@ -501,9 +500,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.patient_id,
         this.program_id
       );
-      // Manjusha code change
-      this.http_rpm_patientList["PatientPrescribtionDetails"].ConsultationDate =
-      this.formatDate(this.http_rpm_patientList["PatientPrescribtionDetails"].ConsultationDate);
       this.getchatData(this.http_rpm_patientList.PatientDetails.UserName)
 
       this.setPatientData();
@@ -513,14 +509,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     }
     //}
   }
-  // Manjusha code change
-  formatDate(dateStr: string): Date {
-    const [day, month, yearAndTime] = dateStr.split('-');
-    const [year, time] = yearAndTime.split(' ');
-    const formatted = `${year}-${month}-${day}T${time}`;
-    return new Date(formatted);
-  }
-
   private setPatientData() {
     this.processPatientHeight();
     this.processPatientTimezone();
@@ -697,7 +685,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.getNoteIdArray(programDetails.ProgramName);
     this.getMasterDataQuestions(programDetails.ProgramName);
     this.patientProgramname = programDetails.ProgramName;
-    this.idProgram = programDetails.ProgramId;
     this.getBillingInfoSrc();
     this.getBillingData();
 
@@ -772,8 +759,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.tz = 'HST';
     }
 
-
-    const res4 = dayjs().utcOffset(utlcval).format('hh:mm A');
+   const res4 = dayjs().utcOffset(utlcval).format('hh:mm A');
     return res4;
   }
   // Vital Reading Template Start
@@ -896,8 +882,12 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.resetCallTimer();
     this.stopCallEditTimer();
     this.callDisConnected();
+    if(this.videoOnVariable == true)
+    {
+      this.disconnectVideo();
+    }
     this.videoOnVariable = false;
-    this.disconnectVideo();
+    //this.disconnectVideo();
   }
   NoteData: any;
   NoteTypeId: any;
@@ -1131,7 +1121,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.device = device;
   }
   updateCallStatus(status: string): void {
-    console.log('Status -> ');
+    console.log("Status -> "+status);
   }
   callCustomer() {
     if (!this.phoneExtension) {
@@ -1141,7 +1131,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.callTimerEnabled = true;
     this.updateCallStatus('Calling ' + this.phoneNumber + '...');
 
-   var params = { To: this.phoneNumber };
+    var params = { To: this.phoneNumber };
     this.device.connect({ params });
   }
   Stop() {
@@ -1201,7 +1191,13 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       (err) => {
         // this.dialog.closeAll();
         this.smsCancel(); // close the panel
-        alert('Failed to Sent Message..!');
+        if(err.status == 400)
+        {
+          alert(err.error.message);
+        }else{
+          alert('SMS Sent Failed')
+        }
+        console.log(err.error.message);
         this.loading_sms = false;
       }
     );
@@ -1258,10 +1254,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   getMasterDataQuestions(patientProgramName: any) {
     this.patientProgramName =
       this.http_rpm_patientList['PatientProgramdetails'].ProgramName;
-    this.patientProgramId = this.http_rpm_patientList['PatientProgramdetails'].ProgramId;
+
     this.rpm
       .rpm_get(
-        `/api/patient/getmasterdatanotes?ProgramId=${this.patientProgramId}&Type=CALL`
+        `/api/patient/getmasterdatanotes?ProgramName=${patientProgramName}&Type=CALL`
       )
       .then(
         (data) => {
@@ -1426,8 +1422,14 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
       // Call data source change method (kept from your original code)
       this.dataSourceChange(5, 5);
-    } catch (error) {
+    } catch (error:any) {
+      if(error.status == 404)
+      {
+        return;
+      }else{
       console.error('❌ Error fetching chat data:', error);
+
+      }
     }
   }
   async getCallNotes() {
@@ -1518,6 +1520,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       }
       const patientId = sessionStorage.getItem('PatientId');
       const programId = sessionStorage.getItem('ProgramId');
+
 
       if (patientId != null && programId != null) {
         const result = await this.patientService.getVitalReading(
@@ -1733,7 +1736,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.CurrentProgramSelected = programId;
   }
   patientProgramname: any;
-  idProgram: any;
   // currentPhysician: any;
   calltimer: any;
   callTimerEnabled: boolean;
@@ -2015,18 +2017,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     'July',
   ];
   color = 'primary';
-  // Manjusha code change
   public lineChartOptions: any = {
     responsive: true,
-    maintainAspectRatio: false,
-    layout: {
-      padding: {
-        top: 10,
-        bottom: 30,
-        left: 10,
-        right: 20,
-      }
-    },
     pan: {
       enabled: true,
       mode: 'xy',
@@ -2058,17 +2050,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
       speed: 0.1,
     },
+    maintainAspectRatio: false,
     line: {
       tension: 0.5,
-    },
-    scales: {
-      x: {
-        ticks: {
-          autoSkip: false,
-          maxRotation: 75,
-          minRotation: 0
-        }
-      }
     },
     legend: {
       display: true,
@@ -2112,16 +2096,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   ];
   public lineChartLegend: boolean = true;
   public lineChartType: any = 'line';
-  // Manjusha code change
-  emptyChartDataset = [
-    {
-      data: [],
-      label: 'No Data',
-      fill: false,
-      borderColor: 'transparent',
-      pointRadius: 0
-    }
-  ];
 
   minValue: number = 30;
   maxValue: number = 75;
@@ -2152,8 +2126,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.program_id,
         this.patientStatusData || ''
       );
-    } catch (error) {
-      console.error('Error in getBillingData:', error);
+    } catch (error:any) {
       this.BillingInfo = [];
     }
   }
@@ -2429,10 +2402,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       menu_id: 4,
       menu_title: 'Reviews',
     },
-    // {
-    //   menu_id:5,
-    //   menu_title:'Chats'
-    // },
+    {
+      menu_id:5,
+      menu_title:'Chats'
+    },
     {
       menu_id: 6,
       menu_title: 'SMS',
@@ -2610,89 +2583,35 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   Health_date_from: any;
   Health_date_to: any;
   healthtrenddisplay = true;
-  // Manjusha code change
+
   async getHealthTrends(daycount: number) {
     try {
-      const data = await this.patientService.fetchHealthTrendInfo(
+      this.http_healthtrends = await this.patientService.fetchHealthTrendInfo(
         this.patient_id,
         this.program_id,
-        daycount
+        daycount,
+        this.convertDate.bind(this),
+        this.auth.ConvertToUTCRangeInput.bind(this.auth)
       );
-      this.http_healthtrends = data.trends;
-      this.healthtrendVitalNameArray = data.vitalNames;
-      this.healthtrenddisplay = this.http_healthtrends.length > 0;
 
-      if (this.healthtrendVitalNameArray.length > 0) {
-        this.onHealthTrendVitalClick(this.healthtrendVitalNameArray[0], daycount);
+      this.healthtrenddisplay = this.http_healthtrends?.VitalName != null;
+
+      if (this.http_healthtrends?.Values?.length > 0) {
+        this.lineChartLabels = this.patientService.convertDateforHealthTrends(
+          this.http_healthtrends.Time,
+          this.http_healthtrends
+        );
+
+        this.processChartData(daycount);
+      } else {
+        this.setGraphFallback(daycount);
       }
-
     } catch (error) {
-      console.error('Error loading health trends:', error);
+      this.setGraphFallback(daycount);
+      console.error('❌ Error:', error);
+    } finally {
+      this.loading = false;
     }
-  }
-
-  async getSingleHealthTrendData(index: number, daycount: number) {
-    try {
-      const data = await this.patientService.fetchHealthTrendInfo(
-        this.patient_id,
-        this.program_id,
-        daycount
-      );
-
-      const trendData = data.trends[index]; // get the vital at that index
-
-      if (!trendData || !trendData.Values || trendData.Values.length === 0) {
-        const emptyGraph = (daycount === 7)
-          ? this.createEmptyGraph(7)
-          : this.createEmptyGraph(30);
-
-        this.allLineChartData[index] = emptyGraph;
-        return;
-      }
-
-      const isVital = trendData.Values?.[0]?.label === 'Vital';
-      const lineChartLabels = this.patientService.convertDateforHealthTrends(
-        trendData.Time,
-        isVital
-      );
-
-      const lineChartData = trendData.Values.map(
-        (item: { data: any[]; label: any }) => ({
-          data: this.cleanData(item.data, trendData.VitalName),
-          label: item.label,
-          fill: false,
-          lineTension: 0.5,
-        })
-      );
-
-      this.allLineChartData[index] = {
-        lineChartLabels,
-        lineChartData,
-      };
-
-    } catch (error) {
-      console.error('Error loading individual health trend:', error);
-    }
-  }
-
-  createEmptyGraph(daycount: number) {
-    const days = Array.from({ length: daycount }, (_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (daycount - 1 - i));
-      return this.convertDate(d);
-    });
-    const labels = this.patientService.convertDateforHealthTrends(days, false);
-    return {
-      lineChartLabels: labels,
-      lineChartData: [
-        {
-          data: Array(daycount).fill(null),
-          label: 'No data available',
-          fill: false,
-          lineTension: 0.5,
-        },
-      ],
-    };
   }
 
   private processChartData(daycount: number) {
@@ -2748,168 +2667,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.setEmpty30DaysGraph();
     }
   }
-  // Manjusha code change
-  onHealthTrendVitalClick(vital: string, duration: number) {
-    this.selectedVital = vital;
-    this.http_healthtrends_current_data = this.http_healthtrends.filter(
-      (item: { VitalName: string }) => item.VitalName === vital
-    );
-
-    if (!this.http_healthtrends_current_data[0] || this.http_healthtrends_current_data[0].Values.length === 0) {
-      this.setGraphFallback(duration);
-      return;
-    }
-
-    const trendData = this.http_healthtrends_current_data[0];
-    const isVital = trendData.Values?.[0]?.label === 'Vital';
-    const originalLabels = this.patientService.convertDateforHealthTrends(
-      trendData.Time,
-      isVital
-    );
-
-    const originalDataSets = trendData.Values.map((item: any) => ({
-      data: [...item.data],
-      label: item.label,
-      fill: false,
-      lineTension: 0.5
-    }));
-
-    const {
-      filteredData,
-      filteredLabels
-    } = this.filterChartDataAndLabelsTogether(
-      originalDataSets,
-      originalLabels,
-      trendData.VitalName
-    );
-
-    this.lineChartLabels = filteredLabels;
-    this.lineChartData = originalDataSets.map((ds: any, idx: any) => ({
-      ...ds,
-      data: filteredData[idx]
-    }));
-  }
-
-  allLineChartData: any=[];
-  async getVitalHealthTrendDataGraph(daycount: number) {
-    try {
-      //Fetch Health Trend Data
-      const data = await this.patientService.fetchHealthTrendInfo(
-        this.patient_id,
-        this.program_id,
-        daycount
-      );
-
-      const vitalHttpHealthTrends = data.trends;
-      const healthtrendVitalNameArray = data.vitalNames;
-      //Set default frequency for all charts to 30 days
-      this.heath_trends_frequencies = new Array(data.vitalNames.length).fill(30);
-      //  Clear previous data before pushing new ones
-      this.allLineChartData = []; // clear previous data
-
-      // Only process trends with actual data
-      vitalHttpHealthTrends.forEach((trendData: any) => {
-        if (!trendData.Values || trendData.Values.length === 0) {
-          if (daycount === 7) {
-            this.setEmptyGraphHealthInfo();
-          } else {
-            this.setEmpty30DaysGraphHealthInfo();
-          }
-          return;
-        }
-
-        const isVital = trendData.Values?.[0]?.label === 'Vital';
-        const originalLabels = this.patientService.convertDateforHealthTrends(
-          trendData.Time,
-          isVital
-        );
-
-        const originalDataSets = trendData.Values.map((item: any) => ({
-          data: [...item.data],
-          label: item.label,
-          fill: false,
-          lineTension: 0.5
-        }));
-
-        const {
-          filteredData,
-          filteredLabels
-        } = this.filterChartDataAndLabelsTogether(
-          originalDataSets,
-          originalLabels,
-          trendData.VitalName
-        );
-
-        const lineChartData = originalDataSets.map((ds: any, idx: any) => ({
-          ...ds,
-          data: filteredData[idx]
-        }));
-
-        this.allLineChartData.push({
-          lineChartLabels: filteredLabels,
-          lineChartData
-        });
-      });
-
-    } catch (error) {
-      console.error('Error loading health trends:', error);
-    }
-  }
-
-  private cleanData(dataArray: any[], vitalName: string): any[] {
-    if (!Array.isArray(dataArray)) return [];
-
-    return dataArray.filter((value, i) => {
-      if (value !== null) return true;
-
-      if (i > 0 && i < dataArray.length - 1 && vitalName !== 'Blood Glucose') {
-        const [prevDate] = this.lineChartLabels[i - 1]?.split(' - ') || [];
-        const [currDate] = this.lineChartLabels[i]?.split(' - ') || [];
-        const [nextDate] = this.lineChartLabels[i + 1]?.split(' - ') || [];
-
-        if (currDate === prevDate || currDate === nextDate) {
-          this.lineChartLabels.splice(i, 1);
-          return false;
-        }
-      }
-      return true;
-    });
-  }
-
-  filterChartDataAndLabelsTogether(
-    datasets: { data: any[]; label: string }[],
-    labels: string[],
-    vitalName: string
-  ): { filteredData: any[][]; filteredLabels: string[] } {
-    const filteredData = datasets.map(ds => [...ds.data]);
-    const filteredLabels = [...labels];
-
-    for (let i = filteredLabels.length - 1; i >= 0; i--) {
-      const isNullAcrossAll = filteredData.every(ds => ds[i] === null);
-
-      if (
-        isNullAcrossAll &&
-        i > 0 &&
-        i < filteredLabels.length - 1 &&
-        vitalName !== 'Blood Glucose'
-      ) {
-        const [prevDate] = filteredLabels[i - 1]?.split(' - ') || [];
-        const [currDate] = filteredLabels[i]?.split(' - ') || [];
-        const [nextDate] = filteredLabels[i + 1]?.split(' - ') || [];
-
-        if (currDate === prevDate || currDate === nextDate) {
-          filteredLabels.splice(i, 1);
-          filteredData.forEach(ds => ds.splice(i, 1));
-        }
-      }
-    }
-
-    return {
-      filteredData,
-      filteredLabels
-    };
-  }
-  // Manjusha code change
   setEmptyGraph() {
     var date_val = new Date();
     var x = [0, 1, 2, 3, 4, 5, 6];
@@ -2921,21 +2678,21 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       date_val_set = this.convertDate(date_val.setDate(date_val.getDate() - 1));
     }
 
-    const fallbackData = {
+    this.http_healthtrends = {
       VitalName: 'No Data',
       VitalId: 1,
       Time: DefaultDates.reverse(),
       Values: [
-        { data: [null, null, null, null, null, null, null], label: 'No data available' },
+        { data: [null, null, null, null, null, null, null], label: 'Vital' },
       ],
     };
     this.lineChartLabels = this.patientService.convertDateforHealthTrends(
-      fallbackData.Time,
-      fallbackData
+      this.http_healthtrends.Time,
+      this.http_healthtrends
     );
 
     var temp = [];
-    for (var item of fallbackData.Values) {
+    for (var item of this.http_healthtrends.Values) {
       var obj = {
         data: item.data,
         label: item.label,
@@ -2961,20 +2718,21 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       date_val_set = this.convertDate(date_val.setDate(date_val.getDate() - 1));
     }
 
-    const fallbackData  = {
+    this.http_healthtrends = {
       VitalName: 'No Data',
       VitalId: 1,
       Time: DefaultDates.reverse(),
       Values: [
-        { data: [null, null, null, null, null, null, null], label: 'No data available' },
+        { data: [null, null, null, null, null, null, null], label: 'Vital' },
       ],
     };
     this.lineChartLabels = this.patientService.convertDateforHealthTrends(
-      fallbackData.Time,
-      fallbackData
+      this.http_healthtrends.Time,
+      this.http_healthtrends
     );
+
     var temp = [];
-    for (var item of fallbackData.Values) {
+    for (var item of this.http_healthtrends.Values) {
       var obj = {
         data: item.data,
         label: item.label,
@@ -2985,90 +2743,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     }
     this.lineChartData = temp;
   }
-  setEmptyGraphHealthInfo() {
-    var date_val = new Date();
-    var x = [0, 1, 2, 3, 4, 5, 6];
-    var DefaultDates = [];
-    var date_val_set = '';
-    for (var item1 of x) {
-      date_val_set = this.convertDate(date_val.setDate(date_val.getDate()));
-      DefaultDates.push(date_val_set);
-      date_val_set = this.convertDate(date_val.setDate(date_val.getDate() - 1));
-    }
-
-    const fallbackData = {
-      VitalName: 'No Data',
-      VitalId: 1,
-      Time: DefaultDates.reverse(),
-      Values: [
-        { data: [null, null, null, null, null, null, null], label: 'No data available' },
-      ],
-    };
-    const lineChartLabels = this.lineChartLabels;
-    var temp = [];
-    for (var item of fallbackData.Values) {
-      var obj = {
-        data: item.data,
-        label: item.label,
-        fill: false,
-        lineTension: 0.5,
-      };
-      temp.push(obj);
-    }
-    this.lineChartData = temp;
-    const lineChartData = this.lineChartData;
-    // Push processed data into array
-    this.allLineChartData.push({
-      lineChartLabels,
-      lineChartData,
-    });
-  }
-
-  setEmpty30DaysGraphHealthInfo() {
-    var date_val = new Date();
-    var x = [
-      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-      21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-    ];
-    var DefaultDates = [];
-    var date_val_set = '';
-    for (var item1 of x) {
-      date_val_set = this.convertDate(date_val.setDate(date_val.getDate()));
-      DefaultDates.push(date_val_set);
-      date_val_set = this.convertDate(date_val.setDate(date_val.getDate() - 1));
-    }
-
-    const fallbackData = {
-      VitalName: 'No Data',
-      VitalId: 1,
-      Time: DefaultDates.reverse(),
-      Values: [
-        { data: [null, null, null, null, null, null, null], label: 'No data avaiable' },
-      ],
-    };
-    this.lineChartLabels = this.patientService.convertDateforHealthTrends(
-      fallbackData.Time,
-      fallbackData
-    );
-    const lineChartLabels = this.lineChartLabels;
-    var temp = [];
-    for (var item of fallbackData.Values) {
-      var obj = {
-        data: item.data,
-        label: item.label,
-        fill: false,
-        lineTension: 0.5,
-      };
-      temp.push(obj);
-    }
-    this.lineChartData = temp;
-    const lineChartData = this.lineChartData;
-    this.allLineChartData.push({
-      lineChartLabels,
-      lineChartData,
-    });
-  }
-
   UpcomingSchedule: any;
   LatestSchedule: any;
   calculateUpcomingSchedule(patient_id: any) {
@@ -3216,11 +2890,15 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
             if (this.pecentageValue >= 100) {
               if (x.CPTCode == '99454') {
                 this.displayText = x.Completed + '/' + x.Total;
-                this.BillingPeriodStart = this.convertDate(
-                  new Date(x.BillingStartDate)
+                 var billingStartDate  = this.convertDate(x.BillingStartDate);
+                 console.log('Billing Start Date');
+                 console.log(x.BillingStartDate)
+                  this.BillingPeriodStart = this.convertDate(
+                  new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
-                this.BillingPeriodEnd = new Date(x.BillingStartDate);
                 if (this.billingtypeVariable == '30days') {
+                  const [Billingyear, Billingmonth, Billingday] = this.BillingPeriodStart.split('-').map(Number);
+                  this.BillingPeriodEnd = new Date(Billingyear, Billingmonth - 1, Billingday, 0, 0, 0);
                   this.BillingPeriodEnd = this.convertDate(
                     new Date(
                       this.BillingPeriodEnd.setDate(
@@ -3228,7 +2906,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                       )
                     )
                   );
-                  if (this.BillingPeriodStart == '1-01-01') {
+                  if (billingStartDate == '1-01-01') {
                     this.BillingPeriodStart = undefined;
                     this.BillingPeriodEnd = undefined;
                   } else {
@@ -3240,32 +2918,45 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                     );
                   }
                 } else {
-                  this.BillingPeriodEnd = new Date(
-                    this.BillingPeriodEnd.setMonth(
-                      this.BillingPeriodEnd.getMonth() + 1
-                    )
-                  );
-                  var day = this.BillingPeriodEnd.getDate();
-                  if (day <= 15) {
-                    this.BillingPeriodEnd.setDate(1);
-                  } else {
-                    this.BillingPeriodEnd.setDate(16);
-                  }
-                  this.BillingPeriodEnd = this.convertDate(
-                    this.BillingPeriodEnd
-                  );
-                  // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
-                  if (this.BillingPeriodStart == '1-01-01') {
-                    this.BillingPeriodStart = undefined;
-                    this.BillingPeriodEnd = undefined;
-                  } else {
-                    this.BillingPeriodStart = this.Billing_ConvertDate(
-                      this.BillingPeriodStart
-                    );
-                    this.BillingPeriodEnd = this.Billing_ConvertDate(
-                      this.BillingPeriodEnd
-                    );
-                  }
+                      let endDate = new Date(this.BillingPeriodStart);
+                      endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
+                      endDate.setMonth(endDate.getMonth()+1);
+                      if (billingStartDate == '1-01-01') {
+                        this.BillingPeriodStart = undefined;
+                        this.BillingPeriodEnd = undefined;
+                      } 
+                      else {                        
+                        this.BillingPeriodEnd = this.Billing_ConvertDate(this.convertDate(endDate));
+                        this.BillingPeriodStart = this.Billing_ConvertDate(this.BillingPeriodStart);
+                      }
+                  // this.BillingPeriodEnd = new Date(x.BillingStartDate);
+                  // this.BillingPeriodEnd = new Date(
+                  //   this.BillingPeriodEnd.setMonth(
+                  //     this.BillingPeriodEnd.getMonth() + 1
+                  //   )
+                  // );
+                  // var day = this.BillingPeriodEnd.getDate();
+                  // if (day <= 15) {
+                  //   this.BillingPeriodEnd.setDate(1);
+                  // } else {
+                  //   this.BillingPeriodEnd.setDate(16);
+                  // }
+                  // this.BillingPeriodEnd = this.convertDate(
+                  //   this.BillingPeriodEnd
+                  // );
+
+                  // // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
+                  // if (billingStartDate == '1-01-01') {
+                  //   this.BillingPeriodStart = undefined;
+                  //   this.BillingPeriodEnd = undefined;
+                  // } else {
+                  //   this.BillingPeriodStart = this.Billing_ConvertDate(
+                  //     this.BillingPeriodStart
+                  //   );
+                  //   this.BillingPeriodEnd = this.Billing_ConvertDate(
+                  //     this.BillingPeriodEnd
+                  //   );
+                  // }
                 }
               } else if (x.CPTCode == '99453') {
                 this.displayText = 'Completed';
@@ -3325,12 +3016,13 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                   var seconds = Math.trunc(x.Completed % 60);
                   this.displayText = min + ':' + seconds + '/' + x.Total / 60;
                 }
-
+                var billingStartDate  = this.convertDate(x.BillingStartDate);
                 this.BillingPeriodStart = this.convertDate(
-                  new Date(x.BillingStartDate)
+                  new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
-                this.BillingPeriodEnd = new Date(x.BillingStartDate);
                 if (this.billingtypeVariable == '30days') {
+                  const [Billingyear, Billingmonth, Billingday] = this.BillingPeriodStart.split('-').map(Number);
+                  this.BillingPeriodEnd = new Date(Billingyear, Billingmonth - 1, Billingday, 0, 0, 0);
                   this.BillingPeriodEnd = this.convertDate(
                     new Date(
                       this.BillingPeriodEnd.setDate(
@@ -3338,7 +3030,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                       )
                     )
                   );
-                  if (this.BillingPeriodStart == '1-01-01') {
+                  if (billingStartDate == '1-01-01') {
                     this.BillingPeriodStart = undefined;
                     this.BillingPeriodEnd = undefined;
                   } else {
@@ -3350,32 +3042,44 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
                     );
                   }
                 } else {
-                  this.BillingPeriodEnd = new Date(
-                    this.BillingPeriodEnd.setMonth(
-                      this.BillingPeriodEnd.getMonth() + 1
-                    )
-                  );
-                  var day = this.BillingPeriodEnd.getDate();
-                  if (day <= 15) {
-                    this.BillingPeriodEnd.setDate(1);
-                  } else {
-                    this.BillingPeriodEnd.setDate(16);
-                  }
-                  this.BillingPeriodEnd = this.convertDate(
-                    this.BillingPeriodEnd
-                  );
-                  // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
-                  if (this.BillingPeriodStart == '1-01-01') {
-                    this.BillingPeriodStart = undefined;
-                    this.BillingPeriodEnd = undefined;
-                  } else {
-                    this.BillingPeriodStart = this.Billing_ConvertDate(
-                      this.BillingPeriodStart
-                    );
-                    this.BillingPeriodEnd = this.Billing_ConvertDate(
-                      this.BillingPeriodEnd
-                    );
-                  }
+                      let endDate = new Date(this.BillingPeriodStart);
+                      endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
+                      endDate.setMonth(endDate.getMonth()+1);
+                      if (billingStartDate == '1-01-01') {
+                        this.BillingPeriodStart = undefined;
+                        this.BillingPeriodEnd = undefined;
+                      } 
+                      else {                        
+                        this.BillingPeriodEnd = this.Billing_ConvertDate(this.convertDate(endDate));
+                        this.BillingPeriodStart = this.Billing_ConvertDate(this.BillingPeriodStart);
+                      }
+                  // this.BillingPeriodEnd = new Date(x.BillingStartDate);
+                  // this.BillingPeriodEnd = new Date(
+                  //   this.BillingPeriodEnd.setMonth(
+                  //     this.BillingPeriodEnd.getMonth() + 1
+                  //   )
+                  // );
+                  // var day = this.BillingPeriodEnd.getDate();
+                  // if (day <= 15) {
+                  //   this.BillingPeriodEnd.setDate(1);
+                  // } else {
+                  //   this.BillingPeriodEnd.setDate(16);
+                  // }
+                  // this.BillingPeriodEnd = this.convertDate(
+                  //   this.BillingPeriodEnd
+                  // );
+                  // // this.BillingPeriodEnd = this.convertDate(new Date(this.BillingPeriodEnd.setDate(this.BillingPeriodEnd.getDate()-1)))
+                  // if (billingStartDate == '1-01-01') {
+                  //   this.BillingPeriodStart = undefined;
+                  //   this.BillingPeriodEnd = undefined;
+                  // } else {
+                  //   this.BillingPeriodStart = this.Billing_ConvertDate(
+                  //     this.BillingPeriodStart
+                  //   );
+                  //   this.BillingPeriodEnd = this.Billing_ConvertDate(
+                  //     this.BillingPeriodEnd
+                  //   );
+                  // }
                 }
               }
             }
@@ -3419,9 +3123,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
               this.interactionpercentValue =
                 ((this.patientInteractionMin * 60 +
                   this.patientInteractionSec) /
-                  Totalval) *
-                100;
-
+                  Totalval) * 100;
               switch (that.BillingOverview[0].ProgramName) {
                 case 'CCM-C':
                   this.colorcodeval = 19;
@@ -3507,9 +3209,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.getInteractionTime(this.patientInteractionMin);
       this.interactionpercentValue =
         ((this.patientInteractionMin * 60 + this.patientInteractionSec) /
-          3600) *
-        100;
-
+          3600) * 100;
       let patientInteractionMin = time / 60;
       this.patientInteractionMin = Math.trunc(patientInteractionMin);
       let patientInteractionSec = time % 60;
@@ -3522,14 +3222,15 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.getInteractionTime(patientInteractionMin);
       this.interactionpercentValue =
         ((this.patientInteractionMin * 60 + this.patientInteractionSec) /
-          3600) *
-        100;
+          3600) * 100;
       // that.interactionpercentValue = parseInt(that.interactionpercentValue)
       if (
         this.interactionpercentValue < 1 &&
         this.interactionpercentValue > 0
       ) {
         this.interactionpercentValue = 1;
+      }else{
+        this.interactionpercentValue = this.interactionpercentValue;
       }
       if (this.patientInteractionSec < 10) {
         this.patientInteractionSec =
@@ -3557,12 +3258,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.heath_trends_frequency = selected_val;
     this.getHealthTrends(selected_val);
   }
-  // Manjusha code change
-  healthtrendsHealthInfo(selected_val: any,index:any) {
-    this.heath_trends_frequencies[index] = selected_val;
-    this.getSingleHealthTrendData(index, selected_val);
-  }
-
   patient_page_nav: any;
   backtopatientlist() {
     this.patient_page_nav = sessionStorage.getItem('patient-page-status');
@@ -3616,8 +3311,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       }
     }
     stillUtc = stillUtc + 'Z';
-
-    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+     const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
 
@@ -3790,12 +3484,14 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       if (!useCustomRange) {
         try {
           // Get current month dates
+
+
           const { start: monthStart, end: monthEnd } =
             this.patientutilService.getCurrentMonthDates();
 
           formattedStartDate = this.patientutilService.formatDateForApi(
             monthStart,
-            true
+            false
           );
 
           formattedEndDate = this.patientutilService.formatDateForApi(
@@ -3826,20 +3522,25 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
               this.frmactivitySchedulerange.controls.end.value
             );
           }
+          const dateStr = this.convertDate(startDate);
+          const dateEnd = this.convertDate(endDate);
 
           // Validate date range
           // if (!startDate || !endDate || startDate > endDate) {
           //   throw new Error('Invalid date range');
           // }
 
-          formattedStartDate = this.patientutilService.formatDateForApi(
-            startDate,
-            true
-          );
-          formattedEndDate = this.patientutilService.formatDateForApi(
-            endDate,
-            false
-          );
+          // formattedStartDate = this.patientutilService.formatDateForApi(
+          //   startDate,
+          //   false
+          // );
+
+          formattedStartDate = dateStr + 'T00:00:00'
+         formattedEndDate = dateEnd + 'T23:59:59'
+          // formattedEndDate = this.patientutilService.formatDateForApi(
+          //   endDate,
+          //   false
+          // );
 
         } catch (error) {
           console.error('Error with custom date range:', error);
@@ -3910,17 +3611,18 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.getScheduleData();
 
         alert('Schedule Status Changed Successfully!!');
+        this.scheduleSelected = []
       },
-      (err) => {
+      (err:any) => {
         //show error patient id creation failed
-        alert('Something Went Wrong ');
+        alert(err.error.message);
       }
     );
   }
 
   Billing_ConvertDate(dateval: string): string {
     if (!dateval) return '';
-
+     console.log(dateval)
     const months = [
       'Jan',
       'Feb',
@@ -3948,7 +3650,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   intervalnote: any;
   showNoteModal = false;
   getDataforquestions() {
-    console.log('My Preview Clicked');
     this.showNoteModal = true;
     //this.dialog.open(this.myPreviewTemp);
   }
@@ -4087,7 +3788,12 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
           this.incomingCallVal = false;
           this.incomingVariableDisable = false;
           this.callDisConnected();
-          this.disconnectVideo();
+          this.showNoteModal=false;
+          if(this.videoOnVariable == true)
+            {
+              this.disconnectVideo();
+            }
+          //this.disconnectVideo();
           this.billingReload();
           this.loading_note = false;
           this.resetCallPanel();
@@ -4279,9 +3985,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       if (!element.Id || !this.patientProgramName) {
         throw new Error('Missing note ID or program name');
       }
+
       // Fetch note data using service
       const data = await this.patientService.getPatientCallNoteById(
-        this.patientProgramId,
+        this.patientProgramName,
         element.Id
       );
 
@@ -4394,6 +4101,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   OnCancelNotesTimer() {
     clearInterval(this.interval);
     this.timerValue = this.timerValue + this.calltimerValue;
+
     this.interval = setInterval(() => {
       if (!this.callTimerEnabled) {
         this.timerValue = this.timerValue + 1;
@@ -4417,13 +4125,17 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   OnpreviewCancel() {
     this.stopCallEditTimer();
     this.showNoteModal=false;
-    this.callVariable = false;
+    //this.callVariable = false;
     this.callDisConnected();
     this.incomingCallVal = false;
     this.incomingVariableDisable = false;
     //25/07/2023
+    if(this.videoOnVariable == true)
+    {
+      this.disconnectVideo();
+    }
     this.videoOnVariable = false;
-    this.disconnectVideo();
+    //this.disconnectVideo();
 
   }
   closenoterDialogModal()
@@ -4507,8 +4219,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     }
 
     this.startDateValue = someDate;
-
-const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
+    const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
     this.renewProgramForm.controls['pgmendDate'].setValue(
       this.convertDate(someDateValue)
     );
@@ -4828,11 +4539,11 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
           );
 
         },
-        (err) => {
+        (err:any) => {
           this.showDialog = true;
           this.confirmDialog.showConfirmDialog(
-            `Device not removed from user assets`,
-            'error',
+            err.error.message,
+            'Error',
             () => {
               null
             },
@@ -4926,7 +4637,8 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
       .then(
         async (body) => {},
         (error: any) => {
-          alert(error.error);
+          console.log('error')
+          alert(error.error.message);
         }
       );
 
@@ -5031,7 +4743,7 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
           }
         },
         (error: any) => {
-          alert(error.error);
+          alert(error.error.message);
         }
       );
   }
@@ -5068,7 +4780,7 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
             }
           },
           (error: any) => {
-            alert(error.error);
+            alert(error.error.message);
           }
         );
     } else {
@@ -5141,7 +4853,7 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
     }
     stillUtc = stillUtc + 'Z';
     const local = dayjs.utc(stillUtc).local().format('HH:mm:ss');
-      return local;
+    return local;
   }
 
   getTimefromDate(text: any) {
@@ -5174,9 +4886,11 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
   async loadPatientReportData() {
     this.selectedPatient = sessionStorage.getItem('PatientId');
     this.selectedProgram = sessionStorage.getItem('ProgramId');
-    var startDate = this.convertDate(this.ThirtyDaysAgo);
-    var endDate = this.convertDate(this.Today);
-
+    const today = new Date();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    var startDate = this.convertDate(thirtyDaysAgo);
+    var endDate = this.convertDate(today);
     startDate = startDate + 'T00:00:00';
     endDate = endDate + 'T23:59:59';
     try {
@@ -5243,7 +4957,6 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
         endDate
       );
 
-      console.log('✅ Patient data loaded successfully');
       this.downloadPatientReport();
     } catch (error) {
       console.error('🚨 Error loading patient data:', error);
@@ -5278,10 +4991,10 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
     );
     this.getHealthTrendsReport();
   }
-  // Manjusha code change
+
   async getHealthTrendsReport() {
-    if (!this.http_healthtrends) {
-      //this.setEmptyGraphReport();
+    if (!this.http_healthtrends || !this.http_healthtrends.Values) {
+      this.setEmptyGraphReport();
       return;
     }
 
@@ -5317,7 +5030,7 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
       this.endDateReport,
       this.selectedPatient,
       this.selectedProgram,
-      this.idProgram
+      this.patientProgramname
     );
     if (this.patientProgramname == 'CCM' || this.patientProgramname == 'PCM') {
       this.patientdownloadService.generatePatientSummaryReport(
@@ -5331,27 +5044,16 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
       this.doc.save('PatientReport.pdf');
       this.DownloadStatus = false;
     } else {
-      // Manjusha code change
-      this.doc.setFontSize(14);
-      this.doc.text('Patient Health Trends', 15, this.currentY);
-      this.doc.setDrawColor('black');
-      const headingWidth = this.doc.getTextWidth('Patient Health Trends');
-      this.doc.line(15, this.currentY + 1, 15 + headingWidth, this.currentY + 1);
-      this.currentY += 20;
-      await this.patientdownloadService.resetPosition();
-      const allGraphs = Array.from(document.querySelectorAll('.pdfData'));
-
-      for (let i = 0; i < allGraphs.length; i++) {
-        const graph = allGraphs[i] as HTMLElement;
-        const vitalTitle = this.healthtrendVitalNameArray[i] || `Chart ${i + 1}`;
-        await this.patientdownloadService.captureHealthTrendsChart(this.doc, graph, vitalTitle);
-      }
-      this.currentY = this.patientdownloadService.getChartCurrentY();
+      this.HtmlGraph = document.querySelector('#pdfGraph');
+      await this.patientdownloadService.captureHealthTrendsChart(
+        this.doc,
+        this.HtmlGraph
+      );
       this.patientdownloadService.generateHealthTrendsTable(
         this.doc,
         this.httpVitalData
       );
-      this.patientdownloadService.generateDaysVitals(this.http7VitalData);
+      this.patientdownloadService.generateDaysVitals(this.httpVitalData);
       this.patientdownloadService.generatePatientSummaryReport(
         this.doc,
         this.patientProgramname,
@@ -5360,7 +5062,7 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
         this.BillingInfo,
         this.httpSMSData
       );
-      await this.patientdownloadService.generateVitalReadingSummary(this.doc, this.selectedPatient,this.selectedProgram);
+      this.patientdownloadService.generateVitalReadingSummary(this.doc);
       this.DownloadStatus = false;
       this.doc.save('PatientReport.pdf');
     }
@@ -5385,4 +5087,6 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
   closesmsDialogModal(){
     this.smsdialogpanel=false;
   }
+
+
 }

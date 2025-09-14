@@ -154,8 +154,8 @@
   font-family: "Rubik";
   cursor: pointer;
   text-align: center;
-  background-color: #8226df; 
-  max-width: 20px; 
+  background-color: #8226df;
+  max-width: 20px;
 }
 
 .notification_container {
@@ -375,4 +375,7 @@
   right: 10px;
   top: 10px;
   border-radius: 5px;
+}
+::ng-deep .autocomplete-container .input-container .x i {
+  font-size: 12px !important;
 }

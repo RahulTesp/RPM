@@ -1,6 +1,15 @@
 export const environment = {
   production: true,
-  host:'rpm-multivital-api-v2.azurewebsites.net',
+  host: 'cx-preprod-server.azurewebsites.net',
+  //host: 'cx-dev-server.azurewebsites.net',
+  // host: 'rpm-demo-api.azurewebsites.net',
+  // host: 'c-lynxapi.azurewebsites.net',
+  //host: 'cx-preprod-server.azurewebsites.net',
+  // host: 'rpm-demo-api.azurewebsites.net',
+  // host: 'meditprodapi.azurewebsites.net',
+  // host: 'md-preprod-server.azurewebsites.net',
+  // host: 'md-dev-server.azurewebsites.net',
+  //host:'rpm-dev-tespcare.azurewebsites.net',
   protocol: 'https',
   firebase: {
     apiKey: 'AIzaSyACz7ajD-LO6x6FlcSjTcevAV0dVDypans',
@@ -8,6 +17,8 @@ export const environment = {
     projectId: 'rpmadmin-a5143',
     storageBucket: 'rpmadmin-a5143.appspot.com',
     messagingSenderId: '1089577441128',
+    // appId: '1:1089577441128:web:d656ba5644330dfc3168dd',
+    // measurementId: 'G-R0H1QC84SS',
     appId: '1:1089577441128:web:675fbd66311496b33168dd',
     measurementId: 'G-723GDEFNHZ',
     vapidKey:

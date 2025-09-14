@@ -375,9 +375,10 @@ alertdatasource = [ {
 
 applyFilterdata()
 {
-  // let c = this.schedule.filter(d => d.data.every(c => this.searchValue.includes(c.id)));
-  // console.log(c);
+
  let result = this.schedule.filter(a => a.data.some(c => this.searchValue.includes(c.id)));
+
+console.log(result);
 }
 
  data =[{ menuName: "Hot dogs", menu: [ { dishId: '1', dish_has_categories: [{ CategoryId: '8' }] }, { dishId: '2', dish_has_categories: [{ CategoryId: '9' }] }] }, { menuName: "Burgers", menu: [{ dishId: '3', dish_has_categories: [{ CategoryId: '6' }] }, { dishId: '4', dish_has_categories: [{ CategoryId: '4' }] }] }, { name: "Drinks", menu: [] } ]

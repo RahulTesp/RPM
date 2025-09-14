@@ -17,12 +17,14 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { AuthService } from 'src/app/services/auth.service';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
-dayjs.extend(utc);
-dayjs.extend(timezone);
+
 
 export const MY_FORMATS = {
   parse: {
@@ -139,7 +141,7 @@ export class AddpatientComponent implements OnInit {
   cities: any;
   image: any;
   openFile() {
-    this.image = null;
+   // this.image = null;
     var a = document.getElementById('image');
     a?.click();
   }
@@ -147,7 +149,7 @@ export class AddpatientComponent implements OnInit {
     this.image = e.target.files[0];
     var a = document.getElementsByClassName('uploadPhoto');
     this.file = this.image.name;
-
+    console.log(this.image)
     // a[0].setAttribute("style", "background-image:"+this.image.name);
     // a[0].setAttribute("style", "background: url(\"https://rpmstorage123.blob.core.windows.net/rpmprofilepictures/CL500626\"); background-repeat: no-repeat;  background-size: 100% 100%;");
   }
@@ -155,13 +157,14 @@ export class AddpatientComponent implements OnInit {
     if (this.image) {
       const myPhoto = uuid.v4();
       var formData: any = new FormData();
+      console.log(formData)
       formData.append(myPhoto, this.image);
       this.rpm
         .rpm_post(`/api/patient/addimage?PatientId=${pid}`, formData)
         .then(
           (data) => {},
-          (err) => {
-            console.log('Img error');
+          (err:any) => {
+             alert(err.error.message);
           }
         );
     }
@@ -172,6 +175,9 @@ export class AddpatientComponent implements OnInit {
   cityFlag: any;
   ngOnInit(): void {
     // this.todaty_date = new Date();
+    this.file = null;
+    this.image = null;
+
     this.todaty_date = this.datepipe.transform(new Date(), 'yyyy-MM-dd');
     this.cityFlag = false;
     this.timezonecalculation();
@@ -341,13 +347,13 @@ export class AddpatientComponent implements OnInit {
       emergencycontact1: new FormControl(''),
       emergencycontact2: new FormControl(null),
       relation1: new FormControl(null),
-      relation1_mobile: new FormControl('', [
+      relation1_mobile: new FormControl(null, [
         Validators.pattern('^[0-9]*$'),
         Validators.minLength(10),
         Validators.maxLength(10),
       ]),
       relation2: new FormControl(null),
-      relation2_mobile: new FormControl('', [
+      relation2_mobile: new FormControl(null, [
         Validators.pattern('^[0-9]*$'),
         Validators.minLength(10),
         Validators.maxLength(10),
@@ -396,12 +402,12 @@ export class AddpatientComponent implements OnInit {
   }
 
   getPhysicianList() {
-    if (this.resp) {
+     if (this.resp) {
       this.physicianList = this.master_data.PhysicianDetails.filter(
         (phy: { ClinicID: any }) =>
           phy.ClinicID === parseInt(this.resp.OrganizationID)
       );
-    }
+     }
   }
 
   public get goals() {
@@ -750,6 +756,7 @@ export class AddpatientComponent implements OnInit {
   }
   resp: any;
   GetDraftedPatientInfo(PatientId: any, page: number) {
+    console.log('Draft Patient Info')
     //call on clicking on one patient row in the draft list, pass patient id from table to get the info
     var that = this;
     this.pid = PatientId;
@@ -980,12 +987,19 @@ export class AddpatientComponent implements OnInit {
     }
 
     if (this.newProgramVariable) {
+      console.log(this.programForm.valid);
+      console.log(this.PatientInfoForm.valid);
       if (this.programForm.valid && this.PatientInfoForm.valid) {
         this.loading = true;
         req_body['PatientId'] = this.pid;
         req_body['PatientProgramId'] = this.PatientPgmId;
         req_body['ProgramId'] = this.programForm.controls.programname.value;
-        req_body['PhysicianId'] = null;
+         if(this.programForm.controls.physician.value == null){
+          req_body['PhysicianId'] = 0;
+        }
+        else{
+          req_body['PhysicianId'] = parseInt(this.programForm.controls.physician.value);
+        }
         req_body['ConsultationDate'] = null;
         req_body['CareTeamUserId'] =
           this.programForm.controls.assignedMember.value;
@@ -1202,6 +1216,7 @@ export class AddpatientComponent implements OnInit {
     someDate = this.Auth.ConvertToUTCRangeInput(new Date(someDate));
     this.startDateValue = someDate;
     const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
+
     this.programForm.controls['enddate'].setValue(
       this.convertDate(someDateValue)
     );
@@ -1361,6 +1376,7 @@ export class AddpatientComponent implements OnInit {
   }
   http_rpm_patientList: any;
   http_ProgramData: any;
+  newProgramClinicCode:any;
   getPatientDetails(patientId: any, pgmId: any) {
     var that = this;
 
@@ -1440,6 +1456,11 @@ export class AddpatientComponent implements OnInit {
         this.PatientInfoForm.controls['relation1'].setValue(
           this.http_rpm_patientList.Contact1RelationName
         );
+        const isValidPhone1 = /^[0-9]{10}$/.test(this.http_rpm_patientList.Contact1Phone);
+         if(!isValidPhone1)
+         {
+           this.http_rpm_patientList.Contact2Phone = null;
+         }
         this.PatientInfoForm.controls['relation1_mobile'].setValue(
           this.http_rpm_patientList.Contact1Phone
         );
@@ -1449,9 +1470,15 @@ export class AddpatientComponent implements OnInit {
         this.PatientInfoForm.controls['relation2'].setValue(
           this.http_rpm_patientList.Contact2RelationName
         );
+         const isValidPhone = /^[0-9]{10}$/.test(this.http_rpm_patientList.Contact2Phone);
+         if(!isValidPhone)
+         {
+           this.http_rpm_patientList.Contact2Phone = null;
+         }
         this.PatientInfoForm.controls['relation2_mobile'].setValue(
-          this.http_rpm_patientList.Contact2Phone
+        this.http_rpm_patientList.Contact2Phone
         );
+
         this.PatientInfoForm.controls['calltime'].setValue(
           this.http_rpm_patientList.CallTime
         );
@@ -1493,26 +1520,31 @@ export class AddpatientComponent implements OnInit {
           this.http_rpm_patientList.OrganizationID,
           { onlySelf: true }
         );
-        this.getPhysicianList();
         that.programForm.controls['clinic'].setValue(PatientProgramData.Clinic);
+        var ClinicCode = null;
+        if(that.Clinic_Selected[0])
+        {
+         ClinicCode = that.Clinic_Selected[0].ClinicCode;
 
-        // that.Clinic_Selected = that.master_data.ClinicDetails.filter(
-        //   (clinic: { ClinicName: any }) => clinic.ClinicName === PatientProgramData.Clinic
-        // );
-
-        var ClinicCode = that.Clinic_Selected[0].ClinicCode;
+        }else{
+          ClinicCode = PatientProgramData.ClinicCode;
+        }
         that.programForm.controls['cliniccode'].setValue(ClinicCode);
+        const selectedPhysician = PatientProgramData.PhysicianId;
+        const match = this.master_data.PhysicianDetails.find(
+            (p: { UserId: any }) =>
+              p.UserId === selectedPhysician
+          );
+            if (match) {
+                this.programForm.controls['physician'].setValue(match.UserId);
+                const clinicId = match.ClinicID;
+                this.physicianList = this.master_data.PhysicianDetails.filter(
+                  (phy: { ClinicID: number }) => phy.ClinicID === clinicId
+                );
+              }
 
-        // that.programForm.controls['cliniccode'].setValue(
-        //  this.http_rpm_patientList.ClinicCode
-        // );
-
-        that.programForm.controls['physician'].setValue(
-          PatientProgramData.Physician
-        );
       });
   }
-
   heightFeetArray = [
     {
       id: 0,
@@ -1623,6 +1655,7 @@ export class AddpatientComponent implements OnInit {
         for (let y of this.Diagnosis_List) {
           found = false;
           for (let x of this.Diagnosis_Name) {
+
             if (
               x.DiagnosisCode == y.DiagnosisCode &&
               y.DiagnosisCode.trim() != ''
@@ -1721,6 +1754,7 @@ export class AddpatientComponent implements OnInit {
     }
     stillUtc = stillUtc + 'Z';
     const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+
     return local;
   }
 }

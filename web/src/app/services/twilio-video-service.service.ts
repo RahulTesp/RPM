@@ -117,6 +117,8 @@ export class TwilioVideoServiceService {
         room.on('participantConnected', (participant) => {
           this.roomParticipants = room.participants;
           this.attachParticipantTracks(participant);
+          console.log('Room On Participant');
+          console.log(participant);
 
           participant.on('trackPublished', track => {
 
@@ -292,6 +294,9 @@ export class TwilioVideoServiceService {
   }
 
   attachTracks(tracks: any) {
+
+    console.log('tracks');
+  console.log(tracks);
   const element = tracks.attach();
   this.renderer.data.id = tracks.sid;
 

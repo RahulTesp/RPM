@@ -201,6 +201,7 @@
                       src="../../../../../assets/04-Icons/Icons_Video A.svg"
                       (click)="getVideoconnection(false)"
                     />
+                    
                   </div>
                 </div>
 
@@ -220,6 +221,7 @@
                       src="../../../../../assets/04-Icons/Icons_Chat A.svg"
                       (click)="openChatPanel()"
                     />
+                     
                   </div>
                 </div>
                 <div
@@ -277,36 +279,30 @@
                 /></span>
               </div>
               <section
-                class="progrssbar_container"
-                [ngClass]="
-                  patientInteractionMin > colorcodeval ? 'completed-target' : ''
-                "
-              >
-                <!-- <mat-progress-bar
-                  mode="determinate"
-                  strokeWidth="10"
-                  value="{{ interactionpercentValue }}"
-                ></mat-progress-bar> -->
-                <div class="custom-progress-bar-outer">
+                class="progrssbar_container">
+                <!-- Custom Progress Bar -->
+                <!-- <div class="custom-progress-bar-outer">
                   <div
-                    class="custom-progress-bar-inner"
+                    class="progress-fill-data"
                     [style.width.%]="interactionpercentValue > 100 ? 100 : interactionpercentValue"
+                  ></div>
+                </div> -->
+                  <div class="custom-progress-bar-outer">
+                  <div
+                    class="progress-fill-data"
+                    [style.width.%]="patientInteractionMin > colorcodeval ? 100 : (interactionpercentValue > 100 ? 100 : interactionpercentValue)"
+                    [ngClass]="patientInteractionMin > colorcodeval ? 'completed-target-data' : ''"
                   ></div>
                 </div>
 
-                <div
-                  *ngIf="interactionpercentValue > 100"
-                  class="progressvalue"
-                >
+
+                <!-- Time display -->
+                <div *ngIf="interactionpercentValue > 100" class="progressvalue">
                   {{ patientInteractionMin }}:{{ patientInteractionSec }}
                 </div>
 
-                <div
-                  *ngIf="interactionpercentValue <= 100"
-                  class="progressvalue"
-                >
+                <div *ngIf="interactionpercentValue <= 100" class="progressvalue">
                   {{ patientInteractionMin }}:{{ patientInteractionSec }} /
-
                   {{ totalInteractionTime }} min
                 </div>
               </section>
@@ -1535,6 +1531,7 @@
                   src="../../../../../assets/04-Icons/Icons_Video A.svg"
                   (click)="getVideoconnection(false)"
                 />
+                 
               </div>
             </div>
             <div
@@ -1553,7 +1550,8 @@
                   id="pd_chat"
                   src="../../../../../assets/04-Icons/Icons_Chat A.svg"
                   (click)="openChatPanel()"
-                />
+                />  
+                  
               </div>
             </div>
             <div
@@ -1609,41 +1607,28 @@
                 /></span>
               </div>
 
-              <section class="progrssbar_container">
-                <section
-                  class="progrssbar_container"
-                  [ngClass]="
-                    patientInteractionMin > 19 ? 'completed-target' : ''
-                  "
-                >
-                  <!-- <mat-progress-bar
-                    mode="determinate"
-                    strokeWidth="10"
-                    value="{{ interactionpercentValue }}"
-                  ></mat-progress-bar> -->
-                  <div class="custom-progress-bar-outer">
-                    <div
-                      class="custom-progress-bar-inner"
-                      [style.width.%]="interactionpercentValue > 100 ? 100 : interactionpercentValue"
-                    ></div>
-                  </div>
 
+              <section
+                class="progrssbar_container"
+              >
+                <!-- Custom Progress Bar -->
+                <div class="custom-progress-bar-outer">
                   <div
-                    *ngIf="interactionpercentValue > 100"
-                    class="progressvalue"
-                  >
-                    {{ patientInteractionMin }}:{{ patientInteractionSec }}
-                  </div>
+                    class="progress-fill-data"
+                    [style.width.%]="patientInteractionMin > colorcodeval ? 100 : (interactionpercentValue > 100 ? 100 : interactionpercentValue)"
+                    [ngClass]="patientInteractionMin > colorcodeval ? 'completed-target-data' : ''"
+                  ></div>
+                </div>
 
-                  <div
-                    *ngIf="interactionpercentValue <= 100"
-                    class="progressvalue"
-                  >
-                    {{ patientInteractionMin }}:{{ patientInteractionSec }} /
+                <!-- Time display -->
+                <div *ngIf="interactionpercentValue > 100" class="progressvalue">
+                  {{ patientInteractionMin }}:{{ patientInteractionSec }}
+                </div>
 
-                    {{ totalInteractionTime }} min
-                  </div>
-                </section>
+                <div *ngIf="interactionpercentValue <= 100" class="progressvalue" >
+                  {{ patientInteractionMin }}:{{ patientInteractionSec }} /
+                  {{ totalInteractionTime }} min
+                </div>
               </section>
             </div>
           </div>
@@ -1678,7 +1663,7 @@
                   {{ programStart | date : "mediumDate" }}
                 </p>
               </div>
-              <div class="program_overview_item">
+              <!-- <div class="program_overview_item">
                 <p class="program_overview_header">Duration</p>
                 <p class="program_overview_value">
                   {{
@@ -1687,7 +1672,7 @@
                   }}
                   Months
                 </p>
-              </div>
+              </div> -->
               <div class="program_overview_item program_overview_vital">
                 <p class="program_overview_header">
                   {{
@@ -1696,9 +1681,12 @@
                       : "Condition Monitored"
                   }}
                 </p>
-                <div *ngFor="let vital of patiantVital">
-                  <p class="program_overview_value">{{ vital.Vital }}</p>
+                <div  class="program_overview_value_panel">
+                  <div *ngFor="let vital of patiantVital" >
+                     <p class="program_overview_value">{{ vital.Vital }}</p>
                 </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -1761,7 +1749,9 @@
     </div>
     <div
       class="summary_graph_main"
-      *ngIf="patientProgramname != 'CCM' && patientProgramname != 'PCM'"
+      *ngIf="!loading && !loading_two && !loading3 && !loading4
+         && patientProgramname != 'CCM'
+         && patientProgramname != 'PCM'"
     >
       <div class="health-panel-btn">
         <p class="patient-detail-panel-heading">Health Trends</p>
@@ -1800,25 +1790,6 @@
         *ngIf="http_healthtrends.VitalName != null"
       > -->
       <div class="summary_graph_container">
-        <div
-          class="vital-buttons"
-          *ngIf="
-            healthtrendVitalNameArray && healthtrendVitalNameArray.length > 0
-          "
-        >
-          <button
-            class="vital-buttons-item"
-            *ngFor="let vital of healthtrendVitalNameArray"
-            (click)="onHealthTrendVitalClick(vital, heath_trends_frequency)"
-            [ngClass]="{
-              'vital_selected_': vital === selectedVital,
-              'vital_not_selected': vital !== selectedVital
-            }"
-          >
-            {{ vital }}
-          </button>
-        </div>
-
         <div id="pdfGraph" style="display: block; width: 100%; height: 98%">
           <canvas
             class="charttrends"
@@ -2064,59 +2035,6 @@
       </div>
     </div>
   </div>
-  <div class="chart-wrapper-scrollfix">
-    <div *ngIf="allLineChartData?.length">
-      <div *ngFor="let chartData of allLineChartData; let i = index">
-        <ng-container *ngIf="chartData?.lineChartData?.length; else emptyGraph">
-          <div class="summary_graph_container" style="overflow: hidden; visibility: hidden">
-            <div
-              class="pdfData"
-              style="display: block; width: 100%; height: 98%; visibility: hidden"
-              *ngIf="http_healthtrends"
-            >
-              <canvas
-                class="charttrends"
-                baseChart
-                width="1"
-                height="1"
-                [datasets]="chartData.lineChartData"
-                [labels]="chartData.lineChartLabels"
-                [options]="lineChartOptions"
-                [legend]="lineChartLegend"
-                id="pd_ClinicalHtrends"
-                [type]="'line'"
-              >
-              </canvas>
-            </div>
-          </div>
-        </ng-container>
-        <!-- 👇 Empty Chart fallback -->
-        <ng-template #emptyGraph>
-          <div class="summary_graph_container" style="overflow: hidden; visibility: hidden">
-            <div
-              class="pdfData"
-              style="display: block; width: 100%; height: 98%; visibility: hidden"
-              *ngIf="http_healthtrends"
-            >
-              <canvas
-                class="charttrends"
-                baseChart
-                width="1"
-                height="1"
-                [datasets]="emptyChartDataset"
-                [labels]="[]"
-                [options]="lineChartOptions"
-                [legend]="lineChartLegend"
-                id="pd_ClinicalHtrends"
-                [type]="'line'"
-              >
-              </canvas>
-            </div>
-          </div>
-        </ng-template>
-      </div>
-    </div>
-  </div>
 </ng-template>
 
 <!-- message Dialog Panel -->
@@ -2353,8 +2271,11 @@
                 </div>
                 <div class="state_timezone_right personal_content">
                   <p class="data_title">Time zone</p>
-                  <p *ngIf="timezone.length > 0" class="data_value">
+                  <!-- <p *ngIf="timezone.length > 0" class="data_value">
                     {{ timezone[0].Name }}
+                  </p> -->
+                  <p class="data_value">
+                    {{ http_rpm_patientList["PatientDetails"].TimeZone }}
                   </p>
                 </div>
               </div>
@@ -2555,7 +2476,7 @@
                     <p class="program_data_value">
                       {{
                         http_rpm_patientList["PatientProgramdetails"].Duration
-                      }}
+                      }} Months
                     </p>
                   </div>
                 </div>
@@ -2674,9 +2595,9 @@
                     <p class="program_data_title">Date</p>
                     <p class="program_data_value">
                       {{
-                        http_rpm_patientList &&
-                          http_rpm_patientList["PatientPrescribtionDetails"]
-                            .PrescribedDate | date : "MMM d, y"
+                         convertToLocalTime(
+                        http_rpm_patientList.PatientPrescribtionDetails.PrescribedDate
+                      ) | date : "mediumDate"
                       }}
                     </p>
                   </div>
@@ -3176,10 +3097,10 @@
                   </ng-container>
 
                   <ng-container matColumnDef="Last_Billing_Cycle">
-                    <mat-header-cell *matHeaderCellDef
+                    <mat-header-cell class="last-billing-col" *matHeaderCellDef
                       >Last Billing Cycle</mat-header-cell
                     >
-                    <mat-cell *matCellDef="let element"
+                    <mat-cell class="last-billing-col" *matCellDef="let element"
                       ><span>{{
                         element.Last_Billing_Cycle == null
                           ? "Not available"
@@ -3626,9 +3547,6 @@
             *ngIf="http_vitalGlucoseData && http_vitalGlucoseData.length > 0"
             id="pd_vital_BG"
             (click)="ChangeVitalScreen('BloodGlucose')"
-            [ngClass]="{
-              'vital_selected_': currentVital === 'BloodGlucose'
-            }"
           >
             BloodGlucose
           </button>
@@ -3637,9 +3555,6 @@
             *ngIf="vital_temporaryData && vital_temporaryData.length > 0"
             id="pd_Vital_BP"
             (click)="ChangeVitalScreen('BloodPressure')"
-            [ngClass]="{
-              'vital_selected_': currentVital === 'BloodPressure'
-            }"
           >
             BloodPressure
           </button>
@@ -3648,9 +3563,6 @@
             *ngIf="http_VitalOxygen && http_VitalOxygen.length > 0"
             (click)="ChangeVitalScreen('Oxygen')"
             id="pd_Vital_O"
-            [ngClass]="{
-              'vital_selected_': currentVital === 'Oxygen'
-            }"
           >
             Oxygen
           </button>
@@ -3659,9 +3571,6 @@
             *ngIf="http_VitalWight && http_VitalWight.length > 0"
             (click)="ChangeVitalScreen('Weight')"
             id="pd_Vital_W"
-            [ngClass]="{
-              'vital_selected_': currentVital === 'Weight'
-            }"
           >
             Weight
           </button>
@@ -4246,56 +4155,55 @@
 <!-- Vital Monitoring Sub Template End -->
 <!-- healthTrendInfo Start Clinical activity Second   Sub-Menu -->
 <ng-template #healthTrendInfo>
-  <div *ngIf="patientProgramname != 'CCM' || patientProgramname != 'PCM'">
+  <div class="health-panel-btn"
+    *ngIf="!loading && !loading_two && !loading3 && !loading4
+         && patientProgramname != 'CCM'
+         && patientProgramname != 'PCM'"
+  >
     <p class="patient-detail-panel-heading">Health Trends</p>
-    <div *ngFor="let chartData of allLineChartData; let i = index">
-      <div class="health-panel-btn">
-        <span>{{ healthtrendVitalNameArray[i] }}</span>
-        <div class="date_btn_panel" fxLayout="row">
-          <button
-            class="btn-date_container"
-            id="pd_ClinicalHtrend_7"
-            (click)="healthtrendsHealthInfo(7, i)"
-            [ngClass]="
-              heath_trends_frequencies[i] === 7 
-                ? 'date_selected_' 
-                : 'date_not_selected'"
-          >
-            7 days
-          </button>
-          <button
-            class="btn-date_container"
-            id="pd_ClinicalHtrend_30"
-            (click)="healthtrendsHealthInfo(30, i)"
-            [ngClass]="
-              heath_trends_frequencies[i] === 30 
-                ? 'date_selected_' 
-                : 'date_not_selected'"
-          >
-            30 days
-          </button>
-        </div>
-      </div>
-      <div class="summary_graph_container">
-        <div style="display: block; width: 98%; height: 98%" id="pdfData">
-          <canvas
-            class="charttrends"
-            baseChart
-            width="1"
-            height="1"
-            [datasets]="chartData.lineChartData"
-            [labels]="chartData.lineChartLabels"
-            [options]="lineChartOptions"
-            [legend]="lineChartLegend"
-            id="pd_ClinicalHtrends"
-            [type]="'line'"
-          >
-          </canvas>
-        </div>
-      </div>
+
+    <!-- (click)="healthoverview(1)" [ngStyle]="{'background-color': heath_overview_frequency== 1 ? '#164d61'  : '#e1e6ed', 'color': heath_overview_frequency == 1 ? '#ffffff' :'#164d61' }" -->
+    <!-- <button class="btn-date_container" (click)="healthoverview(1)" [ngClass]="heath_overview_frequency== 1 ? 'date_selected_':'date_not_selected'"  >Today</button> -->
+    <div class="date_btn_panel" fxLayout="row">
+      <button
+        class="btn-date_container"
+        id="pd_ClinicalHtrend_7"
+        (click)="healthtrends(7)"
+        [ngClass]="
+          heath_trends_frequency == 7 ? 'date_selected_' : 'date_not_selected'
+        "
+      >
+        7 days
+      </button>
+      <button
+        class="btn-date_container"
+        id="pd_ClinicalHtrend_30"
+        (click)="healthtrends(30)"
+        [ngClass]="
+          heath_trends_frequency == 30 ? 'date_selected_' : 'date_not_selected'
+        "
+      >
+        30 days
+      </button>
     </div>
   </div>
-
+  <div class="summary_graph_container">
+    <div style="display: block; width: 98%; height: 98%">
+      <canvas
+        class="charttrends"
+        baseChart
+        width="1"
+        height="1"
+        [datasets]="lineChartData"
+        [labels]="lineChartLabels"
+        [options]="lineChartOptions"
+        [legend]="lineChartLegend"
+        id="pd_ClinicalHtrends"
+        [type]="'line'"
+      >
+      </canvas>
+    </div>
+  </div>
   <!-- <div class="no_graphdata" *ngIf="!healthtrenddisplay">
     <span>No Graph Data Available</span>
   </div> -->
@@ -4428,7 +4336,7 @@
 
             <mat-cell *matCellDef="let element">
               <span *ngIf="element.EndDate">{{
-                datepipe.transform(element.EndDate, "MMM d,y")
+                datepipe.transform(element.EndDate , "MMM d,y")
               }}</span>
             </mat-cell>
           </ng-container>
@@ -4806,7 +4714,7 @@
                 *ngIf="index === 0"
                 [attr.rowspan]="scheduleitem.SchedueInfos.length"
               >
-                {{ datepipe.transform(convertToLocalTime(scheduleitem.ScheduleDate), "MMM d, y") }}
+                {{ datepipe.transform(scheduleitem.ScheduleDate, "MMM d, y") }}
               </td>
               <td [ngStyle]="{ 'border-radius': '8px 0px 0px 8px' }">
                 {{ schedule_data.ScheduleTime }}

@@ -12,18 +12,21 @@ import { Router } from '@angular/router';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { HttpClient } from '@angular/common/http';
-
 import { AuthService } from 'src/app/services/auth.service';
 import { DatePipe } from '@angular/common';
 import html2canvas from 'html2canvas';
 import { RPMService } from '../../../sevices/rpm.service';
 import * as FileSaver from 'file-saver';
+
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
+
+
 
 export interface PeriodicElement {
   name: string;
@@ -323,7 +326,8 @@ export class PatientReportComponent implements OnInit {
   convertToLocalTime(stillUtc: any) {
     stillUtc = stillUtc + 'Z';
     const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
-      return local;
+
+    return local;
   }
 
   isOpen = false;
@@ -603,6 +607,7 @@ export class PatientReportComponent implements OnInit {
                 var linedt1 = this.lineChartLabels[i].split(' - ');
                 var linedt0 = this.lineChartLabels[i - 1].split(' - ');
                 var linedt2 = this.lineChartLabels[i + 1].split(' - ');
+                console.log(item.data);
                 if (linedt1[0] == linedt0[0] || linedt1[0] == linedt2[0]) {
                   this.lineChartLabels.splice(i, 1);
                   var k = 0;
@@ -611,6 +616,7 @@ export class PatientReportComponent implements OnInit {
                     k = k + 1;
                   }
                 }
+                console.log(item.data);
               }
               i = i + 1;
             } catch (ex) {
@@ -2260,7 +2266,7 @@ export class PatientReportComponent implements OnInit {
       }
     }
     stillUtc = stillUtc + 'Z';
-    const local = dayjs.utc(stillUtc).local().format('HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
 

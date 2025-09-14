@@ -158,7 +158,6 @@ export class LoginComponent implements OnInit {
       this.restPasswordloginForm.controls.newpassword.value ===
       this.restPasswordloginForm.controls.confirmpassword.value
     ) {
-
       this.confirmStatus = true;
     } else {
       this.confirmStatus = false;
@@ -608,6 +607,7 @@ export class LoginComponent implements OnInit {
           },
           (err) => {
             //show error patient id creation failed
+            // alert(err.error);
             let errorMsg = typeof err.error === 'object' && err.error.message ? err.error.message : err.error;
             alert(errorMsg);
             this.loading_otp = false;
@@ -678,6 +678,7 @@ export class LoginComponent implements OnInit {
               }, 800);
               this.setResetEmtyOTPFields();
             } else if (err.status == 403) {
+              // alert(err.error);
               let errorMsg = typeof err.error === 'object' && err.error.message ? err.error.message : err.error;
               alert(errorMsg);
               window.location.reload();

@@ -943,6 +943,7 @@ export class PatientVitalsComponent implements OnInit {
     } else {
       // this.callTimerEnabled=false;
       this.Stop();
+
     }
   }
 
@@ -2071,6 +2072,7 @@ export class PatientVitalsComponent implements OnInit {
     }
     stillUtc = stillUtc + 'Z';
     const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+
     return local;
   }
   convertDate(dateval: any) {
@@ -2861,7 +2863,7 @@ export class PatientVitalsComponent implements OnInit {
       sessionStorage.setItem('patientdataUserId', this.patientdataUserId);
       this.vitals =
         this.http_rpm_patientList.PatientProgramdetails.PatientVitalInfos;
-      sessionStorage.setItem('vitals', JSON.stringify(this.vitals));
+      sessionStorage.setItem('viatls', JSON.stringify(this.vitals));
       sessionStorage.setItem(
         'pname',
         this.http_rpm_patientList['PatientDetails'].FirstName +
@@ -3128,10 +3130,12 @@ export class PatientVitalsComponent implements OnInit {
   monthIndex: any;
   selectedMonth: any;
   selectedMonthName(monthNumber: any, year: any) {
-   return dayjs().month(monthNumber).format('MMMM') + ',' + year;  }
+    return dayjs().month(monthNumber).format('MMMM') + ',' + year;
+  }
 
   getlinechartLabel(lineData: any) {
     lineData.map((v: any) => {
+      console.log(v.label);
       if (v.label == 'Non-Fasting') {
         this.lineChartColor = 'red';
         var temp = {
@@ -3173,6 +3177,7 @@ export class PatientVitalsComponent implements OnInit {
         this.lineChartColors.push(temp);
       }
     });
+    console.log(this.lineChartColor);
 
     return this.lineChartColors;
   }
@@ -3192,6 +3197,9 @@ export class PatientVitalsComponent implements OnInit {
           this.HealthData.push(tempData);
         }
       }
+
+      console.log('HealthData');
+      console.log(this.HealthData);
     }
   }
 }

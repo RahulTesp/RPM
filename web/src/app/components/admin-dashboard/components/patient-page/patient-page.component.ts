@@ -16,7 +16,12 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatSort, Sort } from '@angular/material/sort';
 import { DatePipe } from '@angular/common';
 import { AuthService } from 'src/app/services/auth.service';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 @Component({
   selector: 'app-patient-page',
   templateUrl: './patient-page.component.html',
@@ -129,6 +134,7 @@ export class PatientPageComponent implements OnInit {
         // this.searchPatientList_Name = false;
         // this.searchPatientList_Id = false;
         // this.searchPatientList_assign = false;
+
         this.dataSourceTableList = new MatTableDataSource(
           this.total_patient_list_tmp
         );
@@ -235,6 +241,7 @@ export class PatientPageComponent implements OnInit {
   onClickPatientCritical() {
     this.containerSelection = 2;
     this.patientProgramStaus = 'Critical';
+
     this.maskingDataSrc();
     this.searchPatientList_Name = false;
     this.searchPatientList_assign = false;
@@ -523,7 +530,7 @@ export class PatientPageComponent implements OnInit {
     data = data.trim();
 
     if (data != '') {
-      return this.datepipe.transform(data, 'MMM d, y');
+      return this.datepipe.transform(this.convertToLocalTime(data), 'MMM d, y');
     } else {
       return 'Not Enrolled';
     }
@@ -612,25 +619,16 @@ export class PatientPageComponent implements OnInit {
         var activeFilterVarible;
 
         // VitalArray:
-        // if (this.firstload) {
-        //   this.patientVitalsArray = Array.from(
-        //     new Set(
-        //       tempactivePatientDataSrc.map((a: { Vital: any }) => a.Vital)
-        //     )
-        //   ).map((Vital) => {
-        //     return tempactivePatientDataSrc.find(
-        //       (a: { Vital: any }) => a.Vital === Vital
-        //     );
-        //   });
-        // }
         if (this.firstload) {
-          const allVitalInfos = tempactivePatientDataSrc.flatMap(
-            (patient: { VitalInfo: any }) => patient.VitalInfo
-          );
-          const allVitals = allVitalInfos.map(
-            (vital: { Vital: any }) => vital.Vital
-          );
-          this.patientVitalsArray = [...new Set(allVitals)];
+          this.patientVitalsArray = Array.from(
+            new Set(
+              tempactivePatientDataSrc.map((a: { Vital: any }) => a.Vital)
+            )
+          ).map((Vital) => {
+            return tempactivePatientDataSrc.find(
+              (a: { Vital: any }) => a.Vital === Vital
+            );
+          });
         }
         this.firstload = false;
         var tempCountdatasrc;
@@ -669,12 +667,9 @@ export class PatientPageComponent implements OnInit {
         ) {
           activeFilterVarible = activeFilterVarible.filter((data: any) => {
             return (
-              data.PatientType === this.patientTypeSelect &&
-              data.VitalInfo.some(
-                (vital: { Vital: any; VitalPriority: any }) =>
-                  vital.Vital === this.patientVitalSelect &&
-                  vital.VitalPriority === this.patientProgramStaus
-              )
+              data.PatientType == this.patientTypeSelect &&
+              data.Priority == this.patientProgramStaus &&
+              data.Vital == this.patientVitalSelect
             );
           });
         } else if (
@@ -694,10 +689,9 @@ export class PatientPageComponent implements OnInit {
           this.patientProgramStaus != undefined
         ) {
           activeFilterVarible = activeFilterVarible.filter((data: any) => {
-            return data.VitalInfo.some(
-              (vital: { Vital: any; VitalPriority: any }) =>
-                vital.Vital === this.patientVitalSelect &&
-                vital.VitalPriority === this.patientProgramStaus
+            return (
+              data.Vital == this.patientVitalSelect &&
+              data.Priority == this.patientProgramStaus
             );
           });
         } else if (
@@ -707,11 +701,8 @@ export class PatientPageComponent implements OnInit {
         ) {
           activeFilterVarible = activeFilterVarible.filter((data: any) => {
             return (
-              data.PatientType === this.patientTypeSelect &&
-              data.VitalInfo.some(
-                (vital: { Vital: any }) =>
-                  vital.Vital === this.patientVitalSelect
-              )
+              data.Vital == this.patientVitalSelect &&
+              data.PatientType == this.patientTypeSelect
             );
           });
         } else if (
@@ -720,9 +711,7 @@ export class PatientPageComponent implements OnInit {
           this.patientProgramStaus == undefined
         ) {
           activeFilterVarible = activeFilterVarible.filter((data: any) => {
-            return data.VitalInfo.some(
-              (vital: { Vital: any }) => vital.Vital === this.patientVitalSelect
-            );
+            return data.Vital == this.patientVitalSelect;
           });
         } else if (
           this.patientVitalSelect == undefined &&
@@ -861,10 +850,8 @@ export class PatientPageComponent implements OnInit {
     ) {
       dataSrc = dataSrc.filter((data: any) => {
         return (
-          data.PatientType === this.patientTypeSelect &&
-          data.VitalInfo.some(
-            (vital: { Vital: any }) => vital.Vital === this.patientVitalSelect
-          )
+          data.PatientType == this.patientTypeSelect &&
+          data.Vital == this.patientVitalSelect
         );
       });
     } else if (
@@ -872,9 +859,7 @@ export class PatientPageComponent implements OnInit {
       this.patientTypeSelect == undefined
     ) {
       dataSrc = dataSrc.filter((data: any) => {
-        return data.VitalInfo.some(
-          (vital: { Vital: any }) => vital.Vital === this.patientVitalSelect
-        );
+        return data.Vital == this.patientVitalSelect;
       });
     } else if (
       this.patientVitalSelect == undefined &&
@@ -890,48 +875,17 @@ export class PatientPageComponent implements OnInit {
       dataSrc = dataSrc;
     }
 
-    if (
-      this.patientVitalSelect == 'All Vitals' ||
-      this.patientVitalSelect == undefined
-    ) {
-      this.critical_patient_data_array = dataSrc.filter((data: any) => {
-        return data.Priority == 'Critical';
-      });
-      this.cautious_patient_data_array = dataSrc.filter((data: any) => {
-        return data.Priority == 'Cautious';
-      });
-      this.normal_patient_data_array = dataSrc.filter((data: any) => {
-        return data.Priority == 'Normal';
-      });
+    this.critical_patient_data_array = dataSrc.filter((data: any) => {
+      return data.Priority == 'Critical';
+    });
+    this.cautious_patient_data_array = dataSrc.filter((data: any) => {
+      return data.Priority == 'Cautious';
+    });
+    this.normal_patient_data_array = dataSrc.filter((data: any) => {
+      return data.Priority == 'Normal';
+    });
 
-      this.totaltableList = dataSrc.length;
-    } else {
-      this.critical_patient_data_array = dataSrc.filter((data: any) =>
-        data.VitalInfo.some(
-          (vital: { Vital: any; VitalPriority: string }) =>
-            vital.Vital === this.patientVitalSelect &&
-            vital.VitalPriority === 'Critical'
-        )
-      );
-
-      this.cautious_patient_data_array = dataSrc.filter((data: any) =>
-        data.VitalInfo.some(
-          (vital: { Vital: any; VitalPriority: string }) =>
-            vital.Vital === this.patientVitalSelect &&
-            vital.VitalPriority === 'Cautious'
-        )
-      );
-
-      this.normal_patient_data_array = dataSrc.filter((data: any) =>
-        data.VitalInfo.some(
-          (vital: { Vital: any; VitalPriority: string }) =>
-            vital.Vital === this.patientVitalSelect &&
-            vital.VitalPriority === 'Normal'
-        )
-      );
-
-      this.totaltableList = dataSrc.length;
-    }
+    this.totaltableList = dataSrc.length;
   }
 
   searchValueId: any;
@@ -1066,7 +1020,6 @@ export class PatientPageComponent implements OnInit {
     filterValue = (<HTMLInputElement>filterValue.target).value.trim();
     filterValue = filterValue.toLowerCase();
     this.tableFilterValue = filterValue;
-
     this.dataSourceTableList.filter = filterValue;
   }
 
@@ -1369,6 +1322,8 @@ export class PatientPageComponent implements OnInit {
     this.SearchpatientBilling = '';
     this.searchPatientList_assign = true;
     this.searchValueName = false;
+    this.assigneeSerach = '';
+
   }
   refreshBillingData() {
     this.c1 = false;
@@ -1378,7 +1333,6 @@ export class PatientPageComponent implements OnInit {
   billing_tableCount: any;
   billingDataFilter() {
     var that = this;
-
     var searchbillingpgm;
     var searchtotalvitalfiltervalue;
     var searchinteractionfiltervalue;
@@ -2215,6 +2169,7 @@ export class PatientPageComponent implements OnInit {
 
   // Timezone Offset Function Start
   getTimeZoneOffsetData() {
+    console.log(Intl.DateTimeFormat().resolvedOptions().timeZone);
     let offsetValue = new Date().getTimezoneOffset();
     var offset;
     offset = offsetValue <= 0 ? '+' : '-';
@@ -2314,5 +2269,16 @@ export class PatientPageComponent implements OnInit {
     // if (pageEvent.pageIndex > pageEvent.previousPageIndex!)
     this.pageSize = pageEvent.pageSize;
     this.pageIndxValue = pageEvent.pageIndex;
+    console.log(this.pageIndxValue);
   }
+   convertToLocalTime(stillUtc: any) {
+      if (stillUtc.includes('+')) {
+        var temp = stillUtc.split('+');
+
+        stillUtc = temp[0];
+      }
+      stillUtc = stillUtc + 'Z';
+       const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+      return local;
+    }
 }

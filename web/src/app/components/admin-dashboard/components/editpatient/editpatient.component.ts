@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import {
   UntypedFormControl,
@@ -7,9 +7,6 @@ import {
   Validators,
   UntypedFormArray,
   FormControl,
-  FormArray,
-  FormGroup,
-  AbstractControl,
 } from '@angular/forms';
 import { RPMService } from '../../sevices/rpm.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,13 +16,13 @@ import { DatePipe } from '@angular/common';
 import * as uuid from 'uuid';
 import { AuthService } from 'src/app/services/auth.service';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
-import { Subscription } from 'rxjs';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
 export interface document {
   type: string;
   name: string;
@@ -94,7 +91,6 @@ export class EditpatientComponent implements OnInit {
   devArr: any;
   Diagnosis_List: any = [];
   careTeamMembers: any;
-  programDetails: any;
   timezones: any;
   add_patient_masterdata: unknown;
 
@@ -122,25 +118,14 @@ export class EditpatientComponent implements OnInit {
   editProgramVital: any;
   last_status: any;
 
-  vitalList: number[] = [];
-  selectedvitalList: number[] = [];
-  vitalListDialog: number[] = [];
-  oldVitalListDialog: number[] = [];
+  vitalList = [];
   editvitalList = [];
   documentType: any;
   public showDialog = false;
   public confirmDialogTitle: string;
   public confirmDialogMessage: string;
   confirmAction: (() => void) | null = null;
-  vitallist = [];
-  matchingVitals: number[] = [];
-  selectedProgramId: number;
-  selectedProgram: false;
-  initiallySelectedVitals: number[] = [];
-  programVitals: any;
-  initialFormValues: any;
-  allVitalsSelected = false;
-  private programNameValueChangesSubscription: Subscription | undefined;
+
   constructor(
     private _route: ActivatedRoute,
     public dialog: MatDialog,
@@ -149,43 +134,25 @@ export class EditpatientComponent implements OnInit {
     private router: Router,
     public datepipe: DatePipe,
     private Auth: AuthService,
-    private showconfirmDialog: ConfirmDialogServiceService,
-    private fb: UntypedFormBuilder,
-    private cdRef: ChangeDetectorRef
+     private showconfirmDialog: ConfirmDialogServiceService
   ) {
     var that = this;
     this.initForms();
     this.intializeImages();
     this.ImageStatus = false;
     this.discharged_img = this.unbold_icon;
+    // this.ImageStatus = true;
     this.diaganosisMainList = [{ DiagnosisName: '', DiagnosisCode: '' }];
-    this.selectedDiagnoses = [{ DiagnosisName: '', DiagnosisCode: '' }];
-    this.editProgramdata = this.fb.group({
-      programname: ['', Validators.required],
-      vitalListDialog: [[], Validators.required],
-      selectedDiagnoses: this.fb.array([]),
-    });
-    this.diagnosisFormGroups = this.selectedDiagnoses.map(() => this.fb.group({
-      diagnosis: [''],
-      DiagnosisCode: ['']
-    }));
 
-  }
+    // this.editProgramdata.get('programname')?.valueChanges.subscribe((val) => {
+    //   var ProgramSelected = that.master_data.ProgramDetailsMasterData.filter(
+    //     (Pgm: { ProgramId: number }) => Pgm.ProgramId === parseInt(val)
+    //   );
+    //   this.ediProgramSelectedId = ProgramSelected;
+    //   that.editProgramGoal = ProgramSelected[0].goalDetails;
+    //   that.editProgramDiagoList = ProgramSelected[0].Vitals[0].Dignostics;
 
-  getInitialValue(diagnosis: any): string {
-    return diagnosis?.DiagnosisName || '';
-  }
-
-  get diagnosisList() {
-    return this.editProgramdata.get('selectedDiagnoses') as FormArray;
-  }
-
-  addDiagnosis(diagnosis = { diagnosisName: '', diagnosisCode: '' }) {
-    const group = this.fb.group({
-      diagnosisName: [diagnosis.diagnosisName],
-      diagnosisCode: [{ value: diagnosis.diagnosisCode, disabled: true }],
-    });
-    this.diagnosisList.push(group);
+    // });
   }
 
   getPhysicianList() {
@@ -237,18 +204,11 @@ export class EditpatientComponent implements OnInit {
   programnamechangefirst_1 = true;
   programnamechangefirst_2 = true;
   cityFlag: any;
-  diagnosisFormGroups: FormGroup[] = [];
   ngOnInit(): void {
     this.variable = 1;
     this.documentAddFlag = false;
     this.programnamechangefirst = true;
     this.cityFlag = false;
-    this.diagnosisFormGroups = this.selectedDiagnoses.map((d: { DiagnosisName: any; DiagnosisCode:any;}) =>
-      new FormGroup({
-        diagnosis: new FormControl(d.DiagnosisName),
-        DiagnosisCode: new FormControl(d.DiagnosisCode)
-      })
-    );
     // Edit Program
     var that = this;
     this.getLanguage();
@@ -261,7 +221,7 @@ export class EditpatientComponent implements OnInit {
         this.ediProgramSelectedId = ProgramSelected;
         that.editProgramVital = this.ediProgramSelectedId[0].Vitals;
         if (!this.programnamechangefirst) {
-          //that.vitalList = [];
+          that.vitalList = [];
         }
 
         that.editProgramGoal = ProgramSelected[0].goalDetails;
@@ -271,7 +231,6 @@ export class EditpatientComponent implements OnInit {
         }
       }
       this.diaganosisMainList = [{ DiagnosisName: '', DiagnosisCode: '' }];
-      this.selectedDiagnoses = [{ DiagnosisName: '', DiagnosisCode: '' }];
       this.programnamechangefirst = false;
     });
 
@@ -293,11 +252,28 @@ export class EditpatientComponent implements OnInit {
     });
 
     this.programForm.get('startdate')?.valueChanges.subscribe((val) => {
+      // if(that.durationValue > 1 && that.durationValue <=12)
+      // {
       if (this.programForm.controls.startdate.value) {
         this.calculateEndDate();
       }
+
+      // }else{
+      //   alert('Duration Period is Maximum 12 months')
+      // }
     });
 
+    // this.programForm.get('enddate')?.valueChanges.subscribe((val) => {
+    //     if (
+    //       this.programForm.controls.enddate.value &&
+    //       this.programForm.controls.startdate.value
+    //     ) {
+    //       that.durationValue = this.monthDiff(
+    //         this.programForm.controls.startdate.value,
+    //         this.programForm.controls.enddate.value
+    //       );
+    //     }
+    // });
     this.programForm.get('programname')?.valueChanges.subscribe((value) => {
       that.Program_Selected = that.master_data.ProgramDetailsMasterData.filter(
         (Pgm: { ProgramId: number }) => Pgm.ProgramId === parseInt(value)
@@ -306,7 +282,7 @@ export class EditpatientComponent implements OnInit {
         that.vital_selected = that.Program_Selected[0].Vitals;
       }
       if (!this.programnamechangefirst_1) {
-        //that.vitalList = [];
+        that.vitalList = [];
       }
       this.programnamechangefirst_1 = false;
       // this.vitalList=[];
@@ -348,18 +324,15 @@ export class EditpatientComponent implements OnInit {
       });
     that.master_data = sessionStorage.getItem('add_patient_masterdata');
     that.master_data = JSON.parse(that.master_data);
-    that.CommunicationType = that.master_data?.DeviceCommunicationTypes;
+    that.CommunicationType = that.master_data.DeviceCommunicationTypes;
     that.deviceTypeDataId = 1;
 
     this.devArr = [];
     this.careTeamMembers = this.master_data.CareTeamMembers;
-    this.programDetails = this.master_data.ProgramDetailsMasterData;
-    this.programDetails = this.master_data.ProgramDetailsMasterData.filter((program: { Name: string; Vitals: string | any[]; }) =>
-      program.Name === "RPM" && program.Vitals.length > 1
-    );
     var myuser = sessionStorage.getItem('user_name');
     var myid = sessionStorage.getItem('userid');
 
+    // this.careTeamMembers.push(myobj)
     const uniqueValuesSet = new Set();
     this.devArr = this.master_data.DeviceDetails.filter((obj: any) => {
       // check if name property value is already in the set
@@ -446,7 +419,7 @@ export class EditpatientComponent implements OnInit {
       ]),
       clinic: new UntypedFormControl({ value: '' }, [Validators.required]),
       cliniccode: new UntypedFormControl({ value: '' }),
-      consultdate: new UntypedFormControl('', [Validators.required]),
+      consultdate: new UntypedFormControl('',null),
       assignedMember: new UntypedFormControl('', [Validators.required]),
       PrescribedDate: new UntypedFormControl({ value: '' }, [Validators.required]),
       EntrolledDate: new UntypedFormControl({ value: '' }, [Validators.required]),
@@ -466,7 +439,6 @@ export class EditpatientComponent implements OnInit {
       billingcode3: new UntypedFormControl(''),
       billingcode4: new UntypedFormControl(''),
     });
-
     this.programForm_3 = this.PatientFormBuilderObj.group({
       deviceDataList: this.PatientFormBuilderObj.array([
         this.createDeviceGroup(),
@@ -620,6 +592,7 @@ export class EditpatientComponent implements OnInit {
       )
       .then((data) => {
         that.Patientdata = data;
+
         this.processMasterData();
         that.PatientVitalInfos =
           that.Patientdata.PatientVitalDetails.PatientVitalInfos;
@@ -633,15 +606,6 @@ export class EditpatientComponent implements OnInit {
         that.vitalList = vitalArray.map((item: any, index: any, arr: any) => {
           return item.VitalId;
         });
-        that.vitalListDialog = vitalArray.map((item: any, index: any, arr: any) => {
-          return item.VitalId;
-        });
-        this.selectedProgram = this.selectedProgram;
-        this.initiallySelectedVitals = [...this.vitalListDialog];
-        this.allVitalsSelected = this.programVitals.every((vital: { VitalId: number; }) =>
-          this.vitalListDialog.includes(vital.VitalId)
-        );
-        //
         that.PatientVitalInfos_copy =
           that.Patientdata.PatientVitalDetails.PatientVitalInfos;
         that.datasourceDocument =
@@ -780,7 +744,7 @@ export class EditpatientComponent implements OnInit {
         that.programForm.controls['enddate'].setValue(
           that.convertDate(that.Patientdata.PatientProgramdetails.EndDate)
         );
-
+        // that.programForm.controls['target'].setValue(that.Patientdata.PatientProgramdetails.TargetReadings);
         that.programForm.controls['assignedMember'].setValue(
           that.Patientdata.PatientProgramdetails.CareTeamUserId,
           { onlySelf: true }
@@ -797,29 +761,20 @@ export class EditpatientComponent implements OnInit {
         that.programForm.controls['clinic'].setValue(
           that.Patientdata.PatientPrescribtionDetails.Clinic
         );
-        // Manjusha code change
-        // Parse the custom date format "dd-MM-yyyy HH:mm:ss"
-        const rawDate = that.Patientdata.PatientPrescribtionDetails.ConsultationDate;
-
-        let consultDateData: string | null = null;
-
-        if (rawDate) {
-          const [datePart, timePart] = rawDate.split(' ');
-          const [day, month, year] = datePart.split('-');
-
-          // Convert to ISO format: "yyyy-MM-ddTHH:mm:ss"
-          const isoFormatted = `${year}-${month}-${day}T${timePart || '00:00:00'}`;
-
-          // Transform using Angular DatePipe
-          consultDateData = this.datepipe.transform(isoFormatted, 'MMM/dd/yyyy');
-        }
-
-        // Now pass the transformed date into convertDate
-        that.programForm.controls['consultdate'].setValue(
-          this.convertDate(consultDateData)
+        var consultDateData = this.datepipe.transform(
+          that.Patientdata.PatientPrescribtionDetails.ConsultationDate,
+          'MMM/dd/yyyy'
         );
 
-
+        // that.programForm.controls['consultdate'].setValue(
+        //   this.convertDate(consultDateData)
+        // );
+          this.programForm.patchValue({
+          consultdate: consultDateData &&
+                      consultDateData !== '1/1/1970 12:00:00 AM'
+            ? this.convertDate(consultDateData)
+            : null
+        });
         var prescribeDateData = this.datepipe.transform(
           this.convertToLocalTime(
             that.Patientdata.PatientPrescribtionDetails.PrescribedDate
@@ -862,6 +817,7 @@ export class EditpatientComponent implements OnInit {
         } else {
           switch (this.program_name) {
             case 'CCM-C':
+              // this.billingSrcArray = this.billingCCM_C;
               that.codeSelected = [];
               that.codeSelected = that.master_data.BillingCodes.filter(
                 (code: { BillingCode: any }) => code.BillingCode === 'G0506'
@@ -900,6 +856,7 @@ export class EditpatientComponent implements OnInit {
 
               break;
             case 'CCM-P':
+              // this.billingSrcArray = this.billingCCM_C;
               that.codeSelected = [];
               that.codeSelected = that.master_data.BillingCodes.filter(
                 (code: { BillingCode: any }) => code.BillingCode === 'G0506'
@@ -938,6 +895,7 @@ export class EditpatientComponent implements OnInit {
 
               break;
             case 'C-CCM':
+              // this.billingSrcArray = this.billingCCM_C;
               that.codeSelected = [];
               that.codeSelected = that.master_data.BillingCodes.filter(
                 (code: { BillingCode: any }) => code.BillingCode === 'G0506'
@@ -976,6 +934,7 @@ export class EditpatientComponent implements OnInit {
 
               break;
             case 'PCM-P':
+              // this.billingSrcArray = this.billingCCM_C;
               that.codeSelected = [];
               that.codeSelected = that.master_data.BillingCodes.filter(
                 (code: { BillingCode: any }) => code.BillingCode === '99424'
@@ -1053,10 +1012,10 @@ export class EditpatientComponent implements OnInit {
           this.insurance_tname = that.secondaryinsurnace[1].InsuranceVendorName;
         }
 
-        var patientdevicedetailsData =
+        that.patientdevicedetails =
           that.Patientdata.PatientDevicesDetails.PatientDeviceInfos;
-        var vitalArr = [];
-        if (patientdevicedetailsData.length == 0) {
+        if (that.patientdevicedetails.length == 0) {
+          var vitalArr = [];
           for (let v of that.PatientVitalInfos) {
             var obj = {
               VitalName: v.VitalName,
@@ -1065,33 +1024,6 @@ export class EditpatientComponent implements OnInit {
               DeviceNumber: '',
             };
             vitalArr.push(obj);
-          }
-          that.patientdevicedetails = vitalArr;
-        }
-        if (patientdevicedetailsData.length != 0) {
-          for (let v of that.PatientVitalInfos) {
-            const isPresent = this.checkVitalName(
-              patientdevicedetailsData,
-              v.VitalName
-            );
-            // Manjusha code change
-            if (isPresent) {
-              var device = this.getVitalObject(
-                patientdevicedetailsData,
-                v.VitalName
-              );
-              vitalArr.push(...device);
-            } else {
-              var obj = {
-                VitalName: v.VitalName,
-                DeviceStatus: 'InActive',
-                VitalId: v.VitalId,
-                DeviceNumber: '',
-              };
-              if (!vitalArr.some((item) => item.VitalName == obj.VitalName)) {
-                vitalArr.push(obj);
-              }
-            }
           }
           that.patientdevicedetails = vitalArr;
         }
@@ -1110,62 +1042,20 @@ export class EditpatientComponent implements OnInit {
         that.vitalListChange();
       });
   }
-
-  checkVitalName(vitals: any[], nameToCheck: string): boolean {
-    return vitals.some(
-      (vital) => vital.VitalName.toLowerCase() === nameToCheck.toLowerCase()
-    );
-  }
-  // Manjusha code change
-  getVitalObject(vitals: any[], nameToFind: string): any {
-    return vitals.filter(
-      (vital) => vital.VitalName.toLowerCase() === nameToFind.toLowerCase()
-    );
-  }
-   // Manjusha code change
   codeSelected: any;
   DeviceCheck() {
-    const allVitalsActive = this.PatientVitalInfos.every((vital: { VitalName: string }) => {
-      const vitalName = vital?.VitalName?.toLowerCase();
-      if (!vitalName) return false; // if vital name is missing, consider it failed
-
-      return this.patientdevicedetails.some(
-        (device: { VitalName?: string; DeviceStatus: string }) =>
-          device?.VitalName?.toLowerCase() === vitalName &&
-          device.DeviceStatus === 'Active'
-      );
-    });
-    this.DeviceNotAvaliable = !allVitalsActive;
-  }
-
-  DeviceCheckOnSubmit() {
-    if (!Array.isArray(this.patientdevicedetails)) {
-      console.error('patientdevicedetails is not an array:', this.patientdevicedetails);
-      return false;
-    }
-    let devicesToRemove: string[] = [];
     for (let x of this.patientdevicedetails) {
-      if (!this.editProgramdata.controls.vitalListDialog.value.includes(x.VitalId) && x.DeviceStatus === 'Active') {
-        devicesToRemove.push(x.DeviceName);
+      if (x.DeviceStatus == 'Active') {
+        this.DeviceNotAvaliable = false;
+        break;
+      } else {
+        this.DeviceNotAvaliable = true;
       }
     }
-    if (devicesToRemove.length > 0) {
-      let devicesList = devicesToRemove.join(', ');
-      let message = devicesToRemove.length === 1
-      ? `The selected plan does not support the ${devicesList}. Please remove the device to change the plan.`
-      : `The selected plan does not support the following devices: ${devicesList}. Please remove them to change the plan.`;
-
-    alert(message);
-      this.showProgramEditModal = false;
-      return false;
-    }
-    return true;
   }
-  //
   a: any;
   vitalschedule: any;
   InsuranceInfo: any;
-  // Manjusha code change
   addNewDevice() {
     var obj = {
       VitalName: '',
@@ -1173,7 +1063,7 @@ export class EditpatientComponent implements OnInit {
       VitalId: '',
       DeviceNumber: '',
     };
-    if (this.patientdevicedetails?.length < 10) {
+    if (this.patientdevicedetails.length < 5) {
       this.patientdevicedetails.push(obj);
     }
   }
@@ -1215,12 +1105,9 @@ export class EditpatientComponent implements OnInit {
     if (that.Program_Selected.length > 0) {
       that.Diagnosis_Name = that.Program_Selected[0].Vitals[0].Dignostics;
       this.program_name = that.Program_Selected[0].ProgramName;
-      this.program_id = that.Program_Selected[0].ProgramId;
-      this.programVitals = that.Program_Selected[0].Vitals;
-      this.selectedProgram = this.programDetails.some((program: { ProgramId: number; }) => program.ProgramId === that.Program_Selected[0].ProgramId);
-      //
       for (let x of this.Diagnosis_Name) {
         x.DiagnosisField = x.DiagnosisName;
+        //alert(x.DiagnosisField)
       }
     }
   }
@@ -1320,6 +1207,8 @@ export class EditpatientComponent implements OnInit {
   }
   increment_duration() {
     this.durationStatusEnable();
+    // if(this.DurationEdit)
+    // {
     if (this.durationValue < 12) {
       this.durationValue++;
     } else {
@@ -1327,8 +1216,12 @@ export class EditpatientComponent implements OnInit {
     }
 
     this.calculateEndDate();
+    // }
   }
   decrement_duration() {
+    // this.durationStatusEnable();
+    // if(this.DurationEdit)
+    // {
 
     if (this.durationValue > 1) {
       this.durationValue--;
@@ -1336,6 +1229,7 @@ export class EditpatientComponent implements OnInit {
       this.durationValue = 1;
     }
     this.calculateEndDate();
+    // }
   }
 
   startDateValue: any;
@@ -1350,6 +1244,7 @@ export class EditpatientComponent implements OnInit {
     someDate = this.Auth.ConvertToUTCRangeInput(new Date(someDate));
     this.startDateValue = someDate;
     const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
+
     this.programForm.controls['enddate'].setValue(
       this.convertDate(someDateValue)
     );
@@ -1424,6 +1319,12 @@ export class EditpatientComponent implements OnInit {
   minValue: number = 72;
   maxValue: number = 200;
   middle: number = 90;
+  // options: Options = {
+  //   floor: 0,
+  //   step: 1,
+  //   ceil: 200,
+  //   showTicks: false,
+  // };
   displayValue() {}
 
   patient = [
@@ -1509,7 +1410,7 @@ export class EditpatientComponent implements OnInit {
         null &&
       this.Diagnosis_List[this.Diagnosis_List.length - 1].DiagnosisName != null
     ) {
-      if (this.Diagnosis_List.length < 10) {
+      if (this.Diagnosis_List.length < 5) {
         for (let i = 0; i <= this.Diagnosis_List.length; i++) {
           this.Diagnosis_List.push(this.objDiagnosis);
           this.display = !this.display;
@@ -1527,61 +1428,49 @@ export class EditpatientComponent implements OnInit {
   }
 
   editObjDiagnosis = { Id: 0, DiagnosisCode: null, DiagnosisName: null };
-
-  // Manjusha code change
   programaddNewDiaganostic() {
-    const selectedDiagnosesArray = this.editProgramdata.get('selectedDiagnoses') as FormArray;
+    // if(this.diaganosisMainList.length<2){
+    //   this.diaganosisMainList.push(this.editObjDiagnosis);
+    // }
 
-    // Get the last diagnosis form group (if any)
-    const lastItem = selectedDiagnosesArray.at(selectedDiagnosesArray.length - 1);
+    this.editObjDiagnosis = { Id: 0, DiagnosisCode: null, DiagnosisName: null };
 
-    // Only add a new one if last item is filled
     if (
-      !lastItem ||
-      (lastItem.get('DiagnosisCode')?.value != null &&
-       lastItem.get('DiagnosisName')?.value != null)
+      this.diaganosisMainList[this.diaganosisMainList.length - 1]
+        .DiagnosisCode != null &&
+      this.diaganosisMainList[this.diaganosisMainList.length - 1]
+        .DiagnosisName != null
     ) {
-      if (selectedDiagnosesArray.length < 10) {
-        selectedDiagnosesArray.push(this.fb.group({
-          Id: [0],
-          DiagnosisCode: [null],
-          DiagnosisName: [null],
-        }));
-
-        // Optional: toggle UI or emit event
-        this.display = !this.display;
-      } else {
-        alert("Maximum 5 diagnoses allowed.");
+      if (this.diaganosisMainList.length < 5) {
+        for (let i = 0; i <= this.diaganosisMainList.length; i++) {
+          this.diaganosisMainList.push(this.editObjDiagnosis);
+          this.display = !this.display;
+          return;
+        }
       }
-    } else {
-      alert("Please fill the current diagnosis before adding a new one.");
     }
   }
-
   programaremoveNewDiaganostic() {
-    const selectedDiagnosesArray = this.editProgramdata.get('selectedDiagnoses') as FormArray;
-
-    if (selectedDiagnosesArray.length > 1) {
-      selectedDiagnosesArray.removeAt(selectedDiagnosesArray.length - 1); //Proper reactive removal
+    if (this.diaganosisMainList.length > 1) {
+      this.diaganosisMainList.pop();
       this.display = !this.display;
-    } else {
-      alert('At least one diagnosis must remain.');
     }
   }
-
   confirm_action() {
-    if (this.variable == 1) {
-      this.UpdatePatientInfo();
-      this.editPatientProgram();
-    } else if (this.variable == 2) {
-      this.UpdatePatientInfo();
-      this.editPatientProgram();
-    }
+      this.submitImage(this.pid).then((res) => {
+        if (this.variable === 1 || this.variable === 2) {
+          this.UpdatePatientInfo();
+          this.editPatientProgram();
+        }
+      }).catch((err) => {
+        alert(err.error.message);
+      });
   }
   UpdatePatientInfo() {
     this.markFormGroupTouched(this.PatientInfoForm);
 
     //call on clicking savedraft after opening the drafted patient
+    //if (this.PatientInfoForm.valid){
 
     var patientHeight = this.HeightFeetValue + '.' + this.HeightInchValue;
     this.patientHeighValue = parseFloat(patientHeight).toFixed(2);
@@ -1629,6 +1518,7 @@ export class EditpatientComponent implements OnInit {
           if (this.variable != 2) {
             this.dialog.closeAll();
             this.redirect_patient();
+
           }
         },
         (err) => {
@@ -1637,12 +1527,15 @@ export class EditpatientComponent implements OnInit {
             this.dialog.closeAll();
             this.redirect_patient();
           }
+          // alert("Error, Patient details update failed..!")
+          //show error pop up, could not update patient
         }
       );
     } else {
       alert('Please complete all mandatory fields..!');
       this.loading = false;
     }
+    // }
   }
   backtodetailpage() {
     let route = '/admin/patients_detail';
@@ -1688,6 +1581,8 @@ export class EditpatientComponent implements OnInit {
   }
   inactiveVariable: any;
   ChangePatientStatus(status: any, timeofcall: number) {
+    // var status = "Prescribed";
+
 
     if (status == 'OnHold') {
       this.setOnHold();
@@ -1832,6 +1727,7 @@ export class EditpatientComponent implements OnInit {
           this.unsetActive();
           this.unsetReadyToDischarge();
           this.unSetReActive();
+          // this.unsetDischarged();
         } else if (
           (status == 'Enrolled' ||
             status == 'OnHold' ||
@@ -1843,6 +1739,7 @@ export class EditpatientComponent implements OnInit {
           this.unsetActive();
           this.unsetReadyToDischarge();
           this.unSetReActive();
+          // this.unsetDischarged();
           this.isPrescribed = true;
           this.isEnrolled = false;
           this.isActive = false;
@@ -1860,6 +1757,7 @@ export class EditpatientComponent implements OnInit {
           this.setActive();
           this.unsetReadyToDischarge();
           this.unSetReActive();
+          // this.unsetDischarged();
           this.isPrescribed = true;
           this.isEnrolled = true;
           this.isActive = false;
@@ -1877,12 +1775,28 @@ export class EditpatientComponent implements OnInit {
           this.unsetActive();
           this.setReadyToDischarge();
           this.unSetReActive();
+          // this.unsetDischarged();
           this.isPrescribed = true;
           this.isEnrolled = true;
           this.isActive = true;
           this.isReadyToDischarge = true;
           this.isDischarged = false;
         }
+        // if (
+        //   (status == 'Discharged' || status == 'OnHold') &&
+        //   !this.isDischarged
+        // ) {
+        //   this.unsetPrescribed();
+        //   this.unsetEnrolled();
+        //   this.unsetActive();
+        //   this.unsetReadyToDischarge();
+        //   this.setDischarged();
+        //   this.isPrescribed = true;
+        //   this.isEnrolled = true;
+        //   this.isActive = true;
+        //   this.isReadyToDischarge = true;
+        //   this.isDischarged = true;
+        // }
       } else {
         if (
           (status == 'Prescribed' ||
@@ -1896,6 +1810,7 @@ export class EditpatientComponent implements OnInit {
           this.unsetActive();
           this.unsetReadyToDischarge();
           this.unSetReActive();
+          // this.unsetDischarged();
         } else if (
           (status == 'Enrolled' ||
             status == 'OnHold' ||
@@ -1908,6 +1823,7 @@ export class EditpatientComponent implements OnInit {
           this.unsetActive();
           this.unsetReadyToDischarge();
           this.unSetReActive();
+          // this.unsetDischarged();
           this.isPrescribed = true;
           this.isEnrolled = false;
           this.isActive = false;
@@ -1926,6 +1842,7 @@ export class EditpatientComponent implements OnInit {
           this.setActive();
           this.unsetReadyToDischarge();
           this.unSetReActive();
+          // this.unsetDischarged();
           this.isPrescribed = true;
           this.isEnrolled = true;
           this.isActive = false;
@@ -1944,6 +1861,7 @@ export class EditpatientComponent implements OnInit {
           this.setInActive();
           this.unsetReadyToDischarge();
           this.unSetReActive();
+          // this.unsetDischarged();
           this.isPrescribed = true;
           this.isEnrolled = true;
           this.isActive = false;
@@ -1980,6 +1898,7 @@ export class EditpatientComponent implements OnInit {
           this.unsetActive();
           this.setReadyToDischarge();
           this.unSetReActive();
+          // this.unsetDischarged();
           this.isPrescribed = true;
           this.isEnrolled = true;
           this.isActive = true;
@@ -1987,6 +1906,22 @@ export class EditpatientComponent implements OnInit {
           this.isDischarged = false;
           this.ImageStatus = true;
         }
+        // if (
+        //   (status == 'Discharged' || status == 'OnHold') &&
+        //   !this.isDischarged &&
+        //   this.resp.Status == 'ReadyToDischarge'
+        // ) {
+        //   this.unsetPrescribed();
+        //   this.unsetEnrolled();
+        //   this.unsetActive();
+        //   this.unsetReadyToDischarge();
+        //   this.setDischarged();
+        //   this.isPrescribed = true;
+        //   this.isEnrolled = true;
+        //   this.isActive = true;
+        //   this.isReadyToDischarge = true;
+        //   this.isDischarged = true;
+        // }
       }
     }
   }
@@ -2082,6 +2017,19 @@ export class EditpatientComponent implements OnInit {
         this.ImageStatus = false;
       }
     }
+
+    // this.onHoldPanelImgChange();
+
+    // this.prescribed_img = this.inactive_icon;
+    // this.enrolled_img = this.inactive_icon;
+    // this.active_img = this.inactive_icon;
+    // this.readytodischarge_img = this.inactive_icon;
+    // this.discharged_img = this.inactive_icon;
+    // this.isPrescribed = false;
+    // this.isEnrolled = false;
+    // this.isActive = false;
+    // this.isReadyToDischarge = false;
+    // this.isDischarged = false;
     this.onHold = true;
   }
   unsetOnHold() {
@@ -2106,6 +2054,7 @@ export class EditpatientComponent implements OnInit {
     }
     const yyyy = today.getFullYear();
     dateval = yyyy + '-' + mm2 + '-' + dd2;
+    // dateval = mm2 + '/' + dd2 + '/' + yyyy
     return dateval;
   }
 
@@ -2126,6 +2075,7 @@ export class EditpatientComponent implements OnInit {
       mm2 = mm;
     }
     const yyyy = today.getFullYear();
+    // dateval = yyyy + '-' + mm2 + '-' + dd2;
     dateval = mm2 + '/' + dd2 + '/' + yyyy;
     return dateval;
   }
@@ -2142,12 +2092,14 @@ export class EditpatientComponent implements OnInit {
     }
 
     if (this.status_to_send == 'Active') {
+
       if (
         this.Patientdata &&
         this.Patientdata.PatientProgramdetails.ProgramName != 'CCM' &&
         this.Patientdata.PatientProgramdetails.ProgramName != 'PCM'
       ) {
         if (this.isDeviceActive) {
+          //&&this.Patientdata_Document.PatientDocumentDetails.PatientDocumentinfos.length>0){
           console.log('All Patient Details are Verified');
         } else {
           alert(
@@ -2158,7 +2110,12 @@ export class EditpatientComponent implements OnInit {
         }
       }
     }
+
+    console.log('Consultation Date confirm');
+    console.log(this.programForm.controls.consultdate.value)
+    // var diagnostics = this.processDiagnostics(this.programForm.controls.diagnosisDataList.value);
     var diagnosis = this.Diagnosis_List;
+    // var insuranceDeails = this.processInsurance(this.programForm_3.controls.insurance1.value,this.programForm_3.controls.insurance2.value,this.programForm_3.controls.insurance3.value)
 
     var insuranceDeails = this.processInsurance(
       this.insurance_pname,
@@ -2171,9 +2128,15 @@ export class EditpatientComponent implements OnInit {
       PatientId: parseInt(this.pid),
       PatientProgramId: this.patientprogramid,
       PhysicianId: this.programForm.controls.physician.value,
+      // ConsultationDate: this.Auth.ConvertToUTCRangeInput(
+      //   new Date(this.programForm.controls.consultdate.value + 'T00:00:00')
+      // ),
+      //26/10/2023
       ConsultationDate: this.programForm.controls.consultdate.value,
       CareTeamUserId: this.programForm.controls.assignedMember.value,
       PatientStatus: this.status_to_send,
+      // TargetReadings: this.programForm.controls.target.value,
+      // StartDate: this.programForm.controls.startdate.value,
       StartDate: this.startDateValue,
       EndDate: endDate,
       patientProgramGoals: this.Goals_Selected,
@@ -2190,7 +2153,7 @@ export class EditpatientComponent implements OnInit {
       ),
       VitalIds: this.vitalList,
     };
-    if ((this.current_status_value = 'Prescribed')) {
+    if ((this.current_status_value == 'Prescribed')) {
       var datevalue = this.Auth.ConvertToUTCRangeInput(new Date());
       var dtArr = datevalue.split('T');
       req_body['EnrolledDate'] = this.Auth.ConvertToUTCRangeInput(
@@ -2219,6 +2182,7 @@ export class EditpatientComponent implements OnInit {
           }
 
           if (this.variable != 1) {
+            // that.dialog.open(that.successTemplate);
             this.redirect_patient();
             //show success popup patient is updated
           }
@@ -2247,6 +2211,10 @@ export class EditpatientComponent implements OnInit {
   deviceListOX: any;
   deviceVitalLists() {
     var that = this;
+    // this.ReloadDeviceList(1);
+    // this.ReloadDeviceList(2);
+    // this.ReloadDeviceList(3);
+    // this.ReloadDeviceList(4);
 
     this.deviceListBP = this.deviceList.filter((data: { VitalId: any }) => {
       return data.VitalId == 1;
@@ -2371,10 +2339,10 @@ export class EditpatientComponent implements OnInit {
       };
 
       this.rpm.rpm_post('/api/device/account/create/iglucose', req_body).then(
-        (data) => {
+        (data:any) => {
           // this.openDialogWindow('Success', `Device Added Successfully!!!`);
           this.showconfirmDialog.showConfirmDialog(
-            'Device Added Successfully!!!',
+            data.Message,
             'Success',
             () => {
               this.ReloadDeviceList(1);
@@ -2388,10 +2356,10 @@ export class EditpatientComponent implements OnInit {
             false
           );
         },
-        (err) => {
+        (err:any) => {
           // this.openDialogWindow('Error', `Device not added to user assets!!!`);
           this.showconfirmDialog.showConfirmDialog(
-            'Device not added to user assets!!!',
+            err.error.Message,
             'Error',
             () => {
               this.ReloadDeviceList(1);
@@ -2417,39 +2385,44 @@ export class EditpatientComponent implements OnInit {
         DeviceStatus: 'Error',
       };
 
-      this.rpm.rpm_post('/api/device/updatedevicestatus', req_body)
-      .then((data) => {
-        this.showconfirmDialog.showConfirmDialog(
-          'Device Error Updated Successfully.',
-          'Success',
-          () => {
-            this.RemoveDevice(index);
-            this.ReloadDeviceList(1);
-            this.ReloadDeviceList(2);
-            this.ReloadDeviceList(3);
-            this.ReloadDeviceList(4);
-          },
-          false
-        );
-      })
-      .catch((err) => {
-        console.error('Device update failed:', err);
-        this.showconfirmDialog.showConfirmDialog(
-          'Failed to Update Device Error',
-          'Error',
-          () => {
-            this.ReloadDeviceList(1);
-            this.ReloadDeviceList(2);
-            this.ReloadDeviceList(3);
-            this.ReloadDeviceList(4);
-          },
-          false
-        );
-      });
+      this.rpm.rpm_post('/api/device/updatedevicestatus', req_body).then(
+        (data:any) => {
+          this.showconfirmDialog.showConfirmDialog(
+            data.message,
+            'Success',
+            () => {
+              this.ReloadDeviceList(1);
+              this.ReloadDeviceList(2);
+              this.ReloadDeviceList(3);
+              this.ReloadDeviceList(4);
+              this.UpdatePatient_Device(this.pid, this.patientprogramid);
+            },
+            false
+          );
+        },
+        (err:any) => {
+          this.showconfirmDialog.showConfirmDialog(
+            err.error.message,
+            'Error',
+            () => {
+              this.ReloadDeviceList(1);
+              this.ReloadDeviceList(2);
+              this.ReloadDeviceList(3);
+              this.ReloadDeviceList(4);
+            },
+            false
+          );
+          // this.openDialogWindow('Error', `Failed to Update Device Error.`);
+          //show error pop up, could not update patient
+        }
+      );
     }
   }
   RemoveDevice(index: any) {
     if (this.patientdevicedetails[index].DeviceNumber) {
+      // var deviceobj = this.master_data.DeviceDetails.filter((device: { DeviceNumber: any; })=>{
+      //   return device.DeviceNumber==this.patientdevicedetails[index].DeviceNumber
+      // })
       var req_body = {
         PatientId: this.pid,
         VendorId: 1,
@@ -2462,7 +2435,8 @@ export class EditpatientComponent implements OnInit {
       };
 
       this.rpm.rpm_post('/api/device/removedevice/iglucose', req_body).then(
-        (data) => {
+        (data:any) => {
+
           if (!this.ErrorFlag) {
             // this.openDialogWindow('Success', `Device Removed Successfully.`);
             this.showconfirmDialog.showConfirmDialog(
@@ -2479,13 +2453,15 @@ export class EditpatientComponent implements OnInit {
           this.ReloadDeviceList(2);
           this.ReloadDeviceList(3);
           this.ReloadDeviceList(4);
+          this.UpdatePatient_Device(this.pid, this.patientprogramid);
+
           //show success popup patient is updated
         },
-        (err) => {
+        (err:any) => {
+
           if (!this.ErrorFlag) {
             this.showconfirmDialog.showConfirmDialog(
-              'Device not removed from user assets.',
-              'Error',
+              err.error.Message,'Error' ,
               () => {
                 this.ErrorFlag = false;
               },
@@ -2496,6 +2472,7 @@ export class EditpatientComponent implements OnInit {
           this.ReloadDeviceList(2);
           this.ReloadDeviceList(3);
           this.ReloadDeviceList(4);
+          // this.reloadMasterData();
           //show error pop up, could not update patient
         }
       );
@@ -2528,14 +2505,15 @@ export class EditpatientComponent implements OnInit {
               this.ReloadDeviceList(2);
               this.ReloadDeviceList(3);
               this.ReloadDeviceList(4);
+              this.UpdatePatient_Device(this.pid, this.patientprogramid);
+
             },
             false
           );
         },
-        (err) => {
-          // this.openDialogWindow('Error',`Device not removed from user assets.`);
+        (err:any) => {
           this.showconfirmDialog.showConfirmDialog(
-            'Device not removed from user assets.',
+            err.error.Message,
             'Error',
             () => {
               this.ReloadDeviceList(1);
@@ -2569,10 +2547,10 @@ export class EditpatientComponent implements OnInit {
           );
           //show success popup patient is updated
         },
-        (err) => {
+        (err:any) => {
           // this.openDialogWindow('Error', `Device Test Failed.`);
           this.showconfirmDialog.showConfirmDialog(
-            'Device Test Failed.',
+            err.error.message,
             'Error',
             () => {
             },
@@ -2610,6 +2588,7 @@ export class EditpatientComponent implements OnInit {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = '400px';
 
+    // dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
 
     dialogConfig.data = {
@@ -2745,11 +2724,24 @@ export class EditpatientComponent implements OnInit {
     this.Doc = e.target.files[0];
     var a = document.getElementsByClassName('uploadPhoto');
     this.file = this.Doc.name;
+
+    // a[0].setAttribute("style", "background-image:"+this.image.name);
+    // a[0].setAttribute("style", "background: url(\"https://rpmstorage123.blob.core.windows.net/rpmprofilepictures/CL500626\"); background-repeat: no-repeat;  background-size: 100% 100%;");
   }
+  pdfTypeStatus = false;
   openFileData(e: any) {
     this.Doc = e.target.files[0];
     this.documentType = this.Doc.type;
-    this.file = this.Doc.name;
+    if(this.documentType != 'application/pdf')
+    {
+     this.Doc = null;
+     this.pdfTypeStatus = true
+    }else{
+      this.pdfTypeStatus = false;
+    }
+     this.file = this.Doc.name;
+
+
   }
   submitDocument(pid: any) {
     var formData: any = new FormData();
@@ -2764,13 +2756,9 @@ export class EditpatientComponent implements OnInit {
       this.docDesc != null &&
       this.docDesc != undefined &&
       this.docType != null &&
-      this.Doc != undefined
+      this.Doc != undefined &&  this.docDesc != ''
     ) {
-      if (this.documentType != 'application/pdf') {
-        alert('Please Select Pdf File Type');
-        this.DownloadStatus = false;
-        return;
-      } else {
+
         this.rpm.rpm_post(`/api/patient/adddocument`, formData).then(
           (data) => {
             alert('Document Added Successfully');
@@ -2785,7 +2773,7 @@ export class EditpatientComponent implements OnInit {
             this.DownloadStatus = false;
           }
         );
-      }
+
     } else {
       alert('Please Complete the Form');
       this.DownloadStatus = false;
@@ -2805,6 +2793,7 @@ export class EditpatientComponent implements OnInit {
     this.docDesc = null;
     this.Doc = null;
     this.documentAddFlag = false;
+    this.file=null;
   }
   downloadDoc(doc: any) {
     // alert(doc);
@@ -2819,24 +2808,30 @@ export class EditpatientComponent implements OnInit {
     this.image = e.target.files[0];
     var a = document.getElementsByClassName('uploadPhoto');
     this.profilePic = this.image.name;
-    this.submitImage(this.pid);
-  }
-  submitImage(pid: any) {
-    const myPhoto = uuid.v4();
-    var formData: any = new FormData();
-    formData.append(myPhoto, this.image);
-    var that = this;
-    this.rpm.rpm_post(`/api/patient/addimage?PatientId=${pid}`, formData).then(
-      (data) => {
-        that.UpdatePatient_Image(this.pid, this.patientprogramid);
-      },
-      (err) => {
-        alert('Error While Adding Image....!');
-      }
-    );
+    //this.submitImage(this.pid);
   }
 
+submitImage(pid: any) {
+  const myPhoto = uuid.v4();
+  const formData: any = new FormData();
+  formData.append(myPhoto, this.image);
+  if (this.image) {
+    return this.rpm.rpm_post(`/api/patient/addimage?PatientId=${pid}`, formData)
+      .then((data) => {
+        this.UpdatePatient_Image(this.pid, this.patientprogramid);
+        return data; // ✅ forward result
+      })
+      .catch((err: any) => {
+         this.profilePic  = null;
+         this.image = null;
+        throw err; // ✅ forward error
+      });
+  } else {
+    return Promise.resolve(null); // nothing to upload
+  }
+}
   downloadFile(FileName: any) {
+    // FileSaver.saveAs("ConsentForm", FileName);
     const a = document.createElement('a');
     a.href = FileName;
     document.body.appendChild(a);
@@ -2870,6 +2865,10 @@ export class EditpatientComponent implements OnInit {
   current_status: any;
   dialogRef: any;
   changePatientStatusDialog(status: any, timeofcall: number) {
+    // let's call our modal window
+    // if (status == 'OnHold' && timeofcall == 2) {
+    //   this.ImageStatus = false;
+    // }
     if (
       this.current_status_value == 'Prescribed' &&
       (status == 'Active' || status == 'ReadyToDischarge')
@@ -2908,7 +2907,15 @@ export class EditpatientComponent implements OnInit {
       return;
     }
     if (this.current_status_value == 'OnHold') {
+
       if (status == 'Discharged') {
+        // this.dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        //   maxWidth: '400px',
+        //   data: {
+        //     title: 'Are you sure?',
+        //     message: ' Do you want to disCharge the patient ',
+        //   },
+        // });
         this.showDialog = true;
         this.showconfirmDialog.showConfirmDialog(
         'Do you want to disCharge the patient ?',
@@ -2918,6 +2925,13 @@ export class EditpatientComponent implements OnInit {
           }
         );
       } else {
+        // this.dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        //   maxWidth: '400px',
+        //   data: {
+        //     title: 'Are you sure?',
+        //     message: 'Do you want to release from Onhold ? ',
+        //   },
+        // });
 
         this.showconfirmDialog.showConfirmDialog(
         'Do you want to release from Onhold ?',
@@ -2933,6 +2947,15 @@ export class EditpatientComponent implements OnInit {
         this.current_status_value != status
       ) {
         if (this.current_status_value == 'Active' && status == 'Discharged') {
+          // this.dialogRef = this.dialog.open(ConfirmDialogComponent, {
+          //   maxWidth: '400px',
+          //   data: {
+          //     title:
+          //       'Active Patient should be Moved to Ready To discharge Before Discharge',
+          //     message:
+          //       'Are you Sure, You want to Move the patient to Ready To Discharge',
+          //   },
+          // });
           this.showDialog = true;
           this.showconfirmDialog.showConfirmDialog(
           'Are you Sure, You want to Move the patient to Ready To Discharge',
@@ -2943,6 +2966,13 @@ export class EditpatientComponent implements OnInit {
           );
         } else {
           if (status == 'ReActive') {
+            // this.dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            //   maxWidth: '400px',
+            //   data: {
+            //     title: 'Are you sure?',
+            //     message: 'You want to change patient status to Active ? ',
+            //   },
+            // });
             this.showDialog = true;
             this.showconfirmDialog.showConfirmDialog(
             'You want to change patient Status to Active? ',
@@ -2960,25 +2990,48 @@ export class EditpatientComponent implements OnInit {
                 this.ChangePatientStatus(status, timeofcall);
               }
             );
+            // this.dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            //   maxWidth: '400px',
+            //   data: {
+            //     title: 'Are you sure?',
+            //     message:
+            //       'You want to change patient Status to ' + status + '? ',
+            //   },
+            // });
           }
         }
       }
     }
 
     // listen to response
-    this.dialogRef.afterClosed().subscribe((dialogResult: any) => {
-      // if user pressed yes dialogResult will be true,
-      // if he pressed no - it will be false
+    // this.dialogRef.afterClosed().subscribe((dialogResult: any) => {
+    //   // if user pressed yes dialogResult will be true,
+    //   // if he pressed no - it will be false
 
-      if (dialogResult) {
-        this.ChangePatientStatus(status, timeofcall);
-      } else {
-        return;
-      }
-    });
+    //   if (dialogResult) {
+    //     this.ChangePatientStatus(status, timeofcall);
+
+    //   } else {
+    //     return;
+    //   }
+    // });
   }
 
   MarkDeviceErrorDialog(index: any) {
+    // const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    //   maxWidth: '500px',
+    //   data: {
+    //     title: 'Are you sure?',
+    //     message: 'You Want to Mark this Device as Error? ',
+    //   },
+    // });
+    // dialogRef.afterClosed().subscribe((dialogResult) => {
+
+    //   if (dialogResult) {
+    //     this.MarkError(index);
+    //   } else {
+    //   }
+    // });
 
     this.showconfirmDialog.showConfirmDialog(
     'You Want to Mark this Device as Error? ',
@@ -2990,6 +3043,22 @@ export class EditpatientComponent implements OnInit {
   }
 
   RemoveDeviceDialog(index: any) {
+    // const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    //   maxWidth: '500px',
+    //   data: {
+    //     title: 'Are you sure?',
+    //     message: 'You Want to Remove Device from Patient? ',
+    //   },
+    // });
+
+    // dialogRef.afterClosed().subscribe((dialogResult) => {
+
+    //   if (dialogResult) {
+    //     this.ResetDevice(index);
+    //   } else {
+    //   }
+    // });
+
     this.showconfirmDialog.showConfirmDialog(
     'You Want to Remove Device from Patient? ',
       'Are you sure?',
@@ -2998,7 +3067,6 @@ export class EditpatientComponent implements OnInit {
       }
     );
   }
-
   Patientdata_Document: any;
   UpdatePatient_Document(PatientId: any, ProgramId: any) {
     //call on clicking on one patient row in the draft list, pass patient id from table to get the info
@@ -3030,10 +3098,10 @@ export class EditpatientComponent implements OnInit {
       .then((data) => {
         that.Patientdata_Device = data;
         that.processMasterData();
-        var patientdevicedetailsData =
+        that.patientdevicedetails =
           that.Patientdata_Device.PatientDevicesDetails.PatientDeviceInfos;
-        var vitalArr = [];
-        if (patientdevicedetailsData.length == 0) {
+        if (that.patientdevicedetails.length == 0) {
+          var vitalArr = [];
           for (let v of that.PatientVitalInfos) {
             var obj = {
               VitalName: v.VitalName,
@@ -3045,38 +3113,10 @@ export class EditpatientComponent implements OnInit {
           }
           that.patientdevicedetails = vitalArr;
         }
-        if (patientdevicedetailsData.length != 0) {
-          for (let v of that.PatientVitalInfos) {
-            const isPresent = this.checkVitalName(
-              patientdevicedetailsData,
-              v.VitalName
-            );
-
-            if (isPresent) {
-              var device = this.getVitalObject(
-                patientdevicedetailsData,
-                v.VitalName
-              );
-              vitalArr.push(...device);
-            } else {
-              var obj = {
-                VitalName: v.VitalName,
-                DeviceStatus: 'InActive',
-                VitalId: v.VitalId,
-                DeviceNumber: '',
-              };
-              if (!vitalArr.some((item) => item.VitalName == obj.VitalName)) {
-                vitalArr.push(obj);
-              }
-            }
-          }
-          that.patientdevicedetails = vitalArr;
-        }
         that.DeviceCheck();
         // this.DeviceNotAvaliable=true;
       });
   }
-
   Patientdata_Image: any;
   UpdatePatient_Image(PatientId: any, ProgramId: any) {
     //call on clicking on one patient row in the draft list, pass patient id from table to get the info
@@ -3095,9 +3135,22 @@ export class EditpatientComponent implements OnInit {
       });
   }
   diagnosisTitle: any;
+  // diagnosisChanged(event: any, index: any) {
+  //   var DiagnosisSelected = this.Diagnosis_Name.filter(
+  //     (data: { DiagnosisName: any }) => {
+  //       return data.DiagnosisName == event;
+  //     }
+  //   );
+  //   if (DiagnosisSelected.length > 0) {
+  //     this.Diagnosis_List[index].DiagnosisCode =
+  //       DiagnosisSelected[0].DiagnosisCode;
+  //   }
+  // }
+
   diagnosisChanged(event: any, index: any) {
     var DiagnosisSelected = this.Diagnosis_Name.filter(
       (data: { DiagnosisName: any }) => {
+        // return data.DiagnosisName==event
         return data == event;
       }
     );
@@ -3130,39 +3183,42 @@ export class EditpatientComponent implements OnInit {
   keywordDignostics = 'DiagnosisField';
   keywordDignosticsEdit = 'DiagnosisFieldEdit';
 
-  EditProgramdiagnosisChanged(event: any, index: number) {
-    const DiagnosisSelected = this.editProgramDiagoList.filter(
-      (data: any) => data === event
+  // EditProgramdiagnosisChanged(event: any, index: any) {
+  //   var DiagnosisSelected = this.editProgramDiagoList.filter(
+  //     (data: { DiagnosisName: any }) => {
+  //       return data.DiagnosisName == event;
+  //     }
+  //   );
+  //   if (DiagnosisSelected.length > 0) {
+  //     this.diaganosisMainList[index].DiagnosisCode =
+  //       DiagnosisSelected[0].DiagnosisCode;
+  //   }
+  // }
+
+  EditProgramdiagnosisChanged(event: any, index: any) {
+    var DiagnosisSelected = this.editProgramDiagoList.filter(
+      (data: { DiagnosisName: any }) => {
+        return data == event;
+      }
     );
 
-    if (DiagnosisSelected.length === 0) return;
+    if (DiagnosisSelected.length > 0) {
+      const found = this.diaganosisMainList.some(
+        (el: { DiagnosisCode: void }) =>
+          el.DiagnosisCode == DiagnosisSelected[0].DiagnosisCode
+      );
 
-    const selected = DiagnosisSelected[0];
-
-    const foundInMainList = this.diaganosisMainList.some(
-      (el: { DiagnosisCode: string }) => el.DiagnosisCode === selected.DiagnosisCode
-    );
-
-    const selectedDiagnosesArray = this.editProgramdata.get('selectedDiagnoses') as FormArray;
-
-    const foundInForm = selectedDiagnosesArray.controls.some(
-      (ctrl: AbstractControl) => ctrl.value.DiagnosisCode === selected.DiagnosisCode
-    );
-
-    if (foundInForm || foundInMainList) {
-      alert('Diagnosis Already Selected');
-      this.programaremoveNewDiaganostic(); // Optional: only remove if you just added
-      return;
+      if (!found) {
+        this.diaganosisMainList[index].DiagnosisCode =
+          DiagnosisSelected[0].DiagnosisCode;
+        this.diaganosisMainList[index].DiagnosisName =
+          DiagnosisSelected[0].DiagnosisName;
+      } else {
+        alert('Diagnosis Already Selected');
+        this.programaremoveNewDiaganostic();
+      }
     }
-
-    // Update form group at index
-    const formGroup = selectedDiagnosesArray.at(index) as FormGroup;
-    formGroup.patchValue({
-      DiagnosisCode: selected.DiagnosisCode,
-      DiagnosisName: selected.DiagnosisName
-    });
   }
-
   keyword_primary_insurance = 'VendorName';
   insurance_pid: any;
   insurance_pname: any;
@@ -3340,203 +3396,115 @@ export class EditpatientComponent implements OnInit {
     const inputDate = new Date(date);
 
     if (inputDate > mxDate) {
+      // alert("Please Enter a Valid Date")
 
       return (this.futureDateError = true);
     }
     return (this.futureDateError = false);
   }
-  getDiagnosisControl(group: AbstractControl, key: string): FormControl {
-    return group.get(key) as FormControl;
-  }
 
-  selectedDiagnoses: any;
-  VitalId: number;
-
-  get selectedDiagnosesArray(): FormArray {
-    return this.editProgramdata.get('selectedDiagnoses') as FormArray;
-  }
-
-  getSelectedDiagnoses() {
-    return this.editProgramdata.get('selectedDiagnoses') as FormArray;
-  }
-  showProgramEditModal = false;
   programNameEditPanel() {
-    this.selectedProgramId = this.programForm.get('programname')?.value;
-    const selectedDiagnosesArray = this.editProgramdata.get('selectedDiagnoses') as FormArray;
-    selectedDiagnosesArray.clear(); // Clear old controls
-
-    this.Diagnosis_List.forEach((diagnosis: { Id: any; DiagnosisName: any; DiagnosisCode: any; }) => {
-      selectedDiagnosesArray.push(this.fb.group({
-        Id: [diagnosis.Id],
-        DiagnosisName: [diagnosis.DiagnosisName],
-        DiagnosisCode: [diagnosis.DiagnosisCode]
-      }));
-    });
-    this.selectedDiagnoses = selectedDiagnosesArray.value;
-    // Store the current vital list before it gets changed
-    this.vitalListDialog = this.vitalList;
-
-    this.editProgramdata.patchValue({
-      programname: this.selectedProgramId,
-      vitalListDialog: this.vitalListDialog,
-    });
-
-    // Open the dialog after patching the values
-    //this.dialog.open(this.programedit);
-    if (this.programNameValueChangesSubscription) {
-      this.programNameValueChangesSubscription.unsubscribe();
-    }
-    this.programNameValueChangesSubscription = this.editProgramdata.get('programname')?.valueChanges.subscribe((selectedProgramId) => {
-      var ProgramSelected = this.master_data.ProgramDetailsMasterData.filter(
-        (Pgm: { ProgramId: number }) => Pgm.ProgramId === parseInt(selectedProgramId)
+    // Edit Program
+    var that = this;
+    that.editProgramVital = [];
+    this.editProgramdata.get('programname')?.valueChanges.subscribe((val) => {
+      var ProgramSelected = that.master_data.ProgramDetailsMasterData.filter(
+        (Pgm: { ProgramId: number }) => Pgm.ProgramId === parseInt(val)
       );
 
       if (ProgramSelected.length > 0) {
         this.ediProgramSelectedId = ProgramSelected;
-        this.editProgramVital = this.ediProgramSelectedId[0].Vitals;
-        this.oldVitalListDialog = this.vitalListDialog;
-        this.matchingVitals = this.oldVitalListDialog.filter((vitalId: number) =>
-          this.editProgramVital.some((vitallist: { VitalId: number }) => vitallist.VitalId === vitalId)
-        );
-        this.vitalListDialog = this.matchingVitals;
-        // Call the vitalEditPgmListChange function when program name is changed
-        this.vitalEditPgmListChange();
+        that.editProgramVital = this.ediProgramSelectedId[0].Vitals;
+        if (!this.programnamechangefirst_2) {
+          that.editvitalList = [];
+        }
+
+        that.editProgramGoal = ProgramSelected[0].goalDetails;
+        that.editProgramDiagoList = ProgramSelected[0].Vitals[0].Dignostics;
       }
+      this.programnamechangefirst_2 = false;
     });
-    this.showProgramEditModal = true;
-    this.updateProgramDropdownState();
-  }
 
-  updateProgramDropdownState() {
-    const shouldDisable =
-      this.Patientdata?.PatientProgramdetails?.Status === 'Active' &&
-      !!this.selectedProgram;
+    this.editvitalList = [];
 
-    if (shouldDisable) {
-      this.editProgramdata.get('programname')?.disable({ emitEvent: false });
-    } else {
-      this.editProgramdata.get('programname')?.enable({ emitEvent: false });
-    }
-  }
-
-  trackByVitalId(index: number, item: any): any {
-    return item.VitalId;  // Return unique identifier for each option
+    this.dialog.open(this.programedit);
   }
   editProgramdata = new UntypedFormGroup({
     programname: new UntypedFormControl(null, [Validators.required]),
   });
 
-  isFormDirty(): boolean {
-    const currentProgramName = this.editProgramdata.controls.programname.value;
-    const currentVitals = this.editProgramdata.controls.vitalListDialog.value;
-    const currentDiagnoses = (this.editProgramdata.get('selectedDiagnoses') as FormArray).value;
-
-    const vitalsChanged = !this.arrayEqual(this.initiallySelectedVitals, currentVitals);
-    const programChanged = Number(this.program_id) !== Number(currentProgramName);
-    const diagnosisChanged = !this.arrayEqual(currentDiagnoses, this.Diagnosis_List);
-
-    return vitalsChanged || programChanged || diagnosisChanged;
-  }
-
-  arrayEqual(a: any[], b: any[]): boolean {
-    // If the arrays have different lengths, they're not equal
-    if (a.length !== b.length) return false;
-
-    for (let i = 0; i < a.length; i++) {
-      // If the elements are objects, compare their properties
-      if (typeof a[i] === 'object' && typeof b[i] === 'object') {
-        // If the element is an object, compare the properties deeply (you can customize this based on the structure of the object)
-        if (!this.deepEqual(a[i], b[i])) {
-          return false;
-        }
-      } else {
-        // If the elements are primitives, compare them directly
-        if (a[i] !== b[i]) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-  // Helper function to deeply compare two objects (used for complex types)
-  deepEqual(obj1: any, obj2: any): boolean {
-    // If the objects are not the same reference, compare their properties
-    if (obj1 === obj2) return true;
-
-    // If either is not an object, they can't be equal
-    if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) {
-      return false;
-    }
-
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
-
-    if (keys1.length !== keys2.length) return false;
-
-    // Compare each key and value recursively
-    for (let key of keys1) {
-      if (!keys2.includes(key) || !this.deepEqual(obj1[key], obj2[key])) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   newProgramid: any;
   EditProgramData() {
-    const selectedDiagnosesArray = this.editProgramdata.get('selectedDiagnoses') as FormArray;
-    const selectedDiagnoses = selectedDiagnosesArray.value;
-    const vitalList = this.editProgramdata.controls.vitalListDialog.value;
+    var req_body: any = {};
 
     if (
-      selectedDiagnoses.length > 0 &&
-      selectedDiagnoses[0].DiagnosisName &&
-      selectedDiagnoses[0].DiagnosisCode &&
-      vitalList.length > 0
+      this.diaganosisMainList[0].DiagnosisName != '' &&
+      this.diaganosisMainList[0].DiagnosisName != null &&
+      this.diaganosisMainList[0].DiagnosisCode != '' &&
+      this.diaganosisMainList[0].DiagnosisCode != null &&
+      this.editvitalList.length > 0
     ) {
-      const req_body: any = {
-        PatientId: parseInt(this.pid),
-        PatientProgramId: parseInt(this.patientprogramid),
-        ProgramId: parseInt(this.editProgramdata.controls.programname.value),
-        GoalDetails: this.editProgramGoal,
-        ProgramDiagnosis: selectedDiagnoses,
-        VitalIds: vitalList
-      };
+      req_body['PatientId'] = parseInt(this.pid);
 
-      if (!this.DeviceCheckOnSubmit()) return;
-
-      this.rpm.rpm_post('/api/patient/updatepatientprogramdetails', req_body).then(
-        (data) => {
-          alert('Program Changed Successfully !!');
-          this.router.navigate(['/admin/patients_detail'], {
-            queryParams: { id: this.pid, programId: this.patientprogramid },
-            skipLocationChange: true
-          });
-          this.dialog.closeAll();
-          this.editProgramdata.controls['programname'].setValue(0);
-          this.diaganosisMainList = [{ DiagnosisName: '', DiagnosisCode: '' }];
-          this.editProgramDiagoList = [];
-        },
-        (err) => {
-          alert('Something Went Wrong!!');
-          this.diaganosisMainList = [{ DiagnosisName: '', DiagnosisCode: '' }];
-        }
+      req_body['PatientProgramId'] = parseInt(this.patientprogramid);
+      req_body['ProgramId'] = parseInt(
+        this.editProgramdata.controls.programname.value
       );
+      req_body['GoalDetails'] = this.editProgramGoal;
+      req_body['ProgramDiagnosis'] = this.diaganosisMainList;
+      req_body['VitalIds'] = this.editvitalList;
+      this.rpm
+        .rpm_post('/api/patient/updatepatientprogramdetails', req_body)
+        .then(
+          (data) => {
+            this.newProgramid = data;
+
+            alert('Program Changed Successfully !!');
+
+            let route = '/admin/patients_detail';
+            this.router.navigate([route], {
+              queryParams: { id: this.pid, programId: this.patientprogramid },
+              skipLocationChange: true,
+            });
+
+            this.dialog.closeAll();
+
+            this.editProgramdata.controls['programname'].setValue(0);
+
+            this.diaganosisMainList = [
+              { DiagnosisName: '', DiagnosisCode: '' },
+            ];
+            this.editProgramdata.controls['programname'].setValue(0);
+            this.editProgramDiagoList = [];
+          },
+          (err) => {
+            alert('Something Went Wrong!!');
+            this.diaganosisMainList = [
+              { DiagnosisName: '', DiagnosisCode: '' },
+            ];
+            this.editProgramdata.controls['programname'].setValue(0);
+          }
+        );
     } else {
       alert('Please Complete the Form!!');
-      this.vitalEditPgmListChange();
+      this.diaganosisMainList = [{ DiagnosisName: '', DiagnosisCode: '' }];
+      this.editProgramdata.controls['programname'].setValue(0);
+
+      // this.editProgramDiagoList = []
+      this.editvitalList = [];
+      this.editProgramVital = [];
       this.editProgramDiagoList = [];
     }
   }
-
   EditProgramCancel() {
-    this.showProgramEditModal = false;  // Hide the modal
-    if (this.programNameValueChangesSubscription) {
-      this.programNameValueChangesSubscription.unsubscribe();
-    }
-  }
+    this.dialog.closeAll();
 
+    this.diaganosisMainList = [{ DiagnosisName: '', DiagnosisCode: '' }];
+
+    this.editProgramdata.controls['programname'].setValue(0);
+
+    this.editProgramDiagoList = [];
+  }
   vitalListChange() {
     this.loading = true;
     var req_body = { VitalIds: this.vitalList };
@@ -3550,6 +3518,7 @@ export class EditpatientComponent implements OnInit {
         }
         for (let x of this.Diagnosis_Name) {
           x.DiagnosisField = x.DiagnosisName + '-' + x.DiagnosisCode;
+          //alert(x.DiagnosisField)
         }
       },
       (err) => {
@@ -3563,8 +3532,8 @@ export class EditpatientComponent implements OnInit {
       .rpm_get(
         `/api/patient/getpatientlastpgmstatus?PatientId=${this.pid}&PatientProgramId=${this.patientprogramid}`
       )
-      .then((data) => {
-        this.last_status = data;
+      .then((data:any) => {
+        this.last_status = data.message;
       });
   }
 
@@ -3642,8 +3611,15 @@ export class EditpatientComponent implements OnInit {
   }
 
   setInActive() {
+    // if (
+    //   this.current_status_value == 'OnHold' &&
+    //   this.last_status == 'InActive'
+    // ) {
     this.status_to_send = 'InActive';
     this.active_img = this.bold_icon;
+    //   this.onhold_img = this.unbold_icon;
+    //   this.OnHold = false;
+    // }
   }
   convertToLocalTime(stillUtc: any) {
     if (stillUtc.includes('+')) {
@@ -3652,55 +3628,59 @@ export class EditpatientComponent implements OnInit {
       stillUtc = temp[0];
     }
     stillUtc = stillUtc + 'Z';
-    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+     const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
 
   vitalEditPgmListChange() {
     this.loading = true;
-    const req_body = { VitalIds: this.vitalListDialog };
-
+    var req_body = { VitalIds: this.editvitalList };
     this.rpm.rpm_post(`/api/patient/getdiagnosiscodebyvitalid`, req_body).then(
       (data) => {
         this.editProgramDiagoList = data;
+
         this.loading = false;
-
         for (let x of this.editProgramDiagoList) {
+          // New Code
           x.DiagnosisFieldEdit = x.DiagnosisName + '-' + x.DiagnosisCode;
+          //alert(x.DiagnosisField)
         }
+        var j = 0;
+        var found = false;
+        var indexes = [];
+        for (let y of this.diaganosisMainList) {
+          found = false;
+          for (let x of this.editProgramDiagoList) {
+            if (
+              x.DiagnosisCode == y.DiagnosisCode &&
+              y.DiagnosisCode.trim() != ''
+            ) {
+              found = true;
+              break;
+            }
+          }
 
-        const selectedDiagnosesArray = this.editProgramdata.get('selectedDiagnoses') as FormArray;
-
-        let j = 0;
-        while (j < selectedDiagnosesArray.length) {
-          const currentDiagnosis = selectedDiagnosesArray.at(j).value;
-          const match = this.editProgramDiagoList.some(
-            (            x: { DiagnosisCode: any; }) => x.DiagnosisCode === currentDiagnosis.DiagnosisCode && currentDiagnosis.DiagnosisCode?.trim() !== ''
-          );
-
-          if (!match) {
-            selectedDiagnosesArray.removeAt(j); // Remove using FormArray API
-          } else {
-            j++;
+          if (!found) {
+            indexes.push(j);
+          }
+          j = j + 1;
+        }
+        indexes.reverse();
+        for (let obj of indexes) {
+          this.diaganosisMainList.splice(obj, 1);
+          if (this.diaganosisMainList.length == 0) {
+            this.diaganosisMainList = [];
+            this.objDiagnosis = {
+              Id: 0,
+              DiagnosisCode: null,
+              DiagnosisName: null,
+            };
+            this.diaganosisMainList.push(this.objDiagnosis);
           }
         }
-
-        // Add default if no diagnoses left
-        if (selectedDiagnosesArray.length === 0) {
-          selectedDiagnosesArray.push(
-            this.fb.group({
-              Id: [0],
-              DiagnosisName: [null],
-              DiagnosisCode: [null],
-            })
-          );
-        }
-
-        // Optionally update your internal model
-        this.selectedDiagnoses = selectedDiagnosesArray.value;
       },
       (err) => {
-        alert('Could not find Diagnosis for the selected Vitals/Conditions');
+        alert('could not find Diagnosis for the selected Vitals/Conditions');
         this.loading = false;
       }
     );
@@ -3724,6 +3704,23 @@ export class EditpatientComponent implements OnInit {
   }
 
   openDeleteDocumentDialog(documnetId: any) {
+    // const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    //   maxWidth: '400px',
+    //   data: {
+    //     title: 'Are you sure?',
+    //     message: 'Do You Want to Delete the Document ? ',
+    //   },
+    // });
+    // dialogRef.afterClosed().subscribe((dialogResult: any) => {
+    //   // if user pressed yes dialogResult will be true,
+    //   // if he pressed no - it will be false
+
+    //   if (dialogResult) {
+    //     this.deleteDocument(documnetId);
+    //   } else {
+    //     return;
+    //   }
+    // });
 
     this.showDialog = true;
     this.showconfirmDialog.showConfirmDialog(
@@ -3734,6 +3731,7 @@ export class EditpatientComponent implements OnInit {
       }
     );
   }
+
 
   http_data: any;
   getReload() {
@@ -3754,6 +3752,7 @@ export class EditpatientComponent implements OnInit {
     this.rpm.rpm_get('/api/users/getlanguages').then(
       (data) => {
         that.languageList = data;
+
       },
       (err) => {
         console.log(err.error);
@@ -3761,61 +3760,4 @@ export class EditpatientComponent implements OnInit {
     );
   }
   rangeControl = new FormControl<[number, number]>([this.minValue, this.maxValue]);
-  // Manjusha code change
-  isDropdownDisabled(): boolean {
-    return this.Patientdata?.PatientProgramdetails?.Status === 'Active' && !!this.selectedProgram;
-  }
-
-  isOptionDisabled(vitalId: number): boolean {
-    // Disable the option only if it's selected and the status is 'Active'
-    return (this.Patientdata.PatientProgramdetails.Status === 'Active' &&
-            !!this.selectedProgram &&
-            this.initiallySelectedVitals.includes(vitalId));  // Check if the vitalId is selected
-  }
-
-  getUniqueVitals() {
-    const seen = new Set();
-    return this.patientdevicedetails.filter((device: { VitalName: string; }) => {
-      const key = device.VitalName?.toLowerCase();
-      if (!key || seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-  }
-
-  onVitalChange(device: any, event: Event) {
-    const selectedValue = (event.target as HTMLSelectElement).value;
-    const selectedId = Number(selectedValue);
-
-    const selectedVital = this.getUniqueVitals().find((v: { VitalId: number }) => v.VitalId === selectedId);
-    if (!selectedVital) return;
-
-    const selectedVitalName = selectedVital.VitalName.toLowerCase();
-
-    const alreadyActive = this.patientdevicedetails.some(
-      (d: any) =>
-        d.DeviceStatus === 'Active' &&
-        d.VitalName.toLowerCase() === selectedVitalName
-    );
-
-    if (alreadyActive) {
-      alert(
-        'This vital already has an active device assigned. Please choose a different vital or remove the existing device before adding a new one.'
-      );
-
-      // Temporarily mark invalid and clear value
-      device.invalidSelection = true;
-      device.VitalId = null;
-
-      // Force a refresh after short delay
-      setTimeout(() => {
-        device.invalidSelection = false;
-      });
-
-      return;
-    }
-
-    // If valid, update previousVitalId
-    device.previousVitalId = selectedId;
-  }
 }

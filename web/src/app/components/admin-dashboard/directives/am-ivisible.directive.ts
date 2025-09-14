@@ -26,6 +26,7 @@ export class AmIVisibleDirective {
       this.intersectionCallback.bind(this),
       this.intersectionOptions
     );
+
     if (this.isTargetElement) {
       observer.observe(this.element.nativeElement);
     }
@@ -33,6 +34,7 @@ export class AmIVisibleDirective {
 
   intersectionCallback(entries: any[], observer: any) {
     entries.forEach((entry) => {
+
       if (entry.intersectionRatio === 1) {
         this.elementVisible.emit(true); //element is completely visible in the viewport
       } else {

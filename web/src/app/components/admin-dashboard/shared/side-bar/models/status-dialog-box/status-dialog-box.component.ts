@@ -19,9 +19,9 @@ export class StatusDialogBoxComponent {
     this.isStatusDialogVisible = true;
   }
 
-  showFailDialog(): void {
+  showFailDialog(errmessage:any) {
     this.dialogTitle = 'Failure';
-    this.dialogMessage = 'The operation failed. Please try again.';
+    this.dialogMessage = errmessage;
     this.isStatusDialogVisible = true;
   }
 

@@ -14,7 +14,6 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { DatePipe } from '@angular/common';
-
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { StatusMessageComponent } from '../../shared/status-message/status-message.component';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -347,7 +346,6 @@ export class TaskComponent implements OnInit {
     this.campaignOne = new FormGroup({
       start: new FormControl(new Date(year, month, 13)),
       end: new FormControl(new Date(year, month, 16)),
-     // date: new FormControl(moment()),
     });
   }
 
@@ -1001,8 +999,7 @@ export class TaskComponent implements OnInit {
   SelectedMenu: any;
   taskpatientSearch: any;
   ngOnInit(): void {
-    //console.log('Initial date range:', this.dateRangeComponent.rangeTask.value);
-    // this.filterTable();
+
 
     sessionStorage.removeItem('patient-page-status');
 
@@ -1267,6 +1264,7 @@ export class TaskComponent implements OnInit {
   seachAssignedclose() {
     this.alertAssignedName = false;
     this.getReloadDataAlert();
+    console.log('Click');
   }
   searchAlertNameClick() {
     this.alertSearchValeName = !this.alertSearchValeName;
@@ -1532,10 +1530,11 @@ export class TaskComponent implements OnInit {
           alert('Schedule Status Changed Successfully!!');
           this.getTaskScheduleList();
           this.rightsidebar.calculateUpcomingSchedule();
+          this.scheduleSelected = []
         },
-        (err) => {
+        (err:any) => {
           //show error patient id creation failed
-          alert('Something Went Wrong ');
+          alert(err.error.message);
         }
       );
   }
@@ -1671,6 +1670,7 @@ export class TaskComponent implements OnInit {
   convertToLocalTime(stillUtc: any) {
     stillUtc = stillUtc + 'Z';
     const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+
     return local;
   }
   dueDateStatus: any;

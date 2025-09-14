@@ -314,7 +314,10 @@
       <ng-container matColumnDef="AlertType">
         <mat-header-cell *matHeaderCellDef> Alert</mat-header-cell>
         <mat-cell *matCellDef="let element; let rowIndex = index">
-          {{ element.VitalAlert }}
+          <div class="task-type-desc" [title]="element.VitalAlert">
+            {{ element.VitalAlert }}
+          </div>
+
         </mat-cell>
       </ng-container>
 
@@ -813,7 +816,10 @@
       <ng-container matColumnDef="TaskType">
         <mat-header-cell *matHeaderCellDef> Task Type </mat-header-cell>
         <mat-cell *matCellDef="let element; let rowIndex = index">
-          {{ element.TaskType }}
+          <div class="task-type-desc" title="{{element.TaskType}}">
+           {{ element.TaskType }}
+          </div>
+
         </mat-cell>
       </ng-container>
 

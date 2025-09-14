@@ -8,6 +8,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
+
 import { HttpService } from '../../sevices/http.service';
 import {
   Router
@@ -15,7 +16,6 @@ import {
 import { RPMService } from '../../sevices/rpm.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { StatusMessageComponent } from '../status-message/status-message.component';
-import { webSocket } from 'rxjs/webSocket';
 import { AuthService } from 'src/app/services/auth.service';
 import { MessagingService } from '../../sevices/messaging.service';
 import { Subject, Subscription } from 'rxjs';
@@ -43,6 +43,7 @@ export class HeaderComponent implements OnInit {
   current_day: any;
   current_month: any;
   current_year = this.today.getUTCFullYear();
+   private timerId: any;
   notificationBody: string | null = null;
   public notificationLists: { message: string; time: string }[] = [];
   // current_time = this.formatAMPM(this.today)
@@ -97,18 +98,17 @@ export class HeaderComponent implements OnInit {
 
   convertToLocalTime(stillUtc: any) {
     stillUtc = stillUtc + 'Z';
-   const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
   data_patient: any;
   message1: any;
   ngOnInit(): void {
 
-  //  this.subscription = this.ms.notificationData$.subscribe(data => {
-  //   if (data && data.type === 'update') {
-  //     this.unread = data.count;
-  //   }
-  // });
+    this.timerId = setInterval(() => {
+      this.currentDate = new Date();
+    }, 1000); // Update every second
+
     this.subscription = this.ms.notificationData$.subscribe(data => {
       if (data && data.notification) {
         // Refresh notifications when we receive a new one
@@ -268,6 +268,8 @@ export class HeaderComponent implements OnInit {
         this.unreadlist = this.list.filter((data: { IsRead: boolean }) => {
                 return data.IsRead == false;
               });
+
+       console.log('Notifications refreshed in component');
       })
       .catch(error => {
         console.error('Error refreshing notifications:', error);
@@ -322,5 +324,8 @@ export class HeaderComponent implements OnInit {
   onChangeSearch(val: string) {
   }
   onFocused(e: any) {
+  }
+    ngOnDestroy() {
+    clearInterval(this.timerId); // Prevent memory leaks
   }
 }

@@ -192,6 +192,7 @@ export class NotificationComponent implements OnInit {
     }
     stillUtc = stillUtc + 'Z';
     const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+
     return local;
   }
 
@@ -334,7 +335,7 @@ export class NotificationComponent implements OnInit {
         },
         (err) => {
           this.confirmDialog.showConfirmDialog(
-            err.error || 'Could not delete notifications.',
+            err.error.message || 'Could not delete notifications.',
             'Error',
             null,
             false

@@ -158,19 +158,8 @@ export class DevicePageComponent implements OnInit {
 
     that.rpm.rpm_get('/api/devices/getalldevices').then((data2) => {
       this.loading1 = false;
-      const transformedData = (data2 as any[]).map((device: any) => {
-        const rawDate = device.DeviceActivatedDateTime;
-        if (rawDate) {
-          const [datePart, timePart] = rawDate.split(' ');
-          const [day, month, year] = datePart.split('-');
-          const isoDateStr = `${year}-${month}-${day}T${timePart || '00:00:00'}`;
-          device.DeviceActivatedDateTime = new Date(isoDateStr);
-        }
-        return device;
-      });      
-    
-      this.tempDeviceList = transformedData;
-      this.deviceListSource = new MatTableDataSource(transformedData);
+      this.tempDeviceList = data2;
+      this.deviceListSource = data2;
 
       this.activeDeviceCountArray = this.tempDeviceList.filter(
         (c: { DeviceStatus: any }) => c.DeviceStatus == 'Active'
@@ -392,10 +381,14 @@ export class DevicePageComponent implements OnInit {
         alert('Removed Device Successfully');
         this.dialog.closeAll();
         this.loading1 = false;
+        this.deviceavailabledialog = false;
+
       },
       (err) => {
         this.dialog.closeAll();
+        alert('Removed Device Action Failed');
         this.loading1 = false;
+        this.deviceavailabledialog = false;
         throw err;
       }
     );

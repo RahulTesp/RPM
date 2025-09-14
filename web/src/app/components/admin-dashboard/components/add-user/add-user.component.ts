@@ -7,6 +7,7 @@ import { StatusMessageComponent } from '../../shared/status-message/status-messa
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/service/confirm-dialog-service.service';
+import * as uuid from 'uuid';
 
 @Component({
   selector: 'app-add-user',
@@ -16,6 +17,7 @@ import { ConfirmDialogServiceService } from '../../shared/confirm-dialog-panel/s
 export class AddUserComponent implements OnInit {
   @ViewChild(AdminComponent) private admincomponent: AdminComponent;
   public showCancelButton=false;
+  public file: any;
 
   checked = true;
   varData = true;
@@ -64,8 +66,8 @@ export class AddUserComponent implements OnInit {
   http_user_data: any;
 
   editVariable = false;
-
-
+//  imagePath :any;
+  public imagePath: string;
   GenderArray = [
     {
       value: 'M',
@@ -117,8 +119,7 @@ export class AddUserComponent implements OnInit {
 
     // Only display clinicName When selection is Physician
     this.registerForm.get('userrole')?.valueChanges.subscribe((data) => {
-      // if (this.selectedUserRole.includes(6) == true) {
-      // if (this.selectedUserRole == 6 || this.selectedUserRole == 8) {
+
         if (data == 6 || data == 8) {
         this.clinicdisplay = true;
       } else {
@@ -163,9 +164,10 @@ export class AddUserComponent implements OnInit {
       this.userbuttondisplay = this.editVariable;
       this.unlockAccountStatus = true;
       this.getUserAccountLockData();
+
     });
 
-    this.getUserInfo();
+  this.getUserInfo();
   }
   myDate = new Date();
   // Register User
@@ -206,14 +208,6 @@ export class AddUserComponent implements OnInit {
         req_body['Id'] = this.put_user_id;
         this.rpm.rpm_post('/api/users/updateuser', req_body).then(
           (data) => {
-            // this.openDialog('Message', `User Detials Updated Successfully!!`);
-           // this.showDialog = true;
-
-          //   let route = '/admin/admin';
-          //  this.dialog.closeAll();
-          //   this.router.navigate([route], { queryParams: { page: 2 } });
-          //   this.resetAddPateintMasterData();
-          //   this.userVerifyCompleted = false;
           this.confirmDialog.showConfirmDialog(
             'User Details Updated Successfully!!',
             'Success',
@@ -233,7 +227,6 @@ export class AddUserComponent implements OnInit {
               null ,
               false// No action on confirm
             );
-            // this.openDialog('Error', `Something Went Wrong ${err}`);
           }
         );
       } else {
@@ -242,14 +235,6 @@ export class AddUserComponent implements OnInit {
             that.result = data;
             that.userId = that.result.UserId;
             that.password = that.result.password;
-
-            // this.openDialog(
-            //   'Message',
-            //   `New User Added Successfully!! \n
-            //    Password:${that.password}
-            //   `
-            // );
-            // this.showDialog = true;
               this.confirmDialog.showConfirmDialog(
                 `New User Added Successfully!! \n
                Password:${that.password}
@@ -263,18 +248,8 @@ export class AddUserComponent implements OnInit {
                 },
                 false
               );
-            // let route = '/admin/admin';
-            //  this.dialog.closeAll();
-            // this.userVerifyCompleted = false;
-
-            // this.router.navigate([route], { queryParams: { page: 2 } });
-            // this.resetAddPateintMasterData();
-            // this.admincomponent.getAllUser();
           },
           (err) => {
-            //show error patient id creation failed
-            // this.showDialog = true;
-            // this.openDialog('Error', `Something Went Wrong ${err}`);
             this.confirmDialog.showConfirmDialog(
               'Something Went Wrong',
               'Error',
@@ -285,8 +260,6 @@ export class AddUserComponent implements OnInit {
         );
       }
     } else if (!this.successUser && !this.editVariable) {
-      // this.openDialog('Error', `Please verify user`);
-      // this.showDialog = true;
       this.confirmDialog.showConfirmDialog(
         'Please verify user',
         'Error',
@@ -309,6 +282,8 @@ export class AddUserComponent implements OnInit {
         .rpm_get(`/api/users/getuserprofiles?UserId=${this.put_user_id}`)
         .then((data) => {
           this.http_user_data = data;
+          console.log( this.http_user_data)
+
           if (this.http_user_data.HasPatients == 1) {
             this.userCountStatus = true;
           } else {
@@ -371,6 +346,9 @@ export class AddUserComponent implements OnInit {
           }
           this.stateVariable = this.http_user_data.StateId;
           this.cityVariable = this.http_user_data.CityId;
+          this.imagePath = this.http_user_data.Picture;
+          this.imagePath = encodeURI(this.imagePath)
+
         });
     }
   }
@@ -473,5 +451,48 @@ export class AddUserComponent implements OnInit {
       }
     );
   }
+  image: any;
+  openFile() {
+    var a = document.getElementById('image');
+    a?.click();
+  }
+  handle(e: any) {
+    this.image = e.target.files[0];
+    var a = document.getElementsByClassName('uploadPhoto');
+    this.file = this.image.name;
 
+    // a[0].setAttribute("style", "background-image:"+this.image.name);
+    // a[0].setAttribute("style", "background: url(\"https://rpmstorage123.blob.core.windows.net/rpmprofilepictures/CL500626\"); background-repeat: no-repeat;  background-size: 100% 100%;");
+  }
+  async saveUserFlow() {
+  try {
+    await this.submitImage(this.put_user_id);  // wait until upload completes
+    this.registerUser();               // run only if upload succeeded
+  } catch (err:any) {
+   alert(`${err.error.message} Registration aborted.`);
+  }
+}
+
+  submitImage(pid: any) {
+  if (this.image) {
+    const myPhoto = uuid.v4();
+    const formData: any = new FormData();
+    formData.append(myPhoto, this.image);
+
+    // ✅ return the Promise
+    return this.rpm
+      .rpm_post(`/api/users/addimage?UserId=${pid}`, formData)
+      .then((data) => {
+        return data;
+      })
+      .catch((err: any) => {
+       this.image = null;
+       this.file = null;
+        throw err;
+      });
+  } else {
+    // ✅ always return a promise
+    return Promise.resolve(null);
+  }
+}
 }

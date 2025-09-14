@@ -41,7 +41,7 @@
 <div class="profile-button-panel-tab">
   <div class="logout_panel_button-tab">
     <div class="profilename-panel">
-      <span class="profilename">{{ profileName }}</span>
+      <span class="profilename" title="My Profile" (click)="profile()">{{ profileName }}</span>
     </div>
     <div class="logout_user_data">
       <p class="logout-user-name-data">{{ userName }}</p>
@@ -73,7 +73,7 @@
           make sure your password:
         </span>
         <p>
-          -Is longer than 8 characters<br />
+          - Is longer than 8 characters<br />
           - Does not match or significantly contain your username,<br />
           eg.does not use 'username123' <br />
           - Minimum of 2 Uppercase letters <br />
@@ -94,14 +94,19 @@
                   type="password"
                 />
               </div>
-              <div
+              <!-- <div
                 class="err"
                 *ngIf="submitted && NewTextEntered.password.errors"
               >
                 <div *ngIf="NewTextEntered.password.errors.required">
                   Password is required
                 </div>
-              </div>
+              </div> -->
+             <div class="err" [class.visible] ="NewTextEntered['oldpw'].invalid && (NewTextEntered['oldpw'].touched || NewTextEntered['oldpw'].dirty)">
+                  <div  [class.visible]="NewTextEntered['oldpw'].hasError('required')">
+                    Old password is required
+                  </div>
+                </div>
             </div>
 
             <div class="password_subPanel">
@@ -207,4 +212,5 @@
     </div>
   </div>
 </ng-template>
-<app-status-dialog-box #statusDialog></app-status-dialog-box>
+<app-status-dialog-box  #statusDialog  (dialogClosed)="onDialogClosed()">
+</app-status-dialog-box>

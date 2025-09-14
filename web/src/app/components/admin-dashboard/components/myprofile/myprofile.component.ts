@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { HttpService } from '../../sevices/http.service';
 import { RPMService } from '../../sevices/rpm.service';
 import {
@@ -6,9 +6,14 @@ import {
   FormGroup,
   FormControlName,
   Validators,
+  FormBuilder,
 } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import * as uuid from 'uuid';
+import { StatusDialogBoxComponent } from '../../shared/side-bar/models/status-dialog-box/status-dialog-box.component';
+import { AuthService } from 'src/app/services/auth.service';
+import { passwordNotContainUsernameValidator } from '../../shared/side-bar/models/profile-menu-button/password-username-validator';
 
 @Component({
   selector: 'app-myprofile',
@@ -30,6 +35,25 @@ export class MyprofileComponent implements OnInit {
   selectedUserRole: any;
   TimeZoneList: any;
   user_role_status: any;
+
+
+
+  // Password:
+  profileName: string;
+  userName: any;
+  isOpen: boolean = false;
+  userData: any;
+  isChangePasswordVisible: boolean;
+  passwordForm: FormGroup;
+  password: any;
+  result: any;
+  submitted: boolean = false;
+  showPassword: boolean = false;
+  showConfirmPassword: boolean = false;
+  passwordErrors: any;
+  logoutAfterDialog = false;
+  @ViewChild('statusDialog') statusDialog!: StatusDialogBoxComponent;
+
   GenderArray = [
     {
       value: 'M',
@@ -55,6 +79,10 @@ export class MyprofileComponent implements OnInit {
     { accessright: 'Default User Access Right 11' },
     { accessright: 'Default User Access Right 12' },
   ];
+
+
+
+
   registerprofile = new FormGroup({
     email: new FormControl(null, [Validators.required, Validators.email]),
     mobile: new FormControl(null, [
@@ -82,10 +110,17 @@ export class MyprofileComponent implements OnInit {
     private rpm: RPMService,
     private http: HttpService,
     public dialog: MatDialog,
-    private router: Router
+    private router: Router,
+    private auth: AuthService,
+    private formBuilder: FormBuilder
+
+
   ) {
     this.loading = true;
     this.loading1 = true;
+    this.showPassword = false;
+    this.initPasswordForm();
+
     this.rpm
       .rpm_get('/api/authorization/masterdatastatesandcities')
       .then((data) => {
@@ -109,6 +144,7 @@ export class MyprofileComponent implements OnInit {
     that.rpm.rpm_get('/api/users/getmyprofiles').then((data) => {
       this.loading = false;
       that.http_user_data = data;
+
       that.registerprofile.controls.email.setValue(that.http_user_data.Email);
       that.registerprofile.controls.mobile.setValue(
         that.http_user_data.MobileNo
@@ -157,11 +193,18 @@ export class MyprofileComponent implements OnInit {
     }
   }
   selectedCity() {
-    console.log(this.cityVariable);
   }
 
   ngOnInit(): void {
     this.myProfileOnload();
+     this.isChangePasswordVisible = false;
+     this.getProfileName();
+
+    if (this.passwordForm) {
+      this.passwordForm.get('newpw')?.valueChanges.subscribe(() => {
+        this.updatePasswordErrors();
+      });
+    }
   }
   myProfileOnload() {
     this.registerprofile.get('email')?.disable();
@@ -251,5 +294,190 @@ export class MyprofileComponent implements OnInit {
     }
     // let route = '/admin/home';
     // this.router.navigate([route]);
+  }
+    image: any;
+    file:any;
+    openFile() {
+      this.image = null;
+      var a = document.getElementById('image');
+      a?.click();
+    }
+    handle(e: any) {
+      this.image = e.target.files[0];
+      var a = document.getElementsByClassName('uploadPhoto');
+      this.file = this.image.name;
+
+      // a[0].setAttribute("style", "background-image:"+this.image.name);
+      // a[0].setAttribute("style", "background: url(\"https://rpmstorage123.blob.core.windows.net/rpmprofilepictures/CL500626\"); background-repeat: no-repeat;  background-size: 100% 100%;");
+    }
+    submitImage(pid: any) {
+      if (this.image) {
+        const myPhoto = uuid.v4();
+        var formData: any = new FormData();
+        formData.append(myPhoto, this.image);
+        this.rpm
+          .rpm_post(`/api/patient/addimage?PatientId=${pid}`, formData)
+          .then(
+            (data) => {},
+            (err) => {
+              console.log('Img error');
+            }
+          );
+      }
+    }
+
+
+// Password Changes
+initPasswordForm(){
+  this.passwordForm = this.formBuilder.group(
+        {
+          username: new FormControl(null, [Validators.required]),
+          oldpw: new FormControl(null, [Validators.required]),
+          newpw: new FormControl(
+            null,
+            Validators.compose([
+              Validators.required,
+              Validators.minLength(8),
+              Validators.pattern(
+                '^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$'
+              ),
+              passwordNotContainUsernameValidator('username'),
+            ])
+          ),
+
+          confirmpw: new FormControl('', [Validators.required]),
+        },
+
+        {
+          validators: this.MustMatch('newpw', 'confirmpw'),
+        }
+      );
+}
+  ChangePassword() {
+    this.isChangePasswordVisible = true;
+    this.showPassword = false;
+    this.closeDropdown();
+  }
+
+closeDropdown() {
+    this.isOpen = false;
+  }
+
+
+  MustMatch(newpw: any, confirmpw: any) {
+    return (formGroup: FormGroup) => {
+      const passwordcontrol = formGroup.controls[newpw];
+      const confirmpasswordcontrol = formGroup.controls[confirmpw];
+
+      if (
+        confirmpasswordcontrol.errors &&
+        !confirmpasswordcontrol.errors['MisMatch']
+      ) {
+        return;
+      }
+
+      if (passwordcontrol.value !== confirmpasswordcontrol.value) {
+        confirmpasswordcontrol.setErrors({ MustMatch: true });
+      } else {
+        confirmpasswordcontrol.setErrors(null);
+      }
+    };
+  }
+  CloseChangePasswordDialog() {
+    this.isChangePasswordVisible = false;
+    this.passwordForm.reset();
+  }
+  get NewTextEntered() {
+    return this.passwordForm.controls;
+  }
+  getProfileName() {
+    this.rpm.rpm_get('/api/users/getmyprofiles').then((data) => {
+      this.userData = data;
+      if (this.userData) {
+        var firstName = this.userData.FirstName.charAt(0);
+        var lastName = this.userData.LastName.charAt(0);
+        this.profileName = firstName + lastName;
+      }
+
+      this.userName = this.userData.UserName;
+      this.passwordForm.controls.username?.setValue(this.userData.UserName);
+
+    });
+  }
+
+  confirm() {
+    var req_body: any = {};
+
+    this.passwordForm.controls.username?.setValue(this.userName);
+    if (this.passwordForm.valid) {
+      req_body['UserName'] = this.passwordForm.controls.username.value;
+      req_body['OldPassword'] = this.passwordForm.controls.oldpw.value;
+      req_body['NewPassword'] = this.passwordForm.controls.newpw.value;
+
+      this.rpm.rpm_post('/api/authorization/updatepassword', req_body).then(
+        (data) => {
+          this.statusDialog.showSuccessDialog();
+          this.logoutAfterDialog = true;
+          this.passwordForm.reset();
+
+        },
+        (err) => {
+
+          this.statusDialog.showFailDialog(err.error.Status);
+          this.passwordForm.reset();
+        }
+      );
+    }else{
+      alert('All password fields are required. Kindly provide the Old, New, and Confirm Password')
+
+    }
+  }
+  updatePasswordErrors(): void {
+    const control = this.passwordForm.get('newpw');
+    if (!control) {
+      return;
+    }
+    this.passwordErrors = [];
+
+    if (control.errors) {
+      if (control.errors.minlength) {
+        this.passwordErrors.push('Minimum 8 characters required');
+      }
+      if (control.errors.pattern) {
+        this.passwordErrors.push(
+          'Min 2 uppercase, 2 numbers and 1 special character required'
+        );
+      }
+      if (control.errors.containsUsername) {
+        this.passwordErrors.push('New password should not contain username');
+      }
+    }
+  }
+  showPasswordVisible() {
+    this.showPassword = !this.showPassword;
+  }
+  showConfirmPasswordVisible() {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+  isPasswordMatching(): boolean {
+    const newPassword = this.passwordForm.get('newpw')?.value;
+    const confirmPassword = this.passwordForm.get('confirmpw')?.value;
+    return newPassword && confirmPassword && newPassword === confirmPassword;
+  }
+onDialogClosed() {
+  if (this.logoutAfterDialog) {
+    this.logout();
+  }
+}
+ async logout(): Promise<void> {
+    try {
+      await this.auth.logout('/api/authorization/logout');
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      this.auth.removeToken();
+      await this.router.navigate(['/login']);
+      window.location.reload();
+    }
   }
 }

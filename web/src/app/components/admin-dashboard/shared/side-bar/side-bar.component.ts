@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, TemplateRef } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -38,6 +38,7 @@ export class SideBarComponent implements OnInit {
   AdminVar: any;
   // activePageMainMenu: any;
   activePage: any;
+  @Output() emitter: EventEmitter<string> = new EventEmitter<string>();
 
   menuItems = [
     {
@@ -90,6 +91,8 @@ export class SideBarComponent implements OnInit {
       icon: 'assets/04-Icons/Icons_Admin.svg',
       activeIcon: '/assets/04-Icons/Icons_Admin A.svg',
       route: '/admin/admin',
+      hideForRoles: [6, 8],
+
     },
     // Patient Login Menu
     {
@@ -141,6 +144,7 @@ export class SideBarComponent implements OnInit {
     // this.activePageMainMenu = sessionStorage.getItem('ActiveMainMenu');
 
     this.activePage = sessionStorage.getItem('currentactivepage');
+    console.log('ActivePage:', this.activePage);
     this.roles = sessionStorage.getItem('Roles');
     this.roles = JSON.parse(this.roles);
     that.rpm
@@ -247,4 +251,9 @@ export class SideBarComponent implements OnInit {
   smallScreenOpenProfile() {
     this.profile();
   }
+
+   toggleMenu() {
+    this.emitter.emit('out');
+  }
+
 }

@@ -45,13 +45,12 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/manifest.json",
               "src/firebase-messaging-sw.js",
               "src/cx.png",
               {
                 "glob": "**/*",
                 "input": "./node_modules/ngx-extended-pdf-viewer/assets/",
-                "output": "/assets/"
+                "output": "assets/"
               }
             ],
             "styles": [
@@ -127,7 +126,6 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/manifest.json",
               "src/firebase-messaging-sw.js"
             ],
             "styles": [
