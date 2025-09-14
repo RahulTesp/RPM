@@ -753,74 +753,7 @@ namespace RPMWeb.Dal
             return ret;
 
         }
-        public int ActivePatientsProgramVitalAddition(PatientProgramDetailsInsertActivePatients data, string ConnectionString)
-        {
-
-            try
-            {
-                string ProgramVitals = "INSERT INTO  PatientProgramVitals([PatientProgramId],[ProgramId],[VitalId],[CreatedBy])values";
-                string ProgramVitalsinserts = string.Empty;
-                List<int> vitalids = data.VitalIds;
-                string ProgramVitalsInput = string.Empty;
-                if (vitalids != null)
-                    if (vitalids.Count > 0)
-                    {
-                        foreach (int vitalId in vitalids)
-                        {
-                            string insertvalues = "('"+ data .PatientProgramId+ "'," + data.ProgramId + "," + vitalId + ",'" + data.CreatedBy + "'),";
-                            ProgramVitalsinserts += insertvalues;
-                        }
-                        string scriptV = ProgramVitals + ProgramVitalsinserts;
-                        ProgramVitalsInput = scriptV.Substring(0, scriptV.Length - 1);
-                    }
-                string ProgramDiagnostics = "INSERT INTO  PatientProgramDiagnostics([PatientProgramId],[DiagnosticsName],[DiagnosticsCode],[CreatedBy])values";
-                string ProgramDiagnosticsinserts = string.Empty;
-                ProgramDiagnostics[] details2 = data.ProgramDiagnosis;
-                foreach (ProgramDiagnostics details in details2)
-                {
-                    string insertvalues = "('" + data.PatientProgramId + "','" + details.DiagnosisName + "','" + details.DiagnosisCode + "','" + data.CreatedBy + "'),";
-                    ProgramDiagnosticsinserts += insertvalues;
-                }
-                string script2 = ProgramDiagnostics + ProgramDiagnosticsinserts;
-                string ProgramDiagnosticsInput = script2.Substring(0, script2.Length - 1);
-                string ProgramGoals = "INSERT INTO PatientProgramGoals([PatientProgramId],[Goal],[Description],[CreatedBy])VALUES";
-                string ProgramGoalsinserts = string.Empty;
-                GoalDetails[] details1 = data.GoalDetails;
-                foreach (GoalDetails details in details1)
-                {
-                    string insertvalues = "('" + data.PatientProgramId + "','" + details.Goal + "','" + details.Description + "','" + data.CreatedBy + "'),";
-                    ProgramGoalsinserts += insertvalues;
-                }
-                string script = ProgramGoals + ProgramGoalsinserts;
-                string ProgramGoalsInput = script.Substring(0, script.Length - 1);
-                using (SqlConnection connection = new SqlConnection(ConnectionString))
-                {
-                    SqlCommand command = new SqlCommand("usp_InsPatientProgramVitalAddActivePatient", connection);
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@PatientId", data.PatientId);
-                    command.Parameters.AddWithValue("@PatientProgramId", data.PatientProgramId);
-                    command.Parameters.AddWithValue("@VitalIds", ProgramVitalsInput);
-                    command.Parameters.AddWithValue("@ProgramDiagnostics", ProgramDiagnosticsInput);
-                    command.Parameters.AddWithValue("@ProgramGoals", ProgramGoalsInput);
-                    command.Parameters.AddWithValue("@CreatedBy", data.CreatedBy);
-                    SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
-                    returnParameter.Direction = ParameterDirection.ReturnValue;
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                    int id = (int)returnParameter.Value;
-                    connection.Close();
-                    if (id.Equals(0))
-                    {
-                        return id;
-                    }
-                    return id;
-                }
-            }
-            catch
-            {
-                throw;
-            }
-        }
+        
     }
 }
 

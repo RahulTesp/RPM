@@ -1562,17 +1562,7 @@ namespace RPMWeb.Data.Common
         public int createdAt { get; set; }
         public object data { get; set; }
         public bool isTest { get; set; }
-    }
-
-    public class TranstekDeviceTelemetry
-    {
-        public string deviceId { get; set; }
-        public long createdAt { get; set; }
-        public object data { get; set; }
-        public object deviceData { get; set; }
-        public bool isTest { get; set; }
-        public string modelNumber { get; set; }
-    }
+    }   
 
     public class TranstekDeviceTelemetry
     {

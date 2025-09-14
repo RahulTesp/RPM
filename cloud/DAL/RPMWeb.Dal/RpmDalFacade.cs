@@ -316,10 +316,7 @@ namespace RPMWeb.Dal
         {
             return new PatientProgram().SavePatientProgram(Info, CreatedBy,ConnectionString);
         }
-        public static int ActivePatientsProgramVitalAddition(PatientProgramDetailsInsertActivePatients Info)
-        {
-            return new PatientProgram().ActivePatientsProgramVitalAddition(Info, ConnectionString);
-        }
+        
         public static bool UpdatePatientProgram(PatientProgramDetailsUpdate Info)
         {
             return new PatientProgram().UpdatePatientProgram(Info, ConnectionString);
