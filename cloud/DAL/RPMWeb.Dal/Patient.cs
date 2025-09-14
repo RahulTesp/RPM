@@ -109,9 +109,9 @@ namespace RPMWeb.Dal
                         dtstring = dtstring.Replace("-", "");
                         dtstring = dtstring.Replace("/", "");
                         dtstring = dtstring.Replace(":", "");
-                        var cli = containerClient.UploadBlob(filename + "_" + dtstring, stream);
+                        var cli = containerClient.UploadBlob(dtstring + "_" + filename, stream);
                         var uri = containerClient.Uri;
-                        string Uri = uri + "/" + filename + "_" + dtstring;
+                        string Uri = uri + "/" + dtstring + "_" + filename;
 
                         using (SqlConnection connection = new SqlConnection(ConnectionString))
                         {
@@ -1502,7 +1502,7 @@ namespace RPMWeb.Dal
 
                 return list;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw;
             }
@@ -6224,7 +6224,7 @@ namespace RPMWeb.Dal
                         PatientBilldatas.ReadyTobill = 0;
                         return PatientBilldatas;
                     }
-                    else if (StartDateTemp > Today && PatientStartDate.Status.ToLower() == "active")
+                    else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
                     {
                         PatientBilldatas = new PatientBilldata();
                         PatientBilldatas.CPTCode = code.BillingCode;
@@ -6239,14 +6239,14 @@ namespace RPMWeb.Dal
                         DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
                         DateTime endDate = DateTime.UtcNow.Date;
                         DateTime stDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
-
-                        DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+                        DateTime Todayy = DateTime.UtcNow;
+                        DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)Todayy, connectionString);
 
                         // endDate = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
                         //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
                         //the patientbilling table and +1 day will come as next start day.. So we should   
                         // calcualte the start date with respect to the billing threshold
-                        if (stDatetemp > endDatetemp)
+                        if (stDate.Date > endDatetemp)
                         {
                             //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                             BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
@@ -7357,6 +7357,15 @@ namespace RPMWeb.Dal
                 PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
                 if (PatientStartDate == null ||
                     PatientStartDate.Status.ToLower() == "invalid")
+                {
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = 0;
+                    pbd.Total = code.TargetReadings*60;
+                    pbd.IsTargetMet = false;
+                    pbd.ReadyTobill = 0;
+                    return pbd;
+                }
+                else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
                 {
                     pbd.CPTCode = code.BillingCode;
                     pbd.Completed = 0;
@@ -9235,6 +9244,78 @@ namespace RPMWeb.Dal
                             for (int i = 0; i < reader.FieldCount; i++)
                             {
 
+        }
+        public PatientBilldataList GetPatientBillingDataListCCMDaysBasedBilling(string patientType, string patientFilter, string patientId, string patientName, string program, string assignedmember, int Index, string readingFilter, string interactionFilter, int RoleId, string Createdby, string ConnectionString)
+        {
+            try
+            {
+                double startDuration;
+                double endDuration;
+                if (interactionFilter == "0-19")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(19.99);
+                    startDuration = 0;
+                    endDuration=t1.TotalSeconds;
+                }
+                else if (interactionFilter == "20-39")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(20);
+                    TimeSpan t2 = TimeSpan.FromMinutes(39.99);
+                    startDuration = t1.TotalSeconds;
+                    endDuration=t2.TotalSeconds;
+                }
+                else if (interactionFilter == "40-59")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(40);
+                    TimeSpan t2 = TimeSpan.FromMinutes(59.99);
+                    startDuration = t1.TotalSeconds;
+                    endDuration=t2.TotalSeconds;
+                }
+                else if (interactionFilter == "60")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(60);
+                    startDuration = t1.TotalSeconds;
+                    endDuration=0;
+                }
+                else
+                {
+                    startDuration = 0;
+                    endDuration=0;
+                }
+                using (SqlConnection con = new SqlConnection(ConnectionString))
+                {
+                    con.Open();
+
+                    using (SqlCommand command = new SqlCommand("GetPatientBillingDataListCCM_DaysBasedBilling", con))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.Add("@patientType", SqlDbType.NVarChar).Value = patientType;
+                        command.Parameters.Add("@patientFilter", SqlDbType.NVarChar).Value = patientFilter ?? String.Empty;
+                        command.Parameters.Add("@patientId", SqlDbType.NVarChar).Value = patientId ?? String.Empty;
+                        command.Parameters.Add("@patientName", SqlDbType.NVarChar).Value = patientName ?? String.Empty;
+                        command.Parameters.Add("@program", SqlDbType.NVarChar).Value = program;
+                        command.Parameters.Add("@assignedmember", SqlDbType.NVarChar).Value = assignedmember ?? String.Empty;
+                        command.Parameters.Add("@index", SqlDbType.Int).Value = Index;
+                        command.Parameters.Add("@readingFilter", SqlDbType.NVarChar).Value = readingFilter;
+                        command.Parameters.Add("@InteractionFilter", SqlDbType.NVarChar).Value = interactionFilter;
+                        command.Parameters.Add("@Createdby", SqlDbType.NVarChar).Value = Createdby;
+                        command.Parameters.Add("@RoleId", SqlDbType.Int).Value = RoleId;
+                        command.Parameters.Add("@startDuration", SqlDbType.Int).Value = startDuration;
+                        command.Parameters.Add("@endDuration", SqlDbType.Int).Value = endDuration;
+                        SqlDataReader reader = command.ExecuteReader();
+
+                        List<PatientBilldataList> PatientBilldateList = new List<PatientBilldataList>();
+                        List<int> roleids = new List<int>();
+                        TotalCounts counts = new TotalCounts();
+                        PatientBilldataList PatientBilldata = new PatientBilldataList();
+                        PatientBilldata.PatientBilldataRecords = new List<PatientBilldataRecords>();
+
+                        while (reader.Read())
+                        {
+                            bool val = false;
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+
                                 if (reader.GetName(i).Equals("PatientNumber", StringComparison.InvariantCultureIgnoreCase))
                                     val = true;
                             }
@@ -9563,6 +9644,137 @@ namespace RPMWeb.Dal
         {
             try
             {
+                double startDuration;
+                double endDuration;
+                if (interactionFilter == "0-19")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(19.99);
+                    startDuration = 0;
+                    endDuration=t1.TotalSeconds;
+                }
+                else if (interactionFilter == "20-39")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(20);
+                    TimeSpan t2 = TimeSpan.FromMinutes(39.99);
+                    startDuration = t1.TotalSeconds;
+                    endDuration=t2.TotalSeconds;
+                }
+                else if (interactionFilter == "40-59")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(40);
+                    TimeSpan t2 = TimeSpan.FromMinutes(59.99);
+                    startDuration = t1.TotalSeconds;
+                    endDuration=t2.TotalSeconds;
+                }
+                else if (interactionFilter == "60")
+                {
+                    TimeSpan t1 = TimeSpan.FromMinutes(60);
+                    startDuration = t1.TotalSeconds;
+                    endDuration=0;
+                }
+                else
+                {
+                    startDuration = 0;
+                    endDuration=0;
+                }
+                using (SqlConnection con = new SqlConnection(ConnectionString))
+                {
+                    con.Open();
+
+                    using (SqlCommand command = new SqlCommand("GetPatientBillingDataListPCM_DaysBasedBilling", con))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.Add("@patientType", SqlDbType.NVarChar).Value = patientType;
+                        command.Parameters.Add("@patientFilter", SqlDbType.NVarChar).Value = patientFilter ?? String.Empty;
+                        command.Parameters.Add("@patientId", SqlDbType.NVarChar).Value = patientId ?? String.Empty;
+                        command.Parameters.Add("@patientName", SqlDbType.NVarChar).Value = patientName ?? String.Empty;
+                        command.Parameters.Add("@program", SqlDbType.NVarChar).Value = program;
+                        command.Parameters.Add("@assignedmember", SqlDbType.NVarChar).Value = assignedmember ?? String.Empty;
+                        command.Parameters.Add("@index", SqlDbType.Int).Value = Index;
+                        command.Parameters.Add("@readingFilter", SqlDbType.NVarChar).Value = readingFilter;
+                        command.Parameters.Add("@InteractionFilter", SqlDbType.NVarChar).Value = interactionFilter;
+                        command.Parameters.Add("@Createdby", SqlDbType.NVarChar).Value = Createdby;
+                        command.Parameters.Add("@RoleId", SqlDbType.Int).Value = RoleId;
+                        command.Parameters.Add("@startDuration", SqlDbType.Int).Value = startDuration;
+                        command.Parameters.Add("@endDuration", SqlDbType.Int).Value = endDuration;
+                        SqlDataReader reader = command.ExecuteReader();
+
+                        List<PatientBilldataList> PatientBilldateList = new List<PatientBilldataList>();
+                        List<int> roleids = new List<int>();
+                        TotalCounts counts = new TotalCounts();
+                        PatientBilldataList PatientBilldata = new PatientBilldataList();
+                        PatientBilldata.PatientBilldataRecords = new List<PatientBilldataRecords>();
+
+                        while (reader.Read())
+                        {
+                            bool val = false;
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+
+                                if (reader.GetName(i).Equals("PatientNumber", StringComparison.InvariantCultureIgnoreCase))
+                                    val = true;
+                            }
+                            if (val)
+                            {
+                                PatientBilldataRecords patientBilldataRecords = new PatientBilldataRecords();
+                                patientBilldataRecords.PatientNumber = reader["PatientNumber"].ToString();
+                                patientBilldataRecords.patientId = Convert.ToInt32(reader["patientId"]);
+                                patientBilldataRecords.PatientProgramId = Convert.ToInt32(reader["PatientProgramId"]);
+                                patientBilldataRecords.PatientName = Convert.ToString(reader["FirstName"].ToString());
+                                patientBilldataRecords.Program = Convert.ToString(reader["Name"].ToString());
+                                patientBilldataRecords.AssignedMemeber = Convert.ToString(reader["Assignedmember"]) + ' ' + Convert.ToString(reader["AssignedLastName"]);
+                                patientBilldataRecords.TortalVitalCount = Convert.ToInt32(reader["totalVitalCount"]);
+                                patientBilldataRecords.interaction = Convert.ToInt32(reader["TotalDuration"]);
+                                patientBilldataRecords.DaysCompleted = Convert.ToInt32(reader["DaysCompleted"]);
+                                patientBilldataRecords.ClinicName = Convert.ToString(reader["ClinicName"]);
+                                patientBilldataRecords.Code = Convert.ToString(reader["Code"]);
+                                DateTime dateTime = Convert.ToDateTime(reader["NextBillingDate"]);
+                                patientBilldataRecords.NextBillingDate = dateTime.ToString("yyyy-MM-dd");
+                                counts.Total = Convert.ToInt32(reader["Total"]);
+                                counts.TotalCount = Convert.ToInt32(reader["TotalCount"]);
+                                counts.C1Total = null;
+                                counts.C2Total = null;
+                                counts.TodayCount = Convert.ToInt32(reader["TodayCount"]);
+                                counts.Next7DaysCount = Convert.ToInt32(reader["Next7DaysCount"]);
+
+                                PatientBilldata.PatientBilldataRecords.Add(patientBilldataRecords);
+                            }
+                            else
+                            {
+                                counts.Total = Convert.ToInt32(reader["Total"]);
+                                counts.TotalCount = Convert.ToInt32(reader["TotalCount"]);
+                                counts.C1Total = null;
+                                counts.C2Total = null;
+                                counts.TodayCount = Convert.ToInt32(reader["TodayCount"]);
+                                counts.Next7DaysCount = Convert.ToInt32(reader["Next7DaysCount"]);
+                            }
+
+                        }
+                        PatientBilldata.TotalCounts = counts;
+                        // PatientBilldateList.Add(PatientBilldata);
+                        //if (reader.FieldCount == 0)
+                        //{
+                        //    con.Close();
+                        //    return null;
+                        //}
+                        con.Close();
+                        return PatientBilldata;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occured - class Name :" + this.GetType().Name + ",  Method Name : " + MethodBase.GetCurrentMethod().Name + ", Error Message :" + ex.Message + "");
+                return null;
+            }
+
+
+
+        }
+        public PatientBilldataList GetPatientBillingDataListDaysBasedBilling(string patientType, string patientFilter, string patientId, string patientName, string program, string assignedmember, int Index, string readingFilter, string interactionFilter, int RoleId, string Createdby, string ConnectionString)
+        {
+            try
+            {
 
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {
@@ -9656,7 +9868,6 @@ namespace RPMWeb.Dal
 
 
         }
-
         public BilledDates GetPatientLastBilledPeriods(int patientId, int patientPgmId, int billingcode, string connectionString)
         {
             BilledDates ret = new BilledDates();
@@ -14163,7 +14374,7 @@ namespace RPMWeb.Dal
                     string insertQuery = "INSERT INTO twiliochatwebhook (author,Body,Attributes,AccountSid,ClientIdentity,EventType,Source,ConversationSid,ParticipantSid) VALUES (@author,@Body,@Attributes,@AccountSid,@ClientIdentity,@EventType,@Source,@ConversationSid,@ParticipantSid)";
                     using (SqlCommand command = new SqlCommand(insertQuery, con))
                     {
-                        command.Parameters.AddWithValue("@author", hook.author);
+                        command.Parameters.AddWithValue("@author", hook.Author);
                         command.Parameters.AddWithValue("@Body", hook.Body);
                         command.Parameters.AddWithValue("@Attributes", hook.Attributes);
 

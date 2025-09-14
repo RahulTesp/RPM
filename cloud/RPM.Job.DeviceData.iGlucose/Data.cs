@@ -138,9 +138,9 @@ namespace iglucosedata
             try
             {
                 DateTime newenddate = startdate.AddDays(2);
-                if (newenddate >= DateTime.Now)
+                if (newenddate >= DateTime.UtcNow)
                 {
-                    newenddate = DateTime.Now.ToUniversalTime();
+                    newenddate = DateTime.UtcNow;
                 }
                 string strstartdate = startdate.ToString("yyyy-MM-dd'T'HH:mm:ss");
                 strstartdate = strstartdate.Replace('.', ':');
@@ -162,6 +162,7 @@ namespace iglucosedata
                     info.ingest_date_end = strnewenddate;
                     info.device_ids = arr_deviceid;
                     json = JsonConvert.SerializeObject(info);
+
                     streamWriter.Write(json);
                     streamWriter.Flush();
                     streamWriter.Close();

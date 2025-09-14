@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "E3AB1A08-AEF6-4786-B503-118AEAEB8319"
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "03C1D81C-C702-4792-988C-AAA597F6EDFB"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "RPM/View/Home/RMPHomeView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "15"
+            endingLineNumber = "15"
+            landmarkName = "body"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "61E76F83-1CD3-41C6-96A8-08E3E4E93EA4"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "RPM/View/Login/RPMLoginViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "18"
+            endingLineNumber = "18"
+            landmarkName = "login(userName:password:completed:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "61E76F83-1CD3-41C6-96A8-08E3E4E93EA4 - e5127909c991cbae"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in closure #1 (Swift.Result&lt;RPM.RPMLoginDataModel, RPM.APIError&gt;) -&gt; () in RPM.RPMLoginViewModel.login(userName: Swift.String, password: Swift.String, completed: (Swift.Optional&lt;Swift.String&gt;, Swift.Optional&lt;RPM.AlertItem&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "RPM"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/prajeeshprabhakar/Development/TESP%20Labs_1/rpm_mob/Code/RPM/RPM/View/Login/RPMLoginViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "19"
+                  endingLineNumber = "19"
+                  offsetFromSymbolStart = "126">
+               </Location>
+               <Location
+                  uuid = "61E76F83-1CD3-41C6-96A8-08E3E4E93EA4 - e5127909c991cbae"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in closure #1 (Swift.Result&lt;RPM.RPMLoginDataModel, RPM.APIError&gt;) -&gt; () in RPM.RPMLoginViewModel.login(userName: Swift.String, password: Swift.String, completed: (Swift.Optional&lt;Swift.String&gt;, Swift.Optional&lt;RPM.AlertItem&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "RPM"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/prajeeshprabhakar/Development/TESP%20Labs_1/rpm_mob/Code/RPM/RPM/View/Login/RPMLoginViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "19"
+                  endingLineNumber = "19"
+                  offsetFromSymbolStart = "341">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "445D5489-021B-4046-A094-E04407116054"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "RPM/View/Login/RPMLoginView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "63"
+            endingLineNumber = "63"
+            landmarkName = "body"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>

@@ -6,9 +6,10 @@ public class Links {
     // public static  final String BASE_URL= "https://rpmappservicepreprod.azurewebsites.net/api";
     // public static  final String BASE_URL= "https://c-lynxapi.azurewebsites.net/api";
     //public static  final String BASE_URL= "https://rpmdevnew.azurewebsites.net/api";
-    //public static  final String BASE_URL= "https://cx-dev-server.azurewebsites.net/api";
+    public static  final String BASE_URL= "https://cx-dev-server.azurewebsites.net/api";
+   // public static  final String BASE_URL= "https://rpm-multivital-api-v2.azurewebsites.net";
     //public static  final String BASE_URL= "https://cx-preprod-server.azurewebsites.net/api";
-    public static  final String BASE_URL= "https://rpm-dev-tespcare.azurewebsites.net/api";
+    //public static  final String BASE_URL= "https://rpm-dev-tespcare.azurewebsites.net/api";
     //public static  final String BASE_URL= "https://cx-dev-client.azurewebsites.net/api";
     //public static  final String BASE_URL= "https://md-preprod-server.azurewebsites.net/api";
     //public static  final String BASE_URL= "https://meditprodapi.azurewebsites.net/api";

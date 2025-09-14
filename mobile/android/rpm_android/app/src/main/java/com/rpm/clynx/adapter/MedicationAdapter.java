@@ -1,7 +1,10 @@
 package com.rpm.clynx.adapter;
 
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -47,6 +50,12 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
         setCardBackground(holder.mcardAftr,Boolean.parseBoolean(String.valueOf(gValues.get(position).getAfterNoon())));
         setCardBackground(holder.mcardEve,Boolean.parseBoolean(String.valueOf(gValues.get(position).getEvening())));
         setCardBackground(holder.mcardNgt, Boolean.parseBoolean(String.valueOf(gValues.get(position).getNight())));
+
+        if (holder.mItem.isExpired()) {
+            holder.cardContainer.setBackgroundResource(R.drawable.rounded_expired_bg);
+        } else {
+            holder.cardContainer.setBackgroundResource(R.drawable.rounded_white_bg);
+        }
     }
 
     // Helper method to set card background based on a condition
@@ -73,7 +82,7 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
         public final TextView mDate;
         public MedicationItemModel mItem;
         public LinearLayout mcardMng,mcardAftr,mcardEve,mcardNgt;
-
+        public final LinearLayout cardContainer;
         public MedicationViewHolder(MedicationItemBinding binding) {
             super(binding.getRoot());
             mMedicinename = binding.itemMedname;
@@ -87,6 +96,7 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
             mEvening = binding.itemEvening;
             mNight = binding.itemNight;
             mDate = binding.itemDate;
+            cardContainer = binding.cardContainer;
             Log.d("response mMorning",mMorning.toString());
             Log.d("getText mMorning", mMorning.getText().toString());
         }

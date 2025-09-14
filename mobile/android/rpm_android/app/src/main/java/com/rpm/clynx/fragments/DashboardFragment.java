@@ -80,11 +80,14 @@ import java.util.TimeZone;
 import java.text.SimpleDateFormat;
 import com.rpm.clynx.utility.MyMarkerView;
 import com.rpm.clynx.utility.NetworkAlert;
+import com.rpm.clynx.utility.NetworkErrorHandler;
 import com.rpm.clynx.utility.TimeAgoUtils;
 import com.twilio.conversations.CallbackListener;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.ConversationsClient;
+import com.twilio.conversations.ConversationsClientListener;
+import com.twilio.conversations.User;
 import com.twilio.util.ErrorInfo;
 import com.twilio.conversations.Message;
 import com.twilio.conversations.Participant;
@@ -215,12 +218,19 @@ public class DashboardFragment extends Fragment {
             }
         });
 
+        chatMessageCount = view.findViewById(R.id.chatMessageCount);
+
         UnreadMessageViewModel unreadViewModel = new ViewModelProvider(requireActivity()).get(UnreadMessageViewModel.class);
 
         unreadViewModel.getUnreadCounts().observe(getViewLifecycleOwner(), unreadCounts -> {
             int totalUnread = unreadViewModel.getTotalUnread();
-            chatMessageCount.setText(String.valueOf(totalUnread));
+
+            Log.d("DashboardObserver", "Unread counts updated: " + unreadCounts.toString());
+            Log.d("DashboardObserver", "Total unread: " + totalUnread);
+
             chatMessageCount.setVisibility(totalUnread > 0 ? View.VISIBLE : View.GONE);
+            chatMessageCount.setText(String.valueOf(totalUnread)); // ADD THIS LINE!
+
         });
 
         chartContainer = view.findViewById(R.id.chartContainer);
@@ -234,8 +244,6 @@ public class DashboardFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
-       chatMessageCount = view.findViewById(R.id.chatMessageCount);
 
         chat = (ImageView) view.findViewById(R.id.dashboard_chat);
         chat.setOnClickListener(new View.OnClickListener() {
@@ -316,14 +324,8 @@ public class DashboardFragment extends Fragment {
             // Set the text color of the TextView
             tv_status.setTextColor(getResources().getColor(textColorResource));
         } else {
-            tv_status.setBackgroundColor(Color.GREEN); //  Correct
-
-           // tv_status.setBackgroundResource(Color.GREEN);
-            tv_status.setTextColor(Color.WHITE); // ✅ No need to call getResources().getColor()
-
-          //  tv_status.setTextColor(getResources().getColor(Color.WHITE));
-            // Handle the case where the status text is not in your mapping
-            // You can set a default background color or handle it in some other way
+            tv_status.setBackgroundColor(Color.GREEN);
+            tv_status.setTextColor(Color.WHITE);
         }
 
         user_full_name.setText("Hi, " + User_full_Name);
@@ -424,84 +426,205 @@ public class DashboardFragment extends Fragment {
         return view;
     }
 
+
+
     private void setupTwilioListeners() {
+        Log.d("setupTwilioListenersCALLED", "setupTwilioListenersCALLED");
         ConversationsClient conversationsClient = ConversationsClientManager.getInstance().getConvClient();
 
         if (conversationsClient == null) {
-            Log.e("TwilioChat", "ConversationsClient is null. Retrying...");
+            Log.e("TwilioChatDash", "ConversationsClient is null. Retrying...");
             retrySetupLater();
             return;
         }
 
-        if (conversationsClient != null) {
-            if (!ConversationsClientManager.getInstance().isClientSynced()) {
-                Log.e("TwilioChat", "Client not yet synced. Waiting...");
-                waitForSyncAndRetry();
-                return;
-            }
+        if (!ConversationsClientManager.getInstance().isClientSynced()) {
+            Log.e("TwilioChatDash", "Client not yet synced. Waiting...");
+            waitForSyncAndRetry();
+            return;
         }
 
-        if (conversationsClient != null) {
-            Log.e("conversationsClientNOTNULL","conversationsClientNOTNULL");
-            for (Conversation conversation : conversationsClient.getMyConversations()) {
-                String conversationSid = conversation.getSid();
-                unreadCounts.put(conversationSid, 0); // Initialize unread count
+        Log.d("conversationsClientNOTNULL","conversationsClientNOTNULL");
 
-                // Fetch the initial unread count for each conversation
+        // Loop through existing conversations and add listeners
+        for (Conversation conversation : conversationsClient.getMyConversations()) {
+            String conversationSid = conversation.getSid();
+            unreadCounts.put(conversationSid, 0); // Initialize unread count
+
+            Log.d("TwilioDebugDash", "Setting up listener for conversation SID: " + conversation.getSid());
+
+            // Fetch initial unread count
+            conversation.getUnreadMessagesCount(new CallbackListener<Long>() {
+                @Override
+                public void onSuccess(Long unreadCountValue) {
+                    Log.d("TwilioDebugDash", "[Initial Fetch] SID: " + conversationSid + ", Unread: " + unreadCountValue);
+                    unreadCounts.put(conversationSid, unreadCountValue != null ? unreadCountValue.intValue() : 0);
+                    updateUI(); // Update UI with initial count
+                }
+
+                @Override
+                public void onError(ErrorInfo errorInfo) {
+                    Log.e("TwilioChatDash", "Failed to fetch initial unread count: " + errorInfo.getMessage());
+                }
+            });
+
+            Log.d("SyncStatus", conversation.getSid() + " - Sync Status: " + conversation.getSynchronizationStatus());
+
+            // Add listener on this conversation for messages etc.
+            conversation.addListener(new ConversationListener() {
+                @Override
+                public void onMessageAdded(Message message) {
+                    Log.d("TwilioChatDash", "New message received.");
+                    Log.d("TwilioDebugDash", "[MessageEvent] SID: " + conversation.getSid() + " - onMessageAdded triggered");
+                    updateUnreadCount(conversation);
+                }
+
+                @Override
+                public void onSynchronizationChanged(Conversation conversation) {
+                    Log.d("TwilioChatDash", "Conversation sync changed.");
+                    updateUnreadCount(conversation);
+                }
+
+                @Override public void onMessageUpdated(Message message, Message.UpdateReason reason) {}
+                @Override public void onMessageDeleted(Message message) {
+                    Log.d("TwilioChatDash", "homeonMessageDeleted");
+                    updateUnreadCount(conversation);
+                }
+                @Override public void onParticipantAdded(Participant participant) {}
+                @Override public void onParticipantUpdated(Participant participant, Participant.UpdateReason reason) {}
+                @Override public void onParticipantDeleted(Participant participant) {}
+                @Override public void onTypingStarted(Conversation conversation, Participant participant) {}
+                @Override public void onTypingEnded(Conversation conversation, Participant participant) {}
+            });
+        }
+
+        // <-- ADD THIS block HERE to listen for NEW conversations created dynamically
+        conversationsClient.addListener(new ConversationsClientListener() {
+            @Override
+            public void onConversationAdded(Conversation conversation) {
+                Log.d("TwilioChatDash", "New conversation added: " + conversation.getSid());
+
+                // Add listener on the new conversation
+                conversation.addListener(new ConversationListener() {
+                    @Override
+                    public void onMessageAdded(Message message) {
+                        Log.d("TwilioChatDash", "New message received in new conversation.");
+                        updateUnreadCount(conversation);
+                    }
+                    @Override public void onSynchronizationChanged(Conversation conversation) {
+                        updateUnreadCount(conversation);
+                    }
+                    @Override public void onMessageUpdated(Message message, Message.UpdateReason reason) {}
+                    @Override public void onMessageDeleted(Message message) {
+                        updateUnreadCount(conversation);
+                    }
+                    @Override public void onParticipantAdded(Participant participant) {}
+                    @Override public void onParticipantUpdated(Participant participant, Participant.UpdateReason reason) {}
+                    @Override public void onParticipantDeleted(Participant participant) {}
+                    @Override public void onTypingStarted(Conversation conversation, Participant participant) {}
+                    @Override public void onTypingEnded(Conversation conversation, Participant participant) {}
+                });
+
+                // Initialize unread count for this new conversation
                 conversation.getUnreadMessagesCount(new CallbackListener<Long>() {
                     @Override
                     public void onSuccess(Long unreadCountValue) {
-                        unreadCounts.put(conversationSid, unreadCountValue != null ? unreadCountValue.intValue() : 0);
-                        updateUI(); // Update UI with initial count
+                        unreadCounts.put(conversation.getSid(), unreadCountValue != null ? unreadCountValue.intValue() : 0);
+                        updateUI();
                     }
 
                     @Override
                     public void onError(ErrorInfo errorInfo) {
-                        Log.e("TwilioChat", "Failed to fetch initial unread count: " + errorInfo.getMessage());
+                        Log.e("TwilioChatDash", "Failed to fetch initial unread count for new conversation: " + errorInfo.getMessage());
                     }
                 });
 
-                // Listen for new messages and conversation synchronization
-                conversation.addListener(new ConversationListener() {
-                    @Override
-                    public void onMessageAdded(Message message) {
-                        Log.d("TwilioChat", "New message received.");
-                        updateUnreadCount(conversation);
-                    }
-
-                    @Override
-                    public void onSynchronizationChanged(Conversation conversation) {
-                        Log.d("TwilioChat", "Conversation sync changed.");
-                        updateUnreadCount(conversation);
-                    }
-
-                    @Override
-                    public void onMessageUpdated(Message message, Message.UpdateReason reason) {}
-
-                    @Override
-                    public void onMessageDeleted(Message message) {
-                        Log.d("homeonMessageDeleted", "homeonMessageDeleted");
-                        FileLogger.d("homeonMessageDeleted", "homeonMessageDeleted");
-                        updateUnreadCount(conversation);
-                    }
-
-                    @Override
-                    public void onParticipantAdded(Participant participant) {}
-
-                    @Override
-                    public void onParticipantUpdated(Participant participant, Participant.UpdateReason reason) {}
-
-                    @Override
-                    public void onParticipantDeleted(Participant participant) {}
-
-                    @Override
-                    public void onTypingStarted(Conversation conversation, Participant participant) {}
-
-                    @Override
-                    public void onTypingEnded(Conversation conversation, Participant participant) {}
-                });
+                // Also update unread counts immediately
+                updateUnreadCount(conversation);
             }
-        }
+
+            @Override
+            public void onConversationUpdated(Conversation conversation, Conversation.UpdateReason reason) {
+
+            }
+
+
+            @Override
+            public void onConversationDeleted(Conversation conversation) {
+                // Optional: handle conversation deletions
+            }
+
+            @Override
+            public void onConversationSynchronizationChange(Conversation conversation) {
+
+            }
+
+            @Override
+            public void onError(ErrorInfo errorInfo) {
+
+            }
+
+            @Override
+            public void onUserUpdated(User user, User.UpdateReason reason) {
+
+            }
+
+            @Override
+            public void onUserSubscribed(User user) {
+
+            }
+
+            @Override
+            public void onUserUnsubscribed(User user) {
+
+            }
+
+            @Override
+            public void onClientSynchronization(ConversationsClient.SynchronizationStatus status) {
+
+            }
+
+            @Override
+            public void onNewMessageNotification(String conversationSid, String messageSid, long messageIndex) {
+
+            }
+
+            @Override
+            public void onAddedToConversationNotification(String conversationSid) {
+
+            }
+
+            @Override
+            public void onRemovedFromConversationNotification(String conversationSid) {
+
+            }
+
+            @Override
+            public void onNotificationSubscribed() {
+
+            }
+
+            @Override
+            public void onNotificationFailed(ErrorInfo errorInfo) {
+
+            }
+
+            @Override
+            public void onConnectionStateChange(ConversationsClient.ConnectionState state) {
+
+            }
+
+            @Override
+            public void onTokenExpired() {
+
+            }
+
+            @Override
+            public void onTokenAboutToExpire() {
+
+            }
+
+        });
     }
 
     private void retrySetupLater() {
@@ -518,10 +641,10 @@ public class DashboardFragment extends Fragment {
             @Override
             public void run() {
                 if (ConversationsClientManager.getInstance().isClientSynced()) {
-                    Log.e("TwilioChat", "Client is now synced. Setting up listeners.");
+                    Log.e("TwilioChatDash", "Client is now synced. Setting up listeners.");
                     setupTwilioListeners();
                 } else {
-                    Log.e("TwilioChat", "Client still not synced. Retrying...");
+                    Log.e("TwilioChatDash", "Client still not synced. Retrying...");
                     waitForSyncAndRetry();
                 }
             }
@@ -530,12 +653,34 @@ public class DashboardFragment extends Fragment {
 
     private void updateUnreadCount(Conversation conversation) {
         String conversationSid = conversation.getSid();
+        Log.d("TwilioDebugDash", "[UpdateUnread] Fetching unread count for SID: " + conversationSid);
+
         conversation.getUnreadMessagesCount(new CallbackListener<Long>() {
             @Override
             public void onSuccess(Long unreadCountValue) {
-                if (unreadCountValue != null) {
+                Log.d("TwilioDebugDash", "[UpdateUnread] SID: " + conversationSid + ", Count: " + unreadCountValue);
+
+                if (unreadCountValue == null) {
+                    // If unreadCountValue is null, fallback to total message count
+                    conversation.getMessagesCount(new CallbackListener<Long>() {
+                        @Override
+                        public void onSuccess(Long messageCount) {
+                            int count = messageCount != null ? messageCount.intValue() : 0;
+                            unreadCounts.put(conversationSid, count);
+                            updateUI();
+                        }
+
+                        @Override
+                        public void onError(ErrorInfo errorInfo) {
+                            Log.e("TwilioChatDash", "Failed to fetch messages count: " + errorInfo.getMessage());
+                            unreadCounts.put(conversationSid, 0); // fallback default
+                            updateUI();
+                        }
+                    });
+                } else {
+                    // Set unread count directly if not null
                     unreadCounts.put(conversationSid, unreadCountValue.intValue());
-                    updateUI(); // UI update only when count changes
+                    updateUI();
                 }
             }
 
@@ -596,8 +741,7 @@ public class DashboardFragment extends Fragment {
                                     @Override
                                     public void run() {
                                         getNotificationsCount();
-                                        //tv_notification_count.setText(tv_notification_count.getText() + "\n" + finalMessage);
-                                        //tv_notification_count.setVisibility(view.VISIBLE);
+
                                     }
                                 });
                             }
@@ -711,13 +855,7 @@ public class DashboardFragment extends Fragment {
                 Toast.makeText(getContext(), "No data available!", Toast.LENGTH_SHORT).show();
                 l1.dismiss();
 
-                if (error == null || error.networkResponse == null) {
-                    // No internet, show network dialog
-                    if (getContext() != null) {  // Ensure Fragment is attached
-                        NetworkAlert.showNetworkDialog(requireContext());
-                    }
-                    return;
-                }
+                NetworkErrorHandler.handleError(requireContext(), error, editor, db);
 
                 if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
                     Log.d("homecode", String.valueOf(error.networkResponse.statusCode));
@@ -1008,8 +1146,6 @@ public class DashboardFragment extends Fragment {
     }
     private void getNotificationsCount () {
             String url = Links.BASE_URL + Links.NOTIFICATION;
-           // final Loader l1 = new Loader(getActivity());
-          //  l1.show("Please wait...");
             StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
@@ -1036,7 +1172,6 @@ public class DashboardFragment extends Fragment {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.d("Error while fetching Notification count", error.toString());
-                  //  l1.dismiss();
                 }
             }) {
                 @Override

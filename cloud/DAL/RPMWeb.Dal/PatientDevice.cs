@@ -8,9 +8,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
-using System.Globalization;
-using System.Text.Encodings.Web;
+using Newtonsoft.Json;
 using System.Text.Json;
+using System.Text.Encodings.Web;
 
 namespace RPMWeb.Dal
 {
@@ -685,7 +685,6 @@ namespace RPMWeb.Dal
             
             return ret;
         }
-
         public bool StagingTableInsert(TranstekDeviceTelemetry dev, string DeviceType, string ConnectionString)
         {
             bool ret;
@@ -747,8 +746,7 @@ namespace RPMWeb.Dal
 
             return ret;
         }
-
-        public string GetDeviceType(string deviceModel, string ConnectionString)
+		public string GetDeviceType(string deviceModel, string ConnectionString)
         {
             try
             {
@@ -780,7 +778,7 @@ namespace RPMWeb.Dal
                 throw ex;
             }
         }
-		public bool MakeDeviceAvailable(string deviceNumber, string ConnectionString)
+        public bool MakeDeviceAvailable(string deviceNumber, string ConnectionString)
         {
             bool response = false;
             using (SqlConnection con = new SqlConnection(ConnectionString))

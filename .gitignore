@@ -434,3 +434,55 @@ out/
 
 # NDK
 obj/
+
+# iOS specific
+# Xcode
+DerivedData/
+build/
+*.xcworkspace
+*.xcuserstate
+*.xcuserdata
+*.xcscmblueprint
+
+# Swift Package Manager
+.build/
+Packages/
+.swiftpm/
+*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Carthage
+Carthage/
+Carthage/Build/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# Firebase
+GoogleService-Info.plist
+
+# User-specific settings
+*.DS_Store
+*.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Archive
+*.xcarchive
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Others
+*.orig
+*.rej
+

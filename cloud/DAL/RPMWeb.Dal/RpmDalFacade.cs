@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
@@ -313,7 +314,7 @@ namespace RPMWeb.Dal
         }
         public static int SavePatientProgram(PatientProgramDetailsInsert Info, string CreatedBy)
         {
-            return new PatientProgram().SavePatientProgram(Info,CreatedBy,ConnectionString);
+            return new PatientProgram().SavePatientProgram(Info, CreatedBy,ConnectionString);
         }
         public static int ActivePatientsProgramVitalAddition(PatientProgramDetailsInsertActivePatients Info)
         {
@@ -1022,14 +1023,15 @@ namespace RPMWeb.Dal
         {
             new User().NotifyConversation(activeConversationSid, FromUser, ToUser, Message, ConnectionString);
         }
-        public static string GetDeviceType(string DeviceModel)
+		 public static string GetDeviceType(string DeviceModel)
         {
             return new PatientDevice().GetDeviceType(DeviceModel, ConnectionString);
         }
-		 public static bool MakeDeviceAvailable(string deviceNumber)
+        public static bool MakeDeviceAvailable(string deviceNumber)
         {
             return new PatientDevice().MakeDeviceAvailable(deviceNumber, ConnectionString);
         }
+
     }
 
 }

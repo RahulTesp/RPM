@@ -26,8 +26,7 @@
                 android:name="com.rpm.clynx.fragments.MedicationFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="6dp"
-                android:layout_marginRight="6dp"
+
                 app:layoutManager="LinearLayoutManager"
                 tools:context="com.rpm.clynx.fragments.MedicationFragment"
                 tools:listitem="@layout/medication_item" />

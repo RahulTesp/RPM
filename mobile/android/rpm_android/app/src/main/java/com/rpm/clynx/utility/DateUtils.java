@@ -1,7 +1,10 @@
 package com.rpm.clynx.utility;
 
+import android.util.Log;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -77,4 +80,21 @@ public class DateUtils {
         // Format the date in the desired output format
         return outputDateFormat.format(date);
     }
+    public static boolean isPastDate(String dateStr) throws ParseException {
+        Log.d("dateStr", dateStr);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+        sdf.setLenient(false);
+        Date endDate = sdf.parse(dateStr);
+
+        // Strip time from current date for accurate comparison
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+
+        return endDate.before(today.getTime());
+    }
+
+
 }

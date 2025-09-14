@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -163,6 +164,7 @@ public class VideoCallTwilio extends AppCompatActivity {
     private Handler handler;
     SharedPreferences pref;
     SharedPreferences.Editor editor;
+    private ImageView remoteAudioStatusIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,6 +180,8 @@ public class VideoCallTwilio extends AppCompatActivity {
         muteActionFab = findViewById(R.id.mute_action_fab);
         remotePlaceHolderImage = findViewById(R.id.remote_placeholder);
         localPlaceHolderImage = findViewById(R.id.local_placeholder);
+        remoteAudioStatusIcon = findViewById(R.id.remote_audio_status_icon);
+
         handler = new Handler();
         latestActivity = ((MyApplication) getApplication()).getLatestActivity();
         pref = getApplicationContext().getSharedPreferences("RPMUserApp", MODE_PRIVATE);
@@ -1333,6 +1337,11 @@ public class VideoCallTwilio extends AppCompatActivity {
                     RemoteParticipant remoteParticipant,
                     RemoteAudioTrackPublication remoteAudioTrackPublication) {
                 Log.d("onAudioTrackEnabled","onAudioTrackEnabled");
+                runOnUiThread(() -> {
+                    remoteAudioStatusIcon.setVisibility(View.VISIBLE);
+                    remoteAudioStatusIcon.setImageResource(R.drawable.ic_mic_white_24dp); // replace with your "unmute" icon
+                });
+
             }
 
             @Override
@@ -1341,6 +1350,10 @@ public class VideoCallTwilio extends AppCompatActivity {
 
                     RemoteAudioTrackPublication remoteAudioTrackPublication) {
                 Log.d("onAudioTrackDisabled","onAudioTrackDisabled");
+                runOnUiThread(() -> {
+                    remoteAudioStatusIcon.setVisibility(View.VISIBLE);
+                    remoteAudioStatusIcon.setImageResource(R.drawable.ic_mic_off_black_24dp); // replace with your "mute" icon
+                });
             }
 
             @Override

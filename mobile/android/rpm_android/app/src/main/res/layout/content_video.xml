@@ -23,6 +23,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"/>
+    <ImageView
+        android:id="@+id/remote_audio_status_icon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/mute_icon_bg_color_grey"
+        android:layout_gravity="top|start"
+        android:layout_margin="12dp"
+        android:src="@drawable/ic_mic_white_24dp"
+    android:visibility="visible" />
 
     <FrameLayout
         android:id="@+id/local_placeholder"

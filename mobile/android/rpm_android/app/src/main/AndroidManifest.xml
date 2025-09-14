@@ -53,11 +53,9 @@
 
         <activity
             android:name="com.rpm.clynx.activity.ChangePassword"
-            android:parentActivityName="com.rpm.clynx.activity.MyInfoActivity"
             android:exported="false" />
         <activity
             android:name="com.rpm.clynx.activity.AddMedication"
-            android:parentActivityName="com.rpm.clynx.activity.ClinicalInfoActivity"
             android:exported="false" />
         <activity
             android:name="com.rpm.clynx.auth.OTP"
@@ -67,7 +65,6 @@
             android:name="com.rpm.clynx.auth.GenerateOTP"
             android:parentActivityName="com.rpm.clynx.fragments.Login"
             android:exported="false" />
-
         <activity
             android:name="com.rpm.clynx.auth.ResetPassword"
             android:parentActivityName="com.rpm.clynx.fragments.Login"
@@ -75,27 +72,6 @@
         <activity
             android:name="com.rpm.clynx.home.Home"
             android:screenOrientation="portrait"
-            android:exported="false" />
-        <activity
-            android:name="com.rpm.clynx.activity.MoreActivity"
-            android:parentActivityName="com.rpm.clynx.home.Home"
-            android:screenOrientation="portrait"
-            android:exported="false" />
-        <activity
-            android:name="com.rpm.clynx.activity.MyInfoActivity"
-            android:parentActivityName="com.rpm.clynx.activity.MoreActivity"
-            android:exported="false" />
-        <activity
-            android:name="com.rpm.clynx.activity.ProgramInfoActivity"
-            android:parentActivityName="com.rpm.clynx.activity.MoreActivity"
-            android:exported="false" />
-        <activity
-            android:name="com.rpm.clynx.activity.ClinicalInfoActivity"
-            android:parentActivityName="com.rpm.clynx.activity.MoreActivity"
-            android:exported="false" />
-        <activity
-            android:name="com.rpm.clynx.activity.ActivityInfoActivity"
-            android:parentActivityName="com.rpm.clynx.activity.MoreActivity"
             android:exported="false" />
         <activity
             android:name="com.rpm.clynx.MainActivity"
@@ -112,7 +88,6 @@
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -131,12 +106,8 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
     </application>
-
 </manifest>
-
-
 
 
 

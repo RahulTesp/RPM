@@ -43,7 +43,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
-import com.rpm.clynx.activity.ClinicalInfoActivity;
 import com.rpm.clynx.adapter.NewVitalListAdapter;
 import com.rpm.clynx.adapter.VitalReadingsListAdapter;
 import com.rpm.clynx.model.NewVitalsItemModel;
@@ -143,7 +142,7 @@ public class VitalHealthTrends extends Fragment {
             @Override
             public void onClick(View v) {
                 // Handle the "View More..." click here
-                openClinicalInfoActivityFromVitals();
+                openClinicalInfoFragmentFromVitals();
             }
         });
 
@@ -182,7 +181,6 @@ public class VitalHealthTrends extends Fragment {
 
         ProgramTypeName = pref.getString("ProgramTypeName", null);
 
-        //recyclerView_newvitals = view.findViewById(R.id.recyclerview_newvitals);
         emptyView = (TextView) view.findViewById(R.id.empty_viewnew);
         emptyChart = (TextView) view.findViewById(R.id.empty_viewnew);
 
@@ -328,18 +326,12 @@ public class VitalHealthTrends extends Fragment {
             }
         });
 
-       // layoutManager = new LinearLayoutManager(getContext());
         layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        // newVitalsModels = new ArrayList<>();
         vitalReadingsModels = new ArrayList<>();
         adapter = new VitalReadingsListAdapter(vitalReadingsModels,getContext());
-        //adapter = new NewVitalListAdapter( newVitalsModels,getContext());
         recyclerView_vitalreadings =  view.findViewById(R.id.fragmentHTVitalReadings);
         recyclerView_vitalreadings.setLayoutManager(layoutManager);
         recyclerView_vitalreadings.setAdapter(adapter);
-
-        //  recyclerView_newvitals.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-       // recyclerView_newvitals.setAdapter(adapter);
         curDay = view.findViewById(R.id.VitalFragment_today_dt);
 
         DateTime curdt = new DateTime(dt);
@@ -350,12 +342,22 @@ public class VitalHealthTrends extends Fragment {
         curDay.setText(spdf.format(curdt.toDate()));
         return  view;
     }
+    private void openClinicalInfoFragmentFromVitals() {
+        ClinicalInfoFragment clinicalInfoFragment = new ClinicalInfoFragment();
 
-    private void openClinicalInfoActivityFromVitals() {
-        Intent intent = new Intent(getActivity(), ClinicalInfoActivity.class);
-        intent.putExtra("opened_from", "VITALS");
-        startActivity(intent);
+        // Pass "opened_from" argument via Bundle
+        Bundle args = new Bundle();
+        args.putString("opened_from", "VITALS");
+        clinicalInfoFragment.setArguments(args);
+
+        // Replace fragment in your container, e.g. R.id.fl_main
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fl_main, clinicalInfoFragment)
+                .addToBackStack(null)  // so you can press back
+                .commit();
     }
+
     public String getLocalToUTCDate(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -384,17 +386,23 @@ public class VitalHealthTrends extends Fragment {
     }
 
     private void nextDateVital() throws ParseException {
-        Date dt = new Date();
-        DateTime curdt = new DateTime(dt);
+        DateTime today = new DateTime(); // current date
         DateTime dtPlusOne = curdate.plusDays(1);
-        curDay.setText(spdf.format(dtPlusOne.toDate()));
-        curIndex = curIndex+1;
-        curdate = dtPlusOne;
-        Log.d("nextDateaddsOne",dtPlusOne.toString());
-        Log.d("nextDatecurdt",curdt.toString());
 
-        checkvitels(dtPlusOne.toString(),dtPlusOne.toString());
-        Log.d("day1",spdf.format(dtPlusOne.toDate()));
+        // 🔒 Prevent selecting a future date
+        if (dtPlusOne.isAfter(today)) {
+            Toast.makeText(getContext(), "You cannot view upcoming dates.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        curDay.setText(spdf.format(dtPlusOne.toDate()));
+        curIndex = curIndex + 1;
+        curdate = dtPlusOne;
+
+        Log.d("nextDateaddsOne", dtPlusOne.toString());
+        Log.d("today", today.toString());
+
+        checkvitels(dtPlusOne.toString(), dtPlusOne.toString());
     }
 
     private void checkvitels(String startDate, String endDate) {

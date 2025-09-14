@@ -1574,6 +1574,16 @@ namespace RPMWeb.Data.Common
         public string modelNumber { get; set; }
     }
 
+    public class TranstekDeviceTelemetry
+    {
+        public string deviceId { get; set; }
+        public long createdAt { get; set; }
+        public object data { get; set; }
+        public object deviceData { get; set; }
+        public bool isTest { get; set; }
+        public string modelNumber { get; set; }
+    }
+
     public class DeviceTelemetryStatus
     {
         public string deviceId { get; set; }
@@ -2393,8 +2403,9 @@ namespace RPMWeb.Data.Common
     }
 
 
-    public class chathook {
-        public string author { get; set; }
+    public class chathook
+    {
+        public string Author { get; set; }
         public string Body { get; set; }
         public string Attributes { get; set; }
         public string AccountSid { get; set; }
@@ -2403,29 +2414,20 @@ namespace RPMWeb.Data.Common
         public string Source { get; set; }
         public string ConversationSid { get; set; }
         public string ParticipantSid { get; set; }
-        //public string DateCreated { get; set; }
-
-
     }
 
     public class smshook
     {
-        public string MessageSid { get; set; }
-        public string SmsSid { get; set; }
+        public string SmsSid { get; set; }          
         public string AccountSid { get; set; }
-        public string MessagingServiceSid { get; set; }
-
         public string From { get; set; }
         public string To { get; set; }
-
         public string Body { get; set; }
-
         public string SmsStatus { get; set; }
 
-
-
-
+        //public string SentDateUTC { get; set; }  // ❌ Twilio doesn’t send this
     }
+
     public class commUserNamesforVideoCall
     {
         public string CommUserNameCareTeam { get; set; }
@@ -2464,19 +2466,8 @@ namespace RPMWeb.Data.Common
         public string DateTime { get; set; }
         public string Author { get; set; }
     }
-	public class deviceAvailable
+    public class deviceAvailable
     {
         public string DeviceNumber { get; set; }
     }
-	 public class PatientProgramDetailsInsertActivePatients
-    {
-        public int PatientId { get; set; }
-        public int PatientProgramId { get; set; }
-        public int ProgramId { get; set; }
-        public List<int> VitalIds { get; set; }
-        public string CreatedBy { get; set; }
-        public GoalDetails[] GoalDetails { get; set; }
-        public ProgramDiagnostics[] ProgramDiagnosis { get; set; }
-    }
-	
 }

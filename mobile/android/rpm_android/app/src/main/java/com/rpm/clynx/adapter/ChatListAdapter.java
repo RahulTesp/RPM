@@ -68,7 +68,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
         if (chat.getLastMsgText() != null && !chat.getLastMsgText().isEmpty()) {
             holder.lastMsgText.setText(chat.getLastMsgText());
         } else {
-            holder.lastMsgText.setText("Just now");
+            holder.lastMsgText.setText("");
         }
 
         // Handle click event
