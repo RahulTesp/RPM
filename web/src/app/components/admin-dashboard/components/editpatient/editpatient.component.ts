@@ -798,6 +798,16 @@ export class EditpatientComponent implements OnInit {
         that.programForm.controls['clinic'].setValue(
           that.Patientdata.PatientPrescribtionDetails.Clinic
         );
+        var consultDateData = this.datepipe.transform(
+          that.Patientdata.PatientPrescribtionDetails.ConsultationDate,
+          'MMM/dd/yyyy'
+        );
+          this.programForm.patchValue({
+          consultdate: consultDateData &&
+                      consultDateData !== '1/1/1970 12:00:00 AM'
+            ? this.convertDate(consultDateData)
+            : null
+        });
         // Manjusha code change
         // Parse the custom date format "dd-MM-yyyy HH:mm:ss"
         const rawDate = that.Patientdata.PatientPrescribtionDetails.ConsultationDate;
@@ -809,12 +819,7 @@ export class EditpatientComponent implements OnInit {
           this.convertDate(isoString)
        );
 
-          this.programForm.patchValue({
-          consultdate: consultDateData &&
-                      consultDateData !== '1/1/1970 12:00:00 AM'
-            ? this.convertDate(consultDateData)
-            : null
-        });
+       
         var prescribeDateData = this.datepipe.transform(
           this.convertToLocalTime(
             that.Patientdata.PatientPrescribtionDetails.PrescribedDate
