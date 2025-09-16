@@ -817,7 +817,9 @@ export class EditpatientComponent implements OnInit {
       const isoString = ConsultationDateIso.toISOString();
       that.programForm.controls['consultdate'].setValue(
           this.convertDate(isoString)
-       ); 
+       );
+
+       
         var prescribeDateData = this.datepipe.transform(
           this.convertToLocalTime(
             that.Patientdata.PatientPrescribtionDetails.PrescribedDate
