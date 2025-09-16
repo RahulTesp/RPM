@@ -804,6 +804,10 @@ export class EditpatientComponent implements OnInit {
         // Parse the custom date format "dd-MM-yyyy HH:mm:ss"
         const rawDate = that.Patientdata.PatientPrescribtionDetails.ConsultationDate;
 
+         var consultDateData = this.datepipe.transform(
+          that.Patientdata.PatientPrescribtionDetails.ConsultationDate,
+          'MMM/dd/yyyy'
+        );
         // that.programForm.controls['consultdate'].setValue(
         //   this.convertDate(consultDateData)
         // );
@@ -2437,14 +2441,14 @@ export class EditpatientComponent implements OnInit {
         DeviceStatus: 'Error',
       };
 
-      this.rpm.rpm_post('/api/device/updatedevicestatus', req_body)
+      
       this.rpm.rpm_post('/api/device/updatedevicestatus', req_body).then(
-      .then((data) => {
         (data:any) => {
         this.showconfirmDialog.showConfirmDialog(
             data.message,
           'Success',
           () => {
+             this.RemoveDevice(index);
               this.ReloadDeviceList(1);
               this.ReloadDeviceList(2);
               this.ReloadDeviceList(3);
@@ -2466,8 +2470,6 @@ export class EditpatientComponent implements OnInit {
             },
             false
           );
-          // this.openDialogWindow('Error', `Failed to Update Device Error.`);
-          //show error pop up, could not update patient
         }
       );
     }
