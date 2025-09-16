@@ -1828,13 +1828,13 @@ namespace RPMWeb.Dal
                             {
                                 sda.Fill(ds);
 
-                                List<int> programVitalsIds = new List<int>();
+                                List<string> programVitalsIds = new List<string>();
                                 foreach (DataRow dr in ds.Tables[0].Rows)
                                 {
-                                    programVitalsIds.Add(Convert.ToInt32(dr["VitalId"]));
+                                    programVitalsIds.Add(dr["VitalName"].ToString());
                                 }
 
-                                if (programVitalsIds.Contains(2))
+                                if (programVitalsIds.Contains("Blood Glucose"))
                                 {
                                     List<BloodGlucoseReading> readinglistBG = new List<BloodGlucoseReading>();
                                     foreach (DataRow dr2 in ds.Tables[1].Rows)
@@ -1854,7 +1854,7 @@ namespace RPMWeb.Dal
                                     vitalReadings.BloodGlucose = readinglistBG;
                                 }
 
-                                if (programVitalsIds.Contains(1))
+                                if (programVitalsIds.Contains("Blood Pressure"))
                                 {
                                     List<BloodPressureReading> BPreading = new List<BloodPressureReading>();
                                     foreach (DataRow dr2 in ds.Tables[2].Rows)
@@ -1878,7 +1878,7 @@ namespace RPMWeb.Dal
                                     vitalReadings.BloodPressure = BPreading;
                                 }
 
-                                if (programVitalsIds.Contains(3))
+                                if (programVitalsIds.Contains("Weight"))
                                 {
                                     List<WeightReading> readinglistBW = new List<WeightReading>();
                                     foreach (DataRow dr2 in ds.Tables[3].Rows)
@@ -1898,7 +1898,7 @@ namespace RPMWeb.Dal
                                     vitalReadings.Weight = readinglistBW;
                                 }
 
-                                if (programVitalsIds.Contains(4))
+                                if (programVitalsIds.Contains("Oxygen"))
                                 {
                                     List<BloodOxygenReading> BOreading = new List<BloodOxygenReading>();
                                     foreach (DataRow dr2 in ds.Tables[4].Rows)
