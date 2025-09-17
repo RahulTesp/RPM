@@ -32,6 +32,8 @@ final class RPMLoginViewModel: ObservableObject {
                     print("Token:", loginDataModel.tkn)
                     print("MFA:", loginDataModel.mfa)
                     
+                    SessionManager.shared.reset()
+                    
                     // Set MFA flags
 
                     defaults.setValue(loginDataModel.mfa, forKey: "MFAvalue")
@@ -50,6 +52,10 @@ final class RPMLoginViewModel: ObservableObject {
                     } else {
                         // Save token for normal flow
                         defaults.setValue(loginDataModel.tkn, forKey: "jsonwebtoken")
+                     
+                     
+                        
+                        
                         print("Saved login token:", defaults.string(forKey: "jsonwebtoken") ?? "nil")
                         
                         defaults.setValue("MFAENABLEDFALSE", forKey: "MFAENABLEDFALSE")
@@ -226,14 +232,13 @@ final class RPMLoginViewModel: ObservableObject {
         })
     }
     
-    
     func logout(completion: @escaping (String?, AlertItem?) -> Void) {
         print("self.ggttttt")
         print(self.isAuthenticated)
         let defaults = UserDefaults.standard
         
         guard let tkn = defaults.string(forKey: "jsonwebtoken") else {
-            completion(nil, AlertContext.invalidUser) // or other alert
+            completion(nil, AlertContext.invalidUser)
             return
         }
         
@@ -241,13 +246,15 @@ final class RPMLoginViewModel: ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let responseString):
-                    print("LOGOUTresponseString",responseString)
-                    print("self.isAuthenticated",self.isAuthenticated)
-              
+                    print("LOGOUTresponseString", responseString)
+                    
+                    // Reset session flags
                     SessionManager.shared.reset()
-                 
+                    
+                    // Make sure UI goes back to login
+                    self.isAuthenticated = false
                     self.isLoggedOut = true
-             
+                    
                     completion(responseString, nil)
                     
                 case .failure(let error):
@@ -264,12 +271,58 @@ final class RPMLoginViewModel: ObservableObject {
                     case .numberInvalidError: alert = AlertContext.numberInvalidError
                     case .otpWrongError: alert = AlertContext.otpWrongError
                     case .invalidUser: alert = AlertContext.invalidUser
-                    case .unauthorized:
-                        alert = AlertContext.unauthorized
+                    case .unauthorized: alert = AlertContext.unauthorized
                     }
                     completion(nil, alert)
                 }
             }
         }
     }
+
+    
+//    func logout(completion: @escaping (String?, AlertItem?) -> Void) {
+//        print("self.ggttttt")
+//        print(self.isAuthenticated)
+//        let defaults = UserDefaults.standard
+//        
+//        guard let tkn = defaults.string(forKey: "jsonwebtoken") else {
+//            completion(nil, AlertContext.invalidUser) // or other alert
+//            return
+//        }
+//        
+//        NetworkManager.shared.logOut(tkn: tkn) { result in
+//            DispatchQueue.main.async {
+//                switch result {
+//                case .success(let responseString):
+//                    print("LOGOUTresponseString",responseString)
+//                    print("self.isAuthenticated",self.isAuthenticated)
+//              
+//                    SessionManager.shared.reset()
+//                 
+//                    self.isLoggedOut = true
+//             
+//                    completion(responseString, nil)
+//                    
+//                case .failure(let error):
+//                    print("logOutrror", error)
+//                    let alert: AlertItem
+//                    switch error {
+//                    case .invalidData: alert = AlertContext.invalidData
+//                    case .invalidURL: alert = AlertContext.invalidURL
+//                    case .invalidResponse: alert = AlertContext.invalidResponse
+//                    case .unableToComplete: alert = AlertContext.unableToComplete
+//                    case .decodingError: alert = AlertContext.decodingError
+//                    case .invalidPassword: alert = AlertContext.invalidPassword
+//                    case .lockedError: alert = AlertContext.lockedError
+//                    case .numberInvalidError: alert = AlertContext.numberInvalidError
+//                    case .otpWrongError: alert = AlertContext.otpWrongError
+//                    case .invalidUser: alert = AlertContext.invalidUser
+//                    case .unauthorized:
+//                        alert = AlertContext.unauthorized
+//                    }
+//                    completion(nil, alert)
+//                }
+//            }
+//        }
+//    }
 }

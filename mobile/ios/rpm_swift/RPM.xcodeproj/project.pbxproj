@@ -496,7 +496,6 @@
 				3C4966AC2D7EB89700B35848 /* AppDelegate.swift */,
 				13B4582A284507A400A76F67 /* RPMApp.swift */,
 				3CBD6B3E296C1C61000597E1 /* CustomFonts */,
-				3CA6EBD728F42A3F00EF5F91 /* BasicViewModels */,
 				3CBA246B289A377E000526CF /* Service */,
 				3C8D1F1528646C8F00FC4F31 /* Info.plist */,
 				3C8AFD26284BE1FF00A06078 /* Assets.xcassets */,
@@ -854,6 +853,7 @@
 		3CBD6B3E296C1C61000597E1 /* CustomFonts */ = {
 			isa = PBXGroup;
 			children = (
+				3CA6EBD728F42A3F00EF5F91 /* BasicViewModels */,
 				3CBD6B43296C2575000597E1 /* Rubik-Italic.ttf */,
 				3CBD6B41296C24D8000597E1 /* Rubik-SemiBold.ttf */,
 				3CBD6B3F296C1CCE000597E1 /* Rubik-Regular.ttf */,

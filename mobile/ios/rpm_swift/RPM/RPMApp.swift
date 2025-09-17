@@ -72,33 +72,51 @@ struct RPMApp: App {
                                                print("Messages Manager: \(model.messagesManager != nil ? "Initialized" : "Not Initialized")")
                                                print("Participants Manager: \(model.participantsManager != nil ? "Initialized" : "Not Initialized")")
                     }
+                    .onChange(of: scenePhase) { phase in
+                        if phase == .active {
+                            print("App came to foreground, checking token expiry...")
+                            SessionManager.shared.logoutIfTokenExpired()
+                        }
+                    }
+
                 
                     .onChange(of: sessionManager.didReceiveUnauthorized) { isUnauthorized in
+                        print("calling onchange", isUnauthorized)
                         if isUnauthorized {
-                            print("Received 401 Unauthorized. Logging out...")
-
-                            homeViewModel.reset()
-
-                            // Step 1: Logout API call
-                            loginStateViewModel.logout { response, alert in
-                                print("Logout server call finished")
-
-                                if let alert = alert {
-                                    print("Logout failed: \(alert.title)")  // log for debugging
-                                }
-
-                                // Step 2: Always clean app state, even if logout fails
-                                Task { @MainActor in
-                                    model.signOutChat()
-                                    callManager.disconnect()
-                                    roomManager.disconnect()
-                                    
-                                    navigationHelper.path = []
-                                    loginStateViewModel.isAuthenticated = false
-                                    
-                                    print("navigationHelper.path after logout: \(navigationHelper.path)")
-                                }
-                            }
+                            print("RPM APP Received 401 Unauthorized. Logging out...")
+                            
+                            Task { @MainActor in
+                                      sessionManager.logout(
+                                          appModel: model,
+                                          homeViewModel: homeViewModel,
+                                          navigationHelper: navigationHelper,
+                                          loginViewModel: loginStateViewModel,
+                                          callManager: callManager,
+                                          roomManager: roomManager
+                                      )
+                                  }
+//                            homeViewModel.reset()
+//
+//                            // Step 1: Logout API call
+//                            loginStateViewModel.logout { response, alert in
+//                                print("Logout server call finished")
+//
+//                                if let alert = alert {
+//                                    print("Logout failed: \(alert.title)")  // log for debugging
+//                                }
+//
+//                                // Step 2: Always clean app state, even if logout fails
+//                                Task { @MainActor in
+//                                    model.signOutChat()
+//                                    callManager.disconnect()
+//                                    roomManager.disconnect()
+//                                    
+//                                    navigationHelper.path = []
+//                                    loginStateViewModel.isAuthenticated = false
+//                                    
+//                                    print("navigationHelper.path after logout: \(navigationHelper.path)")
+//                                }
+//                            }
                         }
                     }
 
@@ -117,6 +135,7 @@ struct RPMApp: App {
                                 .environmentObject(mediaSetupViewModel)
                                 .environmentObject(homeViewModel)
                                 .environmentObject(loginStateViewModel)
+                                .environmentObject(sessionManager)
                             
                         case .forgotPassword:
                                   RPMGenerateOTPView()
@@ -145,6 +164,7 @@ struct RPMApp: App {
                                 .environmentObject(mediaSetupViewModel)
                                 .environmentObject(homeViewModel)
                                 .environmentObject(loginStateViewModel)
+                                .environmentObject(sessionManager)
                             
                         case .programInfoView:
                                    RPMProgramInfoView()
@@ -278,6 +298,7 @@ struct ApplicationSwitcher: View {
                     .environmentObject(mediaSetupViewModel)
                     .environmentObject(homeViewModel)
                     .environmentObject(loginViewModel)
+                    .environmentObject(sessionManager)
                 
                     .onAppear {
                         print("AppModel in RPMLoginView:", appModel)

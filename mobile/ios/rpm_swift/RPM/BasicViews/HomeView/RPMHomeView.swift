@@ -82,6 +82,7 @@ struct RPMHomeView: View {
     @State private var rejectionMessage = ""
     @EnvironmentObject var sessionManager: SessionManager
     @EnvironmentObject var memberDetList: MembersListViewModel
+   
     
     var body: some View {
         ZStack {

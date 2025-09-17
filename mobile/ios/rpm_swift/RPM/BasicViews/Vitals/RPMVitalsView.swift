@@ -64,6 +64,7 @@ struct RPMVitalsView: View {
     @EnvironmentObject var participantsManager: ParticipantsManager
     @EnvironmentObject var conversationManager: ConversationManager
     @EnvironmentObject var navigationHelper: NavigationHelper
+    @EnvironmentObject var sessionManager: SessionManager
     @State private var showFutureDateToast = false
 
 

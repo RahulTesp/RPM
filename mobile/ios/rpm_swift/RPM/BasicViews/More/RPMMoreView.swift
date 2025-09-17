@@ -22,6 +22,7 @@ struct RPMMoreView: View {
     @State private var isActive = false
     @State private var returningFromClinicalInfo = false
     @EnvironmentObject var homeViewModel: RPMHomeViewModel
+    @EnvironmentObject var sessionManager: SessionManager
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -98,30 +99,67 @@ struct RPMMoreView: View {
     
     func performLogout() {
         print(" performLogoutPath:", navigationHelper.path)
-        homeViewModel.reset()
-        // Step 1: Logout API call
-        loginViewModel.logout { response, alert in
-            print(" Logout server call finished")
-
-            // Step 2: Handle error
-            if let alert = alert {
-                print(" Logout failed: \(alert.title)")
-                return
-            }
-
-            // Step 3: Main cleanup
-            Task { @MainActor in
-                appModel.signOutChat() // Twilio cleanup etc.
-
-                callManager.disconnect()
-                roomManager.disconnect()
-                // Step 4: Reset app state
-                navigationHelper.path = [] // clear all views
-                loginViewModel.isAuthenticated = false // show LoginView
-                print(" navigationHelper.pathMORE: \( navigationHelper.path)")
-            }
-        }
+        
+        Task { @MainActor in
+                  sessionManager.logout(
+                      appModel: appModel,
+                      homeViewModel: homeViewModel,
+                      navigationHelper: navigationHelper,
+                      loginViewModel: loginViewModel,
+                      callManager: callManager,
+                      roomManager: roomManager
+                  )
+              }
+        
+//        homeViewModel.reset()
+//
+//        // Always attempt logout API
+//        loginViewModel.logout { response, alert in
+//            print(" Logout server call finished")
+//
+//            if let alert = alert {
+//                print(" Logout failed: \(alert.title)")
+//            }
+//
+//            //  Always cleanup, regardless of success/failure
+//            Task { @MainActor in
+//                appModel.signOutChat()
+//                callManager.disconnect()
+//                roomManager.disconnect()
+//                navigationHelper.path = []
+//                loginViewModel.isAuthenticated = false
+//                print(" navigationHelper.pathMORE: \(navigationHelper.path)")
+//            }
+//        }
     }
+
+    
+//    func performLogout() {
+//        print(" performLogoutPath:", navigationHelper.path)
+//        homeViewModel.reset()
+//        // Step 1: Logout API call
+//        loginViewModel.logout { response, alert in
+//            print(" Logout server call finished")
+//
+//            // Step 2: Handle error
+//            if let alert = alert {
+//                print(" Logout failed: \(alert.title)")
+//                return
+//            }
+//
+//            // Step 3: Main cleanup
+//            Task { @MainActor in
+//                appModel.signOutChat() // Twilio cleanup etc.
+//
+//                callManager.disconnect()
+//                roomManager.disconnect()
+//                // Step 4: Reset app state
+//                navigationHelper.path = [] // clear all views
+//                loginViewModel.isAuthenticated = false // show LoginView
+//                print(" navigationHelper.pathMORE: \( navigationHelper.path)")
+//            }
+//        }
+//    }
 
 }
 

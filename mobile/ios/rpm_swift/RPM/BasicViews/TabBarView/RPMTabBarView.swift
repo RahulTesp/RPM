@@ -62,6 +62,7 @@ struct RPMTabBarView: View {
                     .environmentObject(mediaSetupViewModel)
                     .environmentObject(loginViewModel)
                     .environmentObject(memberDetList)
+                    .environmentObject(sessionManager)
                 
                     .onAppear {
                         print("AppModelinRPMHome:", appModel)
@@ -81,6 +82,8 @@ struct RPMTabBarView: View {
                     .environmentObject(conversationManager)
                     .environmentObject(messagesManager)
                     .environmentObject(participantsManager)
+                    .environmentObject(sessionManager)
+                
                     .tabItem {
                         Image("ToDoOutline")
                         Text("Todo List")
@@ -94,6 +97,7 @@ struct RPMTabBarView: View {
                         .environmentObject(conversationManager)
                         .environmentObject(messagesManager)
                         .environmentObject(participantsManager)
+                        .environmentObject(sessionManager)
                         .tabItem {
                             Image("VitalOutline")
                             Text("Vitals")
@@ -115,6 +119,7 @@ struct RPMTabBarView: View {
                 
                     .environmentObject(accountListVM)
                     .environmentObject(loginViewModel)
+                    .environmentObject(sessionManager)
                 
                     .tabItem {
                         Image("MenuOutline")

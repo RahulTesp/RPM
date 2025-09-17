@@ -48,7 +48,8 @@ struct RPMTodoListView: View {
     @EnvironmentObject var participantsManager: ParticipantsManager
     @EnvironmentObject var conversationManager: ConversationManager
     @EnvironmentObject var navigationHelper: NavigationHelper
- 
+    @EnvironmentObject var sessionManager: SessionManager
+    
     private var dates: [Date] {
         getWeek(startDate: currentDate)
     }

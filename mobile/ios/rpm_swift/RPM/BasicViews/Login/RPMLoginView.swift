@@ -25,6 +25,7 @@ struct RPMLoginView: View {
     @EnvironmentObject var localParticipant: LocalParticipantManager
     @EnvironmentObject var mediaSetupViewModel: MediaSetupViewModel
     @EnvironmentObject var homeViewModel: RPMHomeViewModel
+    @EnvironmentObject var sessionManager: SessionManager
     @State private var showLoginErrorAlert = false
     @State private var loginAlertTitle = ""
     @State private var loginAlertMessage = ""
@@ -34,8 +35,8 @@ struct RPMLoginView: View {
 //    @State private var username: String = "AHV01927"
 //    @State private var password: String = "cXPJKIWQ"
     
-    @State private var username: String = "ARPL00116"
-    @State private var password: String = "TEsplabs@123"
+    @State private var username: String = "CC0000092"
+    @State private var password: String = "D3PVQMWL"
     
 //    
 //    @State private var username: String = "WSPC02061"
