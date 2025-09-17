@@ -140,9 +140,9 @@
             <option [ngValue]="undefined" selected>All Vitals</option>
             <option
               *ngFor="let data of patientVitalsArray; let i = index"
-              [value]="data.Vital"
+              [value]="data"
             >
-              {{ data.Vital }}
+              {{ data }}
             </option>
           </select>
         </div>
@@ -857,7 +857,7 @@
               /><input
                 class="search_input input_panel"
                 [(ngModel)]="SearchpatientBilling"
-                (keyup.enter)="billingDataFilter()"
+                (ngModelChange)="billingDataFilter()"
               />
             </div>
             <div class="search_heading_default" *ngIf="!searchValueName">
@@ -946,12 +946,12 @@
                 class="search_icon"
                 src="../../../../../assets/04-Icons/Icons_Cancel.svg"
                 (click)="searchAssigneeClose()"
-              />
-              <input
-                class="search_input input_panel"
-                [(ngModel)]="billingAssigneeName"
-                (ngModelChange)="billingDataFilter()"
-              />
+              /> <input
+                  class="search_input input_panel"
+                  (keyup)="applyDataFilter($event)"
+                  id="p_AssignedSearchInput"
+                  (focus)="setupFilter('AssignedMemeber')"
+                  [value]="assigneeSerach" autocomplete="off"/>
 
             </div>
             <div

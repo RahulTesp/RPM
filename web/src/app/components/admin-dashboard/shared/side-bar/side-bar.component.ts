@@ -92,7 +92,6 @@ export class SideBarComponent implements OnInit {
       activeIcon: '/assets/04-Icons/Icons_Admin A.svg',
       route: '/admin/admin',
       hideForRoles: [6, 8],
-
     },
     // Patient Login Menu
     {

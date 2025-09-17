@@ -996,6 +996,8 @@
 }
 .text-danger {
   color: #a20d0a;
+  padding-left:16px;
+
 }
 .SmallFormMessage {
   font-size: 0.6rem;
@@ -1203,4 +1205,10 @@ mat-progress-spinner {
   text-overflow: ellipsis;
   max-width: 300px; /* Adjust based on your design needs */
   padding: 0 8px; /* Add some padding for better spacing */
+}
+.SmallFormMessage {
+  font-size: 0.6rem;
+  text-align: left;
+  height: 0.4rem;
+  padding-left: 0.8rem;
 }

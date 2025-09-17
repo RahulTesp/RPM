@@ -892,7 +892,7 @@ export class RightSidebarComponent implements OnInit {
     // Step 3: Prepare request body
     if (this.registerSchedule.valid) {
       const req_body: any = {
-        AssignedTo:  parseInt(this.Scheduled_user),
+        AssignedTo: parseInt(this.Scheduled_user),
         ScheduleTypeId: parseInt(this.registerSchedule.controls.scheduleType.value),
         Schedule: this.registerSchedule.controls.frequency.value,
         Comments: this.registerSchedule.controls.scheduleDescription.value,
@@ -1586,7 +1586,7 @@ export class RightSidebarComponent implements OnInit {
     return this.registerSchedule.valid;
   }
   private buildSingleScheduleUpdatePayload(): any {
-    const [scheduleyear, schedulemonth, scheduleday] = this.registerSchedule.controls.startDate.value.split('-').map(Number);
+        const [scheduleyear, schedulemonth, scheduleday] = this.registerSchedule.controls.startDate.value.split('-').map(Number);
     var scheduleDate = new Date(scheduleyear, schedulemonth - 1, scheduleday, 0, 0, 0);
     return {
       CurrentScheduleId: this.schedule_edit_id,

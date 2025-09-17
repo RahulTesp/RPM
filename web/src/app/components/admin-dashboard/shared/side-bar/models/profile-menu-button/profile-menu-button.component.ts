@@ -187,6 +187,7 @@ export class ProfileMenuButtonComponent implements OnInit {
       alert('All password fields are required. Kindly provide the Old, New, and Confirm Password')
     }
   }
+
   updatePasswordErrors(): void {
     const control = this.passwordForm.get('newpw');
     if (!control) {

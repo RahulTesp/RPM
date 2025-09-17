@@ -174,6 +174,9 @@ export class AddpatientComponent implements OnInit {
   rolelist: any;
   cityFlag: any;
   ngOnInit(): void {
+    this.file = null;
+    this.image = null;
+
     // this.todaty_date = new Date();
     this.file = null;
     this.image = null;

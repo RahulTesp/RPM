@@ -208,6 +208,7 @@ export class AddUserComponent implements OnInit {
         req_body['Id'] = this.put_user_id;
         this.rpm.rpm_post('/api/users/updateuser', req_body).then(
           (data) => {
+          this.submitImage(this.put_user_id)
           this.confirmDialog.showConfirmDialog(
             'User Details Updated Successfully!!',
             'Success',
@@ -464,15 +465,16 @@ export class AddUserComponent implements OnInit {
     // a[0].setAttribute("style", "background-image:"+this.image.name);
     // a[0].setAttribute("style", "background: url(\"https://rpmstorage123.blob.core.windows.net/rpmprofilepictures/CL500626\"); background-repeat: no-repeat;  background-size: 100% 100%;");
   }
+
   async saveUserFlow() {
   try {
     await this.submitImage(this.put_user_id);  // wait until upload completes
     this.registerUser();               // run only if upload succeeded
   } catch (err:any) {
    alert(`${err.error.message} Registration aborted.`);
-  }
-}
 
+  }
+  }
   submitImage(pid: any) {
   if (this.image) {
     const myPhoto = uuid.v4();
