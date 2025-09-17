@@ -1677,10 +1677,7 @@ namespace RPMWeb.Dal
             try
             {
                 PatientVitalReadings vitalReadings = new PatientVitalReadings();
-                List<BloodPressureReading> bloodPressureList = new List<BloodPressureReading>();
-                List<BloodGlucoseReading> bloodGlucoseList = new List<BloodGlucoseReading>();
-                List<WeightReading> weigthList = new List<WeightReading>();
-                List<BloodOxygenReading> bloodOxygenList = new List<BloodOxygenReading>();
+
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {
                     con.Open();
@@ -1692,6 +1689,7 @@ namespace RPMWeb.Dal
                         command.Parameters.Add("@StartDate", SqlDbType.SmallDateTime).Value = StartDate;
                         command.Parameters.Add("@EndDate", SqlDbType.SmallDateTime).Value = EndDate;
                         command.Parameters.Add("@CreatedBy", SqlDbType.NVarChar).Value = CreatedBy;
+
                         using (SqlDataAdapter sda = new SqlDataAdapter())
                         {
                             sda.SelectCommand = command;
@@ -1699,73 +1697,106 @@ namespace RPMWeb.Dal
                             {
                                 sda.Fill(ds);
 
-                                List<BloodGlucoseReading> readinglistBG = new List<BloodGlucoseReading>();
+                                List<string> programVitalsIds = new List<string>();
+                                foreach (DataRow dr in ds.Tables[0].Rows)
+                                {
+                                    programVitalsIds.Add(dr["VitalName"].ToString());
+                                }
 
-                                foreach (DataRow dr2 in ds.Tables[0].Rows)
+                                if (programVitalsIds.Contains("Blood Glucose"))
                                 {
-                                    BloodGlucoseReading reading = new BloodGlucoseReading();
-                                    reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
-                                    reading.Schedule = dr2["MeasureName"].ToString();
-                                    reading.BGmgdl = Convert.ToInt32(dr2["MeasureValue"]);
-                                    reading.Status = dr2["Remark"].ToString();
-                                    reading.Remarks = dr2["Remark"].ToString();
-                                    readinglistBG.Add(reading);
+                                    List<BloodGlucoseReading> readinglistBG = new List<BloodGlucoseReading>();
+                                    foreach (DataRow dr2 in ds.Tables[1].Rows)
+                                    {
+                                        BloodGlucoseReading reading = new BloodGlucoseReading();
+                                        reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
+                                        reading.Schedule = dr2["MeasureName"].ToString();
+                                        reading.BGmgdl = Convert.ToInt32(dr2["MeasureValue"]);
+                                        reading.Status = dr2["Remark"].ToString();
+                                        reading.Remarks = dr2["Remark"].ToString();
+                                        readinglistBG.Add(reading);
+                                    }
+                                    if (!readinglistBG.Any())
+                                    {
+                                        readinglistBG = new List<BloodGlucoseReading>();
+                                    }
+                                    vitalReadings.BloodGlucose = readinglistBG;
                                 }
-                                vitalReadings.BloodGlucose = readinglistBG;
-                                List<BloodPressureReading> BPreading = new List<BloodPressureReading>();
-                                foreach (DataRow dr2 in ds.Tables[1].Rows)
-                                {
-                                    BloodPressureReading reading = new BloodPressureReading();
-                                    reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
-                                    reading.Systolic = Convert.ToInt32(dr2["SystolicValue"]);
-                                    reading.Diastolic = Convert.ToInt32(dr2["DiastolicValue"]);
-                                    reading.pulse = Convert.ToInt32(dr2["PulseValue"]);
-                                    reading.SystolicStatus = dr2["systRemark"].ToString();
-                                    reading.DiastolicStatus = dr2["diasRemark"].ToString();
-                                    reading.pulseStatus = dr2["pulsRemark"].ToString();
-                                    reading.Remarks = dr2["TotalRemark"].ToString();
-                                    reading.Status = dr2["TotalRemark"].ToString();
-                                    BPreading.Add(reading);
-                                }
-                                vitalReadings.BloodPressure = BPreading;
-                                List<WeightReading> readinglistBW = new List<WeightReading>();
 
-                                foreach (DataRow dr2 in ds.Tables[2].Rows)
+                                if (programVitalsIds.Contains("Blood Pressure"))
                                 {
-                                    WeightReading reading = new WeightReading();
-                                    reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
-                                    reading.Schedule = dr2["MeasureName"].ToString();
-                                    reading.BWlbs = Convert.ToSingle(dr2["MeasureValue"]);
-                                    reading.Status = dr2["Remark"].ToString();
-                                    reading.Remarks = dr2["Remark"].ToString();
-                                    readinglistBW.Add(reading);
+                                    List<BloodPressureReading> BPreading = new List<BloodPressureReading>();
+                                    foreach (DataRow dr2 in ds.Tables[2].Rows)
+                                    {
+                                        BloodPressureReading reading = new BloodPressureReading();
+                                        reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
+                                        reading.Systolic = Convert.ToInt32(dr2["SystolicValue"]);
+                                        reading.Diastolic = Convert.ToInt32(dr2["DiastolicValue"]);
+                                        reading.pulse = Convert.ToInt32(dr2["PulseValue"]);
+                                        reading.SystolicStatus = dr2["systRemark"].ToString();
+                                        reading.DiastolicStatus = dr2["diasRemark"].ToString();
+                                        reading.pulseStatus = dr2["pulsRemark"].ToString();
+                                        reading.Remarks = dr2["TotalRemark"].ToString();
+                                        reading.Status = dr2["TotalRemark"].ToString();
+                                        BPreading.Add(reading);
+                                    }
+                                    if (!BPreading.Any())
+                                    {
+                                        BPreading = new List<BloodPressureReading>();
+                                    }
+                                    vitalReadings.BloodPressure = BPreading;
                                 }
-                                vitalReadings.Weight = readinglistBW;
-                                List<BloodOxygenReading> BOreading = new List<BloodOxygenReading>();
-                                foreach (DataRow dr2 in ds.Tables[3].Rows)
+
+                                if (programVitalsIds.Contains("Weight"))
                                 {
-                                    BloodOxygenReading reading = new BloodOxygenReading();
-                                    reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
-                                    reading.Pulse = Convert.ToInt32(dr2["pulseValue"]);
-                                    reading.Oxygen = Convert.ToInt32(dr2["oxygenValue"]);
-                                    reading.PulseStatus = dr2["pulseRemark"].ToString();
-                                    reading.OxygenStatus = dr2["oxygenRemark"].ToString();
-                                    reading.Remarks = dr2["TotalRemark"].ToString();
-                                    reading.Status = dr2["TotalRemark"].ToString();
-                                    BOreading.Add(reading);
+                                    List<WeightReading> readinglistBW = new List<WeightReading>();
+                                    foreach (DataRow dr2 in ds.Tables[3].Rows)
+                                    {
+                                        WeightReading reading = new WeightReading();
+                                        reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
+                                        reading.Schedule = dr2["MeasureName"].ToString();
+                                        reading.BWlbs = Convert.ToSingle(dr2["MeasureValue"]);
+                                        reading.Status = dr2["Remark"].ToString();
+                                        reading.Remarks = dr2["Remark"].ToString();
+                                        readinglistBW.Add(reading);
+                                    }
+                                    if (!readinglistBW.Any())
+                                    {
+                                        readinglistBW = new List<WeightReading>();
+                                    }
+                                    vitalReadings.Weight = readinglistBW;
                                 }
-                                vitalReadings.BloodOxygen = BOreading;
+
+                                if (programVitalsIds.Contains("Oxygen"))
+                                {
+                                    List<BloodOxygenReading> BOreading = new List<BloodOxygenReading>();
+                                    foreach (DataRow dr2 in ds.Tables[4].Rows)
+                                    {
+                                        BloodOxygenReading reading = new BloodOxygenReading();
+                                        reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
+                                        reading.Pulse = Convert.ToInt32(dr2["pulseValue"]);
+                                        reading.Oxygen = Convert.ToInt32(dr2["oxygenValue"]);
+                                        reading.PulseStatus = dr2["pulseRemark"].ToString();
+                                        reading.OxygenStatus = dr2["oxygenRemark"].ToString();
+                                        reading.Remarks = dr2["TotalRemark"].ToString();
+                                        reading.Status = dr2["TotalRemark"].ToString();
+                                        BOreading.Add(reading);
+                                    }
+                                    if (!BOreading.Any())
+                                    {
+                                        BOreading = new List<BloodOxygenReading>();
+                                    }
+                                    vitalReadings.BloodOxygen = BOreading;
+                                }
+
                                 return vitalReadings;
                             }
-
                         }
-
                     }
                 }
             }
             catch
             {
-
                 throw;
             }
         }
