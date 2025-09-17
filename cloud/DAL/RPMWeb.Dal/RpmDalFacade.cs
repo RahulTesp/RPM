@@ -275,7 +275,7 @@ namespace RPMWeb.Dal
         {
             return new Patient().GetPatientVitalReadingswithDateTime(PatientId, PatientProgramId, StartDate, EndDate, CreatedBy, ConnectionString);
         }
-        public static  HealthTrends GetPatientHealthTrends(string username, int PatientId,int PatientProgramId, DateTime StartDate, DateTime EndDate, string CreatedBy)
+        public static List<HealthTrends> GetPatientHealthTrends(string username, int PatientId,int PatientProgramId, DateTime StartDate, DateTime EndDate, string CreatedBy)
         {
             return new Patient().GetPatientHealthTrends(username,PatientId, PatientProgramId, StartDate, EndDate, CreatedBy, ConnectionString);
         }
@@ -316,6 +316,7 @@ namespace RPMWeb.Dal
         {
             return new PatientProgram().SavePatientProgram(Info, CreatedBy,ConnectionString);
         }
+        
         public static bool UpdatePatientProgram(PatientProgramDetailsUpdate Info)
         {
             return new PatientProgram().UpdatePatientProgram(Info, ConnectionString);
@@ -533,9 +534,13 @@ namespace RPMWeb.Dal
         {
             return new Notes().GetPatientNotes(ProgrameName, Type, PatientNoteId, CreatedBy, ConnectionString);
         }
-        public static NotesTypeMasterData GetMasterDataNotes(string ProgramName, string Type, string CreatedBy)
+        public static GetPatientNotesQA GetPatientNotes(int ProgramId, string Type, int PatientNoteId, string CreatedBy)
         {
-            return new Notes().GetMasterDataNotes(ProgramName, Type,CreatedBy, ConnectionString);
+            return new Notes().GetPatientNotes(ProgramId, Type, PatientNoteId, CreatedBy, ConnectionString);
+        }
+		public static NotesTypeMasterData GetMasterDataNotes(int ProgramId, string Type, string CreatedBy)
+        {
+            return new Notes().GetMasterDataNotes(ProgramId, Type,CreatedBy, ConnectionString);
         }
         public static List<GetNotes> GetPatientReviewNotes(int PatientId, DateTime StartDate, DateTime EndDate, string CreatedBy)
         {

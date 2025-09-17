@@ -31,14 +31,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Sync.Devices.Transt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Billing", "..\RPM.Job.Billing\RPM.Job.Billing.csproj", "{D430FE0B-081F-4FB8-9D42-569B555C1D8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.AlertsTemp", "..\RPM.Job.AlertsTemp\RPM.Job.AlertsTemp.csproj", "{F5740723-F6FA-4B79-B5EF-AE9731083696}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.AlertsSummary.Priority", "..\RPM.Job.AlertsSummary.Priority\RPM.Job.AlertsSummary.Priority.csproj", "{21375139-6DE9-4F68-BB5C-1BEFEFB7C092}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Session.Validation", "..\RPM.Job.Session.Validation\RPM.Job.Session.Validation.csproj", "{6A86165E-A766-4975-B0E9-5008668905E7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Lib.Billing.MedIT", "..\RPM.Lib.Billing.MedIT\RPM.Lib.Billing.MedIT.csproj", "{BD639D22-9FF7-43ED-90C9-248FDE5C6E23}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

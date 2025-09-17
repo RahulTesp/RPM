@@ -211,7 +211,7 @@ namespace RpmCloud.Controllers
                         return Unauthorized(new { message = "Invalid session." });
                     }
 
-                    HealthTrends List = RpmDalFacade.GetPatientHealthTrends(data.UserName, data.PatientId, data.PatientProgramId, StartDate, EndDate, data.UserName);
+                    List<HealthTrends> List = RpmDalFacade.GetPatientHealthTrends(data.UserName, data.PatientId, data.PatientProgramId, StartDate, EndDate, data.UserName);
 
                     if (!(List == null))
                     {
