@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System.Data;
-//cron continuous
+
 class Program
 {
     static ConcurrentDictionary<string, DeviceIDs> deviceid_dictionary = new ConcurrentDictionary<string, DeviceIDs>();
@@ -17,17 +17,13 @@ class Program
     {
         // Set up configuration
         var config = new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json", optional: true)
-        .AddEnvironmentVariables() // Allows overriding via Azure App Settings
-        .Build();
-        if (config == null)
-        {
-            Console.WriteLine("Configuration is null.");
-            return;
-        }
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddEnvironmentVariables() // Allows overriding via Azure App Settings
+            .Build();
+
         // Access a specific config value
-        string? connStr = config["RPM:ConnectionString"];
+        string connStr = config["RPM:ConnectionString"];
         Console.WriteLine($"RPM Connection String: {connStr}");
         // Optional: bind strongly-typed object
         var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
@@ -137,7 +133,7 @@ class Program
         while (reader.Read())
         {
             string? measureName = reader["MeasureName"].ToString();
-            string unit = reader["UnitName"].ToString()??"";
+            string unit = reader["UnitName"].ToString() ?? "";
             if (!string.IsNullOrEmpty(measureName))
             {
                 result[measureName] = unit;
@@ -166,9 +162,9 @@ class Program
                 DateTime lastRecodDate = val.ActivatedDate;
 
                 Console.WriteLine("DeviceId: " + val.Deviceid + "; Lasted Recorded :" + lastRecodDate);
-                
+
                 GetDeviceDataFromAPI(lastRecodDate, val.Deviceid);
-                
+
             }
             Console.WriteLine("TimerApiCallback end");
         }
@@ -177,7 +173,7 @@ class Program
             Console.WriteLine("exception before StagingTableQueueInsert:" + ex);
         }
     }
-    private static void GetDeviceDataFromAPI(DateTime lastRecodDate,String Deviceid)
+    private static void GetDeviceDataFromAPI(DateTime lastRecodDate, String Deviceid)
     {
         DateTime newstart = lastRecodDate.AddSeconds(2);
         string sdata = Data.CallRestMethod("HTTPS://api.iglucose.com/readings/", newstart, Deviceid, acess_key);
@@ -268,7 +264,7 @@ class Program
             reading_type = reading.reading_type,
             battery = reading.battery,
             time_zone_offset = reading.time_zone_offset.ToString(),
-            data_unit = unit??"",
+            data_unit = unit ?? "",
             data_value = unit == "mgdl" ? reading.blood_glucose_mgdl : reading.blood_glucose_mmol,
             before_meal = reading.before_meal,
             data_type = reading.before_meal ? "Fasting" : "Non-Fasting",
@@ -396,72 +392,12 @@ class Program
     }
 
     private static void StagingTableInsertProc(DatabaseInput reading)
-        catch (Exception ex)
-        {
-            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
-        }
-    }
-    private static void TimerStagingTableInsert(DatabaseInput reading)
-        catch (Exception ex)
-        {
-            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
-        }
-    }
-    private static void TimerStagingTableInsert(DatabaseInput reading)
-        catch (Exception ex)
-        {
-            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
-        }
-    }
-    private static void TimerStagingTableInsert(DatabaseInput reading)
-        catch (Exception ex)
-        {
-            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
-        }
-    }
-    private static void TimerStagingTableInsert(DatabaseInput reading)
-        catch (Exception ex)
-        {
-            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
-        }
-    }
-    private static void TimerStagingTableInsert(DatabaseInput reading)
-        catch (Exception ex)
-        {
-            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
-        }
-    }
-    private static void TimerStagingTableInsert(DatabaseInput reading)
-        catch (Exception ex)
-        {
-            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
-        }
-    }
-    private static void TimerStagingTableInsert(DatabaseInput reading)
-        catch (Exception ex)
-        {
-            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
-        }
-    }
-    private static void TimerStagingTableInsert(DatabaseInput reading)
-        catch (Exception ex)
-        {
-            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
-        }
-    }
-    private static void TimerStagingTableInsert(DatabaseInput reading)
-        catch (Exception ex)
-        {
-            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
-        }
-    }
-    private static void TimerStagingTableInsert(DatabaseInput reading)
     {
 
         try
         {
             string jsonData = JsonConvert.SerializeObject(reading);
-            
+
             Console.WriteLine("JsonStg Insert begin: " + jsonData);
             using (SqlConnection connection = new SqlConnection(CONN_STRING))
             {
@@ -473,6 +409,7 @@ class Program
                 command.ExecuteScalar();
                 connection.Close();
             }
+
         }
         catch (Exception ex)
         {
@@ -480,4 +417,8 @@ class Program
         }
         Console.WriteLine("StagingTableInsertProc end");
     }
+}
+public class RpmSettings
+{
+    public string? ConnectionString { get; set; }
 }
