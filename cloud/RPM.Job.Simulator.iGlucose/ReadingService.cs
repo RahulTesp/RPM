@@ -1,4 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
+using System.Collections.Concurrent;
+using System.Data;
 using System.Text.Json;
 
 namespace RPM.Job.Simulator.iGlucose
@@ -7,7 +10,7 @@ namespace RPM.Job.Simulator.iGlucose
     internal class ReadingService
     {
         private readonly string _connectionString;
-
+        static ConcurrentDictionary<string, DeviceIDs> deviceid_dictionary = new ConcurrentDictionary<string, DeviceIDs>();
         public ReadingService(string connectionString)
         {
             _connectionString = connectionString;
@@ -16,44 +19,60 @@ namespace RPM.Job.Simulator.iGlucose
         //Fetch the devices form the Device table with DeviceStatus = "Active" 
         public void getandProcessActiveDevices()
         {
+            var result = new Dictionary<string, DeviceIDs>();
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
+                using var command = new SqlCommand("usp_GetDeviceIds_Simulator", conn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                command.Parameters.AddWithValue("@deviceVendorName", "iGlucose");
                 conn.Open();
-                //Console.WriteLine("Fetching active devices");
 
-                var devices = new List<(string DeviceSerialNo, int DeviceTypeId, string DeviceModel)>();
-
-                string deviceQuery = @"
-                    SELECT d.DeviceSerialNo, d.DeviceTypeId, dm.Name AS DeviceModel
-                    FROM dbo.Device d
-                    INNER JOIN dbo.DeviceModel dm ON d.DeviceModelId = dm.Id
-                    WHERE d.DeviceStatus = 'Active';";
-
-                using SqlCommand getDevicesCmd = new SqlCommand(deviceQuery, conn);
-
-                using (SqlDataReader reader = getDevicesCmd.ExecuteReader())
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
                         string deviceSerialNo = reader["DeviceSerialNo"].ToString()!;
                         int deviceTypeId = Convert.ToInt32(reader["DeviceTypeId"]);
                         string deviceModel = reader["DeviceModel"].ToString()!;
-                        devices.Add((deviceSerialNo, deviceTypeId, deviceModel));
+                        DateTime activatedDate = (DateTime)reader["DeviceActivatedDateTime"];
+                        if (!string.IsNullOrEmpty(deviceSerialNo))
+                        {
+                            result[deviceSerialNo] = new DeviceIDs(deviceSerialNo, deviceTypeId, deviceModel, activatedDate);
+                        }
+                        
                     }
                 }
-
-                foreach (var device in devices)
+                foreach (var kvp in result)
                 {
-                    Console.WriteLine($"Processing Device: {device.DeviceSerialNo}, TypeId: {device.DeviceTypeId}, Model: {device.DeviceModel}");
-                    GenerateAndInsertReading(conn, device.DeviceSerialNo, device.DeviceModel, device.DeviceTypeId);
+                    deviceid_dictionary.AddOrUpdate(kvp.Key, kvp.Value, (k, v) => kvp.Value);
+                }
+                // Remove old devices not present anymore
+                foreach (var existing in deviceid_dictionary.Keys)
+                {
+                    if (!result.ContainsKey(existing))
+                    {
+                        deviceid_dictionary.TryRemove(existing, out _);
+                    }
+                }
+                foreach (var device in result)
+                {
+                    Console.WriteLine($"Processing Device: {device.Value.DeviceSerialNo}, TypeId: {device.Value.DeviceTypeId}, Model: {device.Value.DeviceModel},Time:{device.Value.DeviceActivatedDateTime}");
+                    GenerateAndInsertReading(conn, device.Value);
                 }
             }
         }
 
-        private void GenerateAndInsertReading(SqlConnection conn, string deviceSerialNo, string deviceModel, int deviceTypeId)
+        private void GenerateAndInsertReading(SqlConnection conn,  DeviceIDs device)
         {
             Random rnd = new Random();
-            DateTime now = DateTime.Now;
+            //DateTime now = DateTime.Now;
+            DateTime nextDateTime = device.DeviceActivatedDateTime.AddDays(1);
+            if(nextDateTime>= DateTime.UtcNow)
+            {
+                return;
+            }
 
             string vitalType;
             int? systolic = null, diastolic = null, pulse = null, glucose = null;
@@ -66,7 +85,7 @@ namespace RPM.Job.Simulator.iGlucose
             TimeSpan offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
             string timeZoneOffset = $"{(offset.Hours >= 0 ? "+" : "-")}{offset.Hours:00}:{offset.Minutes:00}";
 
-            switch (deviceTypeId)
+            switch (device.DeviceTypeId)
             {
                 case 1: // Blood Pressure
                     vitalType = "blood_pressure";
@@ -93,28 +112,10 @@ namespace RPM.Job.Simulator.iGlucose
                     break;
 
                 default:
-                    Console.WriteLine($"Skipping unknown device type: {deviceTypeId}");
+                    Console.WriteLine($"Skipping unknown device type: {device.DeviceTypeId}");
                     return;
             }
-
-            // --- Insert into DeviceReadings table ---
-            using (SqlCommand cmd = new SqlCommand("dbo.InsertDeviceReading", conn))
-            {
-                cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@ReadingDateTime", now);
-                cmd.Parameters.AddWithValue("@VitalType", vitalType);
-                cmd.Parameters.AddWithValue("@Systolic", (object?)systolic ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@Diastolic", (object?)diastolic ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@Pulse", (object?)pulse ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@Fasting", vitalType == "blood_glucose" && isFasting == true ? glucose : DBNull.Value);
-                cmd.Parameters.AddWithValue("@NonFasting", vitalType == "blood_glucose" && isFasting == false ? glucose : DBNull.Value);
-                cmd.Parameters.AddWithValue("@Weight", (object?)weight ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@Oxygen", (object?)oxygen ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@Temperature", DBNull.Value);
-
-                cmd.ExecuteNonQuery();
-            }
-
+           
             // --- JSON Payload ---
             List<object> jsonPayloads = new List<object>();
 
@@ -123,10 +124,10 @@ namespace RPM.Job.Simulator.iGlucose
                 jsonPayloads.Add(new
                 {
                     reading_id = Guid.NewGuid().ToString("N"),
-                    device_id = deviceSerialNo,
-                    device_model = deviceModel,
-                    date_recorded = now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    date_received = now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    device_id = device.DeviceSerialNo,
+                    device_model = device.DeviceModel,
+                    date_recorded = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                    date_received = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
                     reading_type = vitalType,
                     battery = rnd.Next(50, 100),
                     time_zone_offset = timeZoneOffset,
@@ -144,10 +145,10 @@ namespace RPM.Job.Simulator.iGlucose
                 jsonPayloads.Add(new
                 {
                     reading_id = readingId,
-                    device_id = deviceSerialNo,
-                    device_model = deviceModel,
-                    date_recorded = now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    date_received = now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    device_id = device.DeviceSerialNo,
+                    device_model = device.DeviceModel,
+                    date_recorded = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                    date_received = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
                     reading_type = vitalType,
                     battery = rnd.Next(50, 100),
                     time_zone_offset = timeZoneOffset,
@@ -161,10 +162,10 @@ namespace RPM.Job.Simulator.iGlucose
                 jsonPayloads.Add(new
                 {
                     reading_id = readingId,
-                    device_id = deviceSerialNo,
-                    device_model = deviceModel,
-                    date_recorded = now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    date_received = now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    device_id = device.DeviceSerialNo,
+                    device_model = device.DeviceModel,
+                    date_recorded = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                    date_received = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
                     reading_type = vitalType,
                     battery = rnd.Next(50, 100),
                     time_zone_offset = timeZoneOffset,
@@ -178,10 +179,10 @@ namespace RPM.Job.Simulator.iGlucose
                 jsonPayloads.Add(new
                 {
                     reading_id = readingId,
-                    device_id = deviceSerialNo,
-                    device_model = deviceModel,
-                    date_recorded = now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    date_received = now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    device_id = device.DeviceSerialNo,
+                    device_model = device.DeviceModel,
+                    date_recorded = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                    date_received = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
                     reading_type = vitalType,
                     battery = rnd.Next(50, 100),
                     time_zone_offset = timeZoneOffset,
@@ -198,10 +199,10 @@ namespace RPM.Job.Simulator.iGlucose
                 jsonPayloads.Add(new
                 {
                     reading_id = Guid.NewGuid().ToString("N"),
-                    device_id = deviceSerialNo,
-                    device_model = deviceModel,
-                    date_recorded = now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    date_received = now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    device_id = device.DeviceSerialNo,
+                    device_model = device.DeviceModel,
+                    date_recorded = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                    date_received = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
                     reading_type = vitalType,
                     battery = rnd.Next(50, 100),
                     time_zone_offset = timeZoneOffset,
@@ -218,10 +219,10 @@ namespace RPM.Job.Simulator.iGlucose
                 jsonPayloads.Add(new
                 {
                     reading_id = Guid.NewGuid().ToString("N"),
-                    device_id = deviceSerialNo,
-                    device_model = deviceModel,
-                    date_recorded = now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    date_received = now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    device_id = device.DeviceSerialNo,
+                    device_model = device.DeviceModel,
+                    date_recorded = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                    date_received = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
                     reading_type = vitalType,
                     battery = rnd.Next(50, 100),
                     time_zone_offset = timeZoneOffset,
@@ -237,17 +238,78 @@ namespace RPM.Job.Simulator.iGlucose
             // --- Insret JSON data into JsonStg table---
             foreach (var payload in jsonPayloads)
             {
-                string jsonString = JsonSerializer.Serialize(payload, new JsonSerializerOptions
+                StagingTableInsert(payload);            
+            }
+            UpdateAppJobLastBatch(device.DeviceSerialNo, nextDateTime);
+        }
+        private  void StagingTableInsert(object payload)
+        {
+
+            try
+            {
+                string jsonString = System.Text.Json.JsonSerializer.Serialize(payload, new JsonSerializerOptions
                 {
                     Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
                 });
-                using (SqlCommand cmd = new SqlCommand("dbo.InsertJsonStg", conn))
+
+               // Console.WriteLine("JsonStg Insert begin: " + jsonData);
+                using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@Json", jsonString);
-                    cmd.ExecuteNonQuery();
+                    SqlCommand command = new SqlCommand("usp_InsJsonStg", connection);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@json", jsonString);
+                    command.Parameters.AddWithValue("@CreatedBy", DateTime.UtcNow);
+                    connection.Open();
+                    command.ExecuteScalar();
+                    connection.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("exception:StagingTableInsertProc" + ex);
+            }
+            Console.WriteLine("StagingTableInsertProc end");
+        }
+        private  void UpdateAppJobLastBatch(string Deviceid, DateTime newenddate)
+        {
+            if (newenddate <= DateTime.Now)
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    SqlCommand command = new SqlCommand("usp_AppJobLastBatch", connection);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@DeviceSerialNo", Deviceid);
+                    command.Parameters.AddWithValue("@DeviceVendorName", "iGlucose");
+                    command.Parameters.AddWithValue("@DateRecorded", newenddate);
+                    SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
+                    returnParameter.Direction = ParameterDirection.ReturnValue;
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                    int id = (int)returnParameter.Value;
+                    connection.Close();
+                    if (id != 0)
+                    {
+                        Console.WriteLine(Deviceid + " Last Record Processed Date: " + newenddate);
+                    }
+
                 }
             }
         }
+    }
+    class DeviceIDs
+    {
+        public DeviceIDs(string _deviceSerialNo,int _deviceTypeId,string _deviceModel, DateTime _deviceActivatedDateTime)
+        {
+            DeviceSerialNo = _deviceSerialNo;
+            DeviceTypeId = _deviceTypeId;
+            DeviceModel = _deviceModel;
+            DeviceActivatedDateTime = _deviceActivatedDateTime;
+
+        }
+        public string DeviceSerialNo { get; set; }
+        public int DeviceTypeId { get; set; }
+        public string DeviceModel { get; set; }
+        public DateTime DeviceActivatedDateTime { get; set; }
+
     }
 }
