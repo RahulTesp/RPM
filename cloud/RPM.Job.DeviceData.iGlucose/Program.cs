@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System.Data;
-
+//cron continuous
 class Program
 {
     static ConcurrentDictionary<string, DeviceIDs> deviceid_dictionary = new ConcurrentDictionary<string, DeviceIDs>();
@@ -17,13 +17,17 @@ class Program
     {
         // Set up configuration
         var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true)
-            .AddEnvironmentVariables() // Allows overriding via Azure App Settings
-            .Build();
-
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json", optional: true)
+        .AddEnvironmentVariables() // Allows overriding via Azure App Settings
+        .Build();
+        if (config == null)
+        {
+            Console.WriteLine("Configuration is null.");
+            return;
+        }
         // Access a specific config value
-        string connStr = config["RPM:ConnectionString"];
+        string? connStr = config["RPM:ConnectionString"];
         Console.WriteLine($"RPM Connection String: {connStr}");
         // Optional: bind strongly-typed object
         var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
@@ -392,19 +396,70 @@ class Program
     }
 
     private static void StagingTableInsertProc(DatabaseInput reading)
+        catch (Exception ex)
+        {
+            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
+        }
+    }
+    private static void TimerStagingTableInsert(DatabaseInput reading)
+        catch (Exception ex)
+        {
+            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
+        }
+    }
+    private static void TimerStagingTableInsert(DatabaseInput reading)
+        catch (Exception ex)
+        {
+            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
+        }
+    }
+    private static void TimerStagingTableInsert(DatabaseInput reading)
+        catch (Exception ex)
+        {
+            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
+        }
+    }
+    private static void TimerStagingTableInsert(DatabaseInput reading)
+        catch (Exception ex)
+        {
+            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
+        }
+    }
+    private static void TimerStagingTableInsert(DatabaseInput reading)
+        catch (Exception ex)
+        {
+            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
+        }
+    }
+    private static void TimerStagingTableInsert(DatabaseInput reading)
+        catch (Exception ex)
+        {
+            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
+        }
+    }
+    private static void TimerStagingTableInsert(DatabaseInput reading)
+        catch (Exception ex)
+        {
+            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
+        }
+    }
+    private static void TimerStagingTableInsert(DatabaseInput reading)
+        catch (Exception ex)
+        {
+            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
+        }
+    }
+    private static void TimerStagingTableInsert(DatabaseInput reading)
+        catch (Exception ex)
+        {
+            Console.WriteLine("exception: after StagingTableQueueInsert" + ex);
+        }
+    }
+    private static void TimerStagingTableInsert(DatabaseInput reading)
     {
 
-        //Console.WriteLine("TimerStagingTableInsert begin");
         try
         {
-            //for (int i = 0; i < tableInsert_queue.Count; i++)
-            //{
-            //    Console.WriteLine("tableInsert_queue.Count"+ tableInsert_queue.Count);
-            //    //DatabaseInput reading;
-            //    if (tableInsert_queue.TryDequeue(out reading))
-            //    {
-            //JavaScriptSerializer js = new JavaScriptSerializer();
-            //string jsonData = js.Serialize(reading);
             string jsonData = JsonConvert.SerializeObject(reading);
             
             Console.WriteLine("JsonStg Insert begin: " + jsonData);
@@ -418,8 +473,6 @@ class Program
                 command.ExecuteScalar();
                 connection.Close();
             }
-            //}
-            //}
         }
         catch (Exception ex)
         {
@@ -427,8 +480,4 @@ class Program
         }
         Console.WriteLine("StagingTableInsertProc end");
     }
-}
-public class RpmSettings
-{
-    public string? ConnectionString { get; set; }
 }

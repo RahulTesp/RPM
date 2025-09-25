@@ -51,7 +51,7 @@ struct RPMVitalSchedulesView: View {
 
                             .font(Font.custom("Rubik-SemiBold", size: 24))
  
-                        if pgmDetList.pgmInfo?.patientDevicesDetails.patientDeviceInfos.isEmpty ?? true {
+                        if pgmDetList.pgmInfo?.patientVitalDetails.patientVitalInfos.isEmpty ?? true {
 
                             Text("NO DATA!")
 
@@ -60,18 +60,26 @@ struct RPMVitalSchedulesView: View {
                                 .frame(maxWidth: .infinity, alignment: .center)
 
                         } else {
-
+                            
+                            //                            if let patientSchedulesInfos = pgmDetList.pgmInfo?.patientVitalDetails.patientVitalInfos {
+                            //
+                            //                                ForEach(Array(patientSchedulesInfos.enumerated()), id: \.element.scheduleId) { index, item in
+                            //
+                            //                                    ScheduleRowView(schedule: item, index: index, width: geometry.size.width)
+                            //
+                            //                                }
+                            //
+                            //                            }
+                            //
+                            //                        }
                             if let patientSchedulesInfos = pgmDetList.pgmInfo?.patientVitalDetails.patientVitalInfos {
-
-                                ForEach(Array(patientSchedulesInfos.enumerated()), id: \.element.scheduleId) { index, item in
-
+                                
+                                ForEach(Array(patientSchedulesInfos.enumerated()), id: \.element.vitalId) { index, item in
                                     ScheduleRowView(schedule: item, index: index, width: geometry.size.width)
-
                                 }
-
                             }
-
                         }
+                        
 
                     }
 

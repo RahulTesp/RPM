@@ -204,6 +204,12 @@ extension PersistentConversationDataItem {
                             print(" Unread messages count fetched: \(count)")
                             context.perform {
                                 self.unreadMessagesCount = Int64(truncating: count)
+                                do {
+                                      try context.save() // commit changes so fetch sees updated value
+                                  } catch {
+                                      print("Failed to save context: \(error)")
+                                  }
+                                
                                 let totalUnread = PersistentConversationDataItem.totalUnreadCount(inContext: context)
                                 print(" Posting TotalUnreadMessageCountUpdated with totalUnreadCount: \(totalUnread)")
                                 NotificationCenter.default.post(

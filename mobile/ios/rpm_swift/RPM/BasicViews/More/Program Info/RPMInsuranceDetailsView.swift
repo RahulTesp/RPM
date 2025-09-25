@@ -50,16 +50,60 @@ struct RPMInsuranceDetailsView: View {
 
                             .padding(.bottom, 10)
 
+//                        if let insuranceInfos = pgmDetList.pgmInfo?.patientInsurenceDetails.patientInsurenceInfos,
+//
+//                           !insuranceInfos.isEmpty {
+//                            
+//                            // Primary insurance
+//
+//                            if let primary = insuranceInfos.first(where: { $0.isPrimary ?? false }) {
+//                                InsuranceSection(title: "Primary Insurance",
+//                                                 vendorName: primary.insuranceName ?? "")
+//                            }
+//                            // Secondary insurance
+//
+//                            let secondaryList = insuranceInfos.filter { $0.isPrimary == false }
+//
+//                            if !secondaryList.isEmpty {
+//
+//                                VStack(alignment: .leading, spacing: 8) {
+//
+//                                    Text("Secondary Insurance (Optional)")
+//
+//                                        .foregroundColor(Color("title1"))
+//
+//                                        .font(Font.custom("Rubik-Regular", size: 14))
+//
+//                                    ForEach(secondaryList) { item in
+//
+//                                        InsuranceBox(vendorName: item.insuranceName ?? "")
+//
+//                                    }
+//
+//                                }
+//
+//                                .padding(.horizontal, 10)
+//
+//                                .padding(.vertical, 5)
+//
+//                            }
+//
+//                        }
+                        
                         if let insuranceInfos = pgmDetList.pgmInfo?.patientInsurenceDetails.patientInsurenceInfos,
 
                            !insuranceInfos.isEmpty {
-
+                         
                             // Primary insurance
 
                             if let primary = insuranceInfos.first(where: { $0.isPrimary ?? false }) {
+
                                 InsuranceSection(title: "Primary Insurance",
-                                                 vendorName: primary.insuranceName ?? "")
+
+                                                 vendorName: primary.insuranceVendorName ?? "")
+
                             }
+                         
                             // Secondary insurance
 
                             let secondaryList = insuranceInfos.filter { $0.isPrimary == false }
@@ -76,7 +120,7 @@ struct RPMInsuranceDetailsView: View {
 
                                     ForEach(secondaryList) { item in
 
-                                        InsuranceBox(vendorName: item.insuranceName ?? "")
+                                        InsuranceBox(vendorName: item.insuranceVendorName ?? "")
 
                                     }
 
@@ -88,7 +132,11 @@ struct RPMInsuranceDetailsView: View {
 
                             }
 
-                        } else {
+                        }
+
+                         
+                        
+ else {
 
                             Text("NO DATA!")
 

@@ -30,11 +30,17 @@ struct RPMApp: App {
     @StateObject private var sessionManager = SessionManager.shared
     @StateObject private var networkMonitor = NetworkMonitor()
     @StateObject var memberDetList = MembersListViewModel()
-
+    @StateObject  var notifList = NotificationViewModel()
 
     // Only one init, which sets up the app model.
     init() {
         _model = StateObject(wrappedValue: AppModel.shared)
+        
+        NSLog("RPMApp.init() called")
+        
+        // Force early initialization
+          print("AppModel.shared early init:", AppModel.shared)
+
         
         if !UserDefaults.standard.bool(forKey: "wasInBackground") {
                   // Reset termination flag if not backgrounded
@@ -61,6 +67,7 @@ struct RPMApp: App {
                     .environmentObject(networkMonitor)
                     .environmentObject(sessionManager)
                     .environmentObject(memberDetList)
+                    .environmentObject(notifList)
                 
                     .onAppear {
                         print("AppModel in RPMTabBar:", model)
@@ -71,14 +78,57 @@ struct RPMApp: App {
                                                print("Conversation Manager: \(model.conversationManager != nil ? "Initialized" : "Not Initialized")")
                                                print("Messages Manager: \(model.messagesManager != nil ? "Initialized" : "Not Initialized")")
                                                print("Participants Manager: \(model.participantsManager != nil ? "Initialized" : "Not Initialized")")
+                        
+                        
+//                        print("RPMApp onAppear - model instance:", model)
+//                                   print("AppModel.shared instance:", AppModel.shared)
+//                                   print("Are they same?", model === AppModel.shared)
+                        
                     }
+                
+              
+
+//                    .onChange(of: scenePhase) { phase in
+//                        if phase == .active {
+//                            print("App came to foreground, checking token expiry...")
+//                            notifList.getnotify()
+//                            SessionManager.shared.logoutIfTokenExpired()
+//                            
+//                            // Let AppModel handle the subscription internally
+//                                   model.refreshUnreadIfReady()
+//                        }
+//                    }
+                
+//                    .onAppear {
+//                        if model.isClientReady {
+//                            print("Client already ready on appear, refreshing unread count")
+//                            model.conversationManager.refreshUnreadCount()
+//                        }
+//                    }
+                
                     .onChange(of: scenePhase) { phase in
                         if phase == .active {
-                            print("App came to foreground, checking token expiry...")
+                            print("App came to foreground")
+                            print("RPMApp model instance:", model)
+                            print("AppModel.shared instance:", AppModel.shared)
+                            print("Are they same?", model === AppModel.shared)
+                            
+                            notifList.getnotify()
                             SessionManager.shared.logoutIfTokenExpired()
+                            
+                            model.refreshUnreadIfReady()
                         }
                     }
 
+
+                    .onChange(of: model.isClientReady) { isReady in
+                        if isReady {
+                            print("Client is ready, refreshing unread count")
+                            model.conversationManager.refreshUnreadCount()
+                        } else {
+                            print("Client not ready yet")
+                        }
+                    }
                 
                     .onChange(of: sessionManager.didReceiveUnauthorized) { isUnauthorized in
                         print("calling onchange", isUnauthorized)
@@ -239,6 +289,9 @@ struct RPMApp: App {
         .environmentObject(model.participantsManager)
         .environmentObject(navigationHelper)
     }
+    
+ 
+
 }
 
 
@@ -257,6 +310,7 @@ struct ApplicationSwitcher: View {
     @EnvironmentObject var networkMonitor: NetworkMonitor
     @State private var showNoInternetAlert = false
     @EnvironmentObject var sessionManager: SessionManager
+    @EnvironmentObject var notifList: NotificationViewModel
     
     var body: some View {
   
@@ -277,12 +331,15 @@ struct ApplicationSwitcher: View {
                     .environmentObject(loginViewModel)
                     .environmentObject(memberDetList)
                     .environmentObject(sessionManager)
+                    .environmentObject(notifList)
                     
                     .onAppear {
                         print("AppModel in RPMTabBarView:", appModel)
                         
                         // Trigger members API now that user is logged in
                                            memberDetList.memDetails()
+                        
+                        
                     }
             } else {
            

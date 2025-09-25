@@ -45,27 +45,40 @@ class Program
     {
         try
         {
-            Console.WriteLine($"[{DateTime.Now}] Timer triggered.");
+            Console.WriteLine("Timer Api call back");
+            using (SqlConnection connection = new SqlConnection(CONN_STRING))
+            {
+                connection.Open();
+                /*SqlCommand command = new SqlCommand("usp_InsPatientVitalMeasures", connection);
+                command.CommandType = CommandType.StoredProcedure;
 
-            using SqlConnection connection = new SqlConnection(CONN_STRING);
-            await connection.OpenAsync();
-            await ExecuteStoredProcedure(connection, "usp_InsPatientVitalMeasures");    
+                command.ExecuteNonQuery();*/
+                /*SqlCommand command4 = new SqlCommand("usp_InsAlerts", connection);
+                command4.CommandType = CommandType.StoredProcedure;
+                command4.ExecuteNonQuery();
+                SqlCommand command1 = new SqlCommand("usp_InsAlertsTemp", connection);
+                command1.CommandType = CommandType.StoredProcedure;
+                command1.ExecuteNonQuery();*/
+                SqlCommand command2 = new SqlCommand("usp_InsPatientProgramPriority", connection);
+                command2.CommandTimeout = 900000;
+                command2.CommandType = CommandType.StoredProcedure;
+                command2.ExecuteNonQuery();
+                SqlCommand command3 = new SqlCommand("usp_InsAlertSummary", connection);
+                command3.CommandTimeout = 900000;
+                command3.CommandType = CommandType.StoredProcedure;
+                command3.ExecuteNonQuery();
+                connection.Close();
+            }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[{DateTime.Now}] Exception: {ex.Message}");
-        }
-    }
-
-    private static async Task ExecuteStoredProcedure(SqlConnection connection, string procedureName, int timeoutSeconds = 300)
-    {
-        using SqlCommand command = new SqlCommand(procedureName, connection)
+        catch (Exception Ex)
         {
             CommandType = CommandType.StoredProcedure,
             CommandTimeout = timeoutSeconds
         };
 
-        await command.ExecuteNonQueryAsync();
-        Console.WriteLine($"Executed {procedureName} successfully.");
     }
+}
+public class RpmSettings
+{
+    public string? ConnectionString { get; set; }
 }

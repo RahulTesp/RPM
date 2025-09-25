@@ -110,7 +110,6 @@ namespace iglucosedata
             {
                 using (SqlConnection connection = new SqlConnection(cs))
                 {
-                    //string query = "select * from SystemConfigurations where Category='iGlucose'";
                     SqlCommand command = new SqlCommand("usp_GetSystemConfig", connection);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.Add("@Category", SqlDbType.NVarChar).Value = category;

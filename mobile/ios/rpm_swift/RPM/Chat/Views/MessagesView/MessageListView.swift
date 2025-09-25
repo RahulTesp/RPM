@@ -141,8 +141,10 @@ struct MessageListView: View {
                                 
                                 
                                 .onAppear {
+                                    print("messagepageappear:")
                                     guard let lastMessage = messagesManager.messages.last else { return }
                               
+                                    print("lastMessageMessageViewonappear:", lastMessage)
                                        proxy.scrollTo(lastMessage.sid, anchor: .bottom)
 
                                      print("viewModel.unreadReceivedMessages.count", viewModel.unreadReceivedMessages.count)
@@ -151,7 +153,7 @@ struct MessageListView: View {
                                     let hasUnreadMessages = viewModel.unreadReceivedMessages.count > 0
                                     let isOutgoing = lastMessage.direction == MessageDirection.outgoing.rawValue
                                     
-                                     print("lastMessage:", lastMessage)
+                                    // print("lastMessage:", lastMessage)
                            
                                     let shouldAutoScroll = isOutgoing || isFirstLoad || isNearBottom || hasUnreadMessages
                                    
@@ -177,6 +179,24 @@ struct MessageListView: View {
                                     
                                     print("messageCount:", messageCount)
                                 }
+                                
+                                .onChange(of: messagesManager.messages) { messages in
+                                    
+                                    print("messagepages on change:")
+                                    guard let lastMessage = messages.last else { return }
+
+                                    proxy.scrollTo(lastMessage.sid, anchor: .bottom)
+                                    showNewMessageBanner = false
+                                    
+                                    // Mark all as read if needed
+                                    DispatchQueue.main.async(execute: markAllMessagesReadTask)
+                                    
+                                    messageCount = messages.count
+                                    print("Messages loaded, scrolled to bottom. messageCount:", messageCount)
+                                }
+
+                                
+                                
                          
                             }
                             

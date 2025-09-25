@@ -41,6 +41,7 @@ struct RPMTabBarView: View {
     @EnvironmentObject var loginViewModel: RPMLoginViewModel
     @EnvironmentObject var memberDetList: MembersListViewModel
     @EnvironmentObject var sessionManager: SessionManager
+    @EnvironmentObject var notifList: NotificationViewModel
     @State private var selectedTab = 0
 
     var body: some View {
@@ -63,6 +64,7 @@ struct RPMTabBarView: View {
                     .environmentObject(loginViewModel)
                     .environmentObject(memberDetList)
                     .environmentObject(sessionManager)
+                    .environmentObject(notifList)
                 
                     .onAppear {
                         print("AppModelinRPMHome:", appModel)

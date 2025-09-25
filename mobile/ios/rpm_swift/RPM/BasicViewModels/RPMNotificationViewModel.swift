@@ -16,7 +16,7 @@ final class NotificationViewModel: ObservableObject {
  
     init() {
   
-        getnotify()
+       // getnotify()
         
     }
  

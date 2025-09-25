@@ -212,30 +212,93 @@ struct RPMVitalMonthReadingsView: View {
                         ScrollView(.horizontal)
                         {
                             
-                            HStack
-                            {
-                                
-                                BPReadings(bpitem : vitalReadingsList.vitalReadings?.bloodPressure ?? [], returningFromClinicalInfo: $returningFromClinicalInfo,
-                                           viewWidth: screenWidth * 0.80
-                                           
-                                )
-                                
-                                WeightReadings(wtitem : vitalReadingsList.vitalReadings?.weight ?? [], returningFromClinicalInfo: $returningFromClinicalInfo
-                                               ,
-                                                          viewWidth: screenWidth * 0.80
-                                )
-                                
-                                GlucoseReadings(gluitem : vitalReadingsList.vitalReadings?.bloodGlucose ?? [], returningFromClinicalInfo: $returningFromClinicalInfo
-                                                ,
-                                                           viewWidth: screenWidth * 0.80
-                                )
-                                
-                                OxygenReadings(oxyitem : vitalReadingsList.vitalReadings?.bloodOxygen ?? [], returningFromClinicalInfo: $returningFromClinicalInfo
-                                               ,
-                                                          viewWidth: screenWidth * 0.80
-                                )
-                                
-                            }.padding(.trailing, 20) 
+//                            HStack
+//                            {
+//                                
+//                                BPReadings(bpitem : vitalReadingsList.vitalReadings?.bloodPressure ?? [], returningFromClinicalInfo: $returningFromClinicalInfo,
+//                                           viewWidth: screenWidth * 0.80
+//                                           
+//                                )
+//                                
+//                                WeightReadings(wtitem : vitalReadingsList.vitalReadings?.weight ?? [], returningFromClinicalInfo: $returningFromClinicalInfo
+//                                               ,
+//                                                          viewWidth: screenWidth * 0.80
+//                                )
+//                                
+//                                GlucoseReadings(gluitem : vitalReadingsList.vitalReadings?.bloodGlucose ?? [], returningFromClinicalInfo: $returningFromClinicalInfo
+//                                                ,
+//                                                           viewWidth: screenWidth * 0.80
+//                                )
+//                                
+//                                OxygenReadings(oxyitem : vitalReadingsList.vitalReadings?.bloodOxygen ?? [], returningFromClinicalInfo: $returningFromClinicalInfo
+//                                               ,
+//                                                          viewWidth: screenWidth * 0.80
+//                                )
+//                                
+//                            }
+                            
+                            HStack {
+
+                                if let bp = vitalReadingsList.vitalReadings?.bloodPressure {
+
+                                    BPReadings(
+
+                                        bpitem: bp,
+
+                                        returningFromClinicalInfo: $returningFromClinicalInfo,
+
+                                        viewWidth: screenWidth * 0.80
+
+                                    )
+
+                                }
+
+                                if let weight = vitalReadingsList.vitalReadings?.weight {
+
+                                    WeightReadings(
+
+                                        wtitem: weight,
+
+                                        returningFromClinicalInfo: $returningFromClinicalInfo,
+
+                                        viewWidth: screenWidth * 0.80
+
+                                    )
+
+                                }
+
+                                if let glucose = vitalReadingsList.vitalReadings?.bloodGlucose {
+
+                                    GlucoseReadings(
+
+                                        gluitem: glucose,
+
+                                        returningFromClinicalInfo: $returningFromClinicalInfo,
+
+                                        viewWidth: screenWidth * 0.80
+
+                                    )
+
+                                }
+
+                                if let oxygen = vitalReadingsList.vitalReadings?.bloodOxygen {
+
+                                    OxygenReadings(
+
+                                        oxyitem: oxygen,
+
+                                        returningFromClinicalInfo: $returningFromClinicalInfo,
+
+                                        viewWidth: screenWidth * 0.80
+
+                                    )
+
+                                }
+
+                            }
+
+                             
+                            .padding(.trailing, 20)
                             
                         }
                     }

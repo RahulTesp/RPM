@@ -1,3 +1,4 @@
+
 import { Injectable } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import dayjs from 'dayjs';
@@ -87,19 +88,30 @@ export class PatientUtilService {
       [`${vitalInfo}`]: groups[ReadingDate], // Dynamically assigning vital type
     }));
   }
-
+  // Manjusha code change
   convertToLocalTime(stillUtc: any) {
     if (stillUtc) {
-      if (stillUtc.includes('+')) {
-        var temp = stillUtc.split('+');
-        stillUtc = temp[0];
+      const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(stillUtc);
+      if (isDateOnly) {
+        const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+        return local;
       }
-    }
-    stillUtc = stillUtc + 'Z';
-    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+      if (stillUtc.includes('+')) {
+        stillUtc = stillUtc.split('+')[0];
+      }
 
-    return local;
+      // Append Z if missing
+      if (!stillUtc.endsWith('Z')) {
+        stillUtc = stillUtc + 'Z';
+      }
+
+      const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+      return local;
+    }
+
+    return null;
   }
+
   getCurrentMonthDates(): { start: Date; end: Date } {
     try {
       const today = new Date();

@@ -164,17 +164,28 @@ struct RPMMoreView: View {
 }
 
 //TOP SECTION
-struct AccountPanel :  View{
- 
+
+
+struct AccountPanel: View {
+    @EnvironmentObject var navigationHelper: NavigationHelper
     @State var isLinkActive = false
-    @State private var isActive : Bool = false
+    @State private var isActive: Bool = false
     
-    var body : some View{
-        
-        VStack{
-            
-            HStack{
-                
+    var body: some View {
+        VStack {
+            // Top row with back arrow + title
+            HStack {
+                Button(action: {
+                    navigationHelper.resetToHomeTab()   //  back to Home tab
+                }) {
+                    
+                    Image("ArrowBack").renderingMode(.template)
+                        .foregroundColor(Color("buttonColor"))
+                    
+                        .font(.system(size: 18, weight: .medium))
+                    
+                    
+                }
                 
                 Spacer()
                 
@@ -183,85 +194,164 @@ struct AccountPanel :  View{
                     .foregroundColor(.black)
                 
                 Spacer()
-            }
-            .padding(.top,30)
-            .padding(.bottom,20)
-            .padding(.horizontal,10)
-            
-            HStack{
                 
-                Image(systemName:"person")
+                // To keep "Account" centered, add invisible spacer matching arrow width
+//                Image(systemName: "chevron.left")
+//                    .opacity(0) // invisible but keeps layout balanced
+            }
+            .padding(.top, 30)
+            .padding(.bottom, 20)
+            .padding(.horizontal, 10)
+            
+            // Rest of your account panel UI...
+            HStack {
+                Image(systemName: "person")
                     .clipShape(Circle())
                     .shadow(radius: 30)
-                
                     .frame(width: 40.0, height: 32.0)
-                    .padding(.horizontal,10)
+                    .padding(.horizontal, 10)
                     .overlay(Circle().stroke(Color.red, lineWidth: 5))
                 
-                VStack(alignment: .leading){
+                VStack(alignment: .leading) {
+                    Text("Hi, " + (UserDefaults.standard.string(forKey: "patientNameString") ?? ""))
+                        .font(Font.custom("Rubik-Regular", size: 18))
+                        .tracking(0.3)
+                        .foregroundColor(Color("darkGreen"))
                     
-                    
-                    Text(
-                        
-                        "Hi, " + (UserDefaults.standard.string(forKey: "patientNameString") ?? "")
-                    )
-                    .font(Font.custom("Rubik-Regular", size: 18))
-                    .tracking(0.3)
-                  
-                    
-                    .foregroundColor( Color("darkGreen"))
-                    
-                    Text(
-                        (UserDefaults.standard.string(forKey: "patientUserNameString") ?? "")
-                           
-                        
-                        
-                    ).fontWeight(.black)
+                    Text(UserDefaults.standard.string(forKey: "patientUserNameString") ?? "")
+                        .fontWeight(.black)
                         .font(Font.custom("Rubik-SemiBold", size: 16))
-                        .foregroundColor( Color("TextColorBlack"))
-                    
+                        .foregroundColor(Color("TextColorBlack"))
                 }
                 Spacer(minLength: 22)
-            }.frame(maxWidth: .infinity, minHeight: 55)
-                .padding(10)
-                .padding(.top,10)
-                .background(Color("avgGreen"))
-                .cornerRadius(15)
-                .padding(.horizontal,20)
+            }
+            .frame(maxWidth: .infinity, minHeight: 55)
+            .padding(10)
+            .padding(.top, 10)
+            .background(Color("avgGreen"))
+            .cornerRadius(15)
+            .padding(.horizontal, 20)
+            .padding(.bottom, 10)
             
-            
-            
-                .padding(.bottom,10)
-          
-                        HStack{
-                            Spacer()
-                            PanelButtons(text: "BellOutline", colorf: Color("darkGreen"), colorb: Color("transparentGreen"),
-                                         label : "Notification"
-            
-                            )
-                            Spacer()
-                            PanelButtons(text: "FeedbackOutline", colorf: Color("darkGreen"), colorb:  Color("transparentGreen"),
-                                         label : "Feedback"
-                            )
-                            Spacer()
-                            PanelButtons(text: "HelpOutline", colorf: Color("darkGreen"), colorb:  Color("transparentGreen"),
-                                         label : "Help"
-                            )
-                            Spacer()
-                            PanelButtons(text: "SettingsOutline", colorf: Color("darkGreen"), colorb:  Color("transparentGreen"),
-                                         label : "Settings"
-                            )
-                            Spacer()
-                        }
-                        .padding(.top,5)
-                        .padding(.bottom,22)
+            HStack {
+                Spacer()
+                PanelButtons(text: "BellOutline", colorf: Color("darkGreen"), colorb: Color("transparentGreen"), label: "Notification")
+                Spacer()
+                PanelButtons(text: "FeedbackOutline", colorf: Color("darkGreen"), colorb: Color("transparentGreen"), label: "Feedback")
+                Spacer()
+                PanelButtons(text: "HelpOutline", colorf: Color("darkGreen"), colorb: Color("transparentGreen"), label: "Help")
+                Spacer()
+                PanelButtons(text: "SettingsOutline", colorf: Color("darkGreen"), colorb: Color("transparentGreen"), label: "Settings")
+                Spacer()
+            }
+            .padding(.top, 5)
+            .padding(.bottom, 22)
         }
-        .padding(.top,40)
-        
-        .background( Color("lightGreen")).clipShape(RoundedRectangle(cornerRadius:20))
-        
+        .padding(.top, 40)
+        .background(Color("lightGreen"))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }
+
+
+//struct AccountPanel :  View{
+// 
+//    @State var isLinkActive = false
+//    @State private var isActive : Bool = false
+//    
+//    var body : some View{
+//        
+//        VStack{
+//            
+//            HStack{
+//                
+//                
+//                Spacer()
+//                
+//                Text("Account")
+//                    .font(Font.custom("Rubik-Regular", size: 16))
+//                    .foregroundColor(.black)
+//                
+//                Spacer()
+//            }
+//            .padding(.top,30)
+//            .padding(.bottom,20)
+//            .padding(.horizontal,10)
+//            
+//            HStack{
+//                
+//                Image(systemName:"person")
+//                    .clipShape(Circle())
+//                    .shadow(radius: 30)
+//                
+//                    .frame(width: 40.0, height: 32.0)
+//                    .padding(.horizontal,10)
+//                    .overlay(Circle().stroke(Color.red, lineWidth: 5))
+//                
+//                VStack(alignment: .leading){
+//                    
+//                    
+//                    Text(
+//                        
+//                        "Hi, " + (UserDefaults.standard.string(forKey: "patientNameString") ?? "")
+//                    )
+//                    .font(Font.custom("Rubik-Regular", size: 18))
+//                    .tracking(0.3)
+//                  
+//                    
+//                    .foregroundColor( Color("darkGreen"))
+//                    
+//                    Text(
+//                        (UserDefaults.standard.string(forKey: "patientUserNameString") ?? "")
+//                           
+//                        
+//                        
+//                    ).fontWeight(.black)
+//                        .font(Font.custom("Rubik-SemiBold", size: 16))
+//                        .foregroundColor( Color("TextColorBlack"))
+//                    
+//                }
+//                Spacer(minLength: 22)
+//            }.frame(maxWidth: .infinity, minHeight: 55)
+//                .padding(10)
+//                .padding(.top,10)
+//                .background(Color("avgGreen"))
+//                .cornerRadius(15)
+//                .padding(.horizontal,20)
+//            
+//            
+//            
+//                .padding(.bottom,10)
+//          
+//                        HStack{
+//                            Spacer()
+//                            PanelButtons(text: "BellOutline", colorf: Color("darkGreen"), colorb: Color("transparentGreen"),
+//                                         label : "Notification"
+//            
+//                            )
+//                            Spacer()
+//                            PanelButtons(text: "FeedbackOutline", colorf: Color("darkGreen"), colorb:  Color("transparentGreen"),
+//                                         label : "Feedback"
+//                            )
+//                            Spacer()
+//                            PanelButtons(text: "HelpOutline", colorf: Color("darkGreen"), colorb:  Color("transparentGreen"),
+//                                         label : "Help"
+//                            )
+//                            Spacer()
+//                            PanelButtons(text: "SettingsOutline", colorf: Color("darkGreen"), colorb:  Color("transparentGreen"),
+//                                         label : "Settings"
+//                            )
+//                            Spacer()
+//                        }
+//                        .padding(.top,5)
+//                        .padding(.bottom,22)
+//        }
+//        .padding(.top,40)
+//        
+//        .background( Color("lightGreen")).clipShape(RoundedRectangle(cornerRadius:20))
+//        
+//    }
+//}
 struct PanelButtons :  View{
     @State private var showToast = false
     var text : String

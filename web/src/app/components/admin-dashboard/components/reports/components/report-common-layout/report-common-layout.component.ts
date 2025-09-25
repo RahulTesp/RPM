@@ -13,3 +13,8 @@ export class ReportCommonLayoutComponent implements OnInit {
 
   ngOnInit(): void {}
 }
+
+
+
+
+

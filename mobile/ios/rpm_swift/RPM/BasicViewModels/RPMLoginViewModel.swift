@@ -19,6 +19,18 @@ final class RPMLoginViewModel: ObservableObject {
     var usrnm : String?
     var usrpwd : String?
 
+    init() {
+//        print("RPMLoginViewModel login state from UserDefaults")
+//           let defaults = UserDefaults.standard
+//           if let token = defaults.string(forKey: "jsonwebtoken"), !token.isEmpty {
+//               self.accessToken = token
+//               self.isAuthenticated = true
+//               print("Restored login state from UserDefaults")
+//           } else {
+//               self.isAuthenticated = false
+//           }
+       }
+    
     func login(userName: String, password: String, completed: @escaping (String?, AlertItem?) -> Void) {
         
         let defaults = UserDefaults.standard
@@ -146,6 +158,19 @@ final class RPMLoginViewModel: ObservableObject {
         }
     }
 
+//    @MainActor
+//    func restoreLoginState() {
+//        let defaults = UserDefaults.standard
+//        if let token = defaults.string(forKey: "jsonwebtoken"), !token.isEmpty {
+//            self.accessToken = token
+//            self.isAuthenticated = true
+//            print("Restored login state from UserDefaults. Token exists.")
+//        } else {
+//            self.isAuthenticated = false
+//            print("No saved token found. User needs to login.")
+//        }
+//    }
+
  
     func verifyOtp(userName: String, otp: String, completed: @escaping (String?, AlertItem?) -> Void) {
         print("userName")
@@ -247,6 +272,10 @@ final class RPMLoginViewModel: ObservableObject {
                 switch result {
                 case .success(let responseString):
                     print("LOGOUTresponseString", responseString)
+                    
+                    // Clear token
+                                   defaults.removeObject(forKey: "jsonwebtoken")
+                                   
                     
                     // Reset session flags
                     SessionManager.shared.reset()

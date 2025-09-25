@@ -82,7 +82,7 @@ export class PatientDataDetailsService {
       //   data.PatientProgramdetails.CareTeamUserId
       // );
       sessionStorage.setItem(
-        'viatls',
+        'vitals',
         JSON.stringify(data.PatientProgramdetails.PatientVitalInfos)
       );
     }
@@ -94,7 +94,7 @@ export class PatientDataDetailsService {
     sessionStorage.removeItem('patientPgmName');
     sessionStorage.removeItem('patientStatusData');
     sessionStorage.removeItem('careteamuser');
-    sessionStorage.removeItem('viatls');
+    sessionStorage.removeItem('vitals');
   }
 
 private convertToISODate(date: Date | number): string {
@@ -329,12 +329,12 @@ private formatDateForQuery(date: any, isEndDate = false): string {
   }
 
   async getPatientCallNoteById(
-    programName: string,
+    programId: string,
     noteId: string
   ): Promise<any> {
     try {
       return await this.rpmService.rpm_get(
-        `/api/patient/getpatientnotesbyprogram?ProgramName=${programName}&Type=CALL&PatientNoteId=${noteId}`
+        `/api/patient/getpatientnotesbyprogramid?ProgramId=${programId}&Type=CALL&PatientNoteId=${noteId}`
       );
     } catch (error) {
       console.error('Error fetching patient call note by ID:', error);
@@ -365,34 +365,58 @@ private formatDateForQuery(date: any, isEndDate = false): string {
     }
   }
 
+  /**
+   *  Convert Date to `YYYY-MM-DD` format
+   */
+  private convertDate(date: Date | number): string {
+    if (typeof date === 'number') date = new Date(date);
+    return date.toISOString().split('T')[0];
+  }
+  // Manjusha code change
   async fetchHealthTrendInfo(
     patientId: string,
     programId: string,
     daycount: number,
-    convertDate: (date: Date) => string,
-    convertToUTCRangeInput: (date: Date) => string
-  ): Promise<any> {
+    startDate?: string,
+    endDate?: string
+  ): Promise<{ trends: any[]; vitalNames: string[] }> {
+    const end = this.auth.ConvertToUTCRangeInputs(
+      (endDate ?? this.convertDate(new Date())) + 'T23:59:59'
+    );
+
+    const start = this.auth.ConvertToUTCRangeInputs(
+      (startDate ?? this.convertDate(
+        new Date().setDate(new Date().getDate() - (daycount - 1))
+      )) + 'T00:00:00'
+    );
+    const url = `/api/patient/getpatienthealthtrends?PatientId=${patientId}&PatientProgramId=${programId}&StartDate=${start}&EndDate=${end}`;
+
     try {
-      const utcdate1 = convertToUTCRangeInput(
-        new Date(convertDate(new Date()) + 'T23:59:59')
-      );
+      this.patientHealthtrendSubject.next(null);
+      // Explicitly cast response to `any[]`
+      const data: any[] = (await this.rpmService.rpm_get(url)) as any[];
 
-      const date2 = new Date();
-      date2.setDate(date2.getDate() - (daycount - 1));
-      const utcdate2 = convertToUTCRangeInput(
-        new Date(convertDate(date2) + 'T00:00:00')
-      );
-      const apiUrl = '/api/patient/getpatienthealthtrends';
-      const url = `${apiUrl}?PatientId=${patientId}&PatientProgramId=${programId}&StartDate=${utcdate2}&EndDate=${utcdate1}`;
+      if (!Array.isArray(data)) {
+        console.warn('API response is not an array', data);
+        return { trends: [], vitalNames: [] };
+      }
+      // Extract Vital Names from data
+      const vitalNames = this.extractVitalNames(data);
+      this.patientHealthtrendSubject.next(data);
 
-      return await this.rpmService.rpm_get(url);
+      return { trends: data, vitalNames: vitalNames };
     } catch (error) {
-      console.error(
-        `❌ Error fetching health trends for PatientId=${patientId}:`,
-        error
-      );
-      throw new Error('Failed to fetch health trends data. Please try again.');
+      console.error('Error fetching patient data:', error);
+      return { trends: [], vitalNames: [] };
     }
+  }
+
+   /**
+   * Extracts `VitalName` from API Response
+   */
+   extractVitalNames(vitalData: any[]): string[] {
+    if (!Array.isArray(vitalData)) return [];
+    return vitalData.map((item) => item.VitalName).filter((name) => name);
   }
 
   /** Convert Date for Health Trends Display */
@@ -414,10 +438,9 @@ private formatDateForQuery(date: any, isEndDate = false): string {
 
     return dateArr.map((dateval) => {
       let newdate =
-        http_healthtrends.Values[0].label !== 'Vital'
+        ! http_healthtrends
           ? this.patientutil.convertToLocalTime(dateval)
           : dateval;
-
       const [datePart] = newdate.includes('T')
         ? newdate.split('T')
         : newdate.split(' ');

@@ -369,23 +369,94 @@ private struct SectionEnrollment: View {
         }
     }
     
-    func dateEnrolled(timeval: String) -> String
-    {
-        print("activetimeval",timeval)
+//    func dateEnrolled(timeval: String) -> String {
+//        print("activetimeval", timeval)
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+//
+//        // Handle fractional seconds
+//        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SS"
+//        
+//        // Try parsing the date
+//        let date = dateFormatter.date(from: timeval) ?? Date()
+//        
+//        // Convert to local readable format
+//        dateFormatter.dateFormat = "MMM d, yyyy"
+//        dateFormatter.timeZone = TimeZone.current
+//        let timeStamp = dateFormatter.string(from: date)
+//        
+//        print("activetimeStamp", timeStamp)
+//        return timeStamp
+//    }
+   
+    
+    func dateEnrolled(timeval: String) -> String {
+
+        print("activetimeval", timeval)
+
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        dateFormatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-        let date = dateFormatter.date(from: timeval) ?? Date()
 
-        // change to a readable time format and change to local time zone
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+
+        let date: Date?
+
+        // Check if string contains fractional seconds
+
+        if timeval.contains(".") {
+
+            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
+
+            date = dateFormatter.date(from: timeval)
+
+        } else {
+
+            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+
+            date = dateFormatter.date(from: timeval)
+
+        }
+
+        guard let validDate = date else {
+
+            print("Failed to parse date")
+
+            return ""
+
+        }
+
+        // Convert to local readable format
+
         dateFormatter.dateFormat = "MMM d, yyyy"
-        dateFormatter.timeZone = NSTimeZone.local
-        let timeStamp = dateFormatter.string(from: date)
 
-        print("activetimeStamp",timeStamp)
+        dateFormatter.timeZone = TimeZone.current
+
+        let timeStamp = dateFormatter.string(from: validDate)
+
+        print("activetimeStamp", timeStamp)
+
         return timeStamp
 
     }
+
+     
+    
+//    func dateEnrolled(timeval: String) -> String
+//    {
+//        print("activetimeval",timeval)
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+//        dateFormatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+//        let date = dateFormatter.date(from: timeval) ?? Date()
+//
+//        // change to a readable time format and change to local time zone
+//        dateFormatter.dateFormat = "MMM d, yyyy"
+//        dateFormatter.timeZone = NSTimeZone.local
+//        let timeStamp = dateFormatter.string(from: date)
+//
+//        print("activetimeStamp",timeStamp)
+//        return timeStamp
+//
+//    }
 }
 private struct SectionActive: View {
     let geometry: GeometryProxy

@@ -93,10 +93,26 @@ struct RPMTodoListView: View {
         .background(Color("ChatBGcolor"))
             
        
-        .onAppear()
-            {
-                print(" todoListONAPEARPath:", navigationHelper.path)
+//        .onAppear()
+//            {
+//                print(" todoListONAPEARPath:", navigationHelper.path)
+//            }
+            
+        .onAppear {
+            print(" todoListONAPEARPath:", navigationHelper.path)
+            // Reset current date and selected index whenever view appears
+            currentDate = Date()
+            selectedIndex = nil
+            showTodoList = false
+            // Load today's activities
+            todoList.loadingtodoAct = true
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            let formatted = formatter.string(from: currentDate)
+            todoList.todoActivities(dt: formatted) { _, _ in
+                todoList.loadingtodoAct = false
             }
+        }
    
     }
     }
@@ -157,8 +173,24 @@ struct RPMTodoListView: View {
                 .padding(.leading, 10) // Add padding on the left side
                 .padding(.trailing, 10) // Add padding on the left side
                 .padding(.horizontal, 10)
+//                .onAppear {
+//                    // Load initial data on appear
+//                    todoList.loadingtodoAct = true
+//                    let formatter = DateFormatter()
+//                    formatter.dateFormat = "yyyy-MM-dd"
+//                    let formatted = formatter.string(from: currentDate)
+//                    todoList.todoActivities(dt: formatted) { _, _ in
+//                        todoList.loadingtodoAct = false
+//                    }
+//                }
+                
                 .onAppear {
-                    // Load initial data on appear
+                    
+                    // Reset current date and selected index whenever view appears
+                    currentDate = Date()
+                    selectedIndex = nil
+                    showTodoList = false
+                    // Load today's activities
                     todoList.loadingtodoAct = true
                     let formatter = DateFormatter()
                     formatter.dateFormat = "yyyy-MM-dd"

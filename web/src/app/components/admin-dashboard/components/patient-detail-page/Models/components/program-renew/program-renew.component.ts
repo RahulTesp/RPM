@@ -28,15 +28,15 @@ export class ProgramRenewComponent {
       pgmendDate: new FormControl(null, [Validators.required]),
     });
 
-
-constructor(  private auth: AuthService,private rpm: RPMService,private router: Router, public datepipe: DatePipe,){
-  this.today_date = this.datepipe.transform(new Date(), 'yyyy-MM-dd');
-}
 ngOnInit() {
   this.renewProgramForm.get('startdate')?.valueChanges.subscribe(() => {
     this.calculateEndDate();
   });
 }
+constructor(  private auth: AuthService,private rpm: RPMService,private router: Router, public datepipe: DatePipe,){
+  this.today_date = this.datepipe.transform(new Date(), 'yyyy-MM-dd');
+}
+
   renewProgram() {
     var req_body: any = {};
     req_body['PatientId'] = parseInt(this.currentpPatientId);

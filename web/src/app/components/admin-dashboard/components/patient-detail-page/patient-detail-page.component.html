@@ -278,6 +278,7 @@
                     src="../../../../../assets/refresh.png"
                 /></span>
               </div>
+
               <section
                 class="progrssbar_container">
                 <!-- Custom Progress Bar -->
@@ -1790,6 +1791,25 @@
         *ngIf="http_healthtrends.VitalName != null"
       > -->
       <div class="summary_graph_container">
+        <div
+          class="vital-buttons"
+          *ngIf="
+            healthtrendVitalNameArray && healthtrendVitalNameArray.length > 0
+          "
+        >
+          <button
+            class="vital-buttons-item"
+            *ngFor="let vital of healthtrendVitalNameArray"
+            (click)="onHealthTrendVitalClick(vital, heath_trends_frequency)"
+            [ngClass]="{
+              'vital_selected_': vital === selectedVital,
+              'vital_not_selected': vital !== selectedVital
+            }"
+          >
+            {{ vital }}
+          </button>
+        </div>
+
         <div id="pdfGraph" style="display: block; width: 100%; height: 98%">
           <canvas
             class="charttrends"
@@ -2032,6 +2052,59 @@
             <p class="data_value"></p>
           </div>
         </div> -->
+      </div>
+    </div>
+  </div>
+    <div class="chart-wrapper-scrollfix">
+    <div *ngIf="allLineChartData?.length">
+      <div *ngFor="let chartData of allLineChartData; let i = index">
+        <ng-container *ngIf="chartData?.lineChartData?.length; else emptyGraph">
+          <div class="summary_graph_container" style="overflow: hidden; visibility: hidden">
+            <div
+              class="pdfData"
+              style="display: block; width: 100%; height: 98%; visibility: hidden"
+              *ngIf="http_healthtrends"
+            >
+              <canvas
+                class="charttrends"
+                baseChart
+                width="1"
+                height="1"
+                [datasets]="chartData.lineChartData"
+                [labels]="chartData.lineChartLabels"
+                [options]="lineChartOptions"
+                [legend]="lineChartLegend"
+                id="pd_ClinicalHtrends"
+                [type]="'line'"
+              >
+              </canvas>
+            </div>
+          </div>
+        </ng-container>
+        <!-- 👇 Empty Chart fallback -->
+        <ng-template #emptyGraph>
+          <div class="summary_graph_container" style="overflow: hidden; visibility: hidden">
+            <div
+              class="pdfData"
+              style="display: block; width: 100%; height: 98%; visibility: hidden"
+              *ngIf="http_healthtrends"
+            >
+              <canvas
+                class="charttrends"
+                baseChart
+                width="1"
+                height="1"
+                [datasets]="emptyChartDataset"
+                [labels]="[]"
+                [options]="lineChartOptions"
+                [legend]="lineChartLegend"
+                id="pd_ClinicalHtrends"
+                [type]="'line'"
+              >
+              </canvas>
+            </div>
+          </div>
+        </ng-template>
       </div>
     </div>
   </div>
@@ -3535,42 +3608,48 @@
       <div class="vitalReadings">
         <div
           class="vitalReadingsMenu"
-          *ngIf="
-            (http_vitalGlucoseData && http_vitalGlucoseData.length > 0) ||
-            (vital_temporaryData && vital_temporaryData.length > 0) ||
-            (http_VitalOxygen && http_VitalOxygen.length > 0) ||
-            (http_VitalWight && http_VitalWight.length > 0)
-          "
-        >
+          *ngIf="ProcessVitalData">
           <button
             class="vitalReading_menu_item"
-            *ngIf="http_vitalGlucoseData && http_vitalGlucoseData.length > 0"
+            *ngIf="ProcessVitalData && ProcessVitalData.BloodGlucose != null"
             id="pd_vital_BG"
             (click)="ChangeVitalScreen('BloodGlucose')"
+            [ngClass]="{
+              'vital_selected_': currentVital === 'BloodGlucose'
+            }"
           >
             BloodGlucose
           </button>
           <button
             class="vitalReading_menu_item"
-            *ngIf="vital_temporaryData && vital_temporaryData.length > 0"
+            *ngIf="ProcessVitalData && ProcessVitalData.BloodPressure != null"
             id="pd_Vital_BP"
             (click)="ChangeVitalScreen('BloodPressure')"
+            [ngClass]="{
+              'vital_selected_': currentVital === 'BloodPressure'
+            }"
           >
             BloodPressure
           </button>
           <button
             class="vitalReading_menu_item"
-            *ngIf="http_VitalOxygen && http_VitalOxygen.length > 0"
+             *ngIf="ProcessVitalData && ProcessVitalData.BloodOxygen != null "
             (click)="ChangeVitalScreen('Oxygen')"
             id="pd_Vital_O"
+              [ngClass]="{
+              'vital_selected_': currentVital === 'Oxygen'
+            }"
           >
             Oxygen
           </button>
           <button
             class="vitalReading_menu_item"
-            *ngIf="http_VitalWight && http_VitalWight.length > 0"
+            *ngIf="ProcessVitalData && ProcessVitalData.Weight != null"
             (click)="ChangeVitalScreen('Weight')"
             id="pd_Vital_W"
+             [ngClass]="{
+              'vital_selected_': currentVital === 'Weight'
+            }"
           >
             Weight
           </button>
@@ -4162,46 +4241,51 @@
   >
     <p class="patient-detail-panel-heading">Health Trends</p>
 
-    <!-- (click)="healthoverview(1)" [ngStyle]="{'background-color': heath_overview_frequency== 1 ? '#164d61'  : '#e1e6ed', 'color': heath_overview_frequency == 1 ? '#ffffff' :'#164d61' }" -->
-    <!-- <button class="btn-date_container" (click)="healthoverview(1)" [ngClass]="heath_overview_frequency== 1 ? 'date_selected_':'date_not_selected'"  >Today</button> -->
-    <div class="date_btn_panel" fxLayout="row">
-      <button
-        class="btn-date_container"
-        id="pd_ClinicalHtrend_7"
-        (click)="healthtrends(7)"
-        [ngClass]="
-          heath_trends_frequency == 7 ? 'date_selected_' : 'date_not_selected'
-        "
-      >
-        7 days
-      </button>
-      <button
-        class="btn-date_container"
-        id="pd_ClinicalHtrend_30"
-        (click)="healthtrends(30)"
-        [ngClass]="
-          heath_trends_frequency == 30 ? 'date_selected_' : 'date_not_selected'
-        "
-      >
-        30 days
-      </button>
-    </div>
-  </div>
-  <div class="summary_graph_container">
-    <div style="display: block; width: 98%; height: 98%">
-      <canvas
-        class="charttrends"
-        baseChart
-        width="1"
-        height="1"
-        [datasets]="lineChartData"
-        [labels]="lineChartLabels"
-        [options]="lineChartOptions"
-        [legend]="lineChartLegend"
-        id="pd_ClinicalHtrends"
-        [type]="'line'"
-      >
-      </canvas>
+   <div *ngFor="let chartData of allLineChartData; let i = index">
+      <div class="health-panel-btn">
+        <span>{{ healthtrendVitalNameArray[i] }}</span>
+        <div class="date_btn_panel" fxLayout="row">
+          <button
+            class="btn-date_container"
+            id="pd_ClinicalHtrend_7"
+            (click)="healthtrendsHealthInfo(7, i)"
+            [ngClass]="
+              heath_trends_frequencies[i] === 7
+                ? 'date_selected_'
+                : 'date_not_selected'"
+          >
+            7 days
+          </button>
+          <button
+            class="btn-date_container"
+            id="pd_ClinicalHtrend_30"
+            (click)="healthtrendsHealthInfo(30, i)"
+            [ngClass]="
+              heath_trends_frequencies[i] === 30
+                ? 'date_selected_'
+                : 'date_not_selected'"
+          >
+            30 days
+          </button>
+        </div>
+      </div>
+      <div class="summary_graph_container">
+        <div style="display: block; width: 98%; height: 98%" id="pdfData">
+          <canvas
+            class="charttrends"
+            baseChart
+            width="1"
+            height="1"
+            [datasets]="chartData.lineChartData"
+            [labels]="chartData.lineChartLabels"
+            [options]="lineChartOptions"
+            [legend]="lineChartLegend"
+            id="pd_ClinicalHtrends"
+            [type]="'line'"
+          >
+          </canvas>
+        </div>
+      </div>
     </div>
   </div>
   <!-- <div class="no_graphdata" *ngIf="!healthtrenddisplay">

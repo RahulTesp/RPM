@@ -737,6 +737,7 @@ namespace RPMWeb.Data.Common
         public List<ProgramVitals> Vitals { get; set; }
         public List<GoalDetails> goalDetails { get; set; }
         public int Duration { get; set; }
+        public string Name { get; set; }
 
     }
     public class PatientProgramDetails
@@ -944,8 +945,18 @@ namespace RPMWeb.Data.Common
         public string PhysicianName { get; set; }
         public string AssignedMember { get; set; }
         public string PatientType { get; set; }
-        public string Vital { get; set; }
+        public List<VitalInfo> VitalInfo { get; set; }
         public string Priority { get; set; }
+        public GetAllPatientInfo()
+        {
+            VitalInfo = new List<VitalInfo>();
+        }
+    }
+    public class VitalInfo
+    {
+        public string Vital { get; set; }
+        public string VitalPriority { get; set; }
+        public int AlertTypeId { get; set; }
     }
     public class GetAllPatientSmsInfo
     {
@@ -1405,6 +1416,10 @@ namespace RPMWeb.Data.Common
 
 
     }
+    public class PatientHealthTrends
+    {
+        public List<HealthTrends> Values { get; set; }
+    }
     public class Values
     {
         public List<string> data { get; set; }
@@ -1547,7 +1562,7 @@ namespace RPMWeb.Data.Common
         public int createdAt { get; set; }
         public object data { get; set; }
         public bool isTest { get; set; }
-    }
+    }   
 
     public class TranstekDeviceTelemetry
     {
@@ -2378,8 +2393,9 @@ namespace RPMWeb.Data.Common
     }
 
 
-    public class chathook {
-        public string author { get; set; }
+    public class chathook
+    {
+        public string Author { get; set; }
         public string Body { get; set; }
         public string Attributes { get; set; }
         public string AccountSid { get; set; }
@@ -2388,29 +2404,20 @@ namespace RPMWeb.Data.Common
         public string Source { get; set; }
         public string ConversationSid { get; set; }
         public string ParticipantSid { get; set; }
-        //public string DateCreated { get; set; }
-
-
     }
 
     public class smshook
     {
-        public string MessageSid { get; set; }
-        public string SmsSid { get; set; }
+        public string SmsSid { get; set; }          
         public string AccountSid { get; set; }
-        public string MessagingServiceSid { get; set; }
-
         public string From { get; set; }
         public string To { get; set; }
-
         public string Body { get; set; }
-
         public string SmsStatus { get; set; }
 
-
-
-
+        //public string SentDateUTC { get; set; }  // ❌ Twilio doesn’t send this
     }
+
     public class commUserNamesforVideoCall
     {
         public string CommUserNameCareTeam { get; set; }

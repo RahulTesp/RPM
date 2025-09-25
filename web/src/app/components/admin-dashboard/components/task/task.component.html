@@ -298,6 +298,7 @@
               (keyup)="applyDataFilter($event)"
               (focus)="setupFilter('PatientName')"
               [value]="alertPatientSearch"
+              autocomplete="off"
             />
           </div>
           <div class="search_heading_default" *ngIf="!alertSearchValeName">

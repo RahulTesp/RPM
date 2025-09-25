@@ -54,44 +54,44 @@ struct ProgramInfo: Codable {
  
 // MARK: - PatientDetails
 struct PatientDetails: Codable {
-    let userName: String
-    let userId: Int
-    let organizationID: Int
-    let mobileNo: String
-    let alternateMobNo: String
-    let email: String
-    let status: String
-    let firstName: String
-    let middleName: String
-    let lastName: String
-    let dob: String
-    let gender: String
-    let height: Double
-    let weight: Double
-    let address1: String
-    let address2: String
-    let cityName: String
-    let cityId: Int
-    let stateId: Int
-    let state: String
-    let countryId: Int
-    let picture: String
-    let zipCode: String
-    let timeZone: String
-    let timeZoneID: Int
-    let utcDifference: Int
-    let contact1Name: String
-    let contact1RelationName: String
-    let contact1Phone: String
-    let contact2Name: String
-    let contact2RelationName: String
-    let contact2Phone: String
-    let callTime: String
-    let preference1: String
-    let preference2: String
-    let preference3: String
-    let notes: String
-    let language: String
+    let userName: String?
+    let userId: Int?
+    let organizationID: Int?
+    let mobileNo: String?
+    let alternateMobNo: String?
+    let email: String?
+    let status: String?
+    let firstName: String?
+    let middleName: String?
+    let lastName: String?
+    let dob: String?
+    let gender: String?
+    let height: Double?
+    let weight: Double?
+    let address1: String?
+    let address2: String?
+    let cityName: String?
+    let cityId: Int?
+    let stateId: Int?
+    let state: String?
+    let countryId: Int?
+    let picture: String?
+    let zipCode: String?
+    let timeZone: String?
+    let timeZoneID: Int?
+    let utcDifference: Int?
+    let contact1Name: String?
+    let contact1RelationName: String?
+    let contact1Phone: String?
+    let contact2Name: String?
+    let contact2RelationName: String?
+    let contact2Phone: String?
+    let callTime: String?
+    let preference1: String?
+    let preference2: String?
+    let preference3: String?
+    let notes: String?
+    let language: String?
  
     enum CodingKeys: String, CodingKey {
         case userName = "UserName"
@@ -137,19 +137,19 @@ struct PatientDetails: Codable {
  
 // MARK: - PatientProgramdetails
 struct PatientProgramdetails: Codable {
-    let patientProgramId: Int
-    let programId: Int
-    let programName: String
-    let careTeamUserId: Int
-    let assignedMember: String
-    let managerId: Int
-    let manager: String
-    let startDate: String
-    let endDate: String
-    let duration: Int
-    let programStatus: String
-    let status: String
-    let targetReadings: Int
+    let patientProgramId: Int?
+    let programId: Int?
+    let programName: String?
+    let careTeamUserId: Int?
+    let assignedMember: String?
+    let managerId: Int?
+    let manager: String?
+    let startDate: String?
+    let endDate: String?
+    let duration: Int?
+    let programStatus: String?
+    let status: String?
+    let targetReadings: Int?
     let patientVitalInfos: [PatientProgramVitalInfo]
  
     enum CodingKeys: String, CodingKey {
@@ -220,21 +220,21 @@ struct GoalDetail: Codable, Identifiable {
 
 struct PatientPrescribtionDetails: Codable {
 
-    let status: String
+    let status: String?
 
-    let prescribedDate: String
+    let prescribedDate: String?
 
-    let physicianId: Int
+    let physicianId: Int?
 
-    let physician: String
+    let physician: String?
 
-    let consultationDate: String
+    let consultationDate: String?
 
-    let clinic: String
+    let clinic: String?
 
-    let clinicCode: String
+    let clinicCode: String?
 
-    let branch: String
+    let branch: String?
 
     let patientDiagnosisInfos: [PatientDiagnosisInfo]
  
@@ -288,7 +288,7 @@ struct PatientDiagnosisInfo: Codable,Identifiable {
 
 struct PatientEnrolledDetails: Codable {
 
-    let status: String
+    let status: String?
 
     let assignedDate: String
 
@@ -399,7 +399,37 @@ struct PatientVitalDetails: Codable {
     }
 }
  
-struct PatientVitalInfo: Codable,Identifiable {
+//struct PatientVitalInfo: Codable,Identifiable {
+//    let vitalName: String
+//    let vitalId: Int
+//    let scheduleId: Int
+//    let scheduleName: String
+//    let schedule: String
+//    let vitalScheduleId: Int
+//    let vitalScheduleName: String
+//    let morning: Bool
+//    let afternoon: Bool
+//    let evening: Bool
+//    let night: Bool
+//    let vitalMeasureInfos: [VitalMeasureInfo]
+//    var id: Int { scheduleId }
+//    enum CodingKeys: String, CodingKey {
+//        case vitalName = "VitalName"
+//        case vitalId = "VitalId"
+//        case scheduleId = "ScheduleId"
+//        case scheduleName = "ScheduleName"
+//        case schedule = "Schedule"
+//        case vitalScheduleId = "VitalScheduleId"
+//        case vitalScheduleName = "VitalScheduleName"
+//        case morning = "Morning"
+//        case afternoon = "Afternoon"
+//        case evening = "Evening"
+//        case night = "Night"
+//        case vitalMeasureInfos = "VitalMeasureInfos"
+//    }
+//}
+
+struct PatientVitalInfo: Codable, Identifiable {
     let vitalName: String
     let vitalId: Int
     let scheduleId: Int
@@ -412,7 +442,10 @@ struct PatientVitalInfo: Codable,Identifiable {
     let evening: Bool
     let night: Bool
     let vitalMeasureInfos: [VitalMeasureInfo]
-    var id: Int { scheduleId }
+ 
+    // Use vitalId for unique ID
+    var id: Int { vitalId }
+ 
     enum CodingKeys: String, CodingKey {
         case vitalName = "VitalName"
         case vitalId = "VitalId"
@@ -458,41 +491,63 @@ struct VitalMeasureInfo: Codable,Identifiable {
 }
  
 // MARK: - PatientInsurenceDetails
+//struct PatientInsurenceDetails: Codable {
+//
+//    let patientInsurenceInfos: [PatientInsurenceInfo]
+//
+//    enum CodingKeys: String, CodingKey {
+//
+//        case patientInsurenceInfos = "PatientInsurenceInfos"
+//
+//    }
+//
+//}
+// 
+//struct PatientInsurenceInfo: Codable,Identifiable {
+//    let id = UUID()  // auto-generated unique ID for SwiftUI
+//
+//    let insuranceId: String?
+//
+//    let insuranceName: String?
+//
+//    let policyNumber: String?
+//
+//    let isPrimary: Bool?
+// 
+//    enum CodingKeys: String, CodingKey {
+//
+//        case insuranceId = "InsuranceId"
+//
+//        case insuranceName = "InsuranceName"
+//
+//        case policyNumber = "PolicyNumber"
+//
+//        case isPrimary = "IsPrimary"
+//
+//    }
+//
+//}
+
 struct PatientInsurenceDetails: Codable {
-
     let patientInsurenceInfos: [PatientInsurenceInfo]
-
+ 
     enum CodingKeys: String, CodingKey {
-
         case patientInsurenceInfos = "PatientInsurenceInfos"
-
     }
-
 }
  
-struct PatientInsurenceInfo: Codable,Identifiable {
-    let id = UUID()  // auto-generated unique ID for SwiftUI
-
-    let insuranceId: String?
-
-    let insuranceName: String?
-
-    let policyNumber: String?
-
+struct PatientInsurenceInfo: Codable, Identifiable {
+    let id = UUID() // SwiftUI unique ID
+ 
+    let insuranceVendorId: Int?
+    let insuranceVendorName: String?
     let isPrimary: Bool?
  
     enum CodingKeys: String, CodingKey {
-
-        case insuranceId = "InsuranceId"
-
-        case insuranceName = "InsuranceName"
-
-        case policyNumber = "PolicyNumber"
-
+        case insuranceVendorId = "InsuranceVendorId"
+        case insuranceVendorName = "InsuranceVendorName"
         case isPrimary = "IsPrimary"
-
     }
-
 }
 
  
