@@ -20,15 +20,6 @@ final class RPMLoginViewModel: ObservableObject {
     var usrpwd : String?
 
     init() {
-//        print("RPMLoginViewModel login state from UserDefaults")
-//           let defaults = UserDefaults.standard
-//           if let token = defaults.string(forKey: "jsonwebtoken"), !token.isEmpty {
-//               self.accessToken = token
-//               self.isAuthenticated = true
-//               print("Restored login state from UserDefaults")
-//           } else {
-//               self.isAuthenticated = false
-//           }
        }
     
     func login(userName: String, password: String, completed: @escaping (String?, AlertItem?) -> Void) {
@@ -158,26 +149,9 @@ final class RPMLoginViewModel: ObservableObject {
         }
     }
 
-//    @MainActor
-//    func restoreLoginState() {
-//        let defaults = UserDefaults.standard
-//        if let token = defaults.string(forKey: "jsonwebtoken"), !token.isEmpty {
-//            self.accessToken = token
-//            self.isAuthenticated = true
-//            print("Restored login state from UserDefaults. Token exists.")
-//        } else {
-//            self.isAuthenticated = false
-//            print("No saved token found. User needs to login.")
-//        }
-//    }
 
- 
     func verifyOtp(userName: String, otp: String, completed: @escaping (String?, AlertItem?) -> Void) {
-        print("userName")
-        print("otp")
-        print(userName)
-        print(otp)
-       
+    
         let defaults = UserDefaults.standard
         NetworkManager.shared.otpVerification(userName: userName,
                                     otp: otp,
@@ -307,51 +281,4 @@ final class RPMLoginViewModel: ObservableObject {
             }
         }
     }
-
-    
-//    func logout(completion: @escaping (String?, AlertItem?) -> Void) {
-//        print("self.ggttttt")
-//        print(self.isAuthenticated)
-//        let defaults = UserDefaults.standard
-//        
-//        guard let tkn = defaults.string(forKey: "jsonwebtoken") else {
-//            completion(nil, AlertContext.invalidUser) // or other alert
-//            return
-//        }
-//        
-//        NetworkManager.shared.logOut(tkn: tkn) { result in
-//            DispatchQueue.main.async {
-//                switch result {
-//                case .success(let responseString):
-//                    print("LOGOUTresponseString",responseString)
-//                    print("self.isAuthenticated",self.isAuthenticated)
-//              
-//                    SessionManager.shared.reset()
-//                 
-//                    self.isLoggedOut = true
-//             
-//                    completion(responseString, nil)
-//                    
-//                case .failure(let error):
-//                    print("logOutrror", error)
-//                    let alert: AlertItem
-//                    switch error {
-//                    case .invalidData: alert = AlertContext.invalidData
-//                    case .invalidURL: alert = AlertContext.invalidURL
-//                    case .invalidResponse: alert = AlertContext.invalidResponse
-//                    case .unableToComplete: alert = AlertContext.unableToComplete
-//                    case .decodingError: alert = AlertContext.decodingError
-//                    case .invalidPassword: alert = AlertContext.invalidPassword
-//                    case .lockedError: alert = AlertContext.lockedError
-//                    case .numberInvalidError: alert = AlertContext.numberInvalidError
-//                    case .otpWrongError: alert = AlertContext.otpWrongError
-//                    case .invalidUser: alert = AlertContext.invalidUser
-//                    case .unauthorized:
-//                        alert = AlertContext.unauthorized
-//                    }
-//                    completion(nil, alert)
-//                }
-//            }
-//        }
-//    }
 }

@@ -2230,23 +2230,7 @@ class MoreManager: NSObject {
                 completed(.failure(.decodingError))
 
             }
-
-             
-            
-//            do {
-//                
-//                let decoder = JSONDecoder()
-//                
-//                let decodedResponse = try decoder.decode(ProgramInfo.self, from: data)
-//                print("\nProfilesdecodedResponse:",decodedResponse)
-//                print(decodedResponse)
-//                completed(.success(decodedResponse))
-//                
-//            } catch {
-//                
-//                completed(.failure(.decodingError))
-//            }
-            
+  
         }
         
         task.resume()

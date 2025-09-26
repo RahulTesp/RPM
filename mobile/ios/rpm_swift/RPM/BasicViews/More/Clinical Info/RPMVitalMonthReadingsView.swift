@@ -127,7 +127,7 @@ struct RPMVitalMonthReadingsView: View {
                     Spacer()
                     
                     Button {
-                        vitalReadingsList.loading = true
+                      //  vitalReadingsList.loading = true
                    
                         let nextMonth = Calendar.current.date(byAdding: .month, value: 1, to: currentMonthDate)!
                         let now = Date()
@@ -143,7 +143,9 @@ struct RPMVitalMonthReadingsView: View {
                             }
                             return
                         }
-
+                        
+                        // only set loading when valid
+                           vitalReadingsList.loading = true
                         currentMonthDate = nextMonth
 
                         
@@ -211,32 +213,7 @@ struct RPMVitalMonthReadingsView: View {
                         
                         ScrollView(.horizontal)
                         {
-                            
-//                            HStack
-//                            {
-//                                
-//                                BPReadings(bpitem : vitalReadingsList.vitalReadings?.bloodPressure ?? [], returningFromClinicalInfo: $returningFromClinicalInfo,
-//                                           viewWidth: screenWidth * 0.80
-//                                           
-//                                )
-//                                
-//                                WeightReadings(wtitem : vitalReadingsList.vitalReadings?.weight ?? [], returningFromClinicalInfo: $returningFromClinicalInfo
-//                                               ,
-//                                                          viewWidth: screenWidth * 0.80
-//                                )
-//                                
-//                                GlucoseReadings(gluitem : vitalReadingsList.vitalReadings?.bloodGlucose ?? [], returningFromClinicalInfo: $returningFromClinicalInfo
-//                                                ,
-//                                                           viewWidth: screenWidth * 0.80
-//                                )
-//                                
-//                                OxygenReadings(oxyitem : vitalReadingsList.vitalReadings?.bloodOxygen ?? [], returningFromClinicalInfo: $returningFromClinicalInfo
-//                                               ,
-//                                                          viewWidth: screenWidth * 0.80
-//                                )
-//                                
-//                            }
-                            
+                           
                             HStack {
 
                                 if let bp = vitalReadingsList.vitalReadings?.bloodPressure {

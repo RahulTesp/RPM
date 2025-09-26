@@ -16,8 +16,6 @@ final class NotificationViewModel: ObservableObject {
  
     init() {
   
-       // getnotify()
-        
     }
  
     func getnotify(completion: (() -> Void)? = nil) {

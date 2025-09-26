@@ -173,6 +173,8 @@ class AppModel: NSObject, ObservableObject {
 
 
     func assignDelegateIfNeeded(for conversation: TCHConversation) {
+        print("Delegate set for SID: \(conversation.sid ?? "nil")")
+
         if conversation.delegate !== AppModel.shared {
             conversation.delegate = AppModel.shared
             print(" Delegate set for conversation SID: \(conversation.sid ?? "nil")")

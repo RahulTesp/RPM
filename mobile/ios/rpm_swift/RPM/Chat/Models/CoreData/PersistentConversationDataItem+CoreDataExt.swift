@@ -232,16 +232,6 @@ extension PersistentConversationDataItem {
                                         let unreadCount = Int64(Int(count) - lastRead - 1)
                                         print(" (Fallback) Messages lastRead: \(lastRead), unreadCount: \(unreadCount)")
                                         
-//                                        if unreadCount > 0 {
-//                                            self.unreadMessagesCount = unreadCount
-//                                            let totalUnread = PersistentConversationDataItem.totalUnreadCount(inContext: context)
-//                                            print(" (Fallback) Posting TotalUnreadMessageCountUpdated with totalUnreadCount: \(totalUnread)")
-//                                            NotificationCenter.default.post(
-//                                                name: Notification.Name("TotalUnreadMessageCountUpdated"),
-//                                                object: nil,
-//                                                userInfo: ["totalUnreadCount": totalUnread]
-//                                            )
-//                                        }
                                         
                                         if unreadCount > 0 {
                                             self.unreadMessagesCount = unreadCount

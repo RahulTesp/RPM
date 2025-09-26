@@ -44,74 +44,7 @@ class ConversationManager: ObservableObject {
     init(_ client: ConversationsClientWrapper, coreDataDelegate: CoreDataDelegate ) {
         self.client = client
         self.coreDataDelegate = coreDataDelegate
-        
-//        NotificationCenter.default.publisher(for: Notification.Name("TotalUnreadMessageCountUpdated"))
-//            .sink { [weak self] notification in
-//                if let userInfo = notification.userInfo {
-//                    if let count = userInfo["totalUnreadCount"] as? Int64 {
-//                        self?.unreadCount = count
-//                    } else if let number = userInfo["totalUnreadCount"] as? NSNumber {
-//                        let count = number.int64Value
-//                        self?.unreadCount = count
-//                    } else {
-//                      
-//                    }
-//                }
-//            }
-//            .store(in: &cancellableSet)
-        
-//        NotificationCenter.default.publisher(for: Notification.Name("TotalUnreadMessageCountUpdated"))
-//            .sink { [weak self] notification in
-//                guard let self = self else { return }
-//
-//                print("\n--- TotalUnreadMessageCountUpdated notification received ---")
-//                print("Notification: \(notification)")
-//                print("Sender: \(String(describing: notification.object))")
-//                print("UserInfo: \(String(describing: notification.userInfo))")
-//                
-//                if let userInfo = notification.userInfo {
-//                    var newCount: Int64? = nil
-//                    if let count = userInfo["totalUnreadCount"] as? Int64 {
-//                        newCount = count
-//                    } else if let number = userInfo["totalUnreadCount"] as? NSNumber {
-//                        newCount = number.int64Value
-//                    }
-//
-//                    if let newCount = newCount, newCount != self.unreadCount {
-//                        self.unreadCount = newCount
-//                        print("Unread count updated to: \(newCount)")
-//                    }
-//                }
-//            }
-//            .store(in: &cancellableSet)
 
-        
-        
-//        NotificationCenter.default.publisher(for: Notification.Name("TotalUnreadMessageCountUpdated"))
-//            .sink { [weak self] notification in
-//                guard let self = self else { return }
-//                if let userInfo = notification.userInfo {
-//                    var newCount: Int64? = nil
-//                    if let count = userInfo["totalUnreadCount"] as? Int64 {
-//                        newCount = count
-//                    } else if let number = userInfo["totalUnreadCount"] as? NSNumber {
-//                        newCount = number.int64Value
-//                    }
-//
-//                    if let newCount = newCount {
-//                        if newCount == 0 && !self.hasLoadedConversationsOnce {
-//                            // ignore "startup reset"
-//                            return
-//                        }
-//
-//                        if newCount != self.unreadCount {
-//                            print("🔔 Updating unreadCount to: \(newCount)")
-//                            self.unreadCount = newCount
-//                        }
-//                    }
-//                }
-//            }
-//            .store(in: &cancellableSet)
         
         NotificationCenter.default.publisher(for: Notification.Name("TotalUnreadMessageCountUpdated"))
                    .sink { [weak self] notification in
@@ -147,30 +80,6 @@ class ConversationManager: ObservableObject {
                self.unreadCount = total
            }
        }
-
-    
-//    func refreshUnreadCount() {
-//        guard let client = client.conversationsClient else { return }
-//
-//        var totalUnread: Int64 = 0
-//
-//        let group = DispatchGroup()
-//
-//        client.myConversations()?.forEach { conversation in
-//            group.enter()
-//            conversation.getUnreadMessagesCount { result, count in
-//                if result.isSuccessful, let count = count {
-//                    totalUnread += count.int64Value
-//                }
-//                group.leave()
-//            }
-//        }
-//
-//        group.notify(queue: .main) {
-//            self.unreadCount = totalUnread
-//            print("Unread count refreshed: \(self.unreadCount)")
-//        }
-//    }
 
 
     

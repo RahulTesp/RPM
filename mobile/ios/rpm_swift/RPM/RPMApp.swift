@@ -78,34 +78,10 @@ struct RPMApp: App {
                                                print("Conversation Manager: \(model.conversationManager != nil ? "Initialized" : "Not Initialized")")
                                                print("Messages Manager: \(model.messagesManager != nil ? "Initialized" : "Not Initialized")")
                                                print("Participants Manager: \(model.participantsManager != nil ? "Initialized" : "Not Initialized")")
-                        
-                        
-//                        print("RPMApp onAppear - model instance:", model)
-//                                   print("AppModel.shared instance:", AppModel.shared)
-//                                   print("Are they same?", model === AppModel.shared)
-                        
+                       
                     }
                 
-              
 
-//                    .onChange(of: scenePhase) { phase in
-//                        if phase == .active {
-//                            print("App came to foreground, checking token expiry...")
-//                            notifList.getnotify()
-//                            SessionManager.shared.logoutIfTokenExpired()
-//                            
-//                            // Let AppModel handle the subscription internally
-//                                   model.refreshUnreadIfReady()
-//                        }
-//                    }
-                
-//                    .onAppear {
-//                        if model.isClientReady {
-//                            print("Client already ready on appear, refreshing unread count")
-//                            model.conversationManager.refreshUnreadCount()
-//                        }
-//                    }
-                
                     .onChange(of: scenePhase) { phase in
                         if phase == .active {
                             print("App came to foreground")
@@ -145,28 +121,7 @@ struct RPMApp: App {
                                           roomManager: roomManager
                                       )
                                   }
-//                            homeViewModel.reset()
-//
-//                            // Step 1: Logout API call
-//                            loginStateViewModel.logout { response, alert in
-//                                print("Logout server call finished")
-//
-//                                if let alert = alert {
-//                                    print("Logout failed: \(alert.title)")  // log for debugging
-//                                }
-//
-//                                // Step 2: Always clean app state, even if logout fails
-//                                Task { @MainActor in
-//                                    model.signOutChat()
-//                                    callManager.disconnect()
-//                                    roomManager.disconnect()
-//                                    
-//                                    navigationHelper.path = []
-//                                    loginStateViewModel.isAuthenticated = false
-//                                    
-//                                    print("navigationHelper.path after logout: \(navigationHelper.path)")
-//                                }
-//                            }
+
                         }
                     }
 
@@ -264,24 +219,28 @@ struct RPMApp: App {
                             .environmentObject(navigationHelper)
                             .environmentObject(memberDetList)
                       
-                        case .messageList(let conversation):
-                            makeMessageListView(for: conversation)
+                            
+                        case .messageList(let conversation, let fromCreate):
+                            makeMessageListView(for: conversation, fromCreate: fromCreate)
+
 
                         }
                     }
             }
         }
     }
+ 
     
     @ViewBuilder
-    private func makeMessageListView(for conversation: PersistentConversationDataItem) -> some View {
+    private func makeMessageListView(for conversation: PersistentConversationDataItem, fromCreate: Bool) -> some View {
         let context = model.getManagedContext()
         let convItemViewModel = model.conversationManager.viewModel(for: conversation, context: context)
 
         MessageListView(
             conversation: conversation,
             viewModel: messageListViewModel,
-            convItemViewModel: convItemViewModel
+            convItemViewModel: convItemViewModel,
+            fromCreate: fromCreate   //  add this
         )
         .environmentObject(model)
         .environmentObject(model.conversationManager)
@@ -289,8 +248,6 @@ struct RPMApp: App {
         .environmentObject(model.participantsManager)
         .environmentObject(navigationHelper)
     }
-    
- 
 
 }
 
@@ -412,7 +369,7 @@ struct ConnectivityBanner: View {
 enum Screen: Hashable{
     case loginView
     case createConversation
-    case messageList(conversation: PersistentConversationDataItem)
+    case messageList(conversation: PersistentConversationDataItem, fromCreate: Bool = false )
     case conversationsList
     case forgotPassword
     case resetPassword
