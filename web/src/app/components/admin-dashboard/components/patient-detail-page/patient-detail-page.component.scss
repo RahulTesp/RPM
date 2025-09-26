@@ -3637,6 +3637,25 @@ li + li {
   display: flex;
   justify-content: space-between;
 }
+.health-panel-btn-ClinicInfo
+{
+   width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-top:1rem;
+
+}
+.health-panel
+{
+  
+  padding-left: 0.5rem;
+}
+.btn-health-panel-ClinicInfo
+{
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
 /* Outer progress container */
 .custom-progress-bar-outer {
   width: 100%;

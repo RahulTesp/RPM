@@ -856,3 +856,10 @@ mat-progress-spinner {
   min-width: 80px;
 }
 
+.task-type-truncated {
+  max-width: 150px; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all; 
+}
