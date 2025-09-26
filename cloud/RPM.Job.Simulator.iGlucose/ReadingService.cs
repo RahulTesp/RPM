@@ -19,7 +19,6 @@ namespace RPM.Job.Simulator.iGlucose
         //Fetch the devices form the Device table with DeviceStatus = "Active" 
         public void getandProcessActiveDevices()
         {
-            var result = new Dictionary<string, DeviceIDs>();
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 using var command = new SqlCommand("usp_GetDeviceIds_Simulator", conn)
@@ -28,7 +27,10 @@ namespace RPM.Job.Simulator.iGlucose
                 };
                 command.Parameters.AddWithValue("@deviceVendorName", "iGlucose");
                 conn.Open();
-
+                foreach (var key in deviceid_dictionary.Keys)
+                {
+                        deviceid_dictionary.TryRemove(key, out _);
+                }
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -39,24 +41,18 @@ namespace RPM.Job.Simulator.iGlucose
                         DateTime activatedDate = (DateTime)reader["DeviceActivatedDateTime"];
                         if (!string.IsNullOrEmpty(deviceSerialNo))
                         {
-                            result[deviceSerialNo] = new DeviceIDs(deviceSerialNo, deviceTypeId, deviceModel, activatedDate);
+                            deviceid_dictionary.AddOrUpdate(
+                            deviceSerialNo,
+                            key => new DeviceIDs(deviceSerialNo, deviceTypeId, deviceModel, activatedDate),
+                            (key, oldValue) => new DeviceIDs(deviceSerialNo, deviceTypeId, deviceModel, activatedDate)
+                            );
+                            
                         }
                         
                     }
                 }
-                foreach (var kvp in result)
-                {
-                    deviceid_dictionary.AddOrUpdate(kvp.Key, kvp.Value, (k, v) => kvp.Value);
-                }
-                // Remove old devices not present anymore
-                foreach (var existing in deviceid_dictionary.Keys)
-                {
-                    if (!result.ContainsKey(existing))
-                    {
-                        deviceid_dictionary.TryRemove(existing, out _);
-                    }
-                }
-                foreach (var device in result)
+             
+                foreach (var device in deviceid_dictionary)
                 {
                     Console.WriteLine($"Processing Device: {device.Value.DeviceSerialNo}, TypeId: {device.Value.DeviceTypeId}, Model: {device.Value.DeviceModel},Time:{device.Value.DeviceActivatedDateTime}");
                     GenerateAndInsertReading(conn, device.Value);
