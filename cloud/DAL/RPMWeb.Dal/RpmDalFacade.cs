@@ -912,6 +912,11 @@ namespace RPMWeb.Dal
         {
             return new Notification().InsertFirebaseToken(UserName, Bearer,Token, ConnectionString);
         }
+        public static bool DeleteFirebaseToken(string UserName, string Bearer, string Token)
+
+        {
+            return new Notification().DeleteFirebaseToken(UserName, Bearer, Token, ConnectionString);
+        }
 
         public static bool IsPatientOnline(string PatientId, string UserName)
         {

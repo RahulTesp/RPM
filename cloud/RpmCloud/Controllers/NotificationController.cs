@@ -293,6 +293,53 @@ namespace RpmCloud.Controllers
             }
         }
 
+        [Route("notification/deletefirebasetoken")]
+        [HttpPost]
+        public IActionResult DeleteFirebaseToken([FromQuery] string Token)
+        {
+            try
+            {
+
+                if (Request.Headers.ContainsKey("Bearer"))
+                {
+                    string? s = Request.Headers["Bearer"].FirstOrDefault();
+                    RpmDalFacade.ConnectionString = CONN_STRING;
+                    if (string.IsNullOrEmpty(s))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    string UserName = RpmDalFacade.IsSessionValid(s);
+                    if (string.IsNullOrEmpty(UserName))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+                    if (!RpmDalFacade.ValidateTkn(s))
+                    {
+                        return Unauthorized(new { message = "Invalid session." });
+                    }
+
+                    bool isinsert = RpmDalFacade.DeleteFirebaseToken(UserName, s, Token);
+                    if (isinsert)
+                    {
+                        return Ok(isinsert);
+                    }
+                    return NotFound("Could not Insert Token");
+                }
+                else
+                {
+                    return Unauthorized(new { message = "Invalid session." });
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("Lifetime validation failed"))
+                {
+                    return BadRequest(new { message = "Invalid session." }); ;
+                }
+                return BadRequest(new { message = "Unexpected Error." });
+            }
+        }
+
 
     }
 }
