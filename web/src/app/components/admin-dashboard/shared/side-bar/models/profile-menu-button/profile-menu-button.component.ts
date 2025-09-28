@@ -10,6 +10,7 @@ import { RPMService } from 'src/app/components/admin-dashboard/sevices/rpm.servi
 import { AuthService } from 'src/app/services/auth.service';
 import { passwordNotContainUsernameValidator } from './password-username-validator';
 import { StatusDialogBoxComponent } from '../status-dialog-box/status-dialog-box.component';
+import { MessagingService } from 'src/app/components/admin-dashboard/sevices/messaging.service';
 
 @Component({
   selector: 'app-profile-menu-button',
@@ -34,6 +35,7 @@ export class ProfileMenuButtonComponent implements OnInit {
 
   @ViewChild('statusDialog') statusDialog!: StatusDialogBoxComponent;
   constructor(
+    private messagingService: MessagingService,
     private router: Router,
     private auth: AuthService,
     private rpm: RPMService,
@@ -89,6 +91,10 @@ export class ProfileMenuButtonComponent implements OnInit {
       console.error('Logout error:', error);
     } finally {
       this.auth.removeToken();
+      
+    // 🔕 Unsubscribe from Firebase notifications
+    await this.messagingService.unsubscribeFromFirebase();
+
       await this.router.navigate(['/login']);
       window.location.reload();
     }
