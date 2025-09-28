@@ -1234,6 +1234,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   isSmall: boolean;
 
   ngAfterViewInit() {
+      this.getHealthTrends(this.heath_trends_frequency);
+      // this.getVitalReading();
     this.breakpoint
       .observe(['(max-width: 1280px)'])
       .subscribe((bs: BreakpointState) => {
@@ -2604,6 +2606,7 @@ getFirstPresentVital(vitalScreen: any) {
       } else if (submenu == 3) {
         this.getTableDataSource(this.http_medication_data);
       } else if (submenu == 1) {
+        // this.getTableDataSource(this.httpVitalData);
       }
     } else {
     }
@@ -3069,7 +3072,7 @@ getFirstPresentVital(vitalScreen: any) {
       VitalId: 1,
       Time: DefaultDates.reverse(),
       Values: [
-        { data: [null, null, null, null, null, null, null], label: 'No data avaiable' },
+        { data: [null, null, null, null, null, null, null], label: 'No data available' },
       ],
     };
     this.lineChartLabels = this.patientService.convertDateforHealthTrends(
@@ -3876,15 +3879,11 @@ getFirstPresentVital(vitalScreen: any) {
             // Use form values if direct dates aren't provided
 
             startDate = new Date(
-              this.frmactivitySchedulerange.controls.start.value,
-              this.frmactivitySchedulerange.controls.start.value
-            );
+              this.frmactivitySchedulerange.controls.start.value);
 
 
             endDate = new Date(
-              this.frmactivitySchedulerange.controls.end.value,
-              this.frmactivitySchedulerange.controls.end.value
-            )
+              this.frmactivitySchedulerange.controls.end.value)
 
           }
           }

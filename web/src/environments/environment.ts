@@ -17,7 +17,7 @@ export const environment = {
   //host: 'rpm-demo-api.azurewebsites.net',
   // host: 'meditprodapi.azurewebsites.net',
   // host:'rpm-dev-tespcare.azurewebsites.net',
-   host : 'rpm-multivital-api-v2.azurewebsites.net',
+   //host : 'rpm-multivital-api-v2.azurewebsites.net',
 
   protocol: 'https',
   firebase: {
