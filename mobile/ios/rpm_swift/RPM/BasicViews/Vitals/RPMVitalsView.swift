@@ -64,6 +64,7 @@ struct RPMVitalsView: View {
     @EnvironmentObject var participantsManager: ParticipantsManager
     @EnvironmentObject var conversationManager: ConversationManager
     @EnvironmentObject var navigationHelper: NavigationHelper
+    @EnvironmentObject var sessionManager: SessionManager
     @State private var showFutureDateToast = false
 
 
@@ -449,6 +450,22 @@ struct RPMVitalsView: View {
         .padding(.bottom, 10)
       
         .background(Color("bgColor"))
+        
+        .onAppear {
+            if !returningFromClinicalInfo {
+                // Reset your dates
+                currentDate = currentDateFix
+                currentDateValue = vitalSummaryList.currentDateValue
+                vitalSummaryList.defaultVitalSumm()
+                showVitalSummary = true
+                isFirstAppearance = false
+            }
+
+            // Reset to ListView
+            currentlySelectedId = 1          // <-- ListView id
+            showingSecVitalSummary = true    // <-- make sure ListView section is active
+        }
+
     }
     private func format(date: Date) -> String {
         let dateFormatter = DateFormatter()
@@ -601,22 +618,100 @@ struct VitalDataItemView: View {
             VStack(alignment: .leading) {
                
                 ScrollView(.horizontal) {
-                    HStack (spacing: 2){
-                       
-                        BPReadings(bpitem : vitalSummaryList.vitalSummary?.bloodPressure ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true, viewWidth: viewWidth)
+//                    HStack (spacing: 2){
+//                       
+//                        BPReadings(bpitem : vitalSummaryList.vitalSummary?.bloodPressure ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true, viewWidth: viewWidth)
+//                            .environmentObject(navigationHelper)
+//
+//                    
+//                        WeightReadings(wtitem: vitalSummaryList.vitalSummary?.weight ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true, viewWidth: viewWidth)
+//                            .environmentObject(navigationHelper)
+//
+//                            GlucoseReadings(gluitem: vitalSummaryList.vitalSummary?.bloodGlucose ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true, viewWidth: viewWidth)
+//                            .environmentObject(navigationHelper)
+//
+//                            OxygenReadings(oxyitem: vitalSummaryList.vitalSummary?.bloodOxygen ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true, viewWidth: viewWidth)
+//                            .environmentObject(navigationHelper)
+//                    
+//                    }
+                    HStack(spacing: 2) {
+
+                        if let bp = vitalSummaryList.vitalSummary?.bloodPressure {
+
+                            BPReadings(
+
+                                bpitem: bp,
+
+                                returningFromClinicalInfo: $returningFromClinicalInfo,
+
+                                showViewMore: true,
+
+                                viewWidth: viewWidth
+
+                            )
+
                             .environmentObject(navigationHelper)
 
-                    
-                        WeightReadings(wtitem: vitalSummaryList.vitalSummary?.weight ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true, viewWidth: viewWidth)
+                        }
+                     
+                        if let weight = vitalSummaryList.vitalSummary?.weight {
+
+                            WeightReadings(
+
+                                wtitem: weight,
+
+                                returningFromClinicalInfo: $returningFromClinicalInfo,
+
+                                showViewMore: true,
+
+                                viewWidth: viewWidth
+
+                            )
+
                             .environmentObject(navigationHelper)
 
-                            GlucoseReadings(gluitem: vitalSummaryList.vitalSummary?.bloodGlucose ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true, viewWidth: viewWidth)
+                        }
+                     
+                        if let glucose = vitalSummaryList.vitalSummary?.bloodGlucose {
+
+                            GlucoseReadings(
+
+                                gluitem: glucose,
+
+                                returningFromClinicalInfo: $returningFromClinicalInfo,
+
+                                showViewMore: true,
+
+                                viewWidth: viewWidth
+
+                            )
+
                             .environmentObject(navigationHelper)
 
-                            OxygenReadings(oxyitem: vitalSummaryList.vitalSummary?.bloodOxygen ?? [],  returningFromClinicalInfo: $returningFromClinicalInfo, showViewMore: true, viewWidth: viewWidth)
+                        }
+                     
+                        if let oxygen = vitalSummaryList.vitalSummary?.bloodOxygen {
+
+                            OxygenReadings(
+
+                                oxyitem: oxygen,
+
+                                returningFromClinicalInfo: $returningFromClinicalInfo,
+
+                                showViewMore: true,
+
+                                viewWidth: viewWidth
+
+                            )
+
                             .environmentObject(navigationHelper)
-                    
+
+                        }
+
                     }
+
+                     
+                    
                 } .frame( height: 200)
                
     

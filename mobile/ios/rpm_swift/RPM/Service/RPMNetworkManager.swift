@@ -2168,7 +2168,7 @@ class MoreManager: NSObject {
         var request = URLRequest(url: url)
         
         request.addValue(tkn, forHTTPHeaderField: "Bearer")
-        print("reque")
+        print("requepgm",request)
      
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             
@@ -2176,7 +2176,8 @@ class MoreManager: NSObject {
             {
                 
             }
-            
+            print("requepgmresponse",response)
+            print("requedata",data)
             
             if let error = error as? URLError {
                 print("URLError:", error.code)
@@ -2187,7 +2188,7 @@ class MoreManager: NSObject {
                 }
                 return
             }
-            print("error")
+            print("errorpgm",error)
         
             guard let response = response as? HTTPURLResponse, response.statusCode == 200
                     
@@ -2198,27 +2199,38 @@ class MoreManager: NSObject {
                 
                 return
             }
-            print("response")
+            print("responsepgm",response)
             print(response)
             guard let data = data , error == nil else {
                 completed(.failure(.invalidData))
                 return
             }
             
-            do {
-                
-                let decoder = JSONDecoder()
-                
-                let decodedResponse = try decoder.decode(ProgramInfo.self, from: data)
-                print("\nProfilesdecodedResponse\n")
-                print(decodedResponse)
-                completed(.success(decodedResponse))
-                
-            } catch {
-                
-                completed(.failure(.decodingError))
-            }
             
+            do {
+
+                let decoder = JSONDecoder()
+
+                let decodedResponse = try decoder.decode(ProgramInfo.self, from: data)
+
+                print("\nProfilesdecodedResponse:", decodedResponse)
+
+                completed(.success(decodedResponse))
+
+            } catch {
+
+                if let jsonString = String(data: data, encoding: .utf8) {
+
+                    print("Raw JSON:", jsonString)
+
+                }
+
+                print("Decoding Error:", error)
+
+                completed(.failure(.decodingError))
+
+            }
+  
         }
         
         task.resume()
