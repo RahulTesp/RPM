@@ -743,9 +743,12 @@ export class EditpatientComponent implements OnInit {
           this.ccode = that.Clinic_Selected[0].ClinicCode;
           this.cid = that.Clinic_Selected[0].Id;
           that.programForm.controls['cliniccode'].setValue(this.ccode);
+        }else{
+          that.programForm.controls['cliniccode'].setValue('');
+
         }
         that.PatientInfoForm.controls['clinicname'].setValue(this.cname);
-        that.PatientInfoForm.controls['cliniccode'].setValue(this.ccode);
+       // that.PatientInfoForm.controls['cliniccode'].setValue(this.ccode);
 
         var patientHeighArray = that.resp.Height.toString().split('.');
 
