@@ -481,6 +481,8 @@ export class HomeComponent implements OnInit {
       (overview: { VitalName: any }) => overview.VitalName === event
     );
     this.health_overview = filtered[0].Priorities;
+    console.log('Health OverView');
+    console.log(this.health_overview)
     if (
       this.health_overview.Normal == this.health_overview.Cautious &&
       this.health_overview.Normal == this.health_overview.Critical
