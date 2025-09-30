@@ -359,21 +359,25 @@ func getEntries2(valueSummary:[Valuev] , count : Int)->[ChartDataEntry]{
 
 }
 
+
 func getEntries(valueSummary: [Valuev], entryIndex: Int) -> [ChartDataEntry] {
     guard entryIndex < valueSummary.count else {
         return []
     }
 
     let dataPoints = valueSummary[entryIndex].data
-    let label = valueSummary[entryIndex].label  // Assuming your Valuev model has a 'label' property
+    let label = valueSummary[entryIndex].label
 
     var entries: [ChartDataEntry] = []
 
     for (index, data) in dataPoints.enumerated() {
-        let value = Double(data ?? "0.0") ?? 0.0
-        print("valuey",value)
-        let entry = ChartDataEntry(x: Double(index), y: value, data: ["label": label])
-        entries.append(entry)
+        if let dataStr = data, let value = Double(dataStr) {
+            let entry = ChartDataEntry(x: Double(index), y: value, data: ["label": label])
+            entries.append(entry)
+        } else {
+            // skip null → no entry added
+            print("Skipping null at index \(index)")
+        }
     }
 
     return entries

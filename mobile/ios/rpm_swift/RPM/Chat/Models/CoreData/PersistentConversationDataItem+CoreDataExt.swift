@@ -204,6 +204,12 @@ extension PersistentConversationDataItem {
                             print(" Unread messages count fetched: \(count)")
                             context.perform {
                                 self.unreadMessagesCount = Int64(truncating: count)
+                                do {
+                                      try context.save() // commit changes so fetch sees updated value
+                                  } catch {
+                                      print("Failed to save context: \(error)")
+                                  }
+                                
                                 let totalUnread = PersistentConversationDataItem.totalUnreadCount(inContext: context)
                                 print(" Posting TotalUnreadMessageCountUpdated with totalUnreadCount: \(totalUnread)")
                                 NotificationCenter.default.post(
@@ -226,8 +232,17 @@ extension PersistentConversationDataItem {
                                         let unreadCount = Int64(Int(count) - lastRead - 1)
                                         print(" (Fallback) Messages lastRead: \(lastRead), unreadCount: \(unreadCount)")
                                         
+                                        
                                         if unreadCount > 0 {
                                             self.unreadMessagesCount = unreadCount
+
+                                            // Save context so totalUnreadCount sees the updated unreadMessagesCount
+                                            do {
+                                                try context.save()
+                                            } catch {
+                                                print("Failed to save context: \(error)")
+                                            }
+
                                             let totalUnread = PersistentConversationDataItem.totalUnreadCount(inContext: context)
                                             print(" (Fallback) Posting TotalUnreadMessageCountUpdated with totalUnreadCount: \(totalUnread)")
                                             NotificationCenter.default.post(
@@ -236,6 +251,7 @@ extension PersistentConversationDataItem {
                                                 userInfo: ["totalUnreadCount": totalUnread]
                                             )
                                         }
+
                                     }
                                 } else {
                                     print(" (Fallback) Failed to fetch messages count")

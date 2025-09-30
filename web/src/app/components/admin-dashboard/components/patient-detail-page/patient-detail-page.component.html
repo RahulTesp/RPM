@@ -1759,7 +1759,7 @@
 
         <!-- (click)="healthoverview(1)" [ngStyle]="{'background-color': heath_overview_frequency== 1 ? '#164d61'  : '#e1e6ed', 'color': heath_overview_frequency == 1 ? '#ffffff' :'#164d61' }" -->
         <!-- <button class="btn-date_container" (click)="healthoverview(1)" [ngClass]="heath_overview_frequency== 1 ? 'date_selected_':'date_not_selected'"  >Today</button> -->
-        <div class="date_btn_panel" fxLayout="row">
+        <div class="date_btn_panel" >
           <button
             class="btn-date_container"
             id="pd_HealthTrends7day"
@@ -3634,10 +3634,10 @@
           <button
             class="vitalReading_menu_item"
              *ngIf="ProcessVitalData && ProcessVitalData.BloodOxygen != null "
-            (click)="ChangeVitalScreen('Oxygen')"
+            (click)="ChangeVitalScreen('BloodOxygen')"
             id="pd_Vital_O"
               [ngClass]="{
-              'vital_selected_': currentVital === 'Oxygen'
+              'vital_selected_': currentVital === 'BloodOxygen'
             }"
           >
             Oxygen
@@ -3693,7 +3693,7 @@
         <ng-container *ngSwitchCase="'BloodGlucose'">
           <ng-container *ngTemplateOutlet="BloodGlucose"></ng-container>
         </ng-container>
-        <ng-container *ngSwitchCase="'Oxygen'">
+        <ng-container *ngSwitchCase="'BloodOxygen'">
           <ng-container *ngTemplateOutlet="BloodOxygen"></ng-container>
         </ng-container>
         <ng-container *ngSwitchCase="'Weight'">
@@ -4234,17 +4234,17 @@
 <!-- Vital Monitoring Sub Template End -->
 <!-- healthTrendInfo Start Clinical activity Second   Sub-Menu -->
 <ng-template #healthTrendInfo>
-  <div class="health-panel-btn"
+  <div class="health-panel-btn-ClinicInfo"
     *ngIf="!loading && !loading_two && !loading3 && !loading4
          && patientProgramname != 'CCM'
          && patientProgramname != 'PCM'"
   >
     <p class="patient-detail-panel-heading">Health Trends</p>
 
-   <div *ngFor="let chartData of allLineChartData; let i = index">
-      <div class="health-panel-btn">
+   <div class ="health-panel" *ngFor="let chartData of allLineChartData; let i = index">
+      <div class="btn-health-panel-ClinicInfo">
         <span>{{ healthtrendVitalNameArray[i] }}</span>
-        <div class="date_btn_panel" fxLayout="row">
+        <div class="date_btn_panel" >
           <button
             class="btn-date_container"
             id="pd_ClinicalHtrend_7"
