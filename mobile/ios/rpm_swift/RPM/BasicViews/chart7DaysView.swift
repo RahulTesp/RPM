@@ -554,9 +554,10 @@ print("itemlabelnames",item.values?.map { $0.label } ?? [])
         dataSet.colors = [color]
         dataSet.mode = .cubicBezier
         dataSet.circleRadius = 5
-        dataSet.circleHoleColor = UIColor(Color(#colorLiteral(red: 0.003921568627, green: 0.231372549, blue: 0.431372549, alpha: 1)))
-     
-        dataSet.setCircleColor(UIColor.clear)
+        dataSet.circleHoleColor = color
+//        dataSet.circleHoleColor = UIColor(Color(#colorLiteral(red: 0.003921568627, green: 0.231372549, blue: 0.431372549, alpha: 1)))
+//     
+//        dataSet.setCircleColor(UIColor.clear)
         dataSet.lineWidth = 2
         dataSet.valueTextColor = color
         dataSet.lineDashLengths = [3]
@@ -703,9 +704,11 @@ print("itemlabelnames",item.values?.map { $0.label } ?? [])
         dataSet.colors = [color]
         dataSet.mode = .cubicBezier
         dataSet.circleRadius = 5
-        dataSet.circleHoleColor = UIColor(Color(#colorLiteral(red: 0.003921568627, green: 0.231372549, blue: 0.431372549, alpha: 1)))
-   
-        dataSet.setCircleColor(UIColor.clear)
+        
+        dataSet.circleHoleColor = color
+//        dataSet.circleHoleColor = UIColor(Color(#colorLiteral(red: 0.003921568627, green: 0.231372549, blue: 0.431372549, alpha: 1)))
+//   
+//        dataSet.setCircleColor(UIColor.clear)
         dataSet.lineWidth = 2
         dataSet.valueTextColor = color
         dataSet.lineDashLengths = [3]
@@ -849,9 +852,10 @@ print("itemlabelnames",item.values?.map { $0.label } ?? [])
         dataSet.colors = [color]
         dataSet.mode = .cubicBezier
         dataSet.circleRadius = 5
-        dataSet.circleHoleColor = UIColor(Color(#colorLiteral(red: 0.003921568627, green: 0.231372549, blue: 0.431372549, alpha: 1)))
-   
-        dataSet.setCircleColor(UIColor.clear)
+        dataSet.circleHoleColor = color
+//        dataSet.circleHoleColor = UIColor(Color(#colorLiteral(red: 0.003921568627, green: 0.231372549, blue: 0.431372549, alpha: 1)))
+//   
+//        dataSet.setCircleColor(UIColor.clear)
         dataSet.lineWidth = 2
         dataSet.valueTextColor = color
         dataSet.lineDashLengths = [3]
