@@ -4,6 +4,7 @@ using RPM.Job.Simulator.iGlucose;
 class Program
     {
     static string CONN_STRING = string.Empty;
+    static int noofreadings = 0;
     static void Main(string[] args)
         {
             try
@@ -20,7 +21,10 @@ class Program
             }
             // Access a specific config value
             string? connStr = config["RPM:ConnectionString"];
-            Console.WriteLine($"RPM Connection String: {connStr}");
+                
+                int.TryParse(config["RPM:ReadingsPerDay"],out noofreadings);
+
+           Console.WriteLine($"RPM Connection String: {connStr}");
             if (connStr == null)
             {
                 Console.WriteLine("Connection string is null in appsettings.json.");
@@ -30,8 +34,11 @@ class Program
             Console.WriteLine("Started Device Readings WebJob");
 
                 var readingService = new ReadingService(CONN_STRING);
+            for (int i = 0; i < noofreadings; i++)
+            {
                 readingService.getandProcessActiveDevices();
-
+            }
+               
                 Console.WriteLine("job Completed successfully");
             }
             catch (Exception ex)

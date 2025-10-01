@@ -10,6 +10,7 @@ namespace RPM.Job.Simulator.iGlucose
     internal class ReadingService
     {
         private readonly string _connectionString;
+       
         static ConcurrentDictionary<string, DeviceIDs> deviceid_dictionary = new ConcurrentDictionary<string, DeviceIDs>();
         public ReadingService(string connectionString)
         {
@@ -62,14 +63,23 @@ namespace RPM.Job.Simulator.iGlucose
 
         private void GenerateAndInsertReading(SqlConnection conn,  DeviceIDs device)
         {
-            Random rnd = new Random();
-            //DateTime now = DateTime.Now;
-            DateTime nextDateTime = device.DeviceActivatedDateTime.AddDays(1);
-            if(nextDateTime>= DateTime.UtcNow)
+           
+            Random rndtime = new Random();
+            DateTime baseDate = DateTime.UtcNow.Date.AddDays(-1);
+
+            int randomHours = rndtime.Next(0, 24);
+            int randomMinutes = rndtime.Next(0, 60);
+            int randomSeconds = rndtime.Next(0, 60);
+
+            DateTime nextDateTime = baseDate
+                                    .AddHours(randomHours)
+                                    .AddMinutes(randomMinutes)
+                                    .AddSeconds(randomSeconds);
+            if (nextDateTime>= DateTime.UtcNow)
             {
                 return;
             }
-
+            Random rnd = new Random();
             string vitalType;
             int? systolic = null, diastolic = null, pulse = null, glucose = null;
             decimal? weight = null;
@@ -199,7 +209,7 @@ namespace RPM.Job.Simulator.iGlucose
                     device_model = device.DeviceModel,
                     date_recorded = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
                     date_received = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
-                    reading_type = vitalType,
+                    reading_type = "weight",
                     battery = rnd.Next(50, 100),
                     time_zone_offset = timeZoneOffset,
                     data_type = "Weight",
@@ -219,7 +229,7 @@ namespace RPM.Job.Simulator.iGlucose
                     device_model = device.DeviceModel,
                     date_recorded = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
                     date_received = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
-                    reading_type = vitalType,
+                    reading_type = "pulse_ox",
                     battery = rnd.Next(50, 100),
                     time_zone_offset = timeZoneOffset,
                     data_type = "Oxygen",
