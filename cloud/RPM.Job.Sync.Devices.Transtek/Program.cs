@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using SyncTranstekDevices;
+using System.Data.Common;
 //cron 0 0 7 * * *
 class Program
 {
@@ -8,26 +9,28 @@ class Program
     {
         try
         {
-            // Set up configuration
+            // Load configuration from appsettings.json and environment variables
             var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true)
-            .AddEnvironmentVariables() // Allows overriding via Azure App Settings
-            .Build();
-            if (config == null)
-            {
-                Console.WriteLine("Configuration is null.");
-                return;
-            }
-            // Access a specific config value
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true)
+                .AddEnvironmentVariables()
+                .Build();
+
             string? connStr = config["RPM:ConnectionString"];
-            Console.WriteLine($"RPM Connection String: {connStr}");
-            if (connStr == null)
+            if (string.IsNullOrEmpty(connStr))
             {
-                Console.WriteLine("Connection string is null in appsettings.json.");
+                Console.WriteLine("Connection string is missing in appsettings.json.");
                 return;
             }
-            CONN_STRING = connStr;
+
+            // Parse connection string for server and database info
+            var builder = new DbConnectionStringBuilder { ConnectionString = connStr };
+            string server = builder.ContainsKey("Server") ? builder["Server"].ToString() : "";
+            string database = builder.ContainsKey("Initial Catalog") ? builder["Initial Catalog"].ToString() : "";
+
+            Console.WriteLine($"Server: {server}");
+            Console.WriteLine($"Database: {database}");
+
             Console.WriteLine("WebJob started...");
             if (CONN_STRING == null)
             {

@@ -1,84 +1,71 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
-//cron contiuous
+using System.Data.Common;
+
 class Program
 {
     static string CONN_STRING = string.Empty;
-
     static async Task Main(string[] args)
     {
-        // Set up configuration
+        // Load configuration from appsettings.json and environment variables
         var config = new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json", optional: true)
-        .AddEnvironmentVariables() // Allows overriding via Azure App Settings
-        .Build();
-        if (config == null)
-        {
-            Console.WriteLine("Configuration is null.");
-            return;
-        }
-        // Access a specific config value
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+
         string? connStr = config["RPM:ConnectionString"];
-        Console.WriteLine($"RPM Connection String: {connStr}");
-        if (connStr == null)
+        if (string.IsNullOrEmpty(connStr))
         {
-            Console.WriteLine("Connection string is null in appsettings.json.");
+            Console.WriteLine("Connection string is missing in appsettings.json.");
             return;
         }
+
+        // Parse connection string for server and database info
+        var builder = new DbConnectionStringBuilder { ConnectionString = connStr };
+        string server = builder.ContainsKey("Server") ? builder["Server"].ToString() : "";
+        string database = builder.ContainsKey("Initial Catalog") ? builder["Initial Catalog"].ToString() : "";
+
+        Console.WriteLine($"Server: {server}");
+        Console.WriteLine($"Database: {database}");
+
         CONN_STRING = connStr;
-        Console.WriteLine(CONN_STRING);
-        if (string.IsNullOrEmpty(CONN_STRING))
-        {
-            Console.WriteLine("Connection string is null or empty.");
-            return;
-        }
-
         Console.WriteLine("WebJob started...");
-        await TimerCallback();
-        Thread.Sleep(20000);
 
+        // Continuous loop: execute job every 5 seconds
+        while (true)
+        {
+            try
+            {
+                await TimerCallback();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[{DateTime.Now}] Exception: {ex}");
+            }
+            await Task.Delay(TimeSpan.FromSeconds(20)); // Non-blocking delay
+        }
     }
 
     private static async Task TimerCallback()
     {
-        try
-        {
-            Console.WriteLine("Timer Api call back");
-            using (SqlConnection connection = new SqlConnection(CONN_STRING))
-            {
-                connection.Open();
-                /*SqlCommand command = new SqlCommand("usp_InsPatientVitalMeasures", connection);
-                command.CommandType = CommandType.StoredProcedure;
+        Console.WriteLine($"[{DateTime.Now}] Timer triggered.");
 
-                command.ExecuteNonQuery();*/
-                /*SqlCommand command4 = new SqlCommand("usp_InsAlerts", connection);
-                command4.CommandType = CommandType.StoredProcedure;
-                command4.ExecuteNonQuery();
-                SqlCommand command1 = new SqlCommand("usp_InsAlertsTemp", connection);
-                command1.CommandType = CommandType.StoredProcedure;
-                command1.ExecuteNonQuery();*/
-                SqlCommand command2 = new SqlCommand("usp_InsPatientProgramPriority", connection);
-                command2.CommandTimeout = 900000;
-                command2.CommandType = CommandType.StoredProcedure;
-                command2.ExecuteNonQuery();
-                SqlCommand command3 = new SqlCommand("usp_InsAlertSummary", connection);
-                command3.CommandTimeout = 900000;
-                command3.CommandType = CommandType.StoredProcedure;
-                command3.ExecuteNonQuery();
-                connection.Close();
-            }
-        }
-        catch (Exception Ex)
+        using SqlConnection connection = new SqlConnection(CONN_STRING);
+        await connection.OpenAsync();
+        await ExecuteStoredProcedure(connection, "usp_InsPatientVitalMeasures");
+    }
+
+    private static async Task ExecuteStoredProcedure(SqlConnection connection, string procedureName, int timeoutSeconds = 300)
+    {
+        using SqlCommand command = new SqlCommand(procedureName, connection)
         {
             CommandType = CommandType.StoredProcedure,
             CommandTimeout = timeoutSeconds
         };
 
+        await command.ExecuteNonQueryAsync();
+        Console.WriteLine($"Executed {procedureName} successfully.");
     }
-}
-public class RpmSettings
-{
-    public string? ConnectionString { get; set; }
 }

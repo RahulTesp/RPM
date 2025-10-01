@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using System.Data.Common;
 // cron 0 0 7 * * *
 namespace TranstekDataCleanupJob
 {
@@ -20,14 +21,20 @@ namespace TranstekDataCleanupJob
             }
             // Access a specific config value
             string? connStr = config["RPM:ConnectionString"];
-            Console.WriteLine($"RPM Connection String: {connStr}");
             if (connStr == null)
             {
                 Console.WriteLine("Connection string is null in appsettings.json.");
                 return;
             }
             CONN_STRING = connStr;
-            Console.WriteLine("Starting housekeeping WebJob...");
+            // Parse connection string for server and database info
+            var builder = new DbConnectionStringBuilder { ConnectionString = connStr };
+            string server = builder.ContainsKey("Server") ? builder["Server"].ToString() : "";
+            string database = builder.ContainsKey("Initial Catalog") ? builder["Initial Catalog"].ToString() : "";
+
+            Console.WriteLine($"Server: {server}");
+            Console.WriteLine($"Database: {database}");
+            Console.WriteLine("Starting house keeping WebJob for Transtek...");
 
             if (string.IsNullOrWhiteSpace(CONN_STRING))
             {

@@ -244,6 +244,7 @@ namespace SyncTranstekDevices
                             DeviceModel = objResult["modelNumber"].ToString();
                             DeviceIMEI = objResult["imei"].ToString();
                             DeviceType = GetDeviceType(DeviceModel);
+                            DeviceType = DeviceType.Trim();
                         }
                     }
                 }
@@ -256,6 +257,18 @@ namespace SyncTranstekDevices
         }
         public static string GetDeviceType(string deviceModel)
         {
+            if (deviceModel == "TMB-2092-G")
+            {
+                return "Blood Pressure Monitor";
+            }
+            else if (deviceModel == "BM1000")
+            {
+                return "Pulse Oximeter";
+            }
+            else if (deviceModel == "GBS-2104-G")
+            {
+                return "Body Weight Monitor";
+            }
             string url = "https://" + SERVER + "/api/device/getDeviceType?deviceModel=" + Uri.EscapeDataString(deviceModel);
             if (url == null)
             {
