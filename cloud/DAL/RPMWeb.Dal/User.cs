@@ -779,10 +779,10 @@ namespace RPMWeb.Dal
                                 int userId = GetUserIdByContactName(contactName, ConnectionString);
                                 string fullName = GetUserFullName(userId, ConnectionString);
                                 ConHistory.ContactName = fullName;
-                                var messages =  await  MessageResource.ReadAsync(
+                                var messages = await MessageResource.ReadAsync(
                                  ChatServiceSid,
-                                conversationSid,
-                                limit: 20);
+                                conversationSid);
+                                
                                 var lastMessage = messages.LastOrDefault(); // Get the latest one
                                 List<MessageHistoryItem> messageHistoryItems = new List<MessageHistoryItem>();
                                 foreach (var message in messages)
