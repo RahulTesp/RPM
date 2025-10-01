@@ -176,9 +176,7 @@ namespace RPMWeb.Dal
                                     }
 
                                 }
-                                DashboardVitalsList vitalListall = new DashboardVitalsList();
-                                Priority priorityall = new Priority();
-                                vitalListall.VitalName = "All Vitals";
+                               
                                 int TotalCritical = 0;
                                 int TotalCautious = 0;
                                 int TotalNormal = 0;
@@ -218,12 +216,7 @@ namespace RPMWeb.Dal
                                     }
                                     list.Add(vitalList);
                                     
-                                }
-                                priorityall.Critical = TotalCritical;
-                                priorityall.Cautious = TotalCautious;
-                                priorityall.Normal = TotalNormal;
-                                vitalListall.Priorities = priorityall;
-                                listAll.Add(vitalListall);
+                                }                               
                                 foreach(DashboardVitalsList listv in list)
                                 {
                                     listAll.Add(listv);

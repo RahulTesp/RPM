@@ -16,6 +16,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         
+        print("AppDelegate: didFinishLaunchingWithOptions")
+        
         FirebaseApp.configure()
         
         UNUserNotificationCenter.current().delegate = self
@@ -79,6 +81,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         print("Notification Tapped: \(response.notification.request.content.userInfo)")
         completionHandler()
     }
+    
+    
     
     func application(_ application: UIApplication,
                      didReceiveRemoteNotification userInfo: [AnyHashable: Any],

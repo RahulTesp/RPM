@@ -133,7 +133,7 @@
   <div *ngIf="allLineChartData?.length" class="chart-hidden-container">
     <div *ngFor="let chartData of allLineChartData; let i = index">
       <span>{{ healthtrendVitalNameArray[i] }}</span>
-        <div class="summary_graph_container">
+        <div class="summary_graph_container" >
           <div class="pdfData" *ngIf="http_healthtrends">
             <canvas
               class="charttrends"

@@ -687,7 +687,7 @@ export class RightSidebarComponent implements OnInit {
   ];
   registerTask = new UntypedFormGroup({
     tasktype: new UntypedFormControl(null, [Validators.required]),
-    description: new UntypedFormControl(null),
+    description: new UntypedFormControl(null ,[Validators.required]),
     duedate: new UntypedFormControl(null, [Validators.required]),
     priority: new UntypedFormControl(null, [Validators.required]),
     task_status: new UntypedFormControl(null, [Validators.required]),
@@ -710,6 +710,7 @@ export class RightSidebarComponent implements OnInit {
 
       if (this.registerTask.valid) {
 
+     
         req_body['PatientId'] = parseInt(this.task_pid);
         req_body['TaskTypeId'] = parseInt(
           this.registerTask.controls.tasktype.value

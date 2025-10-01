@@ -593,8 +593,12 @@
         <mat-header-cell *matHeaderCellDef> Task Type </mat-header-cell>
         <mat-cell
           *matCellDef="let element; let rowIndex = index"
-          [ngClass]="{ due_date: dueDatePass(element.DueDate, element.Status) }"
-        >
+             [ngClass]="{ 
+                'due_date': dueDatePass(element.DueDate, element.Status),
+                'task-type-truncated': true 
+                   }"
+               [attr.title]="element.TaskType"
+               >
           {{ element.TaskType }}
         </mat-cell>
       </ng-container>

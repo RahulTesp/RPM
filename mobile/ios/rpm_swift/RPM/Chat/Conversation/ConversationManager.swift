@@ -36,7 +36,7 @@ class ConversationManager: ObservableObject {
     @Published var hasLoadedConversationsOnce = false
 
     var viewModelCache: [String: ConversationItemViewModel] = [:]
-
+    private var cancellables = Set<AnyCancellable>()
     // MARK: Events
     
     var conversationEventPublisher = PassthroughSubject<ConversationEvent, Never>()
@@ -44,21 +44,21 @@ class ConversationManager: ObservableObject {
     init(_ client: ConversationsClientWrapper, coreDataDelegate: CoreDataDelegate ) {
         self.client = client
         self.coreDataDelegate = coreDataDelegate
+
         
         NotificationCenter.default.publisher(for: Notification.Name("TotalUnreadMessageCountUpdated"))
-            .sink { [weak self] notification in
-                if let userInfo = notification.userInfo {
-                    if let count = userInfo["totalUnreadCount"] as? Int64 {
-                        self?.unreadCount = count
-                    } else if let number = userInfo["totalUnreadCount"] as? NSNumber {
-                        let count = number.int64Value
-                        self?.unreadCount = count
-                    } else {
-                      
-                    }
-                }
-            }
-            .store(in: &cancellableSet)
+                   .sink { [weak self] notification in
+                       guard let self = self else { return }
+                       if let userInfo = notification.userInfo,
+                          let totalUnread = userInfo["totalUnreadCount"] as? Int64 {
+                           DispatchQueue.main.async {
+                               print("📩 ConversationManager updated unreadCount = \(totalUnread)")
+                               self.unreadCount = totalUnread
+                           }
+                       }
+                   }
+                   .store(in: &cancellables)
+
         
     }
 
@@ -68,9 +68,19 @@ class ConversationManager: ObservableObject {
     
     func reset() {
         // Clear any in-memory arrays or caches
+        print("CONVMANAGER reset")
         self.conversations = []
         unreadCount = 0
     }
+    
+    func refreshUnreadCount() {
+           let context = coreDataDelegate.managedObjectContext
+           let total = PersistentConversationDataItem.totalUnreadCount(inContext: context)
+           DispatchQueue.main.async {
+               self.unreadCount = total
+           }
+       }
+
 
     
     func subscribeConversations(onRefresh: Bool) {
