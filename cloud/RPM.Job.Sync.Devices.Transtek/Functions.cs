@@ -7,6 +7,7 @@ using System.Data;
 using System.Net.Mail;
 using System.Net;
 using Microsoft.Extensions.Configuration;
+using System.Data.Common;
 
 namespace SyncTranstekDevices
 {
@@ -32,26 +33,27 @@ namespace SyncTranstekDevices
 
         public static void ConfigureSettings()
         {
-            // Set up configuration
+            // Load configuration from appsettings.json and environment variables
             var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true)
-            .AddEnvironmentVariables() // Allows overriding via Azure App Settings
-            .Build();
-            if (config == null)
-            {
-                Console.WriteLine("Configuration is null.");
-                return;
-            }
-            // Access a specific config value
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true)
+                .AddEnvironmentVariables()
+                .Build();
+
             string? connStr = config["RPM:ConnectionString"];
-            Console.WriteLine($"RPM Connection String: {connStr}");
-            if (connStr == null)
+            if (string.IsNullOrEmpty(connStr))
             {
-                Console.WriteLine("Connection string is null in appsettings.json.");
+                Console.WriteLine("Connection string is missing in appsettings.json.");
                 return;
             }
+
+            // Parse connection string for server and database info
+            var builder = new DbConnectionStringBuilder { ConnectionString = connStr };
+            string server = builder.ContainsKey("Server") ? builder["Server"].ToString() : "";
+            string database = builder.ContainsKey("Initial Catalog") ? builder["Initial Catalog"].ToString() : "";
             CONN_STRING = connStr;
+            Console.WriteLine($"Server: {server}");
+            Console.WriteLine($"Database: {database}");
             Console.WriteLine("WebJob started...");
             if (CONN_STRING == null)
             {
@@ -144,7 +146,7 @@ namespace SyncTranstekDevices
             }
 
         }
-        public static JArray getDeviceList()
+        public static JArray getDeviceList(string NextToken=null)
         {
             JArray ret = new JArray();
             try
@@ -158,15 +160,22 @@ namespace SyncTranstekDevices
                 {
                     client.DefaultRequestHeaders.Clear();
                     client.DefaultRequestHeaders.Add("x-api-key", API_KEY);
-                    HttpResponseMessage response = client.GetAsync(DEVICE_URL).Result;
+                    string requestUrl = DEVICE_URL;
+                    if (NextToken != null && NextToken != "")
+                    {
+                        requestUrl = requestUrl + "?nextToken=" + NextToken;
+                    }
+                    HttpResponseMessage response = client.GetAsync(requestUrl).Result;
                     response.EnsureSuccessStatusCode();
-                    string result = response.Content.ReadAsStringAsync().Result;
+                    string result = null;
+                    result = response.Content.ReadAsStringAsync().Result;
                     JObject objResult = JsonConvert.DeserializeObject<JObject>(result);
                     if (objResult != null)
                     {
                         if ((int)response.StatusCode == 200)
                         {
                             var items = objResult["items"] as JArray;
+                            var nextTokenVal = objResult["nextToken"] as JToken;  // Fixed type and added null-conditional operator
                             if (items != null)
                             {
                                 JArray completeDevices = new JArray();
@@ -183,11 +192,24 @@ namespace SyncTranstekDevices
                                 {
                                     ret = completeDevices;
                                 }
-                                else
+                                // here trying recursive if nextToken exists
+                                if (nextTokenVal != null && !string.IsNullOrEmpty(nextTokenVal.ToString()))
                                 {
-                                    Console.WriteLine("No devices with 'complete' status found.");
+                                    JArray retRecursive = getDeviceList(nextTokenVal.ToString());
+                                    if (retRecursive != null && retRecursive.Count > 0)
+                                    {
+                                        foreach (var item in retRecursive)
+                                        {
+                                            ret.Add(item);
+                                        }
+                                    }
+                                }
+                                if (ret.Count == 0)
+                                {
+                                    Console.WriteLine("No devices with 'complete' status.");
                                     ret = null;
                                 }
+
                             }
                             else
                             {
