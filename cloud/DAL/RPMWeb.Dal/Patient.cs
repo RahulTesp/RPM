@@ -1995,7 +1995,7 @@ namespace RPMWeb.Dal
                         }
                     }
                 }
-                return ret;
+                return ret.OrderBy(t => t.VitalId).ToList(); ;
             }
             catch (Exception ex)
             {
