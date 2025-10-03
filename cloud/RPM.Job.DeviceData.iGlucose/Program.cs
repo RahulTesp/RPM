@@ -176,10 +176,9 @@ class Program
 
                 DeviceIDs val = item.Value;
                 DateTime lastRecodDate = val.ActivatedDate;
-
                 Console.WriteLine("DeviceId: " + val.Deviceid + "; Lasted Recorded :" + lastRecodDate);
-
                 GetDeviceDataFromAPI(lastRecodDate, val.Deviceid);
+                Thread.Sleep(500);
 
             }
             Console.WriteLine("TimerApiCallback end");
