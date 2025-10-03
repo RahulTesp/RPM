@@ -3,36 +3,49 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/card_background_white">
 
+    <!-- Red vertical line at the very left -->
+    <View
+        android:id="@+id/itemShape1"
+        android:layout_width="4dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/custom_shape_critical" />
+
+    <!-- Hidden second shape for binding compatibility -->
+    <View
+        android:id="@+id/itemShape2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        android:background="@drawable/custom_shape_critical" />
+
+    <!-- Content container -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
 
         <LinearLayout
+            android:id="@+id/shape"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/shape"
             android:orientation="vertical">
 
+            <!-- First row of data -->
             <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:orientation="horizontal">
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-                <!-- Add a View for the red vertical line -->
-                <View
-                    android:layout_width="5dp"
-                    android:id="@+id/itemShape1"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/custom_shape_critical" />
                 <TextView
                     android:id="@+id/itemSysto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/margin_5dp"
-                    android:layout_marginTop="@dimen/margin_5dp"
                     android:text=""
                     android:textAlignment="viewStart"
                     android:textColor="@color/black"
@@ -44,29 +57,28 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/margin_5dp"
-                    android:layout_marginTop="@dimen/margin_5dp"
                     android:text=""
                     android:textAlignment="viewStart"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     app:fontFamily="@font/rubik_regular" />
+
                 <TextView
                     android:id="@+id/itemWeight"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/margin_5dp"
-                    android:layout_marginTop="@dimen/margin_5dp"
                     android:text=""
                     android:textAlignment="viewStart"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     app:fontFamily="@font/rubik_regular" />
+
                 <TextView
                     android:id="@+id/itemGlu"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/margin_5dp"
-                    android:layout_marginTop="@dimen/margin_5dp"
                     android:text=""
                     android:textAlignment="viewStart"
                     android:textColor="@color/black"
@@ -77,7 +89,6 @@
                     android:id="@+id/itemDiastolic"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_5dp"
                     android:text=""
                     android:textAlignment="viewStart"
                     android:textColor="@color/black"
@@ -88,32 +99,26 @@
                     android:id="@+id/itemReadTime"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_5dp"
-                    android:layout_marginRight="@dimen/margin_5dp"
                     android:layout_weight="1"
+                    android:layout_marginRight="@dimen/margin_5dp"
                     android:text=""
                     android:textAlignment="viewEnd"
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     app:fontFamily="@font/rubik_regular" />
-        </LinearLayout>
+            </LinearLayout>
 
+            <!-- Second row of data -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-                <!-- Add a View for the red vertical line -->
-                <View
-                    android:layout_width="5dp"
-                    android:id="@+id/itemShape2"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/custom_shape_critical" />
                 <TextView
                     android:id="@+id/itemPulse"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/margin_5dp"
                     android:text=""
                     android:textAlignment="viewStart"
                     android:textColor="@color/black"
@@ -132,10 +137,14 @@
                     app:fontFamily="@font/rubik_regular" />
             </LinearLayout>
         </LinearLayout>
+
+        <!-- Bottom separator line -->
         <View
+            android:id="@+id/bottomSeparator"
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
-            android:layout_marginBottom="@dimen/margin_5dp"
+            android:layout_marginTop="@dimen/margin_5dp"
+            android:visibility="gone"
             android:background="#acacac"/>
     </LinearLayout>
 </LinearLayout>

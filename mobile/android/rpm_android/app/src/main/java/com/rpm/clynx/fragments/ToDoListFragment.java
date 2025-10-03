@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +33,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.rpm.clynx.adapter.ToDoDateAdapter;
 import com.rpm.clynx.adapter.ToDoListAdapter;
 import com.rpm.clynx.model.ToDoListModel;
 import com.rpm.clynx.utility.DataBaseHelper;
@@ -41,8 +43,10 @@ import com.rpm.clynx.utility.Loader;
 import com.rpm.clynx.R;
 import com.rpm.clynx.utility.NetworkAlert;
 import org.joda.time.DateTime;
+
+import java. time. format. DateTimeFormatter;
+
 import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -89,7 +93,11 @@ public class ToDoListFragment extends Fragment  {
     private String mParam1;
     private String mParam2;
     private String Token;
+    ToDoDateAdapter toDoDateAdapter;
+    private LocalDate selectedDate = LocalDate.now();  // start with today
 
+    RecyclerView recyclerView;
+    List<LocalDate> dates;
     public ToDoListFragment() {
         // Required empty public constructor
     }
@@ -116,90 +124,64 @@ public class ToDoListFragment extends Fragment  {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-       view =  inflater.inflate(R.layout.fragment_to_do_list, container, false);
-       initPerformBackClick();
+        view = inflater.inflate(R.layout.fragment_to_do_list, container, false);
+        initPerformBackClick();
 
-       d1 = view.findViewById(R.id.ToDoListFragment_current_date1);
-       d2 = view.findViewById(R.id.ToDoListFragment_current_date2);
-       d3 = view.findViewById(R.id.ToDoListFragment_current_date3);
-       d4 = view.findViewById(R.id.ToDoListFragment_current_date4);
-       d5 = view.findViewById(R.id.ToDoListFragment_current_date5);
-       d6 = view.findViewById(R.id.ToDoListFragment_current_date6);
-       d7 = view.findViewById(R.id.ToDoListFragment_current_date7);
+        recyclerView = view.findViewById(R.id.recyclerview_dates);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false) {
+            @Override
+            public boolean canScrollHorizontally() {
+                return false; // stop horizontal scroll
+            }
+        };
+        recyclerView.setLayoutManager(layoutManager);
+
+        // --- Build a list of many dates (back and forward) ---
+       dates = new ArrayList<>();
+        LocalDate start = LocalDate.now().minusDays(100); // allow scrolling backwards
+        for (int i = 0; i < 200; i++) {
+            dates.add(start.plusDays(i));
+        }
+
+        curDay = view.findViewById(R.id.ToDoListFragment_today_date);
+
+        // --- Adapter ---
+        toDoDateAdapter = new ToDoDateAdapter(dates, date -> {
+            selectedDate = date;
+
+            DateTimeFormatter labelFormatter = DateTimeFormatter.ofPattern("EEEE, MMM d, yyyy");
+            curDay.setText(date.format(labelFormatter));
+
+            DateTimeFormatter apiFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            checkToDoListItems(date.format(apiFormatter));
+
+            toDoDateAdapter.setSelectedDate(date);
+        });
+
+        recyclerView.setAdapter(toDoDateAdapter);
+
+        // --- Scroll so current week (Sun–Sat) is visible ---
+        LocalDate today = LocalDate.now();
+
+        //  Get Sunday of the *current* week (not next Sunday!)
+        LocalDate sunday = today.with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.SUNDAY));
+        int sundayIndex = dates.indexOf(sunday);
+
+        LinearLayoutManager lm = (LinearLayoutManager) recyclerView.getLayoutManager();
+        if (lm != null && sundayIndex >= 0) {
+            lm.scrollToPositionWithOffset(sundayIndex, 0);
+        }
+
+        // Highlight today
+        toDoDateAdapter.setSelectedDate(today);
+
+        // Set label + call API for today
+        curDay.setText(today.format(DateTimeFormatter.ofPattern("EEEE, MMM d, yyyy")));
+        checkToDoListItems(today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
        tvnextday = view.findViewById(R.id.todo_nextdate);
        btnprevdate = view.findViewById(R.id.todo_prevdate);
-
-       d1.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View view) {
-               try {
-                   changedateoftextviewanddate(1);
-               } catch (ParseException e) {
-                   e.printStackTrace();
-               }
-           }
-       });
-        d2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    changedateoftextviewanddate(2);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        d3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    changedateoftextviewanddate(3);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        d4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    changedateoftextviewanddate(4);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        d5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    changedateoftextviewanddate(5);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        d6.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    changedateoftextviewanddate(6);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        d7.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    changedateoftextviewanddate(7);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
 
         tvnextday.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -215,8 +197,6 @@ public class ToDoListFragment extends Fragment  {
             }
         });
 
-       curDay = view.findViewById(R.id.ToDoListFragment_today_date);
-
         db = new DataBaseHelper(getContext());
         pref = getContext().getSharedPreferences("RPMUserApp", MODE_PRIVATE);
         editor = pref.edit();
@@ -230,18 +210,52 @@ public class ToDoListFragment extends Fragment  {
         recyclerView_todolist.setLayoutManager(layoutManager);
         recyclerView_todolist.setAdapter(adapter);
 
-        LocalDate currentDate = LocalDate.now();
-
-        checkToDoListItems(String.valueOf(currentDate));
-
-        try {
-            getweekdata( );
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
         todo_nofoactivites = view.findViewById(R.id.todo_nofoactivites);
 
        return  view;
+    }
+
+    private void nextDate() {
+        selectedDate = selectedDate.plusDays(1);   // move one day forward
+        updateDateAndFetchData();
+    }
+
+    private void prevDate() {
+        selectedDate = selectedDate.minusDays(1);  // move one day backward
+        updateDateAndFetchData();
+    }
+
+    private void updateDateAndFetchData() {
+        DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("EEEE, MMM d, yyyy");
+
+        // If the selected date is today → show "TODAY - ..."
+        if (selectedDate.equals(LocalDate.now())) {
+            String todayText = "TODAY - " + selectedDate.format(displayFormatter);
+
+            // Make "TODAY -" bold
+            SpannableString spannable = new SpannableString(todayText);
+            spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            curDay.setText(spannable);
+        } else {
+            // Normal date
+            curDay.setText(selectedDate.format(displayFormatter));
+        }
+
+        // Call API with yyyy-MM-dd format
+        String formattedDate = selectedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        checkToDoListItems(formattedDate);
+
+        // Update RecyclerView highlight
+        toDoDateAdapter.setSelectedDate(selectedDate);
+
+        //  Scroll RecyclerView back to start of this week (Sun–Sat)
+        LocalDate sunday = selectedDate.with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.SUNDAY));
+        int sundayIndex = dates.indexOf(sunday);  // make sure `dates` is accessible here (move it to class level!)
+
+        LinearLayoutManager lm = (LinearLayoutManager) recyclerView.getLayoutManager();
+        if (lm != null && sundayIndex >= 0) {
+            lm.scrollToPositionWithOffset(sundayIndex, 0);
+        }
     }
 
     private void initPerformBackClick() {
@@ -265,127 +279,6 @@ public class ToDoListFragment extends Fragment  {
         changeColour(i);
         changeData(i);
     }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public void nextDate() {
-        if (curIndex < 6){
-            int thisindex = curIndex;
-            int rmcolorindex = thisindex;
-            int chcolorindex = thisindex+2;
-            int chdatecollorindex = thisindex+2;
-
-            removeColour(rmcolorindex);
-            changeColour(chcolorindex);
-            try {
-                changeData(chdatecollorindex);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            Log.d("currentindex",String.valueOf(curIndex) +
-                    String.valueOf(rmcolorindex) +
-                    String.valueOf(chcolorindex)
-                    + String.valueOf(chdatecollorindex)
-                    + String.valueOf(curIndex));
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public void prevDate() {
-
-        if (curIndex>0){
-            int thisindex = curIndex;
-            Log.d("prevdate",String.valueOf(curIndex)
-            );
-            int rmcolorindex = thisindex;
-            int chcolorindex = thisindex;
-            int chdatecollorindex = thisindex;
-
-            removeColour(rmcolorindex);
-            changeColour(chcolorindex);
-            try {
-                changeData(chdatecollorindex);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            Log.d("prevdate",String.valueOf(curIndex) +
-                    String.valueOf(rmcolorindex) +
-                    String.valueOf(chcolorindex)
-                    + String.valueOf(chdatecollorindex)
-                    + String.valueOf(curIndex));
-        }
-    }
-   void  getweekdata() throws ParseException {
-       Calendar calendar = Calendar.getInstance();
-       int day = calendar.get(Calendar.DAY_OF_WEEK);
-       Date dt = new Date();
-       int l = 7-day;
-       int k = l+1;
-
-       for (int i = day-1; i>0; i--){
-           DateTime dtOrg = new DateTime(dt);
-           DateTime dtPlusOne = dtOrg.minusDays(i);
-           DateTimeFormatter fmt = DateTimeFormat.shortDate();
-           DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
-           Log.d("day907",fmt.print(dtPlusOne));
-           Log.d("day908",fmt.print(dtPlusOne));
-
-           dateList.add((String) android.text.format.DateFormat.format("dd", dtPlusOne.toDate()));
-           dayCompleteList.add(dtPlusOne.toDate());
-       }
-       for (int i = 0; i <k; i++){
-           DateTime dtOrg = new DateTime(dt);
-           DateTime dtPlusOne = dtOrg.plusDays(i);
-           DateTimeFormatter fmt = DateTimeFormat.shortDate();
-           dateList.add((String) android.text.format.DateFormat.format("dd", dtPlusOne.toDate()));
-           dayCompleteList.add(dtPlusOne.toDate());
-       }
-       Log.d("day56",dateList.toString());
-       listOfTextView.add(d1);
-       listOfTextView.add(d2);
-       listOfTextView.add(d3);
-       listOfTextView.add(d4);
-       listOfTextView.add(d5);
-       listOfTextView.add(d6);
-       listOfTextView.add(d7);
-
-       d1.setText(dateList.get(0));
-       d2.setText(dateList.get(1));
-       d3.setText(dateList.get(2));
-       d4.setText(dateList.get(3));
-       d5.setText(dateList.get(4));
-       d6.setText(dateList.get(5));
-       d7.setText(dateList.get(6));
-
-       curIndex =day;
-       changeColour(day);
-
-       Date todayDate = dayCompleteList.get(day - 1);
-       String formattedText = getFormattedText(todayDate);
-
-// Check if this date is today
-       Calendar todayCal = Calendar.getInstance();
-       Calendar selectedCal = Calendar.getInstance();
-       selectedCal.setTime(todayDate);
-
-       if (todayCal.get(Calendar.YEAR) == selectedCal.get(Calendar.YEAR)
-               && todayCal.get(Calendar.DAY_OF_YEAR) == selectedCal.get(Calendar.DAY_OF_YEAR)) {
-
-           // Today → make only "TODAY -" bold
-           String todayPrefix = "TODAY - ";
-           String displayText = todayPrefix + formattedText;
-           SpannableString spannable = new SpannableString(displayText);
-           spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, todayPrefix.length(),
-                   Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-           curDay.setText(spannable);
-
-       } else {
-           curDay.setText(formattedText);
-
-       }
-
-
-       Log.d("day56",dayCompleteList.toString());
-   }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
 
@@ -438,52 +331,11 @@ public class ToDoListFragment extends Fragment  {
         this.curIndex = ncurIndex;
     }
 
-    public static String uTCToLocal(String dateFormatInPut, String dateFomratOutPut, String datesToConvert) {
-        String dateToReturn = datesToConvert;
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(dateFormatInPut);
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        Date gmt = null;
-        java.text.SimpleDateFormat sdfOutPutToSend = new java.text.SimpleDateFormat(dateFomratOutPut);
-        sdfOutPutToSend.setTimeZone(TimeZone.getDefault());
-
-        try {
-            gmt = sdf.parse(datesToConvert);
-            dateToReturn = sdfOutPutToSend.format(gmt);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        Log.d("dateToReturn",dateToReturn);
-        return dateToReturn; }
-
     String getFormattedText(Date date) throws ParseException {
         Log.d("formatteddate1",date.toString() );
         SimpleDateFormat spf = new SimpleDateFormat("EEEE, MMM d, yyyy", Locale.getDefault());
         Log.d("formatteddate2",date.toString() );
         return spf.format(date);
-    }
-      String getFornattedDay(Date date) throws ParseException {
-        Log.d("date2",date.toString() );
-        SimpleDateFormat spf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        Log.d("date2",date.toString() );
-        return spf.format(date);
-    }
-
-    public static String convertToUTC(String inputTimestamp) {
-        String inputFormat = "yyyy-MM-dd HH:mm:ss";
-        String outputFormat = "yyyy-MM-dd'T'HH:mm:ss";
-        SimpleDateFormat sdfInput = new SimpleDateFormat(inputFormat);
-        sdfInput.setTimeZone(TimeZone.getTimeZone("UTC"));
-        SimpleDateFormat sdfOutput = new SimpleDateFormat(outputFormat);
-        sdfOutput.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        try {
-            Date inputDate = sdfInput.parse(inputTimestamp);
-            return sdfOutput.format(inputDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -491,18 +343,14 @@ public class ToDoListFragment extends Fragment  {
         System.out.println("Current Local Date: " + currentDate);
         String cursdt = currentDate+"T00:00:00";
         String todoUtcStDate = DateUtils.convertToUTC(cursdt, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss");
-        Log.d("todoUtcStDate", todoUtcStDate);
         String curedt = currentDate+"T23:59:59";
         String todoUtcEdDate = DateUtils.convertToUTC(curedt, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss");
-        Log.d("todoUtcEdDate", todoUtcEdDate);
-        Log.d("todliststrDate",todoUtcStDate);
-        Log.d("todlistendDate",todoUtcEdDate);
 
         String url = Links.BASE_URL+  Links.TODOLIST +
                 "StartDate="+cursdt +"&EndDate="+curedt;
         final Loader l1 = new Loader(getActivity());
         l1.show("Please wait...");
-        toDoListModels.clear();
+        Log.d("urltodo",url.toString());
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -513,9 +361,33 @@ public class ToDoListFragment extends Fragment  {
                     jsonArray = new JSONArray(response);
                     Log.d("jsontodoleng", String.valueOf(jsonArray.length()));
                     Log.d("log_data_array",jsonArray.toString());
+
+                    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // match your incoming currentDate format
+                    LocalDate selectedDate = LocalDate.parse(currentDate, inputFormatter);
+                    LocalDate today = LocalDate.now();
+
+                    DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("EEEE, MMM d, yyyy");
+                    String formattedDate = selectedDate.format(outputFormatter);
+
+                    if (selectedDate.isEqual(today)) {
+                        String prefix = "TODAY - ";
+                        String fullText = prefix + formattedDate;
+
+                        SpannableString spannable = new SpannableString(fullText);
+                        spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, prefix.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                        curDay.setText(spannable);
+                    } else {
+                        curDay.setText(formattedDate);
+                    }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                //  Clear old data before adding new
+                toDoListModels.clear();
+                adapter.notifyDataSetChanged();
 
                 todo_nofoactivites.setText(jsonArray.length()+" Activities");
                 for (int i = 0; i < jsonArray.length(); i++){

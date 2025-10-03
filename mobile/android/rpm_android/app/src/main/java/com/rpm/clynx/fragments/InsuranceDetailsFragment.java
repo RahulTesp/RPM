@@ -6,6 +6,7 @@ package com.rpm.clynx.fragments;
         import android.view.LayoutInflater;
         import android.view.View;
         import android.view.ViewGroup;
+        import android.widget.ScrollView;
         import android.widget.TextView;
         import androidx.fragment.app.Fragment;
         import com.rpm.clynx.adapter.InsuranceListAdapter;
@@ -45,6 +46,8 @@ public class InsuranceDetailsFragment extends Fragment {
     private List<InsuranceModel> insuranceModels;
     RecyclerView.LayoutManager layoutManager;
     View view;
+    ScrollView scrollView;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,6 +65,9 @@ public class InsuranceDetailsFragment extends Fragment {
         adapter = new InsuranceListAdapter(insuranceModels,getContext());
         insuranceR.setLayoutManager(layoutManager);
         insuranceR.setAdapter(adapter);
+
+        scrollView = view.findViewById(R.id.insurance_scrollview);
+
 
         checkinsurancedet();
         return  view;
@@ -102,9 +108,16 @@ public class InsuranceDetailsFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if (jsonArrayData.length()<=0){
+
+                if (jsonArrayData.length() <= 0) {
                     insuranceR.setVisibility(View.GONE);
                     emptyView.setVisibility(View.VISIBLE);
+                    scrollView.setEnabled(false); // disable scrolling when no data
+                    scrollView.setVerticalScrollBarEnabled(false);
+                } else {
+                    insuranceR.setVisibility(View.VISIBLE);
+                    emptyView.setVisibility(View.GONE);
+                    scrollView.setEnabled(true); // enable scrolling when data exists
                 }
             }
         } ,new Response.ErrorListener() {

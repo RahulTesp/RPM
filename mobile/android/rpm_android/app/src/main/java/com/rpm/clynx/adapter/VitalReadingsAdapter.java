@@ -92,7 +92,7 @@ public class VitalReadingsAdapter extends RecyclerView.Adapter<VitalReadingsAdap
         // Repeat the above logic for other TextViews
         // Check if diastolicValue is not empty
         if (!diastolicValue.isEmpty()) {
-            holder.mDiastolic.setText(" / " + diastolicValue + " mmHg");
+            holder.mDiastolic.setText("/" + diastolicValue + " mmHg");
             if (diastolicstatusvalue.equals("Critical")) {
                 holder.mDiastolic.setTextColor(ContextCompat.getColor(cxt, R.color.red_900));
             } else if (diastolicstatusvalue.equals("Cautious")) {
@@ -190,6 +190,20 @@ public class VitalReadingsAdapter extends RecyclerView.Adapter<VitalReadingsAdap
             // If diastolicValue is empty, set the text color to your default color (e.g., black)
             holder.mSchedule.setTextColor(ContextCompat.getColor(cxt, R.color.black));
         }
+
+        // Handle bottom separator
+        if (gValues.size() > 1 && position != gValues.size() - 1) {
+            // Show separator for all but last item
+            holder.mBottomSeparator.setVisibility(View.VISIBLE);
+        } else {
+            // Hide separator for last item or if only 1 item
+            holder.mBottomSeparator.setVisibility(View.GONE);
+        }
+
+        // Optional: if no readings at all, hide separator
+        if (gValues.isEmpty()) {
+            holder.mBottomSeparator.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -211,6 +225,8 @@ public class VitalReadingsAdapter extends RecyclerView.Adapter<VitalReadingsAdap
         View mShape1;
         View mShape2;
 
+        public View mBottomSeparator;
+
         public VitalReadingsViewHolder(VitalReadingsItemBinding binding) {
             super(binding.getRoot());
             mReadTime = binding.itemReadTime;
@@ -224,6 +240,7 @@ public class VitalReadingsAdapter extends RecyclerView.Adapter<VitalReadingsAdap
             mSchedule = binding.itemSched;
             mShape1 = binding.itemShape1;
             mShape2 = binding.itemShape2;
+            mBottomSeparator = binding.bottomSeparator;
         }
 
         @Override
