@@ -10,6 +10,7 @@ namespace RPM.Job.Simulator.iGlucose
     internal class ReadingService
     {
         private readonly string _connectionString;
+       
         static ConcurrentDictionary<string, DeviceIDs> deviceid_dictionary = new ConcurrentDictionary<string, DeviceIDs>();
         public ReadingService(string connectionString)
         {
@@ -19,7 +20,6 @@ namespace RPM.Job.Simulator.iGlucose
         //Fetch the devices form the Device table with DeviceStatus = "Active" 
         public void getandProcessActiveDevices()
         {
-            var result = new Dictionary<string, DeviceIDs>();
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 using var command = new SqlCommand("usp_GetDeviceIds_Simulator", conn)
@@ -28,7 +28,10 @@ namespace RPM.Job.Simulator.iGlucose
                 };
                 command.Parameters.AddWithValue("@deviceVendorName", "iGlucose");
                 conn.Open();
-
+                foreach (var key in deviceid_dictionary.Keys)
+                {
+                        deviceid_dictionary.TryRemove(key, out _);
+                }
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -39,24 +42,18 @@ namespace RPM.Job.Simulator.iGlucose
                         DateTime activatedDate = (DateTime)reader["DeviceActivatedDateTime"];
                         if (!string.IsNullOrEmpty(deviceSerialNo))
                         {
-                            result[deviceSerialNo] = new DeviceIDs(deviceSerialNo, deviceTypeId, deviceModel, activatedDate);
+                            deviceid_dictionary.AddOrUpdate(
+                            deviceSerialNo,
+                            key => new DeviceIDs(deviceSerialNo, deviceTypeId, deviceModel, activatedDate),
+                            (key, oldValue) => new DeviceIDs(deviceSerialNo, deviceTypeId, deviceModel, activatedDate)
+                            );
+                            
                         }
                         
                     }
                 }
-                foreach (var kvp in result)
-                {
-                    deviceid_dictionary.AddOrUpdate(kvp.Key, kvp.Value, (k, v) => kvp.Value);
-                }
-                // Remove old devices not present anymore
-                foreach (var existing in deviceid_dictionary.Keys)
-                {
-                    if (!result.ContainsKey(existing))
-                    {
-                        deviceid_dictionary.TryRemove(existing, out _);
-                    }
-                }
-                foreach (var device in result)
+             
+                foreach (var device in deviceid_dictionary)
                 {
                     Console.WriteLine($"Processing Device: {device.Value.DeviceSerialNo}, TypeId: {device.Value.DeviceTypeId}, Model: {device.Value.DeviceModel},Time:{device.Value.DeviceActivatedDateTime}");
                     GenerateAndInsertReading(conn, device.Value);
@@ -66,14 +63,23 @@ namespace RPM.Job.Simulator.iGlucose
 
         private void GenerateAndInsertReading(SqlConnection conn,  DeviceIDs device)
         {
-            Random rnd = new Random();
-            //DateTime now = DateTime.Now;
-            DateTime nextDateTime = device.DeviceActivatedDateTime.AddDays(1);
-            if(nextDateTime>= DateTime.UtcNow)
+           
+            Random rndtime = new Random();
+            DateTime baseDate = DateTime.UtcNow.Date.AddDays(-1);
+
+            int randomHours = rndtime.Next(0, 24);
+            int randomMinutes = rndtime.Next(0, 60);
+            int randomSeconds = rndtime.Next(0, 60);
+
+            DateTime nextDateTime = baseDate
+                                    .AddHours(randomHours)
+                                    .AddMinutes(randomMinutes)
+                                    .AddSeconds(randomSeconds);
+            if (nextDateTime>= DateTime.UtcNow)
             {
                 return;
             }
-
+            Random rnd = new Random();
             string vitalType;
             int? systolic = null, diastolic = null, pulse = null, glucose = null;
             decimal? weight = null;
@@ -153,7 +159,7 @@ namespace RPM.Job.Simulator.iGlucose
                     battery = rnd.Next(50, 100),
                     time_zone_offset = timeZoneOffset,
                     data_type = "systolic",
-                    data_unit = (string?)null,
+                    data_unit = "mmHg",
                     data_value = systolic ?? 0,
                     before_meal = false,
                     event_flag = (string?)null,
@@ -170,7 +176,7 @@ namespace RPM.Job.Simulator.iGlucose
                     battery = rnd.Next(50, 100),
                     time_zone_offset = timeZoneOffset,
                     data_type = "diastolic",
-                    data_unit = (string?)null,
+                    data_unit = "mmHg",
                     data_value = diastolic ?? 0,
                     before_meal = false,
                     event_flag = (string?)null,
@@ -187,7 +193,7 @@ namespace RPM.Job.Simulator.iGlucose
                     battery = rnd.Next(50, 100),
                     time_zone_offset = timeZoneOffset,
                     data_type = "pulse",
-                    data_unit = (string?)null,
+                    data_unit = "bpm",
                     data_value = pulse ?? 0,
                     before_meal = false,
                     event_flag = (string?)null,
@@ -203,11 +209,11 @@ namespace RPM.Job.Simulator.iGlucose
                     device_model = device.DeviceModel,
                     date_recorded = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
                     date_received = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
-                    reading_type = vitalType,
+                    reading_type = "weight",
                     battery = rnd.Next(50, 100),
                     time_zone_offset = timeZoneOffset,
                     data_type = "Weight",
-                    data_unit = "kg",
+                    data_unit = "lbs",
                     data_value = weight ?? 0,
                     before_meal = false,
                     event_flag = "0",
@@ -223,12 +229,29 @@ namespace RPM.Job.Simulator.iGlucose
                     device_model = device.DeviceModel,
                     date_recorded = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
                     date_received = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
-                    reading_type = vitalType,
+                    reading_type = "pulse_ox",
                     battery = rnd.Next(50, 100),
                     time_zone_offset = timeZoneOffset,
                     data_type = "Oxygen",
                     data_unit = "%",
                     data_value = oxygen ?? 0,
+                    before_meal = false,
+                    event_flag = "0",
+                    irregular = false
+                });
+                jsonPayloads.Add(new
+                {
+                    reading_id = Guid.NewGuid().ToString("N"),
+                    device_id = device.DeviceSerialNo,
+                    device_model = device.DeviceModel,
+                    date_recorded = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                    date_received = nextDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                    reading_type = "pulse_ox",
+                    battery = rnd.Next(50, 100),
+                    time_zone_offset = timeZoneOffset,
+                    data_type = "Pulse",
+                    data_unit = "bpm",
+                    data_value = pulse ?? 0,
                     before_meal = false,
                     event_flag = "0",
                     irregular = false
