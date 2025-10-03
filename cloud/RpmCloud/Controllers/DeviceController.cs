@@ -567,7 +567,7 @@ namespace RpmCloud.Controllers
                 return BadRequest(new { message = "Exception" });
             }
         }
-		[Route("getDeviceType/{deviceModel}")]
+		[Route("getDeviceType")]
         [HttpGet]
         public IActionResult GetDeviceType([FromQuery] string deviceModel)
         {

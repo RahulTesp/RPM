@@ -3273,7 +3273,7 @@ getFirstPresentVital(vitalScreen: any) {
                     );
                   }
                 } else {
-                      let endDate = new Date(this.BillingPeriodStart);
+                      let endDate = new Date(x.BillingStartDate);
                       endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
                       endDate.setMonth(endDate.getMonth()+1);
                       if (billingStartDate == '1-01-01') {
@@ -3397,7 +3397,7 @@ getFirstPresentVital(vitalScreen: any) {
                     );
                   }
                 } else {
-                      let endDate = new Date(this.BillingPeriodStart);
+                      let endDate = new Date(x.BillingStartDate);
                       endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
                       endDate.setMonth(endDate.getMonth()+1);
                       if (billingStartDate == '1-01-01') {
