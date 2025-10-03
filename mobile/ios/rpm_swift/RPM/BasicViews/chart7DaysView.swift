@@ -82,13 +82,27 @@ struct chart7DaysView: View {
                     // SYSTOLIC/DIASTOLIC/PULSE
                                   
                                   HStack
-                                  {
+                               {
+                       HStack
+                          {
+                   
+                          Rectangle()
+                                .fill(Color(red: 0.1960784346, green: 0.3411764801, blue: 0.1019607857, opacity: 1))
+//                                                     .fill(Color(#colorLiteral(red: 0.5725490451, green: 0, blue: 0.2313725501, alpha: 1)))
+                                       .frame(width: 10, height: 10)
+                            Text("Pulse")
+                                 
+                                .foregroundColor(.black)
+                                .font(.system(size: 10))
+                        }
+                                  
                               HStack
                                   {
                                  Text(" ")
                                       
                                   Rectangle()
-                                                 .fill(Color(#colorLiteral(red: 0.1960784346, green: 0.3411764801, blue: 0.1019607857, alpha: 1)))
+                                          .fill(Color(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, opacity: 1))
+//                                                 .fill(Color(#colorLiteral(red: 0.1960784346, green: 0.3411764801, blue: 0.1019607857, alpha: 1)))
                                                  .frame(width: 10, height: 10)
                                       Text("Systolic")
                                            
@@ -99,24 +113,26 @@ struct chart7DaysView: View {
                                       {
                                    
                                       Rectangle()
-                                                     .fill(Color(#colorLiteral(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, alpha: 1)))
+                                              .fill(Color(red: 0.5725490451, green: 0, blue: 0.2313725501, opacity: 1))
+//                                                     .fill(Color(#colorLiteral(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, alpha: 1)))
                                                      .frame(width: 10, height: 10)
                                           Text("Diastolic")
                                                
                                               .foregroundColor(.black)
                                               .font(.system(size: 10))
                                       }
-                                  HStack
-                                      {
-                                 
-                                      Rectangle()
-                                                     .fill(Color(#colorLiteral(red: 0.5725490451, green: 0, blue: 0.2313725501, alpha: 1)))
-                                                     .frame(width: 10, height: 10)
-                                          Text("Pulse")
-                                               
-                                              .foregroundColor(.black)
-                                              .font(.system(size: 10))
-                                      }
+//                                  HStack
+//                                      {
+//                                 
+//                                      Rectangle()
+//                                              .fill(Color(red: 0.1960784346, green: 0.3411764801, blue: 0.1019607857, opacity: 1))
+////                                                     .fill(Color(#colorLiteral(red: 0.5725490451, green: 0, blue: 0.2313725501, alpha: 1)))
+//                                                     .frame(width: 10, height: 10)
+//                                          Text("Pulse")
+//                                               
+//                                              .foregroundColor(.black)
+//                                              .font(.system(size: 10))
+//                                      }
                                       Spacer()
                                   }
                                   .padding(.bottom,23)
@@ -153,8 +169,8 @@ struct chart7DaysView: View {
                                   {
                                  
                                   Rectangle()
-                                  
-                                                 .fill(Color(#colorLiteral(red: 0.3098039329, green: 0.01568627544, blue: 0.1294117719, alpha: 1)))
+                                          .fill(Color(red: 0.196, green: 0.341, blue: 0.102, opacity: 1.0))
+//                                                 .fill(Color(#colorLiteral(red: 0.3098039329, green: 0.01568627544, blue: 0.1294117719, alpha: 1)))
                                                  .frame(width: 10, height: 10)
                                       Text(item.values?[0].label ?? "")
                                            
@@ -828,9 +844,15 @@ print("itemlabelnames",item.values?.map { $0.label } ?? [])
     func addData() -> LineChartData{
         let data = LineChartData(dataSets: [
             
+            
+            
             //Schedule Trips Line
-            generateLineChartDataSet(dataSetEntries: entries1, color: UIColor(Color(#colorLiteral(red: 0.3098039329, green: 0.01568627544, blue: 0.1294117719, alpha: 1)))
-                              
+//            generateLineChartDataSet(dataSetEntries: entries1, color: UIColor(Color(#colorLiteral(red: 0.3098039329, green: 0.01568627544, blue: 0.1294117719, alpha: 1)))
+            generateLineChartDataSet(dataSetEntries: entries1, color: UIColor(
+                        red: 0.1960784346,
+                        green: 0.3411764801,
+                        blue: 0.1019607857,
+                        alpha: 1.0)
                                     ),
             
            
