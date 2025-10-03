@@ -52,16 +52,19 @@ namespace azuretranstekwebjob
             Console.WriteLine("WebJob started...");
            
             Thread.Sleep(10000);
-            try
+            while (true)
             {
-                TimerDeviceIdCallback();
-                Thread.Sleep(1000);
-                TimerApiCallback();
-                Thread.Sleep(20000);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("exception:" + ex);
+                try
+                {
+                    TimerDeviceIdCallback();
+                    Thread.Sleep(1000);
+                    TimerApiCallback();
+                    Thread.Sleep(20000);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("exception:" + ex);
+                }
             }
             
         }
