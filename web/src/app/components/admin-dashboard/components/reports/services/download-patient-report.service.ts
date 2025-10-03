@@ -599,77 +599,7 @@ export class DownloadPatientReportService {
     return notes;
   }
 
- /* generateCallNotesReport(doc: jsPDF, data: any[]): void {
-
-    this.Notesh = 30;
-    this.setSubHeadingStyle(doc);
-
-    this.setPages(doc, 'Notes', 15);
-    this.drawLine(doc, 'Notes', 15);
-
-    this.Notesh += 10;
-    doc.setFontSize(14);
-
-    for (let notes of data) {
-      this.Notesh += 5;
-      this.setSubHeadingStyle(doc);
-      const formattedDate = this.datepipe.transform(
-        this.convertToLocalTime(notes.CreatedOn)
-      ) as string;
-
-      this.setPages(doc, formattedDate, 20);
-      this.drawLine(doc, formattedDate, 20);
-      this.checkPageBreak(doc);
-
-      this.setContentStyle(doc);
-      this.Notesh += 5;
-      this.setPages(
-        doc,
-        `Duration : ${this.patientReportService.timeConvert(notes.Duration)}`,
-        20
-      );
-      this.checkPageBreak(doc);
-      this.Notesh += 5;
-      this.setPages(doc, `Completed By : ${notes.CompletedBy}`, 20);
-      this.checkPageBreak(doc);
-      this.Notesh += 5;
-      this.setPages(doc, `Note Type : ${notes.NoteType}`, 20);
-      this.checkPageBreak(doc);
-      this.Notesh += 5;
-      this.setPages(doc, `Type : ${notes.Type}`, 20);
-      this.checkPageBreak(doc);
-      this.Notesh += 5;
-
-      if (notes.Type !== 'REVIEW') {
-        this.setPages(
-          doc,
-          `Call Established : ${notes.IsEstablished ? 'Yes' : 'No'}`,
-          20
-        );
-        this.checkPageBreak(doc);
-        this.Notesh += 5;
-        this.setPages(
-          doc,
-          `Care Giver : ${notes.IsCareGiver ? 'Yes' : 'No'}`,
-          20
-        );
-        this.checkPageBreak(doc);
-        this.Notesh += 5;
-      }
-
-      this.Notesh += 5;
-      this.processNoteDetails(doc, notes);
-      this.checkPageBreak(doc);
-      this.Notesh += 3;
-    }
-
-    doc.addPage();
-    this.setMainHeadingStyle(doc);
-    // this.Report_HealthTrends();
-  }
-*/
-
-
+ 
 generateCallNotesReport(doc: jsPDF, data: any[]): void {
 
   const marginLeft = 20;
@@ -759,154 +689,160 @@ private addTextWithBreak(
   doc.text(lines, x, this.Notesh);
   this.Notesh += lines.length * lineHeight;
 }
-
-
-
-/*find page break 
-checkPageBreak(doc: jsPDF) {
+// ✅ Utility: Check and add page break if needed
+private checkPageBreak(doc: jsPDF, estimatedHeight: number = 0): void {
   const pageHeight = doc.internal.pageSize.height;
-  if (this.Notesh > pageHeight - 20) {
+  const bottomMargin = 20;
+
+  if (this.Notesh + estimatedHeight > pageHeight - bottomMargin) {
     doc.addPage();
-    this.Notesh = 30; // Reset to top margin
-    //this.setSubHeadingStyle(doc); 
+    this.Notesh = 30; // Reset top margin
   }
-}*/
+}
+
+// ✅ Utility: Force wrap long words (fix for overflow issue)
+private forceWrapLongWords(text: string, maxWordLength: number = 50): string {
+  return text.replace(new RegExp(`(\\S{${maxWordLength}})`, 'g'), '$1 ');
+}
+
+// ✅ Render a block of text with wrapping and page-break handling
+private renderTextBlock(doc: jsPDF, text: string, x: number): void {
+  const maxWidth = 170;
+  const lineHeight = 6;
+
+  // Apply long-word wrapping fix
+  const wrappedText = this.forceWrapLongWords(text);
+  const lines = doc.splitTextToSize(wrappedText, maxWidth);
+  const estimatedHeight = lines.length * lineHeight;
+
+  this.checkPageBreak(doc, estimatedHeight);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text(lines, x, this.Notesh);
+
+  this.Notesh += estimatedHeight;
+}
+
+// ✅ Render section header with underline
+private renderSectionHeader(doc: jsPDF, title: string, x: number): void {
+  this.checkPageBreak(doc, 15);
+  this.setPages(doc, title, x);
+  this.drawLine(doc, title, x);
+  this.Notesh += 10;
+}
+
+// ✅ Render answers list
+private renderAnswers(doc: jsPDF, answers: any[], x: number): void {
+  if (answers.length > 0) {
+    for (const answer of answers) {
+      this.checkPageBreak(doc, 6);
+      this.setPages(doc, `- ${answer.Answer}`, x);
+      this.Notesh += 6;
+    }
+  } else {
+    this.checkPageBreak(doc, 6);
+    this.setPages(doc, '- None', x);
+    this.Notesh += 6;
+  }
+}
+
+// ✅ Main: Process Note Details
+private processNoteDetails(doc: jsPDF, notes: any): void {
+  if (!notes.NoteDetails) return;
+
+  for (const mainQuestion of notes.NoteDetails.MainQuestions) {
+    this.renderSectionHeader(doc, mainQuestion.Question, 20);
+
+    const checkedAnswers = mainQuestion.AnswerTypes.filter((a: any) => a.Checked);
+    this.renderAnswers(doc, checkedAnswers, 25);
+
+    this.processSubQuestions(doc, mainQuestion.SubQuestions);
+
+    if (mainQuestion.Notes) {
+      this.renderTextBlock(doc, `Extra Notes : ${mainQuestion.Notes}`, 25);
+    }
+  }
+
+  if (notes.NoteDetails.Notes) {
+    this.renderSectionHeader(doc, 'Additional Notes', 20);
+    this.renderTextBlock(doc, notes.NoteDetails.Notes, 25);
+  }
+}
 
 
-
-private checkPageBreak(doc: jsPDF): void {
+/*private checkPageBreak(doc: jsPDF, estimatedHeight: number = 0): void {
   const pageHeight = doc.internal.pageSize.height;
-  const bottomMargin = 20; // Reserve 20 units at bottom
+  const bottomMargin = 20;
 
-  if (this.Notesh + bottomMargin > pageHeight) {
+  if (this.Notesh + estimatedHeight > pageHeight - bottomMargin) {
     doc.addPage();
-    this.Notesh = 30; // Reset to top margin
+    this.Notesh = 30;
+  }
+}
+
+private renderTextBlock(doc: jsPDF, text: string, x: number): void {
+  const maxWidth = 170;
+  const lineHeight = 6;
+  const lines = doc.splitTextToSize(text, maxWidth);
+  const estimatedHeight = lines.length * lineHeight;
+
+  this.checkPageBreak(doc, estimatedHeight);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text(lines, x, this.Notesh);
+
+  this.Notesh += estimatedHeight;
+}
+
+private renderSectionHeader(doc: jsPDF, title: string, x: number): void {
+  this.checkPageBreak(doc, 15);
+  this.setPages(doc, title, x);
+  this.drawLine(doc, title, x);
+  this.Notesh += 10;
+}
+
+private renderAnswers(doc: jsPDF, answers: any[], x: number): void {
+  if (answers.length > 0) {
+    for (const answer of answers) {
+      this.checkPageBreak(doc, 6);
+      this.setPages(doc, `- ${answer.Answer}`, x);
+      this.Notesh += 6;
+    }
+  } else {
+    this.checkPageBreak(doc, 6);
+    this.setPages(doc, '- None', x);
+    this.Notesh += 6;
   }
 }
 
 private processNoteDetails(doc: jsPDF, notes: any): void {
   if (!notes.NoteDetails) return;
 
-  for (let mainQuestion of notes.NoteDetails.MainQuestions) {
-    this.Notesh += 5;
-    this.setPages(doc, mainQuestion.Question, 20);
-    this.drawLine(doc, mainQuestion.Question, 20);
-    this.checkPageBreak(doc);
+  for (const mainQuestion of notes.NoteDetails.MainQuestions) {
+    this.renderSectionHeader(doc, mainQuestion.Question, 20);
 
-    this.Notesh += 5;
-    const checkedAnswers = mainQuestion.AnswerTypes.filter(
-      (answer: { Checked: boolean }) => answer.Checked
-    );
-
-    if (checkedAnswers.length > 0) {
-      checkedAnswers.forEach((answer: { Answer: string }) => {
-        this.setPages(doc, `- ${answer.Answer}`, 25);
-        this.Notesh += 5;
-        this.checkPageBreak(doc);
-      });
-    } else {
-      this.setPages(doc, '- None', 25);
-      this.Notesh += 5;
-      this.checkPageBreak(doc);
-    }
+    const checkedAnswers = mainQuestion.AnswerTypes.filter((a: any) => a.Checked);
+    this.renderAnswers(doc, checkedAnswers, 25);
 
     this.processSubQuestions(doc, mainQuestion.SubQuestions);
 
     if (mainQuestion.Notes) {
-      this.addWrappedText(doc, `Extra Notes : ${mainQuestion.Notes}`, 25);
+      this.renderTextBlock(doc, `Extra Notes : ${mainQuestion.Notes}`, 25);
     }
   }
 
   if (notes.NoteDetails.Notes) {
-      this.Notesh += 5;
-      this.setPages(doc, 'Additional Notes', 20);
-      this.drawLine(doc, 'Additional Notes', 20);
-      this.Notesh += 5;
-      //this.setPages(doc, notes.NoteDetails.Notes, 25);
-      //this.Notesh += 15;
-      const wrappedNotes = doc.splitTextToSize(notes.NoteDetails.Notes, 170); // Adjust width as needed
-      const pageHeight = doc.internal.pageSize.height;
-      const lineHeight = 6;
-      if (this.Notesh + wrappedNotes.length * lineHeight > pageHeight - 20) {
-        doc.addPage();
-        this.Notesh = 30;
-      }
-      doc.text(wrappedNotes, 25, this.Notesh);
-      this.Notesh += wrappedNotes.length * lineHeight;
-      this.checkPageBreak(doc);
-    }
-}
-private addWrappedText(doc: jsPDF, text: string, x: number): void {
-  const maxWidth = 170;
-  const lineHeight = 6;
-  const lines = doc.splitTextToSize(text, maxWidth);
-  const pageHeight = doc.internal.pageSize.height;
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(12);
-  doc.setTextColor(0, 0, 0);
-
-  if (this.Notesh + lines.length * lineHeight > pageHeight - 20) {
-    doc.addPage();
-    this.Notesh = 30;
+    this.renderSectionHeader(doc, 'Additional Notes', 20);
+    this.renderTextBlock(doc, notes.NoteDetails.Notes, 25);
   }
-
-  doc.text(lines, x, this.Notesh);
-  this.Notesh += lines.length * lineHeight;
-  this.checkPageBreak(doc);
 }
 
-
-  // ✅ Process Note Details
-  /*private processNoteDetails(doc: jsPDF, notes: any): void {
-    if (!notes.NoteDetails) return;
-
-    for (let mainQuestion of notes.NoteDetails.MainQuestions) {
-      this.Notesh += 5;
-      this.checkPageSpace(doc);
-      this.setPages(doc, mainQuestion.Question, 20);
-      this.drawLine(doc, mainQuestion.Question, 20);
-      this.Notesh += 5;
-      this.checkPageSpace(doc);
-
-      let hasCheckedAnswer = mainQuestion.AnswerTypes.some(
-        (answer: { Checked: any }) => answer.Checked
-      );
-      if (hasCheckedAnswer) {
-        mainQuestion.AnswerTypes.filter(
-          (answer: { Checked: any }) => answer.Checked
-        ).forEach((answer: { Answer: any }) => {
-          this.checkPageSpace(doc);
-          this.setPages(doc, `- ${answer.Answer}`, 25);
-          this.Notesh += 5;
-        });
-      } else {
-        this.checkPageSpace(doc);
-        this.setPages(doc, '- None', 25);
-        this.Notesh += 5;
-      }
-
-      this.processSubQuestions(doc, mainQuestion.SubQuestions);
-
-      if (mainQuestion.Notes) {
-        this.checkPageSpace(doc);
-        this.setPages(doc, `Extra Notes : ${mainQuestion.Notes}`, 25);
-        this.Notesh += 10;
-      }
-    }
-
-    if (notes.NoteDetails.Notes) {
-      this.Notesh += 5;
-      this.checkPageSpace(doc);
-      this.setPages(doc, 'Additional Notes', 20);
-      this.drawLine(doc, 'Additional Notes', 20);
-      this.Notesh += 5;
-      this.checkPageSpace(doc);
-      this.setPages(doc, notes.NoteDetails.Notes, 25);
-      this.Notesh += 15;
-    }
-  }
 */
+
   // ✅ Process Sub Questions
   private processSubQuestions(doc: jsPDF, subQuestions: any[]): void {
     subQuestions.forEach((subQuestion) => {

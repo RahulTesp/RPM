@@ -164,7 +164,7 @@ export class ReportsComponent implements OnInit {
   });
 
   loadPatients() {
-    this.patientreportService
+    this.patientreportService 
       .getPatientList()
       .then((data) => {
         // Call billing detail method in component
