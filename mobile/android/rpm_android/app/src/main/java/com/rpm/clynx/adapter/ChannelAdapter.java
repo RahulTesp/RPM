@@ -19,15 +19,17 @@ import java.util.List;
  * {@link RecyclerView.Adapter} that can display a {@link ChannelItemModel}.
  * TODO: Replace the implementation with code for your data type.
  */
+
+
+
 public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ChannelViewHolder> {
     private final List<ChannelItemModel> gValues;
     public Context cxt;
     String Token;
-    public ChannelAdapter(List<ChannelItemModel> items) {
-        gValues = items;
-    }
 
-    public ChannelAdapter(List<ChannelItemModel> items,Context cxt, String token) {
+    private int selectedPosition = RecyclerView.NO_POSITION;
+
+    public ChannelAdapter(List<ChannelItemModel> items, Context cxt, String token) {
         gValues = items;
         this.cxt = cxt;
         this.Token = token;
@@ -35,7 +37,8 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ChannelV
 
     @Override
     public ChannelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ChannelViewHolder(ChannelItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ChannelViewHolder(ChannelItemBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
@@ -43,12 +46,49 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ChannelV
         holder.mItem = gValues.get(position);
         holder.memberUsrnmText.setText(gValues.get(position).getMemberUsrnm());
         holder.memberNmText.setText(gValues.get(position).getMemberName());
+
+        // Make the root layout reflect selection
+        holder.itemView.setSelected(selectedPosition == position);
+
+        // Handle click on the whole row
+        holder.itemView.setOnClickListener(v -> {
+            int previousSelected = selectedPosition;
+            selectedPosition = holder.getAdapterPosition();
+
+            notifyItemChanged(previousSelected);
+            notifyItemChanged(selectedPosition);
+
+            Context context = v.getContext();
+            Intent intent = new Intent(context, MessageActivity.class);
+            intent.putExtra("memberName", holder.memberNmText.getText().toString());
+            intent.putExtra("memberUsername", holder.memberUsrnmText.getText().toString());
+            intent.putExtra("memberFullName", holder.memberNmText.getText().toString());
+            intent.putExtra("FriendlyUsername",
+                    holder.memberUsrnmText.getText().toString() + "-" + holder.memberUsrnmText.getText().toString());
+            intent.putExtra("channel", "channel");
+
+            context.startActivity(intent);
+            ((Activity) context).finish();
+        });
+
+        // Handle long click on the whole row
+        holder.itemView.setOnLongClickListener(v -> {
+            int previousSelected = selectedPosition;
+            selectedPosition = holder.getAdapterPosition();
+
+            notifyItemChanged(previousSelected);
+            notifyItemChanged(selectedPosition);
+
+            // Optional: handle extra action here
+            return true;
+        });
     }
 
     @Override
     public int getItemCount() {
         return gValues.size();
     }
+
     public class ChannelViewHolder extends RecyclerView.ViewHolder {
         public final TextView memberUsrnmText;
         public final TextView memberNmText;
@@ -56,30 +96,8 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ChannelV
 
         public ChannelViewHolder(ChannelItemBinding binding) {
             super(binding.getRoot());
-
             memberUsrnmText = binding.itemMemUsrNm;
             memberNmText = binding.itemMemNm;
-            memberNmText.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                   //  Open the new activity here
-                    Context context = v.getContext();
-                    Intent intent = new Intent(context, MessageActivity.class);
-                    intent.putExtra("memberName",memberNmText.getText().toString());
-                    intent.putExtra("memberUsername", memberUsrnmText.getText().toString()); // for backend use (Twilio)
-                    intent.putExtra("memberFullName", memberNmText.getText().toString()); // for display
-                    intent.putExtra("FriendlyUsername", memberUsrnmText.getText().toString() + "-" + memberUsrnmText.getText().toString());
-                    intent.putExtra("channel","channel");
-
-                    String memberName = memberNmText.getText().toString();
-                    String memberUsername = memberUsrnmText.getText().toString();
-                    String friendlyUsername = memberUsername + "-" + memberUsername;
-
-                    context.startActivity(intent);
-                    // Finish the current activity
-                    ((Activity) context).finish();
-                }
-            });
         }
 
         @Override

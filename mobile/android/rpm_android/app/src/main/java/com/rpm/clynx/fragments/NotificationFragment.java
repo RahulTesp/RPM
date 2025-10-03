@@ -5,6 +5,7 @@ import static com.rpm.clynx.utility.Links.BASE_URL;
 import static com.rpm.clynx.utility.Links.NOTI_DELETE;
 import static com.rpm.clynx.utility.Links.NOTI_DELETE_ALL;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,8 +17,12 @@ import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +43,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.rpm.clynx.adapter.NotificationListAdapter;
 import com.rpm.clynx.model.NotificationItemModel;
 import com.rpm.clynx.model.NotificationsModel;
-import com.rpm.clynx.service.NotificationReceiver;
+//import com.rpm.clynx.service.NotificationReceiver;
 import com.rpm.clynx.utility.BooleanRequest;
 import com.rpm.clynx.utility.DataBaseHelper;
 import com.rpm.clynx.utility.Links;
@@ -83,6 +88,7 @@ public class NotificationFragment extends Fragment{
     private JSONArray jsonArrayData; // Store the full response to filter on toggle
 
     public static boolean NotificationFragmentIsVisible = false;
+    private int lastNotificationCount = -1; // keep track of last value
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -106,8 +112,13 @@ public class NotificationFragment extends Fragment{
         public void onReceive(Context context, Intent intent) {
             // This method is called when notification/broadcast is received
             //  Call your API here
-            Log.d("getNotificationsCount", "getNotificationsCount");
-            checkNotifications(); // (your API method)
+            Log.d("getNotificationFragsCount", "getNotificationFragsCount");
+            String type = intent.getStringExtra("type");
+            if ("chat".equals(type)) {
+                Log.d("getNotificationFragstype", "getNotificationFragstype");
+
+                checkNotifications(); // (your API method)
+            }
         }
     };
 
@@ -121,14 +132,7 @@ public class NotificationFragment extends Fragment{
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
     }
-//    @Override
-//    public void onDeleteClick(String notiId) {
-//        // Implement your API call here using the notiId
-//        // For example, you can make a network request to delete the notification
-//        notiDelete(notiId);
-//
-//
-//    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -165,7 +169,7 @@ public class NotificationFragment extends Fragment{
                         })
                         .setNegativeButton("No", null) // Do nothing on "No"
                         .show();
-               // notiDelete(""); // Refactor the display logic into this method
+
             }
         });
 
@@ -191,15 +195,14 @@ public class NotificationFragment extends Fragment{
     public void onStart() {
         super.onStart();
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED); // Use your app's broadcast action
-        ContextCompat.registerReceiver(requireContext(), notificationReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
+        IntentFilter filter = new IntentFilter("com.rpm.clynx.NOTIFICATION_RECEIVED");
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(notificationReceiver, filter);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        requireActivity().unregisterReceiver(notificationReceiver);
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(notificationReceiver);
     }
     private void initPerformBackClick() {
         Toolbar toolbar = view.findViewById(R.id.toolbar);
@@ -214,100 +217,103 @@ public class NotificationFragment extends Fragment{
     }
 
     private void checkNotifications() {
-        String url = Links.BASE_URL+  Links.NOTIFICATION;
-        final Loader l1 = new Loader(getActivity());
+        fetchNotifications(false);
+    }
 
-        l1.show("Please wait...");
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d("response notifications",response.toString());
-               // JSONArray jsonArrayData=null;
-                DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
-                DateFormat dft = DateFormat.getTimeInstance(DateFormat.SHORT);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                l1.dismiss();
-                try {
-                    JSONObject jsonObject = new JSONObject(response);
-                    jsonArrayData = new JSONArray(jsonObject.getString("Data"));
-                    unreadCount = jsonObject.getString("TotalUnRead");
-                    totalCount = jsonObject.getString("TotalNotifications");
-                    Log.d("log_data_array",jsonArrayData.toString());
-                    TextView tv =  (TextView) view.findViewById(R.id.notification_unread);
-                    tv.setText(unreadCount + " Unread");
+    private void fetchNotifications(boolean isRetry) {
+        // Ensure fragment is attached before doing anything
+        if (!isAdded()) {
+            Log.w("NotificationFragment", "Fragment not attached, skipping fetchNotifications()");
+            return;
+        }
 
+        Activity activity = getActivity();
+        if (activity == null || activity.isFinishing()) {
+            Log.w("NotificationFragment", "Activity is null or finishing, skipping fetchNotifications()");
+            return;
+        }
 
-                    filterAndDisplayNotifications(); //  use this instead of looping directly here
+        // Safe loader
+        final Loader l1 = new Loader(activity);
+        try {
+            l1.show("Please wait...");
+        } catch (Exception e) {
+            Log.w("NotificationFragment", "Failed to show loader: " + e.getMessage());
+        }
 
-//                    for (int i = 0; i < jsonArrayData.length(); i++){
-//                        try {
-//                            try {
-//                                JSONObject jsonNotificationList = jsonArrayData.getJSONObject(i);
-//                                JSONArray jsonArrayNL=new JSONArray(jsonNotificationList.getString("NotificationList"));
-//
-//                                ArrayList<NotificationItemModel> nim = new ArrayList<NotificationItemModel>();
-//                                for (int j = 0; j < jsonArrayNL.length(); j++){
-//
-//
-//                                    JSONObject notifObj = jsonArrayNL.getJSONObject(j);
-//
-//                                    String description = notifObj.getString("Description");
-//                                    String notificationId = notifObj.getString("NotificationId");
-//                                    String createdOn = dft.format(sdf.parse(notifObj.getString("CreatedOn")));
-//                                    boolean isRead = notifObj.getBoolean("IsRead"); // 🔥 Here's the value you need!
-//
-//                                    if (!isRead) {
-//                                        nim.add(new NotificationItemModel(description, notificationId, createdOn, isRead));
-//                                    }
-//                                 //   nim.add(new NotificationItemModel(description, notificationId, createdOn, isRead)); // Assuming constructor accepts isRead
-//
-//
-//
-////                                    nim.add(new NotificationItemModel(jsonArrayNL.getJSONObject(j).getString("Description"),jsonArrayNL.getJSONObject(j).getString("NotificationId"),
-////                                            dft.format(sdf.parse(jsonArrayNL.getJSONObject(j).getString("CreatedOn")))));
-//
-//
-//
-//                                    Log.d("nimNoti", nim.toString());
-//                                }
-//                                notifications.add(new NotificationsModel( df.format(sdf.parse(jsonNotificationList.getString("NotificationDate"))),nim));
-//                                adapter.notifyDataSetChanged();
-//                            } catch (ParseException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//                        catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }finally {
-//                            adapter.notifyDataSetChanged();
-//                        }
-//                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+        String url = Links.BASE_URL + Links.NOTIFICATION;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                response -> {
+                    // Check fragment still attached before updating UI
+                    if (!isAdded()) {
+                        try { l1.dismiss(); } catch (Exception ignored) {}
+                        return;
+                    }
+
+                    try {
+                        l1.dismiss();
+                    } catch (Exception ignored) {}
+
+                    try {
+                        JSONObject jsonObject = new JSONObject(response);
+                        jsonArrayData = new JSONArray(jsonObject.getString("Data"));
+                        unreadCount = jsonObject.getString("TotalUnRead");
+                        totalCount = jsonObject.getString("TotalNotifications");
+
+                        int currentCount = Integer.parseInt(unreadCount);
+
+                        // Update UI safely
+                        if (getView() != null) {
+                            TextView tv = getView().findViewById(R.id.notification_unread);
+                            if (tv != null) {
+                                tv.setText(unreadCount + " Unread");
+                            }
+                        }
+
+                        filterAndDisplayNotifications();
+
+                        // Retry logic if needed
+                        if (!isRetry && lastNotificationCount != -1 && currentCount <= lastNotificationCount) {
+                            new Handler(Looper.getMainLooper())
+                                    .postDelayed(() -> fetchNotifications(true), 1500);
+                        }
+
+                        lastNotificationCount = currentCount;
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    // Toast if no data
+                    if ((jsonArrayData == null || jsonArrayData.length() <= 0) && getContext() != null) {
+                        Toast.makeText(getContext(), "No Data Available", Toast.LENGTH_SHORT).show();
+                    }
+
+                },
+                error -> {
+                    // Only update UI if fragment is attached
+                    if (isAdded() && getContext() != null) {
+                        try { l1.dismiss(); } catch (Exception ignored) {}
+                        Toast.makeText(getContext(), "No data available!", Toast.LENGTH_SHORT).show();
+                    }
                 }
-                if (jsonArrayData.length()<=0){
-                    Toast.makeText(getContext(), "No Data Available", Toast.LENGTH_SHORT).show();
-                }
-            }
-        } ,new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getContext(), "No data available!", Toast.LENGTH_SHORT).show();
-                l1.dismiss();
-            }
-        }){
-
+        ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
-                headers.put("Bearer",Token);
-                Log.d("headers_myprofileandprogram",headers.toString());
-                Log.d("Token_myprofileandprogram", Token);
+                headers.put("Bearer", Token);
                 return headers;
             }
         };
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        // Use Activity's application context for RequestQueue
+        RequestQueue requestQueue = Volley.newRequestQueue(activity.getApplicationContext());
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                60000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ));
         requestQueue.add(stringRequest);
     }
 
@@ -350,8 +356,6 @@ public class NotificationFragment extends Fragment{
 
 // Now `createdOn` holds the local time string
 
-
-                   // String createdOn = dft.format(sdf.parse(notifObj.getString("CreatedOn")));
                     boolean isRead = notifObj.getBoolean("IsRead");
 
                     if (!isRead) {

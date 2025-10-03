@@ -73,6 +73,7 @@ public class SymptomsFragment extends Fragment {
         super.onResume();
         refreshSympLayout();
     }
+
     private void checksympdet() {
         String url = Links.BASE_URL+  Links.GET_SYMPTOMS;
         final Loader l1 = new Loader(getActivity());
@@ -80,42 +81,48 @@ public class SymptomsFragment extends Fragment {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d("responseGETsymp",response.toString());
-                JSONArray jsonArrayData=null;
+                Log.d("responseGETsymp",response);
+                JSONArray jsonArrayData = null;
                 l1.dismiss();
                 try {
                     jsonArrayData = new JSONArray(response);
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
                     Log.d("log_data_array",jsonArrayData.toString());
+
+                    // 🔹 Clear old data before adding new
+                    symptomModels.clear();
+
                     try {
-                        ArrayList<SymptomItemModel> nim = new ArrayList<SymptomItemModel>();
+                        ArrayList<SymptomItemModel> nim = new ArrayList<>();
                         for (int i = 0; i < jsonArrayData.length(); i++) {
                             sympR.setVisibility(View.VISIBLE);
                             emptyView.setVisibility(View.GONE);
-                            Log.d("symdt", jsonArrayData.getJSONObject(i).getString("SymptomStartDateTime"));
-                            String localDateFormatted = DateUtils.convertUtcToLocalFormatted(jsonArrayData.getJSONObject(i).getString("SymptomStartDateTime"), "MMM d, yyyy, h:mm a");
-                            Log.d("LocalDate", localDateFormatted);
 
-                            nim.add(new SymptomItemModel(jsonArrayData.getJSONObject(i).getString("Symptom"),
+                            String localDateFormatted = DateUtils.convertUtcToLocalFormatted(
+                                    jsonArrayData.getJSONObject(i).getString("SymptomStartDateTime"),
+                                    "MMM d, yyyy, h:mm a"
+                            );
+
+                            nim.add(new SymptomItemModel(
+                                    jsonArrayData.getJSONObject(i).getString("Symptom"),
                                     localDateFormatted,
                                     jsonArrayData.getJSONObject(i).getString("Description")
                             ));
-
-                            Log.d("nimGoals", nim.toString());
                         }
                         symptomModels.add(new SymptomModel(nim));
-                        adapter.notifyDataSetChanged();
                     }
                     catch (JSONException e) {
                         e.printStackTrace();
-                    }finally {
+                    }
+                    finally {
                         adapter.notifyDataSetChanged();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if (jsonArrayData.length()<=0){
+
+                if (jsonArrayData != null && jsonArrayData.length() <= 0) {
                     sympR.setVisibility(View.GONE);
                     emptyView.setVisibility(View.VISIBLE);
                 }
@@ -127,18 +134,18 @@ public class SymptomsFragment extends Fragment {
                 l1.dismiss();
             }
         }){
-
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
                 headers.put("Bearer",Token);
-                Log.d("headers_SYM",headers.toString());
-                Log.d("Token_SYM", Token);
                 return headers;
             }
         };
+
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(60000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(stringRequest);
     }
 

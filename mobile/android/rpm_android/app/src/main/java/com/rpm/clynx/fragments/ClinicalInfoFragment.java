@@ -44,8 +44,6 @@ public class ClinicalInfoFragment extends Fragment {
 
     private ActivityResultLauncher<Intent> addMedicationLauncher;
 
-    private static final int ADD_MEDICATION_REQUEST_CODE = 1001;
-
     public ClinicalInfoFragment() {
         // Required empty public constructor
     }

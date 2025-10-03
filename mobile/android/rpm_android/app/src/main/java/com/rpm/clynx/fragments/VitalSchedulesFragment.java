@@ -87,38 +87,52 @@ public class VitalSchedulesFragment extends Fragment {
                     jsonArrayData = new JSONArray(jsonObjPatientVitDet.getString("PatientVitalInfos"));
                     Log.d("jsonArrayData",jsonArrayData.toString());
 
-                    for (int i = 0; i < jsonArrayData.length(); i++){
+
+                    for (int i = 0; i < jsonArrayData.length(); i++) {
                         try {
+                            int ival = i + 1;
+                            String combinedSchedule = "Schedule " + ival;  // this goes into SchedVal
+
                             JSONObject jsonNotificationList = jsonArrayData.getJSONObject(i);
-                            JSONArray jsonArrayNL=new JSONArray(jsonNotificationList.getString("VitalMeasureInfos"));
-                            ArrayList<VitalSchedulesItemModel> nim = new ArrayList<VitalSchedulesItemModel>();
-                            for (int j = 0; j < jsonArrayNL.length(); j++){
-                                Log.d(" jsonArrayNL", jsonArrayNL.toString());
+                            JSONArray jsonArrayNL = new JSONArray(jsonNotificationList.getString("VitalMeasureInfos"));
+
+                            ArrayList<VitalSchedulesItemModel> nim = new ArrayList<>();
+
+                            for (int j = 0; j < jsonArrayNL.length(); j++) {
                                 vitalsR.setVisibility(View.VISIBLE);
                                 emptyView.setVisibility(View.GONE);
 
-                                nim.add(new VitalSchedulesItemModel(jsonArrayNL.getJSONObject(j).getString("NormalMinimum"),
+                                nim.add(new VitalSchedulesItemModel(
+                                        jsonArrayNL.getJSONObject(j).getString("NormalMinimum"),
                                         jsonArrayNL.getJSONObject(j).getString("NormalMaximum"),
                                         jsonArrayNL.getJSONObject(j).getString("MeasureName"),
                                         jsonArrayNL.getJSONObject(j).getString("UnitName")
-                        ));
-                                Log.d("nim VitalSchedules", nim.toString());
+                                ));
                             }
-                            vitalSchedulesModels.add(new VitalSchedulesModel( jsonArrayData.getJSONObject(i).getString("VitalName"),
+
+                            //  Pass combinedSchedule as first argument
+                            vitalSchedulesModels.add(new VitalSchedulesModel(
+                                    combinedSchedule,   // "Schedule 1", "Schedule 2", etc.
+                                    jsonArrayData.getJSONObject(i).getString("VitalName"),
                                     jsonArrayData.getJSONObject(i).getString("ScheduleName"),
-                                    jsonArrayData.getJSONObject(i).getString("VitalScheduleName")
-                                    ,jsonArrayData.getJSONObject(i).getString("Morning"),
+                                    jsonArrayData.getJSONObject(i).getString("VitalScheduleName"),
+                                    jsonArrayData.getJSONObject(i).getString("Morning"),
                                     jsonArrayData.getJSONObject(i).getString("Afternoon"),
                                     jsonArrayData.getJSONObject(i).getString("Evening"),
-                                    jsonArrayData.getJSONObject(i).getString("Night"),nim));
+                                    jsonArrayData.getJSONObject(i).getString("Night"),
+                                    nim
+                            ));
+
                             adapter.notifyDataSetChanged();
                         }
                         catch (JSONException e) {
                             e.printStackTrace();
-                        }finally {
+                        }
+                        finally {
                             adapter.notifyDataSetChanged();
                         }
                     }
+
                 }
                 catch (JSONException e) {
                     e.printStackTrace();

@@ -77,7 +77,16 @@ public class VitalReadingsFragment extends Fragment  {
         recyclerView_vitalreadings =  view.findViewById(R.id.fragmentVitalReadings);
         layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         vitalReadingsModels = new ArrayList<>();
-        adapter = new VitalReadingsListAdapter(vitalReadingsModels,getContext());
+
+        adapter = new VitalReadingsListAdapter(vitalReadingsModels, getContext(),
+                new VitalReadingsListAdapter.OnViewMoreClickListener() {
+                    @Override
+                    public void onViewMoreClicked(VitalReadingsModel vital) {
+                        // Open the clinical info fragment when "View More" is clicked
+                        openClinicalInfoFragmentFromVitals(vital);
+                    }
+                },
+                false);
         recyclerView_vitalreadings.setLayoutManager(layoutManager);
         recyclerView_vitalreadings.setAdapter(adapter);
         curDay = view.findViewById(R.id.VtlRdngsFragment_today_date);
@@ -120,6 +129,24 @@ public class VitalReadingsFragment extends Fragment  {
 
         return  view;
     }
+
+    private void openClinicalInfoFragmentFromVitals(VitalReadingsModel vital) {
+        ClinicalInfoFragment clinicalInfoFragment = new ClinicalInfoFragment();
+
+        // Pass arguments via Bundle
+        Bundle args = new Bundle();
+        args.putString("opened_from", "VITALS");
+        args.putString("vital_type", vital.getVitalType());
+        clinicalInfoFragment.setArguments(args);
+
+
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fl_main, clinicalInfoFragment)
+                .addToBackStack(null)  // so back button works
+                .commit();
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void prevdateVital() throws ParseException {
