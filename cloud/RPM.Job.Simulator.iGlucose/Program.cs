@@ -1,18 +1,19 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RPM.Job.Simulator.iGlucose;
+using System.Data.Common;
 
 class Program
-    {
+{
     static string CONN_STRING = string.Empty;
     static void Main(string[] args)
+    {
+        try
         {
-            try
-            {
-                var config = new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                    .AddEnvironmentVariables()
-                    .Build();
-
+            var config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddEnvironmentVariables() // Allows overriding via Azure App Settings
+            .Build();
             if (config == null)
             {
                 Console.WriteLine("Configuration is null.");
@@ -20,24 +21,35 @@ class Program
             }
             // Access a specific config value
             string? connStr = config["RPM:ConnectionString"];
-            Console.WriteLine($"RPM Connection String: {connStr}");
             if (connStr == null)
             {
                 Console.WriteLine("Connection string is null in appsettings.json.");
                 return;
             }
-            CONN_STRING = connStr;
-            Console.WriteLine("Started Device Readings WebJob");
-
-                var readingService = new ReadingService(CONN_STRING);
-                readingService.getandProcessActiveDevices();
-
-                Console.WriteLine("job Completed successfully");
-            }
-            catch (Exception ex)
+            if (string.IsNullOrWhiteSpace(CONN_STRING))
             {
-                Console.WriteLine($"Job failed: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
+                Console.WriteLine("Connection string not found in environment variables.");
+                return;
             }
+            CONN_STRING = connStr;
+            // Parse connection string for server and database info
+            var builder = new DbConnectionStringBuilder { ConnectionString = connStr };
+            string server = builder.ContainsKey("Server") ? builder["Server"].ToString() : "";
+            string database = builder.ContainsKey("Initial Catalog") ? builder["Initial Catalog"].ToString() : "";
+
+            Console.WriteLine($"Server: {server}");
+            Console.WriteLine($"Database: {database}");
+            Console.WriteLine("Started Device Simulator WebJob");
+
+            var readingService = new ReadingService(CONN_STRING);
+            readingService.getandProcessActiveDevices();
+
+            Console.WriteLine("job Completed successfully");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Job failed: {ex.Message}");
+            Console.WriteLine(ex.StackTrace);
         }
     }
+}
