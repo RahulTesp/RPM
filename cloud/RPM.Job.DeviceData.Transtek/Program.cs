@@ -4,6 +4,7 @@ using System.Data;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Data.Common;
 //cron continuous
 
 namespace azuretranstekwebjob
@@ -17,7 +18,6 @@ namespace azuretranstekwebjob
         static string acess_key = string.Empty;
         static async Task Main(string[] args)
         {
-            // Set up configuration
             var config = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: true)
@@ -30,30 +30,41 @@ namespace azuretranstekwebjob
             }
             // Access a specific config value
             string? connStr = config["RPM:ConnectionString"];
-            Console.WriteLine($"RPM Connection String: {connStr}");
             if (connStr == null)
             {
                 Console.WriteLine("Connection string is null in appsettings.json.");
                 return;
             }
-            CONN_STRING = connStr;
-            Console.WriteLine("WebJob started...");
             if (CONN_STRING == null)
             {
                 Console.WriteLine("Connection string is null.");
                 return;
             }
+            CONN_STRING = connStr;
+            // Parse connection string for server and database info
+            var builder = new DbConnectionStringBuilder { ConnectionString = connStr };
+            string server = builder.ContainsKey("Server") ? builder["Server"].ToString() : "";
+            string database = builder.ContainsKey("Initial Catalog") ? builder["Initial Catalog"].ToString() : "";
+
+            Console.WriteLine($"Server: {server}");
+            Console.WriteLine($"Database: {database}");
+
+            Console.WriteLine("WebJob started...");
+           
             Thread.Sleep(10000);
-            try
+            while (true)
             {
-                TimerDeviceIdCallback();
-                Thread.Sleep(1000);
-                TimerApiCallback();
-                Thread.Sleep(20000);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("exception:" + ex);
+                try
+                {
+                    TimerDeviceIdCallback();
+                    Thread.Sleep(1000);
+                    TimerApiCallback();
+                    Thread.Sleep(20000);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("exception:" + ex);
+                }
             }
             
         }

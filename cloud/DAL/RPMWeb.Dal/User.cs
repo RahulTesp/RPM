@@ -1,16 +1,19 @@
-﻿using RPMWeb.Data.Common;
+﻿using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
+using RPMWeb.Data.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Microsoft.Data.SqlClient;
-using Twilio;
 //using Twilio.Rest.Api.V2010.Account;
 using System.Linq;
-using Twilio.Rest.Conversations.V1;
-using Twilio.Rest.Conversations.V1.Conversation;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
+using Twilio;
+using Twilio.Rest.Conversations.V1.Service;
+using Twilio.Rest.Conversations.V1.Service.Conversation;
 using Twilio.TwiML.Fax;
-using Azure.Storage.Blobs;
-using Microsoft.AspNetCore.Http;
 
 
 namespace RPMWeb.Dal
@@ -737,7 +740,7 @@ namespace RPMWeb.Dal
         }
 
 
-        public List<ConverationHistory> GetAllConversationsAsync(string UserName, string ToUser, string AccountSIDValue, string AuthTokenValue, string ConnectionString)
+        public async Task<List<ConverationHistory>> GetAllConversationsAsync(string UserName, string ToUser, string AccountSIDValue, string AuthTokenValue,string ChatServiceSid, string ConnectionString)
         {
             try
             {
@@ -762,7 +765,11 @@ namespace RPMWeb.Dal
                             TwilioClient.Init(AccountSIDValue, AuthTokenValue);
 
                             // Fetch the conversation to ensure it exists
-                            var conversation = ConversationResource.Fetch(conversationSid);
+                            var conversation = ConversationResource.Fetch(ChatServiceSid, conversationSid);
+
+
+
+                            //var conversation = ConversationResource.Fetch(conversationSid);
                             Console.WriteLine($"Conversation: {conversation.FriendlyName}");
                             string contactName = GetConversationFriendlyNameWithoutUser(conversation.FriendlyName, ToUser);
                             
@@ -772,9 +779,10 @@ namespace RPMWeb.Dal
                                 int userId = GetUserIdByContactName(contactName, ConnectionString);
                                 string fullName = GetUserFullName(userId, ConnectionString);
                                 ConHistory.ContactName = fullName;
-                                // Fetch the last 50 messages (Twilio returns in chronological order)
-                                var messages = MessageResource.Read(conversationSid).ToList();
-
+                                var messages = await MessageResource.ReadAsync(
+                                 ChatServiceSid,
+                                conversationSid);
+                                
                                 var lastMessage = messages.LastOrDefault(); // Get the latest one
                                 List<MessageHistoryItem> messageHistoryItems = new List<MessageHistoryItem>();
                                 foreach (var message in messages)

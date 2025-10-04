@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System.Data;
+using System.Data.Common;
 
 class Program
 {
@@ -13,30 +14,41 @@ class Program
     static string readingid = string.Empty;
     static string? acess_key = string.Empty;
     static string? CONN_STRING = string.Empty;
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
-        // Set up configuration
         var config = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: true)
             .AddEnvironmentVariables() // Allows overriding via Azure App Settings
             .Build();
-
-        // Access a specific config value
-        string connStr = config["RPM:ConnectionString"];
-        Console.WriteLine($"RPM Connection String: {connStr}");
-        // Optional: bind strongly-typed object
-        var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
-        Console.WriteLine($"RPM.ConnectionString (typed): {rpmSettings?.ConnectionString}");
-        CONN_STRING = rpmSettings?.ConnectionString;
-        Console.WriteLine("WebJob started...");
-        if (CONN_STRING == null)
+        if (config == null)
         {
-            Console.WriteLine("Connection string is null.");
+            Console.WriteLine("Configuration is null.");
             return;
         }
+        // Access a specific config value
+        string? connStr = config["RPM:ConnectionString"];
+        if (connStr == null)
+        {
+            Console.WriteLine("Connection string is null in appsettings.json.");
+            return;
+        }
+        CONN_STRING = connStr;
+        // Parse connection string for server and database info
+        var builder = new DbConnectionStringBuilder { ConnectionString = connStr };
+        string server = builder.ContainsKey("Server") ? builder["Server"].ToString() : "";
+        string database = builder.ContainsKey("Initial Catalog") ? builder["Initial Catalog"].ToString() : "";
 
-        List<SystemConfigInfo> igc = Data.GetSystemConfig(CONN_STRING, "iGlucose", "User");
+        Console.WriteLine($"Server: {server}");
+        Console.WriteLine($"Database: {database}");
+        
+        if (string.IsNullOrWhiteSpace(CONN_STRING))
+        {
+            Console.WriteLine("Connection string not found in environment variables.");
+            return;
+        }
+        Console.WriteLine("Web Job Started...");
+        List <SystemConfigInfo> igc = Data.GetSystemConfig(CONN_STRING, "iGlucose", "User");
 
         SystemConfigInfo? igckey = igc.Find(x => x.Name.Equals("ApiKey_iGlucose"));
         acess_key = igckey?.Value;
@@ -46,15 +58,19 @@ class Program
             return;
         }
         Thread.Sleep(10000);
-        try
+        while (true)
         {
-            TimerDeviceIdCallback();
-            Thread.Sleep(1000);
-            TimerApiCallback();
-            Thread.Sleep(20000);
-        }
-        catch (Exception)
-        {
+            try
+            {
+                TimerDeviceIdCallback();
+                Thread.Sleep(1000);
+                TimerApiCallback();
+                Thread.Sleep(20000);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[{DateTime.Now}] Exception: {ex}");
+            }
         }
     }
     private static void TimerDeviceIdCallback()
@@ -160,10 +176,9 @@ class Program
 
                 DeviceIDs val = item.Value;
                 DateTime lastRecodDate = val.ActivatedDate;
-
                 Console.WriteLine("DeviceId: " + val.Deviceid + "; Lasted Recorded :" + lastRecodDate);
-
                 GetDeviceDataFromAPI(lastRecodDate, val.Deviceid);
+                Thread.Sleep(500);
 
             }
             Console.WriteLine("TimerApiCallback end");

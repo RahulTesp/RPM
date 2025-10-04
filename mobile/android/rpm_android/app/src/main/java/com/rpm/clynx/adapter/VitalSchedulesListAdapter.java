@@ -40,6 +40,7 @@ public class VitalSchedulesListAdapter extends RecyclerView.Adapter<VitalSchedul
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
+        holder.mSchedId.setText(mValues.get(position).getSchedVal());
         holder.mVitalName.setText(mValues.get(position).getVitalName());
         holder.mScheduleName.setText(mValues.get(position).getScheduleName());
         holder.mVitalScheduleName.setText(mValues.get(position).getVitalScheduleName());
@@ -98,6 +99,7 @@ public class VitalSchedulesListAdapter extends RecyclerView.Adapter<VitalSchedul
         public final TextView mAfternoon;
         public final TextView mEvening;
         public final TextView mNight;
+        public final TextView mSchedId;
         public final RecyclerView crvNotifications;
         public VitalSchedulesModel mItem;
 
@@ -110,6 +112,8 @@ public class VitalSchedulesListAdapter extends RecyclerView.Adapter<VitalSchedul
             mAfternoon = itemView.findViewById(R.id.itemAfternoon);
             mEvening = itemView.findViewById(R.id.itemEvening);
             mNight = itemView.findViewById(R.id.itemNight);
+            mSchedId = itemView.findViewById(R.id.itemSchedIval);
+
 
             Log.d("nim mMorning", mMorning.toString());
             Log.d("nim mAfternoon", mAfternoon.toString());

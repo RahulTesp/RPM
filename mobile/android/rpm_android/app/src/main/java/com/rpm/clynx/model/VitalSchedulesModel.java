@@ -11,14 +11,16 @@ public class VitalSchedulesModel {
     private CharSequence Afternoon;
     private CharSequence Evening;
     private CharSequence Night;
+    private  String SchedVal;
     private ArrayList<VitalSchedulesItemModel> vitalSchedulesItemModel;
 
     public VitalSchedulesModel() {
     }
 
-    public VitalSchedulesModel(String vitalName, String scheduleName, String vitalScheduleName
+    public VitalSchedulesModel(String ischedVal,String vitalName, String scheduleName, String vitalScheduleName
             ,CharSequence morning, CharSequence afternoon,CharSequence evening,CharSequence night,
                                ArrayList<VitalSchedulesItemModel> vitalSchedulesItemModels) {
+        SchedVal = ischedVal;
         this.VitalName = vitalName;
         this.ScheduleName = scheduleName;
         this.VitalScheduleName = vitalScheduleName;
@@ -32,6 +34,10 @@ public class VitalSchedulesModel {
 
     public String getVitalName() {
         return VitalName;
+    }
+
+    public String getSchedVal() {
+        return SchedVal;
     }
 
     public void setVitalName(String vitalName) {

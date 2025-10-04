@@ -79,63 +79,47 @@ struct chart7DaysView: View {
                   }
                   
                     
-                    // SYSTOLIC/DIASTOLIC/PULSE
-                                  
-                                  HStack
-                               {
-                       HStack
-                          {
-                   
-                          Rectangle()
-                                .fill(Color(red: 0.1960784346, green: 0.3411764801, blue: 0.1019607857, opacity: 1))
-//                                                     .fill(Color(#colorLiteral(red: 0.5725490451, green: 0, blue: 0.2313725501, alpha: 1)))
-                                       .frame(width: 10, height: 10)
-                            Text("Pulse")
-                                 
-                                .foregroundColor(.black)
-                                .font(.system(size: 10))
-                        }
-                                  
-                              HStack
-                                  {
-                                 Text(" ")
-                                      
-                                  Rectangle()
-                                          .fill(Color(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, opacity: 1))
-//                                                 .fill(Color(#colorLiteral(red: 0.1960784346, green: 0.3411764801, blue: 0.1019607857, alpha: 1)))
-                                                 .frame(width: 10, height: 10)
-                                      Text("Systolic")
-                                           
-                                          .foregroundColor(.black)
-                                          .font(.system(size: 10))
-                                  }
-                                  HStack
-                                      {
-                                   
-                                      Rectangle()
-                                              .fill(Color(red: 0.5725490451, green: 0, blue: 0.2313725501, opacity: 1))
-//                                                     .fill(Color(#colorLiteral(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, alpha: 1)))
-                                                     .frame(width: 10, height: 10)
-                                          Text("Diastolic")
-                                               
-                                              .foregroundColor(.black)
-                                              .font(.system(size: 10))
-                                      }
-//                                  HStack
-//                                      {
-//                                 
-//                                      Rectangle()
-//                                              .fill(Color(red: 0.1960784346, green: 0.3411764801, blue: 0.1019607857, opacity: 1))
-////                                                     .fill(Color(#colorLiteral(red: 0.5725490451, green: 0, blue: 0.2313725501, alpha: 1)))
-//                                                     .frame(width: 10, height: 10)
-//                                          Text("Pulse")
-//                                               
-//                                              .foregroundColor(.black)
-//                                              .font(.system(size: 10))
-//                                      }
-                                      Spacer()
-                                  }
-                                  .padding(.bottom,23)
+//                    // SYSTOLIC/DIASTOLIC/PULSE
+                    
+                    HStack
+                                        {
+                                            // 1. SYSTOLIC: Dark Green (Matches entries1 color and desired order)
+                                            HStack
+                                            {
+                                                Rectangle()
+                                                    .fill(Color(red: 0.1960784346, green: 0.3411764801, blue: 0.1019607857, opacity: 1)) // Dark Green
+                                                    .frame(width: 10, height: 10)
+                                                Text("Systolic") // CORRECT LABEL
+                                                    .foregroundColor(.black)
+                                                    .font(.system(size: 10))
+                                            }
+                                            
+                                            // 2. DIASTOLIC: Purple (Matches entries2 color and desired order)
+                                            HStack
+                                            {
+                                                Text(" ")
+                                                Rectangle()
+                                                    .fill(Color(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, opacity: 1)) // Purple
+                                                    .frame(width: 10, height: 10)
+                                                Text("Diastolic") // CORRECT LABEL
+                                                    .foregroundColor(.black)
+                                                    .font(.system(size: 10))
+                                            }
+                                            
+                                            // 3. PULSE: Brown/Red (Matches entries3 color and desired order)
+                                            HStack
+                                            {
+                                                Rectangle()
+                                                    .fill(Color(red: 0.5725490451, green: 0, blue: 0.2313725501, opacity: 1)) // Brown/Red
+                                                    .frame(width: 10, height: 10)
+                                                Text("Pulse") // CORRECT LABEL
+                                                    .foregroundColor(.black)
+                                                    .font(.system(size: 10))
+                                            }
+                                            Spacer()
+                                        }
+                                        .padding(.bottom,23)
+                    
             
                 }
                 
@@ -170,7 +154,7 @@ struct chart7DaysView: View {
                                  
                                   Rectangle()
                                           .fill(Color(red: 0.196, green: 0.341, blue: 0.102, opacity: 1.0))
-//                                                 .fill(Color(#colorLiteral(red: 0.3098039329, green: 0.01568627544, blue: 0.1294117719, alpha: 1)))
+
                                                  .frame(width: 10, height: 10)
                                       Text(item.values?[0].label ?? "")
                                            
@@ -266,7 +250,8 @@ struct chart7DaysView: View {
                                   {
                                  
                                   Rectangle()
-                                          .fill(Color(#colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)))
+                                          .fill(Color(#colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)))
+                                         
                                                  .frame(width: 10, height: 10)
                                       Text("Oxygen")
                                            
@@ -277,7 +262,7 @@ struct chart7DaysView: View {
                                           {
                                          
                                           Rectangle()
-                                                  .fill(Color(#colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)))
+                                                  .fill(Color(#colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)))
                                                          .frame(width: 10, height: 10)
                                               Text("Pulse")
                                                    

@@ -1588,19 +1588,23 @@ getFirstPresentVital(vitalScreen: any) {
 
   return null; // No matching keys found
 }
-  selectFirstAvailableVital() {
-  const vitalScreen = this.ProcessVitalData;
-   const result = this.getFirstPresentVital(vitalScreen);
-   if(result)
-   {
-    this.ChangeVitalScreen(result.key)
-   }
-  }
 
-  currentVital: any;
-  ChangeVitalScreen(button: any) {
-    this.currentVital = button;
+    selectFirstAvailableVital() {
+  const vitalScreen = this.ProcessVitalData;
+  const result = this.getFirstPresentVital(vitalScreen);
+
+  // Only change if currentVital is not set or invalid
+  if (!this.currentVital && result) {
+    this.ChangeVitalScreen(result.key);
   }
+}
+
+currentVital: any;
+
+ChangeVitalScreen(button: any) {
+  this.currentVital = button;
+}
+
 
   // Get SMS Data for 30 Days For Report Generation
 
@@ -3273,7 +3277,7 @@ getFirstPresentVital(vitalScreen: any) {
                     );
                   }
                 } else {
-                      let endDate = new Date(this.BillingPeriodStart);
+                      let endDate = new Date(x.BillingStartDate);
                       endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
                       endDate.setMonth(endDate.getMonth()+1);
                       if (billingStartDate == '1-01-01') {
@@ -3397,7 +3401,7 @@ getFirstPresentVital(vitalScreen: any) {
                     );
                   }
                 } else {
-                      let endDate = new Date(this.BillingPeriodStart);
+                      let endDate = new Date(x.BillingStartDate);
                       endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
                       endDate.setMonth(endDate.getMonth()+1);
                       if (billingStartDate == '1-01-01') {

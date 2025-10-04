@@ -7,6 +7,7 @@ using System.Net;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.Data.Common;
 //cron 0 0 7 * * *
 class Program
 {
@@ -42,6 +43,15 @@ class Program
             // Optional: bind strongly-typed object
             var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
             Console.WriteLine($"RPM.ConnectionString (typed): {rpmSettings?.ConnectionString}");
+            CONN_STRING = rpmSettings?.ConnectionString;
+            // Parse connection string for server and database info
+            var builder = new DbConnectionStringBuilder { ConnectionString = CONN_STRING };
+            string server = builder.ContainsKey("Server") ? builder["Server"].ToString() : "";
+            string database = builder.ContainsKey("Initial Catalog") ? builder["Initial Catalog"].ToString() : "";
+
+            Console.WriteLine($"Server: {server}");
+            Console.WriteLine($"Database: {database}");
+
             CONN_STRING = rpmSettings?.ConnectionString;
             API_KEY = rpmSettings?.APIKey;
             USER = rpmSettings?.UserName;

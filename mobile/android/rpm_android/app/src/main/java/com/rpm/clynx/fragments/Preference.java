@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
+
+import com.rpm.clynx.home.Home;
 import com.rpm.clynx.utility.DataBaseHelper;
 import com.rpm.clynx.R;
 import org.json.JSONArray;
@@ -38,45 +40,49 @@ public class Preference extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("getDbData","ONRESUME");
+        Home activity = (Home) getActivity();
+        if (activity != null) {
+            // Fetch profile and update UI after DB is updated
+            activity.getpatientprofile(() -> {
+                if (isAdded()) { // make sure fragment is attached
+                    getActivity().runOnUiThread(this::getDbData);
+                }
+            });
+        }
+    }
+
     private void getDbData() {
-        JSONObject object = null;
+        Cursor dbData = db.getdata();
+
+        if (dbData == null || dbData.getCount() == 0) {
+            Log.d("getDbData", "No data in DB");
+            return;
+        }
+
         StringBuilder PersonalData = new StringBuilder();
-        Cursor dbData =  db.getdata();
-        Log.d("Cursor_dbData",dbData.toString());
-        if (dbData != null){
-            dbData.moveToFirst();
-        }do {
-            String dataDB = dbData.getString(0);
-            PersonalData.append(dataDB);
-        }while (dbData.moveToNext());
-        Log.d("PersonalData",PersonalData.toString());
+        if (dbData.moveToFirst()) {
+            do {
+                PersonalData.append(dbData.getString(0));
+            } while (dbData.moveToNext());
+        }
+
+        Log.d("PersonalData", PersonalData.toString());
+
         try {
             JSONArray jsonArry = new JSONArray(PersonalData.toString());
-            Log.d("JSONObject",jsonArry.toString());
+            JSONObject object = jsonArry.getJSONObject(jsonArry.length() - 1); // get latest entry
 
-            for(int n = 0; n < jsonArry.length(); n++)
-            {
-                object = jsonArry.getJSONObject(n);
-                // do some stuff....
-            }
-
-            String CallTime = object.getString("CallTime");
-            callTime.setText(CallTime);
-
-            String Language = object.getString("Language");
-            language.setText(Language);
-
-            String Preference1 = object.getString("Preference1");
-            preference1.setText(Preference1);
-
-            String Preference2 = object.getString("Preference2");
-            preference2.setText(Preference2);
-
-            String Preference3 = object.getString("Preference3");
-            preference3.setText(Preference3);
-
-            String Notes = object.getString("Notes");
-            notes.setText(Notes);
+            // safely update UI
+            callTime.setText(object.optString("CallTime", ""));
+            language.setText(object.optString("Language", ""));
+            preference1.setText(object.optString("Preference1", ""));
+            preference2.setText(object.optString("Preference2", ""));
+            preference3.setText(object.optString("Preference3", ""));
+            notes.setText(object.optString("Notes", ""));
 
         } catch (JSONException e) {
             e.printStackTrace();

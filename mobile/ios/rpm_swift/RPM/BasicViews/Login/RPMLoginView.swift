@@ -36,8 +36,8 @@ struct RPMLoginView: View {
 //    @State private var password: String = "cXPJKIWQ"
 
     
-    @State private var username: String = "ARPL02382"
-    @State private var password: String = "GauthaM@123"
+    @State private var username: String = "IIM02328"
+    @State private var password: String = "LX3JYcTU"
     
 
     

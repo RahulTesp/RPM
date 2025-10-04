@@ -68,29 +68,59 @@ class SessionManager: ObservableObject {
         }
     }
     
+    // MARK: - Logout with Firebase Token Deletion
     @MainActor
-    func logout(appModel: AppModel,
-                homeViewModel: RPMHomeViewModel,
-                navigationHelper: NavigationHelper,
-                loginViewModel: RPMLoginViewModel,
-                callManager: CallManager,
-                roomManager: RoomManager) {
+    func logoutWithFirebaseToken(appModel: AppModel,
+                                 homeViewModel: RPMHomeViewModel,
+                                 navigationHelper: NavigationHelper,
+                                 loginViewModel: RPMLoginViewModel,
+                                 callManager: CallManager,
+                                 roomManager: RoomManager) {
         
-        print("Logging out from SessionManager...")
-
-        homeViewModel.reset()
-
-        loginViewModel.logout { response, alert in
-            print("Logout server call finished")
+        let defaults = UserDefaults.standard
+        
+        guard let fbToken = defaults.string(forKey: "FCMToken"),
+              let accessToken = token else {
+            print("No FCM token or access token, proceeding to logout")
+            performLogout(appModel: appModel,
+                          homeViewModel: homeViewModel,
+                          navigationHelper: navigationHelper,
+                          loginViewModel: loginViewModel,
+                          callManager: callManager,
+                          roomManager: roomManager)
+            return
         }
+        
+        NetworkManager.shared.deleteFirebaseToken(fbToken: fbToken, accessToken: accessToken) { result in
+            Task { @MainActor in
+                self.performLogout(appModel: appModel,
+                                   homeViewModel: homeViewModel,
+                                   navigationHelper: navigationHelper,
+                                   loginViewModel: loginViewModel,
+                                   callManager: callManager,
+                                   roomManager: roomManager)
+            }
+        }
+    }
 
-        // Always cleanup
+    // Extracted performLogout logic
+    @MainActor
+    private func performLogout(appModel: AppModel,
+                               homeViewModel: RPMHomeViewModel,
+                               navigationHelper: NavigationHelper,
+                               loginViewModel: RPMLoginViewModel,
+                               callManager: CallManager,
+                               roomManager: RoomManager) {
+        
+        homeViewModel.reset()
+        loginViewModel.logout { _, _ in }
         appModel.signOutChat()
         callManager.disconnect()
         roomManager.disconnect()
         navigationHelper.path = []
         loginViewModel.isAuthenticated = false
     }
+
     
     // MARK: - API Error Handling
     

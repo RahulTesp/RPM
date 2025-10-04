@@ -93,7 +93,10 @@ export class ReportDataService {
           return (
             patient.PatientType === 'Active' ||
             patient.PatientType === 'OnHold' ||
-            patient.PatientType === 'ReadyToDischarge'
+            patient.PatientType === 'ReadyToDischarge'||
+            //newly added
+            patient.PatientType === 'Discharged'||
+            patient.PatientType === 'InActive'
           );
         });
 

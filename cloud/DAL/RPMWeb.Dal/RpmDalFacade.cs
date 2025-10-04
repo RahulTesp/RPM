@@ -968,9 +968,9 @@ namespace RPMWeb.Dal
         {
             return new User().GetChatResource(UserName, ToUser, ConnectionString);
         }
-        public static List<ConverationHistory> GetAllConversations(string UserName, string ToUser, string AccountSIDValue, string AuthTokenValue)
+        public async static Task<List<ConverationHistory>> GetAllConversations(string UserName, string ToUser, string AccountSIDValue, string AuthTokenValue,string ChatServiceSid)
         {
-            return new User().GetAllConversationsAsync(UserName, ToUser, AccountSIDValue, AuthTokenValue, ConnectionString);
+            return await  new User().GetAllConversationsAsync(UserName, ToUser, AccountSIDValue, AuthTokenValue, ChatServiceSid, ConnectionString);
         }
         public static void UpdInvalidSessionZero(string jwtToken)
         {

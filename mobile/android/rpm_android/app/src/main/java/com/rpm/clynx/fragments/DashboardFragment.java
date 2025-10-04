@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -27,6 +28,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.AuthFailureError;
@@ -48,7 +50,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.rpm.clynx.adapter.ToDoListHomeAdapter;
 import com.rpm.clynx.model.ToDoListModel;
-import com.rpm.clynx.service.NotificationReceiver;
+//import com.rpm.clynx.service.NotificationReceiver;
 import com.rpm.clynx.service.TimeFormatter;
 import com.rpm.clynx.service.UnreadMessageViewModel;
 import com.rpm.clynx.utility.ConversationsClientManager;
@@ -113,7 +115,7 @@ public class DashboardFragment extends Fragment {
     int textSizeInSP = 24; // Set your desired text size in sp
     LineChart mpLinechart7;
     private LinearLayout chartContainer;
-    private String identity = "123401130";
+
     public final static String TAG = "TwilioConversations";
     private final Handler handler = new Handler();
     private final int RETRY_INTERVAL = 3000; // 3 seconds
@@ -123,13 +125,18 @@ public class DashboardFragment extends Fragment {
 
     public static boolean DashboardFragmentIsVisible = false;
 
-    private BroadcastReceiver notificationReceiver = new BroadcastReceiver() {
+    private int lastNotificationCount = -1;
+
+    private final BroadcastReceiver notificationReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // This method is called when notification/broadcast is received
-            //  Call your API here
-            Log.d("getNotificationsCount", "getNotificationsCount");
-            getNotificationsCount(); // (your API method)
+            String type = intent.getStringExtra("type");
+            if ("chat".equals(type)) {
+                Log.d("chatNotificationsCount", "chattNotificationsCount");
+
+                getNotificationsCount(false);
+
+            }
         }
     };
 
@@ -147,16 +154,19 @@ public class DashboardFragment extends Fragment {
         Log.d("onStart", "Setting up Twilio Listeners...");
         setupTwilioListeners();
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED); // Use your app's broadcast action
-        ContextCompat.registerReceiver(requireContext(), notificationReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
+        IntentFilter filter = new IntentFilter("com.rpm.clynx.NOTIFICATION_RECEIVED");
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(notificationReceiver, filter);
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
         DashboardFragmentIsVisible = true;
-        getNotificationsCount();
+        getNotificationsCount(false);
+
+
         if (pref.getBoolean("loginstatus", false) == false){
             Log.d("loginstsfrmdashboard", String.valueOf(pref.getBoolean("loginstatus", false)));
             editor.clear();
@@ -189,8 +199,7 @@ public class DashboardFragment extends Fragment {
         super.onStop();
         Log.d("onStop", "Removing Twilio Listeners...");
         removeTwilioListeners();  // Clean up listeners when leaving page
-
-        requireContext().unregisterReceiver(notificationReceiver);
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(notificationReceiver);
     }
 
     private void removeTwilioListeners() {
@@ -328,7 +337,12 @@ public class DashboardFragment extends Fragment {
             tv_status.setTextColor(Color.WHITE);
         }
 
-        user_full_name.setText("Hi, " + User_full_Name);
+        if (User_full_Name != null && !User_full_Name.isEmpty()) {
+            user_full_name.setText("Hi, " + User_full_Name);
+        } else {
+            user_full_name.setText("Hi");
+        }
+
         patent_id.setText(Patent_Id);
         mpLinechart7 = (LineChart) view.findViewById(R.id.linechartDashboard);
         markerView = new MyMarkerView(getContext(), R.layout.custom_marker_layout7);
@@ -367,7 +381,7 @@ public class DashboardFragment extends Fragment {
                 e.printStackTrace();
             }
         }
-        getNotificationsCount();
+        getNotificationsCount(false);
 
         // Get the system's default time zone
         TimeZone systemTimeZone = TimeZone.getDefault();
@@ -709,96 +723,6 @@ public class DashboardFragment extends Fragment {
         });
     }
 
-    //TO DO: Need to complete the Notifiction Hub integration post clarifications on return type and testing strategy
-    //Also, need to discuss on returning the unread messages on push notification
-    private void connectWebSocket() {
-        String NOTIFICATION_HUB_URL = Links.BASE_URL + Links.NOTIFICATION_CONNECTHUB;
-        StringRequest request = new StringRequest(Request.Method.GET, NOTIFICATION_HUB_URL,new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.i("onResponse_personal", response.toString());
-                if(response.toString()!=null && response.toString().length()>0)
-                    try {
-                        uri = new URI(response.replace("\"",""));
-                        mWebSocketClient = new WebSocketClient(uri) {
-                            @Override
-                            public void onOpen(ServerHandshake serverHandshake) {
-                                Log.i("Websocket", "Opened");
-                                //mWebSocketClient.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
-                            }
-                            @Override
-                            public void onMessage(String s) {
-                                String message = null;
-                                JSONObject msg = null;
-                                try {
-                                    msg = new JSONObject(s);
-                                    message  = msg.getString("User");
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                String finalMessage = message;
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        getNotificationsCount();
-
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onClose(int i, String s, boolean b) {
-                                Log.i("Websocket", "Closed " + s);
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                Log.i("Websocket", "Error " + e.getMessage());
-                            }
-                        };
-                        mWebSocketClient.connect();
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
-                    }
-            }
-
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("onErrorResponse", error.toString());
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-
-                headers.put("Bearer",Token);
-                Log.d("headers_personal",headers.toString());
-                Log.d("Token_profile_personal", Token);
-                return headers;
-            }
-        };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-        request.setRetryPolicy(new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        requestQueue.add(request);
-    }
-
-    public static String uTCToLocal(String dateFormatInPut, String dateFomratOutPut, String datesToConvert) {
-        String dateToReturn = datesToConvert;
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(dateFormatInPut);
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date gmt = null;
-        java.text.SimpleDateFormat sdfOutPutToSend = new java.text.SimpleDateFormat(dateFomratOutPut);
-        sdfOutPutToSend.setTimeZone(TimeZone.getDefault());
-        try {
-            gmt = sdf.parse(datesToConvert);
-            dateToReturn = sdfOutPutToSend.format(gmt);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return dateToReturn; }
-
     private void checkVitalData(String formattedStartDate, String formattedEndDate) {
         DateTimeFormatter inputFormatter = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -983,7 +907,20 @@ public class DashboardFragment extends Fragment {
                 LineData lineData = new LineData(dataSets);
                 configureLineChart(lineChart, xAxisLabels, lineData);
             }
+
+            // set margin for each card
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 0, 20, 0); // left, top, right, bottom
+            cardViewLayout.setLayoutParams(params);
+
+// add to container
             chartContainer.addView(cardViewLayout);
+
+
+            // chartContainer.addView(cardViewLayout);
         } catch (JSONException e) {
             Log.e("JSONError", "Error processing JSON object", e);
         }
@@ -1067,7 +1004,13 @@ public class DashboardFragment extends Fragment {
                 }
                 if (jsonArray != null) {
                     if (jsonArray.length() <= 0) {
-                        Toast.makeText(getContext(), "No Data Available", Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(getContext(), "No Data Available", Toast.LENGTH_SHORT).show();
+
+                        // Check if fragment is attached before showing Toast
+                        if (isAdded() && getActivity() != null) {
+                            Toast.makeText(getActivity(), "No Data Available", Toast.LENGTH_SHORT).show();
+                        }
+
                         showNoActivities();
                     }
                     todo_nofoactivites.setText(jsonArray.length() + " Activities");
@@ -1144,47 +1087,59 @@ public class DashboardFragment extends Fragment {
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(stringRequest);
     }
-    private void getNotificationsCount () {
-            String url = Links.BASE_URL + Links.NOTIFICATION;
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.d("response", response.toString());
-                 //   l1.dismiss();
-                    try {
-                        JSONObject jsonObject = new JSONObject(response);
-                        try {
-                            Integer value = Integer.parseInt(jsonObject.getString("TotalUnRead"));
-                            if (value > 0) {
-                                tv_notification_count.setText(value.toString());
-                                tv_notification_count.setVisibility(view.VISIBLE);
-                            } else
-                                tv_notification_count.setVisibility(view.INVISIBLE);
-                        } catch (NumberFormatException e) {
-                            e.printStackTrace();
-                            tv_notification_count.setVisibility(View.INVISIBLE);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+
+    private void getNotificationsCount(final boolean isRetry) {
+        if (!isAdded()) {
+            Log.d("getNotificationsCount", "Fragment not attached, skipping");
+            return;
+        }
+
+        String url = Links.BASE_URL + Links.NOTIFICATION;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, response -> {
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                int value = Integer.parseInt(jsonObject.getString("TotalUnRead"));
+                Log.d("NotificationsCountvalue", String.valueOf(value));
+
+                if (isAdded()) { // 🔹 Only update UI if still attached
+                    if (value > 0) {
+                        tv_notification_count.setText(String.valueOf(value));
+                        tv_notification_count.setVisibility(View.VISIBLE);
+                    } else {
+                        tv_notification_count.setVisibility(View.INVISIBLE);
                     }
                 }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d("Error while fetching Notification count", error.toString());
+
+                // Retry once if stale
+                if (!isRetry && lastNotificationCount != -1 && value <= lastNotificationCount) {
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        if (isAdded()) { // 🔹 check again before retry
+                            getNotificationsCount(true);
+                        }
+                    }, 1500);
                 }
-            }) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String> headers = new HashMap<>();
-                    headers.put("Bearer", Token);
-                    Log.d("headers_myprofileandprogram", headers.toString());
-                    Log.d("Token_myprofileandprogram", Token);
-                    return headers;
-                }
-            };
-            RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-            stringRequest.setRetryPolicy(new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-            requestQueue.add(stringRequest);
-        }
+
+                lastNotificationCount = value;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, error -> Log.d("Error while fetching Notification count", error.toString())) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Bearer", Token);
+                return headers;
+            }
+        };
+
+        // 🔹 Safe request queue
+        RequestQueue requestQueue = Volley.newRequestQueue(requireContext().getApplicationContext());
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                60000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        requestQueue.add(stringRequest);
+    }
 }

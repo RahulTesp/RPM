@@ -3789,17 +3789,17 @@ li + li {
 // Manjusha code change
 .vital-buttons-item {
   width: fit-content;
-  height: 2rem;
-  padding: 0.4rem 1.5rem 0.43rem 1.5rem;
-  background-color: #edeff5;
-  border: 1px solid #d8dce5;
-  margin-right: 2px;
-  border-radius: 0.5rem;
-  color: #164d61;
-  font-size: 0.8rem;
+    height: 2rem;
+    padding: 0.4rem 1.5rem 0.43rem 1.5rem;
+    background-color: #edeff5;
+    border: 1px solid #d8dce5;
+    margin-right: 2px;
+    border-radius: 0.5rem;
+    color: #164d61;
+    font-size: 0.8rem;
 }
 .vital-buttons {
-  background-color: #fff;
+  //background-color: #fff;
   padding: 8px;
   border-radius: 0.5rem;
 }
@@ -3828,7 +3828,7 @@ li + li {
   height: 20rem !important;
   width: 100% !important;
   margin-bottom: 1.87rem;
-  background-color: #ffffff;
+  //background-color: #ffffff;
   border-radius: 0.5rem;
   position: relative;
   box-sizing: border-box;
@@ -3845,6 +3845,7 @@ canvas.charttrends {
   width: 100% !important;
   height: 100% !important;
   display: block;
+  background-color: #ffffff;
 }
 
 .vital_selected_ {

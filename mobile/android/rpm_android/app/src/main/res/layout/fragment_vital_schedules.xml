@@ -40,21 +40,10 @@ tools:context="com.rpm.clynx.fragments.VitalSchedulesFragment">
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/margin_30dp"
+
                         android:text="Vital Schedules"
                         android:textColor="@color/black"
                         android:textSize="24sp"
-                        app:fontFamily="@font/rubik_semibold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:id="@+id/schedno"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_20dp"
-                        android:layout_marginLeft="@dimen/margin_30dp"
-                        android:text="Schedule 1"
-                        android:textColor="@color/accent2"
-                        android:textSize="16sp"
                         app:fontFamily="@font/rubik_semibold" />
 
                     <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
