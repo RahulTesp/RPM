@@ -3609,17 +3609,7 @@
         <div
           class="vitalReadingsMenu"
           *ngIf="ProcessVitalData">
-          <button
-            class="vitalReading_menu_item"
-            *ngIf="ProcessVitalData && ProcessVitalData.BloodGlucose != null"
-            id="pd_vital_BG"
-            (click)="ChangeVitalScreen('BloodGlucose')"
-            [ngClass]="{
-              'vital_selected_': currentVital === 'BloodGlucose'
-            }"
-          >
-            BloodGlucose
-          </button>
+          
           <button
             class="vitalReading_menu_item"
             *ngIf="ProcessVitalData && ProcessVitalData.BloodPressure != null"
@@ -3633,14 +3623,14 @@
           </button>
           <button
             class="vitalReading_menu_item"
-             *ngIf="ProcessVitalData && ProcessVitalData.BloodOxygen != null "
-            (click)="ChangeVitalScreen('BloodOxygen')"
-            id="pd_Vital_O"
-              [ngClass]="{
-              'vital_selected_': currentVital === 'BloodOxygen'
+            *ngIf="ProcessVitalData && ProcessVitalData.BloodGlucose != null"
+            id="pd_vital_BG"
+            (click)="ChangeVitalScreen('BloodGlucose')"
+            [ngClass]="{
+              'vital_selected_': currentVital === 'BloodGlucose'
             }"
           >
-            Oxygen
+            BloodGlucose
           </button>
           <button
             class="vitalReading_menu_item"
@@ -3653,6 +3643,18 @@
           >
             Weight
           </button>
+          <button
+            class="vitalReading_menu_item"
+             *ngIf="ProcessVitalData && ProcessVitalData.BloodOxygen != null "
+            (click)="ChangeVitalScreen('BloodOxygen')"
+            id="pd_Vital_O"
+              [ngClass]="{
+              'vital_selected_': currentVital === 'BloodOxygen'
+            }"
+          >
+            Oxygen
+          </button>
+          
         </div>
       </div>
 
