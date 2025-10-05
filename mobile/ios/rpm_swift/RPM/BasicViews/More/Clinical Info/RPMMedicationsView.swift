@@ -228,18 +228,27 @@ struct RPMMedicationsView: View {
         return nil
     }
     
+    
     func isExpired(endDateString: String) -> Bool {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        formatter.timeZone = TimeZone(abbreviation: "UTC")
-        
-        guard let endDate = formatter.date(from: endDateString) else {
-            return false // Treat as not expired if parsing fails
+            let formatter = DateFormatter()
+            // Use the format that matches your timestamp string (usually best without explicit timeZone)
+            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+            
+            guard let endDateWithTime = formatter.date(from: endDateString) else {
+                return false // Cannot parse, so assume not expired (i.e., white)
+            }
+            
+            let calendar = Calendar.current
+            let currentDate = Date()
+            
+            // Get the start of the day for both dates.
+            let startOfEndDate = calendar.startOfDay(for: endDateWithTime)
+            let startOfCurrentDate = calendar.startOfDay(for: currentDate)
+            
+            // Returns true only if the current date is strictly AFTER the end date.
+            return startOfCurrentDate > startOfEndDate
         }
-
-        let currentDate = Date()
-        return endDate < currentDate
-    }
+    
 
 }
 
@@ -248,7 +257,3 @@ struct RPMMedicationsView_Previews: PreviewProvider {
         RPMMedicationsView()
     }
 }
-
-
-
-

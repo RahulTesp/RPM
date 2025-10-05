@@ -15,6 +15,17 @@ class NavigationHelper: ObservableObject {
         return path.last.map { "\($0)" }
     }
     
+    func reset(to screen: Screen? = nil, selectTab: Int? = nil) {
+         DispatchQueue.main.async {
+             self.path.removeAll()
+             if let screen = screen {
+                 self.path.append(screen)
+             }
+             if let tab = selectTab {
+                 self.selectedTab = tab
+             }
+         }
+     }
     func resetToHomeTab() {
           self.path.removeAll()
           self.selectedTab = 0       //  This will switch to the Home tab

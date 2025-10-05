@@ -334,9 +334,9 @@
             filePath = "RPM/Service/RPMNetworkManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1967"
-            endingLineNumber = "1967"
-            landmarkName = "chatHeartbeat(convSID:toUser:lastActiveAt:completed:)"
+            startingLineNumber = "1977"
+            endingLineNumber = "1977"
+            landmarkName = "getChatSID(tkn:memberUserName:completed:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -350,8 +350,8 @@
             filePath = "RPM/RPMApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "230"
-            endingLineNumber = "230"
+            startingLineNumber = "237"
+            endingLineNumber = "237"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>

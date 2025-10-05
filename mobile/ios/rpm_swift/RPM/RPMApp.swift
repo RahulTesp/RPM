@@ -78,6 +78,8 @@ struct RPMApp: App {
                                                print("Conversation Manager: \(model.conversationManager != nil ? "Initialized" : "Not Initialized")")
                                                print("Messages Manager: \(model.messagesManager != nil ? "Initialized" : "Not Initialized")")
                                                print("Participants Manager: \(model.participantsManager != nil ? "Initialized" : "Not Initialized")")
+                        
+                        
                        
                     }
                 
@@ -94,6 +96,10 @@ struct RPMApp: App {
                             
                             model.refreshUnreadIfReady()
                         }
+                        if phase == .background {
+                            print("App moved to background")
+                        }
+                        
                     }
 
 
@@ -110,21 +116,21 @@ struct RPMApp: App {
                         print("calling onchange", isUnauthorized)
                         if isUnauthorized {
                             print("RPM APP Received 401 Unauthorized. Logging out...")
-                            
-                            Task { @MainActor in
-                                      sessionManager.logout(
-                                          appModel: model,
-                                          homeViewModel: homeViewModel,
-                                          navigationHelper: navigationHelper,
-                                          loginViewModel: loginStateViewModel,
-                                          callManager: callManager,
-                                          roomManager: roomManager
-                                      )
-                                  }
 
+                            Task { @MainActor in
+                                sessionManager.logoutWithFirebaseToken(
+                                    appModel: model,
+                                    homeViewModel: homeViewModel,
+                                    navigationHelper: navigationHelper,
+                                    loginViewModel: loginStateViewModel,
+                                    callManager: callManager,
+                                    roomManager: roomManager
+                                )
+                            }
                         }
                     }
 
+                
                     .navigationDestination(for: Screen.self) { screen in
                         switch screen {
                         case .loginView:
@@ -201,6 +207,7 @@ struct RPMApp: App {
                             
                         case .notificationView:
                             RPMNotificationView()
+                                .environmentObject(notifList)
                             
                         case .conversationsList:
                             ConversationsList()
