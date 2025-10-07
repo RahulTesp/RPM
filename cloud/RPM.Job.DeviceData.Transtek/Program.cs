@@ -477,13 +477,13 @@ namespace azuretranstekwebjob
                 blood_pressurepulse.irregular = false;
                 blood_pressuresystolic.data_type = "systolic";
                 blood_pressuresystolic.data_unit = Unitsystolic;
-                blood_pressuresystolic.data_value = Convert.ToDouble(obj["sys"]);
+                blood_pressuresystolic.data_value = Math.Round(Convert.ToDouble(obj["sys"]),2);
                 blood_pressurediastolic.data_type = "diastolic";
                 blood_pressurediastolic.data_unit = Unitdiastolic;
-                blood_pressurediastolic.data_value = Convert.ToDouble(obj["dia"]);
+                blood_pressurediastolic.data_value = Math.Round(Convert.ToDouble(obj["dia"]),2);
                 blood_pressurepulse.data_type = "pulse";
                 blood_pressurepulse.data_unit = Unitpulse;
-                blood_pressurepulse.data_value = Convert.ToDouble(obj["pul"]);
+                blood_pressurepulse.data_value = Math.Round(Convert.ToDouble(obj["pul"]),2);
                 
                 string jsonDataSys = JsonConvert.SerializeObject(blood_pressuresystolic);
                 string jsonDataDia = JsonConvert.SerializeObject(blood_pressurediastolic);
@@ -534,11 +534,11 @@ namespace azuretranstekwebjob
                 blood_glucose.data_unit = Unitglucose;
                 if (isUnitmmol)
                 {
-                    blood_glucose.data_value = Convert.ToDouble(obj["data"]) * 18;
+                    blood_glucose.data_value = Math.Round(Convert.ToDouble(obj["data"]) * 18,2);
                 }
                 else
                 {
-                    blood_glucose.data_value = Convert.ToDouble(obj["data"]);
+                    blood_glucose.data_value = Math.Round(Convert.ToDouble(obj["data"]),2);
                 }
                 bool isFasting = obj["meal"].ToString() == "1";
                 bool isNonFasting = obj["meal"].ToString() == "2";
@@ -610,11 +610,11 @@ namespace azuretranstekwebjob
                 weight.data_unit = Unitweight;
                 if (Unitweight == "kg")
                 {
-                    weight.data_value = Convert.ToDouble(obj["wt"]) / 1000;
+                    weight.data_value = Math.Round(Convert.ToDouble(obj["wt"]) / 1000,2);
                 }
                 else if (Unitweight == "lbs")
                 {
-                    weight.data_value = Convert.ToDouble(obj["wt"]) * 0.00220462;
+                    weight.data_value = Math.Round(Convert.ToDouble(obj["wt"]) * 0.00220462,2);
                 }
                 string jsonData = JsonConvert.SerializeObject(weight);
                 StagingTableInsertJson(stagingInsert + "('" + jsonData + "')", ConnectionString);
@@ -679,10 +679,10 @@ namespace azuretranstekwebjob
                 pulseoximeter_pulse.irregular = false;
                 pulseoximeter_oxygen.data_type = "Oxygen";
                 pulseoximeter_oxygen.data_unit = Unitspo2;
-                pulseoximeter_oxygen.data_value = Convert.ToDouble(objOxygen["spo2"]);
+                pulseoximeter_oxygen.data_value = Math.Round(Convert.ToDouble(objOxygen["spo2"]),2);
                 pulseoximeter_pulse.data_type = "Pulse";
                 pulseoximeter_pulse.data_unit = Unitpulse;
-                pulseoximeter_pulse.data_value = Convert.ToDouble(objOxygen["pr"]);
+                pulseoximeter_pulse.data_value = Math.Round(Convert.ToDouble(objOxygen["pr"]),2);
                 string jsonDataOx = JsonConvert.SerializeObject(pulseoximeter_oxygen);
                 string jsonDataPulse = JsonConvert.SerializeObject(pulseoximeter_pulse);
                 string insertvalues = "('" + jsonDataOx + "'),('" + jsonDataPulse + "')";

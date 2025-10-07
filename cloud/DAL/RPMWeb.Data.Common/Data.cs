@@ -1572,6 +1572,7 @@ namespace RPMWeb.Data.Common
         public object deviceData { get; set; }
         public bool isTest { get; set; }
         public string modelNumber { get; set; }
+        public string messageType { get; set; }
     }
 
     public class DeviceTelemetryStatus

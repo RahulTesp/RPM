@@ -430,10 +430,13 @@ namespace RpmCloud.Controllers
                     {
                         return Unauthorized(new { message = "Unknown Device" });
                     }
-                    if (!RpmDalFacade.StagingTableInsert(dev, DeviceType))
+                    if (dev.messageType == "telemetry")
                     {
-                        return BadRequest(new { message = "Unexcepted error" });
-                    }                   
+                        if (!RpmDalFacade.StagingTableInsert(dev, DeviceType))
+                        {
+                            return BadRequest(new { message = "Unexcepted error" });
+                        }
+                    }
                     return Ok(new { message = "Sucess" });
                 }                
             }
