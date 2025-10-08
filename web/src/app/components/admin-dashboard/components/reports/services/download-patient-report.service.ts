@@ -441,7 +441,7 @@ export class DownloadPatientReportService {
     const formattedDates: string[] = [];
 
     if (!Array.isArray(dateArr)) {
-      console.error('Invalid input to convertDateforHealthTrends:', dateArr);
+      //console.error('Invalid input to convertDateforHealthTrends:', dateArr);
       return formattedDates; // return empty array instead of crashing
     }
 
@@ -734,7 +734,7 @@ private renderSectionHeader(doc: jsPDF, title: string, x: number): void {
 }
 
 // ✅ Render answers list
-private renderAnswers(doc: jsPDF, answers: any[], x: number): void {
+/*private renderAnswers(doc: jsPDF, answers: any[], x: number): void {
   if (answers.length > 0) {
     for (const answer of answers) {
       this.checkPageBreak(doc, 6);
@@ -745,6 +745,30 @@ private renderAnswers(doc: jsPDF, answers: any[], x: number): void {
     this.checkPageBreak(doc, 6);
     this.setPages(doc, '- None', x);
     this.Notesh += 6;
+  }
+ 
+}*/
+
+private renderAnswers(doc: jsPDF, answers: any[], x: number): void {
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 15;
+  const maxWidth = pageWidth - margin * 2;
+  const lineHeight = 6;
+
+  if (answers.length > 0) {
+    for (const answer of answers) {
+      const wrappedText = doc.splitTextToSize(`- ${answer.Answer}`, maxWidth);
+
+      this.checkPageBreak(doc, wrappedText.length * lineHeight);
+      doc.text(wrappedText, x, this.Notesh);
+
+      this.Notesh += wrappedText.length * lineHeight;
+    }
+  } else {
+    const wrappedText = doc.splitTextToSize('- None', maxWidth);
+    this.checkPageBreak(doc, wrappedText.length * lineHeight);
+    doc.text(wrappedText, x, this.Notesh);
+    this.Notesh += wrappedText.length * lineHeight;
   }
 }
 
@@ -1784,12 +1808,38 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
   }
   // ✅ Utility function: Set Text on Page
   private setPages(doc: jsPDF, text: string, x: number): void {
-    doc.text(text, x, this.Notesh);
+  
+   const pageWidth = doc.internal.pageSize.getWidth();
+   const margin = 15; // left/right margin
+   const maxWidth = pageWidth - margin * 2; // available width for text
+  // Split text into multiple lines to fit within maxWidth
+   const wrappedText = doc.splitTextToSize(text, maxWidth);
+   doc.text(wrappedText, x, this.Notesh);
   }
+  
+
+  
   private setSymptomPages(doc: jsPDF, text: string, x: number): void {
-    doc.text(text, x, this.symptomh);
-    doc.setTextColor('black');
-  }
+  
+  doc.setFont('helvetica', 'normal'); // Remove bold
+  doc.setTextColor('black');
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 15; // left/right margin
+  const maxWidth = pageWidth - margin * 2; // available width for text
+
+  // Split text into multiple lines to fit within maxWidth
+  const wrappedText = doc.splitTextToSize(text, maxWidth);
+
+  // Render the wrapped text
+  doc.text(wrappedText, x, this.symptomh);
+
+  // Update Y position for next content
+  this.symptomh += wrappedText.length * 6; // adjust line height
+}
+
+  
+
 
   // ✅ Format Date (Assuming you have a function for this)
   private formatDate(dateStr: string): string {
