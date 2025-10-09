@@ -261,8 +261,8 @@ struct chart7DaysView: View {
 
                                                   .fill(ChartColors.oxygen[0])
                                                          .frame(width: 10, height: 10)
-                                              Text("Oxygen")
-                                                   
+//                                              Text("Oxygen")
+                                              Text(item.values?[0].label ?? "")
                                                   .foregroundColor(.black)
                                                   .font(.system(size: 10))
                                           }
@@ -293,7 +293,8 @@ struct chart7DaysView: View {
     .padding(.top,8)
                     
                     // OXYGEN
-                                  
+                    
+                    
                                   HStack
                                   {
                               HStack
@@ -304,8 +305,8 @@ struct chart7DaysView: View {
                                           .fill(ChartColors.oxygen[0])
                                          
                                                  .frame(width: 10, height: 10)
-                                      Text("Oxygen")
-                                   
+
+                                      Text(item.values?[0].label ?? "")
                                            
                                           .foregroundColor(.black)
                                           .font(.system(size: 10))
@@ -317,7 +318,8 @@ struct chart7DaysView: View {
 
                                                   .fill(ChartColors.oxygen[1])
                                                          .frame(width: 10, height: 10)
-                                              Text("Pulse")
+
+                                              Text(item.values?[1].label ?? "")
                                                    
                                                   .foregroundColor(.black)
                                                   .font(.system(size: 10))

@@ -112,16 +112,31 @@ struct chart7DaysVitalsView: View {
                 )
                 .padding(.top, 8)
             }
+            
         case "Oxygen":
-            MultiLineChartView2v(
-                entries1: getEntries(valueSummary: values, entryIndex: 0),
-                entries2: getEntries(valueSummary: values, entryIndex: 1),
-                days: getDaysv7(patientSummary: days),
-                item: item,
-                lineColors: ChartColors.oxygen,
-                highlightedIndex: $highlightedIndex
-            )
-            .padding(.top, 8)
+            if values.count == 1 {
+                MultiLineChartView1v(
+                    entries1: getEntries(valueSummary: values, entryIndex: 0),
+                    days: getDaysv7(patientSummary: days),
+                    item: item,
+                    lineColors: [ChartColors.oxygen[0]],
+                    highlightedIndex: $highlightedIndex
+                )
+                .padding(.top, 8)
+            }
+            else if values.count == 2 {
+                MultiLineChartView2v(
+                    entries1: getEntries(valueSummary: values, entryIndex: 0),
+                    entries2: getEntries(valueSummary: values, entryIndex: 1),
+                    days: getDaysv7(patientSummary: days),
+                    item: item,
+                    lineColors: ChartColors.oxygen,
+                    highlightedIndex: $highlightedIndex
+                )
+                .padding(.top, 8)
+            }
+                
+            
         case "Weight":
             MultiLineChartView1v(
                 entries1: getEntries(valueSummary: values, entryIndex: 0),
