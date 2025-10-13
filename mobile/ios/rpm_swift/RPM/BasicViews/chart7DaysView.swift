@@ -58,18 +58,26 @@ struct chart7DaysView: View {
                      let entries2 = getEntries(valueSummary: valSummary ?? [], entryIndex: 1)
                      let entries3 = getEntries(valueSummary: valSummary ?? [], entryIndex: 2)
 
-                    MultiLineChartView3v(
-                        
-                        entries1: entries1,
-                             entries2: entries2,
-                             entries3: entries3,
-                                    
-                                    
-                                       days:
-                    
-                            getDaysv7(patientSummary: dayCount ?? []), item: item,highlightedIndex: $highlightedIndex
 
-)
+                    MultiLineChartView3v(
+
+                        entries1: entries1,
+
+                        entries2: entries2,
+
+                        entries3: entries3,
+
+                        days: getDaysv7(patientSummary: dayCount ?? []),
+
+                        item: item,
+
+                        lineColors: ChartColors.bloodPressure, //  Colors from your struct
+
+                        highlightedIndex: $highlightedIndex
+
+                    )
+
+                     
  
     .padding(.top,8)
     .onTapGesture {
@@ -79,7 +87,7 @@ struct chart7DaysView: View {
                   }
                   
                     
-//                    // SYSTOLIC/DIASTOLIC/PULSE
+                    // SYSTOLIC/DIASTOLIC/PULSE
                     
                     HStack
                                         {
@@ -87,7 +95,8 @@ struct chart7DaysView: View {
                                             HStack
                                             {
                                                 Rectangle()
-                                                    .fill(Color(red: 0.1960784346, green: 0.3411764801, blue: 0.1019607857, opacity: 1)) // Dark Green
+
+                                                    .fill(ChartColors.bloodPressure[0])
                                                     .frame(width: 10, height: 10)
                                                 Text("Systolic") // CORRECT LABEL
                                                     .foregroundColor(.black)
@@ -99,7 +108,8 @@ struct chart7DaysView: View {
                                             {
                                                 Text(" ")
                                                 Rectangle()
-                                                    .fill(Color(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, opacity: 1)) // Purple
+
+                                                    .fill(ChartColors.bloodPressure[1])
                                                     .frame(width: 10, height: 10)
                                                 Text("Diastolic") // CORRECT LABEL
                                                     .foregroundColor(.black)
@@ -110,7 +120,8 @@ struct chart7DaysView: View {
                                             HStack
                                             {
                                                 Rectangle()
-                                                    .fill(Color(red: 0.5725490451, green: 0, blue: 0.2313725501, opacity: 1)) // Brown/Red
+
+                                                    .fill(ChartColors.bloodPressure[2])
                                                     .frame(width: 10, height: 10)
                                                 Text("Pulse") // CORRECT LABEL
                                                     .foregroundColor(.black)
@@ -129,19 +140,15 @@ struct chart7DaysView: View {
                     
                     let entries1 = getEntries(valueSummary: valSummary ?? [], entryIndex: 0)
                 
-                    
-                    
+
                     MultiLineChartView1v(
-                 
                         entries1: entries1,
-                   
-                                       days:
+                        days: getDaysv7(patientSummary: dayCount ?? []),
+                        item: item,
+                        lineColors: [ChartColors.bloodGlucose[0]],   //  Use your defined color for single-line charts
+                        highlightedIndex: $highlightedIndex
+                    )
                     
-                            getDaysv7(patientSummary: dayCount ?? []), item: item,highlightedIndex: $highlightedIndex
-
-
-
-)
  
     .padding(.top,8)
              
@@ -153,8 +160,8 @@ struct chart7DaysView: View {
                                   {
                                  
                                   Rectangle()
-                                          .fill(Color(red: 0.196, green: 0.341, blue: 0.102, opacity: 1.0))
 
+                                          .fill(ChartColors.bloodGlucose[0])
                                                  .frame(width: 10, height: 10)
                                       Text(item.values?[0].label ?? "")
                                            
@@ -173,17 +180,17 @@ struct chart7DaysView: View {
                 {
                     let entries1 = getEntries(valueSummary: valSummary ?? [], entryIndex: 0)
                      let entries2 = getEntries(valueSummary: valSummary ?? [], entryIndex: 1)
-                    MultiLineChartView2v(
-                        
-                 
-                        entries1: entries1,
-                        entries2: entries2,
 
-                                       days:
                     
-                            getDaysv7(patientSummary: dayCount ?? []), item: item,highlightedIndex: $highlightedIndex
+                    MultiLineChartView2v(
+                        entries1: getEntries(valueSummary: valSummary ?? [], entryIndex: 0),
+                        entries2: getEntries(valueSummary: valSummary ?? [], entryIndex: 1),
+                        days: getDaysv7(patientSummary: dayCount ?? []),
+                        item: item,
+                        lineColors:ChartColors.bloodGlucose,
 
-)
+                        highlightedIndex: $highlightedIndex
+                    )
 
     .padding(.top,8)
                     
@@ -198,8 +205,7 @@ struct chart7DaysView: View {
                                   Rectangle()
                                       
                                       
-    
-                                                 .fill(Color(#colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)))
+                                                .fill(ChartColors.bloodGlucose[0])
                                                  .frame(width: 10, height: 10)
                                       Text(item.values?[0].label ?? "")
                                            
@@ -211,7 +217,8 @@ struct chart7DaysView: View {
                                    
                                       Rectangle()
                                    
-                                                     .fill(Color(#colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)))
+
+                                              .fill(ChartColors.bloodGlucose[1])
                                                      .frame(width: 10, height: 10)
                                           Text(item.values?[1].label ?? "")
                                                
@@ -225,20 +232,20 @@ struct chart7DaysView: View {
                     
                 }
                 
-                if(item.vitalName == "Oxygen")
+                if(item.vitalName == "Oxygen" && item.values?.count == 1)
                 {
                     let entries1 = getEntries(valueSummary: valSummary ?? [], entryIndex: 0)
                      let entries2 = getEntries(valueSummary: valSummary ?? [], entryIndex: 1)
-                    MultiLineChartView2v(
-                        
-                        entries1: entries1,
-                        entries2: entries2,
-              
-                                       days:
-                    
-                            getDaysv7(patientSummary: dayCount ?? []), item: item,highlightedIndex: $highlightedIndex
 
-)
+                    MultiLineChartView1v(
+                        entries1: getEntries(valueSummary: valSummary ?? [], entryIndex: 0),
+
+                        days: getDaysv7(patientSummary: dayCount ?? []),
+                        item: item,
+                        lineColors:ChartColors.oxygen,
+
+                        highlightedIndex: $highlightedIndex
+                    )
    
     .padding(.top,8)
                     
@@ -246,14 +253,60 @@ struct chart7DaysView: View {
                                   
                                   HStack
                                   {
+
+                                      HStack
+                                          {
+                                         
+                                          Rectangle()
+
+                                                  .fill(ChartColors.oxygen[0])
+                                                         .frame(width: 10, height: 10)
+//                                              Text("Oxygen")
+                                              Text(item.values?[0].label ?? "")
+                                                  .foregroundColor(.black)
+                                                  .font(.system(size: 10))
+                                          }
+                               
+                                  }
+                                  .padding(.bottom,23)
+                    
+                    
+                }
+                
+                
+                
+                if(item.vitalName == "Oxygen" && item.values?.count == 2)
+                {
+                    let entries1 = getEntries(valueSummary: valSummary ?? [], entryIndex: 0)
+                     let entries2 = getEntries(valueSummary: valSummary ?? [], entryIndex: 1)
+
+                    MultiLineChartView2v(
+                        entries1: getEntries(valueSummary: valSummary ?? [], entryIndex: 0),
+                        entries2: getEntries(valueSummary: valSummary ?? [], entryIndex: 1),
+                        days: getDaysv7(patientSummary: dayCount ?? []),
+                        item: item,
+                        lineColors:ChartColors.oxygen,
+
+                        highlightedIndex: $highlightedIndex
+                    )
+   
+    .padding(.top,8)
+                    
+                    // OXYGEN
+                    
+                    
+                                  HStack
+                                  {
                               HStack
                                   {
                                  
                                   Rectangle()
-                                          .fill(Color(#colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)))
+
+                                          .fill(ChartColors.oxygen[0])
                                          
                                                  .frame(width: 10, height: 10)
-                                      Text("Oxygen")
+
+                                      Text(item.values?[0].label ?? "")
                                            
                                           .foregroundColor(.black)
                                           .font(.system(size: 10))
@@ -262,9 +315,11 @@ struct chart7DaysView: View {
                                           {
                                          
                                           Rectangle()
-                                                  .fill(Color(#colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)))
+
+                                                  .fill(ChartColors.oxygen[1])
                                                          .frame(width: 10, height: 10)
-                                              Text("Pulse")
+
+                                              Text(item.values?[1].label ?? "")
                                                    
                                                   .foregroundColor(.black)
                                                   .font(.system(size: 10))
@@ -281,17 +336,15 @@ struct chart7DaysView: View {
                 {
                     let entries1 = getEntries(valueSummary: valSummary ?? [], entryIndex: 0)
                    
-                    MultiLineChartView1v(
-               
-                        entries1 :  entries1,
-                   
-                                    
-                                       days:
+
                     
-                            getDaysv7(patientSummary: dayCount ?? []), item: item,highlightedIndex: $highlightedIndex
-
-
-)
+                    MultiLineChartView1v(
+                        entries1: entries1,
+                        days: getDaysv7(patientSummary: dayCount ?? []),
+                        item: item,
+                        lineColors: [ChartColors.weight],   //  Use your defined color for single-line charts
+                        highlightedIndex: $highlightedIndex
+                    )
 
     .padding(.top,8)
                     
@@ -303,7 +356,8 @@ struct chart7DaysView: View {
                                   {
                                  
                                   Rectangle()
-                                                 .fill(Color(#colorLiteral(red: 0.3098039329, green: 0.01568627544, blue: 0.1294117719, alpha: 1)))
+
+                                          .fill(ChartColors.weight)
                                                  .frame(width: 10, height: 10)
                                       Text("Weight")
                                            
@@ -415,454 +469,321 @@ func getDaysv7(patientSummary:[String])->[String]{
 }
 
 
-struct MultiLineChartView3v : UIViewRepresentable {
-    
-    var entries1 : [ChartDataEntry]
-    var entries2 : [ChartDataEntry]
-    var entries3 : [ChartDataEntry]
+
+struct MultiLineChartView3v: UIViewRepresentable {
+    var entries1: [ChartDataEntry]
+    var entries2: [ChartDataEntry]
+    var entries3: [ChartDataEntry]
     var days: [String]
     var item: RPMVitalsChartDaysDataModel
-  
-    // Add a closure property to handle tap events
-       var onTap: ((Int) -> Void)? = nil
-       
-       // Add a binding property to control the highlighted data point
-       @Binding var highlightedIndex: Int?
-    
+    var lineColors: [Color]
+    var onTap: ((Int) -> Void)? = nil
+    @Binding var highlightedIndex: Int?
+ 
     func makeCoordinator() -> Coordinator {
-          Coordinator(self)
-      }
-    
+        Coordinator(self)
+    }
+ 
     func makeUIView(context: Context) -> LineChartView {
-        print("\ndays.count")
-        print(days.count)
         let chart = LineChartView()
-       
-print("itemlabelnames",item.values?.map { $0.label } ?? [])
-     
-        // Set up the custom marker view
+        chart.delegate = context.coordinator
+ 
         let marker = CustomMarkerView(color: .blue, font: .systemFont(ofSize: 12), days: days)
-              marker.chartView = chart
-              chart.marker = marker
-        
+        marker.chartView = chart
+        chart.marker = marker
+ 
         return createChart(chart: chart)
     }
-    
+ 
     func updateUIView(_ uiView: LineChartView, context: Context) {
-        
         uiView.data = addData()
-        
-        // Highlight the data point based on the binding value
-               if let highlightedIndex = highlightedIndex {
-                   uiView.highlightValue(Highlight(x: Double(highlightedIndex), dataSetIndex: 0, stackIndex: -1))
-               }
-        
+ 
+        //  Highlight the tapped point on the correct dataset
+        if let highlightedIndex = highlightedIndex {
+            let datasetIndex = context.coordinator.tappedDataSetIndex ?? 0
+            uiView.highlightValue(Highlight(
+                x: Double(highlightedIndex),
+                dataSetIndex: datasetIndex,
+                stackIndex: -1
+            ))
+        }
     }
-    
-    class Coordinator: NSObject {
-           var parent: MultiLineChartView3v
-
-           init(_ parent: MultiLineChartView3v) {
-               self.parent = parent
-           }
-
-           @objc func handleTapGesture(_ gesture: UITapGestureRecognizer) {
-               print("Tapped on chart")
-               let location = gesture.location(in: parent.createChart(chart: LineChartView()))
-               if let chart = gesture.view as? LineChartView {
-                   let xAxisValue = chart.getHighlightByTouchPoint(location)?.x ?? 0
-                   
-                   
-                   
-                   if xAxisValue.isFinite {
-                       parent.highlightedIndex = Int(xAxisValue)
-                       parent.onTap?(Int(xAxisValue))
-                   }
-
-               }
-           }
-       }
-    
-    func createChart(chart: LineChartView) -> LineChartView{
-        print("createChart3")
+ 
+    class Coordinator: NSObject, ChartViewDelegate {
+        var parent: MultiLineChartView3v
+        var tappedDataSetIndex: Int? = nil
+ 
+        init(_ parent: MultiLineChartView3v) {
+            self.parent = parent
+        }
+ 
+        func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
+            parent.highlightedIndex = Int(highlight.x)
+            tappedDataSetIndex = highlight.dataSetIndex
+            parent.onTap?(highlight.dataSetIndex)
+        }
+ 
+        func chartValueNothingSelected(_ chartView: ChartViewBase) {
+            parent.highlightedIndex = nil
+            tappedDataSetIndex = nil
+        }
+    }
+ 
+    // MARK: - Chart Setup
+    func createChart(chart: LineChartView) -> LineChartView {
         chart.chartDescription.enabled = false
-        chart.xAxis.drawGridLinesEnabled = true
-        chart.xAxis.drawLabelsEnabled = true
-        chart.xAxis.drawAxisLineEnabled = false
+        chart.rightAxis.enabled = false
+        chart.legend.form = .none
+        chart.drawBordersEnabled = false
+ 
         chart.xAxis.labelPosition = .bottom
         chart.xAxis.labelRotationAngle = -80
-        chart.rightAxis.enabled = false
-        chart.leftAxis.enabled = true
-        chart.drawBordersEnabled = false
-        chart.legend.form = .none
+        chart.xAxis.drawAxisLineEnabled = false
+        chart.xAxis.drawGridLinesEnabled = true
         chart.xAxis.valueFormatter = CustomChartFormatterv(days: days)
-        chart.xAxis.granularityEnabled = true
         chart.xAxis.setLabelCount(days.count, force: false)
-        chart.xAxis.labelTextColor = UIColor.black
+        chart.xAxis.labelTextColor = .black
         chart.xAxis.granularity = 1.0
-        
-        let yAxisFormatter = NumberFormatter()
-        yAxisFormatter.minimumFractionDigits = 1
-      
-        chart.leftAxis.valueFormatter = CustomNumberFormatter()
+ 
+        chart.leftAxis.enabled = true
         chart.leftAxis.granularityEnabled = true
-        chart.leftAxis.granularity = 0.1  // Set to an appropriate granularity
-
-        print("createChart3 adddatacall")
-        
-        chart.data = addData()
+        chart.leftAxis.granularity = 0.1
+        chart.leftAxis.valueFormatter = CustomNumberFormatter()
+ 
         chart.scaleXEnabled = false
         chart.pinchZoomEnabled = false
         chart.doubleTapToZoomEnabled = false
-        chart.dragEnabled = false // If you want to lock the chart entirely
-
+        chart.dragEnabled = false
+ 
+        chart.data = addData()
         return chart
     }
-    
-    func addData() -> LineChartData{
-        
-        print("createChart3 adddatacalled")
-        
-        let data = LineChartData(dataSets: [
-            
-            //Schedule Trips Line
-            generateLineChartDataSet(dataSetEntries: entries1, color: UIColor(Color(#colorLiteral(red: 0.1960784346, green: 0.3411764801, blue: 0.1019607857, alpha: 1)))
-                                  
-                                    ),
-            
-               generateLineChartDataSet(dataSetEntries: entries2, color: UIColor(Color(#colorLiteral(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, alpha: 1)))
-        
-               ),
-            generateLineChartDataSet(dataSetEntries: entries3, color: UIColor(Color(#colorLiteral(red: 0.5725490451, green: 0, blue: 0.2313725501, alpha: 1)))
-   
+ 
+    // MARK: - Add Data
+    func addData() -> LineChartData {
+        LineChartData(dataSets: [
+            generateLineChartDataSet(
+                dataSetEntries: entries1,
+                color: UIColor(lineColors[safe: 0] ?? .gray),
+                label: item.values?[safe: 0]?.label ?? "Value 1"
             ),
-         
+            generateLineChartDataSet(
+                dataSetEntries: entries2,
+                color: UIColor(lineColors[safe: 1] ?? .gray),
+                label: item.values?[safe: 1]?.label ?? "Value 2"
+            ),
+            generateLineChartDataSet(
+                dataSetEntries: entries3,
+                color: UIColor(lineColors[safe: 2] ?? .gray),
+                label: item.values?[safe: 2]?.label ?? "Value 3"
+            )
         ])
-        return data
     }
-    
-    func generateLineChartDataSet(dataSetEntries: [ChartDataEntry], color: UIColor
-                                  //, fillColor: UIColor
-    ) -> LineChartDataSet{
-        
-        print("createChart3 generateLineChartDataSet")
-        
-        let dataSet =
-        
-        LineChartDataSet(entries: dataSetEntries, label: "")
-        
-        print("createChart3 LineChartDataSet")
+ 
+    func generateLineChartDataSet(
+        dataSetEntries: [ChartDataEntry],
+        color: UIColor,
+        label: String
+    ) -> LineChartDataSet {
+        let dataSet = LineChartDataSet(entries: dataSetEntries, label: "")
         dataSet.colors = [color]
         dataSet.mode = .cubicBezier
         dataSet.circleRadius = 5
         dataSet.circleHoleColor = color
-//        dataSet.circleHoleColor = UIColor(Color(#colorLiteral(red: 0.003921568627, green: 0.231372549, blue: 0.431372549, alpha: 1)))
-//     
-//        dataSet.setCircleColor(UIColor.clear)
+        dataSet.setCircleColor(color)
         dataSet.lineWidth = 2
         dataSet.valueTextColor = color
         dataSet.lineDashLengths = [3]
         dataSet.valueFont = UIFont(name: "Avenir", size: 12)!
-        print("createChart3 dataSet")
+      
         return dataSet
     }
-    
 }
 
 
 
-struct MultiLineChartView2v : UIViewRepresentable {
-    
-    var entries1 : [ChartDataEntry]
-    var entries2 : [ChartDataEntry]
-    var days: [String]
-    var item: RPMVitalsChartDaysDataModel
-  
-    
-    // Add a closure property to handle tap events
-       var onTap: ((Int) -> Void)? = nil
-       
-       // Add a binding property to control the highlighted data point
-       @Binding var highlightedIndex: Int?
-    
-    
-    func makeCoordinator() -> Coordinator {
-          Coordinator(self)
-      }
-    
-    func makeUIView(context: Context) -> LineChartView {
-        print("\ndays.count")
-        print(days.count)
-        let chart = LineChartView()
-        
-   
-      
-print("itemlabelnames",item.values?.map { $0.label } ?? [])
-     
-    
-        // Set up the custom marker view
-        let marker = CustomMarkerView(color: .blue, font: .systemFont(ofSize: 12), days: days)
-              marker.chartView = chart
-              chart.marker = marker
-      
-        return createChart(chart: chart)
+ 
+// MARK: - Safe Array Indexing
+extension Array {
+    subscript(safe index: Int) -> Element? {
+        return indices.contains(index) ? self[index] : nil
     }
+}
+
+
+
+
+struct MultiLineChartView2v: UIViewRepresentable {
+
+   var entries1: [ChartDataEntry]
+
+   var entries2: [ChartDataEntry]
+
+   var days: [String]
+
+   var item: RPMVitalsChartDaysDataModel
+
+   var lineColors: [Color]             //  Accepts external line colors
+
+   var onTap: ((Int) -> Void)? = nil
+
+   @Binding var highlightedIndex: Int?
+
+   func makeCoordinator() -> Coordinator {
+
+       Coordinator(self)
+
+   }
+
+   func makeUIView(context: Context) -> LineChartView {
+
+       let chart = LineChartView()
+
+       chart.delegate = context.coordinator
+
+       //  Set up custom marker
+
+       let marker = CustomMarkerView(color: .blue, font: .systemFont(ofSize: 12), days: days)
+
+       marker.chartView = chart
+
+       chart.marker = marker
+
+       return createChart(chart: chart)
+
+   }
+
+
     
     func updateUIView(_ uiView: LineChartView, context: Context) {
-     
         uiView.data = addData()
         
-        // Highlight the data point based on the binding value
-               if let highlightedIndex = highlightedIndex {
-                   uiView.highlightValue(Highlight(x: Double(highlightedIndex), dataSetIndex: 0, stackIndex: -1))
-               }
-     
+        if let highlightedIndex = highlightedIndex {
+            let datasetIndex = context.coordinator.tappedDataSetIndex ?? 0
+            uiView.highlightValue(Highlight(x: Double(highlightedIndex),
+                                            dataSetIndex: datasetIndex,
+                                            stackIndex: -1))
+        }
+        
+
     }
-    
-    class Coordinator: NSObject {
-           var parent: MultiLineChartView2v
 
-           init(_ parent: MultiLineChartView2v) {
-               self.parent = parent
-           }
-
-           @objc func handleTapGesture(_ gesture: UITapGestureRecognizer) {
-               print("Tapped on chart")
-               let location = gesture.location(in: parent.createChart(chart: LineChartView()))
-               if let chart = gesture.view as? LineChartView {
-                   let xAxisValue = chart.getHighlightByTouchPoint(location)?.x ?? 0
-                   // Update the highlighted index
-                   parent.highlightedIndex = Int(xAxisValue)
-                   // Call onTap closure with the tapped index
-                   parent.onTap?(Int(xAxisValue))
-               }
-           }
-       }
-    
-    
-    func createChart(chart: LineChartView) -> LineChartView{
-        chart.chartDescription.enabled = false
-        chart.xAxis.drawGridLinesEnabled = true
-        chart.xAxis.drawLabelsEnabled = true
-        chart.xAxis.drawAxisLineEnabled = false
-        chart.xAxis.labelPosition = .bottom
-        chart.xAxis.labelRotationAngle = -80
-        chart.rightAxis.enabled = false
-        chart.leftAxis.enabled = true
-        chart.drawBordersEnabled = false
-       chart.legend.form = .none
- 
-        chart.xAxis.granularityEnabled = true
-      
-        chart.xAxis.valueFormatter = CustomChartFormatterv(days: days)
-       
-        chart.xAxis.setLabelCount(days.count, force: false)
-     
-        chart.xAxis.labelTextColor = UIColor.black
-    
-        chart.xAxis.granularity = 1.0
-    
-        
-        chart.data = addData()
-        // Set the maximum number of initially visible data points
-           let initialVisibleDataPoints = 15
-           chart.setVisibleXRangeMaximum(Double(initialVisibleDataPoints))
-
-           // Enable horizontal scrolling (disable zooming)
-           chart.scaleXEnabled = true
-
-        return chart
-    }
-    
-    func addData() -> LineChartData{
-        let data = LineChartData(dataSets: [
-            
-            //Schedule Trips Line
-            generateLineChartDataSet(dataSetEntries: entries1, color: UIColor(Color(#colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)))
-                                   
-                                    ),
-            
-               generateLineChartDataSet(dataSetEntries: entries2, color: UIColor(Color(#colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)))
-          
-               ),
-       
-         
-        ])
-        return data
-    }
-    
-    func generateLineChartDataSet(dataSetEntries: [ChartDataEntry], color: UIColor
-                                  //, fillColor: UIColor
-    ) -> LineChartDataSet{
-        
-        
-        
-        let dataSet =
-        
-        LineChartDataSet(entries: dataSetEntries, label: "")
-        
-        
-        dataSet.colors = [color]
-        dataSet.mode = .cubicBezier
-        dataSet.circleRadius = 5
-        
-        dataSet.circleHoleColor = color
-//        dataSet.circleHoleColor = UIColor(Color(#colorLiteral(red: 0.003921568627, green: 0.231372549, blue: 0.431372549, alpha: 1)))
-//   
-//        dataSet.setCircleColor(UIColor.clear)
-        dataSet.lineWidth = 2
-        dataSet.valueTextColor = color
-        dataSet.lineDashLengths = [3]
-        dataSet.valueFont = UIFont(name: "Avenir", size: 12)!
-        return dataSet
-    }
-    
-}
-
-
-
-struct MultiLineChartView1v : UIViewRepresentable {
-    
-    var entries1 : [ChartDataEntry]
-    
    
-    var days: [String]
+        
+    
+    class Coordinator: NSObject, ChartViewDelegate {
+        var parent: MultiLineChartView2v
+        var tappedDataSetIndex: Int? = nil  // store last tapped dataset
+     
+        init(_ parent: MultiLineChartView2v) {
+            self.parent = parent
+        }
+     
+        func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
+            parent.highlightedIndex = Int(highlight.x)
+            tappedDataSetIndex = highlight.dataSetIndex  //  store tapped dataset
+            parent.onTap?(highlight.dataSetIndex)
+        }
+     
+        func chartValueNothingSelected(_ chartView: ChartViewBase) {
+            parent.highlightedIndex = nil
+            tappedDataSetIndex = nil
+        }
+    }
     
     
-    var item: RPMVitalsChartDaysDataModel
+    
+
+
+     
+    
+
+   // MARK: - Chart Setup
+
+   func createChart(chart: LineChartView) -> LineChartView {
+
+       chart.chartDescription.enabled = false
+
+       chart.rightAxis.enabled = false
+
+       chart.legend.form = .none
+
+       chart.drawBordersEnabled = false
+
+       //  X-Axis
+
+       chart.xAxis.labelPosition = .bottom
+
+       chart.xAxis.labelRotationAngle = -80
+
+       chart.xAxis.drawAxisLineEnabled = false
+
+       chart.xAxis.drawGridLinesEnabled = true
+
+       chart.xAxis.valueFormatter = CustomChartFormatterv(days: days)
+
+       chart.xAxis.setLabelCount(days.count, force: false)
+
+       chart.xAxis.labelTextColor = .black
+
+       chart.xAxis.granularity = 1.0
+
+       // Y-Axis
+
+       chart.leftAxis.enabled = true
+
+       chart.leftAxis.granularityEnabled = true
+
+       chart.leftAxis.granularity = 0.1
+
+       chart.leftAxis.valueFormatter = CustomNumberFormatter()
+
+       //  Disable zoom/pan
+
+       chart.scaleXEnabled = false
+
+       chart.pinchZoomEnabled = false
+
+       chart.doubleTapToZoomEnabled = false
+
+       chart.dragEnabled = false
+
+       chart.data = addData()
+
+       return chart
+
+   }
+
   
     
-    
-    // Add a closure property to handle tap events
-       var onTap: ((Int) -> Void)? = nil
-       
-       // Add a binding property to control the highlighted data point
-       @Binding var highlightedIndex: Int?
-    
-    
-    func makeCoordinator() -> Coordinator {
-          Coordinator(self)
-      }
-    
-    
-    func makeUIView(context: Context) -> LineChartView {
-        print("\ndays.count")
-        print(days.count)
-        let chart = LineChartView()
-   
-      
-print("itemlabelnames",item.values?.map { $0.label } ?? [])
-     
-        
-        // Set up the custom marker view
-        let marker = CustomMarkerView(color: .blue, font: .systemFont(ofSize: 12), days: days)
-              marker.chartView = chart
-              chart.marker = marker
-        return createChart(chart: chart)
-    }
-    
-    func updateUIView(_ uiView: LineChartView, context: Context) {
-        print("updateUIView on chart")
-     
-        uiView.data = addData()
-        
-        // Highlight the data point based on the binding value
-               if let highlightedIndex = highlightedIndex {
-                   uiView.highlightValue(Highlight(x: Double(highlightedIndex), dataSetIndex: 0, stackIndex: -1))
-               }
-    }
-    
-    class Coordinator: NSObject {
-           var parent: MultiLineChartView1v
-
-           init(_ parent: MultiLineChartView1v) {
-               self.parent = parent
-           }
-
-           @objc func handleTapGesture(_ gesture: UITapGestureRecognizer) {
-               print("Tapped on chart")
-               let location = gesture.location(in: parent.createChart(chart: LineChartView()))
-               if let chart = gesture.view as? LineChartView {
-                   let xAxisValue = chart.getHighlightByTouchPoint(location)?.x ?? 0
-                   // Update the highlighted index
-                   parent.highlightedIndex = Int(xAxisValue)
-                   // Call onTap closure with the tapped index
-                   parent.onTap?(Int(xAxisValue))
-               }
-           }
-       }
-    
-    func createChart(chart: LineChartView) -> LineChartView{
-        print("createChart")
-             
-        chart.chartDescription.enabled = false
-        chart.xAxis.drawGridLinesEnabled = true
-        chart.xAxis.drawLabelsEnabled = true
-        chart.xAxis.drawAxisLineEnabled = false
-        chart.xAxis.labelPosition = .bottom
-        chart.xAxis.labelRotationAngle = -80
-        chart.rightAxis.enabled = false
-        chart.leftAxis.enabled = true
-        chart.drawBordersEnabled = false
-       chart.legend.form = .none
-        
-        chart.xAxis.granularityEnabled = true
-        chart.xAxis.granularity = 1.0
-        chart.xAxis.valueFormatter = CustomChartFormatterv(days: days)
-      
-        chart.xAxis.setLabelCount(days.count, force: false)
- 
-        chart.xAxis.labelTextColor = UIColor.black
-    
-        
-        chart.data = addData()
-        // Set the maximum number of initially visible data points
-           let initialVisibleDataPoints = 15
-           chart.setVisibleXRangeMaximum(Double(initialVisibleDataPoints))
-
-           // Enable horizontal scrolling (disable zooming)
-           chart.scaleXEnabled = true
-
-        return chart
-    }
-    
-    func addData() -> LineChartData{
-        let data = LineChartData(dataSets: [
-            
-            
-            
-            //Schedule Trips Line
-//            generateLineChartDataSet(dataSetEntries: entries1, color: UIColor(Color(#colorLiteral(red: 0.3098039329, green: 0.01568627544, blue: 0.1294117719, alpha: 1)))
-            generateLineChartDataSet(dataSetEntries: entries1, color: UIColor(
-                        red: 0.1960784346,
-                        green: 0.3411764801,
-                        blue: 0.1019607857,
-                        alpha: 1.0)
-                                    ),
-            
-           
+    func addData() -> LineChartData {
+        LineChartData(dataSets: [
+            generateLineChartDataSet(
+                dataSetEntries: entries1,
+                color: UIColor(lineColors[safe: 0] ?? .gray),
+                label: item.values?[safe: 0]?.label ?? "Value 1"
+            ),
+            generateLineChartDataSet(
+                dataSetEntries: entries2,
+                color: UIColor(lineColors[safe: 1] ?? .gray),
+                label: item.values?[safe: 1]?.label ?? "Value 2"
+            )
         ])
-        return data
     }
-    
-    func generateLineChartDataSet(dataSetEntries: [ChartDataEntry], color: UIColor
-                                  //, fillColor: UIColor
-    ) -> LineChartDataSet{
-        
-        
-        
-        let dataSet =
-        
-        LineChartDataSet(entries: dataSetEntries, label: "")
-        
-        
+
+   
+     
+    func generateLineChartDataSet(
+        dataSetEntries: [ChartDataEntry],
+        color: UIColor,
+        label: String
+    ) -> LineChartDataSet {
+        let dataSet = LineChartDataSet(entries: dataSetEntries, label: "")
         dataSet.colors = [color]
         dataSet.mode = .cubicBezier
         dataSet.circleRadius = 5
         dataSet.circleHoleColor = color
-//        dataSet.circleHoleColor = UIColor(Color(#colorLiteral(red: 0.003921568627, green: 0.231372549, blue: 0.431372549, alpha: 1)))
-//   
-//        dataSet.setCircleColor(UIColor.clear)
+        dataSet.setCircleColor(color)
         dataSet.lineWidth = 2
         dataSet.valueTextColor = color
         dataSet.lineDashLengths = [3]
@@ -870,7 +791,128 @@ print("itemlabelnames",item.values?.map { $0.label } ?? [])
         return dataSet
     }
     
+    
 }
+
+
+
+struct MultiLineChartView1v: UIViewRepresentable {
+    var entries1: [ChartDataEntry]
+    var days: [String]
+    var item: RPMVitalsChartDaysDataModel
+    var lineColors: [Color]
+    var onTap: ((Int) -> Void)? = nil
+    @Binding var highlightedIndex: Int?
+ 
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+ 
+    func makeUIView(context: Context) -> LineChartView {
+        let chart = LineChartView()
+        chart.delegate = context.coordinator
+ 
+        let marker = CustomMarkerView(color: .blue, font: .systemFont(ofSize: 12), days: days)
+        marker.chartView = chart
+        chart.marker = marker
+ 
+        return createChart(chart: chart)
+    }
+ 
+    func updateUIView(_ uiView: LineChartView, context: Context) {
+        uiView.data = addData()
+ 
+        //  Highlight using tappedDataSetIndex
+        if let highlightedIndex = highlightedIndex {
+            let datasetIndex = context.coordinator.tappedDataSetIndex ?? 0
+            uiView.highlightValue(Highlight(
+                x: Double(highlightedIndex),
+                dataSetIndex: datasetIndex,
+                stackIndex: -1
+            ))
+        } else {
+            uiView.highlightValue(nil)
+        }
+    }
+ 
+    class Coordinator: NSObject, ChartViewDelegate {
+        var parent: MultiLineChartView1v
+        var tappedDataSetIndex: Int? = nil
+ 
+        init(_ parent: MultiLineChartView1v) {
+            self.parent = parent
+        }
+ 
+        func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
+            parent.highlightedIndex = Int(highlight.x)
+            tappedDataSetIndex = highlight.dataSetIndex
+            parent.onTap?(highlight.dataSetIndex)
+        }
+ 
+        func chartValueNothingSelected(_ chartView: ChartViewBase) {
+            parent.highlightedIndex = nil
+            tappedDataSetIndex = nil
+        }
+    }
+ 
+    // MARK: - Chart Setup
+    func createChart(chart: LineChartView) -> LineChartView {
+        chart.chartDescription.enabled = false
+        chart.rightAxis.enabled = false
+        chart.legend.form = .none
+        chart.drawBordersEnabled = false
+ 
+        chart.xAxis.labelPosition = .bottom
+        chart.xAxis.labelRotationAngle = -80
+        chart.xAxis.drawAxisLineEnabled = false
+        chart.xAxis.drawGridLinesEnabled = true
+        chart.xAxis.valueFormatter = CustomChartFormatterv(days: days)
+        chart.xAxis.setLabelCount(days.count, force: false)
+        chart.xAxis.labelTextColor = .black
+        chart.xAxis.granularity = 1.0
+ 
+        chart.leftAxis.enabled = true
+        chart.leftAxis.granularityEnabled = true
+        chart.leftAxis.granularity = 0.1
+        chart.leftAxis.valueFormatter = CustomNumberFormatter()
+ 
+        chart.scaleXEnabled = false
+        chart.pinchZoomEnabled = false
+        chart.doubleTapToZoomEnabled = false
+        chart.dragEnabled = false
+ 
+        chart.data = addData()
+        return chart
+    }
+ 
+    // MARK: - Add Data
+    func addData() -> LineChartData {
+        LineChartData(dataSets: [
+            generateLineChartDataSet(
+                dataSetEntries: entries1,
+                color: UIColor(lineColors[safe: 0] ?? .gray),
+                label: item.values?[safe: 0]?.label ?? "Value"
+            )
+        ])
+    }
+ 
+    // MARK: - Dataset Builder
+    func generateLineChartDataSet(dataSetEntries: [ChartDataEntry], color: UIColor, label: String) -> LineChartDataSet {
+        let dataSet = LineChartDataSet(entries: dataSetEntries, label: "")
+        dataSet.colors = [color]
+        dataSet.mode = .cubicBezier
+        dataSet.circleRadius = 5
+        dataSet.circleHoleColor = color
+        dataSet.setCircleColor(color)
+        dataSet.lineWidth = 2
+        dataSet.valueTextColor = color
+        dataSet.lineDashLengths = [3]
+        dataSet.valueFont = UIFont(name: "Avenir", size: 12)!
+        return dataSet
+    }
+}
+
+
 
 class CustomNumberFormatter: NSObject, AxisValueFormatter {
     func stringForValue(_ value: Double, axis: AxisBase?) -> String {
@@ -958,63 +1000,60 @@ class CustomMarkerView: MarkerView {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+       
     override func refreshContent(entry: ChartDataEntry, highlight: Highlight) {
+
         let date = days[min(max(Int(entry.x), 0), days.count - 1)]
+     
+        // Use highlight.dataSetIndex to get the correct dataset
 
-        guard let dataDict = entry.data as? [String: Any],
-              let labelString = dataDict["label"] as? String else {
+        guard let chartData = chartView?.data,
+
+              highlight.dataSetIndex < chartData.dataSetCount else {
+
             return
-        }
 
-        label.text = " \(date)\n \(labelString): \(entry.y)"
+        }
+     
+        let dataSet = chartData.dataSets[highlight.dataSetIndex]
+
+        let entriesAtSameX = dataSet.entriesForXValue(entry.x)
+     
+        // There should be only one entry in this dataset for this x-value
+
+        if let selectedEntry = entriesAtSameX.first,
+
+           let dataDict = selectedEntry.data as? [String: Any],
+
+           let labelString = dataDict["label"] as? String {
+     
+            label.text = " \(date)\n \(labelString): \(selectedEntry.y)"
+
+        }
+     
         label.textAlignment = .left
 
-        let entriesAtSameIndex = chartView?.data?.dataSets
-            .flatMap { $0.entriesForXValue(entry.x) } ?? []
+        label.lineBreakMode = .byWordWrapping
+     
+        // Adjust the size of the marker view
 
-        // Check if there are entries at the same x-value
-        if !entriesAtSameIndex.isEmpty {
-            var labelText = " \(date)\n"
-
-            // Iterate over all entries at the same x-value
-            for otherEntry in entriesAtSameIndex {
-                guard let otherDataDict = otherEntry.data as? [String: Any],
-                      let otherLabel = otherDataDict["label"] as? String else {
-                    continue
-                }
-
-                // Check if the y-values are the same
-                if otherEntry.y == entry.y {
-                    labelText += " \(otherLabel): \(entry.y)"
-                }
-            }
-
-            label.text = labelText
-            label.textAlignment = .left  // Set the text alignment back to left for the entire label
-            label.lineBreakMode = .byWordWrapping
-        }
-
-        // Calculate the size of the label's text
         let labelSize = label.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
 
-        // Adjust the size of the marker view based on the label's text size
-        self.bounds.size.width = labelSize.width + 20 // Add some padding
-        self.bounds.size.height = labelSize.height + 30 // Add some padding
+        self.bounds.size.width = labelSize.width + 20
+
+        self.bounds.size.height = labelSize.height + 30
 
         label.frame = CGRect(x: 10, y: 10, width: labelSize.width, height: labelSize.height)
-
+     
         label.textColor = UIColor.white
-
+     
         // Adjust the offset
-  
-        var offset = CGPoint(x: 0, y: -bounds.height - 12)
 
-        offset.x = -(bounds.width / 2) - 10 // Adjusted by subtracting 10 to move it to the left
-        offset.y = min(offset.y, -(bounds.height / 2))
-        offset.y = max(offset.y, -(bounds.height / 2) - 12)
+        var offset = CGPoint(x: -(bounds.width / 2), y: -bounds.height - 12)
 
         self.offset = offset
 
     }
+
+
 }

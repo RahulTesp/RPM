@@ -76,36 +76,76 @@ struct chart30DaysView: View {
     /// **Function to get the appropriate chart view dynamically**
     @ViewBuilder
     func getChartView(for vitalName: String, values: [Valuev], days: [String]) -> some View {
-        switch values.count {
-        case 3 where vitalName == "Blood Pressure":
+        switch vitalName {
+        case "Blood Pressure" where values.count == 3:
             MultiLineChartView3v(
                 entries1: getEntries(valueSummary: values, entryIndex: 0),
                 entries2: getEntries(valueSummary: values, entryIndex: 1),
                 entries3: getEntries(valueSummary: values, entryIndex: 2),
                 days: getDaysv7(patientSummary: days),
                 item: item,
+                lineColors: ChartColors.bloodPressure,
                 highlightedIndex: $highlightedIndex
-            )   .padding()
-        case 2:
-            MultiLineChartView2v(
-                entries1: getEntries(valueSummary: values, entryIndex: 0),
-                entries2: getEntries(valueSummary: values, entryIndex: 1),
-                days: getDaysv7(patientSummary: days),
-                item: item,
-                highlightedIndex: $highlightedIndex
-            )   .padding()
-        case 1:
+            )
+            .padding(.top, 8)
+        case "Blood Glucose":
+            if values.count == 1 {
+                MultiLineChartView1v(
+                    entries1: getEntries(valueSummary: values, entryIndex: 0),
+                    days: getDaysv7(patientSummary: days),
+                    item: item,
+                    lineColors: [ChartColors.bloodGlucose[0]], // Always use blue for single glucose
+                    highlightedIndex: $highlightedIndex
+                )
+                .padding(.top, 8)
+            } else if values.count == 2 {
+                MultiLineChartView2v(
+                    entries1: getEntries(valueSummary: values, entryIndex: 0),
+                    entries2: getEntries(valueSummary: values, entryIndex: 1),
+                    days: getDaysv7(patientSummary: days),
+                    item: item,
+                    lineColors: ChartColors.bloodGlucose, // Blue + Pink
+                    highlightedIndex: $highlightedIndex
+                )
+                .padding(.top, 8)
+            }
+        case "Oxygen":
+            if values.count == 1 {
+                MultiLineChartView1v(
+                    entries1: getEntries(valueSummary: values, entryIndex: 0),
+                    days: getDaysv7(patientSummary: days),
+                    item: item,
+                    lineColors: [ChartColors.oxygen[0]],
+                    highlightedIndex: $highlightedIndex
+                )
+                .padding(.top, 8)
+            }
+            else if values.count == 2 {
+                MultiLineChartView2v(
+                    entries1: getEntries(valueSummary: values, entryIndex: 0),
+                    entries2: getEntries(valueSummary: values, entryIndex: 1),
+                    days: getDaysv7(patientSummary: days),
+                    item: item,
+                    lineColors: ChartColors.oxygen,
+                    highlightedIndex: $highlightedIndex
+                )
+                .padding(.top, 8)
+            }
+                
+                
+        case "Weight":
             MultiLineChartView1v(
                 entries1: getEntries(valueSummary: values, entryIndex: 0),
                 days: getDaysv7(patientSummary: days),
                 item: item,
+                lineColors: [ChartColors.weight],
                 highlightedIndex: $highlightedIndex
-            )   .padding()
+            )
+            .padding(.top, 8)
         default:
             Text("Unsupported Vital Type")
         }
     }
-    
     /// **Function to generate the legend dynamically**
   
     @ViewBuilder
@@ -127,42 +167,25 @@ struct chart30DaysView: View {
         .padding(8)
     }
     
-
     
     func getColor(for index: Int, vitalName: String, valuesCount: Int) -> Color {
         switch vitalName {
         case "Oxygen":
-            let oxygenColors: [Color] = [
-                Color(red: 0.176, green: 0.498, blue: 0.757), // Oxygen line color
-                Color(red: 0.91, green: 0.478, blue: 0.643)  // Pulse line color
-            ]
-            return oxygenColors[index % oxygenColors.count]
-            
+            return ChartColors.oxygen[index % ChartColors.oxygen.count]
         case "Blood Pressure":
-            let bpColors: [Color] = [
-                Color(red: 0.20, green: 0.34, blue: 0.10), // Green
-                Color(red: 0.55, green: 0.35, blue: 0.96), // Purple
-                Color(red: 0.57, green: 0.00, blue: 0.23)  // Red
-            ]
-            return bpColors[index % bpColors.count]
-            
+            return ChartColors.bloodPressure[index % ChartColors.bloodPressure.count]
         case "Blood Glucose":
-               // Dynamic BG colors based on number of values
-               let bgColors: [Color] = valuesCount == 2 ?
-                   [Color(red: 0.91, green: 0.478, blue: 0.643),  // Non-Fasting
-                    Color(red: 0.176, green: 0.498, blue: 0.757)] // Fasting
-                   :
-                   [Color(red: 0.176, green: 0.498, blue: 0.757)] // Only one line
-               return bgColors[index % bgColors.count]
-            
+            if valuesCount == 1 {
+                return ChartColors.bloodGlucose[0] // Fasting (Blue)
+            } else {
+                return ChartColors.bloodGlucose[index % ChartColors.bloodGlucose.count]
+            }
+        case "Weight":
+            return ChartColors.weight
         default:
-            let defaultColors: [Color] = [
-                Color(red: 0.20, green: 0.34, blue: 0.10), // Green
-                Color(red: 0.55, green: 0.35, blue: 0.96), // Purple
-                Color(red: 0.57, green: 0.00, blue: 0.23)  // Red
-            ]
-            return defaultColors[index % defaultColors.count]
+            return ChartColors.singleLine
         }
     }
-
+    
+    
 }

@@ -32,12 +32,9 @@ struct RPMLoginView: View {
 
     
 #if DEBUG
-//    @State private var username: String = "AHV01927"
-//    @State private var password: String = "cXPJKIWQ"
 
-    
-    @State private var username: String = "IIM02328"
-    @State private var password: String = "LX3JYcTU"
+    @State private var username: String = ""
+    @State private var password: String = ""
     
 
     

@@ -360,10 +360,11 @@ struct MessageListView: View {
                 })
                 
                 .onAppear(perform: {
-                    
+                    print("onappearheartbeat")
                     handleOnAppear()
                     
                     heartbeatTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { _ in
+                        print("HEARTBEATTIMER")
                            sendHeartbeat()
                        }
               
@@ -639,6 +640,7 @@ struct MessageListView: View {
     }
     
     private func sendHeartbeat() {
+        print("sendheartbeatmethodcall")
         let sid: String = conversation.sid ?? ""
         let user = UserDefaults.standard.string(forKey: "patientUserNameString") ?? "UnknownUser"
         
