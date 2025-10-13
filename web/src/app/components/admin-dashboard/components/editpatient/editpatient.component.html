@@ -1755,7 +1755,8 @@
                             <p class="main_input_title">*Vital Monitoring</p>
                             <div *ngIf="device.DeviceStatus == 'InActive'">
                               <!-- Renders only if the selection is valid -->
-                              <select
+                              <select 
+                              [disabled]="!device.isEditable"
                               *ngIf="!device.invalidSelection"
                               class="userInfovalue"
                               id="editDeviceVitalInActive"
@@ -1763,11 +1764,11 @@
                               [ngModelOptions]="{ standalone: true }"
                               (change)="onVitalChange(device, $event)"
                               >
-                              <ng-container *ngFor="let x of getUniqueVitals()">
+                              <ng-container *ngFor="let x of uniqueVitals">
                                 <option *ngIf="x.VitalName != ''" [value]="x.VitalId">
                                   {{ x.VitalName }}
                                 </option>
-                              </ng-container>
+                              </ng-container> 
                               </select>
                             </div>
                             <div *ngIf="device.DeviceStatus != 'InActive'">
@@ -1795,7 +1796,7 @@
                         <div class="second_panel">
                           <div class="userInfoItem">
                             <p class="main_input_title">*Device Type</p>
-                            <select
+                           <select
                               [disabled]="true"
                               id="editDeviceType"
                               *ngIf="device.DeviceCommunicationType"
@@ -1811,7 +1812,7 @@
                             <select
                               *ngIf="!device.DeviceCommunicationType"
                               class="userInfovalue"
-                              id="editDeviceTypeLTE"
+                              id="editDeviceTypeLTE_{{i}}"
                               placeholder="LTE"
                               [(ngModel)]="deviceTypeDataId"
                               [ngModelOptions]="{ standalone: true }"
@@ -1859,6 +1860,31 @@
                           </div>
                           <div class="userInfoItem">
                             <p class="main_input_title">*Device Id</p>
+                            <div *ngIf="!device.VitalId">
+                              <div *ngIf="device.DeviceStatus == 'InActive'">
+                                <ng-autocomplete
+                                  [data]="[]"
+                                  [searchKeyword]="keyword"
+                                  placeholder="Select Device"
+                                  id="editDeviceId1"
+                                  (selected)="selectEvent($event, i)"
+                                  (inputChanged)="onChangeSearch($event)"
+                                  (inputFocused)="onFocused($event)"
+                                  [itemTemplate]="itemTemplate"
+                                  [notFoundTemplate]="notFoundTemplate"
+                                >
+                                </ng-autocomplete>
+
+                                <ng-template #itemTemplate let-item>
+                                  <a [innerHTML]="item.DeviceNumber"></a>
+                                </ng-template>
+
+                                <ng-template #notFoundTemplate let-notFound>
+                                  <div [innerHTML]="notFound"></div>
+                                </ng-template>
+                              </div>
+                              
+                            </div>
                             <div *ngIf="device.VitalId == 1">
                               <div *ngIf="device.DeviceStatus == 'InActive'">
                                 <ng-autocomplete

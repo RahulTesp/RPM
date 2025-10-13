@@ -523,7 +523,7 @@ export class DownloadPatientReportService {
     this.renderCriticalEvents(doc, criticalAlerts, goalh);
   }
 
-  // ✅ Render Goals
+ /* // ✅ Render Goals
   private renderGoals(doc: jsPDF, goals: any[], startHeight: number): number {
     let goalh = startHeight;
     goals.forEach((goal) => {
@@ -577,7 +577,75 @@ export class DownloadPatientReportService {
     } else {
       doc.text('No Data', 20, goalh);
     }
+  }*/
+
+
+
+
+    
+private renderGoals(doc: jsPDF, goals: any[], startHeight: number): number {
+  let goalh = startHeight;
+  const pageHeight = doc.internal.pageSize.height;
+
+  goals.forEach(goal => {
+    // Page break check
+    if (goalh + 20 > pageHeight - 20) {
+      doc.addPage();
+      goalh = 20;
+    }
+
+    this.setSubHeadingStyle(doc);
+    doc.text(goal.Goal, 15, goalh);
+    const textWidth = doc.getTextWidth(goal.Goal);
+    doc.line(15, goalh + 1, 15 + textWidth, goalh + 1);
+
+    goalh += 6;
+    this.setContentStyle(doc);
+
+    const wrappedDescription = doc.splitTextToSize(goal.Description, 180);
+    doc.text(wrappedDescription, 20, goalh);
+    goalh += wrappedDescription.length * 5 + 4; // compact spacing
+  });
+
+  return goalh;
+}
+
+private renderCriticalEvents(doc: jsPDF, alerts: any[], startHeight: number): void {
+  // Always start on a new page
+  doc.addPage();
+  let goalh = 20; // Reset Y for new page
+  const pageHeight = doc.internal.pageSize.height;
+
+  this.setSubHeadingStyle(doc);
+  const eventsTitle = 'Critical Events';
+  doc.text(eventsTitle, 15, goalh);
+  const textWidth = doc.getTextWidth(eventsTitle);
+  doc.line(15, goalh + 1, 15 + textWidth, goalh + 1);
+  goalh += 6;
+
+  this.setContentStyle(doc);
+
+  if (alerts.length > 0) {
+    alerts.forEach(alert => {
+      // Page break check for long content
+      if (goalh + 20 > pageHeight - 20) {
+        doc.addPage();
+        goalh = 20;
+      }
+
+      const formattedDate = this.formatDate(alert.Time);
+      doc.text(formattedDate, 20, goalh);
+      goalh += 5;
+
+      const wrappedAlert = doc.splitTextToSize(alert.VitalAlert, 180);
+      doc.text(wrappedAlert, 20, goalh);
+      goalh += wrappedAlert.length * 5 + 4;
+    });
+  } else {
+    doc.text('No Data', 20, goalh);
   }
+}
+
   //Notes
 
   // ✅ Fetch and Populate Notes Details Recursively
@@ -678,8 +746,7 @@ private addTextWithBreak(
   const pageHeight = doc.internal.pageSize.height;
 
   // Reset font and color before adding text
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(0, 0, 0);
+  this.setNormalStyle(doc);
 
   if (this.Notesh + lines.length * lineHeight > pageHeight) {
     doc.addPage();
@@ -707,6 +774,8 @@ private forceWrapLongWords(text: string, maxWordLength: number = 50): string {
 
 // ✅ Render a block of text with wrapping and page-break handling
 private renderTextBlock(doc: jsPDF, text: string, x: number): void {
+  
+  this.setNormalStyle(doc);
   const maxWidth = 170;
   const lineHeight = 6;
 
@@ -716,10 +785,6 @@ private renderTextBlock(doc: jsPDF, text: string, x: number): void {
   const estimatedHeight = lines.length * lineHeight;
 
   this.checkPageBreak(doc, estimatedHeight);
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(12);
-  doc.setTextColor(0, 0, 0);
   doc.text(lines, x, this.Notesh);
 
   this.Notesh += estimatedHeight;
@@ -754,6 +819,7 @@ private renderAnswers(doc: jsPDF, answers: any[], x: number): void {
   const margin = 15;
   const maxWidth = pageWidth - margin * 2;
   const lineHeight = 6;
+  this.setNormalStyle(doc);
 
   if (answers.length > 0) {
     for (const answer of answers) {
@@ -869,7 +935,9 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
 
   // ✅ Process Sub Questions
   private processSubQuestions(doc: jsPDF, subQuestions: any[]): void {
+    this.setNormalStyle(doc);
     subQuestions.forEach((subQuestion) => {
+       
       this.Notesh += 5;
       this.checkPageSpace(doc);
       this.setPages(doc, subQuestion.Question, 25);
@@ -1073,8 +1141,8 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
 
     this.drawsymptomsLine(doc, title, 15);
     this.symptomh += 10;
-
-    if (data.length > 0) {
+    if(data && data.length > 0){
+    //if (data.length > 0) {
       renderFunction(doc, data);
     } else {
       doc.text('', 15, this.symptomh + 10);
@@ -1807,8 +1875,8 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
     doc.line(x, this.symptomh + 1, x + textWidth, this.symptomh + 1);
   }
   // ✅ Utility function: Set Text on Page
-  private setPages(doc: jsPDF, text: string, x: number): void {
-  
+  private setPages(doc: jsPDF, text: string, x: number): void { 
+   this.setNormalStyle(doc);
    const pageWidth = doc.internal.pageSize.getWidth();
    const margin = 15; // left/right margin
    const maxWidth = pageWidth - margin * 2; // available width for text
@@ -1817,25 +1885,23 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
    doc.text(wrappedText, x, this.Notesh);
   }
   
-
-  
-  private setSymptomPages(doc: jsPDF, text: string, x: number): void {
-  
-  doc.setFont('helvetica', 'normal'); // Remove bold
-  doc.setTextColor('black');
-
+private setSymptomPages(doc: jsPDF, text: string, x: number): void {
+  this.setNormalStyle(doc);
   const pageWidth = doc.internal.pageSize.getWidth();
-  const margin = 15; // left/right margin
-  const maxWidth = pageWidth - margin * 2; // available width for text
-
-  // Split text into multiple lines to fit within maxWidth
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 15;
+  const maxWidth = pageWidth - margin * 2;
   const wrappedText = doc.splitTextToSize(text, maxWidth);
 
-  // Render the wrapped text
-  doc.text(wrappedText, x, this.symptomh);
+  // Check if content fits on current page
+  if (this.symptomh + wrappedText.length * 6 > pageHeight - 20) {
+    doc.addPage();
+    this.symptomh = 20; // reset Y for new page
+  }
 
-  // Update Y position for next content
-  this.symptomh += wrappedText.length * 6; // adjust line height
+  doc.text(wrappedText, x, this.symptomh);
+  // Compact spacing
+  this.symptomh += wrappedText.length * 5 + 4;
 }
 
   
@@ -1940,4 +2006,13 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
   // Convert UTC → Local and format
   return dayjs.utc(normalized).local().format('MM/DD/YYYY');
 }
+
+
+
+private setNormalStyle(doc: jsPDF): void {
+  doc.setFont('helvetica', 'normal');  // Normal font
+  doc.setFontSize(12);                 // Standard size
+  doc.setTextColor(0, 0, 0);           // Black color
+}
+
 }
