@@ -1557,7 +1557,7 @@ namespace RPMWeb.Dal
                             info.Senddate = formattedDate;
                             info.Senddate = info.Senddate.ToString();
                             info.FromNumber = reader["FromNo"].ToString();
-                            info.Id = Convert.ToInt16(reader["Id"]);
+                            info.Id = Convert.ToInt32(reader["Id"]);
                             info.Message = reader["SmsBody"].ToString();
 
 
