@@ -1543,13 +1543,14 @@
                       <div class="userInfoItem">
                         <p class="main_input_title">Date</p>
                         <p class="userInfovalue">
-                          {{
-                            convertDateMMDD(
-                              this.convertToLocalTime(
-                                ActiveDetails.AssignedDate
-                              )
-                            )
-                          }}
+                           {{ 
+                              convertDateMMDD(
+                                this.convertToLocalTime(
+                                  ActiveDetails.AssignedDate
+                                )
+                              ) 
+                              | date: 'MM-dd-yyyy' 
+                            }}
                         </p>
                       </div>
                     </div>
@@ -1586,7 +1587,7 @@
                               this.convertToLocalTime(
                                 ReadyToDischarge.AssignedDate
                               )
-                            )
+                            ) | date: 'MM-dd-yyyy'
                           }}
                         </p>
                       </div>
@@ -1619,7 +1620,7 @@
                       <div class="userInfoItem">
                         <p class="main_input_title">Date</p>
                         <p class="userInfovalue">
-                          {{ convertDateMMDD(Discharged.AssignedDate) }}
+                          {{ convertDateMMDD(Discharged.AssignedDate)| date: 'MM-dd-yyyy' }}
                         </p>
                       </div>
                     </div>
@@ -1652,7 +1653,7 @@
                           {{
                             convertDateMMDD(
                               this.convertToLocalTime(OnHold.AssignedDate)
-                            )
+                            )| date: 'MM-dd-yyyy' 
                           }}
                         </p>
                       </div>
@@ -1684,7 +1685,7 @@
                           {{
                             convertDateMMDD(
                               this.convertToLocalTime(InActive.AssignedDate)
-                            )
+                            )| date: 'MM-dd-yyyy' 
                           }}
                         </p>
                       </div>

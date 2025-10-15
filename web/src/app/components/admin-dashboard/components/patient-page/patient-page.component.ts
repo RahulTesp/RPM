@@ -1171,6 +1171,8 @@ convertToLocalTime(stillUtc: any) {
       )
       .then((data2) => {
         this.billingInfodata = data2;
+        console.log('Billing Data');
+        console.log(this.billingInfodata);
 
         this.http_billing_data_info =
           this.billingInfodata.PatientBilldataRecords;

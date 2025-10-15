@@ -28,6 +28,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -68,6 +69,7 @@ export class SidePanelPatientComponent implements OnInit {
   nightSchedule = false;
   loading: any;
   loading_note: any;
+  minStartDate: string | null = null; 
 
 
   @Input() activityMenuVariable: any;
@@ -377,6 +379,8 @@ export class SidePanelPatientComponent implements OnInit {
       Notes: '',
     },
   ];
+  this.minStartDate = this.datepipe.transform(new Date(), 'yyyy-MM-dd');
+
 }
 
 

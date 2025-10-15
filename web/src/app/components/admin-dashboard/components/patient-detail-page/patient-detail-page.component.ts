@@ -490,7 +490,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.DownloadStatus = false;
 
     // Fetch Health Trends
-    this.getHealthTrends(this.heath_trends_frequency);
+    //this.getHealthTrends(this.heath_trends_frequency);
     this.getVitalHealthTrendDataGraph(this.heath_trends_frequency);
   }
 
@@ -2652,7 +2652,13 @@ getFirstPresentVital(vitalScreen: any) {
       this.healthtrenddisplay = this.http_healthtrends.length > 0;
 
       if (this.healthtrendVitalNameArray.length > 0) {
-        this.onHealthTrendVitalClick(this.healthtrendVitalNameArray[0], daycount);
+        if(this.selectedVital == "")
+        {
+          this.onHealthTrendVitalClick(this.healthtrendVitalNameArray[0], daycount);
+        }else{
+          this.onHealthTrendVitalClick(this.selectedVital, daycount);
+        }
+        
       }
 
     } catch (error) {
@@ -2783,7 +2789,8 @@ getFirstPresentVital(vitalScreen: any) {
     this.http_healthtrends_current_data = this.http_healthtrends.filter(
       (item: { VitalName: string }) => item.VitalName === vital
     );
-
+     console.log("Health Trend onHealthTrendVitalClick");
+     console.log(this.http_healthtrends_current_data)
     if (!this.http_healthtrends_current_data[0] || this.http_healthtrends_current_data[0].Values.length === 0) {
       this.setGraphFallback(duration);
       return;

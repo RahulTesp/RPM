@@ -11,7 +11,7 @@ export class MasterDataService {
 
   constructor(private rpm: RPMService) {}
 
-getFilteredTaskAssignees(
+  getFilteredTaskAssignees(
   roleId: number,
   patientId?: number,
   userId?: number
@@ -38,6 +38,8 @@ getFilteredTaskAssignees(
       }
 
       // 🧠 Filter by UserId if provided
+      // Note: This block currently runs ONLY if patientId is NOT present.
+      // If that's the desired logic (PatientId filter takes precedence), it's fine.
       else if (userId) {
         const userTeam = filteredAssignees.find((m) => m.UserId === +userId);
         if (userTeam) {
@@ -47,12 +49,72 @@ getFilteredTaskAssignees(
         }
       }
 
+      // -----------------------------------------------------------
+      // ✅ NEW: DE-DUPLICATION STEP (The Core Fix)
+      // Remove duplicate team members based on their unique UserId.
+      // -----------------------------------------------------------
+      const uniqueMembersMap = new Map();
+      
+      filteredAssignees.forEach((item: any) => {
+        // Use 'UserId' as the unique key for the map
+        if (!uniqueMembersMap.has(item.UserId)) {
+          uniqueMembersMap.set(item.UserId, item);
+        }
+      });
+      
+      // Convert the map values (the unique objects) back to an array
+      const finalUniqueAssignees = Array.from(uniqueMembersMap.values());
+      // -----------------------------------------------------------
+
       return {
         taskMasterData: response,
-        filteredAssignees,
+        filteredAssignees: finalUniqueAssignees, // Return the guaranteed unique list
       };
     });
 }
+
+// getFilteredTaskAssignees(
+//   roleId: number,
+//   patientId?: number,
+//   userId?: number
+// ): Promise<{
+//   taskMasterData: TaskMasterData;
+//   filteredAssignees: any[];
+// }> {
+//   return this.rpm
+//     .rpm_get(`/api/tasks/gettaskmasterdata?RoleId=${roleId}`)
+//     .then((data) => {
+//       const response = data as TaskMasterData;
+//       let filteredAssignees = response.CareTeamMembersList;
+
+//       // 🧠 Filter by PatientId if provided
+//       if (patientId) {
+//         const currentCareTeam = response.PatientList.find(
+//           (p) => p.PatientId === patientId
+//         );
+//         if (currentCareTeam) {
+//           filteredAssignees = filteredAssignees.filter(
+//             (member) => member.CareTeamId === currentCareTeam.CareTeamId
+//           );
+//         }
+//       }
+
+//       // 🧠 Filter by UserId if provided
+//       else if (userId) {
+//         const userTeam = filteredAssignees.find((m) => m.UserId === +userId);
+//         if (userTeam) {
+//           filteredAssignees = filteredAssignees.filter(
+//             (m) => m.CareTeamId === userTeam.CareTeamId
+//           );
+//         }
+//       }
+
+//       return {
+//         taskMasterData: response,
+//         filteredAssignees,
+//       };
+//     });
+// }
 getScheduleMasterData(roleId: number, patientUserId?: number): Promise<{
   rawData: any;
   scheduleTypes: any[];

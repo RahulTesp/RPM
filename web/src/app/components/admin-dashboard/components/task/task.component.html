@@ -231,8 +231,10 @@
           *matCellDef="let element; let rowIndex = index"
           [ngClass]="{
             Critical_text: element.Prioriy == 'Critical',
-            Missing_text: element.Prioriy == 'Cautious'
+            Missing_text: element.Prioriy == 'Cautious',
+             'task-type-truncated': true
           }"
+          [attr.title]="element.VitalAlert"
         >
           {{ element.VitalAlert }}
         </mat-cell>
