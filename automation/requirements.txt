@@ -1,0 +1,5 @@
+openpyxl~=3.1.5
+pytest~=8.4.1
+playwright~=1.54.0
+faker~=28.4.1
+pytest-html~=4.1.1
