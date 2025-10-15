@@ -114,3 +114,15 @@ input[type="radio"] {
 {
   opacity: 0; 
 }
+
+canvas.charttrends {
+  width: 98% !important;
+  height: 98% !important;
+  display: block;
+  background-color: #ffffff;
+}
+.chart-wrapper-scrollfix {
+  position: relative;
+  overflow: hidden;
+  height: 0;
+}

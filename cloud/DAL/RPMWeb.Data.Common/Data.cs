@@ -564,7 +564,7 @@ namespace RPMWeb.Data.Common
         public string DOB { get; set; }
 
         public string Gender { get; set; }
-        public int Height { get; set; }
+        public float Height { get; set; }
         public int Weight { get; set; }
         public string Email { get; set; }
         public string PhoneNo { get; set; }
@@ -1572,6 +1572,7 @@ namespace RPMWeb.Data.Common
         public object deviceData { get; set; }
         public bool isTest { get; set; }
         public string modelNumber { get; set; }
+        public string messageType { get; set; }
     }
 
     public class DeviceTelemetryStatus

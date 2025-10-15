@@ -25,133 +25,18 @@ struct RPMLoginView: View {
     @EnvironmentObject var localParticipant: LocalParticipantManager
     @EnvironmentObject var mediaSetupViewModel: MediaSetupViewModel
     @EnvironmentObject var homeViewModel: RPMHomeViewModel
+    @EnvironmentObject var sessionManager: SessionManager
     @State private var showLoginErrorAlert = false
     @State private var loginAlertTitle = ""
     @State private var loginAlertMessage = ""
 
     
 #if DEBUG
-//    @State private var username: String = "AHV01927"
-//    @State private var password: String = "cXPJKIWQ"
-    
-    @State private var username: String = "ARPL00116"
-    @State private var password: String = "TEsplabs@123"
-    
-//    
-//    @State private var username: String = "WSPC02061"
-//    @State private var password: String = "TO5SV452"
-    
-//    @State private var username: String = "WSPC00385"
-//    @State private var password: String = "GLXQUPcY"
-    //oxygen
-    //    @State private var username: String = "121501988"
-    //    @State private var password: String = "GI5T88YW"
-    
-//
-//    @State private var username: String = "19801972"
-//    @State private var password: String = "GSOX5NMM"
-//    @State private var password: String = "GSOX5NMM"
-    
-//    @State private var username: String = "SMD01846"
-//    @State private var password: String = "I5TOBWHB"
-//    
-//    @State private var username: String = "SMD01847"
-//    @State private var password: String = "PND6RM8L"
-    
-//    @State private var username: String = "ARPL00104"
-//    @State private var password: String = "BH5587GQ"
-    
-//    @State private var username: String = "123400033"
-//    @State private var password: String = "GcTQOHLV"
-    
-//    @State private var username: String = "154201932"
-//    @State private var password: String = "ODJVOBCB"
-//    @State private var username: String = "WSPC01933"
-//    @State private var password: String = "7YLDDXQF"
 
-//    @State private var username: String = "154201949"
-//    @State private var password: String = "RF3JVNNN"
+    @State private var username: String = ""
+    @State private var password: String = ""
     
-//    @State private var username: String = "AFC01952"
-//    @State private var password: String = "J3bCBUI6"
-    
-//    @State private var username: String = "SPCP01554"
-//    @State private var password: String = "QTN4QNT7"
-    
-//    @State private var username: String = "19801970"
-//    @State private var password: String = "TKVTQNFN"
-    
-//    @State private var username: String = "154200183"
-//    @State private var password: String = "MUIbQJRJ"
-    
-//    @State private var username: String = "154200189"
-//    @State private var password: String = "O8DQO4RY"
-//    @State private var username: String = "154200224"
-//    @State private var password: String = "4UN53BX4"
-    
-//    @State private var username: String = "154200202"
-//    @State private var password: String = "MTSY68KU"
-//    
-//    @State private var username: String = "154200216"
-//    @State private var password: String = "5P7XTbWQ"
-    
-    
-//    @State private var username: String = "154200230"
-//    @State private var password: String = "IJSX7LOd"
-    
-//    @State private var username: String = "154200231"
-//    @State private var password: String = "5CWC4PWV"
-    
-//    @State private var username: String = "SUPC01979"
-//    @State private var password: String = "bL4KdW8M"
-    
-//        @State private var username: String = "121501944"
-//        @State private var password: String = "YEB8N6BU"
-    
-    
-//        @State private var username: String = "IIM02261"
-//        @State private var password: String = "EMSOdWBC"
-    
-    //multi
-//            @State private var username: String = "HKP02268"
-//            @State private var password: String = "UL67NWDL"
-//                @State private var username: String = "HKP02267"
-//                @State private var password: String = "NIXXWRTD"
-    
-//    @State private var username: String = "AFC01099"
-//    @State private var password: String = "FT5ObXIV"
-    
-//    @State private var username: String = "123400968"
-//    @State private var password: String = "HLGV5O6F"
-    
-//    @State private var username: String = "123400966"
-//    @State private var password: String = "KWIYYCbd"
-    
-//    @State private var username: String = "FCC002065"
-//    @State private var password: String = "5RcXTCC7"
-    
-//    @State private var username: String = "FCC002066"
-//    @State private var password: String = "JE4VRY6c"
-    
-//    @State private var username: String = "123401015"
-//    @State private var password: String = "ULU4GSWc"
-    
-//    @State private var username: String = "123401017"
-//    @State private var password: String = "7YTCGVSN"
-    
-//                @State private var username: String = "FCC002269"
-//                @State private var password: String = "ET8ddbPD"
-    
-//    @State private var username: String = "HKP02197"
-//    @State private var password: String = "7Y7VUMK2"
-    
-    //cx dev cindyj
-    
-//    @State private var username: String = "DLPC01997"
-//    @State private var password: String = "RB4HcRQ4"
-    
-//    @State private var username: String = ""
-//    @State private var password: String = ""
+
     
 #else
     @State private var username: String = ""

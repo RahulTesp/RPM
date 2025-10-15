@@ -30,11 +30,17 @@ struct RPMApp: App {
     @StateObject private var sessionManager = SessionManager.shared
     @StateObject private var networkMonitor = NetworkMonitor()
     @StateObject var memberDetList = MembersListViewModel()
-
+    @StateObject  var notifList = NotificationViewModel()
 
     // Only one init, which sets up the app model.
     init() {
         _model = StateObject(wrappedValue: AppModel.shared)
+        
+        NSLog("RPMApp.init() called")
+        
+        // Force early initialization
+          print("AppModel.shared early init:", AppModel.shared)
+
         
         if !UserDefaults.standard.bool(forKey: "wasInBackground") {
                   // Reset termination flag if not backgrounded
@@ -61,6 +67,7 @@ struct RPMApp: App {
                     .environmentObject(networkMonitor)
                     .environmentObject(sessionManager)
                     .environmentObject(memberDetList)
+                    .environmentObject(notifList)
                 
                     .onAppear {
                         print("AppModel in RPMTabBar:", model)
@@ -71,37 +78,59 @@ struct RPMApp: App {
                                                print("Conversation Manager: \(model.conversationManager != nil ? "Initialized" : "Not Initialized")")
                                                print("Messages Manager: \(model.messagesManager != nil ? "Initialized" : "Not Initialized")")
                                                print("Participants Manager: \(model.participantsManager != nil ? "Initialized" : "Not Initialized")")
+                        
+                        
+                       
+                    }
+                
+
+                    .onChange(of: scenePhase) { phase in
+                        if phase == .active {
+                            print("App came to foreground")
+                            print("RPMApp model instance:", model)
+                            print("AppModel.shared instance:", AppModel.shared)
+                            print("Are they same?", model === AppModel.shared)
+                            
+                            notifList.getnotify()
+                            SessionManager.shared.logoutIfTokenExpired()
+                            
+                            model.refreshUnreadIfReady()
+                        }
+                        if phase == .background {
+                            print("App moved to background")
+                        }
+                        
+                    }
+
+
+                    .onChange(of: model.isClientReady) { isReady in
+                        if isReady {
+                            print("Client is ready, refreshing unread count")
+                            model.conversationManager.refreshUnreadCount()
+                        } else {
+                            print("Client not ready yet")
+                        }
                     }
                 
                     .onChange(of: sessionManager.didReceiveUnauthorized) { isUnauthorized in
+                        print("calling onchange", isUnauthorized)
                         if isUnauthorized {
-                            print("Received 401 Unauthorized. Logging out...")
+                            print("RPM APP Received 401 Unauthorized. Logging out...")
 
-                            homeViewModel.reset()
-
-                            // Step 1: Logout API call
-                            loginStateViewModel.logout { response, alert in
-                                print("Logout server call finished")
-
-                                if let alert = alert {
-                                    print("Logout failed: \(alert.title)")  // log for debugging
-                                }
-
-                                // Step 2: Always clean app state, even if logout fails
-                                Task { @MainActor in
-                                    model.signOutChat()
-                                    callManager.disconnect()
-                                    roomManager.disconnect()
-                                    
-                                    navigationHelper.path = []
-                                    loginStateViewModel.isAuthenticated = false
-                                    
-                                    print("navigationHelper.path after logout: \(navigationHelper.path)")
-                                }
+                            Task { @MainActor in
+                                sessionManager.logoutWithFirebaseToken(
+                                    appModel: model,
+                                    homeViewModel: homeViewModel,
+                                    navigationHelper: navigationHelper,
+                                    loginViewModel: loginStateViewModel,
+                                    callManager: callManager,
+                                    roomManager: roomManager
+                                )
                             }
                         }
                     }
 
+                
                     .navigationDestination(for: Screen.self) { screen in
                         switch screen {
                         case .loginView:
@@ -117,6 +146,7 @@ struct RPMApp: App {
                                 .environmentObject(mediaSetupViewModel)
                                 .environmentObject(homeViewModel)
                                 .environmentObject(loginStateViewModel)
+                                .environmentObject(sessionManager)
                             
                         case .forgotPassword:
                                   RPMGenerateOTPView()
@@ -145,6 +175,7 @@ struct RPMApp: App {
                                 .environmentObject(mediaSetupViewModel)
                                 .environmentObject(homeViewModel)
                                 .environmentObject(loginStateViewModel)
+                                .environmentObject(sessionManager)
                             
                         case .programInfoView:
                                    RPMProgramInfoView()
@@ -176,6 +207,7 @@ struct RPMApp: App {
                             
                         case .notificationView:
                             RPMNotificationView()
+                                .environmentObject(notifList)
                             
                         case .conversationsList:
                             ConversationsList()
@@ -194,24 +226,28 @@ struct RPMApp: App {
                             .environmentObject(navigationHelper)
                             .environmentObject(memberDetList)
                       
-                        case .messageList(let conversation):
-                            makeMessageListView(for: conversation)
+                            
+                        case .messageList(let conversation, let fromCreate):
+                            makeMessageListView(for: conversation, fromCreate: fromCreate)
+
 
                         }
                     }
             }
         }
     }
+ 
     
     @ViewBuilder
-    private func makeMessageListView(for conversation: PersistentConversationDataItem) -> some View {
+    private func makeMessageListView(for conversation: PersistentConversationDataItem, fromCreate: Bool) -> some View {
         let context = model.getManagedContext()
         let convItemViewModel = model.conversationManager.viewModel(for: conversation, context: context)
 
         MessageListView(
             conversation: conversation,
             viewModel: messageListViewModel,
-            convItemViewModel: convItemViewModel
+            convItemViewModel: convItemViewModel,
+            fromCreate: fromCreate   //  add this
         )
         .environmentObject(model)
         .environmentObject(model.conversationManager)
@@ -219,6 +255,7 @@ struct RPMApp: App {
         .environmentObject(model.participantsManager)
         .environmentObject(navigationHelper)
     }
+
 }
 
 
@@ -237,6 +274,7 @@ struct ApplicationSwitcher: View {
     @EnvironmentObject var networkMonitor: NetworkMonitor
     @State private var showNoInternetAlert = false
     @EnvironmentObject var sessionManager: SessionManager
+    @EnvironmentObject var notifList: NotificationViewModel
     
     var body: some View {
   
@@ -257,12 +295,15 @@ struct ApplicationSwitcher: View {
                     .environmentObject(loginViewModel)
                     .environmentObject(memberDetList)
                     .environmentObject(sessionManager)
+                    .environmentObject(notifList)
                     
                     .onAppear {
                         print("AppModel in RPMTabBarView:", appModel)
                         
                         // Trigger members API now that user is logged in
                                            memberDetList.memDetails()
+                        
+                        
                     }
             } else {
            
@@ -278,6 +319,7 @@ struct ApplicationSwitcher: View {
                     .environmentObject(mediaSetupViewModel)
                     .environmentObject(homeViewModel)
                     .environmentObject(loginViewModel)
+                    .environmentObject(sessionManager)
                 
                     .onAppear {
                         print("AppModel in RPMLoginView:", appModel)
@@ -334,7 +376,7 @@ struct ConnectivityBanner: View {
 enum Screen: Hashable{
     case loginView
     case createConversation
-    case messageList(conversation: PersistentConversationDataItem)
+    case messageList(conversation: PersistentConversationDataItem, fromCreate: Bool = false )
     case conversationsList
     case forgotPassword
     case resetPassword

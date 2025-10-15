@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -87,21 +88,31 @@ public class ProgramInfoFragment extends Fragment {
         setupTabIcons();
     }
 
+
     private void setupTabIcons() {
         tabLayout.removeAllTabs();
 
         if ("RPM".equals(ProgramName)) {
-            tabLayout.addTab(tabLayout.newTab().setIcon(tabIcons[0])); // Program
-            tabLayout.addTab(tabLayout.newTab().setIcon(tabIcons[1])); // Devices
-            tabLayout.addTab(tabLayout.newTab().setIcon(tabIcons[2])); // Vitals
-            tabLayout.addTab(tabLayout.newTab().setIcon(tabIcons[3])); // Insurance
-            tabLayout.addTab(tabLayout.newTab().setIcon(tabIcons[4])); // Timeline
+            tabLayout.addTab(tabLayout.newTab().setIcon(resizeIcon(R.drawable.icons_program, 55, 55)));
+            tabLayout.addTab(tabLayout.newTab().setIcon(resizeIcon(R.drawable.icons_devices, 50, 50)));
+            tabLayout.addTab(tabLayout.newTab().setIcon(resizeIcon(R.drawable.icons_vitals, 48, 48)));
+            tabLayout.addTab(tabLayout.newTab().setIcon(resizeIcon(R.drawable.icons_insurance, 48, 48)));
+            tabLayout.addTab(tabLayout.newTab().setIcon(resizeIcon(R.drawable.icons_timeline, 48, 48)));
         } else {
-            tabLayout.addTab(tabLayout.newTab().setIcon(tabIcons[0])); // Program
-            tabLayout.addTab(tabLayout.newTab().setIcon(tabIcons[3])); // Insurance
-            tabLayout.addTab(tabLayout.newTab().setIcon(tabIcons[4])); // Timeline
+            tabLayout.addTab(tabLayout.newTab().setIcon(resizeIcon(R.drawable.icons_program, 48, 48)));
+            tabLayout.addTab(tabLayout.newTab().setIcon(resizeIcon(R.drawable.icons_insurance, 48, 48)));
+            tabLayout.addTab(tabLayout.newTab().setIcon(resizeIcon(R.drawable.icons_timeline, 48, 48)));
         }
     }
+
+    private Drawable resizeIcon(int resId, int widthDp, int heightDp) {
+        Drawable icon = requireContext().getResources().getDrawable(resId);
+        int widthPx = (int) (widthDp * getResources().getDisplayMetrics().density);
+        int heightPx = (int) (heightDp * getResources().getDisplayMetrics().density);
+        icon.setBounds(0, 0, widthPx, heightPx);
+        return icon;
+    }
+
 
     private void initToolbar(View view) {
         androidx.appcompat.widget.Toolbar toolbar = view.findViewById(R.id.toolbar);

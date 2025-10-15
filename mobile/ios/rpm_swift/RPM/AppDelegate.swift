@@ -16,6 +16,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         
+        print("AppDelegate: didFinishLaunchingWithOptions")
+        
+        
         FirebaseApp.configure()
         
         UNUserNotificationCenter.current().delegate = self
@@ -42,6 +45,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func applicationWillTerminate(_ application: UIApplication) {
         print("App will terminate")
         UserDefaults.standard.set(true, forKey: "wasTerminated")
+        UserDefaults.standard.set(true, forKey: "needsLogout")
+
     }
     
     
@@ -60,6 +65,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     // MARK: FCM Token
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         print(" FCM Token: \(fcmToken ?? "")")
+        
+        // Save FCM token to UserDefaults
+            UserDefaults.standard.setValue(fcmToken, forKey: "FCMToken")
         // send to backend
     }
     
@@ -79,6 +87,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         print("Notification Tapped: \(response.notification.request.content.userInfo)")
         completionHandler()
     }
+    
+    
     
     func application(_ application: UIApplication,
                      didReceiveRemoteNotification userInfo: [AnyHashable: Any],

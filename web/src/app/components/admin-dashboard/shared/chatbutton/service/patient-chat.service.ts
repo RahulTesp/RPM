@@ -1,5 +1,6 @@
 // twilio.service.ts
-import { Injectable } from '@angular/core';
+import { Router, NavigationStart } from '@angular/router';
+import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import {
   Client,
@@ -21,7 +22,25 @@ interface TempMessage extends Partial<Message> {
   providedIn: 'root',
 
 })
-export class PatientChatService {
+export class PatientChatService implements OnDestroy{
+  private routerSubscription: Subscription;
+  constructor(private router: Router, private rpm: RPMService) {
+     this.removeMessageListeners();
+    this.routerSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationStart) {
+        // Clean up resources when navigating away
+        this.removeMessageListeners();
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+  // Clean up the router subscription
+  if (this.routerSubscription) {
+    this.routerSubscription.unsubscribe();
+  }
+}
+
   public client: Client | null = null;
   private chatHistoryDataSubject = new BehaviorSubject<any>(null);
 
@@ -42,8 +61,8 @@ export class PatientChatService {
   );
   private loadingSubject = new BehaviorSubject<boolean>(false);
   private errorSubject = new BehaviorSubject<string>('');
-  private messageListenerRegistered = false;
-
+  //private messageListenerRegistered = false;  
+private messageAddedListener: ((msg: Message) => void) | null = null;
   public chatList$ = this.chatListSubject.asObservable();
   public messages$ = this.messagesSubject.asObservable();
   // public isTyping$ = this.isTypingSubject.asObservable();
@@ -58,7 +77,7 @@ export class PatientChatService {
   private currentTime: Date = new Date();
   private currentPatientUser: string = '';
 
-  constructor(private rpm: RPMService) {}
+  //constructor(private rpm: RPMService) {}
 
   public initialized = false;
 
@@ -166,21 +185,29 @@ private messageAddedListenerCount: number = 0;
   // Event listeners
   private setupEventListeners(): void {
     if (!this.client) return;
+    
+  // Remove any existing listeners to avoid duplicates
+    this.removeMessageListeners();
+    // Register messageAdded listener to handle all messages
 
-     this.removeMessageListeners();
-    this.client.on('messageAdded', async (msg: Message) => {
-       if (!this.messageListenerRegistered)
-       {
-               this.messageAddedListenerCount++;
-
-              // Get the current conversation ID
+    
+this.messageAddedListener = async (msg: Message) => {
+  this.messageAddedListenerCount++;
+  await this.handleMessageAdded(msg);
+  console.log('📩 Message received:', msg);
                const currentConversation = this.currentConversationSubject.getValue();
                const currentConversationId = currentConversation?.sid;
-               this.handleMessageAdded(msg);
+};
+this.client.on('messageAdded', this.messageAddedListener);
 
-       }
-
-       });
+    /*this.client.on('messageAdded', async (msg: Message) => {
+               this.messageAddedListenerCount++;
+              // Get the current conversation ID
+              console.log('📩 Message received:', msg);
+               const currentConversation = this.currentConversationSubject.getValue();
+               const currentConversationId = currentConversation?.sid;
+               await this.handleMessageAdded(msg);
+       });*/
       this.client.on('messageRemoved', this.handleMessageRemoved);
       this.client.on('messageUpdated', this.handleMessageUpdated);
 
@@ -278,7 +305,7 @@ private messageAddedListenerCount: number = 0;
           return; // Exit early since we found and handled the conversation
         }
       } catch (error) {
-        console.error('Error getting conversation participants:', error);
+        //console.error('Error getting conversation participants:', error);
       }
 
       // If we didn't find the conversation above, use the existing method
@@ -326,7 +353,7 @@ private messageAddedListenerCount: number = 0;
           }
         }
       } catch (error) {
-        console.error('Error in conversationAdded handler:', error);
+        //console.error('Error in conversationAdded handler:', error);
       }
     });
 
@@ -353,22 +380,25 @@ private messageAddedListenerCount: number = 0;
       }
     });
   }
+
 private removeMessageListeners(): void {
-  if (this.client && this.messageListenerRegistered) {
+  if (this.client) {
     console.log('Removing existing message listeners');
-    this.client.off('messageAdded', this.handleMessageAdded);
+    if (this.messageAddedListener) {
+      this.client.off('messageAdded', this.messageAddedListener);
+      this.messageAddedListener = null;
+    }
     this.client.off('messageRemoved', this.handleMessageRemoved);
     this.client.off('messageUpdated', this.handleMessageUpdated);
-    this.messageListenerRegistered = false;
   }
 }
+
 
 
   private handleMessageAdded = async (msg: Message) => {
     console.log('New Message Received:', msg);
 
     // Get current state
-
     const currentConversation = this.currentConversationSubject.getValue();
     const chatList = this.chatListSubject.getValue() || [];
     this.fetchMessages().catch(error => {
@@ -412,8 +442,8 @@ private removeMessageListeners(): void {
 
         // Update total unread count if incoming message
         if (isIncoming) {
-
           this.updateTotalUnreadCount();
+          
         }
 
         // After adding the conversation, continue to process the message
@@ -466,8 +496,6 @@ private removeMessageListeners(): void {
       );
       this.chatListSubject.next(updatedChatList);
     }
-    // commenting this line because this is breaking chat count updation
-    //this.messageListenerRegistered = true;
     this.getPatientChat(this.currentPatientUser);
   };
 // Optimized version of the chat service methods
@@ -579,6 +607,7 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
       );
 
       this.updateTotalUnreadCount();
+      
     }
      }
 
@@ -682,7 +711,7 @@ private async updateReadStatus(conversation: Conversation, messages: any[]): Pro
       this.LoginStatus = true;
     } catch (error) {
       this.LoginStatus = false;
-      console.error('Error creating new chat:', error);
+      //console.error('Error creating new chat:', error);
       this.setError('Patient login required. Please have the patient sign in to the mobile app to begin the conversation.')
 
     //  this.setError(error instanceof Error ? error.message : 'Chat creation failed.');
@@ -823,7 +852,6 @@ private async updateChatListUnreadCount(
     },
     0
   );
-
     this.unreadCountSubject.next(totalUnread);
   }
 
@@ -1060,8 +1088,6 @@ private async updateChatListUnreadCount(
       // const url = `${apiUrl}?ToUser=${patientId}`;
       //     return await this.rpmService.rpm_get(url);
       const response = await this.rpm.rpm_get(`/api/comm/getallchats?ToUser=${patientUsername}`);
-      this.messageListenerRegistered = false;
-
       // Update the BehaviorSubject with new data
       this.updateChatData(response);
 
@@ -1091,4 +1117,5 @@ private async updateChatListUnreadCount(
   getCurrentChatData(): any {
     return this.chatHistoryDataSubject.getValue();
   }
+
 }

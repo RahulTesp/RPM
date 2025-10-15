@@ -369,77 +369,49 @@ class NetworkManager: NSObject {
             completed(.failure(.invalidURL))
             return
         }
-        
-        let bodyData = "{\"UserName\": \"\(userName)\", \"OTP\": \"\(otp)\", \"Password\": \"\(password)\"}"
-        let postData = bodyData.data(using: .utf8)
-        
+
+        let bodyData = """
+        {
+            "UserName": "\(userName)",
+            "OTP": "\(otp)",
+            "Password": "\(password)"
+        }
+        """.data(using: .utf8)
+
         var request = URLRequest(url: url)
-        print("jsonwebtokenRP")
-        print((UserDefaults.standard.string(forKey: "jsonwebtokenRP") ?? ""))
-        request.addValue( (UserDefaults.standard.string(forKey: "jsonwebtokenRP") ?? ""), forHTTPHeaderField: "Bearer")
-        
+        request.addValue(UserDefaults.standard.string(forKey: "jsonwebtokenRP") ?? "", forHTTPHeaderField: "Bearer")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
         request.httpMethod = "POST"
-        request.httpBody = postData
-        
+        request.httpBody = bodyData
+
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            
-            if let data = data,let _ = String(data: data,encoding:  .utf8)
-            {
-                
-            }
-            
-            if let _ =  error {
+            if let error = error {
+                print("Network error:", error)
                 completed(.failure(.unableToComplete))
                 return
             }
-            
-            let statusCode: Int? = {
-                if let httpUrlResponse = response as? HTTPURLResponse {
-                    return httpUrlResponse.statusCode
-                }
-                return nil
-            }()
-            
-            guard   statusCode != 401  else{
-                
-                completed(.failure(.otpWrongError))
-                
-                return
-            }
-            
-            guard   statusCode != 403 else {
-                
-                completed(.failure(.lockedError))
-                
-                return
-            }
-            
-            guard let data = data
-                    
-            else {
-                print(data as Any)
+
+            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+            guard statusCode != 401 else { completed(.failure(.otpWrongError)); return }
+            guard statusCode != 403 else { completed(.failure(.lockedError)); return }
+
+            guard let data = data else {
                 completed(.failure(.invalidData))
                 return
             }
-            
-            do {
-                let decoder = JSONDecoder()
-                let decodedResponse = try decoder.decode(String.self, from: data)
-                
-                completed(.success(decodedResponse))
-                
-            } catch {
-                
+
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("RESET_PASSWORD raw response:", responseString)
+                completed(.success(responseString))
+            } else {
                 completed(.failure(.invalidData))
-                
             }
         }
-        
+
         task.resume()
-        
     }
+
+  
     
     
     // NOTE : CHANGE PASSWORD API INTEGRATION
@@ -640,6 +612,44 @@ class NetworkManager: NSObject {
         task.resume()
     }
     
+    func deleteFirebaseToken(fbToken: String, accessToken: String , completed: @escaping (Result<Bool, APIError>) -> Void) {
+   
+        guard let url = URL(string: "\(NetworkManager.baseURL)/api/notification/deletefirebasetoken?Token=\(fbToken)") else {
+            completed(.failure(.invalidURL))
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+       
+        request.addValue(accessToken, forHTTPHeaderField: "Bearer")
+        
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            
+            if let error = error as? URLError {
+                print("URLError:", error.code)
+                
+                switch error.code {
+
+                default:
+                    completed(.failure(.unableToComplete))
+                }
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                completed(.failure(.invalidResponse))
+                return
+            }
+            
+            DispatchQueue.main.async {
+                completed(.success(true))
+            }
+        }
+        
+        task.resume()
+    }
     
     func fetchVideoCallToken(roomName: String, completed: @escaping (Result<String, APIError>) -> Void) {
         guard let encodedRoomName = roomName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
@@ -2168,7 +2178,7 @@ class MoreManager: NSObject {
         var request = URLRequest(url: url)
         
         request.addValue(tkn, forHTTPHeaderField: "Bearer")
-        print("reque")
+        print("requepgm",request)
      
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             
@@ -2176,7 +2186,8 @@ class MoreManager: NSObject {
             {
                 
             }
-            
+            print("requepgmresponse",response)
+            print("requedata",data)
             
             if let error = error as? URLError {
                 print("URLError:", error.code)
@@ -2187,7 +2198,7 @@ class MoreManager: NSObject {
                 }
                 return
             }
-            print("error")
+            print("errorpgm",error)
         
             guard let response = response as? HTTPURLResponse, response.statusCode == 200
                     
@@ -2198,27 +2209,38 @@ class MoreManager: NSObject {
                 
                 return
             }
-            print("response")
+            print("responsepgm",response)
             print(response)
             guard let data = data , error == nil else {
                 completed(.failure(.invalidData))
                 return
             }
             
-            do {
-                
-                let decoder = JSONDecoder()
-                
-                let decodedResponse = try decoder.decode(ProgramInfo.self, from: data)
-                print("\nProfilesdecodedResponse\n")
-                print(decodedResponse)
-                completed(.success(decodedResponse))
-                
-            } catch {
-                
-                completed(.failure(.decodingError))
-            }
             
+            do {
+
+                let decoder = JSONDecoder()
+
+                let decodedResponse = try decoder.decode(ProgramInfo.self, from: data)
+
+                print("\nProfilesdecodedResponse:", decodedResponse)
+
+                completed(.success(decodedResponse))
+
+            } catch {
+
+                if let jsonString = String(data: data, encoding: .utf8) {
+
+                    print("Raw JSON:", jsonString)
+
+                }
+
+                print("Decoding Error:", error)
+
+                completed(.failure(.decodingError))
+
+            }
+  
         }
         
         task.resume()

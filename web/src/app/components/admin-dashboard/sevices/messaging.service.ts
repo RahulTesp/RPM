@@ -3,6 +3,7 @@ import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 import { BehaviorSubject } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RPMService } from './rpm.service';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class MessagingService {
@@ -15,6 +16,7 @@ export class MessagingService {
   unread: number = 0;
   list: any[] = [];
   unreadlist: any[] = [];
+  providers: [MessagingService]
 
   constructor(
     private afm: AngularFireMessaging,
@@ -86,24 +88,7 @@ export class MessagingService {
     });
   }
 
-  // registerMessageEventListener() {
-  //   const channel = new BroadcastChannel('notification-channel');
-  //   channel.addEventListener('message', (event) => {
-  //     const payload = event.data;
-  //     console.log('Background notification received:', payload.data.body);
-  //     this.notificationData.next(payload.data.body);
-  //     if (payload.data && payload.data.Body) {
-  //       this.snackBar.open(
-  //         payload.notification?.title || 'New message',
-  //         '',
-  //         { duration: 5000 }
-  //       );
-
-  //     }
-
-  //   });
-  //   return channel;
-  // }
+ 
   registerMessageEventListener() {
     const channel = new BroadcastChannel('notification-channel');
     channel.addEventListener('message', (event) => {
@@ -112,13 +97,6 @@ export class MessagingService {
       this.notificationData.next(payload.data.body);
 
        if (payload.data && payload.data.Body) {
-      //   this.snackBar.open(
-      //    payload.notification?.title || 'New message',
-      //     '',
-      //    // payload.data.Body,
-      //     { duration: 5000 }
-      //   );
-
         this.GetNotifications()
           .then(() => console.log('Notifications refreshed after background message'))
           .catch(err => console.error('Failed to refresh notifications:', err));
@@ -188,4 +166,15 @@ export class MessagingService {
         return this.GetNotifications();
       });
   }
+async unsubscribeFromFirebase(): Promise<void> {
+  try {
+    const token = await firstValueFrom(this.afm.getToken);
+    if (token) {
+      await firstValueFrom(this.afm.deleteToken(token));
+      console.log('✅ FCM token deleted, notifications disabled');
+    }
+  } catch (error) {
+    console.error('❌ Error deleting FCM token:', error);
+  }
+}
 }

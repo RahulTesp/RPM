@@ -56,8 +56,9 @@ extension Date {
 
 struct RPMHomeView: View {
     
-    @StateObject  var notifList = NotificationViewModel()
+   // @StateObject  var notifList = NotificationViewModel()
     @EnvironmentObject var homeViewModel: RPMHomeViewModel
+    @EnvironmentObject var notifList: NotificationViewModel
     @EnvironmentObject var appModel: AppModel
     @EnvironmentObject var messagesManager: MessagesManager
     @EnvironmentObject var participantsManager: ParticipantsManager
@@ -82,6 +83,7 @@ struct RPMHomeView: View {
     @State private var rejectionMessage = ""
     @EnvironmentObject var sessionManager: SessionManager
     @EnvironmentObject var memberDetList: MembersListViewModel
+   
     
     var body: some View {
         ZStack {
@@ -383,6 +385,8 @@ struct RPMHomeView: View {
                       homeViewModel.dashboard()
                       notifList.getnotify()
                   
+//                      print("Home UI appModelrefreshUnreadCount", appModel)
+//                      appModel.conversationManager.refreshUnreadCount()
                       
                   }
     }

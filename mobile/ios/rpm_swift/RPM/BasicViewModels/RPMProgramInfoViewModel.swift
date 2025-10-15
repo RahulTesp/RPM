@@ -54,6 +54,3 @@ final class RPMProgramInfoViewModel: ObservableObject {
         
     }
 }
-
-
-

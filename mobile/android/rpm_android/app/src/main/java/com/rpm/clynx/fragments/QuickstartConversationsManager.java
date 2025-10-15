@@ -1,4 +1,5 @@
 package com.rpm.clynx.fragments;
+import static android.content.Context.MODE_PRIVATE;
 import static com.rpm.clynx.utility.Links.BASE_URL;
 import static com.rpm.clynx.utility.Links.CHAT_UPDATE;
 import static com.rpm.clynx.utility.Links.NotifyConversation_URL;
@@ -58,6 +59,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -65,7 +67,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 interface QuickstartConversationsManagerListener {
     void receivedNewMessage(boolean equals);
@@ -81,7 +85,7 @@ interface AccessTokenListener {
     void receivedAccessToken(@Nullable String token, @Nullable Exception exception);
 }
 
-class QuickstartConversationsManager extends  AppCompatActivity {
+class QuickstartConversationsManager {
     // This is the unique name of the conversation  we are using
     private static String CONVERSATION_SID = "";
     private static String Patent_Id;
@@ -809,6 +813,27 @@ class QuickstartConversationsManager extends  AppCompatActivity {
                         " | FriendlyName: " + conversation.getFriendlyName() +
                         " | SyncStatus: " + conversation.getSynchronizationStatus());
 
+
+                // --- ADD THIS ---
+                // --- ADD THIS ---
+                Date createdDate = conversation.getDateCreatedAsDate(); // SDK method returns Date
+
+                String createdDateTime = "Unknown";
+                if (createdDate != null) {
+                    // Format as full date + time
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                    createdDateTime = sdf.format(createdDate);
+                }
+
+                Log.d("ChatCreationLOG",
+                        "Conversation created -> SID: " + conversation.getSid() +
+                                " | Username: " + conversation.getFriendlyName().split("-")[0] +
+                                " | FriendlyName: " + conversation.getFriendlyName() +
+                                " | DateCreated: " + createdDateTime +
+                                " | TimestampMillis: " + (createdDate != null ? createdDate.getTime() : 0)
+                );
+
+
                 // Remove existing listeners before adding a new one
                 conversation.removeAllListeners();
                 // Fetch unread messages initially
@@ -1119,7 +1144,9 @@ class QuickstartConversationsManager extends  AppCompatActivity {
 
         String[] nameParts = conversation.getFriendlyName().split("-");
         String friendlyUserName = nameParts[0];
-        String friendlyName = getMemberNameFromList(friendlyUserName, context);
+        String friendlyName = getMemberNameFromList(friendlyUserName.trim(), context);
+
+       // String friendlyName = getMemberNameFromList(friendlyUserName, context);
 
         Date lastMessageDate = conversation.getLastMessageDate();
         long timestamp = (lastMessageDate != null) ? lastMessageDate.getTime() : System.currentTimeMillis();
@@ -1129,6 +1156,9 @@ class QuickstartConversationsManager extends  AppCompatActivity {
 
         String convSid = conversation.getSid();
         int unreadMessages = (unreadMsgCount != null) ? unreadMsgCount.intValue() : 0;
+
+        Log.d("handleInitialUnreadMessages", "Username: " + friendlyUserName +
+                " | SID: " + convSid + " | LastMsg: " + lastMessageText);
 
         conversation.getLastMessages(1, new CallbackListener<List<Message>>() {
             @Override
@@ -1155,6 +1185,7 @@ class QuickstartConversationsManager extends  AppCompatActivity {
 
 
         for (Chat chat : chatList) {
+            Log.d("chatListItem", "SID: " + chat.getSID() + " | Name: " + chat.getFriendlyUsername());
             if (chat.getSID().equals(sid)) {  // Use SID to uniquely identify a conversation
                 chat.setUnreadCount(unreadMessages);
                 chat.setTimeStamp(formattedTime);
@@ -1169,7 +1200,23 @@ class QuickstartConversationsManager extends  AppCompatActivity {
 
         Log.d("chatListONMAIN", String.valueOf(chatList.size()));
         Log.d("chatListONMAIN", String.valueOf(chatList));
+
+
         if (!chatUpdated) {
+
+            // Convert timestamp to readable date
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            sdf.setTimeZone(TimeZone.getDefault());
+            String readableDate = sdf.format(new Date(timestamp));
+
+            // Log the readable date
+            Log.d("ChatCreationTrace", "Adding chat -> SID: " + sid +
+                    " | Username: " + friendlyUserName +
+                    " | FriendlyName: " + friendlyName +
+                    " | TimestampMillis: " + timestamp +
+                    " | DateTime: " + readableDate +
+                    " | LastMsg: " + lastMessageText);
+
             // Add new chat entry if not found
             chatList.add(new Chat(friendlyUserName,friendlyName, formattedTime, unreadMessages, timestamp,false, lastMessageText, sid, conversation));
             Log.d("AddedtoChatModel", friendlyName + formattedTime + unreadMessages + timestamp+ lastMessageText );
@@ -1206,7 +1253,8 @@ class QuickstartConversationsManager extends  AppCompatActivity {
 
         String[] nameParts = conversation.getFriendlyName().split("-");
         String friendlyUserName = nameParts[0];
-        String friendlyName = getMemberNameFromList(friendlyUserName, context);
+       // String friendlyName = getMemberNameFromList(friendlyUserName, context);
+        String friendlyName = getMemberNameFromList(friendlyUserName.trim(), context);
 
         Date lastMessageDate = conversation.getLastMessageDate();
         long timestamp = (lastMessageDate != null) ? lastMessageDate.getTime() : System.currentTimeMillis();
@@ -1261,7 +1309,7 @@ class QuickstartConversationsManager extends  AppCompatActivity {
     }
 
     private String getMemberNameFromList(String friendlyName, Context context) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("RPMUserApp", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = context.getSharedPreferences("RPMUserApp", MODE_PRIVATE);
         String savedResponse = sharedPreferences.getString("members_list", "[]");
 
         try {
@@ -1272,9 +1320,15 @@ class QuickstartConversationsManager extends  AppCompatActivity {
                 String memberName = obj.getString("MemberName").trim(); // Trim spaces
                 Log.d("hamemberUserName:memberName", memberUserName + " : " + friendlyName);
 
-                if (memberUserName.equalsIgnoreCase(friendlyName.trim())) {  // Trim and Ignore Case
-                    return memberName; // Found matching user, return their MemberName
+                Log.d("getMemberName", "Input: '" + friendlyName + "' | JSON username: '" + memberUserName + "' | MemberName: '" + memberName + "'");
+
+                if (memberUserName.trim().equalsIgnoreCase(friendlyName.trim())) {
+                    return memberName.trim();
                 }
+
+//                if (memberUserName.equalsIgnoreCase(friendlyName.trim())) {  // Trim and Ignore Case
+//                    return memberName; // Found matching user, return their MemberName
+//                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -1520,9 +1574,9 @@ class QuickstartConversationsManager extends  AppCompatActivity {
                     savedUserName = pref.getString("UserName", null);
                     String convupFriendlyName = conversation.getFriendlyName().split("-")[0];
                     Log.d("equal1", "equal");
-                    ((MyApplication) getApplication()).getLatestActivity();
+                   // ((MyApplication) getApplication()).getLatestActivity();
                     System.out.println("chatctvty");
-                    System.out.println(((MyApplication) getApplication()).getLatestActivity());
+                  //  System.out.println(((MyApplication) getApplication()).getLatestActivity());
 
                     try {
                         List<Conversation> conversationList = conversationsClient.getMyConversations();

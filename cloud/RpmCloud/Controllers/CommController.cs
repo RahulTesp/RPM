@@ -648,7 +648,7 @@ namespace RpmCloud.Controllers
         }
         [HttpGet]
         [Route("getallchats")]
-        public IActionResult GetAllChats(string ToUser)
+        public async Task<IActionResult> GetAllChats(string ToUser)
         {
 
             try
@@ -671,16 +671,18 @@ namespace RpmCloud.Controllers
                     {
                         return BadRequest(new { message = "Exception" });
                     }
-                    SystemConfigInfo? AccountSID = lstConf.Find(x => x.Name.Equals("AccountSID"));
+                    SystemConfigInfo? AccountSID = lstConf.Find(x => x.Name.Equals("AccountSID")); 
                     SystemConfigInfo? AuthToken = lstConf.Find(x => x.Name.Equals("AuthToken"));
-                    if(AuthToken==null || AccountSID== null)
+                    SystemConfigInfo? ChatServiceSid = lstConf.Find(x => x.Name.Equals("ChatServiceSid"));
+                    if (AuthToken==null || AccountSID== null)
                     {
                         return BadRequest(new { message = "Exception" });
                     }
                     string AccountSIDValue = Convert.ToString(AccountSID.Value);
                     string AuthTokenValue = Convert.ToString(AuthToken.Value);
+                    string ChatServiceSidValue = Convert.ToString(ChatServiceSid.Value);
 
-                    List<ConverationHistory> Conversations = RpmDalFacade.GetAllConversations(UserName, ToUser, AccountSIDValue, AuthTokenValue);
+                    List<ConverationHistory> Conversations = await RpmDalFacade.GetAllConversations(UserName, ToUser, AccountSIDValue, AuthTokenValue, ChatServiceSidValue);
                     if (Conversations.Count == 0)
                     {
                         return NotFound(new { message = "No Conversation History Found" });

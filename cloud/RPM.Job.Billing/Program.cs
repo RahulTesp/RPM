@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.Extensions.Configuration;
 using RPMPatientBillingJob;
+using System.Data.Common;
 // cron 0 0 * * * *
 class Program
 {
@@ -27,7 +28,13 @@ class Program
                 Console.WriteLine("Connection string is null in appsettings.json.");
                 return;
             }
-            Console.WriteLine($"RPM Connection String: {connStr}");
+            // Parse connection string for server and database info
+            var builder = new DbConnectionStringBuilder { ConnectionString = connStr };
+            string server = builder.ContainsKey("Server") ? builder["Server"].ToString() : "";
+            string database = builder.ContainsKey("Initial Catalog") ? builder["Initial Catalog"].ToString() : "";
+
+            Console.WriteLine($"Server: {server}");
+            Console.WriteLine($"Database: {database}");
             CONN_STRING = connStr;
             Console.WriteLine("WebJob started...");
             if(CONN_STRING == null)

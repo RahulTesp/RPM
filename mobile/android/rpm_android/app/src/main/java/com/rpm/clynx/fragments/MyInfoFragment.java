@@ -36,7 +36,6 @@ public class MyInfoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate your existing activity_my_info.xml layout (you may want to rename it to fragment_my_info.xml)
         View view = inflater.inflate(R.layout.fragment_my_info, container, false);
 
         // Initialize your views and logic here using 'view.findViewById'
