@@ -70,7 +70,7 @@ export class SidePanelPatientComponent implements OnInit {
   loading: any;
   loading_note: any;
   minStartDate: string | null = null; 
-
+  programId: any;
 
   @Input() activityMenuVariable: any;
 
