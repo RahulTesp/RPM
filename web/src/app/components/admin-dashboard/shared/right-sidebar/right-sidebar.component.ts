@@ -442,8 +442,11 @@ export class RightSidebarComponent implements OnInit {
           x.searchFieldTask = `${x.PatientName}[${x.ProgramName}]`;
         });
 
+       
         this.http_taskAssigneeList = res.filteredAssignees;
+      
 
+       
       })
       .catch((err) => {
         console.error('Error fetching task master data:', err);
@@ -1851,10 +1854,15 @@ export class RightSidebarComponent implements OnInit {
         .then(
           (data) => {
             this.worklistgettaskbyid = data;
-            this.alertAssigneeName = this.worklistgettaskbyid.CareTeamId;
-            this.WorkListTaskArrayList = this.worklistgettaskbyid.Members;
-
-
+            // this.alertAssigneeName = this.worklistgettaskbyid.CareTeamId;
+            const uniqueCareTeam = [...new Set(this.worklistgettaskbyid.CareTeamId)];
+             this.alertAssigneeName = uniqueCareTeam;
+             console.log('uniqueTaskArrayList-Previous');
+             console.log(this.worklistgettaskbyid.Members);
+             const uniqueTaskArrayList = [...new Set(this.worklistgettaskbyid.Members)]; 
+             console.log('uniqueTaskArrayList');
+             console.log(uniqueTaskArrayList);
+             this.WorkListTaskArrayList = uniqueTaskArrayList;
             this.task_pname = this.worklistgettaskbyid.PatientName;
             this.task_pid = this.worklistgettaskbyid.PatientId;
              this.task_careteam_name = this.worklistgettaskbyid.AssignedMember;
