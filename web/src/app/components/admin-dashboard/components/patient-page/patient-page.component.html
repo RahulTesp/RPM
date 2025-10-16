@@ -948,10 +948,8 @@
                 (click)="searchAssigneeClose()"
               /> <input
                   class="search_input input_panel"
-                  (keyup)="applyDataFilter($event)"
-                  id="p_AssignedSearchInput"
-                  (focus)="setupFilter('AssignedMemeber')"
-                  [value]="assigneeSerach" autocomplete="off"/>
+                  [(ngModel)]="billingAssigneeName"
+                (ngModelChange)="billingDataFilter()" autocomplete="off"/>
 
             </div>
             <div

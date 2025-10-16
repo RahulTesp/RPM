@@ -1759,9 +1759,14 @@ table {
 .personal_info_data_container_last {
   margin-right: 0px !important;
 }
-
+.userInfovalue input{
+  width:100%;
+}
 .userInfovalue {
   border: none;
+  display:flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
   background-color: #edeff5;
   height: 1.7rem;

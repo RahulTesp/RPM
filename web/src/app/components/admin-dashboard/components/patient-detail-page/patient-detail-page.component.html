@@ -842,8 +842,12 @@
             [(ngModel)]="additionaNotes"
             id="pd_additionalNote"
             [ngModelOptions]="{ standalone: true }"
+             maxlength="200"
           ></textarea>
         </div>
+        <span *ngIf="additionaNotes.length >= 200" style="color: red; font-weight: bold; margin-left: 10px;">
+            ⚠️ Max length 200 reached.
+        </span>
       </div>
       <!-- <div class="lower_container">
         <div>
@@ -1196,8 +1200,12 @@
             [(ngModel)]="additionaNotes"
             id="pd_updateAdditionalNote"
             [ngModelOptions]="{ standalone: true }"
+            maxlength="200"
           ></textarea>
         </div>
+         <span *ngIf="additionaNotes.length >= 200" style="color: red; font-weight: bold; margin-left: 10px;">
+            ⚠️ Max length 200 reached.
+        </span>
       </div>
       <!-- <div class="lower_container">
         <div>
@@ -4909,7 +4917,10 @@
 
           <ng-container matColumnDef="Type">
             <mat-header-cell       [ngStyle]="{ 'border-radius': '16px 0px 0px 0px' }" *matHeaderCellDef> Task Type </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{ element.Type }} </mat-cell>
+            <mat-cell *matCellDef="let element" [ngClass]="{
+             'task-type-truncated': true
+          }"
+          [attr.title]="element.Type"> {{ element.Type }} </mat-cell>
           </ng-container>
 
           <ng-container matColumnDef="TaskOrAlert">
@@ -5553,8 +5564,12 @@
           [(ngModel)]="additionaNotes"
           id="pd_SummaryAdditionalNote"
           [ngModelOptions]="{ standalone: true }"
+          maxlength="200"
         ></textarea>
       </div>
+       <span *ngIf="additionaNotes.length >= 200" style="color: red; font-weight: bold; margin-left: 10px;">
+            ⚠️ Max length 200 reached.
+        </span>
     </div>
 
     <div class="button_panel note_preview_button_panel">
@@ -5715,8 +5730,12 @@
           id="pd_smryUpdateAdditional"
           [(ngModel)]="additionaNotes"
           [ngModelOptions]="{ standalone: true }"
+          maxlength="200"
         ></textarea>
       </div>
+       <span *ngIf="additionaNotes.length >= 200" style="color: red; font-weight: bold; margin-left: 10px;">
+            ⚠️ Max length 200 reached.
+        </span>
     </div>
 
     <div class="button_panel note_preview_button_panel">

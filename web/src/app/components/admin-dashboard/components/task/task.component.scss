@@ -857,9 +857,9 @@ mat-progress-spinner {
 }
 
 .task-type-truncated {
-  max-width: 150px; 
+  display: inline-block;
+  min-width: 180px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  word-break: break-all; 
 }

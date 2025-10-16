@@ -3891,3 +3891,10 @@ canvas.charttrends {
   width: 220px;
   flex: 0 0 220px; /* Prevent shrinking */
 }
+.task-type-truncated {
+  display: inline-block;
+  min-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
