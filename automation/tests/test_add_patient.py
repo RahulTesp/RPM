@@ -16,7 +16,7 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 RESOURCES_DIR = os.path.join(CURRENT_DIR, "resources")
 IMAGE_FILE_PATH = os.path.join(RESOURCES_DIR, "profile.jpg")
 EXCEL_FILE_PATH = os.path.join(RESOURCES_DIR, "patient_details_updated.xlsx")
-BASE_URL = "https://cx-preprod-client.azurewebsites.net//login"
+BASE_URL = "https://cx-dev-client.azurewebsites.net/login"
 fake = Faker()
 
 
