@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install pytest pytest-html playwright openpyxl
+          pip install pytest pytest-html playwright openpyxl faker
           playwright install --with-deps chromium
 
       - name: Run Sanity Tests
