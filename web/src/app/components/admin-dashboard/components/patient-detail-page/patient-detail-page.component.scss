@@ -3898,3 +3898,10 @@ canvas.charttrends {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.truncate-text {
+  display: inline-block;
+  max-width: 200px; /* adjust width as needed */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

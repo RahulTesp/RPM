@@ -4437,9 +4437,8 @@
 
           <ng-container matColumnDef="Description">
             <mat-header-cell *matHeaderCellDef> Remark </mat-header-cell>
-            <mat-cell *matCellDef="let element; let rowIndex = index">{{
-              element.Description
-            }}</mat-cell>
+            <mat-cell *matCellDef="let element; let rowIndex = index" [title]="element.Description ">
+              <span class="truncate-text">{{ element.Description }}</span></mat-cell>
           </ng-container>
 
           <!-- Action Column -->
@@ -4860,7 +4859,8 @@
       *ngIf="http_ActivityScheduleData && http_ActivityScheduleData.length > 0"
     >
       <!-- btn_save -->
-      <button class="addCommonBtn" id="pd_SaveSch" (click)="saveCompleteTask()">
+      <button   *ngIf="rolelist[0]?.Id !== 8 && rolelist[0]?.Id !== 6" 
+      class="addCommonBtn" id="pd_SaveSch" (click)="saveCompleteTask()">
         Save
       </button>
     </div>

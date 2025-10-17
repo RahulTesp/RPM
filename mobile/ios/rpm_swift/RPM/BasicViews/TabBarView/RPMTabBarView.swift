@@ -1,3 +1,5 @@
+
+
 //
 //  RMPTabBarView.swift
 //  RPM
@@ -54,7 +56,8 @@ struct RPMTabBarView: View {
     @EnvironmentObject var sessionManager: SessionManager
     @EnvironmentObject var notifList: NotificationViewModel
     @State private var selectedTab = 0
-
+    @EnvironmentObject var notificationManager: NotificationManager
+    
     var body: some View {
         VStack {
             TabView (selection: $navigationHelper.selectedTab) {
@@ -76,12 +79,12 @@ struct RPMTabBarView: View {
                     .environmentObject(memberDetList)
                     .environmentObject(sessionManager)
                     .environmentObject(notifList)
-                
+                    .environmentObject(notificationManager)
                     .onAppear {
                         print("AppModelinRPMHome:", appModel)
                 
                         print("conversationManagerinRPMHome:", conversationManager)
-                        navigationHelper.selectedTab = 0 
+                        navigationHelper.selectedTab = 0
                     }
                     .tabItem {
                         Image("HomeOutline")
@@ -192,3 +195,4 @@ struct TabBarAccessor: UIViewControllerRepresentable {
         }
     }
 }
+

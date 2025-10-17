@@ -1,3 +1,5 @@
+
+
 //
 //  RPMNetworkManager.swift
 //  RPM
@@ -613,7 +615,7 @@ class NetworkManager: NSObject {
     }
     
     func deleteFirebaseToken(fbToken: String, accessToken: String , completed: @escaping (Result<Bool, APIError>) -> Void) {
-   
+   print("deleetfbtoken")
         guard let url = URL(string: "\(NetworkManager.baseURL)/api/notification/deletefirebasetoken?Token=\(fbToken)") else {
             completed(.failure(.invalidURL))
             return
@@ -2186,8 +2188,7 @@ class MoreManager: NSObject {
             {
                 
             }
-            print("requepgmresponse",response)
-            print("requedata",data)
+     
             
             if let error = error as? URLError {
                 print("URLError:", error.code)
@@ -2198,7 +2199,7 @@ class MoreManager: NSObject {
                 }
                 return
             }
-            print("errorpgm",error)
+         
         
             guard let response = response as? HTTPURLResponse, response.statusCode == 200
                     
@@ -2548,3 +2549,6 @@ extension String {
         return String(self[startIndex..<endIndex])
     }
 }
+
+
+

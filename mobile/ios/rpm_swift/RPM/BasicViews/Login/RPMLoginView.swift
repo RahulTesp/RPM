@@ -1,3 +1,4 @@
+               
 //
 //  ContentView.swift
 //  RPM
@@ -174,7 +175,11 @@ struct RPMLoginView: View {
                     signIn(chatacctoken: token)
                     
                 }
-
+                else if UserDefaults.standard.bool(forKey: "MFAvalue") == true {
+                    // MFA required
+                    print("MFA is TRUE - Navigating to OTP screen...")
+                    navigationHelper.path.append(.otp) //  navigate to your OTP screen
+                }
                 print(" navigationHelper.pathlogin: \( navigationHelper.path)")
                 
             } else {
@@ -376,5 +381,4 @@ struct SecureInputView: View {
         }
     }
 }
-                      
                       

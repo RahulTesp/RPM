@@ -1,3 +1,4 @@
+
 //
 //  NotificationManager.swift
 //  RPM
@@ -88,6 +89,7 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
             }
             // Case 2: Alert should be hidden immediately
             else {
+                print("else showAlert updated to: \(shouldShowAlert)")
                 self.alertDismissTimer?.invalidate()
                 self.showAlert = false
             }

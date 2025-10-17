@@ -2042,7 +2042,7 @@
             <p class="common_content_title">Assignee Name</p>
             <div class="Self_assign">
               <div class="assignedMemberinputPanel">
-                <!-- <ng-autocomplete
+                <ng-autocomplete
                   id="Task_Assignee"
                   [data]="http_taskAssigneeList"
                   [searchKeyword]="keyword_alert_careteam"
@@ -2055,7 +2055,7 @@
                   [notFoundTemplate]="notFoundTemplate"
                   (inputCleared)="onClear_alertAssign($event)"
                 >
-                </ng-autocomplete> -->
+                </ng-autocomplete>
               </div>
 
               <ng-template #itemTemplate let-item>
@@ -2177,12 +2177,13 @@
               </ng-container>
             </div>
           </div>
-          <div class="common_content">
+          <div class="common_content" [class.disabled-div]="worklistgettaskbyid?.Status == 'Complete'">
             <p class="common_content_title">Task Type</p>
             <select
               class="common_input_dropdown"
               formControlName="tasktype"
               id="Task_Type"
+              
             >
               <option [ngValue]="undefined" hidden>Select Task Type</option>
               <option
@@ -2218,7 +2219,7 @@
           </div>
           <!-- Tak Content date Start -->
           <div class="common_content task_content_date">
-            <div class="task_date_picker_container">
+            <div class="task_date_picker_container" [class.disabled-div]="worklistgettaskbyid?.Status == 'Complete'">
               <p class="common_content_title">Due Date</p>
 
               <input
@@ -2240,7 +2241,7 @@
                 </ng-container>
               </div>
             </div>
-            <div class="task_priority common_content">
+            <div class="task_priority common_content" [class.disabled-div]="worklistgettaskbyid?.Status == 'Complete'">
               <p class="common_content_title">Priority</p>
               <select
                 class="common_input_dropdown priority_task_dropdown"
@@ -2269,7 +2270,7 @@
             </div>
           </div>
           <!-- Tak Content date End -->
-          <div class="common_content">
+          <div class="common_content" [class.disabled-div]="worklistgettaskbyid?.Status == 'Complete'">
             <p class="common_content_title">Task Status</p>
             <select
               class="common_input_dropdown task_content_dropdown_self"
@@ -3225,10 +3226,10 @@
               placeholder="Describe Your Task"
             >
             </textarea>
-            <!-- <div class="warn">
-                <ng-container  *ngIf="registerTask.get('description')?.invalid && registerSchedule.get('description')?.touched">Description is Required
+            <div class="warn">
+                <ng-container  *ngIf="registerTeamTask.get('description')?.invalid && registerTeamTask.get('description')?.touched">Description is Required
                 </ng-container>
-              </div> -->
+              </div>
           </div>
           <!-- Tak Content date Start -->
           <div class="common_content task_content_date">
