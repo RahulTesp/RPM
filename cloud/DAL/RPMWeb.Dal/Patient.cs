@@ -1557,7 +1557,7 @@ namespace RPMWeb.Dal
                             info.Senddate = formattedDate;
                             info.Senddate = info.Senddate.ToString();
                             info.FromNumber = reader["FromNo"].ToString();
-                            info.Id = Convert.ToInt16(reader["Id"]);
+                            info.Id = Convert.ToInt32(reader["Id"]);
                             info.Message = reader["SmsBody"].ToString();
 
 
@@ -1995,7 +1995,7 @@ namespace RPMWeb.Dal
                         }
                     }
                 }
-                return ret;
+                return ret.OrderBy(t => t.VitalId).ToList(); ;
             }
             catch (Exception ex)
             {
@@ -2742,7 +2742,7 @@ namespace RPMWeb.Dal
                             ret.LastName = reader["LastName"].ToString();
                             ret.DOB = reader["DOB"].ToString();
                             ret.Gender = reader["Gender"].ToString();
-                            ret.Height = Convert.ToInt32(reader["Height"]);
+                            ret.Height = Convert.ToSingle(reader["Height"]);
                             ret.Weight = Convert.ToInt32(reader["Weight"]);
                             ret.Email = reader["Email"].ToString();
                             ret.PhoneNo = reader["PhoneNo"].ToString();
@@ -9081,7 +9081,6 @@ namespace RPMWeb.Dal
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {
                     con.Open();
-
                     using (SqlCommand command = new SqlCommand("GetPatientBillingDataListCCM_CycleBasedBilling", con))
                     {
                         command.CommandType = CommandType.StoredProcedure;

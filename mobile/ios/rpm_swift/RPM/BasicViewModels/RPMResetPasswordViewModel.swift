@@ -22,144 +22,118 @@ final class RPMResetPasswordViewModel: ObservableObject {
     @Published  var loggedIn: Bool = false
     @Published var isOn: Bool = false
     
-    func generateOTP(userName: String,  completed: @escaping (String?, AlertItem?) -> Void) {
-        
+    func generateOTP(userName: String, completed: @escaping (String?, AlertItem?) -> Void) {
         let defaults = UserDefaults.standard
         
-        NetworkManager.shared.generateOTP(userName: userName,
-                                          
-                                          completed: { result in
+        NetworkManager.shared.generateOTP(userName: userName) { result in
             switch result {
             case .success(let generateOTPDataModel):
-                completed(generateOTPDataModel.tkn, nil)
-                print("generateOTPDataModel")
-                print(generateOTPDataModel)
-                
-                print("MFA")
-                print(generateOTPDataModel.mfa)
-                
-                self.loginData = generateOTPDataModel
-                defaults.set(generateOTPDataModel.mobilenumber, forKey: "MobileNumberRP")
-                
-                self.isAuthenticated = true
-                
-                print("self.isAuthenticatedlogins")
-                print(self.isAuthenticated)
-                
-                defaults.set(generateOTPDataModel.tkn, forKey: "jsonwebtokenRP")
-                defaults.set(generateOTPDataModel.timeLimit, forKey: "TimeLimitRP")
-                
-                print( defaults.set(generateOTPDataModel.mobilenumber, forKey: "MobileNumberRP"))
-                print( defaults.set(generateOTPDataModel.tkn, forKey: "jsonwebtokenRP"))
+                DispatchQueue.main.async {   // ensure on main
+                    completed(generateOTPDataModel.tkn, nil)
+                    
+                    self.loginData = generateOTPDataModel
+                    self.isAuthenticated = true
+                    
+                    defaults.set(generateOTPDataModel.mobilenumber, forKey: "MobileNumberRP")
+                    defaults.set(generateOTPDataModel.tkn, forKey: "jsonwebtokenRP")
+                    defaults.set(generateOTPDataModel.timeLimit, forKey: "TimeLimitRP")
+                }
                 
             case .failure(let error):
-                switch error {
-                case .invalidData:
-                    completed(nil, AlertContext.invalidData)
-                case .invalidURL:
-                    completed(nil, AlertContext.invalidURL)
-                case .invalidResponse:
-                    completed(nil, AlertContext.invalidResponse)
-                case .invalidPassword:
-                    completed(nil, AlertContext.invalidPassword)
-                case .unableToComplete:
-                    completed(nil, AlertContext.unableToComplete)
-                case .decodingError:
-                    completed(nil, AlertContext.decodingError)
-                case .lockedError:
-                    completed(nil, AlertContext.lockedError)
-                case .numberInvalidError:
-                    completed(nil, AlertContext.numberInvalidError)
-                case .otpWrongError:
-                    completed(nil, AlertContext.otpWrongError)
-                case .invalidUser:
-                    completed(nil, AlertContext.invalidUser)
-                case .unauthorized:
-                    completed(nil, AlertContext.unauthorized)
+                DispatchQueue.main.async {   //  ensure on main
+                    switch error {
+                    case .invalidData:
+                        completed(nil, AlertContext.invalidData)
+                    case .invalidURL:
+                        completed(nil, AlertContext.invalidURL)
+                    case .invalidResponse:
+                        completed(nil, AlertContext.invalidResponse)
+                    case .invalidPassword:
+                        completed(nil, AlertContext.invalidPassword)
+                    case .unableToComplete:
+                        completed(nil, AlertContext.unableToComplete)
+                    case .decodingError:
+                        completed(nil, AlertContext.decodingError)
+                    case .lockedError:
+                        completed(nil, AlertContext.lockedError)
+                    case .numberInvalidError:
+                        completed(nil, AlertContext.numberInvalidError)
+                    case .otpWrongError:
+                        completed(nil, AlertContext.otpWrongError)
+                    case .invalidUser:
+                        completed(nil, AlertContext.invalidUser)
+                    case .unauthorized:
+                        completed(nil, AlertContext.unauthorized)
+                    }
                 }
             }
-        })
+        }
     }
+
+ 
     
-    
-    
-    func resetPassword(userName: String, otp: String, password : String , isResetpwd : Binding<Bool>  ,completed: @escaping (String?, AlertItem?) -> Void) {
+    func resetPassword(
+        userName: String,
+        otp: String,
+        password: String,
+        isResetpwd: Binding<Bool>,
+        completed: @escaping (String?, AlertItem?) -> Void
+    ) {
         print("userName")
         print("otp")
         print(userName)
         print(otp)
         
         UserDefaults.standard.setValue(false, forKey: "resetSuccess")
-     
-        NetworkManager.shared.resetPassword(userName: userName,
-                                            otp: otp, password: password,
-                                            completed: { result in
+        
+        NetworkManager.shared.resetPassword(userName: userName, otp: otp, password: password) { result in
             
             switch result {
             case .success(let account):
-                
                 print("account")
                 print(account)
                 
-                isResetpwd.wrappedValue.toggle()
-                print("isResetpwdvvvvvv")
-                print(isResetpwd)
-                
-                let alert = UIAlertController(title: "Success", message: "API request was successful!", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-                
-                UserDefaults.standard.set(true, forKey: "resetSuccess" )
-                
-                print("account12")
-                print(UserDefaults.standard.bool(forKey: "resetSuccess") )
-                
-                self.isOn = true
-                print("self.isOn")
-                print(self.isOn)
-                
+                //  Update all UI-bound state on main thread
+                DispatchQueue.main.async {
+                    isResetpwd.wrappedValue = true  // triggers alert
+                    self.isOn = true
+                    UserDefaults.standard.set(true, forKey: "resetSuccess")
+                    completed(account, nil)
+                }
+
                 
             case .failure(let error):
                 print("error")
                 print(error)
-                UserDefaults.standard.setValue(false, forKey: "userLocked")
-                print("userLocked val1111")
-                print( (UserDefaults.standard.bool(forKey: "userLocked") ))
-                if(error == .lockedError)
-                {
-                    UserDefaults.standard.setValue(true, forKey: "userLocked")
-                    print("userLocked val222")
-                    print( (UserDefaults.standard.bool(forKey: "userLocked") ))
+                
+                DispatchQueue.main.async {
+                    UserDefaults.standard.setValue(false, forKey: "userLocked")
+                    if error == .lockedError {
+                        UserDefaults.standard.setValue(true, forKey: "userLocked")
+                    }
                     
+                    print("userLocked: \(UserDefaults.standard.bool(forKey: "userLocked"))")
+                    
+                    // Send the appropriate alert
+                    switch error {
+                    case .invalidData: completed(nil, AlertContext.invalidData)
+                    case .invalidURL: completed(nil, AlertContext.invalidURL)
+                    case .invalidResponse: completed(nil, AlertContext.invalidResponse)
+                    case .invalidPassword: completed(nil, AlertContext.invalidPassword)
+                    case .unableToComplete: completed(nil, AlertContext.unableToComplete)
+                    case .decodingError: completed(nil, AlertContext.decodingError)
+                    case .lockedError: completed(nil, AlertContext.lockedError)
+                    case .numberInvalidError: completed(nil, AlertContext.numberInvalidError)
+                    case .otpWrongError: completed(nil, AlertContext.otpWrongError)
+                    case .invalidUser: completed(nil, AlertContext.invalidUser)
+                    case .unauthorized: completed(nil, AlertContext.unauthorized)
+                    }
                 }
-                
-                switch error {
-                case .invalidData:
-                    completed(nil, AlertContext.invalidData)
-                case .invalidURL:
-                    completed(nil, AlertContext.invalidURL)
-                case .invalidResponse:
-                    completed(nil, AlertContext.invalidResponse)
-                case .invalidPassword:
-                    completed(nil, AlertContext.invalidPassword)
-                case .unableToComplete:
-                    completed(nil, AlertContext.unableToComplete)
-                case .decodingError:
-                    completed(nil, AlertContext.decodingError)
-                case .lockedError:
-                    completed(nil, AlertContext.lockedError)
-                case .numberInvalidError:
-                    completed(nil, AlertContext.numberInvalidError)
-                case .otpWrongError:
-                    completed(nil, AlertContext.otpWrongError)
-                case .invalidUser:
-                    completed(nil, AlertContext.invalidUser)
-                case .unauthorized:
-                    completed(nil, AlertContext.unauthorized)
-                }
-                
             }
-        })
+        }
     }
+
+ 
     
     func logout( completed:@escaping (String?, AlertItem?) -> Void) {
         

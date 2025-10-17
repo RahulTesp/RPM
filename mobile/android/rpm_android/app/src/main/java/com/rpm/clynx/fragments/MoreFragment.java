@@ -20,13 +20,25 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.rpm.clynx.R;
 import com.rpm.clynx.service.TwilioChatManager;
 import com.rpm.clynx.utility.ConversationsClientManager;
 import com.rpm.clynx.utility.DataBaseHelper;
+import com.rpm.clynx.utility.MyApplication;
 import com.rpm.clynx.utility.SystemBarColor;
+import static com.rpm.clynx.utility.Links.BASE_URL;
+import static com.rpm.clynx.utility.Links.FB_TOK_DELETE;
+import static com.rpm.clynx.utility.Links.LOGOUT;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MoreFragment extends Fragment {
 
@@ -124,7 +136,7 @@ public class MoreFragment extends Fragment {
                 Toast.makeText(requireContext(), "Coming Soon!", Toast.LENGTH_SHORT).show()
         );
 
-        Logout_btn.setOnClickListener(v -> logOff());
+        Logout_btn.setOnClickListener(v -> logOff(Token));
 
         return view;
     }
@@ -150,23 +162,108 @@ public class MoreFragment extends Fragment {
         }
     }
 
-    private void logOff() {
+    private void logOff(String tokenVALUE) {
+        // 1️ Get Firebase token from SharedPreferences
+        String fbtoken = pref.getString("FirebaseToken", null);
+
+        if (fbtoken != null) {
+            // Call delete API first
+            firebasetokenDeletion(fbtoken, tokenVALUE);
+        } else {
+            // No FCM token saved, skip directly to logout API
+            callLogoutApi(tokenVALUE);
+        }
+    }
+
+    /**
+     * Delete Firebase token from backend before logout.
+     */
+    private void firebasetokenDeletion(String fbtoken, String tokenVALUE) {
+        String FB_token_delete_URL = BASE_URL + FB_TOK_DELETE; // backend delete endpoint
+        RequestQueue requestQueue = Volley.newRequestQueue(requireContext());
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, FB_token_delete_URL + fbtoken,
+                response -> {
+                    Log.e("fbDeletionSuccess", response);
+                    // after deletion → call logout API
+                    callLogoutApi(tokenVALUE);
+                },
+                error -> {
+                    Log.e("firebasetokenDeletionFailed", error.toString());
+                    // even if delete fails → continue logout
+                    callLogoutApi(tokenVALUE);
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Bearer", tokenVALUE);
+                return headers;
+            }
+        };
+
+        requestQueue.add(stringRequest);
+    }
+
+    /**
+     *  Logout API call.
+     */
+    private void callLogoutApi(String tokenVALUE) {
+        String LOGOUT_URL = BASE_URL + LOGOUT.toString();
+
+        StringRequest request = new StringRequest(Request.Method.POST, LOGOUT_URL,
+                response -> {
+                    Log.i("LogoutAPI", "Success: " + response);
+                    doLocalLogoutCleanup();
+                },
+                error -> {
+                    Log.e("LogoutAPI", "Error: " + error.toString());
+                    doLocalLogoutCleanup(); // force local cleanup anyway
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Bearer", tokenVALUE);
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
+
+        RequestQueue queue = Volley.newRequestQueue(requireContext());
+        queue.add(request);
+    }
+
+    /**
+     * Local cleanup (Twilio, DB, SharedPreferences, navigation).
+     */
+    private void doLocalLogoutCleanup() {
         try {
             TwilioChatManager.getInstance().clearChatList();
             unsubscribeFromTopicsOnLogout(requireContext());
-            editor.putBoolean("loginstatus", false);
+
+            FirebaseMessaging.getInstance().deleteToken()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d("LogoutFIREBASE", "FCM token deleted locally");
+                        }
+                    });
+
             editor.clear();
             editor.apply();
             db.deleteData();
             db.deleteProfileData("myprofileandprogram");
+
             ConversationsClientManager.getInstance().clearConversationsClient();
 
             Intent more = new Intent(requireContext(), Login.class);
-            more.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            more.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                    Intent.FLAG_ACTIVITY_NEW_TASK |
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(more);
             requireActivity().finish();
+
         } catch (Exception e) {
-            Log.e("onLogOff Client Clear", e.toString());
+            Log.e("onLogOff Cleanup Error", e.toString());
         }
     }
 
@@ -175,7 +272,16 @@ public class MoreFragment extends Fragment {
         String token = prefs.getString("FirebaseToken", null);
 
         if (token != null) {
-            FirebaseMessaging.getInstance().unsubscribeFromTopic("videocall");
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("videocall")
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d("FCM", "Successfully unsubscribed from topic: videocall");
+                        } else {
+                            Log.e("FCM", "Failed to unsubscribe from topic", task.getException());
+                        }
+                    });
+
+
             SharedPreferences.Editor editor = prefs.edit();
             editor.remove("FirebaseToken");
             editor.apply();

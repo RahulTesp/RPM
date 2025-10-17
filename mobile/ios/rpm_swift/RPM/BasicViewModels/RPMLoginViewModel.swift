@@ -19,6 +19,9 @@ final class RPMLoginViewModel: ObservableObject {
     var usrnm : String?
     var usrpwd : String?
 
+    init() {
+       }
+    
     func login(userName: String, password: String, completed: @escaping (String?, AlertItem?) -> Void) {
         
         let defaults = UserDefaults.standard
@@ -31,6 +34,8 @@ final class RPMLoginViewModel: ObservableObject {
                     print("loginDataModel:", loginDataModel)
                     print("Token:", loginDataModel.tkn)
                     print("MFA:", loginDataModel.mfa)
+                    
+                    SessionManager.shared.reset()
                     
                     // Set MFA flags
 
@@ -50,6 +55,10 @@ final class RPMLoginViewModel: ObservableObject {
                     } else {
                         // Save token for normal flow
                         defaults.setValue(loginDataModel.tkn, forKey: "jsonwebtoken")
+                     
+                     
+                        
+                        
                         print("Saved login token:", defaults.string(forKey: "jsonwebtoken") ?? "nil")
                         
                         defaults.setValue("MFAENABLEDFALSE", forKey: "MFAENABLEDFALSE")
@@ -140,13 +149,9 @@ final class RPMLoginViewModel: ObservableObject {
         }
     }
 
- 
+
     func verifyOtp(userName: String, otp: String, completed: @escaping (String?, AlertItem?) -> Void) {
-        print("userName")
-        print("otp")
-        print(userName)
-        print(otp)
-       
+    
         let defaults = UserDefaults.standard
         NetworkManager.shared.otpVerification(userName: userName,
                                     otp: otp,
@@ -226,14 +231,13 @@ final class RPMLoginViewModel: ObservableObject {
         })
     }
     
-    
     func logout(completion: @escaping (String?, AlertItem?) -> Void) {
         print("self.ggttttt")
         print(self.isAuthenticated)
         let defaults = UserDefaults.standard
         
         guard let tkn = defaults.string(forKey: "jsonwebtoken") else {
-            completion(nil, AlertContext.invalidUser) // or other alert
+            completion(nil, AlertContext.invalidUser)
             return
         }
         
@@ -241,13 +245,19 @@ final class RPMLoginViewModel: ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let responseString):
-                    print("LOGOUTresponseString",responseString)
-                    print("self.isAuthenticated",self.isAuthenticated)
-              
+                    print("LOGOUTresponseString", responseString)
+                    
+                    // Clear token
+                                   defaults.removeObject(forKey: "jsonwebtoken")
+                                   
+                    
+                    // Reset session flags
                     SessionManager.shared.reset()
-                 
+                    
+                    // Make sure UI goes back to login
+                    self.isAuthenticated = false
                     self.isLoggedOut = true
-             
+                    
                     completion(responseString, nil)
                     
                 case .failure(let error):
@@ -264,8 +274,7 @@ final class RPMLoginViewModel: ObservableObject {
                     case .numberInvalidError: alert = AlertContext.numberInvalidError
                     case .otpWrongError: alert = AlertContext.otpWrongError
                     case .invalidUser: alert = AlertContext.invalidUser
-                    case .unauthorized:
-                        alert = AlertContext.unauthorized
+                    case .unauthorized: alert = AlertContext.unauthorized
                     }
                     completion(nil, alert)
                 }

@@ -26,7 +26,6 @@ public class ActivityInfoActivity extends AppCompatActivity {
     DataBaseHelper db;
     SharedPreferences pref;
     SharedPreferences.Editor editor;
-    String Token;
     private TabLayout tabLayout;
     private int[] tabIcons = {
             R.drawable.icons_calendar,

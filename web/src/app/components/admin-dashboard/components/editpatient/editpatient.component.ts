@@ -86,6 +86,7 @@ export class EditpatientComponent implements OnInit {
   primaryinsurnace: any;
   secondaryinsurnace: any;
   patientdevicedetails: any;
+  
   DiagnosisInfos: any;
   failureTemplate: TemplateRef<any>;
   successTemplate: TemplateRef<any>;
@@ -140,6 +141,7 @@ export class EditpatientComponent implements OnInit {
   programVitals: any;
   initialFormValues: any;
   allVitalsSelected = false;
+  uniqueVitals: any;
   private programNameValueChangesSubscription: Subscription | undefined;
   constructor(
     private _route: ActivatedRoute,
@@ -742,13 +744,14 @@ export class EditpatientComponent implements OnInit {
           this.cname = that.Clinic_Selected[0].ClinicName;
           this.ccode = that.Clinic_Selected[0].ClinicCode;
           this.cid = that.Clinic_Selected[0].Id;
+          that.PatientInfoForm.controls['cliniccode'].setValue(this.ccode);
           that.programForm.controls['cliniccode'].setValue(this.ccode);
         }else{
           that.programForm.controls['cliniccode'].setValue('');
-
         }
         that.PatientInfoForm.controls['clinicname'].setValue(this.cname);
-       // that.PatientInfoForm.controls['cliniccode'].setValue(this.ccode);
+        // this was commented in the original code as part of bug fix enabled this
+        //that.PatientInfoForm.controls['cliniccode'].setValue(this.ccode);
 
         var patientHeighArray = that.resp.Height.toString().split('.');
 
@@ -1075,6 +1078,8 @@ export class EditpatientComponent implements OnInit {
               DeviceStatus: 'InActive',
               VitalId: v.VitalId,
               DeviceNumber: '',
+              isEditable : false,
+              DeviceTypeDataId: null
             };
             vitalArr.push(obj);
           }
@@ -1100,6 +1105,8 @@ export class EditpatientComponent implements OnInit {
                 DeviceStatus: 'InActive',
                 VitalId: v.VitalId,
                 DeviceNumber: '',
+                isEditable : false,
+                DeviceTypeDataId: null
               };
               if (!vitalArr.some((item) => item.VitalName == obj.VitalName)) {
                 vitalArr.push(obj);
@@ -1107,6 +1114,7 @@ export class EditpatientComponent implements OnInit {
             }
           }
           that.patientdevicedetails = vitalArr;
+           this.uniqueVitals = this.getUniqueVitals();
           console.log('Patient Device Details');
           console.log(that.patientdevicedetails)
         }
@@ -1187,6 +1195,7 @@ export class EditpatientComponent implements OnInit {
       DeviceStatus: 'InActive',
       VitalId: '',
       DeviceNumber: '',
+      isEditable: true,
     };
     if (this.patientdevicedetails?.length < 10) {
       this.patientdevicedetails.push(obj);
@@ -3825,16 +3834,18 @@ export class EditpatientComponent implements OnInit {
       return true;
     });
   }
-
+  
   onVitalChange(device: any, event: Event) {
     const selectedValue = (event.target as HTMLSelectElement).value;
     const selectedId = Number(selectedValue);
 
-    const selectedVital = this.getUniqueVitals().find((v: { VitalId: number }) => v.VitalId === selectedId);
+    //const selectedVital = this.getUniqueVitals().find((v: { VitalId: number }) => v.VitalId === selectedId);
+  const selectedVital = this.uniqueVitals.find((v: {VitalId: number}) => v.VitalId === selectedId);
+  if (!selectedVital) return;
+
     if (!selectedVital) return;
 
     const selectedVitalName = selectedVital.VitalName.toLowerCase();
-
     const alreadyActive = this.patientdevicedetails.some(
       (d: any) =>
         d.DeviceStatus === 'Active' &&
@@ -3849,6 +3860,9 @@ export class EditpatientComponent implements OnInit {
       // Temporarily mark invalid and clear value
       device.invalidSelection = true;
       device.VitalId = null;
+      device.previousVitalId = null;
+      device.DeviceName = '';
+      device.device_id = null;
 
       // Force a refresh after short delay
       setTimeout(() => {
@@ -3860,5 +3874,7 @@ export class EditpatientComponent implements OnInit {
 
     // If valid, update previousVitalId
     device.previousVitalId = selectedId;
+    device.DeviceName = this.devArr.find((d: any) => d.VitalId === selectedId)?.DeviceName ?? '';
   }
+  
 }

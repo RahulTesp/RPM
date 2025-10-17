@@ -1451,9 +1451,9 @@ namespace RpmCloud.Controllers
                 return BadRequest(new { message = "Exception" });
             }
         }
-        [Route("getpatientnotesbyprogram")]
+        [Route("getpatientnotesbyprogramid")]
         [HttpGet]
-        public IActionResult GetPatientNotes([FromQuery] string ProgramName, [FromQuery] string Type, [FromQuery] int PatientNoteId)
+        public IActionResult GetPatientNotes([FromQuery] int ProgramId, [FromQuery] string Type, [FromQuery] int PatientNoteId)
         {
 
             try
@@ -1475,7 +1475,7 @@ namespace RpmCloud.Controllers
                     {
                         return Unauthorized(new { message = "Invalid session." });
                     }
-                    GetPatientNotesQA GetPatientNotes = RpmDalFacade.GetPatientNotes(ProgramName, Type, PatientNoteId, UserName);
+                    GetPatientNotesQA GetPatientNotes = RpmDalFacade.GetPatientNotes(ProgramId, Type, PatientNoteId, UserName);
                     // List<NotesProgramMaster> GetMasterDataNotes = RpmDalFacade.GetMasterDataNotes(UserName);
                     if (!GetPatientNotes.Equals(null))
                     {

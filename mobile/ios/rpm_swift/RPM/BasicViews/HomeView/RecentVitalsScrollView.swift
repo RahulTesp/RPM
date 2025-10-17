@@ -60,8 +60,7 @@ struct RecentVitalsScrollView: View {
                 .padding(.horizontal,13)
                 
             }
-            .frame(width: width)
-          
+            .frame(width: width, height: 150)
             .background(Color("LGreen"))
             .cornerRadius(15)
           

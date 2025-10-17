@@ -110,7 +110,6 @@ struct RPMResetPasswordView: View {
         }
     }
 
-
     private var actionButton: some View {
         Group {
             if showResend {
@@ -146,19 +145,43 @@ struct RPMResetPasswordView: View {
         }
         .alert(item: $alertItem) { $0.alert }
         .alert(result, isPresented: $showingAlerts) { Button("OK", role: .cancel) {} }
-        .alert("Password Reset Successfully", isPresented: $isResetpwd) { Button("OK", role: .cancel) {} }
+    
+        //.alert("Password Reset Successfully", isPresented: $isResetpwd) { Button("OK", role: .cancel) {} }
+        .alert("Password Reset Successfully", isPresented: $isResetpwd) {
+            // After reset password alert OK button
+            Button("OK") {
+                // Clear navigation stack
+                navigationHelper.path.removeAll()
+                
+                // Reset login state to make login view root
+                loginViewModel.isAuthenticated = false
+                
+                // Optional: reset temp tokens
+                UserDefaults.standard.removeObject(forKey: "jsonwebtoken")
+                UserDefaults.standard.removeObject(forKey: "jsonwebtokenold")
+            }
+
+        }
+
+
+
+
+        
+        
     }
 
     private func resendOTP() {
         restartTimer = true
         resetModel.generateOTP(userName: UserDefaults.standard.string(forKey: "usernameGP") ?? "") { token, alert in
-            if token != nil {
-                self.isActive = true
-            } else {
-                self.shouldShowLoginAlert = true
-                self.alertItem = alert
+            DispatchQueue.main.async {   // ✅ ensure UI updates happen on main thread
+                if token != nil {
+                    self.isActive = true
+                } else {
+                    self.shouldShowLoginAlert = true
+                    self.alertItem = alert
+                }
+                dismissKeyboard()
             }
-            dismissKeyboard()
         }
     }
 
@@ -177,16 +200,15 @@ struct RPMResetPasswordView: View {
             password: newpassword,
             isResetpwd: $isResetpwd
         ) { token, alert in
-            if token != nil {
-                
-                self.isActive = true
-              
-                
-            } else {
-                self.shouldShowLoginAlert = true
-                self.alertItem = alert
+            DispatchQueue.main.async {   // ✅ ensure UI updates happen on main thread
+                if token != nil {
+                    self.isActive = true
+                } else {
+                    self.shouldShowLoginAlert = true
+                    self.alertItem = alert
+                }
+                dismissKeyboard()
             }
-            dismissKeyboard()
         }
     }
 
@@ -215,17 +237,17 @@ struct RPMResetPasswordView: View {
     }
     
     private func dismissKeyboard() {
-        UIApplication.shared
-            .connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap { $0.windows }
-            .first { $0.isKeyWindow }?
-            .endEditing(true)
+        DispatchQueue.main.async {
+            UIApplication.shared
+                .connectedScenes
+                .compactMap { $0 as? UIWindowScene }
+                .flatMap { $0.windows }
+                .first { $0.isKeyWindow }?
+                .endEditing(true)
+        }
     }
 
-
 }
-
 
 extension AlertItem {
     var alert: Alert {
@@ -236,7 +258,6 @@ extension AlertItem {
         )
     }
 }
-
 
 struct SecureInputResetView: View {
     
@@ -253,16 +274,14 @@ struct SecureInputResetView: View {
         ZStack(alignment: .trailing) {
             if isSecured {
                 SecureField(title, text: $text)
-                    .opacity(1)  // Ensure visibility when password is hidden
+                    .opacity(1)
                     .onTapGesture {
-                        // Enable text input
                         UIApplication.shared.sendAction(#selector(UIResponder.becomeFirstResponder), to: nil, from: nil, for: nil)
                     }
             } else {
                 TextField(title, text: $text)
-                    .opacity(1)  // Ensure visibility when password is visible
+                    .opacity(1)
                     .onTapGesture {
-                        // Enable text input
                         UIApplication.shared.sendAction(#selector(UIResponder.becomeFirstResponder), to: nil, from: nil, for: nil)
                     }
             }
@@ -276,7 +295,7 @@ struct SecureInputResetView: View {
                     .padding(.horizontal, 8)
             }
         }
-        .padding(.horizontal)  // Add padding to ensure the button doesn't overlay the text field
+        .padding(.horizontal)
     }
 }
 

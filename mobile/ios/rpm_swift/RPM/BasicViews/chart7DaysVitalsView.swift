@@ -1,26 +1,41 @@
+
 //
 //  chart7DaysVitalsView.swift
 //  RPM
 //
 //  Created by Tesplabs on 05/08/1945 Saka.
 //
-
-
+ 
 import SwiftUI
 import Charts
-
+ 
+// MARK: - Chart Colors
+struct ChartColors {
+    static let bloodPressure: [Color] = [
+        Color(red: 0.196, green: 0.341, blue: 0.102),  // Systolic (Green)
+        Color(red: 0.557, green: 0.353, blue: 0.969),  // Diastolic (Purple)
+        Color(red: 0.573, green: 0.0, blue: 0.231)     // Pulse (Red)
+    ]
+    static let bloodGlucose: [Color] = [
+        Color(red: 0.176, green: 0.498, blue: 0.757),  // Fasting (Blue)
+        Color(red: 0.91, green: 0.478, blue: 0.643)    // Post-Meal (Pink)
+    ]
+    static let oxygen: [Color] = [
+        Color(red: 0.176, green: 0.498, blue: 0.757),  // Oxygen (Blue)
+        Color(red: 0.91, green: 0.478, blue: 0.643)    // Pulse (Pink)
+    ]
+    static let singleLine: Color = Color(red: 0.196, green: 0.341, blue: 0.102) // Default Green
+    static let weight: Color = Color(red: 0.31, green: 0.016, blue: 0.129)      // Maroon/Brown
+}
+ 
+// MARK: - Chart View
 struct chart7DaysVitalsView: View {
-    
     @State private var highlightedIndex: Int?
-    
     var item: RPMVitalsChartDaysDataModel
-    
     var viewWidth: CGFloat
-    
     var body: some View {
-        VStack(spacing: 0) {  // Stack elements without extra spacing
-            
-            // **1st HStack: Vital Name (Green Background)**
+        VStack(spacing: 0) {
+            //  Vital Name Header
             HStack {
                 Text(item.vitalName ?? "No Vital")
                     .foregroundColor(Color("darkGreen"))
@@ -28,88 +43,121 @@ struct chart7DaysVitalsView: View {
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(width: viewWidth, height: 50)  // Ensure consistent width
+            .frame(width: viewWidth, height: 50)
             .background(Color("ColorGreen"))
             .cornerRadius(10, corners: [.topLeft, .topRight])
-           
-            
-            // **2nd HStack: Chart (White Background)**
+            // Chart Section
             HStack {
                 if item.time == nil || item.values?.isEmpty == true {
-                    Text("No Readings").foregroundColor(.red)
+                    Text("No Readings")
+                        .foregroundColor(.red)
                 } else {
                     let valSummary = item.values ?? []
                     let dayCount = item.time ?? []
-                    
                     let chartView = getChartView(for: item.vitalName ?? "", values: valSummary, days: dayCount)
-                    
                     chartView
                         .onTapGesture {
                             print("Tapped on index: \(highlightedIndex ?? -1)")
                         }
                 }
             }
-            .frame(width: viewWidth, height: 300) // Ensure same width
-            .background(Color.white)  // White background
-            .cornerRadius(0) // No corner radius to keep separation clear
-         
-            
-            // **3rd HStack: Legend (White Background)**
+            .frame(width: viewWidth, height: 300)
+            .background(Color.white)
+            //  Legend Section
             HStack {
                 if let values = item.values {
                     legendView(for: values)
                 }
             }
-            .frame(width: viewWidth, height: 30) // Ensure same width
+            .frame(width: viewWidth, height: 30)
             .padding(.bottom, 10)
-            .background(Color.white) // White background
-            .cornerRadius(10, corners: [.bottomLeft, .bottomRight]) // Round bottom corners
+            .background(Color.white)
+            .cornerRadius(10, corners: [.bottomLeft, .bottomRight])
         }
-   
-        .frame(width: viewWidth)  // Ensure proper width
+        .frame(width: viewWidth)
     }
-    
-    /// **Function to get the appropriate chart view dynamically**
+    // MARK: - Chart Selector
     @ViewBuilder
     func getChartView(for vitalName: String, values: [Valuev], days: [String]) -> some View {
-        switch values.count {
-        case 3 where vitalName == "Blood Pressure":
+        switch vitalName {
+        case "Blood Pressure" where values.count == 3:
             MultiLineChartView3v(
                 entries1: getEntries(valueSummary: values, entryIndex: 0),
                 entries2: getEntries(valueSummary: values, entryIndex: 1),
                 entries3: getEntries(valueSummary: values, entryIndex: 2),
                 days: getDaysv7(patientSummary: days),
                 item: item,
+                lineColors: ChartColors.bloodPressure,
                 highlightedIndex: $highlightedIndex
-            )   .padding()
-        case 2:
-            MultiLineChartView2v(
-                entries1: getEntries(valueSummary: values, entryIndex: 0),
-                entries2: getEntries(valueSummary: values, entryIndex: 1),
-                days: getDaysv7(patientSummary: days),
-                item: item,
-                highlightedIndex: $highlightedIndex
-            )   .padding()
-        case 1:
+            )
+            .padding(.top, 8)
+        case "Blood Glucose":
+            if values.count == 1 {
+                MultiLineChartView1v(
+                    entries1: getEntries(valueSummary: values, entryIndex: 0),
+                    days: getDaysv7(patientSummary: days),
+                    item: item,
+                    lineColors: [ChartColors.bloodGlucose[0]], // Always use blue for single glucose
+                    highlightedIndex: $highlightedIndex
+                )
+                .padding(.top, 8)
+            } else if values.count == 2 {
+                MultiLineChartView2v(
+                    entries1: getEntries(valueSummary: values, entryIndex: 0),
+                    entries2: getEntries(valueSummary: values, entryIndex: 1),
+                    days: getDaysv7(patientSummary: days),
+                    item: item,
+                    lineColors: ChartColors.bloodGlucose, // Blue + Pink
+                    highlightedIndex: $highlightedIndex
+                )
+                .padding(.top, 8)
+            }
+            
+        case "Oxygen":
+            if values.count == 1 {
+                MultiLineChartView1v(
+                    entries1: getEntries(valueSummary: values, entryIndex: 0),
+                    days: getDaysv7(patientSummary: days),
+                    item: item,
+                    lineColors: [ChartColors.oxygen[0]],
+                    highlightedIndex: $highlightedIndex
+                )
+                .padding(.top, 8)
+            }
+            else if values.count == 2 {
+                MultiLineChartView2v(
+                    entries1: getEntries(valueSummary: values, entryIndex: 0),
+                    entries2: getEntries(valueSummary: values, entryIndex: 1),
+                    days: getDaysv7(patientSummary: days),
+                    item: item,
+                    lineColors: ChartColors.oxygen,
+                    highlightedIndex: $highlightedIndex
+                )
+                .padding(.top, 8)
+            }
+                
+            
+        case "Weight":
             MultiLineChartView1v(
                 entries1: getEntries(valueSummary: values, entryIndex: 0),
                 days: getDaysv7(patientSummary: days),
                 item: item,
+                lineColors: [ChartColors.weight],
                 highlightedIndex: $highlightedIndex
-            )   .padding()
+            )
+            .padding(.top, 8)
         default:
             Text("Unsupported Vital Type")
         }
     }
-    
-    /// **Function to generate the legend dynamically**
+    // MARK: - Legend View
     @ViewBuilder
     func legendView(for values: [Valuev]) -> some View {
         HStack {
             ForEach(values.indices, id: \.self) { index in
-                HStack {
+                HStack(spacing: 4) {
                     Rectangle()
-                        .fill(getColor(for: index))
+                        .fill(getColor(for: index, vitalName: item.vitalName ?? "", valuesCount: item.values?.count ?? 1))
                         .frame(width: 10, height: 10)
                     Text(values[index].label)
                         .foregroundColor(.black)
@@ -120,16 +168,23 @@ struct chart7DaysVitalsView: View {
         }
         .padding(8)
     }
-    
-    /// **Function to get a color for a specific vital value**
-    func getColor(for index: Int) -> Color {
-        let colors: [Color] = [
-            Color(red: 0.20, green: 0.34, blue: 0.10), // Green
-            Color(red: 0.55, green: 0.35, blue: 0.96), // Purple
-            Color(red: 0.57, green: 0.00, blue: 0.23)  // Red
-        ]
-        return colors[index % colors.count] // Cycle through colors
+    // MARK: - Color Resolver
+    func getColor(for index: Int, vitalName: String, valuesCount: Int) -> Color {
+        switch vitalName {
+        case "Oxygen":
+            return ChartColors.oxygen[index % ChartColors.oxygen.count]
+        case "Blood Pressure":
+            return ChartColors.bloodPressure[index % ChartColors.bloodPressure.count]
+        case "Blood Glucose":
+            if valuesCount == 1 {
+                return ChartColors.bloodGlucose[0] // Fasting (Blue)
+            } else {
+                return ChartColors.bloodGlucose[index % ChartColors.bloodGlucose.count]
+            }
+        case "Weight":
+            return ChartColors.weight
+        default:
+            return ChartColors.singleLine
+        }
     }
-
 }
-

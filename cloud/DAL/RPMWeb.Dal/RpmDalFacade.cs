@@ -912,6 +912,11 @@ namespace RPMWeb.Dal
         {
             return new Notification().InsertFirebaseToken(UserName, Bearer,Token, ConnectionString);
         }
+        public static bool DeleteFirebaseToken(string UserName, string Bearer, string Token)
+
+        {
+            return new Notification().DeleteFirebaseToken(UserName, Bearer, Token, ConnectionString);
+        }
 
         public static bool IsPatientOnline(string PatientId, string UserName)
         {
@@ -963,9 +968,9 @@ namespace RPMWeb.Dal
         {
             return new User().GetChatResource(UserName, ToUser, ConnectionString);
         }
-        public static List<ConverationHistory> GetAllConversations(string UserName, string ToUser, string AccountSIDValue, string AuthTokenValue)
+        public async static Task<List<ConverationHistory>> GetAllConversations(string UserName, string ToUser, string AccountSIDValue, string AuthTokenValue,string ChatServiceSid)
         {
-            return new User().GetAllConversationsAsync(UserName, ToUser, AccountSIDValue, AuthTokenValue, ConnectionString);
+            return await  new User().GetAllConversationsAsync(UserName, ToUser, AccountSIDValue, AuthTokenValue, ChatServiceSid, ConnectionString);
         }
         public static void UpdInvalidSessionZero(string jwtToken)
         {

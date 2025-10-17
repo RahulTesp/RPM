@@ -1,74 +1,73 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
+using System.Data.Common;
 
 class Program
 {
-    static string CONN_STRING =string.Empty;
-    private static Timer _timer = null;
+    static string CONN_STRING = string.Empty;
     static async Task Main(string[] args)
     {
-        // Set up configuration
+        // Load configuration from appsettings.json and environment variables
         var config = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: true)
-            .AddEnvironmentVariables() // Allows overriding via Azure App Settings
+            .AddEnvironmentVariables()
             .Build();
 
-        // Access a specific config value
-        string connStr = config["RPM:ConnectionString"];
-        Console.WriteLine($"RPM Connection String: {connStr}");
-
-        // Optional: bind strongly-typed object
-        var rpmSettings = config.GetSection("RPM").Get<RpmSettings>();
-        Console.WriteLine($"RPM.ConnectionString (typed): {rpmSettings?.ConnectionString}");
-        CONN_STRING = rpmSettings?.ConnectionString;
-        Console.WriteLine("WebJob started...");
-        if(CONN_STRING == null)
+        string? connStr = config["RPM:ConnectionString"];
+        if (string.IsNullOrEmpty(connStr))
         {
-            Console.WriteLine("Connection string is null.");
+            Console.WriteLine("Connection string is missing in appsettings.json.");
             return;
         }
-        try
-        {
-            Thread.Sleep(20000);
-            _timer = new Timer(TimerCallback, null, 0, 30000);
-            Console.ReadLine();
 
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("exception:" + ex);
-        }
+        // Parse connection string for server and database info
+        var builder = new DbConnectionStringBuilder { ConnectionString = connStr };
+        string server = builder.ContainsKey("Server") ? builder["Server"].ToString() : "";
+        string database = builder.ContainsKey("Initial Catalog") ? builder["Initial Catalog"].ToString() : "";
 
-    }
-    private static void TimerCallback(Object o)
-    {
-        try
+        Console.WriteLine($"Server: {server}");
+        Console.WriteLine($"Database: {database}");
+
+        CONN_STRING = connStr;
+        Console.WriteLine("WebJob started...");
+
+        // Continuous loop: execute job every 5 seconds
+        while (true)
         {
-            Console.WriteLine("Timer Api call back");
-            using (SqlConnection connection = new SqlConnection(CONN_STRING))
+            try
             {
-                connection.Open();
-                SqlCommand command2 = new SqlCommand("usp_InsPatientProgramPriority", connection);
-                command2.CommandTimeout = 900000;
-                command2.CommandType = CommandType.StoredProcedure;
-                command2.ExecuteNonQuery();
-                SqlCommand command3 = new SqlCommand("usp_InsAlertSummary", connection);
-                command3.CommandTimeout = 900000;
-                command3.CommandType = CommandType.StoredProcedure;
-                command3.ExecuteNonQuery();
-                connection.Close();
+                await TimerCallback();
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[{DateTime.Now}] Exception: {ex}");
+            }
+            await Task.Delay(TimeSpan.FromSeconds(20)); // Non-blocking delay
         }
-        catch (Exception Ex)
-        {
-            Console.WriteLine(Ex);
-        }
-
     }
-}
-public class RpmSettings
-{
-    public string? ConnectionString { get; set; }
+
+    private static async Task TimerCallback()
+    {
+        Console.WriteLine($"[{DateTime.Now}] Timer triggered.");
+
+        using SqlConnection connection = new SqlConnection(CONN_STRING);
+        await connection.OpenAsync();
+        await ExecuteStoredProcedure(connection, "usp_InsPatientProgramPriority");
+        Thread.Sleep(5000);
+        await ExecuteStoredProcedure(connection, "usp_InsAlertSummary");
+    }
+
+    private static async Task ExecuteStoredProcedure(SqlConnection connection, string procedureName, int timeoutSeconds = 300)
+    {
+        using SqlCommand command = new SqlCommand(procedureName, connection)
+        {
+            CommandType = CommandType.StoredProcedure,
+            CommandTimeout = timeoutSeconds
+        };
+
+        await command.ExecuteNonQueryAsync();
+        Console.WriteLine($"Executed {procedureName} successfully.");
+    }
 }

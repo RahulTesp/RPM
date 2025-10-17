@@ -20,6 +20,16 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/itemSchedIval"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_30dp"
+                android:text="Schedule"
+                android:textColor="@color/accent2"
+                android:textSize="16sp"
+                app:fontFamily="@font/rubik_semibold" />
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_20dp"

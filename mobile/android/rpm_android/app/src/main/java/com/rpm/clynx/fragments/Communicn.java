@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
+
+import com.rpm.clynx.home.Home;
 import com.rpm.clynx.utility.DataBaseHelper;
 import com.rpm.clynx.R;
 import org.json.JSONArray;
@@ -43,6 +45,21 @@ public class Communicn extends Fragment {
         getDbData();
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("getDbData","ONRESUME");
+        Home activity = (Home) getActivity();
+        if (activity != null) {
+            // Fetch profile and update UI after DB is updated
+            activity.getpatientprofile(() -> {
+                if (isAdded()) { // make sure fragment is attached
+                    getActivity().runOnUiThread(this::getDbData);
+                }
+            });
+        }
     }
 
     private void getDbData() {

@@ -12,7 +12,7 @@ import SwiftUI
 struct RPMNotificationView: View {
     
     @Environment(\.presentationMode) var presentationMode
-    @ObservedObject var notifList = NotificationViewModel()
+    @EnvironmentObject var notifList: NotificationViewModel
     @State private var showDeleteConfirmation = false
     @State private var isLoading = true //  loading state
     
@@ -94,6 +94,7 @@ struct RPMNotificationView: View {
 
     // MARK: - Helper
     private func loadData() {
+        print("notiloaddata")
         isLoading = true
         notifList.getnotify {
             // You should modify getnotify to accept a completion handler
