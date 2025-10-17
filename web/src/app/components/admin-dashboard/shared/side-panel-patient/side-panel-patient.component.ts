@@ -448,7 +448,9 @@ export class SidePanelPatientComponent implements OnInit {
         this.ScheduleTypeIdArray = res.scheduleTypes;
         this.scheduleUserList = res.patientOrContacts;
         this.http_AssigneeListSchedule = res.filteredAssignees;
-
+        this.http_AssigneeListSchedule = this.http_AssigneeListSchedule.filter((item: { Id: any; }, index: any, self: any[]) =>
+         index === self.findIndex((t) => t.Id === item.Id)
+         );
         sessionStorage.setItem('PatientOrContact', JSON.stringify(res.patientOrContacts));
       })
       .catch(err => {
