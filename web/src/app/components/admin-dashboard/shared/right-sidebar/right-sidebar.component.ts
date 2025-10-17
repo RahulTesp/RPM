@@ -1854,9 +1854,9 @@ export class RightSidebarComponent implements OnInit {
         .then(
           (data) => {
             this.worklistgettaskbyid = data;
-            // this.alertAssigneeName = this.worklistgettaskbyid.CareTeamId;
-            const uniqueCareTeam = [...new Set(this.worklistgettaskbyid.CareTeamId)];
-             this.alertAssigneeName = uniqueCareTeam;
+             this.alertAssigneeName = this.worklistgettaskbyid.CareTeamId;
+            //const uniqueCareTeam = [...new Set(this.worklistgettaskbyid.CareTeamId)];
+             //this.alertAssigneeName = uniqueCareTeam;
              console.log('uniqueTaskArrayList-Previous');
              console.log(this.worklistgettaskbyid.Members);
              const uniqueTaskArrayList = [...new Set(this.worklistgettaskbyid.Members)]; 
@@ -1917,6 +1917,7 @@ export class RightSidebarComponent implements OnInit {
         this.registerTask.controls.duedate.value,
         'yyyy-MM-dd'
       );
+      
       var req_body: any = {
         Id: this.taskId,
         // CareteamMemberUserId:this.registerTask.controls.assignee_name.value,
@@ -3047,7 +3048,7 @@ export class RightSidebarComponent implements OnInit {
   registerTeamTask = new UntypedFormGroup({
     // task_pname: new FormControl(null,[Validators.required]),
     tasktype: new UntypedFormControl(null, [Validators.required]),
-    description: new UntypedFormControl(null),
+    description: new UntypedFormControl(null,[Validators.required]),
     duedate: new UntypedFormControl(null, [Validators.required]),
     priority: new UntypedFormControl(null, [Validators.required]),
     task_status: new UntypedFormControl(null, [Validators.required]),
@@ -3199,6 +3200,7 @@ export class RightSidebarComponent implements OnInit {
       );
     } else {
       alert('Please Complete the Form ');
+      this.loading = false;
     }
   }
 

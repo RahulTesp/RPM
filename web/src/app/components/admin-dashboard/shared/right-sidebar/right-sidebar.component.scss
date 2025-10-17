@@ -1236,3 +1236,7 @@ input.mat-input-element
 {
   width: 100%;
 }
+.disabled-div {
+  pointer-events: none;   /* disables clicks */
+  opacity: 0.6;           /* optional: grey out */
+}

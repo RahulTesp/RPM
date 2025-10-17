@@ -1206,6 +1206,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         alert('Message Sent Successfully..!');
         this.loading_sms = false;
         this.getSMSData();
+       this.activityInfoMenuSelect(6);
       },
       (err) => {
         // this.dialog.closeAll();
@@ -1588,23 +1589,19 @@ getFirstPresentVital(vitalScreen: any) {
 
   return null; // No matching keys found
 }
-
-    selectFirstAvailableVital() {
+  selectFirstAvailableVital() {
   const vitalScreen = this.ProcessVitalData;
-  const result = this.getFirstPresentVital(vitalScreen);
-
-  // Only change if currentVital is not set or invalid
-  if (!this.currentVital && result) {
-    this.ChangeVitalScreen(result.key);
+   const result = this.getFirstPresentVital(vitalScreen);
+   if(result)
+   {
+    this.ChangeVitalScreen(result.key)
+   }
   }
-}
 
-currentVital: any;
-
-ChangeVitalScreen(button: any) {
-  this.currentVital = button;
-}
-
+  currentVital: any;
+  ChangeVitalScreen(button: any) {
+    this.currentVital = button;
+  }
 
   // Get SMS Data for 30 Days For Report Generation
 
@@ -2017,10 +2014,10 @@ ChangeVitalScreen(button: any) {
           this.billingSrcArray = billingC_CCM;
           break;
         case 'PCM-P':
-          this.billingSrcArray = billingPCM_C;
+          this.billingSrcArray = billingPCM_P;
           break;
         case 'PCM-C':
-          this.billingSrcArray = billingPCM_P;
+          this.billingSrcArray = billingPCM_C;
           break;
       }
     } else {
@@ -3284,7 +3281,7 @@ ChangeVitalScreen(button: any) {
                     );
                   }
                 } else {
-                      let endDate = new Date(x.BillingStartDate);
+                      let endDate = new Date(this.BillingPeriodStart);
                       endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
                       endDate.setMonth(endDate.getMonth()+1);
                       if (billingStartDate == '1-01-01') {
@@ -3408,7 +3405,7 @@ ChangeVitalScreen(button: any) {
                     );
                   }
                 } else {
-                      let endDate = new Date(x.BillingStartDate);
+                      let endDate = new Date(this.BillingPeriodStart);
                       endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
                       endDate.setMonth(endDate.getMonth()+1);
                       if (billingStartDate == '1-01-01') {
