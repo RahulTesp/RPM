@@ -1206,6 +1206,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         alert('Message Sent Successfully..!');
         this.loading_sms = false;
         this.getSMSData();
+       this.activityInfoMenuSelect(6);
       },
       (err) => {
         // this.dialog.closeAll();

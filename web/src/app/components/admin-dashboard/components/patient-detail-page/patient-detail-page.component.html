@@ -4437,9 +4437,8 @@
 
           <ng-container matColumnDef="Description">
             <mat-header-cell *matHeaderCellDef> Remark </mat-header-cell>
-            <mat-cell *matCellDef="let element; let rowIndex = index">{{
-              element.Description
-            }}</mat-cell>
+            <mat-cell *matCellDef="let element; let rowIndex = index" [title]="element.Description ">
+              <span class="truncate-text">{{ element.Description }}</span></mat-cell>
           </ng-container>
 
           <!-- Action Column -->
