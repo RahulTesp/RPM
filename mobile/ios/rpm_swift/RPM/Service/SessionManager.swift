@@ -1,3 +1,4 @@
+
 ////
 ////  SessionManager.swift
 ////  RPM
@@ -154,6 +155,7 @@ class SessionManager: ObservableObject {
     }
     
         func handleUnauthorizedResponse() {
+            print("handleUnauthorizedResponse")
             DispatchQueue.main.async {
                 self.didReceiveUnauthorized = true
             }

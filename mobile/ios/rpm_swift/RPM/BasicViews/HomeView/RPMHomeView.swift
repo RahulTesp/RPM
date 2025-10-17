@@ -1,3 +1,5 @@
+
+
 //
 //  RMPHomeView.swift
 //  RPM
@@ -56,7 +58,6 @@ extension Date {
 
 struct RPMHomeView: View {
     
-   // @StateObject  var notifList = NotificationViewModel()
     @EnvironmentObject var homeViewModel: RPMHomeViewModel
     @EnvironmentObject var notifList: NotificationViewModel
     @EnvironmentObject var appModel: AppModel
@@ -68,7 +69,8 @@ struct RPMHomeView: View {
     @StateObject var todoList = RPMTodoListViewModel()
     @StateObject var chartDays = RPMVitalsChartDaysViewModel()
     @EnvironmentObject var loginViewModel: RPMLoginViewModel
-    @StateObject private var notificationManager = NotificationManager.shared
+    @EnvironmentObject var notificationManager: NotificationManager
+
     @State private var isMediaSetup = false
     @State private var roomName: String = ""
     @State private var isShowingMediaSetup = false
@@ -78,7 +80,6 @@ struct RPMHomeView: View {
     @EnvironmentObject var roomManager: RoomManager
     @EnvironmentObject var localParticipant: LocalParticipantManager
     @EnvironmentObject var mediaSetupViewModel: MediaSetupViewModel
-    @State private var showAlertProxy: Bool = false
     @State private var showRejectionAlert = false
     @State private var rejectionMessage = ""
     @EnvironmentObject var sessionManager: SessionManager
@@ -320,12 +321,17 @@ struct RPMHomeView: View {
                
         
     }
+       
+        
+        .onChange(of: notificationManager.showAlert) { newValue in
+            print("ALERT STATE CHANGED → \(newValue)")
+        }
                   .alert(notificationManager.notificationTitle,
-                                isPresented: $showAlertProxy,
+                         isPresented: $notificationManager.showAlert,
                                 actions: {
                                     Button("No", role: .cancel) {
                                         print("No tapped")
-                                        showAlertProxy = false
+                                
                                         notificationManager.showAlert = false
                                         
                                         if let room = notificationManager.roomName {
@@ -347,7 +353,7 @@ struct RPMHomeView: View {
                                     }
                                     Button("Yes") {
                                         print("Yes tapped")
-                                        showAlertProxy = false
+                                   
                                         notificationManager.showAlert = false
                                         
                                         if let room = notificationManager.roomName {
@@ -363,9 +369,6 @@ struct RPMHomeView: View {
                                     Text("Do you want to join?")
                                 })
         
-                  .onReceive(notificationManager.$showAlert) { newValue in
-                      showAlertProxy = newValue
-                  }
 
                   .onReceive(NotificationCenter.default.publisher(for: Notification.Name("RefreshNotifications"))) { _ in
                       print("RefreshNotifications")
@@ -384,9 +387,7 @@ struct RPMHomeView: View {
                       print(" HOMEONAPEARPath:", navigationHelper.path)
                       homeViewModel.dashboard()
                       notifList.getnotify()
-                  
-//                      print("Home UI appModelrefreshUnreadCount", appModel)
-//                      appModel.conversationManager.refreshUnreadCount()
+                
                       
                   }
     }
@@ -556,12 +557,16 @@ struct CustomCorners : Shape{
     }
 }
 
+
+
+
 struct TopButton: View {
     var text: String
     var colorf: Color
     var colorb: Color
     var flagval: Int
     var phoneNumber = "+16232676578"
+//    var phoneNumber = ""
     @State var isChatActive = false
     @EnvironmentObject var appModel: AppModel
     @EnvironmentObject var navigationHelper: NavigationHelper
@@ -570,12 +575,12 @@ struct TopButton: View {
     var body: some View {
         Button(action: {
             print("appModel3", appModel)
-            
+
             if flagval == 2 {
                 let phone = "tel://"
                 let phoneNumberformatted = phone + phoneNumber
                 guard let url = URL(string: phoneNumberformatted) else { return }
-                
+
                 if UIApplication.shared.canOpenURL(url) {
                     UIApplication.shared.open(url)
                 } else {
@@ -703,3 +708,4 @@ func findDateDiff(time1Str: String, time2Str: String) -> String {
     return timeDiffVal
     
 }
+

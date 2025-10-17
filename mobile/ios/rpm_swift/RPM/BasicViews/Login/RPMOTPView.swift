@@ -1,221 +1,71 @@
+
+
+////
+////  ContentView.swift
+////  RPM
+////
+////  Created by Prajeesh Prabhakar on 30/05/22.
+////
 //
-//  ContentView.swift
-//  RPM
-//
-//  Created by Prajeesh Prabhakar on 30/05/22.
-//
+
 
 import SwiftUI
 
 struct RPMOTPView: View {
-    @Environment(\.colorScheme) var colorScheme
-   var  widthFull = UIScreen.main.bounds.width
-    @State private var shouldShowLoginAlert: Bool = false
-    
-    @State private var restartTimer = false
-    
-    @State private var showingAlerts = false
-    @State private var result = ""
-    
-    @State private var showText = false
-    @State private var showResend = false
-    
-    @EnvironmentObject var navigationHelper: NavigationHelper
     @EnvironmentObject var loginViewModel: RPMLoginViewModel
-    
-    var width: CGFloat {
-          if UIDevice.current.userInterfaceIdiom == .phone {
-              return UIScreen.main.bounds.width / 1.39
-          } else {
-              return UIScreen.main.bounds.width / 1.3
-          }
-      }
-    
-    @State var isActive = false
-    @State private var alertItem: AlertItem?
+    @EnvironmentObject var navigationHelper: NavigationHelper
     @State var otpCode: String = ""
-    @State var otpCodeLength: Int = 8
-    @State var textColor = Color.black
-    @State var textSize = CGFloat(27)
-    
+    let otpCodeLength = 8
+    @State var showText = false
+    @State var showResend = false
+    @State var restartTimer = false
     var body: some View {
-
-            VStack {
-             
-                if loginViewModel.isLoggedOut {
-                 
-                    RPMLoginView()
-               
-                } else {
-                 
-                    Text("Log In")
-                        .font(Font.custom("Rubik-Regular", size: 16))
-              
-                        .foregroundColor(.black)
-                
-                        .multilineTextAlignment(.center)
-                        .padding(.vertical,10)
-                  
-                    Image("logoclynx")
-                        .resizable()
-                        .frame(width: 160.0, height: 150.0)
-                        .padding(10)
-                    //NOTE : COUNT DOWN PROGRESS TIMER
-                    CountdownView(otpCode: $otpCode,showText : $showText, showResend: $showResend , restartTimer : $restartTimer)
-                        .padding(10)
-                    
-                    Text("Enter the Code received on your Mobile number " + (UserDefaults.standard.string(forKey: "MobileNumber") ?? ""))
-                        .foregroundColor(Color("TextColorBlack"))
-                        .font(Font.custom("Rubik-Regular", size: 16))
-                        .padding(10)
-                        .fixedSize(horizontal: false, vertical: true)
-                    
-                        .multilineTextAlignment(.center)
-                
-                    
-                    OtpView_SwiftUI(otpCode: $otpCode, otpCodeLength: otpCodeLength, textColor: textColor, textSize: textSize)
-                        .environmentObject(navigationHelper)
-                        .environmentObject(loginViewModel)
-                        .padding(10)
-                    Spacer()
-                    if showText {
-                        Text("Not Received a Verification Code?")
-                            .foregroundColor(Color("TextColorBlack"))
-                            .font(Font.custom("Rubik-Regular", size: 14))
-                            .padding(10)
-                    } else {
-                        Text("")
-                            .foregroundColor(Color("TextColorBlack"))
-                            .font(Font.custom("Rubik-Regular", size: 14))
-                            .padding(10)
-                    }
-             
-                    if showText {
-                      
-                        Button(action: {
-                            print("Button action")
-                      
-                            self.showText = false
-                            self.showResend = false
-                            self.restartTimer = true
-                            
-                            showingAlerts = true
-                            self.shouldShowLoginAlert = true //trigger Alert
-                      
-                            print(UserDefaults.standard.string(forKey: "pgmUserID") ?? "")
-                            
-                            print(UserDefaults.standard.string(forKey: "passwordSaved") ?? "")
-                            
-                            loginViewModel.login(userName: (UserDefaults.standard.string(forKey: "pgmUserID") ?? ""), password: (UserDefaults.standard.string(forKey: "passwordSaved") ?? ""), completed: { token, alertItem in
-                                if let _ = token {
-                                    
-                                    print("isLogin")
-                                 
-                                    self.isActive = true
-                                    print("self.isActive 2")
-                                    print(self.isActive)
-                                
-                                    print("isAuthenticated value")
-                                    print(loginViewModel.self.isAuthenticated)
-                                    print(loginViewModel.isAuthenticated)
-                                
-                               
-                                    print("loggedin Value1")
-                                    print(UserDefaults.standard.bool(forKey: "loggedInValue") )
-                                    print("isAuthenticated value2222222")
-                                    print(loginViewModel.self.isAuthenticated)
-                                    print(loginViewModel.isAuthenticated)
-                                    
-                                    print("alertItem1")
-                              
-                                
-                                }else {
-                                    shouldShowLoginAlert = true
-                                    self.alertItem = alertItem
-                                    print("alertItem2")
-                             
-                                    print("alertItem title ")
-                                
-                                    
-                                }
-                            
-                            })
-                      
-                        }) {
-                            Text("Resend OTP")
-                            
-                                .font(Font.custom("Rubik-Regular", size: 16))
-                                .frame(width: width, height: 50)
-                            
-                                .background(  showText == true ? Color("lightGreen") : Color("bgColorDark") )
-                                .foregroundColor(showText == true ? Color("title1") : Color("bgColorDark"))
-                          
-                                .cornerRadius(15)
-                         
+        VStack {
+            if loginViewModel.isLoggedOut {
+                RPMLoginView()
+            } else {
+                Text("Log In").font(.title)
+                Image("logoclynx").resizable().frame(width: 160, height: 150)
+                CountdownView(
+                    otpCode: $otpCode,
+                    showText: $showText,
+                    showResend: $showResend,
+                    restartTimer: $restartTimer
+                ).padding()
+                Text("Enter the code sent to \(UserDefaults.standard.string(forKey: "MobileNumber") ?? "")")
+                    .multilineTextAlignment(.center)
+                OtpView_SwiftUI(
+                    otpCode: $otpCode,
+                    otpCodeLength: otpCodeLength,
+                    textColor: .black,
+                    textSize: 27
+                )
+                .environmentObject(navigationHelper)
+                .environmentObject(loginViewModel)
+                .padding()
+                if showText {
+                    Button("Resend OTP") {
+                        restartTimer = true
+                        loginViewModel.login(
+                            userName: UserDefaults.standard.string(forKey: "pgmUserID") ?? "",
+                            password: UserDefaults.standard.string(forKey: "passwordSaved") ?? ""
+                        ) { token, alert in
+                            if alert != nil {
+                                // handle alert
+                            }
                         }
                     }
-                   
-                    else
-                    {
-                        Button(action: {
-                            
-                            print("Button action")
-                      
-                            
-                        }) {
-                            Text("Resend OTP")
-                            
-                                .font(Font.custom("Rubik-Regular", size: 16))
-                                .frame(width: width, height: 50)
-                            
-                                .background(  showText == true ? Color("lightGreen") : Color("bgColorDark") )
-                                .foregroundColor(showText == true ? Color("title1") : Color("bgColorDark") )
-                       
-                                .cornerRadius(15)
-                         
-                        }
-               
+                    .frame(height: 50)
+                    .frame(maxWidth: .infinity)
+                    .background(Color("lightGreen"))
+                    .foregroundColor(.white)
+                    .cornerRadius(15)
+                    .padding()
                 }
-      
-                }
-        
-                Spacer()
-            
-            }.navigationBarBackButtonHidden(true)
-         
-                .frame(minWidth: widthFull)
-            
-                .background(Color("bgColorDark"))
-      
+            }
+            Spacer()
         }
-    
-    // NOTE : OTP VALIDATION FUCTION
-    func validateOTP(_ otp: String ) -> String {
-        
-        
-        if otp.isEmpty  {
-            return "OTP is Required"
-        }
-        return "Valid"
-    }
-   
-    
-}
-
-struct MyTextFieldotpStyle: TextFieldStyle {
-    func _body(configuration: TextField<Self._Label>) -> some View {
-        configuration
-            .padding(12)
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color("textFieldBG"), lineWidth: 2)
-                    .background(Color("textFieldBG"))
-                    .foregroundColor(Color("TextColorGray"))
-                 
-                    .cornerRadius(10)
-                
-            )
-            .padding(.vertical,5)
-       
+        .navigationBarBackButtonHidden(true)
+        .background(Color("bgColorDark").edgesIgnoringSafeArea(.all))
     }
 }

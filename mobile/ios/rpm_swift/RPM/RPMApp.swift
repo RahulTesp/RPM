@@ -1,3 +1,4 @@
+
 //
 //  RPMApp.swift
 //  RPM
@@ -31,7 +32,7 @@ struct RPMApp: App {
     @StateObject private var networkMonitor = NetworkMonitor()
     @StateObject var memberDetList = MembersListViewModel()
     @StateObject  var notifList = NotificationViewModel()
-
+    @StateObject private var notificationManager = NotificationManager.shared
     // Only one init, which sets up the app model.
     init() {
         _model = StateObject(wrappedValue: AppModel.shared)
@@ -68,7 +69,7 @@ struct RPMApp: App {
                     .environmentObject(sessionManager)
                     .environmentObject(memberDetList)
                     .environmentObject(notifList)
-                
+                    .environmentObject(notificationManager)
                     .onAppear {
                         print("AppModel in RPMTabBar:", model)
                         // Log AppModel details for debugging
@@ -176,7 +177,9 @@ struct RPMApp: App {
                                 .environmentObject(homeViewModel)
                                 .environmentObject(loginStateViewModel)
                                 .environmentObject(sessionManager)
-                            
+                                .environmentObject(memberDetList)
+                                .environmentObject(notifList)
+                                .environmentObject(notificationManager)
                         case .programInfoView:
                                    RPMProgramInfoView()
                                 .environmentObject(homeViewModel)

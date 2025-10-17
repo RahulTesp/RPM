@@ -1,3 +1,4 @@
+
 //
 //  CallManager.swift
 //  RPM
@@ -103,46 +104,71 @@ class CallManager: NSObject, ObservableObject {
     
     func connect(roomName: String) {
         print("Attempting to connect to room: \(roomName)")
+     
         let videoPermission = AVCaptureDevice.authorizationStatus(for: .video)
         let audioPermission = AVAudioSession.sharedInstance().recordPermission
-        
+     
         guard videoPermission == .authorized, audioPermission == .granted else {
             print("Permissions not granted")
-            
+     
             AVCaptureDevice.requestAccess(for: .video) { videoGranted in
-                      AVAudioSession.sharedInstance().requestRecordPermission { audioGranted in
-                          DispatchQueue.main.async {
-                              if videoGranted && audioGranted {
-                                  print("videoGranted",videoGranted)
-                                  print("audioGranted",audioGranted)
-                                  self.connect(roomName: roomName) // Try again after permission is granted
-                              } else {
-                                  print("User denied one or more permissions.")
-                              }
-                          }
-                      }
-                  }
-                  return
+                AVAudioSession.sharedInstance().requestRecordPermission { audioGranted in
+                    DispatchQueue.main.async { [weak self] in
+                        guard videoGranted && audioGranted else {
+                            print("User denied one or more permissions.")
+                            return
+                        }
+                        // Only call the setup method once
+                        self?.startCallKitTransaction(roomName: roomName)
+                    }
+                }
+            }
+            return
         }
-        
-        let handle = CXHandle(type: .generic, value: roomName)
+     
+        // Permissions already granted
+        startCallKitTransaction(roomName: roomName)
+    }
+     
+    // MARK: - Separate method for CallKit transaction
+    private func startCallKitTransaction(roomName: String) {
+        //  Prevent multiple active calls
+        guard callUUID == nil else {
+            print("Call already in progress, ignoring duplicate request")
+            return
+        }
+     
+        //  Activate audio session first
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .videoChat, options: [.allowBluetooth, .defaultToSpeaker])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Failed to activate audio session: \(error)")
+            return
+        }
+     
+        //  Generate a unique UUID
         callUUID = UUID()
+        let handle = CXHandle(type: .generic, value: roomName)
         let startCallAction = CXStartCallAction(call: callUUID!, handle: handle)
         startCallAction.isVideo = true
         let transaction = CXTransaction(action: startCallAction)
-        
+     
         print("Requesting CallKit transaction for call: \(callUUID!.uuidString)")
-        
+     
+        //  Request transaction safely
         controller.request(transaction) { [weak self] error in
             if let error = error {
                 print("Error starting call: \(error)")
                 self?.handleError(error)
+                self?.callUUID = nil // reset UUID on failure
+            } else {
+                print("Transaction request successful")
             }
-            else {
-                    print("Transaction request successful")
-                }
         }
     }
+    
+    
     
     func setMute(isMuted: Bool) {
         if let callUUID = callUUID {
