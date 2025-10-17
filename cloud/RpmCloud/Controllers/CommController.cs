@@ -167,10 +167,7 @@ namespace RpmCloud.Controllers
                 string res = commMgr.CallConnect(toNumber, mynumber.Value);
                 if (!string.IsNullOrEmpty(res))
                 {
-                    //resp.StatusCode = HttpStatusCode.OK;
-                    //resp.Content = new StringContent(res, Encoding.UTF8, "application/xml");
-                    //return resp;
-                    return Ok(Content(res, "application/xml", Encoding.UTF8));
+                    return Content(res, "application/xml", Encoding.UTF8);
                 }
                 return Unauthorized(new { message = "Not Found" });
 
@@ -651,7 +648,7 @@ namespace RpmCloud.Controllers
         }
         [HttpGet]
         [Route("getallchats")]
-        public IActionResult GetAllChats(string ToUser)
+        public async Task<IActionResult> GetAllChats(string ToUser)
         {
 
             try
@@ -674,16 +671,18 @@ namespace RpmCloud.Controllers
                     {
                         return BadRequest(new { message = "Exception" });
                     }
-                    SystemConfigInfo? AccountSID = lstConf.Find(x => x.Name.Equals("AccountSID"));
+                    SystemConfigInfo? AccountSID = lstConf.Find(x => x.Name.Equals("AccountSID")); 
                     SystemConfigInfo? AuthToken = lstConf.Find(x => x.Name.Equals("AuthToken"));
-                    if(AuthToken==null || AccountSID== null)
+                    SystemConfigInfo? ChatServiceSid = lstConf.Find(x => x.Name.Equals("ChatServiceSid"));
+                    if (AuthToken==null || AccountSID== null)
                     {
                         return BadRequest(new { message = "Exception" });
                     }
                     string AccountSIDValue = Convert.ToString(AccountSID.Value);
                     string AuthTokenValue = Convert.ToString(AuthToken.Value);
+                    string ChatServiceSidValue = Convert.ToString(ChatServiceSid.Value);
 
-                    List<ConverationHistory> Conversations = RpmDalFacade.GetAllConversations(UserName, ToUser, AccountSIDValue, AuthTokenValue);
+                    List<ConverationHistory> Conversations = await RpmDalFacade.GetAllConversations(UserName, ToUser, AccountSIDValue, AuthTokenValue, ChatServiceSidValue);
                     if (Conversations.Count == 0)
                     {
                         return NotFound(new { message = "No Conversation History Found" });
@@ -747,10 +746,12 @@ namespace RpmCloud.Controllers
        
         [HttpPost]
         [Route("updatechatwebhook")]
-        public IActionResult UpdateChatWebhook([FromBody] chathook hook)
+        [Consumes("application/x-www-form-urlencoded")]
+        public IActionResult UpdateChatWebhook([FromForm] chathook hook)
         {
             try
             {
+                RpmDalFacade.ConnectionString = CONN_STRING;
                 bool ischatresurceupdated = RpmDalFacade.UpdateChatWebhook(hook);
                 if (ischatresurceupdated)
                 {
@@ -769,8 +770,10 @@ namespace RpmCloud.Controllers
 
         [HttpPost]
         [Route("updatesmswebhook")]
-        public IActionResult UpdatesmsWebhook([FromBody] smshook hook)
+        [Consumes("application/x-www-form-urlencoded")]
+        public IActionResult UpdatesmsWebhook([FromForm] smshook hook)
         {
+            RpmDalFacade.ConnectionString = CONN_STRING;
             try
             {
                 RpmDalFacade.UpdateIncomingSmsDetails(hook);

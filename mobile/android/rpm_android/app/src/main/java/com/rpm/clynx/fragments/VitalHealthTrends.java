@@ -5,8 +5,12 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,7 +48,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
-import com.rpm.clynx.activity.ClinicalInfoActivity;
 import com.rpm.clynx.adapter.NewVitalListAdapter;
 import com.rpm.clynx.adapter.VitalReadingsListAdapter;
 import com.rpm.clynx.model.NewVitalsItemModel;
@@ -83,11 +87,8 @@ public class VitalHealthTrends extends Fragment {
 
     View view;
     TextView emptyView, emptyChart,textHighlight7,textHighlight30,headername,viewMoreTextView,VitalNameLabel7,VitalNameLabel30 ;
-   // RecyclerView recyclerView_newvitals;
     RecyclerView recyclerView_vitalreadings;
-    //private List<NewVitalsModel> newVitalsModels;
     LineChart mpLinechart7, mpLinechart30;
-    //private NewVitalListAdapter adapter;
     RecyclerView.LayoutManager layoutManager;
     DataBaseHelper db;
     SharedPreferences pref;
@@ -138,19 +139,12 @@ public class VitalHealthTrends extends Fragment {
         // Inflate the layout for this fragment
         view =  inflater.inflate(R.layout.new_fragment_vitals, container, false);
         initPerformBackClick();
-        viewMoreTextView = view.findViewById(R.id.viewMore);
-        viewMoreTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle the "View More..." click here
-                openClinicalInfoActivityFromVitals();
-            }
-        });
 
         VitalNameLabel30 = (TextView) view.findViewById(R.id.vitalname30);
         final LinearLayout linearLayoutDateView = (LinearLayout) view.findViewById(R.id.headerdateview);
         linearLayout7D30D = (LinearLayout) view.findViewById(R.id.header7D30D);
         headearLayout = (LinearLayout) view.findViewById(R.id.headers);
+
         final FrameLayout frameVitalSummary = (FrameLayout) view.findViewById(R.id.fl_main);
         final FrameLayout frame7days = (FrameLayout) view.findViewById(R.id.fl_sub7);
         frame30days = (FrameLayout) view.findViewById(R.id.fl_sub30);
@@ -175,6 +169,7 @@ public class VitalHealthTrends extends Fragment {
         textHighlight7 = (TextView) markerView77.findViewById(R.id.marker_text7);
         textHighlight30 = (TextView) markerView3030.findViewById(R.id.marker_text30);
 
+
         db = new DataBaseHelper(getContext());
         pref = getContext().getSharedPreferences("RPMUserApp", MODE_PRIVATE);
         editor = pref.edit();
@@ -182,7 +177,6 @@ public class VitalHealthTrends extends Fragment {
 
         ProgramTypeName = pref.getString("ProgramTypeName", null);
 
-        //recyclerView_newvitals = view.findViewById(R.id.recyclerview_newvitals);
         emptyView = (TextView) view.findViewById(R.id.empty_viewnew);
         emptyChart = (TextView) view.findViewById(R.id.empty_viewnew);
 
@@ -328,34 +322,56 @@ public class VitalHealthTrends extends Fragment {
             }
         });
 
-       // layoutManager = new LinearLayoutManager(getContext());
         layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        // newVitalsModels = new ArrayList<>();
         vitalReadingsModels = new ArrayList<>();
-        adapter = new VitalReadingsListAdapter(vitalReadingsModels,getContext());
-        //adapter = new NewVitalListAdapter( newVitalsModels,getContext());
+        //adapter = new VitalReadingsListAdapter(vitalReadingsModels,getContext());
+
+        // Adapter with OnViewMoreClickListener
+        adapter = new VitalReadingsListAdapter(vitalReadingsModels, getContext(),
+                new VitalReadingsListAdapter.OnViewMoreClickListener() {
+                    @Override
+                    public void onViewMoreClicked(VitalReadingsModel vital) {
+                        // Open the clinical info fragment when "View More" is clicked
+                        openClinicalInfoFragmentFromVitals(vital);
+                    }
+                },
+                true);
+
         recyclerView_vitalreadings =  view.findViewById(R.id.fragmentHTVitalReadings);
         recyclerView_vitalreadings.setLayoutManager(layoutManager);
         recyclerView_vitalreadings.setAdapter(adapter);
-
-        //  recyclerView_newvitals.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-       // recyclerView_newvitals.setAdapter(adapter);
         curDay = view.findViewById(R.id.VitalFragment_today_dt);
 
         DateTime curdt = new DateTime(dt);
         getLocalToUTCDate(dt);
         Log.d("current date",getLocalToUTCDate(dt));
 
+        // Today at start of day
+        DateTime today = new DateTime().withTimeAtStartOfDay();
+
+        // Update TextView with bold "TODAY - " if it's today
+        updateCurDayText(curdt, today);
+
         checkvitels(curdt.toString(),curdt.toString());
-        curDay.setText(spdf.format(curdt.toDate()));
         return  view;
     }
 
-    private void openClinicalInfoActivityFromVitals() {
-        Intent intent = new Intent(getActivity(), ClinicalInfoActivity.class);
-        intent.putExtra("opened_from", "VITALS");
-        startActivity(intent);
+
+    private void openClinicalInfoFragmentFromVitals(VitalReadingsModel vital) {
+        ClinicalInfoFragment clinicalInfoFragment = new ClinicalInfoFragment();
+
+        Bundle args = new Bundle();
+        args.putString("opened_from", "VITALS");
+        args.putString("vital_type", vital.getVitalType());
+        clinicalInfoFragment.setArguments(args);
+
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fl_main, clinicalInfoFragment)
+                .addToBackStack(null)  // so you can press back
+                .commit();
     }
+
     public String getLocalToUTCDate(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -367,33 +383,34 @@ public class VitalHealthTrends extends Fragment {
     }
 
     private void prevdateVital() throws ParseException {
-        Date dt = new Date();
-        DateTime curdt = new DateTime(dt);
         DateTime dtPlusOne = curdate.minusDays(1);
-        DateTime dtToday = curdate;
-        curDay.setText(spdf.format(dtPlusOne.toDate()));
-        curIndex = curIndex-1;
-        curdate = dtPlusOne;
-        Log.d("dtPlusOne",dtPlusOne.toString());
-        Log.d("dtToday",dtToday.toString());
-        Log.d("curdt",curdt.toString());
-        Log.d("day1",spdff.format(dtPlusOne.toDate()));
-        Log.d("daycurdt1",spdff.format(curdt.toDate()));
+        DateTime today = new DateTime().withTimeAtStartOfDay();
 
-        checkvitels(dtPlusOne.toString(),dtPlusOne.toString());
+        // Update TextView with bold "TODAY - " if dtPlusOne is today
+        updateCurDayText(dtPlusOne, today);
+
+        curIndex = curIndex - 1;
+        curdate = dtPlusOne;
+
+        Log.d("dtPlusOne", dtPlusOne.toString());
+        Log.d("today", today.toString());
+
+        checkvitels(dtPlusOne.toString(), dtPlusOne.toString());
     }
 
     private void nextDateVital() throws ParseException {
-        DateTime today = new DateTime(); // current date
-        DateTime dtPlusOne = curdate.plusDays(1);
+        DateTime today = new DateTime().withTimeAtStartOfDay();
+        DateTime dtPlusOne = curdate.plusDays(1).withTimeAtStartOfDay();
 
-        // 🔒 Prevent selecting a future date
+        // Prevent selecting a future date
         if (dtPlusOne.isAfter(today)) {
             Toast.makeText(getContext(), "You cannot view upcoming dates.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        curDay.setText(spdf.format(dtPlusOne.toDate()));
+        // Update TextView with bold "TODAY - " if dtPlusOne is today
+        updateCurDayText(dtPlusOne, today);
+
         curIndex = curIndex + 1;
         curdate = dtPlusOne;
 
@@ -401,6 +418,22 @@ public class VitalHealthTrends extends Fragment {
         Log.d("today", today.toString());
 
         checkvitels(dtPlusOne.toString(), dtPlusOne.toString());
+    }
+
+    // Helper method to update curDay TextView
+    private void updateCurDayText(DateTime dateToDisplay, DateTime today) {
+        String formattedDate = spdf.format(dateToDisplay.toDate());
+
+        if (dateToDisplay.withTimeAtStartOfDay().equals(today)) {
+            SpannableStringBuilder sb = new SpannableStringBuilder();
+            String prefix = "TODAY - ";
+            sb.append(prefix);
+            sb.setSpan(new StyleSpan(Typeface.BOLD), 0, prefix.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.append(formattedDate);
+            curDay.setText(sb);
+        } else {
+            curDay.setText(formattedDate);
+        }
     }
 
     private void checkvitels(String startDate, String endDate) {
@@ -618,6 +651,12 @@ public class VitalHealthTrends extends Fragment {
                     } else if (response.trim().startsWith("[")) {
                         // Array of Objects Case
                         JSONArray jsonArray = new JSONArray(response);
+
+                        //  Clear only once before looping
+                        if (chartHealthTrends != null) {
+                            chartHealthTrends.removeAllViews();
+                        }
+
                         for (int i = 0; i < jsonArray.length(); i++) {
                             Log.d("jsonArraypre7", jsonArray.toString());
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -654,89 +693,106 @@ public class VitalHealthTrends extends Fragment {
     }
 
     private void processVitalData(JSONObject jsonObject) {
+        if (!isAdded() || getContext() == null) {
+            Log.w("VitalHealthTrends", "Fragment not attached, skipping processVitalData()");
+            return;
+        }
+
         try {
-            LayoutInflater inflater = LayoutInflater.from(requireContext());
-            // Inflate a new instance of the card layout for each item
-            View cardViewLayout = inflater.inflate(R.layout.card_view_health_trends, null);
 
-            // Get the CardView from the inflated layout
+
+            LayoutInflater inflater = LayoutInflater.from(getContext());
+            View cardViewLayout = inflater.inflate(R.layout.card_view_health_trends, chartHealthTrends, false);
+
+            // CardView setup
             cardViewLineChart7 = cardViewLayout.findViewById(R.id.cardVitalHealthTrends);
-            cardViewLineChart7.setVisibility(View.VISIBLE); // Ensure it’s visible
+            cardViewLineChart7.setVisibility(View.VISIBLE);
 
-            // Find views inside CardView and set data
+            // Vital name
             TextView vitalNameTV = cardViewLayout.findViewById(R.id.vitalname7);
-            String vitalName = jsonObject.isNull("VitalName") ? "No Readings" : jsonObject.optString("VitalName", "").trim();
+            String vitalName = jsonObject.isNull("VitalName")
+                    ? "No Readings"
+                    : jsonObject.optString("VitalName", "").trim();
             Log.d("VitalNameCheck", "VitalName: " + vitalName);
             vitalNameTV.setText(vitalName);
 
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                );
-                layoutParams.setMargins(5, 0, 5, 0); // Left, Top, Right, Bottom margins
-                cardViewLineChart7.setLayoutParams(layoutParams);
+            // Layout params
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,   // ✅ Use MATCH_PARENT for better chart width
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            layoutParams.setMargins(5, 0, 5, 0);
+            cardViewLineChart7.setLayoutParams(layoutParams);
 
-                // Find the LineChart inside the CardView
-                LineChart lineChart = cardViewLayout.findViewById(R.id.linechart7);
+            // LineChart
+            LineChart lineChart = cardViewLayout.findViewById(R.id.linechart7);
 
-                // Extract Time and Values dynamically
-                JSONArray timeArray = jsonObject.optJSONArray("Time");
-                JSONArray valuesArray = jsonObject.optJSONArray("Values");
+            // Extract Time and Values dynamically
+            JSONArray timeArray = jsonObject.optJSONArray("Time");
+            JSONArray valuesArray = jsonObject.optJSONArray("Values");
 
-                Log.d("valuesArray", String.valueOf(valuesArray));
+            if (timeArray != null && valuesArray != null && valuesArray.length() > 0) {
+                List<String> xAxisLabels = new ArrayList<>();
+                for (int t = 0; t < timeArray.length(); t++) {
+                    String utcTimestamp = timeArray.optString(t, "");
+                    String localTime = TimeFormatter.formatChartTimestampFromUTC(utcTimestamp);
+                    xAxisLabels.add(localTime);
+                }
 
-                if (timeArray != null && valuesArray != null && valuesArray.length() > 0) {
-                    List<String> xAxisLabels = new ArrayList<>();
-                    for (int t = 0; t < timeArray.length(); t++) {
-                        Log.d("timeArray", String.valueOf(timeArray));
-                        String utcTimestamp = timeArray.optString(t, "");  // Get the timestamp at index 't'
-                        Log.d("utcTimestamp", utcTimestamp); // Log the extracted timestamp
-                        String localTime = TimeFormatter.formatChartTimestampFromUTC(utcTimestamp);
-                        Log.d("localTime", localTime);
-                        xAxisLabels.add(localTime);
-                    }
+                List<ILineDataSet> dataSets = new ArrayList<>();
+                for (int v = 0; v < valuesArray.length(); v++) {
+                    JSONObject valueObject = valuesArray.getJSONObject(v);
+                    String label = valueObject.optString("label", "Unknown");
+                    JSONArray dataArray = valueObject.optJSONArray("data");
 
-                    List<ILineDataSet> dataSets = new ArrayList<>();
-                    for (int v = 0; v < valuesArray.length(); v++) {
-                        JSONObject valueObject = valuesArray.getJSONObject(v);
-                        String label = valueObject.optString("label", "Unknown");
-                        JSONArray dataArray = valueObject.optJSONArray("data");
+                    List<Entry> entries = new ArrayList<>();
 
-                        List<Entry> entries = new ArrayList<>();
-                        for (int d = 0; d < dataArray.length(); d++) {
-                            float yValue = dataArray.isNull(d) ? 0 : Float.parseFloat(dataArray.optString(d, "0"));
+                    for (int d = 0; d < dataArray.length(); d++) {
+                        if (!dataArray.isNull(d)) {  // skip nulls
+                            float yValue = Float.parseFloat(dataArray.optString(d, "0"));
                             entries.add(new Entry(d, yValue));
                         }
-
-                        if (!entries.isEmpty()) {
-                            LineDataSet dataSet = new LineDataSet(entries, label);
-                            dataSet.setColor(getRandomColor(v)); // Assign unique colors dynamically
-                            dataSet.setCircleColor(getRandomColor(v));
-                            dataSet.setLineWidth(2f);
-                            dataSet.setCircleRadius(3f);
-                            dataSet.setDrawValues(true);
-                            dataSet.setDrawHighlightIndicators(true); // Enables highlight indicators
-                            dataSet.setHighLightColor(Color.RED); // Set highlight line color
-                            dataSets.add(dataSet);
-                        }
                     }
-                    // Configure LineChart
-                    LineData lineData = new LineData(dataSets);
-                    configureLineChart(lineChart, xAxisLabels, lineData);
+
+                    if (!entries.isEmpty()) {
+                        LineDataSet dataSet = new LineDataSet(entries, label);
+                        int color = getRandomColor(v);
+                        dataSet.setColor(color);
+                        dataSet.setCircleColor(color);
+                        dataSet.setLineWidth(2f);
+                        dataSet.setCircleRadius(3f);
+                        dataSet.setDrawValues(true);
+                        dataSet.setDrawHighlightIndicators(true);
+                        dataSet.setHighLightColor(Color.RED);
+                        dataSets.add(dataSet);
+                    }
                 }
-                // Add the dynamically created CardView to the container
-                chartHealthTrends.addView(cardViewLayout);
-        }
-            catch (JSONException e) {
-                Log.e("JSONError", "Error processing JSON object", e);
+
+                LineData lineData = new LineData(dataSets);
+                configureLineChart(lineChart, xAxisLabels, lineData);
             }
+
+            // Add new chart
+            if (chartHealthTrends != null) {
+                chartHealthTrends.addView(cardViewLayout);
+            }
+
+        } catch (JSONException e) {
+            Log.e("JSONError", "Error processing JSON object", e);
+        }
     }
 
     private void processVitalData30(JSONObject jsonObject) {
         try {
-            LayoutInflater inflater = LayoutInflater.from(requireContext());
+            // Check if fragment is still attached
+            if (!isAdded() || getContext() == null) {
+                Log.w("VitalHealthTrends", "Fragment not attached, skipping processVitalData30");
+                return;
+            }
+
+            LayoutInflater inflater = LayoutInflater.from(getContext());
             // Inflate a new instance of the card layout for each item
-            View cardViewLayout = inflater.inflate(R.layout.card_view_health_trends30, null);
+            View cardViewLayout = inflater.inflate(R.layout.card_view_health_trends30, chartHealthTrends30, false);
 
             // Get the CardView from the inflated layout
             cardViewLineChart30 = cardViewLayout.findViewById(R.id.cardVitalHealthTrends30);
@@ -744,73 +800,79 @@ public class VitalHealthTrends extends Fragment {
 
             // Find views inside CardView and set data
             TextView vitalNameTV = cardViewLayout.findViewById(R.id.vitalname30);
-            String vitalName = jsonObject.isNull("VitalName") ? "No Readings" : jsonObject.optString("VitalName", "").trim();
+            String vitalName = jsonObject.isNull("VitalName")
+                    ? "No Readings"
+                    : jsonObject.optString("VitalName", "").trim();
             Log.d("VitalNameCheck", "VitalName: " + vitalName);
             vitalNameTV.setText(vitalName);
 
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                );
-                layoutParams.setMargins(5, 0, 5, 0); // Left, Top, Right, Bottom margins
-                cardViewLineChart30.setLayoutParams(layoutParams);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            layoutParams.setMargins(5, 0, 5, 0); // Left, Top, Right, Bottom margins
+            cardViewLineChart30.setLayoutParams(layoutParams);
 
-                // Find the LineChart inside the CardView
-                LineChart lineChart = cardViewLayout.findViewById(R.id.linechart30);
+            // Find the LineChart inside the CardView
+            LineChart lineChart = cardViewLayout.findViewById(R.id.linechart30);
 
-                // Extract Time and Values dynamically
-                JSONArray timeArray = jsonObject.optJSONArray("Time");
-                JSONArray valuesArray = jsonObject.optJSONArray("Values");
-                Log.d("valuesArray", String.valueOf(valuesArray));
+            // Extract Time and Values dynamically
+            JSONArray timeArray = jsonObject.optJSONArray("Time");
+            JSONArray valuesArray = jsonObject.optJSONArray("Values");
+            Log.d("valuesArray", String.valueOf(valuesArray));
 
-                if (timeArray != null && valuesArray != null && valuesArray.length() > 0) {
-                    List<String> xAxisLabels = new ArrayList<>();
-                    for (int t = 0; t < timeArray.length(); t++) {
-                        Log.d("timeArray", String.valueOf(timeArray));
-                        String utcTimestamp = timeArray.optString(t, "");  // Get the timestamp at index 't'
-                        Log.d("utcTimestamp", utcTimestamp); // Log the extracted timestamp
-                        String localTime = TimeFormatter.formatChartTimestampFromUTC(utcTimestamp);
-                        Log.d("localTime",localTime);
-                        xAxisLabels.add(localTime);
-                    }
+            if (timeArray != null && valuesArray != null && valuesArray.length() > 0) {
+                List<String> xAxisLabels = new ArrayList<>();
+                for (int t = 0; t < timeArray.length(); t++) {
+                    String utcTimestamp = timeArray.optString(t, "");
+                    String localTime = TimeFormatter.formatChartTimestampFromUTC(utcTimestamp);
+                    xAxisLabels.add(localTime);
+                }
 
-                    List<ILineDataSet> dataSets = new ArrayList<>();
-                    for (int v = 0; v < valuesArray.length(); v++) {
-                        JSONObject valueObject = valuesArray.getJSONObject(v);
-                        String label = valueObject.optString("label", "Unknown");
-                        JSONArray dataArray = valueObject.optJSONArray("data");
-                        Log.d("dataArraysize", String.valueOf(dataArray.length()));
+                List<ILineDataSet> dataSets = new ArrayList<>();
+                for (int v = 0; v < valuesArray.length(); v++) {
+                    JSONObject valueObject = valuesArray.getJSONObject(v);
+                    String label = valueObject.optString("label", "Unknown");
+                    JSONArray dataArray = valueObject.optJSONArray("data");
 
-                        List<Entry> entries = new ArrayList<>();
-                        for (int d = 0; d < dataArray.length(); d++) {
-                            float yValue = dataArray.isNull(d) ? 0 : Float.parseFloat(dataArray.optString(d, "0"));
+                    if (dataArray == null) continue;
+
+                    List<Entry> entries = new ArrayList<>();
+
+                    for (int d = 0; d < dataArray.length(); d++) {
+                        if (!dataArray.isNull(d)) {  // Only add if value is not null
+                            float yValue = (float) dataArray.optDouble(d, 0);
                             entries.add(new Entry(d, yValue));
                         }
-
-                        if (!entries.isEmpty()) {
-                            LineDataSet dataSet = new LineDataSet(entries, label);
-                            dataSet.setColor(getRandomColor(v)); // Assign unique colors dynamically
-                            dataSet.setCircleColor(getRandomColor(v));
-                            dataSet.setLineWidth(2f);
-                            dataSet.setCircleRadius(3f);
-                            dataSet.setDrawValues(true);
-                            dataSet.setDrawHighlightIndicators(true); // Enables highlight indicators
-                            dataSet.setHighLightColor(Color.RED); // Set highlight line color
-                            dataSets.add(dataSet);
-                        }
                     }
 
-                    // Configure LineChart
-                    LineData lineData = new LineData(dataSets);
-                    configureLineChart(lineChart, xAxisLabels, lineData);
+                    if (!entries.isEmpty()) {
+                        LineDataSet dataSet = new LineDataSet(entries, label);
+                        int color = getRandomColor(v); //  reuse same color for line & circles
+                        dataSet.setColor(color);
+                        dataSet.setCircleColor(color);
+                        dataSet.setLineWidth(2f);
+                        dataSet.setCircleRadius(3f);
+                        dataSet.setDrawValues(true);
+                        dataSet.setDrawHighlightIndicators(true);
+                        dataSet.setHighLightColor(Color.RED);
+                        dataSets.add(dataSet);
+                    }
                 }
-                // Add the dynamically created CardView to the container
-                chartHealthTrends30.addView(cardViewLayout);
-        }
-        catch (JSONException e) {
+
+                // Configure LineChart
+                LineData lineData = new LineData(dataSets);
+                configureLineChart(lineChart, xAxisLabels, lineData);
+            }
+
+            // Add the dynamically created CardView to the container
+            chartHealthTrends30.addView(cardViewLayout);
+
+        } catch (JSONException e) {
             Log.e("JSONError", "Error processing JSON object", e);
         }
     }
+
     private int getRandomColor(int index) {
         int[] colors = {Color.RED, Color.BLUE, Color.GREEN, Color.CYAN, Color.MAGENTA, Color.YELLOW};
         return colors[index % colors.length];

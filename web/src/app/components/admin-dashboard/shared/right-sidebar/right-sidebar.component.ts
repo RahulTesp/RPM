@@ -442,8 +442,11 @@ export class RightSidebarComponent implements OnInit {
           x.searchFieldTask = `${x.PatientName}[${x.ProgramName}]`;
         });
 
+       
         this.http_taskAssigneeList = res.filteredAssignees;
+      
 
+       
       })
       .catch((err) => {
         console.error('Error fetching task master data:', err);
@@ -687,7 +690,7 @@ export class RightSidebarComponent implements OnInit {
   ];
   registerTask = new UntypedFormGroup({
     tasktype: new UntypedFormControl(null, [Validators.required]),
-    description: new UntypedFormControl(null),
+    description: new UntypedFormControl(null ,[Validators.required]),
     duedate: new UntypedFormControl(null, [Validators.required]),
     priority: new UntypedFormControl(null, [Validators.required]),
     task_status: new UntypedFormControl(null, [Validators.required]),
@@ -710,6 +713,7 @@ export class RightSidebarComponent implements OnInit {
 
       if (this.registerTask.valid) {
 
+     
         req_body['PatientId'] = parseInt(this.task_pid);
         req_body['TaskTypeId'] = parseInt(
           this.registerTask.controls.tasktype.value
@@ -747,7 +751,7 @@ export class RightSidebarComponent implements OnInit {
           },
           (err) => {
             //show error patient id creation failed
-            alert('Error, could not add task..!, ' + err);
+            alert(err.error.message);
             this.loading = false;
           }
         );
@@ -892,7 +896,7 @@ export class RightSidebarComponent implements OnInit {
     // Step 3: Prepare request body
     if (this.registerSchedule.valid) {
       const req_body: any = {
-        AssignedTo:  parseInt(this.schedule_careteam_id),
+        AssignedTo: parseInt(this.Scheduled_user),
         ScheduleTypeId: parseInt(this.registerSchedule.controls.scheduleType.value),
         Schedule: this.registerSchedule.controls.frequency.value,
         Comments: this.registerSchedule.controls.scheduleDescription.value,
@@ -1586,9 +1590,11 @@ export class RightSidebarComponent implements OnInit {
     return this.registerSchedule.valid;
   }
   private buildSingleScheduleUpdatePayload(): any {
+        const [scheduleyear, schedulemonth, scheduleday] = this.registerSchedule.controls.startDate.value.split('-').map(Number);
+    var scheduleDate = new Date(scheduleyear, schedulemonth - 1, scheduleday, 0, 0, 0);
     return {
       CurrentScheduleId: this.schedule_edit_id,
-      ScheduleDate: this.convertDate(this.registerSchedule.controls.startDate.value),
+      ScheduleDate: this.convertDate(scheduleDate),
       StartTime: this.registerSchedule.controls.startTime.value,
       Duration: this.durationValue,
       Comments: this.registerSchedule.controls.scheduleDescription.value,
@@ -1848,13 +1854,15 @@ export class RightSidebarComponent implements OnInit {
         .then(
           (data) => {
             this.worklistgettaskbyid = data;
-            this.alertAssigneeName = this.worklistgettaskbyid.CareTeamId;
-            console.log('this.alertAssigneeName');
-            console.log(this.alertAssigneeName);
-            this.WorkListTaskArrayList = this.worklistgettaskbyid.Members;
-            console.log('WorkList Task');
-            console.log(this.WorkListTaskArrayList);
-
+            // this.alertAssigneeName = this.worklistgettaskbyid.CareTeamId;
+            const uniqueCareTeam = [...new Set(this.worklistgettaskbyid.CareTeamId)];
+             this.alertAssigneeName = uniqueCareTeam;
+             console.log('uniqueTaskArrayList-Previous');
+             console.log(this.worklistgettaskbyid.Members);
+             const uniqueTaskArrayList = [...new Set(this.worklistgettaskbyid.Members)]; 
+             console.log('uniqueTaskArrayList');
+             console.log(uniqueTaskArrayList);
+             this.WorkListTaskArrayList = uniqueTaskArrayList;
             this.task_pname = this.worklistgettaskbyid.PatientName;
             this.task_pid = this.worklistgettaskbyid.PatientId;
              this.task_careteam_name = this.worklistgettaskbyid.AssignedMember;
@@ -2312,6 +2320,8 @@ export class RightSidebarComponent implements OnInit {
 
   selectEvent_schedule(item: any) {
     // do something with selected item
+    console.log('Patient/Contact Selected');
+    console.log(item);
     if (typeof item != 'string') {
       this.Scheduled_user = item.Id;
       this.Scheduled_userName = item.Name;
@@ -2511,6 +2521,9 @@ export class RightSidebarComponent implements OnInit {
   schedule_careteam_name: any;
 
   selectEvent_schedule_careteam(item: any) {
+
+    console.log('Assigned Member Selection');
+    console.log(item);
     // do something with selected item
     if (typeof item != 'string') {
       this.schedule_careteam_id = item.Id;
@@ -2886,7 +2899,7 @@ export class RightSidebarComponent implements OnInit {
 
           (err) => {
             this.verificationStatus = false;
-            alert(err.error);
+            alert(err.error.message);
           }
         );
       }
@@ -2934,15 +2947,15 @@ export class RightSidebarComponent implements OnInit {
         this.registerDevice.controls.purchaseDate.value;
 
       this.rpmservice.rpm_post('/api/devices/adddevice', req_body).then(
-        (data) => {
+        (data:any) => {
           alert('New Device Added Successfully!!');
           this.registerVendor.reset();
           this.deviceReload();
           this.onClickVendorCancel();
         },
-        (err) => {
+        (err:any) => {
           //show error patient id creation failed
-          alert('Error, could not add Device..!, ' + err);
+          alert(err.error.message);
         }
       );
     } else {
@@ -3006,8 +3019,8 @@ export class RightSidebarComponent implements OnInit {
           req_body
         )
         .then(
-          (data) => {
-            this.verificationStatus = data;
+          (data:any) => {
+            this.verificationStatus = data.message;
           },
           (err) => {
             //show error patient id creation failed

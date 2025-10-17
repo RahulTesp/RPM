@@ -53,7 +53,6 @@ export class AuthService {
         .then(
           (data) => {
             resolve(data);
-            console.log(data);
           },
           (err) => {
             reject(err);
@@ -102,7 +101,6 @@ export class AuthService {
         .then(
           (data) => {
             resolve(data);
-            console.log(data);
           },
           (err) => {
             reject(err);
@@ -185,6 +183,11 @@ export class AuthService {
   ConvertToUTCRangeInput(data: any) {
     var combineDateIsoFrm = new Date(data.toUTCString()).toISOString();
 
+    return combineDateIsoFrm;
+  }
+    ConvertToUTCRangeInputs(data: any) {
+    const dateObj = new Date(data); // Ensures it's a Date instance
+    const combineDateIsoFrm = dateObj.toISOString(); // Already in UTC
     return combineDateIsoFrm;
   }
 }

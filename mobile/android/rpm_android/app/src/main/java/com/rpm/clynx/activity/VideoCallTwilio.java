@@ -102,7 +102,7 @@ public class VideoCallTwilio extends AppCompatActivity {
      * Access token used to connect. This field will be set either from the console generated token
      * or the request to the token server.
      */
-    private String accessToken;
+
 
     /*
      * A Room represents communication between a local participant and one or more participants.

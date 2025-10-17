@@ -60,192 +60,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview_dates"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="@dimen/margin_20dp"
-                android:layout_marginRight="@dimen/margin_20dp"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_gravity="center_vertical"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:gravity="center"
-                        android:text="S"
-                        android:textColor="@color/Primary_dark"
-                        android:textAlignment="center"/>
-                    <TextView
-                        android:id="@+id/ToDoListFragment_current_date1"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:text="30"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:onClick="changedateoftextviewanddate"
-                        android:textColor="@color/todolist_color1"
-                        android:textAlignment="center"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_gravity="center_vertical"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:gravity="center"
-                        android:text="M"
-                        android:textColor="@color/todolist_color1"
-                        android:textAlignment="center"/>
-                    <TextView
-                        android:id="@+id/ToDoListFragment_current_date2"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:text="30"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:onClick="changedateoftextviewanddate"
-                        android:textColor="@color/todolist_color1"
-                        android:textAlignment="center"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_gravity="center_vertical"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:gravity="center"
-                        android:text="T"
-                        android:textColor="@color/todolist_color1"
-                        android:textAlignment="center"/>
-                    <TextView
-                        android:id="@+id/ToDoListFragment_current_date3"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:text="30"
-                        android:onClick="changedateoftextviewanddate"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:textColor="@color/todolist_color1"
-                        android:textAlignment="center"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_gravity="center_vertical"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:gravity="center"
-                        android:text="W"
-                        android:textColor="@color/todolist_color1"
-                        android:textAlignment="center"/>
-                    <TextView
-                        android:id="@+id/ToDoListFragment_current_date4"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:text="30"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:textColor="@color/todolist_color1"
-                        android:textAlignment="center"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_gravity="center_vertical"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:gravity="center"
-                        android:text="T"
-                        android:textColor="@color/todolist_color1"
-                        android:textAlignment="center"/>
-                    <TextView
-                        android:id="@+id/ToDoListFragment_current_date5"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:text="30"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:textColor="@color/todolist_color1"
-                        android:textAlignment="center"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_gravity="center_vertical"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:gravity="center"
-                        android:text="F"
-                        android:textColor="@color/todolist_color1"
-                        android:textAlignment="center"/>
-                    <TextView
-                        android:id="@+id/ToDoListFragment_current_date6"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:text="30"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:textColor="@color/todolist_color1"
-                        android:textAlignment="center"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_gravity="center_vertical"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:gravity="center"
-                        android:text="S"
-                        android:textColor="@color/todolist_color1" />
-                    <TextView
-                        android:id="@+id/ToDoListFragment_current_date7"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:text="30"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:textColor="@color/todolist_color1"
-                        android:textAlignment="center"/>
-                </LinearLayout>
-
-            </LinearLayout>
+                android:orientation="horizontal"
+                android:overScrollMode="never"
+                android:scrollbars="none"
+                android:padding="8dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_todo_date"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -270,7 +94,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:gravity="center_horizontal"
-                    android:layout_weight="4"
+                    android:layout_weight="8"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
                     android:orientation="horizontal">
@@ -284,13 +108,18 @@
 
                     <TextView
                         android:id="@+id/ToDoListFragment_today_date"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:textStyle="bold"
+                        android:layout_weight="8"
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="10sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:text="Sunday, Jan 28, 2022"
+                        android:textColor="@color/todolist_color1" />
 
-                        android:text="Sunday,Jan 28, 2022"
-                        android:textSize="16sp"
-                        android:textColor="@color/todolist_color1"/>
                 </LinearLayout>
 
                 <ImageButton

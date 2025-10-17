@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/ChatBG"
+    android:background="@color/ChatActivityBG"
     android:padding="@dimen/activity_vertical_margin"
     android:orientation="vertical"
     tools:context="com.rpm.clynx.fragments.ChatAddActivity">

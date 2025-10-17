@@ -33,6 +33,9 @@ class AppModel: NSObject, ObservableObject {
     private let networkMonitor = NWPathMonitor()
     var deviceToken: Data?
     
+    @Published var isClientReady = false
+
+    
     var coreDataManager: CoreDataManager!
     var conversationManager: ConversationManager!
     var messagesManager: MessagesManager!
@@ -56,12 +59,13 @@ class AppModel: NSObject, ObservableObject {
 
     
     private var cancellableSet: Set<AnyCancellable> = []
+    let id = UUID()
     
     init(inMemory: Bool = false) {
         coreDataManager = CoreDataManager(inMemory: inMemory)
         
         super.init()
-        
+        print("AppModel.shared init called with id: \(id)")
         print(" AppModel.shared created")
         
         conversationManager = ConversationManager(client, coreDataDelegate: coreDataManager)
@@ -116,6 +120,23 @@ class AppModel: NSObject, ObservableObject {
          self.wipeAllCache()
      }
      
+    func refreshUnreadIfReady() {
+        print("Refreshing unread count")
+          if isClientReady {
+              print("Refreshing isClientReady")
+              conversationManager.refreshUnreadCount()
+          } else {
+              print("Client not ready yet, will refresh when ready")
+              $isClientReady
+                  .filter { $0 }
+                  .first()
+                  .sink { [weak self] _ in
+                      print("Client became ready, refreshing unread count")
+                      self?.conversationManager.refreshUnreadCount()
+                  }
+                  .store(in: &cancellableSet)
+          }
+      }
     
     func signOutChat() {
         DispatchQueue.global(qos: .userInitiated).async {
@@ -152,6 +173,8 @@ class AppModel: NSObject, ObservableObject {
 
 
     func assignDelegateIfNeeded(for conversation: TCHConversation) {
+        print("Delegate set for SID: \(conversation.sid ?? "nil")")
+
         if conversation.delegate !== AppModel.shared {
             conversation.delegate = AppModel.shared
             print(" Delegate set for conversation SID: \(conversation.sid ?? "nil")")
@@ -231,16 +254,22 @@ extension AppModel: TwilioConversationsClientDelegate {
         print("self DELEGATE VAL",self)
         if status == .failed {
             print("syncstatusfailed",status)
-         
+            DispatchQueue.main.async {
+                       self.isClientReady = false
+                   }
            self.client.updateToken(shouldLogout: false)
         }
         if status == .completed {
             print("statuscompleted",status)
             print("STATUSclient",client)
             client.delegate = self
+            DispatchQueue.main.async {
+                       self.isClientReady = true
+                   }
             TwilioConversationsClient.setLogLevel(.debug)
 
             conversationManager.loadAllConversations()
+          
         }
         
         if let client = AppModel.shared.client.conversationsClient {

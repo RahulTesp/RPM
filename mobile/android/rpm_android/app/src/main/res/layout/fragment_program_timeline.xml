@@ -22,7 +22,9 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="50dp"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -55,6 +57,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_20dp"
+                        android:layout_marginLeft="@dimen/margin_10dp"
                         android:text="Date"
                         android:textColor="@color/Primary_dark"
                         android:textSize="14sp"
@@ -84,6 +87,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_20dp"
+                        android:layout_marginLeft="@dimen/margin_10dp"
                         android:text="Physician"
                         android:textColor="@color/Primary_dark"
                         android:textSize="14sp"
@@ -114,6 +118,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_20dp"
+                        android:layout_marginLeft="@dimen/margin_10dp"
                         android:text="Clinic"
                         android:textColor="@color/Primary_dark"
                         android:textSize="14sp"
@@ -143,6 +148,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_20dp"
+                        android:layout_marginLeft="@dimen/margin_10dp"
                         android:text="Clinic Code"
                         android:textColor="@color/Primary_dark"
                         android:textSize="14sp"
@@ -173,6 +179,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_20dp"
+                        android:layout_marginLeft="@dimen/margin_10dp"
                         android:text="Order Date"
                         android:textColor="@color/Primary_dark"
                         android:textSize="14sp"
@@ -203,6 +210,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_20dp"
+                        android:layout_marginLeft="@dimen/margin_10dp"
                         android:text="Diagnosis"
                         android:textColor="@color/Primary_dark"
                         android:textSize="14sp"
@@ -218,6 +226,11 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment"
                         tools:listitem="@layout/diagnosis_item_list" />
 
+                    <LinearLayout
+                        android:id="@+id/enrollSectionLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -231,6 +244,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_20dp"
+                        android:layout_marginLeft="@dimen/margin_10dp"
                         android:text="Date"
                         android:textColor="@color/Primary_dark"
                         android:textSize="14sp"
@@ -261,6 +275,7 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_20dp"
+                        android:layout_marginLeft="@dimen/margin_10dp"
                         android:text="Enrollment Personal"
                         android:textColor="@color/Primary_dark"
                         android:textSize="14sp"
@@ -287,112 +302,419 @@ tools:context="com.rpm.clynx.fragments.ProgramTimelineFragment">
                             app:fontFamily="@font/rubik_regular" />
 
                     </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Active Section -->
                     <LinearLayout
                         android:id="@+id/activeSectionLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_20dp"
+                            android:text="Active"
+                            android:textColor="@color/accent2"
+                            android:textSize="16sp"
+                            app:fontFamily="@font/rubik_semibold" />
+
+                        <!-- Assigned Date -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_20dp"
+                            android:layout_marginLeft="@dimen/margin_10dp"
+                            android:text="Date"
+                            android:textColor="@color/Primary_dark"
+                            android:textSize="14sp"
+                            app:fontFamily="@font/rubik_regular" />
+
+                        <LinearLayout
+                            android:id="@+id/llo_activeDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="@dimen/spacing_xmedium"
+                            android:background="@drawable/pgm_info_bg"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/frag_active_dt"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/margin_10dp"
+                                android:backgroundTint="@android:color/transparent"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/text_light"
+                                android:textSize="16sp"
+                                app:fontFamily="@font/rubik_regular" />
+                        </LinearLayout>
+
+                        <!-- Assignee Name -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_20dp"
+                            android:layout_marginLeft="@dimen/margin_10dp"
+                            android:text="Assigned Personal"
+                            android:textColor="@color/Primary_dark"
+                            android:textSize="14sp"
+                            app:fontFamily="@font/rubik_regular" />
+
+                        <LinearLayout
+                            android:id="@+id/llo_activeAssignee"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="@dimen/spacing_xmedium"
+                            android:background="@drawable/pgm_info_bg"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/frag_active_assignee"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/margin_10dp"
+                                android:backgroundTint="@android:color/transparent"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/text_light"
+                                android:textSize="16sp"
+                                app:fontFamily="@font/rubik_regular" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Ready For Discharge Section -->
+                    <LinearLayout
+                        android:id="@+id/readyForDischargeSectionLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_20dp"
-                        android:text="Active"
-                        android:textColor="@color/accent2"
-                        android:textSize="16sp"
-                        app:fontFamily="@font/rubik_semibold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_20dp"
-                        android:text="Date"
-                        android:textColor="@color/Primary_dark"
-                        android:textSize="14sp"
-                        app:fontFamily="@font/rubik_regular" />
-
-                    <LinearLayout
-                        android:id="@+id/llo_pers1"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_marginTop="@dimen/spacing_xmedium"
-                        android:background="@drawable/pgm_info_bg"
-                        android:gravity="center">
 
                         <TextView
-                            android:id="@+id/frag_activedt"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="@dimen/margin_10dp"
-                            android:backgroundTint="@android:color/transparent"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:textColor="@color/black"
-                            android:textColorHint="@color/text_light"
+                            android:layout_marginTop="@dimen/margin_20dp"
+                            android:text="Ready To Discharge"
+                            android:textColor="@color/accent2"
                             android:textSize="16sp"
-                            app:fontFamily="@font/rubik_regular" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_20dp"
-                        android:text="Care Team Personal"
-                        android:textColor="@color/Primary_dark"
-                        android:textSize="14sp"
-                        app:fontFamily="@font/rubik_regular" />
-
-                    <LinearLayout
-                        android:id="@+id/llo_pers11"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_marginTop="@dimen/spacing_xmedium"
-                        android:background="@drawable/pgm_info_bg"
-                        android:gravity="center">
+                            app:fontFamily="@font/rubik_semibold" />
 
                         <TextView
-                            android:id="@+id/careteam_pers"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_20dp"
                             android:layout_marginLeft="@dimen/margin_10dp"
-                            android:backgroundTint="@android:color/transparent"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:textColor="@color/black"
-                            android:textColorHint="@color/text_light"
-                            android:textSize="16sp"
+                            android:text="Date"
+                            android:textColor="@color/Primary_dark"
+                            android:textSize="14sp"
                             app:fontFamily="@font/rubik_regular" />
-                    </LinearLayout>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_20dp"
-                        android:text="Care Team Manager"
-                        android:textColor="@color/Primary_dark"
-                        android:textSize="14sp"
-                        app:fontFamily="@font/rubik_regular" />
-                    <LinearLayout
-                        android:id="@+id/llo_mngr1"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_marginTop="@dimen/spacing_xmedium"
-                        android:background="@drawable/pgm_info_bg"
-                        android:gravity="center">
+
+                        <LinearLayout
+                            android:id="@+id/llo_readyDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="@dimen/spacing_xmedium"
+                            android:background="@drawable/pgm_info_bg"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/frag_ready_dt"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/margin_10dp"
+                                android:backgroundTint="@android:color/transparent"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/text_light"
+                                android:textSize="16sp"
+                                app:fontFamily="@font/rubik_regular" />
+                        </LinearLayout>
 
                         <TextView
-                            android:id="@+id/careteammngr"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_20dp"
                             android:layout_marginLeft="@dimen/margin_10dp"
-                            android:backgroundTint="@android:color/transparent"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:textColor="@color/black"
-                            android:textColorHint="@color/text_light"
-                            android:textSize="16sp"
+                            android:text="Assigned Personal"
+                            android:textColor="@color/Primary_dark"
+                            android:textSize="14sp"
                             app:fontFamily="@font/rubik_regular" />
+
+                        <LinearLayout
+                            android:id="@+id/llo_readyAssignee"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="@dimen/spacing_xmedium"
+                            android:background="@drawable/pgm_info_bg"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/frag_ready_assignee"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/margin_10dp"
+                                android:backgroundTint="@android:color/transparent"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/text_light"
+                                android:textSize="16sp"
+                                app:fontFamily="@font/rubik_regular" />
+                        </LinearLayout>
                     </LinearLayout>
 
+
+                    <!-- On Hold Section -->
+                    <LinearLayout
+                        android:id="@+id/onHoldSectionLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_20dp"
+                            android:text="On Hold"
+                            android:textColor="@color/accent2"
+                            android:textSize="16sp"
+                            app:fontFamily="@font/rubik_semibold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_20dp"
+                            android:layout_marginLeft="@dimen/margin_10dp"
+                            android:text="Date"
+                            android:textColor="@color/Primary_dark"
+                            android:textSize="14sp"
+                            app:fontFamily="@font/rubik_regular" />
+
+                        <LinearLayout
+                            android:id="@+id/llo_holdDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="@dimen/spacing_xmedium"
+                            android:background="@drawable/pgm_info_bg"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/frag_hold_dt"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/margin_10dp"
+                                android:backgroundTint="@android:color/transparent"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/text_light"
+                                android:textSize="16sp"
+                                app:fontFamily="@font/rubik_regular" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_20dp"
+                            android:layout_marginLeft="@dimen/margin_10dp"
+                            android:text="Assigned Personal"
+                            android:textColor="@color/Primary_dark"
+                            android:textSize="14sp"
+                            app:fontFamily="@font/rubik_regular" />
+
+                        <LinearLayout
+                            android:id="@+id/llo_holdAssignee"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="@dimen/spacing_xmedium"
+                            android:background="@drawable/pgm_info_bg"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/frag_hold_assignee"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/margin_10dp"
+                                android:backgroundTint="@android:color/transparent"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/text_light"
+                                android:textSize="16sp"
+                                app:fontFamily="@font/rubik_regular" />
+                        </LinearLayout>
                     </LinearLayout>
+
+
+                    <!-- Inactive Section -->
+                    <LinearLayout
+                        android:id="@+id/inactiveSectionLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_20dp"
+                            android:text="Inactive"
+                            android:textColor="@color/accent2"
+                            android:textSize="16sp"
+                            app:fontFamily="@font/rubik_semibold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_20dp"
+                            android:layout_marginLeft="@dimen/margin_10dp"
+                            android:text="Date"
+                            android:textColor="@color/Primary_dark"
+                            android:textSize="14sp"
+                            app:fontFamily="@font/rubik_regular" />
+
+                        <LinearLayout
+                            android:id="@+id/llo_inactiveDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="@dimen/spacing_xmedium"
+                            android:background="@drawable/pgm_info_bg"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/frag_inactive_dt"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/margin_10dp"
+                                android:backgroundTint="@android:color/transparent"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/text_light"
+                                android:textSize="16sp"
+                                app:fontFamily="@font/rubik_regular" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_20dp"
+                            android:layout_marginLeft="@dimen/margin_10dp"
+                            android:text="Assigned Personal"
+                            android:textColor="@color/Primary_dark"
+                            android:textSize="14sp"
+                            app:fontFamily="@font/rubik_regular" />
+
+                        <LinearLayout
+                            android:id="@+id/llo_inactiveAssignee"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="@dimen/spacing_xmedium"
+                            android:background="@drawable/pgm_info_bg"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/frag_inactive_assignee"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/margin_10dp"
+                                android:backgroundTint="@android:color/transparent"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/text_light"
+                                android:textSize="16sp"
+                                app:fontFamily="@font/rubik_regular" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+
+                    <!-- Discharged Section -->
+                    <LinearLayout
+                        android:id="@+id/dischargedSectionLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_20dp"
+                            android:text="Discharged"
+                            android:textColor="@color/accent2"
+                            android:textSize="16sp"
+                            app:fontFamily="@font/rubik_semibold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_20dp"
+                            android:layout_marginLeft="@dimen/margin_10dp"
+                            android:text="Date"
+                            android:textColor="@color/Primary_dark"
+                            android:textSize="14sp"
+                            app:fontFamily="@font/rubik_regular" />
+
+                        <LinearLayout
+                            android:id="@+id/llo_dischargedDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="@dimen/spacing_xmedium"
+                            android:background="@drawable/pgm_info_bg"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/frag_discharged_dt"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/margin_10dp"
+                                android:backgroundTint="@android:color/transparent"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/text_light"
+                                android:textSize="16sp"
+                                app:fontFamily="@font/rubik_regular" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_20dp"
+                            android:layout_marginLeft="@dimen/margin_10dp"
+                            android:text="Assigned Personal"
+                            android:textColor="@color/Primary_dark"
+                            android:textSize="14sp"
+                            app:fontFamily="@font/rubik_regular" />
+
+                        <LinearLayout
+                            android:id="@+id/llo_dischargedAssignee"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="@dimen/spacing_xmedium"
+                            android:background="@drawable/pgm_info_bg"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/frag_discharged_assignee"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/margin_10dp"
+                                android:backgroundTint="@android:color/transparent"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/text_light"
+                                android:textSize="16sp"
+                                app:fontFamily="@font/rubik_regular" />
+                        </LinearLayout>
+                    </LinearLayout>
+
 
                     <View
                         android:layout_width="match_parent"

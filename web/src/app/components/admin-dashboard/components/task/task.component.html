@@ -231,8 +231,10 @@
           *matCellDef="let element; let rowIndex = index"
           [ngClass]="{
             Critical_text: element.Prioriy == 'Critical',
-            Missing_text: element.Prioriy == 'Cautious'
+            Missing_text: element.Prioriy == 'Cautious',
+             'task-type-truncated': true
           }"
+          [attr.title]="element.VitalAlert"
         >
           {{ element.VitalAlert }}
         </mat-cell>
@@ -298,6 +300,7 @@
               (keyup)="applyDataFilter($event)"
               (focus)="setupFilter('PatientName')"
               [value]="alertPatientSearch"
+              autocomplete="off"
             />
           </div>
           <div class="search_heading_default" *ngIf="!alertSearchValeName">
@@ -592,8 +595,12 @@
         <mat-header-cell *matHeaderCellDef> Task Type </mat-header-cell>
         <mat-cell
           *matCellDef="let element; let rowIndex = index"
-          [ngClass]="{ due_date: dueDatePass(element.DueDate, element.Status) }"
-        >
+             [ngClass]="{ 
+                'due_date': dueDatePass(element.DueDate, element.Status),
+                'task-type-truncated': true 
+                   }"
+               [attr.title]="element.TaskType"
+               >
           {{ element.TaskType }}
         </mat-cell>
       </ng-container>

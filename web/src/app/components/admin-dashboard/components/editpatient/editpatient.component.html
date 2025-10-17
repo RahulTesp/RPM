@@ -141,7 +141,6 @@
                       'background-size': '100% 100%'
                     }"
                   >
-                    <!-- <img class="icon_camera" src="../../../assets/04-Icons/Icons_Camera.svg" /> -->
                     {{ profilePic }}
                     <img
                       id="editOpenImage"
@@ -161,8 +160,6 @@
                 <div class="personal_info_data_container">
                   <div class="userInfoItem">
                     <p class="main_input_title">*First Name</p>
-                    <!-- <input [attr.disabled]="Patientdata.PatientProgramdetails.Status == 'Active' ? true : null" class="userInfovalue" placeholder="Enter First Name" required
-                                    formControlName="firstname"  maxlength="20" /> -->
                     <input
                       class="userInfovalue"
                       placeholder="Enter First Name"
@@ -184,8 +181,6 @@
                   </div>
                   <div class="userInfoItem">
                     <p class="main_input_title">Middle Name</p>
-                    <!-- <input [attr.disabled]="Patientdata.PatientProgramdetails.Status == 'Active' ? true : null" class="userInfovalue" placeholder="Enter Middle Name" notrequired
-                                    formControlName="middlename"  maxlength="20" /> -->
                     <input
                       class="userInfovalue"
                       placeholder="Enter Middle Name"
@@ -223,8 +218,6 @@
                   </div>
                   <div class="userInfoItem">
                     <p class="main_input_title">*Gender</p>
-                    <!-- <select [attr.disabled]="Patientdata.PatientProgramdetails.Status == 'Active' ? true : null" class="userInfovalue" placeholder="Select Gender" formControlName="gender"
-                                    required> -->
                     <select
                       class="userInfovalue"
                       placeholder="Select Gender"
@@ -266,8 +259,6 @@
                   </div>
                   <div class="userInfoItem">
                     <p class="main_input_title">*Last Name</p>
-                    <!-- <input [attr.disabled]="Patientdata.PatientProgramdetails.Status == 'Active' ? true : null" class="userInfovalue" placeholder="Enter Last Name" required
-                                    formControlName="lastname" maxlength="20" /> -->
 
                     <input
                       class="userInfovalue"
@@ -345,7 +336,6 @@
                           />
                         </div>
 
-                        <!-- <span class="duration_value">{{ weightValue }}</span> -->
                         <input
                           class="duration_value"
                           [(ngModel)]="weightValue"
@@ -687,10 +677,6 @@
                         id="editRelation2_mobile"
                         notrequired
                       />
-                      <!-- <small class="text-danger"
-                                      *ngIf="PatientInfoForm.get('relation2_mobile')?.invalid && PatientInfoForm.get('relation2_mobile')?.touched">Mobile
-                                      Number
-                                      Required</small> -->
                     </div>
                   </div>
                 </div>
@@ -890,14 +876,7 @@
       >
         <div class="edit">
           <div class="edit_patient_progress" [class.disabled]="ImageStatus">
-            <!-- <div class="edit_patient_progress"> -->
             <div class="edit_patient_progress edit_patient_progress_outer">
-              <!-- <div
-              [class.disabled] = "onHold"
-              class="edit_patient_progress edit_patient_progress_outer"
-              [attr.disabled]="ActivePanelBar()"
-              [class.disabled]="ActivePanelBar()"
-            > -->
               <div
                 class="measure_line"
                 id="editPatientStatusPrescribed"
@@ -1029,25 +1008,6 @@
             </div>
           </div>
 
-          <!-- <div class="edit_patient2">
-            <div class="onhold_panel">
-              <div
-                class="measure_onholdline"
-                id="editPatientStatusInActive"
-                [class.disabled]="setDisableInActivePanel()"
-                (click)="ConfirmChangePatientStatus('InActive', 2)"
-              >
-                <img
-                  class="arrow-onholdcheck"
-                  src="{{ inactive_img }}"
-                  style="background-color: #ffffff"
-                />
-                <p class="measureonhold_label" style="color: #c1c7d5">
-                  InActive
-                </p>
-              </div>
-            </div>
-          </div> -->
           <div class="edit_patient2">
             <div class="onhold_panel" [class.disabled]="ImageStatus">
               <div
@@ -1078,14 +1038,14 @@
               <div class="flex-program-details">
                 <div class="program_left_panel">
                   <div class="start_date">
-                    <div class="userInfoItem" [ngClass]="{ 'disabled-div': true }">
+                    <div class="userInfoItem"  [ngClass]="{ 'disabled-div': true }">
                       <p class="main_input_title">*Program Name</p>
                       <select
                         class="userInfovalue"
                         id="editProgramName"
                         placeholder="Select Program Name"
                         formControlName="programname"
-                        [attr.disabled]="true"
+                        [disabled]="true"
                         required
                       >
                         <option
@@ -1121,10 +1081,6 @@
                         id="editStartDate"
                         type="date"
                       />
-                      <!-- [attr.disabled]="Patientdata.PatientProgramdetails.Status == 'Active'
-                                                  || Patientdata.PatientProgramdetails.Status == 'OnHold'
-                                                  || Patientdata.PatientProgramdetails.Status == 'ReadyToDischarge'
-                                                  || Patientdata.PatientProgramdetails.Status == 'Discharged' ? true : null" -->
 
                       <div class="warn">
                         <ng-container
@@ -1143,9 +1099,6 @@
                       <p class="main_input_title">
                         *Vitals/Condition Monitored
                       </p>
-                      <!-- <div *ngFor="let v of vital_selected">
-                                              <div class="userInfovalue ">{{v.VitalName}}</div>
-                                          </div> -->
 
                       <mat-select
                         [(value)]="vitalList"
@@ -1154,6 +1107,7 @@
                         id="editVitalList"
                         multiple
                         class="common_input_dropdown"
+                        [disabled]="true"
                       >
                         <mat-option
                           *ngFor="let v of vital_selected"
@@ -1214,32 +1168,16 @@
                       type="date"
                     />
                   </div>
-
-                  <!-- <div class="userInfoItem">
-                                              <p class="main_input_title"> *Target/Month</p>
-                                              <input class="userInfovalue" placeholder="16 days" required
-                                                  formControlName="target" />
-                                              <small class="text-danger"
-                                                  *ngIf="programForm.get('target')?.invalid && programForm.get('target')?.touched">End date
-                                                  are
-                                                  Required</small>
-                                          </div> -->
                 </div>
 
                 <div
-                  *ngIf="Patientdata.PatientProgramdetails.Status != 'Active'"
                 >
                   <img
                     id="editprogramNameEditPanel"
                     *ngIf="
-                      DeviceNotAvaliable &&
-                      Patientdata.PatientProgramdetails.Status != 'Active' &&
-                      Patientdata.PatientProgramdetails.Status !=
-                        'ReadyToDischarge' &&
-                      Patientdata.PatientProgramdetails.Status != 'OnHold' &&
-                      Patientdata.PatientProgramdetails.Status !=
-                        'Discharged' &&
-                      Patientdata.PatientProgramdetails.Status != 'InActive'
+                    (Patientdata.PatientProgramdetails.Status === 'Prescribed' ||
+                     Patientdata.PatientProgramdetails.Status === 'Enrolled') ||
+                    (Patientdata.PatientProgramdetails.Status === 'Active' && selectedProgram && !allVitalsSelected)
                     "
                     (click)="programNameEditPanel()"
                     class="edit-icon"
@@ -1252,7 +1190,7 @@
                   class="goals_note_container"
                   *ngFor="let goal of Goals_Selected; let i = index"
                 >
-                  <form class="goal_list" [name]="i">
+                  <div  class="goal_list" [attr.data-index]="i">
                     <div>
                       <div class="note_dropdown">
                         <div class="userInfoItem" style="width: 48%">
@@ -1266,27 +1204,15 @@
                         </div>
                         <br />
                       </div>
-                      <!-- <mat-form-field class="noteTextArea">
                         <textarea
-                          class="goal_description"
-                          id="editGoalDescription"
-                          matInput
-                          cdkTextareaAutosize
-                          cdkAutosizeMinRows="1"
-                          cdkAutosizeMaxRows="5"
-                          [(ngModel)]="goal.Description"
-                          [ngModelOptions]="{ standalone: true }"
-                        ></textarea>
-                      </mat-form-field> -->
-                      <textarea
                         class="goal_description noteTextArea"
-                        formControlName="additionalnotes"
                         id="addPatientAdditionalNotes"
                         [(ngModel)]="goal.Description"
+                        [ngModelOptions]="{ standalone: true }"
                         maxlength="500"
                       ></textarea>
                     </div>
-                  </form>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1294,7 +1220,6 @@
             <div class="program_subpanel2">
               <div class="personal">
                 <p class="main_input_main_heading">Program Timeline</p>
-                <!-- <img class="add_icon1" src="../../../../../assets/04-Icons/Icons_Add A.svg" /> -->
               </div>
               <div class="program-timeline_subpanel">
                 <div
@@ -1321,7 +1246,6 @@
                   class="program_column1"
                 ></div>
               </div>
-              <!-- <p> Program Time Line</p> -->
               <div class="program-timeline">
                 <div>
                   <!-- First Segment  -->
@@ -1382,7 +1306,6 @@
                         formControlName="physician"
                         id="editPhysician"
                       >
-                        <!-- <option *ngFor="let phy of master_data.PhysicianDetails" [value]="phy.UserId"> -->
                         <option
                           *ngFor="let phy of physicianList"
                           [value]="phy.UserId"
@@ -1390,7 +1313,6 @@
                           {{ phy.PhysicianName }}
                         </option>
                       </select>
-                      <!-- <small class="text-danger"  *ngIf="programForm.get('physician')?.invalid && programForm.get('physician')?.touched">Physicianis required</small> -->
                     </div>
 
                     <div class="userInfoItem">
@@ -1403,14 +1325,14 @@
                         id="editOrderDate"
                         (ngModelChange)="checkDateValidity($event)"
                       />
-                      <small
+                      <!-- <small
                         class="text-danger"
                         *ngIf="
                           programForm.get('consultdate')?.invalid &&
                           programForm.get('consultdate')?.touched
                         "
                         >Consultdate is required</small
-                      >
+                      > -->
                       <div class="warn">
                         <ng-container *ngIf="futureDateError">
                           Please Enter valid Date
@@ -1452,88 +1374,6 @@
                     </div>
                   </div>
                   <!-- Fourth Segment  -->
-
-                  <!-- <div class="diagosis_panel">
-                      <div
-                        *ngFor="let Diagnosis of Diagnosis_List; let i = index"
-                      >
-                        <form [name]="i">
-                          <div class="program_timeline_data">
-                            <div class="userInfoItem program_timeline_data_left">
-                              <p class="main_input_title">*Diagnosis</p>
-
-                              <select
-                                class="userInfovalue diagnosis_title"
-                                id="editDiagnosis"
-                                title="{{ Diagnosis.DiagnosisName }}"
-                                [(ngModel)]="Diagnosis.DiagnosisName"
-                                [ngModelOptions]="{ standalone: true }"
-                                (ngModelChange)="diagnosisChanged($event, i)"
-                              >
-                                <option
-                                  title="{{ Diag_name.DiagnosisName }}"
-                                  *ngFor="let Diag_name of Diagnosis_Name"
-                                  [value]="Diag_name.DiagnosisName"
-                                >
-                                  {{ Diag_name.DiagnosisName }}
-                                </option>
-                              </select>
-
-                              <small
-                                class="text-danger"
-                                *ngIf="
-                                  programForm.get('diagnosis')?.invalid &&
-                                  programForm.get('diagnosis')?.touched
-                                "
-                                >Diagnosis name is required
-                              </small>
-                            </div>
-
-                            <div class="userInfoItem">
-                              <p class="main_input_title">*Code</p>
-                              <div class="code">
-                                <div class="code_data">
-                                  <input
-                                    class="userInfovalue"
-                                    [(ngModel)]="Diagnosis.DiagnosisCode"
-                                    [ngModelOptions]="{ standalone: true }"
-                                    required
-                                    [disabled]="true"
-                                  />
-                                </div>
-
-                                <div *ngIf="i == 0">
-                                  <div class="icon_panel">
-                                    <img
-                                      class="add_icon4"
-                                      src="../../../../../assets/04-Icons/Icons_Add.svg"
-                                      id="editaddNewDiaganostics"
-                                      (click)="addNewDiaganostics()"
-                                    />
-                                    <div class="remove_icon">
-                                      <img
-                                        class="add_icon4"
-                                        src="../../../../../assets/04-Icons/Icons_Minus.svg"
-                                        id="editremoveDiaganostics"
-                                        (click)="removeDiaganostics_Patient()"
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <small
-                                class="text-danger"
-                                *ngIf="
-                                  programForm.get('code')?.invalid &&
-                                  programForm.get('code')?.touched
-                                "
-                                >code is Required</small
-                              >
-                            </div>
-                          </div>
-                        </form>
-                      </div>
-                    </div> -->
 
                   <div class="diagosis_panel">
                     <div
@@ -1624,12 +1464,12 @@
               <div class="program_timeline_container">
                 <div
                   *ngIf="
-                    EnrolmentDetails.Status != null &&
+                    EnrolmentDetails?.Status != null &&
                     EnrolmentDetails.Status == 'Enrolled'
                   "
                   class="extend_program-timeline"
                 >
-<div class="program_column1">
+                  <div class="program_column1">
                       <div class="userInfoItem">
                         <p class="main_input_title">*Patient Stage</p>
 
@@ -1652,11 +1492,6 @@
                       </div>
                     </div>
                     <div class="program_column2">
-                      <!-- <div class="userInfoItem">
-                                          <p class="main_input_title"> Date</p>
-                                          <p class="userInfovalue" >{{convertDateMMDD(EnrolmentDetails.AssignedDate)}}</p>
-
-                                      </div> -->
                       <div class="userInfoItem">
                         <p class="main_input_title">Date</p>
                         <input
@@ -1685,7 +1520,7 @@
                 </div>
 
                 <div
-                  *ngIf="ActiveDetails.Status == 'Active'"
+                  *ngIf="ActiveDetails?.Status == 'Active'"
                   class="extend_program-timeline"
                 >
                   <div class="program_column1">
@@ -1708,20 +1543,21 @@
                       <div class="userInfoItem">
                         <p class="main_input_title">Date</p>
                         <p class="userInfovalue">
-                          {{
-                            convertDateMMDD(
-                              this.convertToLocalTime(
-                                ActiveDetails.AssignedDate
-                              )
-                            )
-                          }}
+                           {{ 
+                              convertDateMMDD(
+                                this.convertToLocalTime(
+                                  ActiveDetails.AssignedDate
+                                )
+                              ) 
+                              | date: 'MM-dd-yyyy' 
+                            }}
                         </p>
                       </div>
                     </div>
 
                 </div>
                 <div
-                  *ngIf="ReadyToDischarge.Status == 'ReadyToDischarge'"
+                  *ngIf="ReadyToDischarge?.Status == 'ReadyToDischarge'"
                   class="extend_program-timeline"
                 >
                 <div class="program_column1">
@@ -1751,7 +1587,7 @@
                               this.convertToLocalTime(
                                 ReadyToDischarge.AssignedDate
                               )
-                            )
+                            ) | date: 'MM-dd-yyyy'
                           }}
                         </p>
                       </div>
@@ -1759,7 +1595,7 @@
 
                 </div>
                 <div
-                  *ngIf="Discharged.Status == 'Discharged'"
+                  *ngIf="Discharged?.Status == 'Discharged'"
                   class="extend_program-timeline"
                 >
                     <div class="program_column1">
@@ -1784,7 +1620,7 @@
                       <div class="userInfoItem">
                         <p class="main_input_title">Date</p>
                         <p class="userInfovalue">
-                          {{ convertDateMMDD(Discharged.AssignedDate) }}
+                          {{ convertDateMMDD(Discharged.AssignedDate)| date: 'MM-dd-yyyy' }}
                         </p>
                       </div>
                     </div>
@@ -1817,7 +1653,7 @@
                           {{
                             convertDateMMDD(
                               this.convertToLocalTime(OnHold.AssignedDate)
-                            )
+                            )| date: 'MM-dd-yyyy' 
                           }}
                         </p>
                       </div>
@@ -1849,7 +1685,7 @@
                           {{
                             convertDateMMDD(
                               this.convertToLocalTime(InActive.AssignedDate)
-                            )
+                            )| date: 'MM-dd-yyyy' 
                           }}
                         </p>
                       </div>
@@ -1919,22 +1755,21 @@
                           <div class="userInfoItem">
                             <p class="main_input_title">*Vital Monitoring</p>
                             <div *ngIf="device.DeviceStatus == 'InActive'">
-                              <select
-                                class="userInfovalue"
-                                id="editDeviceVitalInActive"
-                                [(ngModel)]="device.VitalId"
-                                [ngModelOptions]="{ standalone: true }"
+                              <!-- Renders only if the selection is valid -->
+                              <select 
+                              [disabled]="!device.isEditable"
+                              *ngIf="!device.invalidSelection"
+                              class="userInfovalue"
+                              id="editDeviceVitalInActive"
+                              [(ngModel)]="device.VitalId"
+                              [ngModelOptions]="{ standalone: true }"
+                              (change)="onVitalChange(device, $event)"
                               >
-                                <ng-container
-                                  *ngFor="let x of patientdevicedetails"
-                                >
-                                  <option
-                                    *ngIf="x.VitalName != ''"
-                                    value="{{ x.VitalId }}"
-                                  >
-                                    {{ x.VitalName }}
-                                  </option>
-                                </ng-container>
+                              <ng-container *ngFor="let x of uniqueVitals">
+                                <option *ngIf="x.VitalName != ''" [value]="x.VitalId">
+                                  {{ x.VitalName }}
+                                </option>
+                              </ng-container> 
                               </select>
                             </div>
                             <div *ngIf="device.DeviceStatus != 'InActive'">
@@ -1959,12 +1794,10 @@
                             </div>
                           </div>
                         </div>
-
-
                         <div class="second_panel">
                           <div class="userInfoItem">
                             <p class="main_input_title">*Device Type</p>
-                            <select
+                           <select
                               [disabled]="true"
                               id="editDeviceType"
                               *ngIf="device.DeviceCommunicationType"
@@ -1980,7 +1813,7 @@
                             <select
                               *ngIf="!device.DeviceCommunicationType"
                               class="userInfovalue"
-                              id="editDeviceTypeLTE"
+                              id="editDeviceTypeLTE_{{i}}"
                               placeholder="LTE"
                               [(ngModel)]="deviceTypeDataId"
                               [ngModelOptions]="{ standalone: true }"
@@ -2028,6 +1861,31 @@
                           </div>
                           <div class="userInfoItem">
                             <p class="main_input_title">*Device Id</p>
+                            <div *ngIf="!device.VitalId">
+                              <div *ngIf="device.DeviceStatus == 'InActive'">
+                                <ng-autocomplete
+                                  [data]="[]"
+                                  [searchKeyword]="keyword"
+                                  placeholder="Select Device"
+                                  id="editDeviceId1"
+                                  (selected)="selectEvent($event, i)"
+                                  (inputChanged)="onChangeSearch($event)"
+                                  (inputFocused)="onFocused($event)"
+                                  [itemTemplate]="itemTemplate"
+                                  [notFoundTemplate]="notFoundTemplate"
+                                >
+                                </ng-autocomplete>
+
+                                <ng-template #itemTemplate let-item>
+                                  <a [innerHTML]="item.DeviceNumber"></a>
+                                </ng-template>
+
+                                <ng-template #notFoundTemplate let-notFound>
+                                  <div [innerHTML]="notFound"></div>
+                                </ng-template>
+                              </div>
+                              
+                            </div>
                             <div *ngIf="device.VitalId == 1">
                               <div *ngIf="device.DeviceStatus == 'InActive'">
                                 <ng-autocomplete
@@ -2171,18 +2029,6 @@
                                 </option>
                               </select>
                             </div>
-
-                            <!-- <select [disabled]="true"  *ngIf="device.DeviceNumber" class="userInfovalue" [(ngModel)]="device.DeviceNumber" [ngModelOptions]="{standalone: true}">
-                                                        <option [value]="device.DeviceNumber">{{device.DeviceNumber}}</option>
-                                                </select>
-                                                <select  *ngIf="!device.DeviceNumber" class="userInfovalue" [(ngModel)]="device.DeviceNumber" [ngModelOptions]="{standalone: true}">
-                                                    <ng-container *ngFor="let v of master_data.DeviceDetails">
-                                                        <option *ngIf="v.VitalId==device.VitalId"
-                                                            [value]="v.DeviceNumber">{{v.DeviceNumber}}
-                                                        </option>
-                                                    </ng-container>
-
-                                                </select> -->
                           </div>
                         </div>
 
@@ -2216,8 +2062,6 @@
                               class="icon_error"
                               src="../../../../../assets/04-Icons/Icons_Error A_add.svg"
                             />
-                            <!-- <p style="visibility: hidden;">TEST</p> -->
-                            <!-- <button *ngIf="patientdevicedetails[i].DeviceStatus =='Error'" class="test_device" (click)="TestDevice(i)">TEST DEVICE</button> -->
                             <button
                               *ngIf="
                                 patientdevicedetails[i].DeviceStatus == 'Active'
@@ -2266,7 +2110,6 @@
               </div>
             </div>
           </div>
-          <!-- </form> -->
 
           <div #vitalScheduledata_>
             <div
@@ -2276,7 +2119,6 @@
                 <div>
                   <div class="device">
                     <p class="main_input_main_heading">Vital schedules</p>
-                    <!-- <img class="add_icon1" src="../../../../../assets/04-Icons/Icons_Add A.svg" /> -->
                   </div>
                   <div class="vital_data_panel">
                     <div class="vital_data_left_panel">
@@ -2409,8 +2251,6 @@
                                 />
                               </div>
                             </div>
-
-                            <!-- (click)="editprogram()" -->
                           </div>
 
                           <app-sliderdata
@@ -2466,19 +2306,6 @@
                         class="billing_userInfoItem"
                         *ngIf="programForm_3.controls.billingcode3.value != ''"
                       >
-                        <!-- <div class="bill_code_panel">
-                          <img
-                            class="arrow-check2"
-                            src="../../../../../assets/04-Icons/Icons_Check A.svg"
-                          />
-                          <input
-                            class="userInfovalue"
-                            formControlName="billingcode2"
-                            id="editBillingCode2"
-                            [attr.disabled]="true"
-                          />
-                        </div>
-                         -->
                         <div class="bill_code_panel">
                           <img
                             class="arrow-check2"
@@ -2551,12 +2378,6 @@
                     <div class="first_panel">
                       <div class="userInfoItem">
                         <p class="main_input_title">Primary Insurance</p>
-                        <!-- <select class="userInfovalue" formControlName="insurance1">
-                                                <option  *ngFor="let v of insuracevendors"
-                                                    [value]="v.VendorId">{{v.VendorName}}
-                                                </option>
-                                            </select> -->
-
                         <ng-autocomplete
                           [data]="insuracevendors"
                           [searchKeyword]="keyword_primary_insurance"
@@ -2598,11 +2419,6 @@
                         <p class="main_input_title">
                           Additional Insurance(optional)
                         </p>
-                        <!-- <select class="userInfovalue" formControlName="insurance2">
-                                                <option  *ngFor="let v of insuracevendors"
-                                                    [value]="v.VendorId">{{v.VendorName}}
-                                                </option>
-                                            </select> -->
                         <ng-autocomplete
                           [data]="insuracevendors"
                           [searchKeyword]="keyword_secondary_insurance"
@@ -2631,11 +2447,6 @@
                         </ng-template>
                       </div>
                       <div class="userInfoItem">
-                        <!-- <select class="userInfovalue" formControlName="insurance3">
-                                                <option  *ngFor="let v of insuracevendors"
-                                                    [value]="v.VendorId">{{v.VendorName}}
-                                                </option>
-                                            </select> -->
                         <ng-autocomplete
                           [data]="insuracevendors"
                           [searchKeyword]="keyword_ternary_insurance"
@@ -2740,12 +2551,6 @@
                       *matRowDef="let row; columns: displayedColumns"
                       [style.minHeight.px]="35"
                     ></tr>
-                    <!--
-                    <mat-row
-                    [style.minHeight.px]="35"
-                    *matRowDef="let row; columns: displayedColumns"
-                    [ngClass]="{}"
-                  ></mat-row> -->
                   </table>
                 </div>
               </div>
@@ -2767,9 +2572,6 @@
           <div class="download">
             <h4 class="subheading-dialog">Patient Details will be updated!</h4>
           </div>
-          <!-- <div class="download">
-                    <p> Patient id:{{pid}}</p>
-                </div> -->
         </div>
         <div class="button">
           <button
@@ -2803,9 +2605,6 @@
               Patient Details Updated Successfully...!
             </h4>
           </div>
-          <!-- <div class="download">
-                    <p> Patient id:{{pid}}</p>
-                </div> -->
         </div>
         <div class="button">
           <button
@@ -2839,21 +2638,18 @@
               Could not Update Patient Details...!
             </h4>
           </div>
-          <!-- <div class="download">
-                    <p> Patient id:{{pid}}</p>
-                </div> -->
         </div>
         <div class="button">
           <button
             id="editfailCancelOk"
-            class="edit_cancel"
+            class="btn_cancel"
             [mat-dialog-close]="true"
           >
             CANCEL
           </button>
           <button
             id="editfailConfirmOk"
-            class="edit_save"
+            class="btn_save"
             (click)="redirect_patient()"
           >
             OK
@@ -2875,66 +2671,27 @@
               id="editUpdateVital"
               class="common_input_dropdown"
               [(ngModel)]="vitalName"
+              [ngModelOptions]="{standalone: true}"
             />
-            <!-- <select class="common_input_dropdown" [(ngModel)]="vialName">
-                    <option value="">Blood Glucose</option>
-                    <option>1</option>
-                    <option>2</option>
-                  </select> -->
-            <!-- <img class="arrow-check2" src="../../../../../assets/04-Icons/Icons_Check A.svg" /> -->
           </div>
-          <!-- <button class="btn_setDefault">SetDefault</button> -->
         </div>
       </div>
-      <!-- <div class="common_content">
-            <p class="common_content_title"> Device</p>
-            <div class="userInfoItem_side_panel ">
-              <input class="common_input_dropdown" [(ngModel)]="deviceName"/>
-              <img class="arrow-check2" src="../../../../../assets/04-Icons/Icons_Check A.svg" />
-            </div>
-        </div> -->
       <div class="common_content">
         <p class="common_content_title">Measurement</p>
         <div class="vital_panel">
           <div class="userInfoItem_side_panel">
-            <!-- <select class="common_input_dropdown">
-                    <option value="">Glucose Level - Before Meal</option>
-                    <option value="1">First Option</option>
-                     <option value="2">second option</option>
-                   </select> -->
             <input
               [attr.disabled]="true"
               id="editUpdateVitalMeasurement"
               class="common_input_dropdown"
               [(ngModel)]="vitalMeasureName"
+              [ngModelOptions]="{standalone: true}"
             />
-            <!-- <img class="add_icon_side_panel" src="../../../../../assets/04-Icons/Icons_Add.svg" /> -->
           </div>
         </div>
       </div>
-      <!-- <div class="common_content">
-            <p class="common_content_title"> Unit</p>
-            <input class="common_input_dropdown" [(ngModel)]="unitName"/>
-            <select class="common_input_dropdown unit_dropdown">
-                <option value="">mg/DL</option>
-                <option value="1">First Option</option>
-                <option value="2">second option</option>
-            </select>
-        </div> -->
       <p class="common_content_title">Normal</p>
       <div class="vital_range_panel">
-        <!-- <div class="custom-slider"> -->
-          <!-- <ngx-slider
-            (mouseup)="displayValue()"
-            id="editUpdateNormal"
-            [options]="options"
-            [(value)]="minValue"
-            [(highValue)]="maxValue"
-          >
-          </ngx-slider> -->
-          <!-- <mat-slider min="0" max="maxValue" step="1" [(ngModel)]="minValue"></mat-slider> -->
-
-        <!-- </div> -->
         <form>
           <app-dual-range-slider
             [min]="0"
@@ -2942,8 +2699,6 @@
             [formControl]="rangeControl">
           </app-dual-range-slider>
         </form>
-<!--
-        <p>Selected Range: {{ rangeControl.value | json }}</p> -->
       </div>
       <p class="common_content_title">Cautious</p>
       <div class="cautious_range_panel">
@@ -2959,7 +2714,6 @@
                     class="btn-common"
                     src="../../../../../assets/04-Icons/Icons_Plus.svg"
                   />
-                  <!-- <span class="duration_value">{{lowerthresholdvalue }} </span> -->
                   <input
                     type="number"
                     id="editCautiousNumber"
@@ -2989,7 +2743,6 @@
                     class="btn-common"
                     src="../../../../../assets/04-Icons/Icons_Plus.svg"
                   />
-                  <!-- <span class="duration_value">{{ higherthresholdvalue }} </span> -->
                   <input
                     type="number"
                     class="duration_value vitalvalue"
@@ -3022,7 +2775,6 @@
                     class="btn-common"
                     src="../../../../../assets/04-Icons/Icons_Plus.svg"
                   />
-                  <!-- <span class="duration_value">{{lowercriticalthreshold }} </span> -->
                   <input
                     type="number"
                     class="duration_value vitalvalue"
@@ -3050,7 +2802,6 @@
                     class="btn-common"
                     src="../../../../../assets/04-Icons/Icons_Plus.svg"
                   />
-                  <!-- <span class="duration_value">{{ highercriticalthreshold }} </span> -->
                   <input
                     type="number"
                     class="duration_value vitalvalue"
@@ -3099,10 +2850,10 @@
               class="common_input_dropdown"
               id="editDocumentType"
               [(ngModel)]="docType"
+              [ngModelOptions]="{standalone: true}"
             >
               <option value="PatientConsentForm">Patient Consent Form</option>
             </select>
-            <!-- <input /> -->
           </div>
         </div>
         <div class="common_content">
@@ -3112,19 +2863,10 @@
             class="common_input_dropdown"
             id="editDocumentDescription"
             [(ngModel)]="docDesc"
+            [ngModelOptions]="{standalone: true}"
           />
         </div>
         <div class="common_content">
-          <!-- <p class="common_content_title">File</p>
-          <div>
-            <input
-              id="doc"
-              type="file"
-              class="common_input_dropdown"
-              id="editOpenFile"
-              (change)="openFileData($event)"
-            />
-          </div> -->
           <div class="doc_attachment">
             <input
               type="text"
@@ -3173,9 +2915,8 @@
       </div>
     </div>
   </ng-template>
-
   <ng-template #programedit>
-    <div class="mydialogBox">
+    <div class="mydialogBox" *ngIf="showProgramEditModal">
       <div class="dialogrenewDatePanel">
         <div class="header">
           <h3>Edit Program Details</h3>
@@ -3189,9 +2930,10 @@
               formControlName="programname"
               id="editProgramNameDialog"
               required
+              [disabled]="isDropdownDisabled()"
             >
               <option
-                *ngFor="let pgm of master_data.ProgramDetailsMasterData"
+                *ngFor="let pgm of master_data?.ProgramDetailsMasterData"
                 [value]="pgm.ProgramId"
               >
                 {{ pgm.ProgramName }}
@@ -3202,9 +2944,10 @@
               <p class="main_input_title">*Vitals/Condition Monitored</p>
 
               <mat-select
-                [(value)]="editvitalList"
+                [(value)]="vitalListDialog"
+                formControlName="vitalListDialog"
                 (selectionChange)="vitalEditPgmListChange()"
-                name="vitalList"
+                name="vitalListDialog"
                 id="editVitalListDialog"
                 multiple
                 class="common_input_dropdown"
@@ -3212,98 +2955,21 @@
                 <mat-option
                   *ngFor="let v of editProgramVital"
                   [value]="v.VitalId"
+                  [disabled]="isOptionDisabled(v.VitalId)"
                 >
                   {{ v.VitalName }}
                 </mat-option>
               </mat-select>
             </div>
-
-            <!-- <div *ngFor="let Diag of diaganosisMainList; let i = index"> -->
-            <!-- <div class="diagonsis_panel">
-                <div class="left_panel">
-                  <p class="main_input_title">*Diagnosis</p>
-
-                  <select
-                    class="userInfovalue editdiagnosis_title"
-                    id="editDiagnosisDialog"
-                    title="{{ Diag.DiagnosisName }}"
-                    [(ngModel)]="Diag.DiagnosisName"
-                    [ngModelOptions]="{ standalone: true }"
-                    (ngModelChange)="EditProgramdiagnosisChanged($event, i)"
-                  >
-                    <option [value]="undefined">Select</option>
-                    <option
-                      title="{{ Diag_name.DiagnosisName }}"
-                      *ngFor="let Diag_name of editProgramDiagoList"
-                      [value]="Diag_name.DiagnosisName"
-                    >
-                      {{ Diag_name.DiagnosisName }}
-                    </option>
-                  </select>
-
-                  <small
-                    class="text-danger"
-                    *ngIf="
-                      editProgramdata.get('diagnosis')?.invalid &&
-                      editProgramdata.get('diagnosis')?.touched
-                    "
-                    >Diagnosis name is required
-                  </small>
-                </div>
-
-                <div class="right_panel">
-                  <p class="main_input_title">*Code</p>
-                  <div class="code">
-                    <div class="code_data">
-                      <input
-                        class="userInfovalue"
-                        id="editDiagnosisCodeDialog"
-                        [(ngModel)]="Diag.DiagnosisCode"
-                        [ngModelOptions]="{ standalone: true }"
-                        required
-                        [disabled]="true"
-                      />
-                    </div>
-
-                    <div *ngIf="i == 0">
-
-                      <div class="icon_panel">
-                        <img
-                          class="add_icon4"
-                          src="../../../../../assets/04-Icons/Icons_Add.svg"
-                          (click)="programaddNewDiaganostic()"
-                          id="editAddNewDiaganostic"
-                        />
-                        <div class="remove_icon">
-                          <img
-                            class="add_icon4"
-                            src="../../../../../assets/04-Icons/Icons_Minus.svg"
-                            (click)="programaremoveNewDiaganostic()"
-                            id="editRemoveNewDiaganostic"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <small
-                    class="text-danger"
-                    *ngIf="
-                      editProgramdata.get('code')?.invalid &&
-                      editProgramdata.get('code')?.touched
-                    "
-                    >code is Required</small
-                  >
-                </div>
-              </div> -->
             <div class="diagosis_panel">
-              <div *ngFor="let Diagnosis of diaganosisMainList; let i = index">
-                <form>
-                  <div class="program_timeline_data">
-                    <div class="userInfoItem program_timeline_data_left">
-                      <p class="main_input_title">*Diagnosis</p>
-                      <ng-autocomplete
+              <div formArrayName="selectedDiagnoses">
+                <div *ngFor="let diag of selectedDiagnosesArray.controls; let i = index" [formGroupName]="i">
+                    <div class="program_timeline_data">
+                      <div class="userInfoItem program_timeline_data_left">
+                        <p class="main_input_title">*Diagnosis</p>
+                        <ng-autocomplete
                         id="editpatientProgram"
-                        [initialValue]="Diagnosis.DiagnosisName"
+                        [initialValue]="diag.get('DiagnosisName')?.value"
                         [searchKeyword]="keywordDignosticsEdit"
                         [data]="editProgramDiagoList"
                         placeholder="Select Diagnosis"
@@ -3311,72 +2977,69 @@
                         (inputCleared)="clearedEdit($event, i)"
                         [itemTemplate]="itemTemplate"
                         [notFoundTemplate]="notFoundTemplate"
-                      >
-                      </ng-autocomplete>
-                      <ng-template #itemTemplate let-item>
-                        <a [innerHTML]="item.DiagnosisFieldEdit"></a>
-                      </ng-template>
-                      <ng-template #notFoundTemplate let-notFound>
-                        <div [innerHTML]="notFound"></div>
-                      </ng-template>
+                        ></ng-autocomplete>
+                        <ng-template #itemTemplate let-item>
+                          <a [innerHTML]="item.DiagnosisFieldEdit"></a>
+                        </ng-template>
+                        <ng-template #notFoundTemplate let-notFound>
+                          <div [innerHTML]="notFound"></div>
+                        </ng-template>
 
-                      <small
-                        class="text-danger"
-                        *ngIf="
-                          editProgramdata.get('code')?.invalid &&
-                          editProgramdata.get('code')?.touched
-                        "
-                        >Code is required</small
-                      >
-                    </div>
+                        <small
+                          class="text-danger"
+                          *ngIf="
+                            editProgramdata.get('code')?.invalid &&
+                            editProgramdata.get('code')?.touched
+                          "
+                          >Code is required</small
+                        >
+                      </div>
 
-                    <div class="userInfoItem">
-                      <p class="main_input_title">*Code</p>
-                      <div class="code">
-                        <div class="code_data">
-                          <input
-                            class="userInfovalue"
-                            id="editPatientDiagnosisCode"
-                            [(ngModel)]="Diagnosis.DiagnosisCode"
-                            [ngModelOptions]="{ standalone: true }"
-                            required
-                            [disabled]="true"
-                          />
-                        </div>
-
-                        <div *ngIf="i == 0">
-                          <div class="icon_panel">
-                            <img
-                              class="add_icon4"
-                              src="../../../../../assets/04-Icons/Icons_Add.svg"
-                              id="editAddNewDiaganostic"
-                              (click)="programaddNewDiaganostic()"
+                      <div class="userInfoItem">
+                        <p class="main_input_title">*Code</p>
+                        <div class="code">
+                          <div class="code_data">
+                            <input
+                              class="userInfovalue"
+                              id="editPatientDiagnosisCode"
+                              formControlName="DiagnosisCode"
+                              required
+                              [disabled]="true"
                             />
-                            <div class="remove_icon">
+                          </div>
+
+                          <div *ngIf="i == 0">
+                            <div class="icon_panel">
                               <img
                                 class="add_icon4"
-                                src="../../../../../assets/04-Icons/Icons_Minus.svg"
-                                id="editRemoveNewDiaganostic"
-                                (click)="programaremoveNewDiaganostic()"
+                                src="../../../../../assets/04-Icons/Icons_Add.svg"
+                                id="editAddNewDiaganostic"
+                                (click)="programaddNewDiaganostic()"
                               />
+                              <div class="remove_icon">
+                                <img
+                                  class="add_icon4"
+                                  src="../../../../../assets/04-Icons/Icons_Minus.svg"
+                                  id="editRemoveNewDiaganostic"
+                                  (click)="programaremoveNewDiaganostic()"
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
+                        <small
+                          class="text-danger"
+                          *ngIf="
+                            programForm.get('code')?.invalid &&
+                            programForm.get('code')?.touched
+                          "
+                          >Code is required</small
+                        >
                       </div>
-                      <small
-                        class="text-danger"
-                        *ngIf="
-                          programForm.get('code')?.invalid &&
-                          programForm.get('code')?.touched
-                        "
-                        >Code is required</small
-                      >
                     </div>
-                  </div>
-                </form>
+                </div>
               </div>
             </div>
-            <!-- </div> -->
           </div>
         </form>
         <div class="btn_panel">
@@ -3391,6 +3054,7 @@
             class="btn_save"
             id="editProgramDatasbmit"
             (click)="EditProgramData()"
+            [disabled]="!isFormDirty()"
           >
             Submit
           </button>
@@ -3398,8 +3062,14 @@
       </div>
     </div>
   </ng-template>
-</div>
-<app-confirm-dialog-panel
+  <div class="custom-modal" *ngIf="showProgramEditModal"  >
+    <div class="modal-content" (click)="$event.stopPropagation()">
 
->
+
+      <!-- Your preview content (template or component) -->
+      <ng-template [ngTemplateOutlet]="programedit"></ng-template>
+    </div>
+  </div>
+</div>
+<app-confirm-dialog-panel>
 </app-confirm-dialog-panel>

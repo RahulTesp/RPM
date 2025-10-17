@@ -26,8 +26,6 @@
                 android:name="com.rpm.clynx.fragments.SymptomsFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
                 app:layoutManager="LinearLayoutManager"
                 tools:context="com.rpm.clynx.fragments.SymptomsFragment"
                 tools:listitem="@layout/symptoms_item" />

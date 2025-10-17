@@ -1,20 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_width="match_parent"
-android:layout_marginTop="10dp"
-android:layout_marginBottom="10dp"
-android:layout_height="wrap_content">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/select_contact_bg_selector"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical"
+    android:padding="10dp"
+
+    >
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/myinfo_card_bg_radius"
+
     android:orientation="vertical"
-    android:padding="10dp">
+    >
     <LinearLayout
+        android:id="@+id/channelRowLayout"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/itemIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/check_icon_selector"
+        android:duplicateParentState="true"/>
 
         <TextView
             android:id="@+id/itemMemNm"
@@ -25,7 +41,10 @@ android:layout_height="wrap_content">
             android:gravity="center_vertical"
             android:paddingLeft="@dimen/margin_10dp"
             android:text="Channel"
-            android:textColor="@color/Primary_dark"
+            android:duplicateParentState="true"
+
+            android:textColor="@color/text_colour_selector"
+
             android:textSize="20sp"/>
         <TextView
             android:id="@+id/itemMemUsrNm"
@@ -35,8 +54,11 @@ android:layout_height="wrap_content">
             android:fontFamily="sans-serif-medium"
             android:gravity="center_vertical"
             android:paddingLeft="@dimen/margin_10dp"
+            android:duplicateParentState="true"
+
             android:text="Channel"
-            android:textColor="@color/accent1"
+            android:textColor="@color/text_colour_selector"
+
             android:textSize="20sp"/>
     </LinearLayout>
 </LinearLayout>

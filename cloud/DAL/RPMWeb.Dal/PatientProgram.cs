@@ -172,19 +172,7 @@ namespace RPMWeb.Dal
                             {
                                 return id;
                             }
-
-                            
-
                             return id;
-
-
-                            
-
-
-
-
-
-
                         }
                     }
                     else
@@ -202,21 +190,61 @@ namespace RPMWeb.Dal
 
             try
             {
-			//ccm change
-                string ProgramVitals = "INSERT INTO  PatientProgramVitals([PatientProgramId],[ProgramId],[VitalId],[CreatedBy])values";
-                string ProgramVitalsinserts = string.Empty;
+                DataSet ds;
+                List<int> newVitals;
+                List<int> deletedVitals;
+                string ProgramVitalsNew = "INSERT INTO  #tempNewVitals([PatientProgramId],[VitalId])values";
+                string ProgramVitalsDel = "INSERT INTO  #tempDeletedVitals ([PatientProgramId],[VitalId])values";
+                string ProgramVitalsNewinserts = string.Empty;
+                string ProgramVitalsDeletedinserts = string.Empty;
                 List<int> vitalids = data.VitalIds;
-                string ProgramVitalsInput = string.Empty;
+                string ProgramVitalsNewInput = string.Empty;
+                string ProgramVitalsDeletedInput = string.Empty;
                 if (vitalids != null)
                     if (vitalids.Count > 0)
                     {
-                        foreach (int vitalId in vitalids)
+                        using (SqlConnection con = new SqlConnection(ConnectionString))
                         {
-                            string insertvalues = "('PATIENTPROGRAMIDXXX'," + data.ProgramId + "," + vitalId + ",'" + data.CreatedBy + "'),";
-                            ProgramVitalsinserts = ProgramVitalsinserts + insertvalues;
+                            con.Open();
+                            using (SqlCommand command = new SqlCommand("usp_GetPatientProgramVitals", con))
+                            {
+                                command.CommandType = CommandType.StoredProcedure;
+                                command.Parameters.AddWithValue("@PatientProgramId", data.PatientProgramId);
+                                using (SqlDataAdapter sda = new SqlDataAdapter())
+                                {
+                                    sda.SelectCommand = command;
+                                    using (ds = new DataSet())
+                                    {
+                                        sda.Fill(ds);
+                                        List<int> oldVitals = ds.Tables[0].AsEnumerable().Select(s => s.Field<int>("VitalId")).Distinct().ToList();
+                                        newVitals = vitalids.Except(oldVitals).ToList();
+                                        deletedVitals = oldVitals.Except(vitalids).ToList();
+                                    }
+                                }
+                            }
                         }
-                        string scriptV = ProgramVitals + ProgramVitalsinserts;
-                        ProgramVitalsInput = scriptV.Substring(0, scriptV.Length - 1);
+                        foreach (int vitalId in newVitals)
+                        {
+                            string insertvalues = "(" + data.PatientProgramId  + "," + vitalId + "),";
+                            ProgramVitalsNewinserts += insertvalues;
+                        }
+                        foreach (int vitalId in deletedVitals)
+                        {
+                            string insertvalues = "(" + data.PatientProgramId +  "," + vitalId + "),";
+                            ProgramVitalsDeletedinserts  += insertvalues;
+                        }
+                        string scriptV = ProgramVitalsNew + ProgramVitalsNewinserts;
+                        ProgramVitalsNewInput = scriptV.Substring(0, scriptV.Length - 1);
+                        scriptV = ProgramVitalsDel + ProgramVitalsDeletedinserts;
+                        ProgramVitalsDeletedInput = scriptV.Substring(0, scriptV.Length - 1);
+                        if (newVitals.Count == 0)
+                        {
+                            ProgramVitalsNewInput = string.Empty;
+                        }
+                        if (deletedVitals.Count == 0)
+                        {
+                            ProgramVitalsDeletedInput = string.Empty;
+                        }
                     }
                 string ProgramDiagnostics = "INSERT INTO  PatientProgramDiagnostics([PatientProgramId],[DiagnosticsName],[DiagnosticsCode],[CreatedBy])values";
                 string ProgramDiagnosticsinserts = string.Empty;
@@ -224,8 +252,6 @@ namespace RPMWeb.Dal
                 ProgramDiagnostics[] details2 = data.ProgramDiagnosis;
                 if (details2.Length > 0)
                 {
-
-
                     foreach (ProgramDiagnostics details in details2)
                     {
                         string insertvalues = "(" + data.PatientProgramId + ",'" + details.DiagnosisName + "','" + details.DiagnosisCode + "','" + data.CreatedBy + "'),";
@@ -234,20 +260,6 @@ namespace RPMWeb.Dal
                     string script2 = ProgramDiagnostics + ProgramDiagnosticsinserts;
                     ProgramDiagnosticsInput = script2.Substring(0, script2.Length - 1);
                 }
-                string ProgramGoals = "INSERT INTO PatientProgramGoals([PatientProgramId],[Goal],[Description],[CreatedBy])VALUES";
-                string ProgramGoalsinserts = string.Empty;
-                string ProgramGoalsInput = string.Empty;
-                GoalDetails[] details1 = data.GoalDetails;
-                if (details1.Length > 0)
-                {
-                    foreach (GoalDetails details in details1)
-                    {
-                        string insertvalues = "(" + data.PatientProgramId + ",'" + details.Goal + "','" + details.Description + "','" + data.CreatedBy + "'),";
-                        ProgramGoalsinserts = ProgramGoalsinserts + insertvalues;
-                    }
-                    string script = ProgramGoals + ProgramGoalsinserts;
-                    ProgramGoalsInput = script.Substring(0, script.Length - 1);
-                }
 
                 using (SqlConnection connection = new SqlConnection(ConnectionString))
                 {
@@ -255,9 +267,9 @@ namespace RPMWeb.Dal
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@PatientId", data.PatientId);
                     command.Parameters.AddWithValue("@ProgramId", data.ProgramId);
-                    command.Parameters.AddWithValue("@VitalIds", ProgramVitalsInput);//ccm change
+                    command.Parameters.AddWithValue("@VitalIdsNew", ProgramVitalsNewInput);
+                    command.Parameters.AddWithValue("@VitalIdsDeleted", ProgramVitalsDeletedInput);
                     command.Parameters.AddWithValue("@ProgramDiagnostics", ProgramDiagnosticsInput);
-                    command.Parameters.AddWithValue("@ProgramGoals", ProgramGoalsInput);
                     command.Parameters.AddWithValue("@PatientProgramId", data.PatientProgramId);
                     command.Parameters.AddWithValue("@CreatedBy", data.CreatedBy);
                     SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
@@ -364,7 +376,7 @@ namespace RPMWeb.Dal
                 }
                 response.HttpRetCode = 200;
                 response.DevicUserId = reg.PatientNumber;
-                response.Message = "Device set to active without vendor activation.";
+                response.Message = "Device Added Successfully";
                 return response;
             }
            
@@ -458,7 +470,7 @@ namespace RPMWeb.Dal
                     con.Open();
                     cmd.ExecuteNonQuery();
                     con.Close();
-                           
+                   
                 }
             }
             return response;
@@ -741,6 +753,7 @@ namespace RPMWeb.Dal
             return ret;
 
         }
+        
     }
 }
 

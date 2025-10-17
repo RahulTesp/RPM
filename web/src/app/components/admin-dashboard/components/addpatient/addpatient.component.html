@@ -690,7 +690,7 @@
                 formControlName="cliniccode"
                 id="addPatientClinicCode"
                 maxlength="5"
-                [attr.disabled]="true"
+                [readonly]="true"
               />
             </div>
           </div>
@@ -1235,7 +1235,7 @@
 
               <div class="Program-details_container_sub">
                 <div
-                  class="userInfoItem Program-details_container_sub_left"
+                  class="userInfoItem Program-details_container_sub_left vital_sub_Box "
                   style="width: 47.5%; margin-right: 2rem"
                 >
                   <!-- <div *ngFor="let v of vital_selected">
@@ -1454,7 +1454,7 @@
                     required
                     formControlName="cliniccode"
                     id="addPatientClinicCode"
-                    [attr.disabled]="true"
+                    [readonly]="true"
                   />
                 </div>
               </div>

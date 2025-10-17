@@ -102,11 +102,11 @@ export class PatientReportApiService {
 
   // ✅ Fetch Note Details by ID (for REVIEW or CALL)
   async getNoteDetails(
-    programName: string,
+    idProgram: string,
     noteType: string,
     noteId: string
   ): Promise<any> {
-    const apiUrl = `/api/patient/getpatientnotesbyprogram?ProgramName=${programName}&Type=${noteType}&PatientNoteId=${noteId}`;
+    const apiUrl = `/api/patient/getpatientnotesbyprogramid?ProgramId=${idProgram}&Type=${noteType}&PatientNoteId=${noteId}`;
 
     try {
       return await this.rpmService.rpm_get(apiUrl);

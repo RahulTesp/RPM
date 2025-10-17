@@ -169,8 +169,11 @@ struct CreateConversationView: View {
                     }
                     DispatchQueue.main.async {
                         print(" [UI] Navigating to Message List View with newly created conversation.")
+
                         self.isLoading = false
-                        navigateToMessageListView(with: newConversation)
+                        navigateToMessageListView(with: newConversation, fromCreate: true)  //  true only for create
+
+                        
                     }
 
                 }
@@ -179,16 +182,14 @@ struct CreateConversationView: View {
     }
     
 
-    private func navigateToMessageListView(with conversation: PersistentConversationDataItem) {
-        
-        // Remove CreateConversationView from stack
+    private func navigateToMessageListView(with conversation: PersistentConversationDataItem, fromCreate: Bool = false) {
         if let last = navigationHelper.path.last, case .createConversation = last {
             navigationHelper.path.removeLast()
         }
-        
-        navigationHelper.path.append(.messageList(conversation: conversation))
-       
+
+        navigationHelper.path.append(.messageList(conversation: conversation, fromCreate: fromCreate))
     }
+
     
     
     private func createConversation(conversationTitle: String, completion: @escaping (String?) -> ()) {
@@ -225,4 +226,3 @@ struct CreateConversationView: View {
         }
     }
 }
-

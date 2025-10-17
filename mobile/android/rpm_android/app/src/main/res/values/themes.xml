@@ -57,7 +57,7 @@
         <item name="tabIndicator">@null</item>
                 <item name="android:background">@drawable/tablayout_bg</item>
         <item name="tabSelectedTextColor">@color/white</item>
-        <item name="tabTextColor">@color/accent3</item>
+        <item name="tabTextColor">@color/Primary_dark</item>
     </style>
 
     <style name="Theme.RPM.NoActionBar">

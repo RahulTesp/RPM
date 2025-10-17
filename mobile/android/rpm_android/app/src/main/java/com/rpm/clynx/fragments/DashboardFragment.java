@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -27,6 +28,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.AuthFailureError;
@@ -48,7 +50,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.rpm.clynx.adapter.ToDoListHomeAdapter;
 import com.rpm.clynx.model.ToDoListModel;
-import com.rpm.clynx.service.NotificationReceiver;
+//import com.rpm.clynx.service.NotificationReceiver;
 import com.rpm.clynx.service.TimeFormatter;
 import com.rpm.clynx.service.UnreadMessageViewModel;
 import com.rpm.clynx.utility.ConversationsClientManager;
@@ -86,6 +88,8 @@ import com.twilio.conversations.CallbackListener;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.ConversationsClient;
+import com.twilio.conversations.ConversationsClientListener;
+import com.twilio.conversations.User;
 import com.twilio.util.ErrorInfo;
 import com.twilio.conversations.Message;
 import com.twilio.conversations.Participant;
@@ -111,7 +115,7 @@ public class DashboardFragment extends Fragment {
     int textSizeInSP = 24; // Set your desired text size in sp
     LineChart mpLinechart7;
     private LinearLayout chartContainer;
-    private String identity = "123401130";
+
     public final static String TAG = "TwilioConversations";
     private final Handler handler = new Handler();
     private final int RETRY_INTERVAL = 3000; // 3 seconds
@@ -121,13 +125,18 @@ public class DashboardFragment extends Fragment {
 
     public static boolean DashboardFragmentIsVisible = false;
 
-    private BroadcastReceiver notificationReceiver = new BroadcastReceiver() {
+    private int lastNotificationCount = -1;
+
+    private final BroadcastReceiver notificationReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // This method is called when notification/broadcast is received
-            //  Call your API here
-            Log.d("getNotificationsCount", "getNotificationsCount");
-            getNotificationsCount(); // (your API method)
+            String type = intent.getStringExtra("type");
+            if ("chat".equals(type)) {
+                Log.d("chatNotificationsCount", "chattNotificationsCount");
+
+                getNotificationsCount(false);
+
+            }
         }
     };
 
@@ -145,16 +154,19 @@ public class DashboardFragment extends Fragment {
         Log.d("onStart", "Setting up Twilio Listeners...");
         setupTwilioListeners();
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED); // Use your app's broadcast action
-        ContextCompat.registerReceiver(requireContext(), notificationReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
+        IntentFilter filter = new IntentFilter("com.rpm.clynx.NOTIFICATION_RECEIVED");
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(notificationReceiver, filter);
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
         DashboardFragmentIsVisible = true;
-        getNotificationsCount();
+        getNotificationsCount(false);
+
+
         if (pref.getBoolean("loginstatus", false) == false){
             Log.d("loginstsfrmdashboard", String.valueOf(pref.getBoolean("loginstatus", false)));
             editor.clear();
@@ -187,8 +199,7 @@ public class DashboardFragment extends Fragment {
         super.onStop();
         Log.d("onStop", "Removing Twilio Listeners...");
         removeTwilioListeners();  // Clean up listeners when leaving page
-
-        requireContext().unregisterReceiver(notificationReceiver);
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(notificationReceiver);
     }
 
     private void removeTwilioListeners() {
@@ -216,12 +227,19 @@ public class DashboardFragment extends Fragment {
             }
         });
 
+        chatMessageCount = view.findViewById(R.id.chatMessageCount);
+
         UnreadMessageViewModel unreadViewModel = new ViewModelProvider(requireActivity()).get(UnreadMessageViewModel.class);
 
         unreadViewModel.getUnreadCounts().observe(getViewLifecycleOwner(), unreadCounts -> {
             int totalUnread = unreadViewModel.getTotalUnread();
-            chatMessageCount.setText(String.valueOf(totalUnread));
+
+            Log.d("DashboardObserver", "Unread counts updated: " + unreadCounts.toString());
+            Log.d("DashboardObserver", "Total unread: " + totalUnread);
+
             chatMessageCount.setVisibility(totalUnread > 0 ? View.VISIBLE : View.GONE);
+            chatMessageCount.setText(String.valueOf(totalUnread)); // ADD THIS LINE!
+
         });
 
         chartContainer = view.findViewById(R.id.chartContainer);
@@ -235,8 +253,6 @@ public class DashboardFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
-       chatMessageCount = view.findViewById(R.id.chatMessageCount);
 
         chat = (ImageView) view.findViewById(R.id.dashboard_chat);
         chat.setOnClickListener(new View.OnClickListener() {
@@ -321,7 +337,12 @@ public class DashboardFragment extends Fragment {
             tv_status.setTextColor(Color.WHITE);
         }
 
-        user_full_name.setText("Hi, " + User_full_Name);
+        if (User_full_Name != null && !User_full_Name.isEmpty()) {
+            user_full_name.setText("Hi, " + User_full_Name);
+        } else {
+            user_full_name.setText("Hi");
+        }
+
         patent_id.setText(Patent_Id);
         mpLinechart7 = (LineChart) view.findViewById(R.id.linechartDashboard);
         markerView = new MyMarkerView(getContext(), R.layout.custom_marker_layout7);
@@ -360,7 +381,7 @@ public class DashboardFragment extends Fragment {
                 e.printStackTrace();
             }
         }
-        getNotificationsCount();
+        getNotificationsCount(false);
 
         // Get the system's default time zone
         TimeZone systemTimeZone = TimeZone.getDefault();
@@ -419,84 +440,205 @@ public class DashboardFragment extends Fragment {
         return view;
     }
 
+
+
     private void setupTwilioListeners() {
+        Log.d("setupTwilioListenersCALLED", "setupTwilioListenersCALLED");
         ConversationsClient conversationsClient = ConversationsClientManager.getInstance().getConvClient();
 
         if (conversationsClient == null) {
-            Log.e("TwilioChat", "ConversationsClient is null. Retrying...");
+            Log.e("TwilioChatDash", "ConversationsClient is null. Retrying...");
             retrySetupLater();
             return;
         }
 
-        if (conversationsClient != null) {
-            if (!ConversationsClientManager.getInstance().isClientSynced()) {
-                Log.e("TwilioChat", "Client not yet synced. Waiting...");
-                waitForSyncAndRetry();
-                return;
-            }
+        if (!ConversationsClientManager.getInstance().isClientSynced()) {
+            Log.e("TwilioChatDash", "Client not yet synced. Waiting...");
+            waitForSyncAndRetry();
+            return;
         }
 
-        if (conversationsClient != null) {
-            Log.e("conversationsClientNOTNULL","conversationsClientNOTNULL");
-            for (Conversation conversation : conversationsClient.getMyConversations()) {
-                String conversationSid = conversation.getSid();
-                unreadCounts.put(conversationSid, 0); // Initialize unread count
+        Log.d("conversationsClientNOTNULL","conversationsClientNOTNULL");
 
-                // Fetch the initial unread count for each conversation
+        // Loop through existing conversations and add listeners
+        for (Conversation conversation : conversationsClient.getMyConversations()) {
+            String conversationSid = conversation.getSid();
+            unreadCounts.put(conversationSid, 0); // Initialize unread count
+
+            Log.d("TwilioDebugDash", "Setting up listener for conversation SID: " + conversation.getSid());
+
+            // Fetch initial unread count
+            conversation.getUnreadMessagesCount(new CallbackListener<Long>() {
+                @Override
+                public void onSuccess(Long unreadCountValue) {
+                    Log.d("TwilioDebugDash", "[Initial Fetch] SID: " + conversationSid + ", Unread: " + unreadCountValue);
+                    unreadCounts.put(conversationSid, unreadCountValue != null ? unreadCountValue.intValue() : 0);
+                    updateUI(); // Update UI with initial count
+                }
+
+                @Override
+                public void onError(ErrorInfo errorInfo) {
+                    Log.e("TwilioChatDash", "Failed to fetch initial unread count: " + errorInfo.getMessage());
+                }
+            });
+
+            Log.d("SyncStatus", conversation.getSid() + " - Sync Status: " + conversation.getSynchronizationStatus());
+
+            // Add listener on this conversation for messages etc.
+            conversation.addListener(new ConversationListener() {
+                @Override
+                public void onMessageAdded(Message message) {
+                    Log.d("TwilioChatDash", "New message received.");
+                    Log.d("TwilioDebugDash", "[MessageEvent] SID: " + conversation.getSid() + " - onMessageAdded triggered");
+                    updateUnreadCount(conversation);
+                }
+
+                @Override
+                public void onSynchronizationChanged(Conversation conversation) {
+                    Log.d("TwilioChatDash", "Conversation sync changed.");
+                    updateUnreadCount(conversation);
+                }
+
+                @Override public void onMessageUpdated(Message message, Message.UpdateReason reason) {}
+                @Override public void onMessageDeleted(Message message) {
+                    Log.d("TwilioChatDash", "homeonMessageDeleted");
+                    updateUnreadCount(conversation);
+                }
+                @Override public void onParticipantAdded(Participant participant) {}
+                @Override public void onParticipantUpdated(Participant participant, Participant.UpdateReason reason) {}
+                @Override public void onParticipantDeleted(Participant participant) {}
+                @Override public void onTypingStarted(Conversation conversation, Participant participant) {}
+                @Override public void onTypingEnded(Conversation conversation, Participant participant) {}
+            });
+        }
+
+        // <-- ADD THIS block HERE to listen for NEW conversations created dynamically
+        conversationsClient.addListener(new ConversationsClientListener() {
+            @Override
+            public void onConversationAdded(Conversation conversation) {
+                Log.d("TwilioChatDash", "New conversation added: " + conversation.getSid());
+
+                // Add listener on the new conversation
+                conversation.addListener(new ConversationListener() {
+                    @Override
+                    public void onMessageAdded(Message message) {
+                        Log.d("TwilioChatDash", "New message received in new conversation.");
+                        updateUnreadCount(conversation);
+                    }
+                    @Override public void onSynchronizationChanged(Conversation conversation) {
+                        updateUnreadCount(conversation);
+                    }
+                    @Override public void onMessageUpdated(Message message, Message.UpdateReason reason) {}
+                    @Override public void onMessageDeleted(Message message) {
+                        updateUnreadCount(conversation);
+                    }
+                    @Override public void onParticipantAdded(Participant participant) {}
+                    @Override public void onParticipantUpdated(Participant participant, Participant.UpdateReason reason) {}
+                    @Override public void onParticipantDeleted(Participant participant) {}
+                    @Override public void onTypingStarted(Conversation conversation, Participant participant) {}
+                    @Override public void onTypingEnded(Conversation conversation, Participant participant) {}
+                });
+
+                // Initialize unread count for this new conversation
                 conversation.getUnreadMessagesCount(new CallbackListener<Long>() {
                     @Override
                     public void onSuccess(Long unreadCountValue) {
-                        unreadCounts.put(conversationSid, unreadCountValue != null ? unreadCountValue.intValue() : 0);
-                        updateUI(); // Update UI with initial count
+                        unreadCounts.put(conversation.getSid(), unreadCountValue != null ? unreadCountValue.intValue() : 0);
+                        updateUI();
                     }
 
                     @Override
                     public void onError(ErrorInfo errorInfo) {
-                        Log.e("TwilioChat", "Failed to fetch initial unread count: " + errorInfo.getMessage());
+                        Log.e("TwilioChatDash", "Failed to fetch initial unread count for new conversation: " + errorInfo.getMessage());
                     }
                 });
 
-                // Listen for new messages and conversation synchronization
-                conversation.addListener(new ConversationListener() {
-                    @Override
-                    public void onMessageAdded(Message message) {
-                        Log.d("TwilioChat", "New message received.");
-                        updateUnreadCount(conversation);
-                    }
-
-                    @Override
-                    public void onSynchronizationChanged(Conversation conversation) {
-                        Log.d("TwilioChat", "Conversation sync changed.");
-                        updateUnreadCount(conversation);
-                    }
-
-                    @Override
-                    public void onMessageUpdated(Message message, Message.UpdateReason reason) {}
-
-                    @Override
-                    public void onMessageDeleted(Message message) {
-                        Log.d("homeonMessageDeleted", "homeonMessageDeleted");
-                        FileLogger.d("homeonMessageDeleted", "homeonMessageDeleted");
-                        updateUnreadCount(conversation);
-                    }
-
-                    @Override
-                    public void onParticipantAdded(Participant participant) {}
-
-                    @Override
-                    public void onParticipantUpdated(Participant participant, Participant.UpdateReason reason) {}
-
-                    @Override
-                    public void onParticipantDeleted(Participant participant) {}
-
-                    @Override
-                    public void onTypingStarted(Conversation conversation, Participant participant) {}
-
-                    @Override
-                    public void onTypingEnded(Conversation conversation, Participant participant) {}
-                });
+                // Also update unread counts immediately
+                updateUnreadCount(conversation);
             }
-        }
+
+            @Override
+            public void onConversationUpdated(Conversation conversation, Conversation.UpdateReason reason) {
+
+            }
+
+
+            @Override
+            public void onConversationDeleted(Conversation conversation) {
+                // Optional: handle conversation deletions
+            }
+
+            @Override
+            public void onConversationSynchronizationChange(Conversation conversation) {
+
+            }
+
+            @Override
+            public void onError(ErrorInfo errorInfo) {
+
+            }
+
+            @Override
+            public void onUserUpdated(User user, User.UpdateReason reason) {
+
+            }
+
+            @Override
+            public void onUserSubscribed(User user) {
+
+            }
+
+            @Override
+            public void onUserUnsubscribed(User user) {
+
+            }
+
+            @Override
+            public void onClientSynchronization(ConversationsClient.SynchronizationStatus status) {
+
+            }
+
+            @Override
+            public void onNewMessageNotification(String conversationSid, String messageSid, long messageIndex) {
+
+            }
+
+            @Override
+            public void onAddedToConversationNotification(String conversationSid) {
+
+            }
+
+            @Override
+            public void onRemovedFromConversationNotification(String conversationSid) {
+
+            }
+
+            @Override
+            public void onNotificationSubscribed() {
+
+            }
+
+            @Override
+            public void onNotificationFailed(ErrorInfo errorInfo) {
+
+            }
+
+            @Override
+            public void onConnectionStateChange(ConversationsClient.ConnectionState state) {
+
+            }
+
+            @Override
+            public void onTokenExpired() {
+
+            }
+
+            @Override
+            public void onTokenAboutToExpire() {
+
+            }
+
+        });
     }
 
     private void retrySetupLater() {
@@ -513,10 +655,10 @@ public class DashboardFragment extends Fragment {
             @Override
             public void run() {
                 if (ConversationsClientManager.getInstance().isClientSynced()) {
-                    Log.e("TwilioChat", "Client is now synced. Setting up listeners.");
+                    Log.e("TwilioChatDash", "Client is now synced. Setting up listeners.");
                     setupTwilioListeners();
                 } else {
-                    Log.e("TwilioChat", "Client still not synced. Retrying...");
+                    Log.e("TwilioChatDash", "Client still not synced. Retrying...");
                     waitForSyncAndRetry();
                 }
             }
@@ -525,12 +667,34 @@ public class DashboardFragment extends Fragment {
 
     private void updateUnreadCount(Conversation conversation) {
         String conversationSid = conversation.getSid();
+        Log.d("TwilioDebugDash", "[UpdateUnread] Fetching unread count for SID: " + conversationSid);
+
         conversation.getUnreadMessagesCount(new CallbackListener<Long>() {
             @Override
             public void onSuccess(Long unreadCountValue) {
-                if (unreadCountValue != null) {
+                Log.d("TwilioDebugDash", "[UpdateUnread] SID: " + conversationSid + ", Count: " + unreadCountValue);
+
+                if (unreadCountValue == null) {
+                    // If unreadCountValue is null, fallback to total message count
+                    conversation.getMessagesCount(new CallbackListener<Long>() {
+                        @Override
+                        public void onSuccess(Long messageCount) {
+                            int count = messageCount != null ? messageCount.intValue() : 0;
+                            unreadCounts.put(conversationSid, count);
+                            updateUI();
+                        }
+
+                        @Override
+                        public void onError(ErrorInfo errorInfo) {
+                            Log.e("TwilioChatDash", "Failed to fetch messages count: " + errorInfo.getMessage());
+                            unreadCounts.put(conversationSid, 0); // fallback default
+                            updateUI();
+                        }
+                    });
+                } else {
+                    // Set unread count directly if not null
                     unreadCounts.put(conversationSid, unreadCountValue.intValue());
-                    updateUI(); // UI update only when count changes
+                    updateUI();
                 }
             }
 
@@ -558,97 +722,6 @@ public class DashboardFragment extends Fragment {
             }
         });
     }
-
-    //TO DO: Need to complete the Notifiction Hub integration post clarifications on return type and testing strategy
-    //Also, need to discuss on returning the unread messages on push notification
-    private void connectWebSocket() {
-        String NOTIFICATION_HUB_URL = Links.BASE_URL + Links.NOTIFICATION_CONNECTHUB;
-        StringRequest request = new StringRequest(Request.Method.GET, NOTIFICATION_HUB_URL,new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.i("onResponse_personal", response.toString());
-                if(response.toString()!=null && response.toString().length()>0)
-                    try {
-                        uri = new URI(response.replace("\"",""));
-                        mWebSocketClient = new WebSocketClient(uri) {
-                            @Override
-                            public void onOpen(ServerHandshake serverHandshake) {
-                                Log.i("Websocket", "Opened");
-                                //mWebSocketClient.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
-                            }
-                            @Override
-                            public void onMessage(String s) {
-                                String message = null;
-                                JSONObject msg = null;
-                                try {
-                                    msg = new JSONObject(s);
-                                    message  = msg.getString("User");
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                String finalMessage = message;
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        getNotificationsCount();
-                                        //tv_notification_count.setText(tv_notification_count.getText() + "\n" + finalMessage);
-                                        //tv_notification_count.setVisibility(view.VISIBLE);
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onClose(int i, String s, boolean b) {
-                                Log.i("Websocket", "Closed " + s);
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                Log.i("Websocket", "Error " + e.getMessage());
-                            }
-                        };
-                        mWebSocketClient.connect();
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
-                    }
-            }
-
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("onErrorResponse", error.toString());
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-
-                headers.put("Bearer",Token);
-                Log.d("headers_personal",headers.toString());
-                Log.d("Token_profile_personal", Token);
-                return headers;
-            }
-        };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-        request.setRetryPolicy(new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        requestQueue.add(request);
-    }
-
-    public static String uTCToLocal(String dateFormatInPut, String dateFomratOutPut, String datesToConvert) {
-        String dateToReturn = datesToConvert;
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(dateFormatInPut);
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date gmt = null;
-        java.text.SimpleDateFormat sdfOutPutToSend = new java.text.SimpleDateFormat(dateFomratOutPut);
-        sdfOutPutToSend.setTimeZone(TimeZone.getDefault());
-        try {
-            gmt = sdf.parse(datesToConvert);
-            dateToReturn = sdfOutPutToSend.format(gmt);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return dateToReturn; }
 
     private void checkVitalData(String formattedStartDate, String formattedEndDate) {
         DateTimeFormatter inputFormatter = null;
@@ -834,7 +907,20 @@ public class DashboardFragment extends Fragment {
                 LineData lineData = new LineData(dataSets);
                 configureLineChart(lineChart, xAxisLabels, lineData);
             }
+
+            // set margin for each card
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 0, 20, 0); // left, top, right, bottom
+            cardViewLayout.setLayoutParams(params);
+
+// add to container
             chartContainer.addView(cardViewLayout);
+
+
+            // chartContainer.addView(cardViewLayout);
         } catch (JSONException e) {
             Log.e("JSONError", "Error processing JSON object", e);
         }
@@ -918,7 +1004,13 @@ public class DashboardFragment extends Fragment {
                 }
                 if (jsonArray != null) {
                     if (jsonArray.length() <= 0) {
-                        Toast.makeText(getContext(), "No Data Available", Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(getContext(), "No Data Available", Toast.LENGTH_SHORT).show();
+
+                        // Check if fragment is attached before showing Toast
+                        if (isAdded() && getActivity() != null) {
+                            Toast.makeText(getActivity(), "No Data Available", Toast.LENGTH_SHORT).show();
+                        }
+
                         showNoActivities();
                     }
                     todo_nofoactivites.setText(jsonArray.length() + " Activities");
@@ -995,47 +1087,59 @@ public class DashboardFragment extends Fragment {
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(stringRequest);
     }
-    private void getNotificationsCount () {
-            String url = Links.BASE_URL + Links.NOTIFICATION;
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.d("response", response.toString());
-                 //   l1.dismiss();
-                    try {
-                        JSONObject jsonObject = new JSONObject(response);
-                        try {
-                            Integer value = Integer.parseInt(jsonObject.getString("TotalUnRead"));
-                            if (value > 0) {
-                                tv_notification_count.setText(value.toString());
-                                tv_notification_count.setVisibility(view.VISIBLE);
-                            } else
-                                tv_notification_count.setVisibility(view.INVISIBLE);
-                        } catch (NumberFormatException e) {
-                            e.printStackTrace();
-                            tv_notification_count.setVisibility(View.INVISIBLE);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+
+    private void getNotificationsCount(final boolean isRetry) {
+        if (!isAdded()) {
+            Log.d("getNotificationsCount", "Fragment not attached, skipping");
+            return;
+        }
+
+        String url = Links.BASE_URL + Links.NOTIFICATION;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, response -> {
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                int value = Integer.parseInt(jsonObject.getString("TotalUnRead"));
+                Log.d("NotificationsCountvalue", String.valueOf(value));
+
+                if (isAdded()) { // 🔹 Only update UI if still attached
+                    if (value > 0) {
+                        tv_notification_count.setText(String.valueOf(value));
+                        tv_notification_count.setVisibility(View.VISIBLE);
+                    } else {
+                        tv_notification_count.setVisibility(View.INVISIBLE);
                     }
                 }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d("Error while fetching Notification count", error.toString());
+
+                // Retry once if stale
+                if (!isRetry && lastNotificationCount != -1 && value <= lastNotificationCount) {
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        if (isAdded()) { // 🔹 check again before retry
+                            getNotificationsCount(true);
+                        }
+                    }, 1500);
                 }
-            }) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String> headers = new HashMap<>();
-                    headers.put("Bearer", Token);
-                    Log.d("headers_myprofileandprogram", headers.toString());
-                    Log.d("Token_myprofileandprogram", Token);
-                    return headers;
-                }
-            };
-            RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-            stringRequest.setRetryPolicy(new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-            requestQueue.add(stringRequest);
-        }
+
+                lastNotificationCount = value;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, error -> Log.d("Error while fetching Notification count", error.toString())) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Bearer", Token);
+                return headers;
+            }
+        };
+
+        // 🔹 Safe request queue
+        RequestQueue requestQueue = Volley.newRequestQueue(requireContext().getApplicationContext());
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                60000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        requestQueue.add(stringRequest);
+    }
 }

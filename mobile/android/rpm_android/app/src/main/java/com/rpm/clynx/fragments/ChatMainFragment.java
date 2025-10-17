@@ -210,16 +210,18 @@ public class ChatMainFragment extends Fragment {
     }
 
     private void loadConversations() {
-        Log.d("loadConversations ","loadConversations");
+        Log.d("loadConversations", "loadConversations called");
         ConversationsClient convClientVal = ConversationsClientManager.getInstance().getConvClient();
-        Log.d("convClientVal ", String.valueOf(convClientVal));
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            Log.d("chatListAdapterFROMMAIN ", String.valueOf(chatListAdapter));
-            if (isAdded() && !NetworkUtils.isNetworkAvailable(requireContext())) {
-                NetworkAlert.showNetworkDialog(requireContext());
-            }
-            else {
-                quickstartConversationsManager.loadAllConversations(convClientVal, requireContext(), recyclerView, chatListAdapter, chatList, progressBar, isChatLoad, Patent_Id);
+            Context ctx = getContext();
+            if (ctx != null && isAdded()) {
+                quickstartConversationsManager.loadAllConversations(
+                        convClientVal, ctx, recyclerView, chatListAdapter,
+                        chatList, progressBar, isChatLoad, Patent_Id
+                );
+            } else {
+                Log.w("loadConversations", "Fragment not attached, skipping load.");
             }
         }
     }

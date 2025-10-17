@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background1"
-    tools:context="com.rpm.clynx.activity.ProgramInfoActivity">
+    >
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -35,7 +35,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="40dp"
         android:layout_margin="@dimen/margin_10dp"
         app:cardCornerRadius="@dimen/margin_10dp"
         app:cardBackgroundColor="@color/background_grey1"
@@ -49,7 +49,7 @@
             android:id="@+id/pgminfo_tablayout"
             style="@style/RoundedTabLayoutStyle"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="40dp"
             android:background="@color/background_grey1"
             app:layout_constraintCircleRadius="10dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -57,7 +57,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar"
             app:layout_constraintVertical_bias="1.0"
-            app:tabBackground="@drawable/tab_layout_bg"
+            app:tabBackground="@drawable/pgm_info_tab_layout"
             app:tabIconTint="@color/tab_icon"
             app:tabIndicatorColor="@color/colorPrimary"
             app:tabInlineLabel="true"

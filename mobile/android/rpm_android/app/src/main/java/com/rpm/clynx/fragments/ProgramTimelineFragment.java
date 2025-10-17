@@ -49,16 +49,19 @@ public class ProgramTimelineFragment extends Fragment {
     private List<DiagnosisModel> diagnosisModels;
     RecyclerView.LayoutManager layoutManager;
     TextView presdate, consultdate, enrollpers , activedate,  carepersonal,caremanager,
-            enrolldate, clinic,cliniccode, physician;
+            enrolldate, clinic,cliniccode, physician, readyAssigneeNameTxt,
+            readyAssignedDateTxt, holdAssigneeNameTxt, holdAssignedDateTxt,
+            inactiveAssigneeNameTxt, inactiveAssignedDateTxt, dischargeAssigneeNameTxt,
+            dischargeAssignedDateTxt, activeAssigneeNameTxt, activeAssignedDateTxt;
     private String PrescribedDate;
     private String Physician;
     private String Clinic,ClinicCode;
     private String ConsultationDate;
-    LinearLayout activeSectionLayout;
+    LinearLayout activeSectionLayout, readySectionLayout, holdSectionLayout,
+            inactiveSectionLayout, dischargedSectionLayout, enrolledSectionLayout;
     private String EnrollmentPersonal;
-    private String ActiveAssignedDate, EnrollAssignedDate;
-    private String CareTeamPersonalAssigneeName;
-    private String ManagerName;
+    private String  EnrollAssignedDate;
+
     View view;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,10 +75,35 @@ public class ProgramTimelineFragment extends Fragment {
         consultdate = (TextView) view.findViewById(R.id.frag_timeline_consulationdt);
         enrolldate = (TextView) view.findViewById(R.id.frag_timeline_enrolldt);
         enrollpers = (TextView) view.findViewById(R.id.enrollpersonal);
-        activedate = (TextView) view.findViewById(R.id.frag_activedt);
-        carepersonal = (TextView) view.findViewById(R.id.careteam_pers);
-        caremanager = (TextView) view.findViewById(R.id.careteammngr);
         activeSectionLayout = view.findViewById(R.id.activeSectionLayout);
+
+        // Section layouts
+        enrolledSectionLayout = view.findViewById(R.id.enrollSectionLayout);
+         readySectionLayout = view.findViewById(R.id.readyForDischargeSectionLayout);
+         holdSectionLayout = view.findViewById(R.id.onHoldSectionLayout);
+         inactiveSectionLayout = view.findViewById(R.id.inactiveSectionLayout);
+         dischargedSectionLayout = view.findViewById(R.id.dischargedSectionLayout);
+
+// TextViews for ReadyForDischarge
+         readyAssigneeNameTxt = view.findViewById(R.id.frag_ready_assignee);
+         readyAssignedDateTxt = view.findViewById(R.id.frag_ready_dt);
+
+        activeAssigneeNameTxt = view.findViewById(R.id.frag_active_assignee);
+        activeAssignedDateTxt = view.findViewById(R.id.frag_active_dt);
+
+
+// TextViews for OnHold
+         holdAssigneeNameTxt = view.findViewById(R.id.frag_hold_assignee);
+         holdAssignedDateTxt = view.findViewById(R.id.frag_hold_dt);
+
+// TextViews for InActive
+         inactiveAssigneeNameTxt = view.findViewById(R.id.frag_inactive_assignee);
+         inactiveAssignedDateTxt = view.findViewById(R.id.frag_inactive_dt);
+
+// TextViews for Discharged
+         dischargeAssigneeNameTxt = view.findViewById(R.id.frag_discharged_assignee);
+         dischargeAssignedDateTxt = view.findViewById(R.id.frag_discharged_dt);
+
         db = new DataBaseHelper(getContext());
         pref = this.getActivity().getSharedPreferences("RPMUserApp",getContext().MODE_PRIVATE);
         editor = pref.edit();
@@ -111,8 +139,79 @@ public class ProgramTimelineFragment extends Fragment {
                     JSONObject jsonObjectEnrollDet = jsonObject.getJSONObject("PatientEnrolledDetails");
                     JSONObject jsonObjectActiveDet = jsonObject.getJSONObject("ActivePatientDetails");
 
-                    if ("Active".equals(Status)) {
-                        Log.d("StatusPT",Status);
+                    // Ready For Discharge
+                    JSONObject jsonObjectReadyForDischargePatientDet = jsonObject.getJSONObject("ReadyForDischargePatientDetails");
+                    String readyStatus = jsonObjectReadyForDischargePatientDet.optString("Status", null);
+                    if (readyStatus != null && !"null".equalsIgnoreCase(readyStatus)) {
+                        readyAssigneeNameTxt.setText(jsonObjectReadyForDischargePatientDet.optString("AssigneeName", ""));
+                        String readyAssigneeNametolocal = DateUtils.convertUtcToLocalFormatted(jsonObjectReadyForDischargePatientDet.optString("AssignedDate", ""), "MMM d, yyyy");
+                        Log.d("enrollassgndtolocal", String.valueOf(readyAssigneeNametolocal));
+                        readyAssignedDateTxt.setText(readyAssigneeNametolocal);
+                        readySectionLayout.setVisibility(View.VISIBLE);
+                    } else {
+                        readySectionLayout.setVisibility(View.GONE);
+                    }
+
+// On Hold
+                    JSONObject jsonObjectOnHoldPatientDet = jsonObject.getJSONObject("OnHoldPatientDetais");
+                    String holdStatus = jsonObjectOnHoldPatientDet.optString("Status", null);
+                    if (holdStatus != null && !"null".equalsIgnoreCase(holdStatus)) {
+
+                        holdAssigneeNameTxt.setText(jsonObjectOnHoldPatientDet.optString("AssigneeName", ""));
+                        String holdAssignedtolocal = DateUtils.convertUtcToLocalFormatted(jsonObjectOnHoldPatientDet.optString("AssignedDate", ""), "MMM d, yyyy");
+                        Log.d("enrollassgndtolocal", String.valueOf(holdAssignedtolocal));
+                        holdAssignedDateTxt.setText(holdAssignedtolocal);
+                        holdSectionLayout.setVisibility(View.VISIBLE);
+                    } else {
+                        holdSectionLayout.setVisibility(View.GONE);
+                    }
+
+// InActive
+                    JSONObject jsonObjectInActivePatientDetaisDet = jsonObject.getJSONObject("InActivePatientDetais");
+                    String inactiveStatus = jsonObjectInActivePatientDetaisDet.optString("Status", null);
+                    if (inactiveStatus != null && !"null".equalsIgnoreCase(inactiveStatus)) {
+                        inactiveAssigneeNameTxt.setText(jsonObjectInActivePatientDetaisDet.optString("AssigneeName", ""));
+
+                        String inactiveAssignedtolocal = DateUtils.convertUtcToLocalFormatted(jsonObjectInActivePatientDetaisDet.optString("AssignedDate", ""), "MMM d, yyyy");
+                        Log.d("enrollassgndtolocal", String.valueOf(inactiveAssignedtolocal));
+                        inactiveAssignedDateTxt.setText(inactiveAssignedtolocal);
+                        inactiveSectionLayout.setVisibility(View.VISIBLE);
+                    } else {
+                        inactiveSectionLayout.setVisibility(View.GONE);
+                    }
+
+// Discharged
+                    JSONObject jsonObjectDischargedPatientDet = jsonObject.getJSONObject("DischargedPatientDetails");
+                    String dischargeStatus = jsonObjectDischargedPatientDet.optString("Status", null);
+                    if (dischargeStatus != null && !"null".equalsIgnoreCase(dischargeStatus)) {
+                        dischargeAssigneeNameTxt.setText(jsonObjectDischargedPatientDet.optString("AssigneeName", ""));
+
+                        String dischargeAssignedtolocal = DateUtils.convertUtcToLocalFormatted(jsonObjectDischargedPatientDet.optString("AssignedDate", ""), "MMM d, yyyy");
+                        Log.d("enrollassgndtolocal", String.valueOf(dischargeAssignedtolocal));
+                        dischargeAssignedDateTxt.setText(dischargeAssignedtolocal);
+                        dischargedSectionLayout.setVisibility(View.VISIBLE);
+                    } else {
+                        dischargedSectionLayout.setVisibility(View.GONE);
+                    }
+
+                    JSONObject jsonObjectEnrolled = jsonObject.getJSONObject("PatientEnrolledDetails");
+                    String enrollStatus = jsonObjectEnrolled.optString("Status", null);
+                    if (enrollStatus != null && !"null".equalsIgnoreCase(enrollStatus)) {
+
+                        enrollpers.setText(jsonObjectEnrolled.optString("EnrolledPersonal", ""));
+                        enrolldate.setText(jsonObjectEnrolled.optString("EnrolledDate", ""));
+                        enrolledSectionLayout.setVisibility(View.VISIBLE);
+                    } else {
+                        enrolledSectionLayout.setVisibility(View.GONE);
+                    }
+
+                    JSONObject jsonObjectActive = jsonObject.getJSONObject("ActivePatientDetails");
+                    String activeStatus = jsonObjectActive.optString("Status", null);
+                    if (activeStatus != null && !"null".equalsIgnoreCase(activeStatus)) {
+                        activeAssigneeNameTxt.setText(jsonObjectActive.optString("AssigneeName", ""));
+                        String activeAssignedDatetolocal = DateUtils.convertUtcToLocalFormatted(jsonObjectActive.optString("AssignedDate", ""), "MMM d, yyyy");
+                        Log.d("enrollassgndtolocal", String.valueOf(activeAssignedDatetolocal));
+                        activeAssignedDateTxt.setText(activeAssignedDatetolocal);
                         activeSectionLayout.setVisibility(View.VISIBLE);
                     } else {
                         activeSectionLayout.setVisibility(View.GONE);
@@ -139,12 +238,6 @@ public class ProgramTimelineFragment extends Fragment {
 
                     ConsultationDate = jsonObjectPresDet.getString("ConsultationDate");
                     EnrollAssignedDate = jsonObjectEnrollDet.getString("AssignedDate");
-                    ActiveAssignedDate = jsonObjectActiveDet.getString("AssignedDate");
-                    Log.d("ConsultationDate", String.valueOf(ConsultationDate));
-                    Log.d("EnrollAssignedDate", String.valueOf(EnrollAssignedDate));
-                    Log.d("ActiveAssignedDate", String.valueOf(ActiveAssignedDate));
-                    Log.d("ConsultationDateisEmpty", String.valueOf(ConsultationDate.isEmpty()));
-
                     try {
                         if (!ConsultationDate.isEmpty()) {
                             // Create a SimpleDateFormat object for the input format
@@ -176,37 +269,7 @@ public class ProgramTimelineFragment extends Fragment {
                         {
                             enrolldate.setText("");
                         }
-                        if (!ActiveAssignedDate.isEmpty()) {
-                            String actvassgndtolocal = DateUtils.convertUtcToLocalFormatted(ActiveAssignedDate, "MMM d, yyyy");
-                            Log.d("actvassgndtolocal", String.valueOf(actvassgndtolocal));
-                            activedate.setText(actvassgndtolocal);
-                        }
-                        else
-                        {
-                            activedate.setText("");
-                        }
 
-                        CareTeamPersonalAssigneeName = jsonObjectActiveDet.getString("AssigneeName");
-                        Log.d("CareTeamPersonalAssigneeName", CareTeamPersonalAssigneeName);
-
-                        if (CareTeamPersonalAssigneeName == "null" || CareTeamPersonalAssigneeName.isEmpty()) {
-                            carepersonal.setText("Not Assigned");
-                            Log.d("Debug", "AssigneeNameisnullorempty");
-                        } else {
-                            Log.d("Debug", "AssigneeNameisnotnullornotempty");
-                            carepersonal.setText(CareTeamPersonalAssigneeName);
-                        }
-
-                        ManagerName = jsonObjectActiveDet.getString("ManagerName");
-                        Log.d("ManagerName", ManagerName);
-
-                        if (ManagerName == "null" || ManagerName.isEmpty()) {
-                            caremanager.setText("Not Assigned");
-                            Log.d("Debug", "ManagerNameisnullorempty");
-                        } else {
-                            Log.d("Debug", "ManagerNameisnotnullornotempty");
-                            caremanager.setText(ManagerName);
-                        }
                         if( jsonArrayEnrollInfo.length() != 0) {
                             for (int i = 0; i < jsonArrayEnrollInfo.length(); i++) {
                                 EnrollmentPersonal = jsonArrayEnrollInfo.getJSONObject(i).getString("EnrollmentPersonal");

@@ -1,26 +1,27 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using iText.Forms.Form.Element;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using RPMWeb.Data.Common;
 using System.Data;
-using Microsoft.Data.SqlClient;
+using System.Globalization;
 using System.Reflection;
-using DataTable = System.Data.DataTable;
-using Font = iTextSharp.text.Font;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Workbook = DocumentFormat.OpenXml.Spreadsheet.Workbook;
-using Worksheet = DocumentFormat.OpenXml.Spreadsheet.Worksheet;
-using Sheets = DocumentFormat.OpenXml.Spreadsheet.Sheets;
-using Values = RPMWeb.Data.Common.Values;
+using System.Text.RegularExpressions;
 using Border = DocumentFormat.OpenXml.Spreadsheet.Border;
 using Borders = DocumentFormat.OpenXml.Spreadsheet.Borders;
 using CellFormat = DocumentFormat.OpenXml.Spreadsheet.CellFormat;
-using System.Globalization;
-using iText.Forms.Form.Element;
-using Microsoft.AspNetCore.Http;
+using DataTable = System.Data.DataTable;
+using Font = iTextSharp.text.Font;
+using Sheets = DocumentFormat.OpenXml.Spreadsheet.Sheets;
+using Values = RPMWeb.Data.Common.Values;
+using Workbook = DocumentFormat.OpenXml.Spreadsheet.Workbook;
+using Worksheet = DocumentFormat.OpenXml.Spreadsheet.Worksheet;
 
 namespace RPMWeb.Dal
 {
@@ -108,9 +109,9 @@ namespace RPMWeb.Dal
                         dtstring = dtstring.Replace("-", "");
                         dtstring = dtstring.Replace("/", "");
                         dtstring = dtstring.Replace(":", "");
-                        var cli = containerClient.UploadBlob(filename + "_" + dtstring, stream);
+                        var cli = containerClient.UploadBlob(dtstring + "_" + filename, stream);
                         var uri = containerClient.Uri;
-                        string Uri = uri + "/" + filename + "_" + dtstring;
+                        string Uri = uri + "/" + dtstring + "_" + filename;
 
                         using (SqlConnection connection = new SqlConnection(ConnectionString))
                         {
@@ -530,7 +531,7 @@ namespace RPMWeb.Dal
         }
         public bool UpdatePatient(PatientDetails Info, string ConnectionString)
         {
-            
+
             bool ret = true;
             try
             {
@@ -629,6 +630,7 @@ namespace RPMWeb.Dal
 
                                                     programDetailsMD.ProgramId = Convert.ToInt32(dr["ProgramId"]);
                                                     programDetailsMD.ProgramName = dr["ProgramName"].ToString();
+                                                    programDetailsMD.Name = dr["Name"].ToString();
                                                     programDetailsMD.Duration = Convert.ToInt32(dr["Duration"]);
                                                     GoalDetails gd = new GoalDetails(Convert.ToInt32(dr["GoalId"]),
                                                                                     dr["Goal"].ToString(),
@@ -1012,8 +1014,8 @@ namespace RPMWeb.Dal
                                         getPatientPrescribtionDetails.PhysicianId = (!DBNull.Value.Equals(ds.Tables[3].Rows[0]["PhysicianId"])) ? Convert.ToInt32(ds.Tables[3].Rows[0]["PhysicianId"]) : 0;
                                         getPatientPrescribtionDetails.Physician = ds.Tables[3].Rows[0]["Physician"].ToString();
                                         getPatientPrescribtionDetails.ConsultationDate = ds.Tables[3].Rows[0]["ConsultationDate"].ToString(); //fix
-                                       // getPatientPrescribtionDetails.ConsultationDate = (DateTime)ds.Tables[3].Rows[0]["ConsultationDate"];
-                                       // getPatientPrescribtionDetails.ConsultationDate= (!DBNull.Value.Equals(ds.Tables[0].Rows[0]["ConsultationDate"]) ? (DateTime)ds.Tables[3].Rows[0]["ConsultationDate"] : (DateTime)ds.Tables[3].Rows[0]["PrescribedDate"]);
+                                                                                                                                              // getPatientPrescribtionDetails.ConsultationDate = (DateTime)ds.Tables[3].Rows[0]["ConsultationDate"];
+                                                                                                                                              // getPatientPrescribtionDetails.ConsultationDate= (!DBNull.Value.Equals(ds.Tables[0].Rows[0]["ConsultationDate"]) ? (DateTime)ds.Tables[3].Rows[0]["ConsultationDate"] : (DateTime)ds.Tables[3].Rows[0]["PrescribedDate"]);
                                         getPatientPrescribtionDetails.ClinicCode = ds.Tables[3].Rows[0]["ClinicCode"].ToString();
                                         getPatientPrescribtionDetails.Clinic= ds.Tables[3].Rows[0]["Clinic"].ToString();
                                         getPatientPrescribtionDetails.Branch = ds.Tables[3].Rows[0]["Branch"].ToString();
@@ -1264,7 +1266,6 @@ namespace RPMWeb.Dal
                 throw ex;
             }
         }
-
         public List<GetAllPatientInfo> GetAllPatients(string PatientType, string Vitals, int RoleId, string CreatedBy, string ConnectionString)
         {
             List<GetAllPatientInfo> list = new List<GetAllPatientInfo>();
@@ -1282,25 +1283,97 @@ namespace RPMWeb.Dal
                         command.Parameters.Add("@RoleId", SqlDbType.NVarChar).Value = RoleId;
                         command.Parameters.Add("@CreatedBy", SqlDbType.NVarChar).Value = CreatedBy;
                         SqlDataReader reader = command.ExecuteReader();
+
                         while (reader.Read())
                         {
-                            GetAllPatientInfo info = new GetAllPatientInfo();
-                            info.PatientId = (!DBNull.Value.Equals(reader["PatientId"])) ? Convert.ToInt32(reader["PatientId"]) : 0;
-                            info.PatientProgramId = (!DBNull.Value.Equals(reader["PatientProgramId"])) ? Convert.ToInt32(reader["PatientProgramId"]) : 0;
-                            info.AssignedMemberId = (!DBNull.Value.Equals(reader["AssignedMemberId"])) ? Convert.ToInt32(reader["AssignedMemberId"]) : 0;
-                            info.ClinicId = (!DBNull.Value.Equals(reader["ClinicId"])) ? Convert.ToInt32(reader["ClinicId"]) : 0;
-                            info.ClinicName = reader["ClinicName"].ToString();
-                            info.PatientNumber = reader["PatientNumber"].ToString();
-                            info.PatientName = reader["PatientName"].ToString();
-                            info.ProgramName = reader["ProgramName"].ToString();
-                            info.Program= reader["Program"].ToString();
-                            info.EnrolledDate = reader["EnrolledDate"].ToString();
-                            info.PhysicianName = reader["PhysicianName"].ToString();
-                            info.AssignedMember = reader["AssignedMember"].ToString();
-                            info.PatientType = reader["PatientType"].ToString();
-                            info.Vital = reader["Vital"].ToString();
-                            info.Priority = reader["Priority"].ToString();
-                            list.Add(info);
+                            int patientId = (!DBNull.Value.Equals(reader["PatientId"])) ? Convert.ToInt32(reader["PatientId"]) : 0;
+
+                            // Find or create the patient info object
+                            var patientInfo = list.FirstOrDefault(p => p.PatientId == patientId);
+                            if (patientInfo == null)
+                            {
+                                string enrolledDate = string.Empty;
+                                    string EnrolledDateTime = reader["EnrolledDate"].ToString();
+                                    if (!string.IsNullOrWhiteSpace(EnrolledDateTime))
+                                {
+                                    EnrolledDateTime = Regex.Replace(EnrolledDateTime, @"\s+", " ").Trim();
+                                    DateTime parsedDate = DateTime.ParseExact(EnrolledDateTime, "MMM d yyyy h:mmtt", CultureInfo.InvariantCulture);
+
+
+
+                                    // Convert to ISO 8601 format
+                                    string formattedDate = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
+
+                                    // Assign to your object
+                                    EnrolledDateTime = formattedDate;
+                                    enrolledDate = parsedDate.ToString("MMM dd yyyy");
+                                }
+                                patientInfo = new GetAllPatientInfo
+                                {
+                                    PatientId = patientId,
+                                    PatientProgramId = (!DBNull.Value.Equals(reader["PatientProgramId"])) ? Convert.ToInt32(reader["PatientProgramId"]) : 0,
+                                    AssignedMemberId = (!DBNull.Value.Equals(reader["AssignedMemberId"])) ? Convert.ToInt32(reader["AssignedMemberId"]) : 0,
+                                    ClinicId = (!DBNull.Value.Equals(reader["ClinicId"])) ? Convert.ToInt32(reader["ClinicId"]) : 0,
+                                    ClinicName = reader["ClinicName"].ToString(),
+                                    PatientNumber = reader["PatientNumber"].ToString(),
+                                    PatientName = reader["PatientName"].ToString(),
+                                    ProgramName = reader["ProgramName"].ToString(),
+                                    Program = reader["Program"].ToString(),
+                                    EnrolledDate = enrolledDate,
+                                    EnrolledDateTime = EnrolledDateTime,
+
+                                    PhysicianName = reader["PhysicianName"].ToString(),
+                                    AssignedMember = reader["AssignedMember"].ToString(),
+                                    PatientType = reader["PatientType"].ToString()
+                                };
+
+                                list.Add(patientInfo);
+                            }
+
+                            // Check if Program is "RPM"
+                            if (patientInfo.Program == "RPM")
+                            {
+                                // If PatientType is not Active, InActive, or ReadyToDischarge, set Priority to "NA"
+                                if (patientInfo.PatientType != "Active" && patientInfo.PatientType != "InActive" && patientInfo.PatientType != "ReadyToDischarge")
+                                {
+                                    patientInfo.Priority = "NA";
+                                }
+                            }
+
+                            // If the program is not "RPM", set Priority to "NA"
+                            if (patientInfo.Program != "RPM")
+                            {
+                                patientInfo.Priority = "NA";
+                            }
+
+                            // Add the vital to the patient's vitals list
+                            var vital = reader["Vital"].ToString();
+                            var vitalPriority = reader["Priority"].ToString();
+                            var vitalAlertType = reader["AlertTypeId"];
+
+                            if (!string.IsNullOrEmpty(vital))
+                            {
+                                // Create a new VitalInfo object and add it to the list
+                                patientInfo.VitalInfo.Add(new VitalInfo
+                                {
+                                    Vital = vital,
+                                    VitalPriority = vitalPriority,
+                                    AlertTypeId = (int)vitalAlertType
+                                });
+                            }
+                        }
+
+                        if (list.Any())
+                        {
+                            foreach (var patientInfo in list)
+                            {
+                                // Only set priority based on the vital's AlertTypeId if it was not set to "NA" previously
+                                if (patientInfo.Priority != "NA")
+                                {
+                                    AlertType maxAlertTypeId = (AlertType)patientInfo.VitalInfo.Max(v => v.AlertTypeId);
+                                    patientInfo.Priority = GetPriorityFromAlertType(maxAlertTypeId);
+                                }
+                            }
                         }
                     }
                 }
@@ -1308,10 +1381,8 @@ namespace RPMWeb.Dal
             }
             catch (Exception)
             {
-
                 throw;
             }
-
         }
         public List<GetAllPatientInfo> GetAllPatientsList(DateTime ToDate, int UtcOffset, int Days, int RoleId, string CreatedBy, string ConnectionString)
         {
@@ -1330,41 +1401,134 @@ namespace RPMWeb.Dal
                         command.Parameters.Add("@RoleId", SqlDbType.NVarChar).Value = RoleId;
                         command.Parameters.Add("@Days", SqlDbType.NVarChar).Value = Days;
                         command.Parameters.Add("@CreatedBy", SqlDbType.NVarChar).Value = CreatedBy;
+
                         SqlDataReader reader = command.ExecuteReader();
+
                         while (reader.Read())
                         {
-                            GetAllPatientInfo info = new GetAllPatientInfo();
-                            info.PatientId = (!DBNull.Value.Equals(reader["PatientId"])) ? Convert.ToInt32(reader["PatientId"]) : 0;
-                            info.PatientProgramId = (!DBNull.Value.Equals(reader["PatientProgramId"])) ? Convert.ToInt32(reader["PatientProgramId"]) : 0;
-                            info.AssignedMemberId = (!DBNull.Value.Equals(reader["AssignedMemberId"])) ? Convert.ToInt32(reader["AssignedMemberId"]) : 0;
-                            info.ClinicId = (!DBNull.Value.Equals(reader["ClinicId"])) ? Convert.ToInt32(reader["ClinicId"]) : 0;
-                            info.ClinicName = reader["ClinicName"].ToString();
-                            info.PatientNumber = reader["PatientNumber"].ToString();
-                            info.PatientName = reader["PatientName"].ToString();
-                            info.ProgramName = reader["ProgramName"].ToString();
-                            info.Program = reader["Program"].ToString();
-                            info.EnrolledDate = reader["EnrolledDate"].ToString();
-                            info.PhysicianName = reader["PhysicianName"].ToString();
-                            info.AssignedMember = reader["AssignedMember"].ToString();
-                            info.PatientType = reader["PatientType"].ToString();
-                            info.Vital = reader["Vital"].ToString();
-                            info.Priority = reader["Priority"].ToString();
+                            int patientId = (!DBNull.Value.Equals(reader["PatientId"])) ? Convert.ToInt32(reader["PatientId"]) : 0;
 
-                            list.Add(info);
+                            // Find or create the patient info object
+                            var patientInfo = list.FirstOrDefault(p => p.PatientId == patientId);
+                            if (patientInfo == null)
+                            {
+                                string enrolledDate = string.Empty;
+                                string EnrolledDateTime = reader["EnrolledDate"].ToString();
+                                if (!string.IsNullOrWhiteSpace(EnrolledDateTime))
+                                {
+                                    EnrolledDateTime = Regex.Replace(EnrolledDateTime, @"\s+", " ").Trim();
+                                    DateTime parsedDate = DateTime.ParseExact(EnrolledDateTime, "MMM d yyyy h:mmtt", CultureInfo.InvariantCulture);
+
+
+
+                                    // Convert to ISO 8601 format
+                                    string formattedDate = parsedDate.ToString("yyyy-MM-ddTHH:mm:ss");
+
+                                    // Assign to your object
+                                    EnrolledDateTime = formattedDate;
+                                    enrolledDate = parsedDate.ToString("MMM dd yyyy");
+                                }
+                                patientInfo = new GetAllPatientInfo
+                                {
+                                    PatientId = patientId,
+                                    PatientProgramId = (!DBNull.Value.Equals(reader["PatientProgramId"])) ? Convert.ToInt32(reader["PatientProgramId"]) : 0,
+                                    AssignedMemberId = (!DBNull.Value.Equals(reader["AssignedMemberId"])) ? Convert.ToInt32(reader["AssignedMemberId"]) : 0,
+                                    ClinicId = (!DBNull.Value.Equals(reader["ClinicId"])) ? Convert.ToInt32(reader["ClinicId"]) : 0,
+                                    ClinicName = reader["ClinicName"].ToString(),
+                                    PatientNumber = reader["PatientNumber"].ToString(),
+                                    PatientName = reader["PatientName"].ToString(),
+                                    ProgramName = reader["ProgramName"].ToString(),
+                                    Program = reader["Program"].ToString(),
+                                    EnrolledDate = enrolledDate,
+                                    EnrolledDateTime = EnrolledDateTime,
+
+
+                                    PhysicianName = reader["PhysicianName"].ToString(),
+                                    AssignedMember = reader["AssignedMember"].ToString(),
+                                    PatientType = reader["PatientType"].ToString()
+                                };
+
+                                list.Add(patientInfo); // Add the patient to the list
+                            }
+
+                            // Check if Program is "RPM"
+                            if (patientInfo.Program == "RPM")
+                            {
+                                // If PatientType is not Active, InActive, or ReadyToDischarge, set Priority to "NA"
+                                if (patientInfo.PatientType != "Active" && patientInfo.PatientType != "InActive" && patientInfo.PatientType != "ReadyToDischarge")
+                                {
+                                    patientInfo.Priority = "NA";
+                                }
+                            }
+
+                            // If the program is not "RPM", set Priority to "NA"
+                            if (patientInfo.Program != "RPM")
+                            {
+                                patientInfo.Priority = "NA";
+                            }
+
+                            // Add the vital to the patient's vitals list
+                            var vital = reader["Vital"].ToString();
+                            var vitalPriority = reader["Priority"].ToString();
+                            var vitalAlertType = reader["AlertTypeId"];
+
+                            if (!string.IsNullOrEmpty(vital))
+                            {
+                                // Create a new VitalInfo object and add it to the list
+                                patientInfo.VitalInfo.Add(new VitalInfo
+                                {
+                                    Vital = vital,
+                                    VitalPriority = vitalPriority,
+                                    AlertTypeId = (int)vitalAlertType
+                                });
+                            }
+                        }
+
+                        // After checking all vital info, set Priority based on the max AlertTypeId
+                        if (list.Any())
+                        {
+                            foreach (var patientInfo in list)
+                            {
+                                // Only set priority based on the vital's AlertTypeId if it was not set to "NA" previously
+                                if (patientInfo.Priority != "NA")
+                                {
+                                    AlertType maxAlertTypeId = (AlertType)patientInfo.VitalInfo.Max(v => v.AlertTypeId);
+                                    patientInfo.Priority = GetPriorityFromAlertType(maxAlertTypeId);
+                                }
+                            }
                         }
                     }
                 }
+
                 return list;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
                 throw;
             }
-
         }
 
-        public List<GetAllPatientSmsInfo> GetAllPatientsSmsList( int RoleId, string CreatedBy, string ConnectionString)
+        public string GetPriorityFromAlertType(AlertType alertTypeId)
+        {
+            string type = string.Empty;
+            switch (alertTypeId)
+            {
+                case AlertType.Normal:
+                    type = "Normal";
+                    break;
+                case AlertType.Missing:
+                    type = "Missing";
+                    break;
+                case AlertType.Cautious:
+                    type = "Cautious";
+                    break;
+                case AlertType.Critical:
+                    type = "Critical";
+                    break;
+            }
+            return type;
+        }
+        public List<GetAllPatientSmsInfo> GetAllPatientsSmsList(int RoleId, string CreatedBy, string ConnectionString)
         {
             List<GetAllPatientSmsInfo> list = new List<GetAllPatientSmsInfo>();
             try
@@ -1388,12 +1552,12 @@ namespace RPMWeb.Dal
                             info.ProgramName = reader["ProgramName"].ToString();
                             info.Senddate = reader["SentDate"].ToString();
                             DateTime parsedDate;
-                            DateTime.TryParse(info.Senddate,out parsedDate);
+                            DateTime.TryParse(info.Senddate, out parsedDate);
                             string formattedDate = parsedDate.ToString("yyyy-MM-dd HH:mm:ss");
                             info.Senddate = formattedDate;
                             info.Senddate = info.Senddate.ToString();
                             info.FromNumber = reader["FromNo"].ToString();
-                            info.Id = Convert.ToInt16(reader["Id"]);
+                            info.Id = Convert.ToInt32(reader["Id"]);
                             info.Message = reader["SmsBody"].ToString();
 
 
@@ -1644,10 +1808,7 @@ namespace RPMWeb.Dal
             try
             {
                 PatientVitalReadings vitalReadings = new PatientVitalReadings();
-                List<BloodPressureReading> bloodPressureList = new List<BloodPressureReading>();
-                List<BloodGlucoseReading> bloodGlucoseList = new List<BloodGlucoseReading>();
-                List<WeightReading> weigthList = new List<WeightReading>();
-                List<BloodOxygenReading> bloodOxygenList = new List<BloodOxygenReading>();
+
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {
                     con.Open();
@@ -1659,6 +1820,7 @@ namespace RPMWeb.Dal
                         command.Parameters.Add("@StartDate", SqlDbType.SmallDateTime).Value = StartDate;
                         command.Parameters.Add("@EndDate", SqlDbType.SmallDateTime).Value = EndDate;
                         command.Parameters.Add("@CreatedBy", SqlDbType.NVarChar).Value = CreatedBy;
+
                         using (SqlDataAdapter sda = new SqlDataAdapter())
                         {
                             sda.SelectCommand = command;
@@ -1666,83 +1828,115 @@ namespace RPMWeb.Dal
                             {
                                 sda.Fill(ds);
 
-                                List<BloodGlucoseReading> readinglistBG = new List<BloodGlucoseReading>();
+                                List<string> programVitalsIds = new List<string>();
+                                foreach (DataRow dr in ds.Tables[0].Rows)
+                                {
+                                    programVitalsIds.Add(dr["VitalName"].ToString());
+                                }
 
-                                foreach (DataRow dr2 in ds.Tables[0].Rows)
+                                if (programVitalsIds.Contains("Blood Glucose"))
                                 {
-                                    BloodGlucoseReading reading = new BloodGlucoseReading();
-                                    reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
-                                    reading.Schedule = dr2["MeasureName"].ToString();
-                                    reading.BGmgdl = Convert.ToInt32(dr2["MeasureValue"]);
-                                    reading.Status = dr2["Remark"].ToString();
-                                    reading.Remarks = dr2["Remark"].ToString();
-                                    readinglistBG.Add(reading);
+                                    List<BloodGlucoseReading> readinglistBG = new List<BloodGlucoseReading>();
+                                    foreach (DataRow dr2 in ds.Tables[1].Rows)
+                                    {
+                                        BloodGlucoseReading reading = new BloodGlucoseReading();
+                                        reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
+                                        reading.Schedule = dr2["MeasureName"].ToString();
+                                        reading.BGmgdl = Convert.ToInt32(dr2["MeasureValue"]);
+                                        reading.Status = dr2["Remark"].ToString();
+                                        reading.Remarks = dr2["Remark"].ToString();
+                                        readinglistBG.Add(reading);
+                                    }
+                                    if (!readinglistBG.Any())
+                                    {
+                                        readinglistBG = new List<BloodGlucoseReading>();
+                                    }
+                                    vitalReadings.BloodGlucose = readinglistBG;
                                 }
-                                vitalReadings.BloodGlucose = readinglistBG;
-                                List<BloodPressureReading> BPreading = new List<BloodPressureReading>();
-                                foreach (DataRow dr2 in ds.Tables[1].Rows)
-                                {
-                                    BloodPressureReading reading = new BloodPressureReading();
-                                    reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
-                                    reading.Systolic = Convert.ToInt32(dr2["SystolicValue"]);
-                                    reading.Diastolic = Convert.ToInt32(dr2["DiastolicValue"]);
-                                    reading.pulse = Convert.ToInt32(dr2["PulseValue"]);
-                                    reading.SystolicStatus = dr2["systRemark"].ToString();
-                                    reading.DiastolicStatus = dr2["diasRemark"].ToString();
-                                    reading.pulseStatus = dr2["pulsRemark"].ToString();
-                                    reading.Remarks = dr2["TotalRemark"].ToString();
-                                    reading.Status = dr2["TotalRemark"].ToString();
-                                    BPreading.Add(reading);
-                                }
-                                vitalReadings.BloodPressure = BPreading;
-                                List<WeightReading> readinglistBW = new List<WeightReading>();
 
-                                foreach (DataRow dr2 in ds.Tables[2].Rows)
+                                if (programVitalsIds.Contains("Blood Pressure"))
                                 {
-                                    WeightReading reading = new WeightReading();
-                                    reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
-                                    reading.Schedule = dr2["MeasureName"].ToString();
-                                    reading.BWlbs = Convert.ToSingle(dr2["MeasureValue"]);
-                                    reading.Status = dr2["Remark"].ToString();
-                                    reading.Remarks = dr2["Remark"].ToString();
-                                    readinglistBW.Add(reading);
+                                    List<BloodPressureReading> BPreading = new List<BloodPressureReading>();
+                                    foreach (DataRow dr2 in ds.Tables[2].Rows)
+                                    {
+                                        BloodPressureReading reading = new BloodPressureReading();
+                                        reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
+                                        reading.Systolic = Convert.ToInt32(dr2["SystolicValue"]);
+                                        reading.Diastolic = Convert.ToInt32(dr2["DiastolicValue"]);
+                                        reading.pulse = Convert.ToInt32(dr2["PulseValue"]);
+                                        reading.SystolicStatus = dr2["systRemark"].ToString();
+                                        reading.DiastolicStatus = dr2["diasRemark"].ToString();
+                                        reading.pulseStatus = dr2["pulsRemark"].ToString();
+                                        reading.Remarks = dr2["TotalRemark"].ToString();
+                                        reading.Status = dr2["TotalRemark"].ToString();
+                                        BPreading.Add(reading);
+                                    }
+                                    if (!BPreading.Any())
+                                    {
+                                        BPreading = new List<BloodPressureReading>();
+                                    }
+                                    vitalReadings.BloodPressure = BPreading;
                                 }
-                                vitalReadings.Weight = readinglistBW;
-                                List<BloodOxygenReading> BOreading = new List<BloodOxygenReading>();
-                                foreach (DataRow dr2 in ds.Tables[3].Rows)
+
+                                if (programVitalsIds.Contains("Weight"))
                                 {
-                                    BloodOxygenReading reading = new BloodOxygenReading();
-                                    reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
-                                    reading.Pulse = Convert.ToInt32(dr2["pulseValue"]);
-                                    reading.Oxygen = Convert.ToInt32(dr2["oxygenValue"]);
-                                    reading.PulseStatus = dr2["pulseRemark"].ToString();
-                                    reading.OxygenStatus = dr2["oxygenRemark"].ToString();
-                                    reading.Remarks = dr2["TotalRemark"].ToString();
-                                    reading.Status = dr2["TotalRemark"].ToString();
-                                    BOreading.Add(reading);
+                                    List<WeightReading> readinglistBW = new List<WeightReading>();
+                                    foreach (DataRow dr2 in ds.Tables[3].Rows)
+                                    {
+                                        WeightReading reading = new WeightReading();
+                                        reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
+                                        reading.Schedule = dr2["MeasureName"].ToString();
+                                        reading.BWlbs = Convert.ToSingle(dr2["MeasureValue"]);
+                                        reading.Status = dr2["Remark"].ToString();
+                                        reading.Remarks = dr2["Remark"].ToString();
+                                        readinglistBW.Add(reading);
+                                    }
+                                    if (!readinglistBW.Any())
+                                    {
+                                        readinglistBW = new List<WeightReading>();
+                                    }
+                                    vitalReadings.Weight = readinglistBW;
                                 }
-                                vitalReadings.BloodOxygen = BOreading;
+
+                                if (programVitalsIds.Contains("Oxygen"))
+                                {
+                                    List<BloodOxygenReading> BOreading = new List<BloodOxygenReading>();
+                                    foreach (DataRow dr2 in ds.Tables[4].Rows)
+                                    {
+                                        BloodOxygenReading reading = new BloodOxygenReading();
+                                        reading.ReadingTime = Convert.ToDateTime(dr2["CreatedOn"]);
+                                        reading.Pulse = Convert.ToInt32(dr2["pulseValue"]);
+                                        reading.Oxygen = Convert.ToInt32(dr2["oxygenValue"]);
+                                        reading.PulseStatus = dr2["pulseRemark"].ToString();
+                                        reading.OxygenStatus = dr2["oxygenRemark"].ToString();
+                                        reading.Remarks = dr2["TotalRemark"].ToString();
+                                        reading.Status = dr2["TotalRemark"].ToString();
+                                        BOreading.Add(reading);
+                                    }
+                                    if (!BOreading.Any())
+                                    {
+                                        BOreading = new List<BloodOxygenReading>();
+                                    }
+                                    vitalReadings.BloodOxygen = BOreading;
+                                }
+
                                 return vitalReadings;
                             }
-
                         }
-
                     }
                 }
             }
             catch
             {
-
                 throw;
             }
         }
-        public HealthTrends GetPatientHealthTrends(string username, int PatientId, int PatientProgramId, DateTime StartDate, DateTime EndDate, string CreatedBy, string ConnectionString)
+
+        public List<HealthTrends> GetPatientHealthTrends(string username, int PatientId, int PatientProgramId, DateTime StartDate, DateTime EndDate, string CreatedBy, string ConnectionString)
         {
             try
             {
-                HealthTrends ret = new HealthTrends();
-                ret.Time = new List<DateTime>();
-                ret.Values = new List<Values>();
+                List<HealthTrends> ret = new List<HealthTrends>();
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {
                     con.Open();
@@ -1752,97 +1946,160 @@ namespace RPMWeb.Dal
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.Add("@PatientId", SqlDbType.Int).Value = PatientId;
                         command.Parameters.Add("@PatientProgramId", SqlDbType.Int).Value = PatientProgramId;
-                        //command.Parameters.Add("@StartDate", SqlDbType.SmallDateTime).Value = StartDate;
-                        //command.Parameters.Add("@EndDate", SqlDbType.SmallDateTime).Value = EndDate;
-
                         command.Parameters.AddWithValue("@StartDate", StartDate);
                         command.Parameters.AddWithValue("@EndDate", EndDate);
-
                         command.Parameters.Add("@CreatedBy", SqlDbType.NVarChar).Value = CreatedBy;
-                        SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
-                        returnParameter.Direction = ParameterDirection.ReturnValue;
-                        SqlDataReader reader = command.ExecuteReader();
-                        HealthTrends list = new HealthTrends();
-                        DataTable dt = new DataTable();
-                        while (!reader.IsClosed)
+                        DataSet ds;
+                        using (SqlDataAdapter sda = new SqlDataAdapter())
                         {
-                            dt.Load(reader);
-                        }
-                        if (dt.Rows.Count > 0)
-                        {
-                            List<DateTime> xAxisInfo = new List<DateTime>();
-                            List<DateTime> xDatesInDb = dt.AsEnumerable().Select(s => s.Field<DateTime>("CreatedOn")).Distinct().ToList<DateTime>();
+                            sda.SelectCommand = command;
+                            using (ds = new DataSet())
+                            {
+                                sda.Fill(ds);
+                                var allVitals = new List<HealthTrends>();
+                                foreach (DataRow row in ds.Tables[0].Rows)
+                                {
+                                    var vital = new HealthTrends()
+                                    {
+                                        VitalName = row["VitalName"].ToString(),
+                                        VitalId = Convert.ToInt32(row["VitalId"]),
+                                        Values = new List<Values>(),
+                                        Time = new List<DateTime>()
+                                    };
+                                    allVitals.Add(vital);
+                                }
 
-                            for (DateTime sDate = StartDate; sDate.Date <= EndDate.Date; sDate = sDate.AddDays(1))
-                            {
-                                List<DateTime> tempTime = xDatesInDb.FindAll(x => x.Date == sDate.Date);
-                                if (tempTime.Count > 0)
+                                DataSet newDs = new DataSet();
+                                for (int i = 1; i < ds.Tables.Count; i++)
                                 {
-                                    xAxisInfo.AddRange(tempTime);
+                                    newDs.Tables.Add(ds.Tables[i].Copy());
                                 }
-                                else
+
+                                if (newDs.Tables.Count > 0)
                                 {
-                                    if(sDate.Date == EndDate.Date) { sDate=sDate.AddSeconds(-1);}
-                                    xAxisInfo.Add(sDate); 
+                                    ret = ConvertHealthTrendData(username, newDs, StartDate, EndDate, ConnectionString);
                                 }
-                            }
-                            string sVitalName = string.Empty;
-                            int nVitalId = 0;
-                            Dictionary<string, List<VitalMesureData>> values = new Dictionary<string, List<VitalMesureData>>();
-                            foreach (DataRow row in dt.Rows)
-                            {
-                                if (string.IsNullOrEmpty(sVitalName))
+
+                                foreach (var vital in allVitals)
                                 {
-                                    sVitalName = row["VitalName"].ToString();
-                                    nVitalId = Convert.ToInt32(row["VitalId"]);
+                                    var existingVital = ret.FirstOrDefault(v => v.VitalId == vital.VitalId);
+
+                                    if (existingVital == null)
+                                    {
+                                        vital.Values = new List<Values>();
+                                        vital.Time = new List<DateTime>();
+                                        ret.Add(vital);
+                                    }
                                 }
-                                string sMeasurementName = row["MeasureName"].ToString();
-                                int nMeasureValue = Convert.ToInt32(row["MeasureValue"]);
-                                DateTime dtCreatedOn = Convert.ToDateTime(row["CreatedOn"]);
-                                if (!values.ContainsKey(sMeasurementName))
-                                {
-                                    values.Add(sMeasurementName, new List<VitalMesureData>());
-                                }
-                                VitalMesureData vi = new VitalMesureData();
-                                vi.ValueDate = dtCreatedOn;
-                                vi.Value = nMeasureValue.ToString();
-                                values[sMeasurementName].Add(vi);
-                            }
-                            ret.VitalName = sVitalName;
-                            VitalMeasure vitaldata = new VitalMeasure();
-                            vitaldata = GetLatestReading(username, 7, ConnectionString, sVitalName);
-                            ret.LatestVitalMeasure = vitaldata;
-                            ret.VitalId = nVitalId;
-                            ret.Time.AddRange(xAxisInfo);
-                            foreach (KeyValuePair<string, List<VitalMesureData>> kv in values)
-                            {
-                                Values v = new Values();
-                                v.label = kv.Key;
-                                v.data = new List<string>();
-                                foreach (DateTime sDate in ret.Time)
-                                {
-                                    VitalMesureData vm = kv.Value.Find(x => x.ValueDate == sDate);
-                                    if (vm == null)
-                                        v.data.Add(null);
-                                    else
-                                        v.data.Add(vm.Value);
-                                }
-                                ret.Values.Add(v);
                             }
                         }
-                        else {
-                            VitalMeasure vitaldata = new VitalMeasure();
-                            vitaldata = GetLatestReading(username, 7, ConnectionString,null);
-                            ret.LatestVitalMeasure = vitaldata;
-                        }
-                        
                     }
                 }
-                return ret;
+                return ret.OrderBy(t => t.VitalId).ToList(); ;
             }
             catch (Exception ex)
             {
                 throw ex;
+            }
+        }
+        private List<HealthTrends> ConvertHealthTrendData(string username, DataSet ds, DateTime StartDate, DateTime EndDate, string ConnectionString)
+        {
+            List<HealthTrends> patientHealthTrends = new List<HealthTrends>();
+            try
+            {
+                foreach (DataTable table in ds.Tables)
+                {
+                    HealthTrends ret = new HealthTrends();
+                    ret.Time = new List<DateTime>();
+                    ret.Values = new List<Values>();
+                    List<DateTime> xAxisInfo = new List<DateTime>();
+                    List<DateTime> xDatesInDb = table.AsEnumerable().Select(s => s.Field<DateTime>("CreatedOn")).Distinct().ToList<DateTime>();
+
+                    for (DateTime sDate = StartDate; sDate.Date <= EndDate.Date; sDate = sDate.AddDays(1))
+                    {
+                        List<DateTime> tempTime = xDatesInDb.FindAll(x => x.Date == sDate.Date);
+                        if (tempTime.Count > 0)
+                        {
+                            xAxisInfo.AddRange(tempTime);
+                        }
+                        else
+                        {
+                            if (sDate.Date == EndDate.Date) { sDate = sDate.AddSeconds(-1); }
+                            xAxisInfo.Add(sDate);
+                        }
+                    }
+
+                    int nVitalId = 0;
+                    string sVitalName = string.Empty;
+                    Dictionary<string, List<VitalMesureData>> values = GetHealthTrendRowValue(table, ref nVitalId, ref sVitalName);
+                    ret.VitalName = sVitalName;
+
+                    VitalMeasure vitaldata = GetLatestReading(username, 7, ConnectionString, sVitalName);
+                    ret.LatestVitalMeasure = vitaldata;
+                    ret.VitalId = nVitalId;
+                    ret.Time.AddRange(xAxisInfo);
+
+                    foreach (KeyValuePair<string, List<VitalMesureData>> kv in values)
+                    {
+                        Values v = new Values();
+                        v.label = kv.Key;
+                        v.data = new List<string>();
+
+                        foreach (DateTime sDate in ret.Time)
+                        {
+                            VitalMesureData vm = kv.Value.Find(x => x.ValueDate == sDate);
+                            if (vm == null)
+                                v.data.Add(null);
+                            else
+                                v.data.Add(vm.Value);
+                        }
+                        ret.Values.Add(v);
+                    }
+
+                    // Skip adding the vital if it has no data
+                    if (ret.Values.Any(v => v.data.Any(d => d != null)))
+                    {
+                        patientHealthTrends.Add(ret);
+                    }
+                }
+                return patientHealthTrends;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private Dictionary<string, List<VitalMesureData>> GetHealthTrendRowValue(DataTable table, ref int nVitalId, ref string sVitalName)
+        {
+            try
+            {
+                Dictionary<string, List<VitalMesureData>> values = new Dictionary<string, List<VitalMesureData>>();
+                foreach (DataRow row in table.Rows)
+                {
+                    if (string.IsNullOrEmpty(sVitalName))
+                    {
+                        sVitalName = row["VitalName"].ToString();
+                        nVitalId = Convert.ToInt32(row["VitalId"]);
+                    }
+                    string sMeasurementName = row["MeasureName"].ToString();
+                    int nMeasureValue = Convert.ToInt32(row["MeasureValue"]);
+                    DateTime dtCreatedOn = Convert.ToDateTime(row["CreatedOn"]);
+                    if (!values.ContainsKey(sMeasurementName))
+                    {
+                        values.Add(sMeasurementName, new List<VitalMesureData>());
+                    }
+                    VitalMesureData vi = new VitalMesureData();
+                    vi.ValueDate = dtCreatedOn;
+                    vi.Value = nMeasureValue.ToString();
+                    values[sMeasurementName].Add(vi);
+                }
+                return values;
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
         public List<GetSchedules> GetPatientSchedule(int PatientId, DateTime StartDate, DateTime EndDate, string CreatedBy, string ConnectionString)
@@ -2175,37 +2432,37 @@ namespace RPMWeb.Dal
                                     }
                                 }
 
-                               /* int i = 0;
-                                List<DateTime> DateTimeAdded = data.Measurements[i].Time;
+                                /* int i = 0;
+                                 List<DateTime> DateTimeAdded = data.Measurements[i].Time;
 
-                                List<DateTime> newDateList = dateTimeAll.Except(DateTimeAdded).ToList();
-                                /* foreach (DateTime datee in dateTimeAll)
+                                 List<DateTime> newDateList = dateTimeAll.Except(DateTimeAdded).ToList();
+                                 /* foreach (DateTime datee in dateTimeAll)
+                                  {
+
+                                      bool alreadyExists = DateTimeAdded.Any(x => x.Date==datee.Date);
+                                      if (!alreadyExists)
+                                      {
+                                          foreach(var vitals in data.Measurements)
+                                          {
+                                              data.Measurements[i].Time.Add(datee);
+                                              data.Measurements[i].Value.Add("null");
+
+                                          }
+
+
+                                      }
+
+
+                                  }
+                                  i++;
+                                 foreach (DateTime datee in newDateList)
                                  {
+                                     vitals.Time.Add(datee);
+                                     vitals.Value.Add("null");
+                                 }*/
 
-                                     bool alreadyExists = DateTimeAdded.Any(x => x.Date==datee.Date);
-                                     if (!alreadyExists)
-                                     {
-                                         foreach(var vitals in data.Measurements)
-                                         {
-                                             data.Measurements[i].Time.Add(datee);
-                                             data.Measurements[i].Value.Add("null");
-
-                                         }
-
-
-                                     }
-
-
-                                 }
-                                 i++;
-                                foreach (DateTime datee in newDateList)
-                                {
-                                    vitals.Time.Add(datee);
-                                    vitals.Value.Add("null");
-                                }*/
-                                
                             }
-                            
+
                         }
 
                         /*DateTime[] dates = dt.AsEnumerable().Select(s => s.Field<DateTime>("CreatedOn").Date).Distinct().ToArray<DateTime>();
@@ -2237,7 +2494,7 @@ namespace RPMWeb.Dal
                             lstSummery.Add(ret);
                         }*/
 
-                        
+
                         return lstSummery;
                     }
                 }
@@ -2443,9 +2700,9 @@ namespace RPMWeb.Dal
                                     list.vitals.Add(vitalslistpulse);
 
                                 }
-                               // list.vitals.Add(vitalslist);
+                                // list.vitals.Add(vitalslist);
                             }
-       
+
                         }
 
                         return list;
@@ -2485,7 +2742,7 @@ namespace RPMWeb.Dal
                             ret.LastName = reader["LastName"].ToString();
                             ret.DOB = reader["DOB"].ToString();
                             ret.Gender = reader["Gender"].ToString();
-                            ret.Height = Convert.ToInt32(reader["Height"]);
+                            ret.Height = Convert.ToSingle(reader["Height"]);
                             ret.Weight = Convert.ToInt32(reader["Weight"]);
                             ret.Email = reader["Email"].ToString();
                             ret.PhoneNo = reader["PhoneNo"].ToString();
@@ -2643,8 +2900,8 @@ namespace RPMWeb.Dal
                                     Reportlist.Add(info);
                                 }
                             }
-                        
-                    }
+
+                        }
                         reader.Close();
                         /*if (list.Count > 0)
                         {
@@ -2703,8 +2960,8 @@ namespace RPMWeb.Dal
                 {
                     Reportlist = (List<PatientBillReport>)Reportlist.Where(s => s.clinic == clinic).ToList();
                     isClinic = true;
-                    if(Reportlist.Count > 0)
-                    clinic = Reportlist[0].ClinicName.ToString();
+                    if (Reportlist.Count > 0)
+                        clinic = Reportlist[0].ClinicName.ToString();
                 }
                 else if (!string.IsNullOrEmpty(cptCode) && string.IsNullOrEmpty(clinic))
                 {
@@ -2774,7 +3031,7 @@ namespace RPMWeb.Dal
                             info.CPT99437 = "NA";
                             info.CPT99487 = "NA";
                             info.CPT99489 = "NA";
-                            if ( ApplicableCPTCodes.Contains("99490"))
+                            if (ApplicableCPTCodes.Contains("99490"))
                             {
                                 info.CPT99490 = reader["99490"].ToString();
                                 info.CPT99490 =  Convert.ToString(ConvertSecondsToMinutes(Convert.ToInt32(info.CPT99490)));
@@ -2804,13 +3061,13 @@ namespace RPMWeb.Dal
                                 info.CPT99489 = reader["99489"].ToString();
                                 info.CPT99489 = Convert.ToString(ConvertSecondsToMinutes(Convert.ToInt32(info.CPT99489)));
                             }
-                           
 
-                            
-                            
-                            
-                            
-                            
+
+
+
+
+
+
                             info.EnrolledDate = Convert.ToDateTime(reader["ENROLL DATE"]);
                             info.clinic = reader["CLINIC"].ToString();
                             info.clinicname = reader["clinicname"].ToString();
@@ -3027,9 +3284,9 @@ namespace RPMWeb.Dal
                                 info.CPT99427 = reader["99427"].ToString();
                                 info.CPT99427 =  Convert.ToString(ConvertSecondsToMinutes(Convert.ToInt32(info.CPT99427)));
                             }
-                            
 
-                            
+
+
 
                             info.EnrolledDate = Convert.ToDateTime(reader["ENROLL DATE"]);
                             info.clinic = reader["CLINIC"].ToString();
@@ -3897,79 +4154,16 @@ namespace RPMWeb.Dal
                         {
                             command.Parameters.AddWithValue("@vitalName", vitalname);
                         }
-                        SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
-                        returnParameter.Direction = ParameterDirection.ReturnValue;
                         SqlDataReader reader = command.ExecuteReader();
-
-
-                        DataTable dt = new DataTable();
-                        while (!reader.IsClosed)
+                        while (reader.Read())
                         {
-
-                            dt.Load(reader);
-
-                        }
-                        if (dt.Rows.Count == 0)
-                        {
-                            return null;
-                        }
-
-                        var result = dt.AsEnumerable().OrderByDescending(y => y.Field<DateTime>("CreatedOn")).FirstOrDefault();
-
-                        if (result != null)
-                        {
-                            var pulse = dt.AsEnumerable().Where(p => p.Field<string>("MeasureName") == "Pulse").OrderByDescending(y => y.Field<DateTime>("CreatedOn")).FirstOrDefault();
-                            if(vitalname== null)
-                            {
-                                vitalname = result["Name"].ToString();
-                            }
-                            if (vitalname == "Blood Pressure")
-                            {
-                                string[] MeasureNames = dt.AsEnumerable().Where(p => p.Field<string>("MeasureName") != "Pulse").Select(s => s.Field<string>("MeasureName")).Distinct().ToArray<string>();
-                                List<string> Values = new List<string>();
-                                DataRow latestReading1;
-                                foreach (var measure in MeasureNames)//systoli,diastolic,pulse
-                                {
-
-                                    latestReading1 = dt.AsEnumerable().Where(s => s.Field<string>("MeasureName") == measure).OrderByDescending(m => m.Field<DateTime>("CreatedOn")).FirstOrDefault();
-                                    Values.Add(latestReading1["MeasureValue"].ToString());
-                                    ret.Date = (DateTime)latestReading1["CreatedOn"];
-                                    ret.unit = latestReading1["UnitName"].ToString();
-                                    ret.time = latestReading1["time"].ToString();
-                                    ret.VitalName = latestReading1["Name"].ToString();
-                                    string datePart = ret.Date.ToString("yyyy-MM-dd");
-                                    string newDate = datePart + " " + ret.time;
-                                    DateTime date = DateTime.ParseExact(datePart, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                    DateTime combinedDateTime = date.Add(TimeSpan.Parse(ret.time));
-                                    ret.Date = combinedDateTime;
-
-
-                                }
-                                string[] myString = Values.ToArray();
-                                ret.Value = string.Join(" / ", myString);
-
-                            } 
-                            else
-                            {
-                                ret.Value = result["MeasureValue"].ToString();
-                                ret.Date = (DateTime)result["CreatedOn"];
-                                ret.unit = result["UnitName"].ToString();
-                                ret.time = result["time"].ToString();
-                                ret.VitalName = result["Name"].ToString();
-                                string datePart = ret.Date.ToString("yyyy-MM-dd");
-                                string newDate = datePart + " " + ret.time;
-                                DateTime date = DateTime.ParseExact(datePart, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                DateTime combinedDateTime = date.Add(TimeSpan.Parse(ret.time));
-                                ret.Date = combinedDateTime;
-
-                            }
-                            if (pulse != null)
-                            {
-                                ret.PulseValue = pulse["MeasureValue"].ToString();
-                                ret.PulseUnit = pulse["UnitName"].ToString();
-
-                            }
-
+                            ret.Date= DBNull.Value.Equals(reader["Date"]) ? DateTime.MinValue : (DateTime)reader["Date"];
+                            ret.PulseUnit= DBNull.Value.Equals(reader["PulseUnit"]) ? "" : reader["PulseUnit"].ToString();
+                            ret.PulseValue= DBNull.Value.Equals(reader["PulseValue"]) ? "" : reader["PulseValue"].ToString();
+                            ret.unit= DBNull.Value.Equals(reader["Unit"]) ? "" : reader["Unit"].ToString();
+                            ret.Value= DBNull.Value.Equals(reader["Value"]) ? "" : reader["Value"].ToString();
+                            ret.VitalName= DBNull.Value.Equals(reader["VitalName"]) ? "" : reader["VitalName"].ToString();
+                            ret.time= DBNull.Value.Equals(reader["Time"]) ? "" : reader["Time"].ToString();
 
                         }
                         return ret;
@@ -6030,7 +6224,7 @@ namespace RPMWeb.Dal
                         PatientBilldatas.ReadyTobill = 0;
                         return PatientBilldatas;
                     }
-                    else if (StartDateTemp > Today && PatientStartDate.Status.ToLower() == "active")
+                    else if (PatientStartDate.StartDate > DateTime.UtcNow && PatientStartDate.Status.ToLower() == "active")
                     {
                         PatientBilldatas = new PatientBilldata();
                         PatientBilldatas.CPTCode = code.BillingCode;
@@ -6045,14 +6239,14 @@ namespace RPMWeb.Dal
                         DateTime stDate = Convert.ToDateTime(PatientStartDate.StartDate);
                         DateTime endDate = DateTime.UtcNow.Date;
                         DateTime stDatetemp = GetLocalTimeFromUTC((DateTime)stDate, connectionString);
-
-                        DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
+                        DateTime Todayy = DateTime.UtcNow;
+                        DateTime endDatetemp = GetLocalTimeFromUTC((DateTime)Todayy, connectionString);
 
                         // endDate = GetLocalTimeFromUTC((DateTime)endDate, connectionString);
                         //Note: This will happen in the last day of billing.. In the last day, billed date will set in 
                         //the patientbilling table and +1 day will come as next start day.. So we should   
                         // calcualte the start date with respect to the billing threshold
-                        if (stDatetemp > endDatetemp)
+                        if (stDate.Date > endDatetemp)
                         {
                             //stDate = stDate.AddDays(-1 * code.BillingThreshold);
                             BilledDates bd = GetPatientLastBilledPeriods(patientId, patientProgramId, code.BillingCodeID, connectionString);
@@ -7163,6 +7357,15 @@ namespace RPMWeb.Dal
                 PatientStartDate = GetPatientBillingStartDateEx(patientId, patientProgramId, code.BillingCodeID, connectionString);
                 if (PatientStartDate == null ||
                     PatientStartDate.Status.ToLower() == "invalid")
+                {
+                    pbd.CPTCode = code.BillingCode;
+                    pbd.Completed = 0;
+                    pbd.Total = code.TargetReadings*60;
+                    pbd.IsTargetMet = false;
+                    pbd.ReadyTobill = 0;
+                    return pbd;
+                }
+                else if (PatientStartDate.StartDate > DateTime.UtcNow.Date && PatientStartDate.Status.ToLower() == "active")
                 {
                     pbd.CPTCode = code.BillingCode;
                     pbd.Completed = 0;
@@ -8615,7 +8818,7 @@ namespace RPMWeb.Dal
             {
                 Console.WriteLine("Exception occured - class Name :" + this.GetType().Name + ",  Method Name : " + MethodBase.GetCurrentMethod().Name + ", Error Message :" + ex.Message + "");
                 return null;
-        }
+            }
 
 
 
@@ -8878,7 +9081,6 @@ namespace RPMWeb.Dal
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {
                     con.Open();
-
                     using (SqlCommand command = new SqlCommand("GetPatientBillingDataListCCM_CycleBasedBilling", con))
                     {
                         command.CommandType = CommandType.StoredProcedure;
@@ -8980,32 +9182,32 @@ namespace RPMWeb.Dal
                 {
                     TimeSpan t1 = TimeSpan.FromMinutes(19.99);
                     startDuration = 0;
-                    endDuration=t1.TotalSeconds;
+                    endDuration = t1.TotalSeconds;
                 }
                 else if (interactionFilter == "20-39")
                 {
                     TimeSpan t1 = TimeSpan.FromMinutes(20);
                     TimeSpan t2 = TimeSpan.FromMinutes(39.99);
                     startDuration = t1.TotalSeconds;
-                    endDuration=t2.TotalSeconds;
+                    endDuration = t2.TotalSeconds;
                 }
                 else if (interactionFilter == "40-59")
                 {
                     TimeSpan t1 = TimeSpan.FromMinutes(40);
                     TimeSpan t2 = TimeSpan.FromMinutes(59.99);
                     startDuration = t1.TotalSeconds;
-                    endDuration=t2.TotalSeconds;
+                    endDuration = t2.TotalSeconds;
                 }
                 else if (interactionFilter == "60")
                 {
                     TimeSpan t1 = TimeSpan.FromMinutes(60);
                     startDuration = t1.TotalSeconds;
-                    endDuration=0;
+                    endDuration = 0;
                 }
                 else
                 {
                     startDuration = 0;
-                    endDuration=0;
+                    endDuration = 0;
                 }
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {
@@ -9101,6 +9303,7 @@ namespace RPMWeb.Dal
 
 
         }
+        
         public PatientBilldataList GetPatientBillingDataListPCMCycleBasedBilling(string patientType, string patientFilter, string patientId, string patientName, string program, string assignedmember, int Index, string readingFilter, string interactionFilter, int RoleId, string Createdby, string ConnectionString)
         {
             try
@@ -9462,6 +9665,7 @@ namespace RPMWeb.Dal
 
 
         }
+       
         public BilledDates GetPatientLastBilledPeriods(int patientId, int patientPgmId, int billingcode, string connectionString)
         {
             BilledDates ret = new BilledDates();
@@ -10320,7 +10524,7 @@ namespace RPMWeb.Dal
 
 
         }
-        
+
         public List<VitalReading> GetVitalReadingsLocal(int patientProgramId, string connectionString, DateTime startDate, DateTime endDate)
         {
 
@@ -12023,7 +12227,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string datss = stDate.ToString();
+                        datss = datss.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(datss);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12042,7 +12248,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string datess = stDate.ToString();
+                        datess = datess.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(datess);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12051,7 +12259,9 @@ namespace RPMWeb.Dal
                     {
                         TotalReading = code.TargetReadings * 60;
                     }
-                    pbd.BillingStartDate = (DateTime)stDate;
+                    string dates = stDate.ToString();
+                    dates = dates.Replace("Z", "");
+                    pbd.BillingStartDate = DateTime.Parse(dates);
                     pbd.CPTCode = code.BillingCode;
                     pbd.Completed = TotalReading;
                     pbd.Total = code.TargetReadings * 60;
@@ -12135,7 +12345,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string datss = stDate.ToString();
+                        datss = datss.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(datss);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12154,7 +12366,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string datess = stDate.ToString();
+                        datess = datess.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(datess);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12164,7 +12378,9 @@ namespace RPMWeb.Dal
                         TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
                         TotalReading = (int)(t1.TotalSeconds - (code490.TargetReadings * 60));
 
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dates = stDate.ToString();
+                        dates = dates.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dates);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = TotalReading;
                         if (TotalReading < code490.TargetReadings * 60)
@@ -12184,7 +12400,9 @@ namespace RPMWeb.Dal
                     else
                     {
                         //Target reading 20
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dats = stDate.ToString();
+                        dats = dats.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dats);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = 0;
                         pbd.Total = code490.TargetReadings * 60;
@@ -12278,7 +12496,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dats = stDate.ToString();
+                        dats = dats.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dats);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12297,7 +12517,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dates = stDate.ToString();
+                        dates = dates.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dates);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12306,7 +12528,9 @@ namespace RPMWeb.Dal
                     {
                         TotalReading = code.TargetReadings * 60;
                     }
-                    pbd.BillingStartDate = (DateTime)stDate;
+                    string datess = stDate.ToString();
+                    datess = datess.Replace("Z", "");
+                    pbd.BillingStartDate = DateTime.Parse(datess);
                     pbd.CPTCode = code.BillingCode;
                     pbd.Completed = TotalReading;
                     pbd.Total = code.TargetReadings * 60;
@@ -12391,7 +12615,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string datess = stDate.ToString();
+                        datess = datess.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(datess);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12410,7 +12636,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dates = stDate.ToString();
+                        dates = dates.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dates);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12420,7 +12648,9 @@ namespace RPMWeb.Dal
                         TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
                         TotalReading = (int)(t1.TotalSeconds - (code491.TargetReadings * 60));
 
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string date = stDate.ToString();
+                        date = date.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(date);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = TotalReading;
                         if (TotalReading < code491.TargetReadings * 60)
@@ -12440,7 +12670,9 @@ namespace RPMWeb.Dal
                     else
                     {
                         //Target reading 20
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateN = stDate.ToString();
+                        dateN = dateN.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateN);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = 0;
                         pbd.Total = code491.TargetReadings * 60;
@@ -12532,7 +12764,11 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
+
+
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12551,7 +12787,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string date = stDate.ToString();
+                        date = date.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(date);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12560,7 +12798,9 @@ namespace RPMWeb.Dal
                     {
                         TotalReading = code.TargetReadings * 60;
                     }
-                    pbd.BillingStartDate = (DateTime)stDate;
+                    string Newdate = stDate.ToString();
+                    Newdate = Newdate.Replace("Z", "");
+                    pbd.BillingStartDate = DateTime.Parse(Newdate);
                     pbd.CPTCode = code.BillingCode;
                     pbd.Completed = TotalReading;
                     pbd.Total = code.TargetReadings * 60;
@@ -12644,7 +12884,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12663,7 +12905,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string date = stDate.ToString();
+                        date = date.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(date);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12673,7 +12917,9 @@ namespace RPMWeb.Dal
                         TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
                         TotalReading = (int)(t1.TotalSeconds - (code487.TargetReadings * 60));
 
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = TotalReading;
 
@@ -12778,7 +13024,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12797,7 +13045,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string date = stDate.ToString();
+                        date = date.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(date);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12806,7 +13056,9 @@ namespace RPMWeb.Dal
                     {
                         TotalReading = code.TargetReadings * 60;
                     }
-                    pbd.BillingStartDate = (DateTime)stDate;
+                    string Newdate = stDate.ToString();
+                    Newdate = Newdate.Replace("Z", "");
+                    pbd.BillingStartDate = DateTime.Parse(Newdate);
                     pbd.CPTCode = code.BillingCode;
                     pbd.Completed = TotalReading;
                     pbd.Total = code.TargetReadings * 60;
@@ -12890,7 +13142,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string Newdate = stDate.ToString();
+                        Newdate = Newdate.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(Newdate);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -12909,7 +13163,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string date = stDate.ToString();
+                        date = date.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(date);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -12919,7 +13175,9 @@ namespace RPMWeb.Dal
                         TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
                         TotalReading = (int)(t1.TotalSeconds - (code424.TargetReadings * 60));
 
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = TotalReading;
                         if (TotalReading < code424.TargetReadings * 60)
@@ -12939,7 +13197,9 @@ namespace RPMWeb.Dal
                     else
                     {
                         //Target reading 20
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNews = stDate.ToString();
+                        dateNews = dateNews.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNews);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = 0;
                         pbd.Total = code424.TargetReadings * 60;
@@ -13031,7 +13291,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNews = stDate.ToString();
+                        dateNews = dateNews.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNews);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -13050,7 +13312,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -13059,7 +13323,9 @@ namespace RPMWeb.Dal
                     {
                         TotalReading = code.TargetReadings * 60;
                     }
-                    pbd.BillingStartDate = (DateTime)stDate;
+                    string dates = stDate.ToString();
+                    dates = dates.Replace("Z", "");
+                    pbd.BillingStartDate = DateTime.Parse(dates);
                     pbd.CPTCode = code.BillingCode;
                     pbd.Completed = TotalReading;
                     pbd.Total = code.TargetReadings * 60;
@@ -13143,7 +13409,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dates = stDate.ToString();
+                        dates = dates.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dates);
                         return pbd;
                     }
                     //var isEstablishedExist = PatientInteractiontim.Where(s => s.IsCallNote == 1).ToList();
@@ -13162,7 +13430,9 @@ namespace RPMWeb.Dal
                         pbd.Total = code.TargetReadings*60;
                         pbd.IsTargetMet = false;
                         pbd.ReadyTobill = 0;
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNew = stDate.ToString();
+                        dateNew = dateNew.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNew);
                         return pbd;
                     }
                     TotalReading = PatientInteractiontim.Sum(s => s.Duration);
@@ -13172,7 +13442,9 @@ namespace RPMWeb.Dal
                         TimeSpan t1 = TimeSpan.FromSeconds(TotalReading);
                         TotalReading = (int)(t1.TotalSeconds - (code426.TargetReadings * 60));
 
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateNw = stDate.ToString();
+                        dateNw = dateNw.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateNw);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = TotalReading;
                         if (TotalReading < code426.TargetReadings * 60)
@@ -13192,7 +13464,9 @@ namespace RPMWeb.Dal
                     else
                     {
                         //Target reading 20
-                        pbd.BillingStartDate = (DateTime)stDate;
+                        string dateN = stDate.ToString();
+                        dateN = dateN.Replace("Z", "");
+                        pbd.BillingStartDate = DateTime.Parse(dateN);
                         pbd.CPTCode = code.BillingCode;
                         pbd.Completed = 0;
                         pbd.Total = code426.TargetReadings * 60;
@@ -13210,7 +13484,7 @@ namespace RPMWeb.Dal
 
         }
 
-        public string DownloadInvoice(string Blob_Conn_String,string ContainerName, string ConnectionString)
+        public string DownloadInvoice(string Blob_Conn_String, string ContainerName, string ConnectionString)
         {
             string Uri = "";
             try
@@ -13409,8 +13683,8 @@ namespace RPMWeb.Dal
                     Reportlist = (List<PatientBillReportDetails>)Reportlist.Where(s => s.clinic == clinic).ToList();
                     isClinic = true;
                     isCptCode = true;
-                    if(Reportlist.Count>0)
-                    clinic = Reportlist[0].clinicname.ToString();
+                    if (Reportlist.Count>0)
+                        clinic = Reportlist[0].clinicname.ToString();
                 }
 
                 if (Reportlist.Count > 0)
@@ -13621,7 +13895,7 @@ namespace RPMWeb.Dal
             try
             {
                 string PatientNumber = dtblTable.Rows[0][2].ToString();
-               
+
                 PdfPTable table = new PdfPTable(dtblTable.Columns.Count);
                 System.IO.FileStream fs = new FileStream(strPdfPath, FileMode.Create, FileAccess.Write, FileShare.None);
                 Document document = new Document();
@@ -13682,8 +13956,8 @@ namespace RPMWeb.Dal
                 //Table header
                 BaseFont btnColumnHeader = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
                 Font fntColumnHeader = new Font(btnColumnHeader, 10, 1, BaseColor.WHITE);
-                
-                
+
+
                 for (int i = 0; i < dtblTable.Columns.Count; i++)
                 {
                     var cells = new PdfPCell() { HorizontalAlignment = Element.ALIGN_CENTER };
@@ -13753,7 +14027,7 @@ namespace RPMWeb.Dal
                         SqlDataReader reader = command.ExecuteReader();
 
                         PatientDocuments patientData = new PatientDocuments();
-       
+
                         while (reader.Read())
                         {
 
@@ -13789,12 +14063,12 @@ namespace RPMWeb.Dal
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {
                     SqlCommand command = new SqlCommand("usp_InsPatientSMSDetails", con);
-                    
+
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@CreatedBy", UserName);
-                    command.Parameters.AddWithValue("@PatientUserName",Info.PatientUserName);
-                    command.Parameters.AddWithValue("@fromNo",Info.fromNo);
-                    command.Parameters.AddWithValue("@toNo",Info.toNo);
+                    command.Parameters.AddWithValue("@PatientUserName", Info.PatientUserName);
+                    command.Parameters.AddWithValue("@fromNo", Info.fromNo);
+                    command.Parameters.AddWithValue("@toNo", Info.toNo);
                     command.Parameters.AddWithValue("@Body", Info.Body);
                     command.Parameters.AddWithValue("@SentDate", Info.SentDate);
                     command.Parameters.AddWithValue("@Direction", Info.Direction);
@@ -13833,9 +14107,9 @@ namespace RPMWeb.Dal
             }
             catch (Exception ex) { throw ex; }
         }
-        
+
         // for getting patient sms history (incoming and outgoing)
-        public List<GetSmsInfo> GetPatientSmsDetails(int PatientId, int PatientProgramId,DateTime StartDate, DateTime EndDate, string CreatedBy, string ConnectionString)
+        public List<GetSmsInfo> GetPatientSmsDetails(int PatientId, int PatientProgramId, DateTime StartDate, DateTime EndDate, string CreatedBy, string ConnectionString)
         {
             List<GetSmsInfo> fullsmsdetails = new List<GetSmsInfo>();
             try
@@ -13855,7 +14129,7 @@ namespace RPMWeb.Dal
                     returnParameter.Direction = ParameterDirection.ReturnValue;
                     con.Open();
                     SqlDataReader reader = command.ExecuteReader();
-                    
+
 
                     while (reader.Read())
                     {
@@ -13865,11 +14139,11 @@ namespace RPMWeb.Dal
                         info.Sender = reader["CreatedBy"].ToString();
                         info.Status = reader["Status"].ToString();
                         info.Direction = reader["Direction"].ToString();
-                        if(info.Direction== "inbound-api")
+                        if (info.Direction== "inbound-api")
                         {
                             info.Sender = "Patient";
                         }
-                        else if(info.Direction== "outbound-api")
+                        else if (info.Direction== "outbound-api")
                         {
                             info.Sender = "Care Team";
                         }
@@ -13898,7 +14172,7 @@ namespace RPMWeb.Dal
                     string insertQuery = "INSERT INTO twiliochatwebhook (author,Body,Attributes,AccountSid,ClientIdentity,EventType,Source,ConversationSid,ParticipantSid) VALUES (@author,@Body,@Attributes,@AccountSid,@ClientIdentity,@EventType,@Source,@ConversationSid,@ParticipantSid)";
                     using (SqlCommand command = new SqlCommand(insertQuery, con))
                     {
-                        command.Parameters.AddWithValue("@author", hook.author);
+                        command.Parameters.AddWithValue("@author", hook.Author);
                         command.Parameters.AddWithValue("@Body", hook.Body);
                         command.Parameters.AddWithValue("@Attributes", hook.Attributes);
 
@@ -13925,7 +14199,7 @@ namespace RPMWeb.Dal
             return true;
         }
 
-  
+
     }
 
 

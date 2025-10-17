@@ -108,6 +108,8 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
         ToUser = getIntent().getStringExtra("memberUsername") != null ? getIntent().getStringExtra("memberUsername") : "";
         FriendlyUsername = getIntent().getStringExtra("FriendlyUsername") != null ? getIntent().getStringExtra("FriendlyUsername") : "";
 
+        String fullName = getIntent().getStringExtra("memberFullName");
+
         if (FriendlyUsername.contains("-")) {
             FriendlyUsername = FriendlyUsername.split("-")[0];  // Take the part before "-"
         }
@@ -118,7 +120,8 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
 
         Log.d("memberusername", memberusername);
         chatMemberName = findViewById(R.id.chatMemName);
-        chatMemberName.setText(memberusername);
+
+        chatMemberName.setText(fullName != null ? fullName :memberusername);
 
         Log.d("ToUservalue:--", ToUser);
         Log.d("FriendlyUsernamevalue:-", FriendlyUsername);
@@ -171,51 +174,62 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
             @Override
             public void onClick(View view) {
                 String messageBody = writeMessageEditText.getText().toString();
-                // Check if the message is empty
+
                 if (messageBody.isEmpty()) {
-                    // Show a Toast message if the input is empty
-                    Toast.makeText(MessageActivity.this, "Message is empty. Please enter a message.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MessageActivity.this,
+                            "Message is empty. Please enter a message.",
+                            Toast.LENGTH_SHORT).show();
                 } else {
+                    //  Disable the button immediately
+                    sendChatMessageButton.setEnabled(false);
+
                     Log.d("messageBody", messageBody);
                     FileLogger.d("messageBody", messageBody);
 
-
                     if (messageBody.length() > 0) {
-                        // Case 1: When CONVERSATION_SID is null or empty, create and join a new conversation.
                         if (CONVERSATION_SID == null || CONVERSATION_SID.isEmpty()) {
                             Log.d("CONVERSATION_SID is null or empty", CONVERSATION_SID);
                             FileLogger.d("CONVERSATION_SID is null or empty", CONVERSATION_SID);
-                            ConversationsClient convClientVal = ConversationsClientManager.getInstance().getConvClient();
 
-                            // Create and join a new conversation, then send the message
-                            quickstartConversationsManager.createAndJoinConversation(ToUser, convClientVal, MessageActivity.this, Token, messagesAdapter, messageBody, Token, UserId);
+                            ConversationsClient convClientVal =
+                                    ConversationsClientManager.getInstance().getConvClient();
 
-                        }
-                        // Case 2: If CONVERSATION_SID is not null, check if we are already part of the conversation.
-                        else {
+                            quickstartConversationsManager.createAndJoinConversation(
+                                    ToUser, convClientVal, MessageActivity.this,
+                                    Token, messagesAdapter, messageBody, Token, UserId);
+
+                        } else {
                             Log.d("CONVERSATION_SID not null", CONVERSATION_SID);
                             FileLogger.d("CONVERSATION_SID not null", CONVERSATION_SID);
 
-                            // Check if the conversation is already joined or the user is already participating.
                             if (quickstartConversationsManager.isConversationParticipating(CONVERSATION_SID)) {
                                 Log.d("Already Participating", "Sending message to existing conversation.");
                                 FileLogger.d("Already Participating", "Sending message to existing conversation.");
                                 Log.d("ChatDebug", "Sending message. FromUser: " + UserId + ", ToUser: " + ToUser);
                                 FileLogger.d("ChatDebug", "Sending message. FromUser: " + UserId + ", ToUser: " + ToUser);
 
+                                quickstartConversationsManager.sendMessage(
+                                        messageBody, MessageActivity.this,
+                                        CONVERSATION_SID, Token, UserId,
+                                        FriendlyUsername, messagesAdapter);
 
-                                // Send message to the existing conversation
-                                quickstartConversationsManager.sendMessage(messageBody, MessageActivity.this, CONVERSATION_SID, Token, UserId, FriendlyUsername, messagesAdapter);
                             } else {
                                 Log.d("Not Participating", "Joining conversation and sending message.");
                                 FileLogger.d("Not Participating", "Joining conversation and sending message.");
 
-                                // If not yet participating, create, join, and send the message.
-                                ConversationsClient convClientVal = ConversationsClientManager.getInstance().getConvClient();
-                                quickstartConversationsManager.createAndJoinConversation(ToUser, convClientVal, MessageActivity.this, Token, messagesAdapter, messageBody, Token, UserId);
+                                ConversationsClient convClientVal =
+                                        ConversationsClientManager.getInstance().getConvClient();
+
+                                quickstartConversationsManager.createAndJoinConversation(
+                                        ToUser, convClientVal, MessageActivity.this,
+                                        Token, messagesAdapter, messageBody, Token, UserId);
                             }
                         }
                     }
+
+                    //  Re-enable the button after a small delay
+                    // (safe fallback if you don’t have callbacks for send completion yet)
+                    sendChatMessageButton.postDelayed(() -> sendChatMessageButton.setEnabled(true), 2000);
                 }
             }
         });
@@ -489,6 +503,16 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
     }
 
     @Override
+    public void onBackPressed() {
+        // do your custom logic first
+        quickstartConversationsManager.setLastReadIndex(CONVERSATION_SID, MessageActivity.this);
+
+        // then call super to finish the activity (same as pressing back normally)
+        super.onBackPressed();
+    }
+
+
+    @Override
     public void receivedNewMessage( boolean equals) {
         runOnUiThread(new Runnable() {
             @Override
@@ -670,11 +694,6 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
                         }
                         notifyDataSetChanged();
 
-//                        if (holder.editDeleteContainer.getVisibility() == View.VISIBLE) {
-//                            holder.editDeleteContainer.setVisibility(View.GONE);
-//                        } else {
-//                            holder.editDeleteContainer.setVisibility(View.VISIBLE);
-//                        }
                     }
                 });
 
@@ -719,11 +738,6 @@ public class MessageActivity extends AppCompatActivity implements QuickstartConv
                         }
                         notifyDataSetChanged();
 
-//                        if (holder.editDeleteContainer.getVisibility() == View.VISIBLE) {
-//                            holder.editDeleteContainer.setVisibility(View.GONE);
-//                        } else {
-//                            holder.editDeleteContainer.setVisibility(View.VISIBLE);
-//                        }
                     }
                 });
 

@@ -64,6 +64,8 @@ struct MessageListView: View {
     @ObservedObject var convItemViewModel: ConversationItemViewModel
     @State private var selectedMessageID: String? = nil
 
+    private var fromCreate: Bool
+    
     // The display name is computed here to avoid issues with initialization order.
     @State private var displayName: String = ""
     // MARK: View
@@ -116,11 +118,16 @@ struct MessageListView: View {
                                     }
 
                                 HStack (alignment: .top, spacing: 0){
-                                    
-                                    if messagesManager.messages.isEmpty {
+                                
+                                    let hasAnyMessages = !viewModel.readMessages.isEmpty || !viewModel.unreadReceivedMessages.isEmpty
+
+                                    if messagesManager.messages.isEmpty && !fromCreate && hasAnyMessages {
                                         ProgressView("Loading messages...Will take 2 minutes")
                                             .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    } else {
+                                    }
+
+                                    
+                                    else {
                                     LazyVStack(alignment: .leading) {
                                        
                                         ForEach(messagesManager.messages, id: \.sid) { message in
@@ -141,8 +148,10 @@ struct MessageListView: View {
                                 
                                 
                                 .onAppear {
+                                    print("messagepageappear:")
                                     guard let lastMessage = messagesManager.messages.last else { return }
                               
+                                    print("lastMessageMessageViewonappear:", lastMessage)
                                        proxy.scrollTo(lastMessage.sid, anchor: .bottom)
 
                                      print("viewModel.unreadReceivedMessages.count", viewModel.unreadReceivedMessages.count)
@@ -150,9 +159,7 @@ struct MessageListView: View {
                                     let isFirstLoad = (messageCount == 0)
                                     let hasUnreadMessages = viewModel.unreadReceivedMessages.count > 0
                                     let isOutgoing = lastMessage.direction == MessageDirection.outgoing.rawValue
-                                    
-                                     print("lastMessage:", lastMessage)
-                           
+                                   
                                     let shouldAutoScroll = isOutgoing || isFirstLoad || isNearBottom || hasUnreadMessages
                                    
                                     if shouldAutoScroll {
@@ -177,6 +184,24 @@ struct MessageListView: View {
                                     
                                     print("messageCount:", messageCount)
                                 }
+                                
+                                .onChange(of: messagesManager.messages) { messages in
+                                    
+                                    print("messagepages on change:")
+                                    guard let lastMessage = messages.last else { return }
+
+                                    proxy.scrollTo(lastMessage.sid, anchor: .bottom)
+                                    showNewMessageBanner = false
+                                    
+                                    // Mark all as read if needed
+                                    DispatchQueue.main.async(execute: markAllMessagesReadTask)
+                                    
+                                    messageCount = messages.count
+                                    print("Messages loaded, scrolled to bottom. messageCount:", messageCount)
+                                }
+
+                                
+                                
                          
                             }
                             
@@ -335,10 +360,11 @@ struct MessageListView: View {
                 })
                 
                 .onAppear(perform: {
-                    
+                    print("onappearheartbeat")
                     handleOnAppear()
                     
                     heartbeatTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { _ in
+                        print("HEARTBEATTIMER")
                            sendHeartbeat()
                        }
               
@@ -548,10 +574,11 @@ struct MessageListView: View {
     
  
     // MARK: Init
-    init(conversation: PersistentConversationDataItem, viewModel: MessageListViewModel,    convItemViewModel: ConversationItemViewModel) {
+    init(conversation: PersistentConversationDataItem, viewModel: MessageListViewModel,    convItemViewModel: ConversationItemViewModel,   fromCreate: Bool = false ) {
         self.conversation = conversation
         self.viewModel = viewModel
         self.convItemViewModel = convItemViewModel
+        self.fromCreate = fromCreate
     }
     
     /**
@@ -613,6 +640,7 @@ struct MessageListView: View {
     }
     
     private func sendHeartbeat() {
+        print("sendheartbeatmethodcall")
         let sid: String = conversation.sid ?? ""
         let user = UserDefaults.standard.string(forKey: "patientUserNameString") ?? "UnknownUser"
         

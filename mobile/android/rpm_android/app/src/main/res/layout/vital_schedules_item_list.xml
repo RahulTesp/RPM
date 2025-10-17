@@ -15,14 +15,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="10dp"
+
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/itemSchedIval"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_30dp"
+                android:text="Schedule"
+                android:textColor="@color/accent2"
+                android:textSize="16sp"
+                app:fontFamily="@font/rubik_semibold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_20dp"
+                android:layout_marginLeft="@dimen/margin_10dp"
                 android:text="Vital Monitoring"
                 android:textColor="@color/Primary_dark"
                 android:textSize="14sp"
@@ -52,6 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_20dp"
+                android:layout_marginLeft="@dimen/margin_10dp"
                 android:text="Schedule"
                 android:textColor="@color/Primary_dark"
                 android:textSize="14sp"
@@ -101,6 +113,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_10dp"
+                android:layout_marginLeft="@dimen/margin_10dp"
                 android:text="Intervals"
                 android:textColor="@color/Primary_dark"
                 android:textSize="14sp"
@@ -263,6 +276,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_20dp"
+                android:layout_marginLeft="@dimen/margin_10dp"
                 android:text="Normal Range"
                 android:textColor="@color/Primary_dark"
                 android:textSize="14sp"

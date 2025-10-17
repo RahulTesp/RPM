@@ -7,6 +7,7 @@ import autoTable from 'jspdf-autotable';
 import { PatientUtilService } from '../../patient-detail-page/Models/service/patient-util.service';
 import html2canvas from 'html2canvas';
 import { PatientReportApiService } from './patient-report-api.service';
+import { PatientDataDetailsService } from '../../patient-detail-page/Models/service/patient-data-details.service';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -14,10 +15,13 @@ import timezone from 'dayjs/plugin/timezone';
   providedIn: 'root',
 })
 export class DownloadPatientReportService {
+  vitals: any;
+  patientInfo: any;
   constructor(
     private datepipe: DatePipe,
     private patientReportService: ReportDataService,
     private rpmService: RPMService,
+    private patientService: PatientDataDetailsService,
     private patientUtilService: PatientUtilService,
     private patientReportApiService: PatientReportApiService
   ) {}
@@ -26,6 +30,9 @@ export class DownloadPatientReportService {
   private VitalsSevenDaysConsolidated: any[] = []; // 🟢 Store last 7 days vitals
   private reviewNotes: any;
   private callNotes: any;
+  private selectedVitals: any;
+  currentpPatientId: any;
+  currentProgramId: any;
 
   /**
    * Set main heading style for PDF
@@ -266,9 +273,7 @@ export class DownloadPatientReportService {
     healthTrends: any
   ): Promise<{ chartData: any; chartLabels: string[] }> {
     if (
-      !healthTrends ||
-      !healthTrends.Values ||
-      healthTrends.Values.length === 0
+      !healthTrends
     ) {
       return this.generateEmptyChartData();
     }
@@ -386,7 +391,7 @@ export class DownloadPatientReportService {
 
     return { chartData, chartLabels };
   }
-
+  allLineChartData: any=[];
   /**
    * Generate empty chart data when no data is available
    */
@@ -426,7 +431,6 @@ export class DownloadPatientReportService {
         lineTension: 0.5,
       })
     );
-
     return { chartData, chartLabels };
   }
 
@@ -435,6 +439,11 @@ export class DownloadPatientReportService {
    */
   convertDateforHealthTrends(dateArr: string[]): string[] {
     const formattedDates: string[] = [];
+
+    if (!Array.isArray(dateArr)) {
+      //console.error('Invalid input to convertDateforHealthTrends:', dateArr);
+      return formattedDates; // return empty array instead of crashing
+    }
 
     for (const dateVal of dateArr) {
       const dateParts = dateVal.split('+');
@@ -471,7 +480,6 @@ export class DownloadPatientReportService {
       // Combine date and time
       formattedDates.push(date + ' - ' + time);
     }
-
     return formattedDates;
   }
 
@@ -515,7 +523,7 @@ export class DownloadPatientReportService {
     this.renderCriticalEvents(doc, criticalAlerts, goalh);
   }
 
-  // ✅ Render Goals
+ /* // ✅ Render Goals
   private renderGoals(doc: jsPDF, goals: any[], startHeight: number): number {
     let goalh = startHeight;
     goals.forEach((goal) => {
@@ -569,18 +577,86 @@ export class DownloadPatientReportService {
     } else {
       doc.text('No Data', 20, goalh);
     }
+  }*/
+
+
+
+
+    
+private renderGoals(doc: jsPDF, goals: any[], startHeight: number): number {
+  let goalh = startHeight;
+  const pageHeight = doc.internal.pageSize.height;
+
+  goals.forEach(goal => {
+    // Page break check
+    if (goalh + 20 > pageHeight - 20) {
+      doc.addPage();
+      goalh = 20;
+    }
+
+    this.setSubHeadingStyle(doc);
+    doc.text(goal.Goal, 15, goalh);
+    const textWidth = doc.getTextWidth(goal.Goal);
+    doc.line(15, goalh + 1, 15 + textWidth, goalh + 1);
+
+    goalh += 6;
+    this.setContentStyle(doc);
+
+    const wrappedDescription = doc.splitTextToSize(goal.Description, 180);
+    doc.text(wrappedDescription, 20, goalh);
+    goalh += wrappedDescription.length * 5 + 4; // compact spacing
+  });
+
+  return goalh;
+}
+
+private renderCriticalEvents(doc: jsPDF, alerts: any[], startHeight: number): void {
+  // Always start on a new page
+  doc.addPage();
+  let goalh = 20; // Reset Y for new page
+  const pageHeight = doc.internal.pageSize.height;
+
+  this.setSubHeadingStyle(doc);
+  const eventsTitle = 'Critical Events';
+  doc.text(eventsTitle, 15, goalh);
+  const textWidth = doc.getTextWidth(eventsTitle);
+  doc.line(15, goalh + 1, 15 + textWidth, goalh + 1);
+  goalh += 6;
+
+  this.setContentStyle(doc);
+
+  if (alerts.length > 0) {
+    alerts.forEach(alert => {
+      // Page break check for long content
+      if (goalh + 20 > pageHeight - 20) {
+        doc.addPage();
+        goalh = 20;
+      }
+
+      const formattedDate = this.formatDate(alert.Time);
+      doc.text(formattedDate, 20, goalh);
+      goalh += 5;
+
+      const wrappedAlert = doc.splitTextToSize(alert.VitalAlert, 180);
+      doc.text(wrappedAlert, 20, goalh);
+      goalh += wrappedAlert.length * 5 + 4;
+    });
+  } else {
+    doc.text('No Data', 20, goalh);
   }
+}
+
   //Notes
 
   // ✅ Fetch and Populate Notes Details Recursively
   async populateNotesDetails(
     notes: any[],
-    programName: string,
+    idProgram: string,
     noteType: string
   ): Promise<any[]> {
     for (let i = 0; i < notes.length; i++) {
       const details = await this.patientReportApiService.getNoteDetails(
-        programName,
+        idProgram,
         noteType,
         notes[i].Id
       );
@@ -591,116 +667,283 @@ export class DownloadPatientReportService {
     return notes;
   }
 
-  generateCallNotesReport(doc: jsPDF, data: any[]): void {
-    this.Notesh = 30;
-    this.setSubHeadingStyle(doc);
+ 
+generateCallNotesReport(doc: jsPDF, data: any[]): void {
 
-    this.setPages(doc, 'Notes', 15);
-    this.drawLine(doc, 'Notes', 15);
-
+  const marginLeft = 20;
+  const maxWidth = 170;
+  const lineHeight = 6;
+  const pageHeight = doc.internal.pageSize.height;
+  this.Notesh = 30;
+  this.setSubHeadingStyle(doc);
+  this.setPages(doc, 'Notes', 15);
+  this.drawLine(doc, 'Notes', 15);
+  this.Notesh += 10;
+  doc.setFontSize(14);
+  
+  for (const notes of data) {
     this.Notesh += 10;
-    doc.setFontSize(14);
-
-    for (let notes of data) {
-      this.Notesh += 5;
       this.setSubHeadingStyle(doc);
       const formattedDate = this.datepipe.transform(
         this.convertToLocalTime(notes.CreatedOn)
       ) as string;
 
-      this.setPages(doc, formattedDate, 20);
-      this.drawLine(doc, formattedDate, 20);
+    this.setPages(doc, formattedDate, 20);
+    this.drawLine(doc, formattedDate, 20);
+    this.setContentStyle(doc);
+    this.Notesh += 5;
+    
+    this.addTextWithBreak(
+      doc,
+      `Duration : ${this.patientReportService.timeConvert(notes.Duration)}`,
+      marginLeft,
+      maxWidth,
+      lineHeight
+    );
 
-      this.setContentStyle(doc);
-      this.Notesh += 5;
-      this.setPages(
+    this.addTextWithBreak(doc, `Completed By : ${notes.CompletedBy}`, marginLeft, maxWidth, lineHeight);
+    this.addTextWithBreak(doc, `Note Type : ${notes.NoteType}`, marginLeft, maxWidth, lineHeight);
+    this.addTextWithBreak(doc, `Type : ${notes.Type}`, marginLeft, maxWidth, lineHeight);
+
+    if (notes.Type !== 'REVIEW') {
+      this.addTextWithBreak(
         doc,
-        `Duration : ${this.patientReportService.timeConvert(notes.Duration)}`,
-        20
+        `Call Established : ${notes.IsEstablished ? 'Yes' : 'No'}`,
+        marginLeft,
+        maxWidth,
+        lineHeight
       );
-      this.Notesh += 5;
-      this.setPages(doc, `Completed By : ${notes.CompletedBy}`, 20);
-      this.Notesh += 5;
-      this.setPages(doc, `Note Type : ${notes.NoteType}`, 20);
-      this.Notesh += 5;
-      this.setPages(doc, `Type : ${notes.Type}`, 20);
-      this.Notesh += 5;
-
-      if (notes.Type !== 'REVIEW') {
-        this.setPages(
-          doc,
-          `Call Established : ${notes.IsEstablished ? 'Yes' : 'No'}`,
-          20
-        );
-        this.Notesh += 5;
-        this.setPages(
-          doc,
-          `Care Giver : ${notes.IsCareGiver ? 'Yes' : 'No'}`,
-          20
-        );
-        this.Notesh += 5;
-      }
-
-      this.Notesh += 5;
-      this.processNoteDetails(doc, notes);
-      this.Notesh += 3;
+      this.addTextWithBreak(
+        doc,
+        `Care Giver : ${notes.IsCareGiver ? 'Yes' : 'No'}`,
+        marginLeft,
+        maxWidth,
+        lineHeight
+      );
     }
 
+    this.Notesh += 5;
+    this.processNoteDetails(doc, notes); // Make sure this method also uses splitTextToSize
+    this.checkPageBreak(doc);
+    this.Notesh += 3;
+  }
+
+  
+  this.Notesh += 20; // Add bottom spacing
+  doc.addPage();
+  //this.setMainHeadingStyle(doc);
+
+}
+
+private addTextWithBreak(
+  doc: jsPDF,
+  text: string,
+  x: number,
+  maxWidth: number,
+  lineHeight: number
+): void {
+  const lines = doc.splitTextToSize(text, maxWidth);
+  const pageHeight = doc.internal.pageSize.height;
+
+  // Reset font and color before adding text
+  this.setNormalStyle(doc);
+
+  if (this.Notesh + lines.length * lineHeight > pageHeight) {
     doc.addPage();
-    this.setMainHeadingStyle(doc);
-    // this.Report_HealthTrends();
+    this.Notesh = 30;
   }
 
-  // ✅ Process Note Details
-  private processNoteDetails(doc: jsPDF, notes: any): void {
-    if (!notes.NoteDetails) return;
+  doc.text(lines, x, this.Notesh);
+  this.Notesh += lines.length * lineHeight;
+}
+// ✅ Utility: Check and add page break if needed
+private checkPageBreak(doc: jsPDF, estimatedHeight: number = 0): void {
+  const pageHeight = doc.internal.pageSize.height;
+  const bottomMargin = 20;
 
-    for (let mainQuestion of notes.NoteDetails.MainQuestions) {
-      this.Notesh += 5;
-      this.setPages(doc, mainQuestion.Question, 20);
-      this.drawLine(doc, mainQuestion.Question, 20);
-      this.Notesh += 5;
+  if (this.Notesh + estimatedHeight > pageHeight - bottomMargin) {
+    doc.addPage();
+    this.Notesh = 30; // Reset top margin
+  }
+}
 
-      let hasCheckedAnswer = mainQuestion.AnswerTypes.some(
-        (answer: { Checked: any }) => answer.Checked
-      );
-      if (hasCheckedAnswer) {
-        mainQuestion.AnswerTypes.filter(
-          (answer: { Checked: any }) => answer.Checked
-        ).forEach((answer: { Answer: any }) => {
-          this.setPages(doc, `- ${answer.Answer}`, 25);
-          this.Notesh += 5;
-        });
-      } else {
-        this.setPages(doc, '- None', 25);
-        this.Notesh += 5;
-      }
+// ✅ Utility: Force wrap long words (fix for overflow issue)
+private forceWrapLongWords(text: string, maxWordLength: number = 50): string {
+  return text.replace(new RegExp(`(\\S{${maxWordLength}})`, 'g'), '$1 ');
+}
 
-      this.processSubQuestions(doc, mainQuestion.SubQuestions);
+// ✅ Render a block of text with wrapping and page-break handling
+private renderTextBlock(doc: jsPDF, text: string, x: number): void {
+  
+  this.setNormalStyle(doc);
+  const maxWidth = 170;
+  const lineHeight = 6;
 
-      if (mainQuestion.Notes) {
-        this.setPages(doc, `Extra Notes : ${mainQuestion.Notes}`, 25);
-        this.Notesh += 10;
-      }
+  // Apply long-word wrapping fix
+  const wrappedText = this.forceWrapLongWords(text);
+  const lines = doc.splitTextToSize(wrappedText, maxWidth);
+  const estimatedHeight = lines.length * lineHeight;
+
+  this.checkPageBreak(doc, estimatedHeight);
+  doc.text(lines, x, this.Notesh);
+
+  this.Notesh += estimatedHeight;
+}
+
+// ✅ Render section header with underline
+private renderSectionHeader(doc: jsPDF, title: string, x: number): void {
+  this.checkPageBreak(doc, 15);
+  this.setPages(doc, title, x);
+  this.drawLine(doc, title, x);
+  this.Notesh += 10;
+}
+
+// ✅ Render answers list
+/*private renderAnswers(doc: jsPDF, answers: any[], x: number): void {
+  if (answers.length > 0) {
+    for (const answer of answers) {
+      this.checkPageBreak(doc, 6);
+      this.setPages(doc, `- ${answer.Answer}`, x);
+      this.Notesh += 6;
     }
+  } else {
+    this.checkPageBreak(doc, 6);
+    this.setPages(doc, '- None', x);
+    this.Notesh += 6;
+  }
+ 
+}*/
 
-    if (notes.NoteDetails.Notes) {
-      this.Notesh += 5;
-      this.setPages(doc, 'Additional Notes', 20);
-      this.drawLine(doc, 'Additional Notes', 20);
-      this.Notesh += 5;
-      this.setPages(doc, notes.NoteDetails.Notes, 25);
-      this.Notesh += 15;
+private renderAnswers(doc: jsPDF, answers: any[], x: number): void {
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 15;
+  const maxWidth = pageWidth - margin * 2;
+  const lineHeight = 6;
+  this.setNormalStyle(doc);
+
+  if (answers.length > 0) {
+    for (const answer of answers) {
+      const wrappedText = doc.splitTextToSize(`- ${answer.Answer}`, maxWidth);
+
+      this.checkPageBreak(doc, wrappedText.length * lineHeight);
+      doc.text(wrappedText, x, this.Notesh);
+
+      this.Notesh += wrappedText.length * lineHeight;
+    }
+  } else {
+    const wrappedText = doc.splitTextToSize('- None', maxWidth);
+    this.checkPageBreak(doc, wrappedText.length * lineHeight);
+    doc.text(wrappedText, x, this.Notesh);
+    this.Notesh += wrappedText.length * lineHeight;
+  }
+}
+
+// ✅ Main: Process Note Details
+private processNoteDetails(doc: jsPDF, notes: any): void {
+  if (!notes.NoteDetails) return;
+
+  for (const mainQuestion of notes.NoteDetails.MainQuestions) {
+    this.renderSectionHeader(doc, mainQuestion.Question, 20);
+
+    const checkedAnswers = mainQuestion.AnswerTypes.filter((a: any) => a.Checked);
+    this.renderAnswers(doc, checkedAnswers, 25);
+
+    this.processSubQuestions(doc, mainQuestion.SubQuestions);
+
+    if (mainQuestion.Notes) {
+      this.renderTextBlock(doc, `Extra Notes : ${mainQuestion.Notes}`, 25);
     }
   }
+
+  if (notes.NoteDetails.Notes) {
+    this.renderSectionHeader(doc, 'Additional Notes', 20);
+    this.renderTextBlock(doc, notes.NoteDetails.Notes, 25);
+  }
+}
+
+
+/*private checkPageBreak(doc: jsPDF, estimatedHeight: number = 0): void {
+  const pageHeight = doc.internal.pageSize.height;
+  const bottomMargin = 20;
+
+  if (this.Notesh + estimatedHeight > pageHeight - bottomMargin) {
+    doc.addPage();
+    this.Notesh = 30;
+  }
+}
+
+private renderTextBlock(doc: jsPDF, text: string, x: number): void {
+  const maxWidth = 170;
+  const lineHeight = 6;
+  const lines = doc.splitTextToSize(text, maxWidth);
+  const estimatedHeight = lines.length * lineHeight;
+
+  this.checkPageBreak(doc, estimatedHeight);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text(lines, x, this.Notesh);
+
+  this.Notesh += estimatedHeight;
+}
+
+private renderSectionHeader(doc: jsPDF, title: string, x: number): void {
+  this.checkPageBreak(doc, 15);
+  this.setPages(doc, title, x);
+  this.drawLine(doc, title, x);
+  this.Notesh += 10;
+}
+
+private renderAnswers(doc: jsPDF, answers: any[], x: number): void {
+  if (answers.length > 0) {
+    for (const answer of answers) {
+      this.checkPageBreak(doc, 6);
+      this.setPages(doc, `- ${answer.Answer}`, x);
+      this.Notesh += 6;
+    }
+  } else {
+    this.checkPageBreak(doc, 6);
+    this.setPages(doc, '- None', x);
+    this.Notesh += 6;
+  }
+}
+
+private processNoteDetails(doc: jsPDF, notes: any): void {
+  if (!notes.NoteDetails) return;
+
+  for (const mainQuestion of notes.NoteDetails.MainQuestions) {
+    this.renderSectionHeader(doc, mainQuestion.Question, 20);
+
+    const checkedAnswers = mainQuestion.AnswerTypes.filter((a: any) => a.Checked);
+    this.renderAnswers(doc, checkedAnswers, 25);
+
+    this.processSubQuestions(doc, mainQuestion.SubQuestions);
+
+    if (mainQuestion.Notes) {
+      this.renderTextBlock(doc, `Extra Notes : ${mainQuestion.Notes}`, 25);
+    }
+  }
+
+  if (notes.NoteDetails.Notes) {
+    this.renderSectionHeader(doc, 'Additional Notes', 20);
+    this.renderTextBlock(doc, notes.NoteDetails.Notes, 25);
+  }
+}
+
+*/
 
   // ✅ Process Sub Questions
   private processSubQuestions(doc: jsPDF, subQuestions: any[]): void {
+    this.setNormalStyle(doc);
     subQuestions.forEach((subQuestion) => {
+       
       this.Notesh += 5;
+      this.checkPageSpace(doc);
       this.setPages(doc, subQuestion.Question, 25);
       this.drawLine(doc, subQuestion.Question, 25);
       this.Notesh += 5;
+      this.checkPageSpace(doc);
 
       let hasCheckedAnswer = subQuestion.AnswerTypes.some(
         (answer: { Checked: any }) => answer.Checked
@@ -709,15 +952,26 @@ export class DownloadPatientReportService {
         subQuestion.AnswerTypes.filter(
           (answer: { Checked: any }) => answer.Checked
         ).forEach((answer: { Answer: any }) => {
+          this.checkPageSpace(doc);
           this.setPages(doc, `- ${answer.Answer}`, 25);
           this.Notesh += 5;
         });
       } else {
+        this.checkPageSpace(doc);
         this.setPages(doc, '- None', 25);
         this.Notesh += 5;
       }
     });
   }
+
+  private checkPageSpace(doc: jsPDF, buffer: number = 20): void {
+    const pageHeight = doc.internal.pageSize.height;
+    if (this.Notesh + buffer > pageHeight) {
+      doc.addPage();
+      this.Notesh = 30; // Reset to top margin
+    }
+  }
+
   /**
    * Gets patient review notes, then call notes, and generates report sections
    */
@@ -727,7 +981,7 @@ export class DownloadPatientReportService {
     rpmEndDate: any,
     currentPatient: any,
     currentProgram: any,
-    patientProgramName: any
+    idProgram: any
   ): Promise<any[]> {
     try {
       // ✅ Fetch REVIEW Notes
@@ -742,7 +996,7 @@ export class DownloadPatientReportService {
       if (this.reviewNotes.length > 0) {
         this.reviewNotes = await this.populateNotesDetails(
           this.reviewNotes,
-          patientProgramName,
+          idProgram,
           'REVIEW'
         );
       }
@@ -754,7 +1008,7 @@ export class DownloadPatientReportService {
         rpmEndDate,
         currentPatient,
         currentProgram,
-        patientProgramName
+        idProgram
       );
 
       return combinedNotes;
@@ -773,7 +1027,7 @@ export class DownloadPatientReportService {
     rpmEndDate: any,
     currentPatient: any,
     currentProgram: any,
-    patientProgramName: any
+    idProgram: any
   ): Promise<any[]> {
     try {
       // Fetch CALL Notes
@@ -789,7 +1043,7 @@ export class DownloadPatientReportService {
       if (this.callNotes.length > 0) {
         this.callNotes = await this.populateNotesDetails(
           this.callNotes,
-          patientProgramName,
+          idProgram,
           'CALL'
         );
       }
@@ -887,8 +1141,8 @@ export class DownloadPatientReportService {
 
     this.drawsymptomsLine(doc, title, 15);
     this.symptomh += 10;
-
-    if (data.length > 0) {
+    if(data && data.length > 0){
+    //if (data.length > 0) {
       renderFunction(doc, data);
     } else {
       doc.text('', 15, this.symptomh + 10);
@@ -939,11 +1193,12 @@ export class DownloadPatientReportService {
       med.MedicineSchedule,
       this.ProcessSchedules(med),
       this.datepipe.transform(
-        this.convertToLocalTime(med.StartDate)!,
+        med.StartDate!,
         'MMM d, y'
       ),
       this.datepipe.transform(
         this.convertToLocalTime(med.EndDate)!,
+        med.EndDate!,
         'MMM d, y'
       ),
     ]);
@@ -1030,7 +1285,7 @@ export class DownloadPatientReportService {
 
     return intervals.length > 0 ? intervals.join(' - ') : 'None';
   }
-
+  // Manjusha code change
   generateHealthTrendsTable(doc: jsPDF, vitalData: any): void {
     this.vitalsConsolidated = [];
     const vitals = {
@@ -1067,31 +1322,37 @@ export class DownloadPatientReportService {
         ],
         vitals.BloodGlucose,
         'BloodGlucoseReadings',
-        this.BloodGlucoseReportDisplayTest
+        this.BloodGlucoseReportDisplayTest.bind(this)
       );
-    } else if (vitals.BloodPressure?.length > 0) {
+    }
+    if (vitals.BloodPressure?.length > 0) {
       this.generateVitalTable(
         doc,
         'Blood Pressure Readings',
         ['Date', 'Time', 'SBP', 'DBP', 'Pulse', 'Remarks'],
         vitals.BloodPressure,
-        'BloodPressureReadings'
+        'BloodPressureReadings',
+        this.formatBloodPressureRow
       );
-    } else if (vitals.BloodOxygen?.length > 0) {
+    }
+    if (vitals.BloodOxygen?.length > 0) {
       this.generateVitalTable(
         doc,
         'Blood Oxygen Readings',
         ['Date', 'Time', 'Oxygen', 'Pulse', 'Remarks'],
         vitals.BloodOxygen,
-        'BloodOxygenReadings'
+        'BloodOxygenReadings',
+        this.formatBloodOxygenRow
       );
-    } else if (vitals.Weight?.length > 0) {
+    }
+    if (vitals.Weight?.length > 0) {
       this.generateVitalTable(
         doc,
         'Weight Readings',
-        ['Date', 'Time', 'Schedule', 'Weight', 'Remarks'],
+        ['Date', 'Time', 'Weight', 'Remarks'],
         vitals.Weight,
-        'WeightReadings'
+        'WeightReadings',
+        this.formatWeightRow
       );
     }
   }
@@ -1106,9 +1367,23 @@ export class DownloadPatientReportService {
     formatter?: (data: any) => string[]
   ): void {
     let rows: string[][] = [];
+    const vitalTypeMap: { [key: string]: string } = {
+      BloodPressureReadings: 'Blood Pressure',
+      BloodGlucoseReadings: 'Blood Glucose',
+      BloodOxygenReadings: 'Oxygen',
+      WeightReadings: 'Weight',
+    };
+    const vitalType = vitalTypeMap[readingType];
+
+    // 🏷️ Add Title Above Table
+    const startY = this.currentY || 30;
+    doc.setFontSize(12);
+    doc.text(title, 15, startY);
+    const tableStartY = startY + 7;
 
     for (let vital of vitalData) {
       for (let reading of vital[readingType]) {
+        reading.VitalType = vitalType;
         this.vitalsConsolidated.push(reading); // 🟢 Store consolidated readings
 
         let temp = formatter
@@ -1121,10 +1396,41 @@ export class DownloadPatientReportService {
     autoTable(doc, {
       head: [columns],
       body: rows,
-      startY: 105,
+      startY: tableStartY,
       didParseCell: this.formatTableCells,
     });
+    const docAny = doc as any;
+    this.currentY = docAny.lastAutoTable?.finalY + 10 || tableStartY + rows.length * 10;
   }
+  private formatBloodPressureRow = (reading: any): string[] => {
+    return [
+      this.datepipe.transform(reading.ReadingTime) ?? 'N/A',
+      this.datepipe.transform(reading.ReadingTime, 'h:mm a') ?? 'N/A',
+      reading.Systolic ?? '-',
+      reading.Diastolic ?? '-',
+      reading.Pulse ?? '-',
+      reading.Remarks ?? '-',
+    ];
+  };
+
+  private formatBloodOxygenRow = (reading: any): string[] => {
+    return [
+      this.datepipe.transform(reading.ReadingTime) ?? 'N/A',
+      this.datepipe.transform(reading.ReadingTime, 'h:mm a') ?? 'N/A',
+      reading.Oxygen ?? '-',
+      reading.Pulse ?? '-',
+      reading.Remarks ?? '-',
+    ];
+  };
+
+  private formatWeightRow = (reading: any): string[] => {
+    return [
+      this.datepipe.transform(reading.ReadingTime) ?? 'N/A',
+      this.datepipe.transform(reading.ReadingTime, 'h:mm a') ?? 'N/A',
+      reading.BWlbs ?? '-',
+      reading.Remarks ?? '-',
+    ];
+  };
 
   // ✅ Format Vital Row Data
   private formatVitalRow(reading: any): string[] {
@@ -1271,11 +1577,8 @@ export class DownloadPatientReportService {
     return vitalDataArray;
   }
 
-  // setVitalsData(vitalsSevenDays: any[]): void {
-  //   this.VitalsSevenDaysConsolidated = vitalsSevenDays;
-  // }
-
-  generateVitalReadingSummary(doc: jsPDF): void {
+  // Manjusha code change
+  async generateVitalReadingSummary(doc: jsPDF,currentpPatientId:any, currentProgramId:any): Promise<void> {
     doc.addPage();
     this.setSubHeadingStyle(doc);
 
@@ -1283,82 +1586,178 @@ export class DownloadPatientReportService {
     doc.text(statSumm, 15, 20);
     const textWidth = doc.getTextWidth(statSumm);
     doc.line(15, 21, 15 + textWidth, 21);
-
-    const columns = [
-      'Days of Reading',
-      'Selected Last 7 days',
-      'Selected Last 30 Days',
-    ];
-    const rows: string[][] = [];
-
-    rows.push([
-      'Total Days of Reading',
-      this.VitalsSevenDaysConsolidated.length.toString(),
-      this.vitalsConsolidated.length.toString(),
-    ]);
-
-    const critical7 = this.VitalsSevenDaysConsolidated.filter(
-      (data) => data.Status === 'Critical'
+    this.patientInfo = await this.patientService.fetchPatientInfo(
+      currentpPatientId,
+      currentProgramId
     );
-    const critical30 = this.vitalsConsolidated.filter(
-      (data) => data.Status === 'Critical'
-    );
-    rows.push([
-      'Critical Readings',
-      critical7.length.toString(),
-      critical30.length.toString(),
-    ]);
+    this.vitals = this.patientInfo.PatientProgramdetails.PatientVitalInfos;
+    if (this.vitals) {
+      const selectedVitals = this.vitals
+        .filter((v: any) => v.Selected)
+        .map((v: any) => v.Vital);
+      this.selectedVitals = selectedVitals;
+    }
+    let currentY = 30;
+    this.selectedVitals.forEach((vital: string) => {
+      doc.setFontSize(12);
+      doc.text(`${vital} - Summary`, 15, currentY);
 
-    const cautious7 = this.VitalsSevenDaysConsolidated.filter(
-      (data) => data.Status === 'Cautious'
-    );
-    const cautious30 = this.vitalsConsolidated.filter(
-      (data) => data.Status === 'Cautious'
-    );
-    rows.push([
-      'Cautious Readings',
-      cautious7.length.toString(),
-      cautious30.length.toString(),
-    ]);
+      currentY += 5;
+      const columns = [
+        'Days of Reading',
+        'Selected Last 7 days',
+        'Selected Last 30 Days',
+      ];
+      const rows: string[][] = [];
 
-    autoTable(doc, {
-      head: [columns],
-      body: rows,
-      startY: 30,
-    });
-  }
-  generateDaysVitals(vitalData: any): void {
-    this.VitalsSevenDaysConsolidated = [];
+      // 🔍 Filter 7-day and 30-day data for current vital
+      const vitalKeyMap: { [key: string]: string } = {
+        'Blood Pressure': 'BloodPressure',
+        'Blood Glucose': 'BloodGlucose',
+        'Oxygen': 'BloodOxygen',
+        'Weight': 'Weight',
+      };
+      const vitalKey = vitalKeyMap[vital];
+      const vital7 = this.VitalsSevenDaysConsolidated.filter(
+        (v) => v.VitalType === vital
+      );
+      const vital30 = this.vitalsConsolidated.filter(
+        (v) => v.VitalType === vital
+      );
+      // Total Days
+      rows.push([
+        'Total Days of Reading',
+        Object.keys(this.groupByDate(vital7)).length.toString(),
+        Object.keys(this.groupByDate(vital30)).length.toString(),
+      ]);
 
-    const vitals = {
-      BloodGlucose: this.patientUtilService.newVitalreadingData(
-        vitalData.BloodGlucose,
-        'BloodGlucoseReadings'
-      ),
-      BloodPressure: this.patientUtilService.newVitalreadingData(
-        vitalData.BloodPressure,
-        'BloodPressureReadings'
-      ),
-      BloodOxygen: this.patientUtilService.newVitalreadingData(
-        vitalData.BloodOxygen,
-        'BloodOxygenReadings'
-      ),
-      Weight: this.patientUtilService.newVitalreadingData(
-        vitalData.Weight,
-        'WeightReadings'
-      ),
-    };
+      // Critical
+      const critical7 = vital7.filter((v) => v.Status === 'Critical');
+      const critical30 = vital30.filter((v) => v.Status === 'Critical');
+      rows.push([
+        'Critical Readings',
+        Object.keys(this.groupByDate(critical7)).length.toString(),
+        Object.keys(this.groupByDate(critical30)).length.toString(),
+      ]);
 
-    Object.values(vitals).forEach((vitalArray: any) => {
-      if (vitalArray?.length > 0) {
-        for (let vital of vitalArray) {
-          const readingsKey = Object.keys(vital)[1]; // Extract reading key dynamically
-          for (let reading of vital[readingsKey]) {
-            this.VitalsSevenDaysConsolidated.push(reading);
+      // Cautious
+      const cautious7 = vital7.filter((v) => v.Status === 'Cautious');
+      const cautious30 = vital30.filter((v) => v.Status === 'Cautious');
+      rows.push([
+        'Cautious Readings',
+        Object.keys(this.groupByDate(cautious7)).length.toString(),
+        Object.keys(this.groupByDate(cautious30)).length.toString(),
+      ]);
+
+      autoTable(doc, {
+        head: [columns],
+        body: rows,
+        startY: currentY + 5,
+        styles: { fontSize: 10 },
+        didDrawPage: (data) => {
+          if (data.cursor) {
+            currentY = data.cursor.y + 10;
           }
         }
-      }
+      });
     });
+  }
+
+  groupByDate(vitalDataArray: any[]) {
+    const groups = vitalDataArray.reduce((groups: any, vitals: any) => {
+        const date = vitals.DateData.split(' ')[0]; // Extract date without time
+        if (!groups[date]) {
+            groups[date] = [];
+        }
+        groups[date].push(vitals);
+        return groups;
+    }, {});
+
+    return groups;
+  }
+
+  convertDate(dateval: any) {
+    let today = new Date(dateval);
+    let dd = today.getDate();
+    let dd2;
+    if (dd < 10) {
+      dd2 = '0' + dd;
+    } else {
+      dd2 = dd;
+    }
+    let mm = today.getMonth() + 1;
+    let mm2;
+    if (mm < 10) {
+      mm2 = '0' + mm;
+    } else {
+      mm2 = mm;
+    }
+    const yyyy = today.getFullYear();
+    dateval = yyyy + '-' + mm2 + '-' + dd2;
+    return dateval;
+  }
+
+  http_7day_vitalDataReport: any;
+  generateDaysVitals(vitalData: any): void {
+    this.VitalsSevenDaysConsolidated = [];
+    this.http_7day_vitalDataReport = vitalData;
+    var vitalBloodPressure =
+      this.http_7day_vitalDataReport &&
+      this.patientUtilService.newVitalreadingData(
+        this.http_7day_vitalDataReport.BloodPressure,
+        'BloodPressureReadings'
+      );
+
+    var vitalGlucoseData =
+      this.http_7day_vitalDataReport &&
+      this.patientUtilService.newVitalreadingData(
+        this.http_7day_vitalDataReport.BloodGlucose,
+        'BloodGlucoseReadings'
+      );
+
+    var VitalOxygen =
+      this.http_7day_vitalDataReport &&
+      this.patientUtilService.newVitalreadingData(
+        this.http_7day_vitalDataReport.BloodOxygen,
+        'BloodOxygenReadings'
+      );
+
+    var VitalWight =
+      this.http_7day_vitalDataReport &&
+      this.patientUtilService.newVitalreadingData(
+        this.http_7day_vitalDataReport.Weight,
+        'WeightReadings'
+      );
+
+    if (vitalGlucoseData && vitalGlucoseData.length > 0) {
+      for (let vl of vitalGlucoseData) {
+        for (let vv of vl.BloodGlucoseReadings) {
+          vv.VitalType = 'Blood Glucose';
+          this.VitalsSevenDaysConsolidated.push(vv);
+        }
+      }
+    } if (vitalBloodPressure && vitalBloodPressure.length > 0) {
+      for (let vl of vitalBloodPressure) {
+        for (let vv of vl.BloodPressureReadings) {
+          vv.VitalType = 'Blood Pressure';
+          this.VitalsSevenDaysConsolidated.push(vv);
+        }
+      }
+    } if (VitalOxygen && VitalOxygen.length > 0) {
+      for (let vl of VitalOxygen) {
+        for (let vv of vl.BloodOxygenReadings) {
+          vv.VitalType = 'Oxygen';
+          this.VitalsSevenDaysConsolidated.push(vv);
+        }
+      }
+    } if (VitalWight && VitalWight.length > 0) {
+      for (let vl of VitalWight) {
+        for (let vv of vl.WeightReadings) {
+          vv.VitalType = 'Weight';
+          this.VitalsSevenDaysConsolidated.push(vv);
+        }
+      }
+    }
   }
 
   getVitalsSevenDays(): any[] {
@@ -1376,35 +1775,39 @@ export class DownloadPatientReportService {
     return val ? flg : '0';
   }
 
+  currentY: number = 10;
   async captureHealthTrendsChart(
     doc: jsPDF,
-    chartElement: HTMLElement
+    chartElement: HTMLElement,
+    title: string
   ): Promise<jsPDF> {
     return new Promise((resolve, reject) => {
       try {
         // Make chart visible for capturing
         chartElement.style.visibility = 'visible';
-
         html2canvas(chartElement)
           .then((canvas) => {
             try {
-              // Set heading style and add title
-              this.setSubHeadingStyle(doc);
-              const healthTrends = 'Patient Health Trends';
-              doc.text(healthTrends, 15, 20);
+              // 🔹 Chart-specific heading
+            doc.setFontSize(12);
+            doc.text(title, 15, this.currentY);
 
-              // Add underline
-              doc.setDrawColor('black');
-              const textWidth = doc.getTextWidth(healthTrends);
-              doc.line(15, 21, 15 + textWidth, 21);
+            // Add underline
+            doc.setDrawColor('black');
+            const textWidth = doc.getTextWidth(title);
+            doc.line(15, this.currentY + 1, 15 + textWidth, this.currentY + 1);
 
-              // Add chart image to PDF
-              const imgData = canvas.toDataURL('image/jpeg', 1.0);
-              doc.addImage(imgData, 10, 35, 180, 65);
+            // Add chart image
+            const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            const imageY = this.currentY + 6;
+            const imageHeight = 65;
+            doc.addImage(imgData, 10, imageY, 180, imageHeight);
 
-              // Hide the chart element again
-              // chartElement.style.visibility = 'hidden';
-
+            this.currentY = imageY + imageHeight + 15;
+              if (this.currentY > 270) {
+                doc.addPage();
+                this.currentY = 20;
+              }
               resolve(doc);
             } catch (error) {
               console.error('Error processing chart canvas:', error);
@@ -1423,6 +1826,14 @@ export class DownloadPatientReportService {
         reject(error);
       }
     });
+  }
+
+  getChartCurrentY(): number {
+    return this.currentY;
+  }
+
+  resetPosition(): void {
+    this.currentY = 30;
   }
 
   generateReportHeading(doc: any, startDate: any, endDate: any) {
@@ -1464,13 +1875,37 @@ export class DownloadPatientReportService {
     doc.line(x, this.symptomh + 1, x + textWidth, this.symptomh + 1);
   }
   // ✅ Utility function: Set Text on Page
-  private setPages(doc: jsPDF, text: string, x: number): void {
-    doc.text(text, x, this.Notesh);
+  private setPages(doc: jsPDF, text: string, x: number): void { 
+   this.setNormalStyle(doc);
+   const pageWidth = doc.internal.pageSize.getWidth();
+   const margin = 15; // left/right margin
+   const maxWidth = pageWidth - margin * 2; // available width for text
+  // Split text into multiple lines to fit within maxWidth
+   const wrappedText = doc.splitTextToSize(text, maxWidth);
+   doc.text(wrappedText, x, this.Notesh);
   }
-  private setSymptomPages(doc: jsPDF, text: string, x: number): void {
-    doc.text(text, x, this.symptomh);
-    doc.setTextColor('black');
+  
+private setSymptomPages(doc: jsPDF, text: string, x: number): void {
+  this.setNormalStyle(doc);
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 15;
+  const maxWidth = pageWidth - margin * 2;
+  const wrappedText = doc.splitTextToSize(text, maxWidth);
+
+  // Check if content fits on current page
+  if (this.symptomh + wrappedText.length * 6 > pageHeight - 20) {
+    doc.addPage();
+    this.symptomh = 20; // reset Y for new page
   }
+
+  doc.text(wrappedText, x, this.symptomh);
+  // Compact spacing
+  this.symptomh += wrappedText.length * 5 + 4;
+}
+
+  
+
 
   // ✅ Format Date (Assuming you have a function for this)
   private formatDate(dateStr: string): string {
@@ -1571,4 +2006,13 @@ export class DownloadPatientReportService {
   // Convert UTC → Local and format
   return dayjs.utc(normalized).local().format('MM/DD/YYYY');
 }
+
+
+
+private setNormalStyle(doc: jsPDF): void {
+  doc.setFont('helvetica', 'normal');  // Normal font
+  doc.setFontSize(12);                 // Standard size
+  doc.setTextColor(0, 0, 0);           // Black color
+}
+
 }

@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import com.rpm.clynx.activity.ChangePassword;
+import com.rpm.clynx.home.Home;
 import com.rpm.clynx.utility.DataBaseHelper;
 import com.rpm.clynx.R;
 import org.json.JSONArray;
@@ -60,79 +61,81 @@ public class PersonalFragment extends Fragment {
 
         return  view;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("getDbData","ONRESUME");
+        Home activity = (Home) getActivity();
+        if (activity != null) {
+            // Fetch profile and update UI after DB is updated
+            activity.getpatientprofile(() -> {
+                if (isAdded()) { // make sure fragment is attached
+                    getActivity().runOnUiThread(this::getDbData);
+                }
+            });
+        }
+    }
     private void changepw() {
         Intent more = new Intent(getContext(), ChangePassword.class);
         startActivity(more);
     }
     private void getDbData() {
-        JSONObject object = null;
-        StringBuilder PersonalData = new StringBuilder();
-       Cursor dbData =  db.getdata();
-       Log.d("Cursor_dbPersonalFragmentData",dbData.toString());
-       if (dbData != null){
-           dbData.moveToFirst();
-       }do {
-           String dataDB = dbData.getString(0);
+       // JSONObject object = null;
+       // StringBuilder PersonalData = new StringBuilder();
 
-            PersonalData.append(dataDB);
+        Cursor dbData = db.getdata();
+        Log.d("Cursor_dbPersonalFragmentData", dbData.toString());
 
-       }while (dbData.moveToNext());
-        Log.d("PersonalFragmentData",PersonalData.toString());
-        try {
-            JSONArray jsonArry = new JSONArray(PersonalData.toString());
-            Log.d("JSONObject",jsonArry.toString());
+        if (dbData != null) {
+            if (dbData.moveToFirst()) {  // Only proceed if there is at least one row
+                StringBuilder PersonalData = new StringBuilder();
+                do {
+                    String dataDB = dbData.getString(0);
+                    PersonalData.append(dataDB);
+                } while (dbData.moveToNext());
 
-            for(int n = 0; n < jsonArry.length(); n++)
-            {
-                object = jsonArry.getJSONObject(n);
-                // do some stuff....
+                Log.d("PersonalFragmentData", PersonalData.toString());
+
+                try {
+                    JSONArray jsonArry = new JSONArray(PersonalData.toString());
+                    JSONObject object = jsonArry.getJSONObject(0);  // Assuming first object is needed
+
+                    first_name.setText(object.optString("FirstName", ""));
+                    middle_name.setText(object.optString("MiddleName", ""));
+                    last_name.setText(object.optString("LastName", ""));
+
+                    String DOb = object.optString("DOB", "");
+                    if (!DOb.isEmpty()) {
+                        SimpleDateFormat inputFormat = new SimpleDateFormat("M/d/yyyy h:mm:ss a", Locale.US);
+                        SimpleDateFormat outputFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
+                        try {
+                            Date inputDate = inputFormat.parse(DOb);
+                            Dob.setText(outputFormat.format(inputDate));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    String Gender = object.optString("Gender", "");
+                    if (Gender.equalsIgnoreCase("M")) gender.setText("Male");
+                    else if (Gender.equalsIgnoreCase("F")) gender.setText("Female");
+
+                    height.setText(object.optString("Height", "") + " Feet");
+                    weight.setText(object.optString("Weight", "") + " Pounds");
+                    Email.setText(object.optString("Email", ""));
+                    Primary_Mobile_no.setText(object.optString("PhoneNo", ""));
+                    alternate_Mobile_no.setText(object.optString("AlternateMobNo", ""));
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Log.d("PersonalFragment", "No data found in DB");
             }
-            String First_name = object.getString("FirstName");
-            first_name.setText(First_name);
-
-            String Middle_name = object.getString("MiddleName");
-            middle_name.setText(Middle_name);
-
-            String Last_name = object.getString("LastName");
-            last_name.setText(Last_name);
-
-            String DOb = object.getString("DOB");
-            SimpleDateFormat inputFormat = new SimpleDateFormat("M/d/yyyy h:mm:ss a", Locale.US);
-            SimpleDateFormat outputFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
-
-            if (DOb!=null && DOb.length()>0)
-            try {
-                Date inputDate = inputFormat.parse(DOb);
-                String outputDateStr = outputFormat.format(inputDate);
-                System.out.println(outputDateStr); // Output: Apr 17, 1951
-                Dob.setText(outputDateStr);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            String Gender = object.getString("Gender");
-            if(Gender.toUpperCase().equals("M"))
-                gender.setText("Male");
-            else if (Gender.toUpperCase().equals("F"))
-                gender.setText("Female");
-
-            String Height = object.getString("Height");
-            height.setText(Height + " Feet");
-
-            String Weight = object.getString("Weight");
-            weight.setText(Weight + " Pounds");
-
-            String email = object.getString("Email");
-            Email.setText(email);
-
-            String primary_Mobile_no = object.getString("PhoneNo");
-            Primary_Mobile_no.setText(primary_Mobile_no);
-
-            String Alternate_Mobile_no = object.getString("AlternateMobNo");
-            alternate_Mobile_no.setText(Alternate_Mobile_no);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+            dbData.close(); // Always close cursor
+        } else {
+            Log.d("PersonalFragment", "Cursor is null");
         }
     }
 }

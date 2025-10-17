@@ -1,13 +1,11 @@
 package com.rpm.clynx.fragments;
 
 import static com.rpm.clynx.utility.Links.BASE_URL;
-import static com.rpm.clynx.utility.Links.CALL_REJECT;
+import static com.rpm.clynx.utility.Links.FB_TOK_DELETE;
 import static com.rpm.clynx.utility.Links.FB_TOK_SAVE;
 import static com.rpm.clynx.utility.Links.LOGIN;
 import static com.rpm.clynx.utility.Links.LOGOUT;
 import static com.rpm.clynx.utility.Links.MEMBERS_LIST;
-import static com.rpm.clynx.utility.Links.PATIENT_PROFILE;
-import static com.rpm.clynx.utility.Links.VIDEOCALL;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.NotificationChannel;
@@ -24,6 +22,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +34,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -52,11 +53,9 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.rpm.clynx.R;
-import com.rpm.clynx.activity.VideoCallTwilio;
 import com.rpm.clynx.auth.GenerateOTP;
 import com.rpm.clynx.auth.OTP;
 import com.rpm.clynx.home.Home;
-import com.rpm.clynx.service.NotificationReceiver;
 import com.rpm.clynx.utility.ConversationsClientManager;
 import com.rpm.clynx.utility.DataBaseHelper;
 import com.rpm.clynx.utility.FileLogger;
@@ -70,7 +69,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
 
 public class Login extends AppCompatActivity  implements QuickstartConversationsManagerListener {
     DataBaseHelper db;
@@ -83,96 +81,13 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
     String tokenOld,token, mobileNumber;
     String role,programname;
     int timeLimit;
-    String valUserID,valPassWord,  toUsername;
+    String valUserID,valPassWord;
     private static final String TAG = "Login";
     String firebasetoken;
-    private String title,body;
-    AlertDialog alertDialog;
     private Handler handler;
     Activity latestActivity;
-    private String videocallToken;
     private final QuickstartConversationsManager quickstartConversationsManager = new QuickstartConversationsManager(this);
     private static Login logininstance;
-    String roomnameVal,tokenid, callStatus;
-    private boolean isCallJoined = false; // Tr
-    private Handler alertHandler;
-    private Runnable alertTimeoutRunnable;// ack whether the user has joined the call
-
-    private BroadcastReceiver notificationReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d("loginnotialert", "loginnotialert");
-            FileLogger.d("videologinnotialert", "loginnotialert");
-
-            if (intent.getAction().equals(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED)) {
-                FileLogger.d("notificationReceiver1", "ACTION_NOTIFICATION_RECEIVED received");
-
-                // Handle the received notification data
-                Bundle notificationData = intent.getBundleExtra(NotificationReceiver.EXTRA_NOTIFICATION_DATA);
-                if (notificationData == null) {
-                    Log.d("notificationReceiver", "notificationData is null");
-                    FileLogger.d("notificationReceiver2", "notificationData is null");
-                    return;
-                }
-
-                title = notificationData.getString("title");
-                body = notificationData.getString("body");
-
-                Log.d("notificationReceiver", "Notification title: " + title);
-                Log.d("notificationReceiver", "Notification body: " + body);
-                FileLogger.d("notificationReceiver3", "Notification title: " + title);
-                FileLogger.d("notificationReceiver4", "Notification body: " + body);
-
-                if (body != null) {
-                    FileLogger.d("notificationReceiver5", "alert success");
-
-                    int atSymbolIndex = body.indexOf("@");
-                    int hashIndex = body.indexOf("#");
-
-                    if (atSymbolIndex != -1 && hashIndex != -1 && atSymbolIndex < hashIndex) {
-                        roomnameVal = body.substring(0, atSymbolIndex);
-                        tokenid = body.substring(atSymbolIndex + 1, hashIndex);
-                        callStatus = body.substring(hashIndex + 1);
-
-                        Log.d("callbody", body);
-                        Log.d("CallStatusfrombody", callStatus);
-                        Log.d("roomnameVal", roomnameVal);
-                        Log.d("TokenID", tokenid);
-
-                        FileLogger.d("notificationReceiver6", "callbody: " + body);
-                        FileLogger.d("notificationReceiver7", "CallStatusfrombody: " + callStatus);
-                        FileLogger.d("notificationReceiver8", "roomnameVal: " + roomnameVal);
-                        FileLogger.d("notificationReceiver9", "TokenID: " + tokenid);
-
-                        int firstUnderscoreIndex = body.indexOf('_');
-                        if (firstUnderscoreIndex != -1) {
-                            int secondUnderscoreIndex = body.indexOf('_', firstUnderscoreIndex + 1);
-                            if (secondUnderscoreIndex != -1) {
-                                toUsername = body.substring(0, secondUnderscoreIndex);
-                                Log.d("toUsername", toUsername);
-                                FileLogger.d("notificationReceiver10", "toUsername: " + toUsername);
-                            } else {
-                                Log.d("CutString", "Only one underscore found");
-                                FileLogger.d("notificationReceiver11", "Only one underscore found");
-                            }
-                        } else {
-                            Log.d("CutString", "No underscore found");
-                            FileLogger.d("notificationReceiver12", "No underscore found");
-                        }
-
-                        FileLogger.d("notificationReceiver13", "Calling startAlertTimer with callStatus: " + callStatus);
-                        startAlertTimer(callStatus);
-                    } else {
-                        Log.d("notificationReceiver14", "Invalid body format: missing '@' or '#' or incorrect order");
-                        FileLogger.d("notificationReceiver14", "Invalid body format: missing '@' or '#' or incorrect order");
-                    }
-                } else {
-                    Log.d("notificationReceiver", "Notification body is null");
-                    FileLogger.d("notificationReceiver15", "Notification body is null");
-                }
-            }
-        }
-    };
 
     private BroadcastReceiver logoutReceiver = new BroadcastReceiver() {
         @Override
@@ -196,7 +111,7 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
     };
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    private Timer timer;
+   // private Timer timer;
     @SuppressLint("SuspiciousIndentation")
     @Override
 
@@ -218,10 +133,6 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
         boolean otpstatus = pref.getBoolean("otpstatus", false);
         handler = new Handler();
         latestActivity = ((MyApplication) getApplication()).getLatestActivity();
-
-        // Register the notification receiver
-        IntentFilter intentFilter = new IntentFilter(NotificationReceiver.ACTION_NOTIFICATION_RECEIVED);
-        LocalBroadcastManager.getInstance(this).registerReceiver(notificationReceiver, intentFilter);
 
         // Register the logout receiver
         IntentFilter intentFilterlogout = new IntentFilter("com.rpm.clynx.ACTION_LOGOUT_RESULT");
@@ -250,6 +161,27 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
             System.out.println("bundlenotnull");
             //bundle must contain all info sent in "data" field of the notification
         }
+
+// Disable button initially
+        login_btn.setEnabled(false);
+        login_btn.setTextColor(ContextCompat.getColor(Login.this, R.color.accent3)); // inactive color
+
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                checkFields();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
+
+        login_UsernameTV.addTextChangedListener(textWatcher);
+        login_PasswordTV.addTextChangedListener(textWatcher);
+
 
         forgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -297,6 +229,22 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
         });
     }
 
+
+    // Add this method inside your Login class
+    private void checkFields() {
+        String username = login_UsernameTV.getText().toString().trim();
+        String password = login_PasswordTV.getText().toString().trim();
+
+        if (!username.isEmpty() && !password.isEmpty()) {
+            login_btn.setEnabled(true);
+            login_btn.setTextColor(ContextCompat.getColor(Login.this, R.color.white));
+            login_btn.setBackgroundResource(R.drawable.button_inactive); // optional active bg
+        } else {
+            login_btn.setEnabled(false);
+            login_btn.setTextColor(ContextCompat.getColor(Login.this, R.color.accent3)); // inactive color
+            login_btn.setBackgroundResource(R.drawable.button_inactive);
+        }
+    }
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelId = "NOTIFICATION";
@@ -354,244 +302,6 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
         }
     };
 
-
-
-    private void startAlertTimer(String callStatus) {
-      //  Log.d("startAlertTimer", "Invoked with callStatus: " + callStatus);
-        FileLogger.d("startAlertTimer", "Invoked with callStatus: " + callStatus);
-
-        latestActivity = ((MyApplication) getApplication()).getLatestActivity();
-       // Log.d("startAlertTimer", "latestActivity: " + latestActivity);
-        FileLogger.d("startAlertTimer", "latestActivity: " + latestActivity);
-
-        if (latestActivity == null || latestActivity.isFinishing() || latestActivity.isDestroyed()) {
-            Log.e("startAlertTimer", "latestActivity is invalid. Cannot show dialog.");
-            FileLogger.e("startAlertTimer", "latestActivity is invalid. Cannot show dialog.");
-            return;
-        }
-
-        latestActivity.runOnUiThread(() -> {
-            if ("False".equalsIgnoreCase(callStatus)) {
-               // Log.d("startAlertTimer", "callStatus is False. Checking existing alertDialog...");
-                FileLogger.d("startAlertTimer", "callStatus is False. Checking existing alertDialog...");
-
-                if (alertDialog != null && alertDialog.isShowing()) {
-                    FileLogger.d("startAlertTimer", "alertDialog is showing. Dismissing.");
-                    safelyDismissAlertDialog();
-                    FileLogger.d("startAlertTimer", "alertDialog dismissed.");
-                }
-                return;
-            }
-
-            if (alertDialog != null) {
-                safelyDismissAlertDialog(); // Dismiss previous alert
-            }
-
-            FileLogger.d("startAlertTimer", "Preparing to show new alert dialog.");
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(latestActivity);
-            alertDialogBuilder.setTitle(title);
-            alertDialogBuilder.setMessage("Do you want to join?");
-            alertDialogBuilder.setCancelable(false);
-
-            alertDialogBuilder.setPositiveButton("Yes", (dialog, which) -> {
-              //  Log.d("AlertDialog", "User clicked YES");
-                FileLogger.d("AlertDialog", "User clicked YES");
-
-                cancelAlertTimer(); // Cancel the 2-minute timeout
-                dialog.dismiss();
-                alertDialog = null;
-                isCallJoined = true;
-                videoCall(roomnameVal, title, latestActivity);
-            });
-
-            alertDialogBuilder.setNegativeButton("No", (dialog, which) -> {
-                //Log.d("AlertDialog", "User clicked NO");
-                FileLogger.d("AlertDialog", "User clicked NO");
-
-                cancelAlertTimer(); // Cancel the 2-minute timeout
-                safelyDismissAlertDialog();
-                Toast.makeText(latestActivity, "No clicked", Toast.LENGTH_SHORT).show();
-                callReject(latestActivity);
-            });
-
-            try {
-                alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
-              //  Log.d("startAlertTimer", "Alert dialog shown.");
-                FileLogger.d("startAlertTimer", "Alert dialog shown.");
-            } catch (Exception e) {
-                Log.e("startAlertTimer", "Exception while showing alert dialog", e);
-                FileLogger.e("startAlertTimer", "Exception while showing alert dialog: " + e.getMessage());
-            }
-
-            // Start 2-minute timeout only if no interaction
-            startAlertAutoDismissTimer();
-        });
-    }
-
-    private void startAlertAutoDismissTimer() {
-        cancelAlertTimer(); // Clear previous if any
-
-        alertHandler = new Handler(Looper.getMainLooper());
-        alertTimeoutRunnable = () -> {
-            Log.d("AlertTimer", "2-minute timeout reached. Auto-dismissing alert.");
-            FileLogger.d("AlertTimer", "2-minute timeout reached. Auto-dismissing alert.");
-            safelyDismissAlertDialog();
-        };
-        alertHandler.postDelayed(alertTimeoutRunnable, 120000); // 2 minutes
-    }
-
-    private void cancelAlertTimer() {
-        if (alertHandler != null && alertTimeoutRunnable != null) {
-            alertHandler.removeCallbacks(alertTimeoutRunnable);
-            alertHandler = null;
-            alertTimeoutRunnable = null;
-        }
-    }
-
-    private void safelyDismissAlertDialog() {
-        new Handler(Looper.getMainLooper()).post(() -> {
-            if (alertDialog != null) {
-                try {
-                    if (alertDialog.isShowing()) {
-                        alertDialog.dismiss();
-                        Log.d("AlertDialog", "Dialog dismissed successfully.");
-                        FileLogger.d("AlertDialog", "Dialog dismissed successfully.");
-                    } else {
-                        Log.d("AlertDialog", "Dialog was not showing.");
-                        FileLogger.d("AlertDialog", "Dialog was not showing.");
-                    }
-                } catch (Exception e) {
-                    Log.e("AlertDialog", "Exception during dismiss: " + e.getMessage());
-                    FileLogger.e("AlertDialog", "Exception during dismiss: " + e.getMessage());
-                } finally {
-                    alertDialog = null;
-                }
-            } else {
-                Log.d("AlertDialog", "alertDialog is already null.");
-                FileLogger.d("AlertDialog", "alertDialog is already null.");
-            }
-        });
-    }
-
-    private void videoCall(String roomname, String caller, Activity latstActvty)  {
-        String VIDEOCALL_URL = BASE_URL+ VIDEOCALL ;
-        System.out.println("roomname");
-        System.out.println(roomname);
-        System.out.println("VIDEOCALL_URL");
-        System.out.println(VIDEOCALL_URL);
-        System.out.println("VIDEO lateactity");
-        System.out.println(latstActvty);
-
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, VIDEOCALL_URL + roomname ,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Handle the API response
-                        System.out.println("  VIDEOCALL response");
-                        System.out.println(response);
-                        System.out.println("  VIDEOCALL latestActivity");
-                        System.out.println(latstActvty);
-                        videocallToken = response;
-                        Intent intent = new Intent(latstActvty, VideoCallTwilio.class);
-                        intent.putExtra("videocallToken", videocallToken);
-                        intent.putExtra("videocallRoomname", roomname);
-                        intent.putExtra("videocallCallername", caller);
-                        startActivity(intent);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // Handle network or API errors
-                        System.out.println("VolleyError");
-                        Log.e("BooleanonErrorResponse", error.toString());
-                    }
-                }
-        )
-
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Bearer",pref.getString("Token", null));
-                Log.d("Token_videocall", pref.getString("Token", null));
-                //  headers.put("Content-Type", "application/json");
-                //  headers.put("Authorization", "Bearer" + Token);
-                return headers;
-            }
-        };
-
-// Add the request to the request queue
-        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        requestQueue.add(stringRequest);
-    }
-
-    private void callReject(Activity latstactvty)  {
-        Log.d("toUsername", toUsername);
-        Log.d("tokenid", tokenid);
-        String CALL_REJECT_URL = BASE_URL+ CALL_REJECT +
-                toUsername + "&tokenid="+ tokenid;
-        String body =  "Rejected your Call";
-        JSONObject parameters = new JSONObject();
-        try{
-            parameters.put("Title", "");
-            parameters.put("Body", body);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, CALL_REJECT_URL,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("rejectcallResponse", response.toString());
-                        Log.d("Log_url", CALL_REJECT_URL);
-                        Toast.makeText(latstactvty, "Call Rejected , Notification Sent Successfully!", Toast.LENGTH_LONG).show();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("onErrorResponse", error.toString());
-                        Toast.makeText(latstactvty, "Something went wrong!", Toast.LENGTH_SHORT).show();
-                    }
-                }
-        )
-        {
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json";
-            }
-
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                return parameters.toString().getBytes();
-            }
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Bearer",pref.getString("Token", null));
-                Log.d("Token_callReject", pref.getString("Token", null));
-                return headers;
-            }
-        };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(latstactvty);
-        //adding the string request to request queue
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, -1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        requestQueue.add(stringRequest);
-    }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // Unregister the notification receiver
-        stopTimer();
-    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -610,32 +320,6 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
         //do nothing
         super.onBackPressed();
         finishAffinity();
-    }
-
-    private void stopTimer() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            if (timer != null) {
-                timer.cancel();
-                timer = null;
-            }
-        }
-    }
-
-    private void userDetails() {
-        Runnable objRunnable = new Runnable() {
-            @Override
-            public void run() {
-                //userLogin();
-                getpatientprofile();
-                try {
-                    Thread.sleep(60000);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        };
-        Thread objBgThread = new Thread(objRunnable);
-        objBgThread.start();
     }
 
     private void userLogin() {
@@ -737,8 +421,13 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
                                                 });
 
                                         Log.d("MFA2", String.valueOf(response.getBoolean("MFA")));
+
+
                                         Intent intent = new Intent(Login.this, Home.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         startActivity(intent);
+                                        finish(); // Login killed
+
 
                                         // Inside your login success callback
                                         Log.d("starttimerService", "starttimerService");
@@ -766,6 +455,7 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         l1.dismiss();
+                        Log.d("logine", error.toString());
                         if (error instanceof TimeoutError || error instanceof NoConnectionError) {
                             showToastWithCustomColor("Please check Internet Connection");
                         } else if ( error.networkResponse.statusCode == 503) {
@@ -785,12 +475,14 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
                         }
                         else if( error.networkResponse.statusCode == 404)
                         {
+                            Log.d("logine404", error.toString());
                             // Refresh the current page
                             showToastWithCustomColor("Invalid User!");
                             finish();
                             startActivity(getIntent());
                         }
                         else {
+                            Log.d("logineelse", error.toString());
                             showToastWithCustomColor("Invalid User!");
                         }
                     }
@@ -830,6 +522,7 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
             editor.apply();
         }
     }
+
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
@@ -838,68 +531,112 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
         }
         return false;
     }
+
     public void logoutOnExpiry(String tokenVALUE) {
         Log.d("logouttimerends", "logouttimerends");
-        Log.d("context", String.valueOf((((MyApplication) getApplication()).getLatestActivity())));
-        SharedPreferences sharedPreferences = (((MyApplication) getApplication()).getLatestActivity()).getSharedPreferences("RPMUserApp", Context.MODE_PRIVATE);
+        Context context = ((MyApplication) getApplication()).getLatestActivity();
+        SharedPreferences sharedPreferences = context.getSharedPreferences("RPMUserApp", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        DataBaseHelper db = new DataBaseHelper((((MyApplication) getApplication()).getLatestActivity()));
+        DataBaseHelper db = new DataBaseHelper(context);
 
         // Check network connectivity
         if (!isNetworkAvailable()) {
-            Log.d("isNetworkAvailable", "isNetworkAvailable");
-            unsubscribeFromTopicsOnLogout((((MyApplication) getApplication()).getLatestActivity()));
+            Log.d("isNetworkAvailable", "no network → do local cleanup");
+            unsubscribeFromTopicsOnLogout(context);
             editor.putBoolean("loginstatus", false);
             editor.apply();
-            // Display a toast message indicating poor or no network connectivity
-            unsubscribeFromTopicsOnLogout((((MyApplication) getApplication()).getLatestActivity()));
+            return; // stop here
         }
-        else
-        {
-            Log.d("notisNetworkAvailable", "notisNetworkAvailable");
-            String LOGOUT_URL = BASE_URL + LOGOUT.toString();
-            JSONObject parameters = new JSONObject();
-            try {
-                parameters.put("Bearer", tokenVALUE);
-            } catch (Exception e) {
+
+        // 1⃣ Get Firebase token from SharedPreferences
+        String fbtoken = sharedPreferences.getString("FirebaseToken", null);
+
+        if (fbtoken != null) {
+            // Delete token from backend first
+            firebasetokenDeletion(fbtoken, tokenVALUE, editor, db, context);
+        } else {
+            // If no Firebase token → directly call logout API
+            callLogoutApi(tokenVALUE, editor, db, context);
+        }
+    }
+
+    private void firebasetokenDeletion(String fbtoken, String tokenVALUE,
+                                       SharedPreferences.Editor editor,
+                                       DataBaseHelper db,
+                                       Context context) {
+        String FB_token_delete_URL = BASE_URL + FB_TOK_DELETE; // backend delete endpoint
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, FB_token_delete_URL + fbtoken,
+                response -> {
+                    Log.e("fbDeletionSuccess", response);
+                    // after deletion → call logout API
+                    callLogoutApi(tokenVALUE, editor, db, context);
+                },
+                error -> {
+                    Log.e("fbDeletionFailed", error.toString());
+                    // even if delete fails → still call logout API
+                    callLogoutApi(tokenVALUE, editor, db, context);
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Bearer", tokenVALUE);
+                return headers;
             }
-            StringRequest request = new StringRequest(Request.Method.POST, LOGOUT_URL, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.d("loginstsfrmlogn1", String.valueOf(pref.getBoolean("loginstatus", false)));
-                    Log.i("onResponse", response.toString());
+        };
+
+        requestQueue.add(stringRequest);
+    }
+
+    private void callLogoutApi(String tokenVALUE,
+                               SharedPreferences.Editor editor,
+                               DataBaseHelper db,
+                               Context context) {
+        String LOGOUT_URL = BASE_URL + LOGOUT.toString();
+
+        StringRequest request = new StringRequest(Request.Method.POST, LOGOUT_URL,
+                response -> {
+                    Log.i("LogoutAPI", "Success: " + response);
+
+                    FirebaseMessaging.getInstance().deleteToken()
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Log.d("LogoutFIREBASE", "FCM token deleted locally");
+                                }
+                            });
+
                     editor.putBoolean("loginstatus", false);
                     editor.apply();
-                    Log.d("loginstsfrmlogn2", String.valueOf(pref.getBoolean("loginstatus", false)));
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e("onErrorResponse", error.toString());
-                    if ( error.networkResponse.statusCode == 401) {
-                        Log.d("JSONE statusCoden", String.valueOf(error.networkResponse.statusCode));
-                        error.printStackTrace();
-                        Log.d("e", error.toString());
+                    db.deleteData();
+                    db.deleteProfileData("myprofileandprogram");
+                },
+                error -> {
+                    Log.e("LogoutAPI", "Error: " + error.toString());
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
                         editor.putBoolean("loginstatus", false);
                         editor.apply();
                     }
-                }
-            }) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String> headers = new HashMap<>();
-                    headers.put("Bearer", tokenVALUE);
-                    headers.put("Content-Type", "application/json");
-                    Log.d("headers", headers.toString());
-                    return headers;
-                }
-            };
-            Log.d("contextgetApplicationContext", String.valueOf(((MyApplication) getApplication()).getLatestActivity()));
-            RequestQueue requestQueue = Volley.newRequestQueue(((MyApplication) getApplication()).getLatestActivity());
-            request.setRetryPolicy(new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-            requestQueue.add(request);
-        }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Bearer", tokenVALUE);
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                60000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ));
+        requestQueue.add(request);
     }
+
     public static synchronized Login getInstance() {
         if (logininstance == null) {
             logininstance = new Login();
@@ -908,19 +645,6 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
         return logininstance;
     }
 
-    public static void unsubscribeFirebaseOnLogout(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences("RPMUserApp", Context.MODE_PRIVATE);
-        String token = prefs.getString("FirebaseToken", null);
-
-        if (token != null) {
-            // Unsubscribe from FCM topics using the stored token
-            FirebaseMessaging.getInstance().unsubscribeFromTopic("videocall");
-            // Clear the stored token after unsubscribing
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.remove("FirebaseToken");
-            editor.apply();
-        }
-    }
 
     private void membersList() {
         String MEMBERS_LIST_URL = BASE_URL + MEMBERS_LIST;
@@ -975,8 +699,8 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
                         // Handle the API response
                         boolean success = Boolean.parseBoolean(response);
                         // Process the boolean value as needed
-                        System.out.println("fbtokinsrtsuccess");
-                        System.out.println(success);
+                        Log.e("firebasetokenInsertionSuccess",response);
+
                     }
                 },
                 new Response.ErrorListener() {
@@ -984,7 +708,7 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
                     public void onErrorResponse(VolleyError error) {
                         // Handle network or API errors
                         System.out.println("VolleyError");
-                        Log.e("BooleanonErrorResponse", error.toString());
+                        Log.e("firebasetokenInsertionFailed", error.toString());
                     }
                 }
         )
@@ -999,41 +723,6 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
 
 // Add the request to the request queue
         requestQueue.add(stringRequest);
-    }
-
-    private void getpatientprofile() {
-        String Token = pref.getString("Token", null);
-        Log.d("Token_profile", Token);
-        String PROFILE_URL = BASE_URL + PATIENT_PROFILE.toString();
-        JSONObject parameters = new JSONObject();
-        try {
-            parameters.put("Bearer", token);
-        } catch (Exception e) {
-        }
-        Log.d("Bearer", parameters.toString());
-        StringRequest request = new StringRequest(Request.Method.POST, PROFILE_URL,new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.i("onResponse", response.toString());
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("onErrorResponse", error.toString());
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Bearer",token);
-                Log.d("headers",headers.toString());
-                Log.d("Token_profile", token);
-                return headers;
-            }
-        };
-        RequestQueue requestQueue = Volley.newRequestQueue(Login.this);
-        request.setRetryPolicy(new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        requestQueue.add(request);
     }
 
     private boolean validateUserName() {

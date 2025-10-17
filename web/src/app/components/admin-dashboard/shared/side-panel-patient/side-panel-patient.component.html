@@ -1379,13 +1379,12 @@
               formControlName="frmpatientName"
             />
           </div>
-
+        <fieldset [disabled]="checkedSingle || AssigneeMemberStatus">
           <div class="common_content">
             <p class="common_content_title">Schedule Type</p>
             <select
               class="common_input_dropdown"
               id="Sch_UpdateType"
-              [attr.disabled]="checkedSingle || AssigneeMemberStatus ? true : null"
               formControlName="scheduleType"
               required
             >
@@ -1407,10 +1406,12 @@
               </ng-container>
             </div>
           </div>
+        </fieldset>
+
           <div class="common_content common_content_description">
             <p class="common_content_title">Schedule Description</p>
             <textarea
-              [attr.disabled]="AssigneeMemberStatus ? true : null"
+              [readonly]="AssigneeMemberStatus ? true : null"
               id="Sch_UpdateDescription"
               placeholder="Describe Schedule"
               formControlName="scheduleDescription"
@@ -1465,7 +1466,7 @@
               <p class="common_content_title">Start Date</p>
               <input
                 class="common_input_dropdown"
-                [attr.disabled]="AssigneeMemberStatus ? true : null"
+                [readonly]="AssigneeMemberStatus ? true : null"
                 id="schedule_start"
                 type="text"
                 min="{{ todaty_date }}"
@@ -1489,7 +1490,7 @@
 
               <input
                 class="common_input_dropdown"
-                [attr.disabled]="AssigneeMemberStatus ? true : null"
+                [readonly]="AssigneeMemberStatus ? true : null"
                 type="text"
                 min="{{ todaty_date }}"
                 onfocus="(this.type='date')"
@@ -1514,7 +1515,7 @@
               <p class="common_content_title">Start Date</p>
               <input
                 class="common_input_dropdown"
-                [attr.disabled]="AssigneeMemberStatus ? true : null"
+                [readonly]="AssigneeMemberStatus ? true : null"
                 type="text"
                 onfocus="(this.type='date')"
                 id="schedule_start"
@@ -1544,7 +1545,7 @@
                 onfocus="(this.type='time')"
                 formControlName="startTime"
                 id="Sch_StartTime"
-                [attr.disabled]="AssigneeMemberStatus ? true : null"
+                [readonly]="AssigneeMemberStatus ? true : null"
               />
               <div class="warn">
                 <ng-container
@@ -1589,8 +1590,8 @@
               </div>
             </div>
           </div>
-
-          <div class="common_content" *ngIf="checkedSeries">
+           <fieldset [disabled]="AssigneeMemberStatus">
+              <div class="common_content" *ngIf="checkedSeries">
             <p class="common_content_title">Frequency</p>
 
             <select
@@ -1622,7 +1623,7 @@
               <div class="frequency_sub_panel">
                 <div class="schedule_week_item">
                   <input
-                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    [readonly]="AssigneeMemberStatus ? true : null"
                     class="schedule_checkbox"
                     type="checkbox"
                     formControlName="scheduleMonday"
@@ -1648,7 +1649,7 @@
 
                 <div class="schedule_week_item">
                   <input
-                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    [readonly]="AssigneeMemberStatus ? true : null"
                     class="schedule_checkbox"
                     type="checkbox"
                     formControlName="scheduleWednesday"
@@ -1663,7 +1664,7 @@
               <div class="frequency_sub_panel">
                 <div class="schedule_week_item">
                   <input
-                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    [readonly]="AssigneeMemberStatus ? true : null"
                     class="schedule_checkbox"
                     type="checkbox"
                     formControlName="scheduleThursday"
@@ -1675,7 +1676,7 @@
                 </div>
                 <div class="schedule_week_item">
                   <input
-                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    [readonly]="AssigneeMemberStatus ? true : null"
                     class="schedule_checkbox"
                     type="checkbox"
                     formControlName="scheduleFriday"
@@ -1687,7 +1688,7 @@
                 </div>
                 <div class="schedule_week_item">
                   <input
-                    [attr.disabled]="AssigneeMemberStatus ? true : null"
+                    [readonly]="AssigneeMemberStatus ? true : null"
                     class="schedule_checkbox"
                     type="checkbox"
                     formControlName="scheduleSaturday"
@@ -1700,7 +1701,7 @@
               </div>
               <div class="schedule_week_item">
                 <input
-                  [attr.disabled]="AssigneeMemberStatus ? true : null"
+                  [readonly]="AssigneeMemberStatus ? true : null"
                   class="schedule_checkbox"
                   type="checkbox"
                   formControlName="scheduleSunday"
@@ -1711,28 +1712,32 @@
                 <label for="sun" class="common_content_title"> Sun </label>
               </div>
             </div>
+
             <div *ngIf="frequencyValue == 'Monthly'" class="frequency_monthly">
+
               <div class="frequency_monthly_panel">
-                <p class="common_content_title">Week Selection</p>
-                <select
-                  [attr.disabled]="AssigneeMemberStatus ? true : null"
+                 <fieldset [disabled]="AssigneeMemberStatus">
+                  <p class="common_content_title">Week Selection</p>
+                   <select
                   class="schedule_monthy_dropdown"
                   formControlName="weekSelectionFrequency"
                   id="Sch_updateMonthFrequency"
-                >
+                  >
                   <option [ngValue]="undefined" hidden>
                     Select Frequency Type
                   </option>
                   <option *ngFor="let freq of weekFrequency" [value]="freq.id">
                     {{ freq.weekPeriod }}
                   </option>
-                </select>
+                  </select>
+              </fieldset>
+
 
                 <div class="frequency_week">
                   <div class="frequency_sub_panel">
                     <div class="schedule_week_item">
                       <input
-                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        [readonly]="AssigneeMemberStatus ? true : null"
                         class="schedule_checkbox"
                         type="checkbox"
                         formControlName="scheduleSubMonday"
@@ -1747,7 +1752,7 @@
 
                     <div class="schedule_week_item">
                       <input
-                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        [readonly]="AssigneeMemberStatus ? true : null"
                         class="schedule_checkbox"
                         type="checkbox"
                         formControlName="scheduleSubTuesday"
@@ -1762,7 +1767,7 @@
 
                     <div class="schedule_week_item">
                       <input
-                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        [readonly]="AssigneeMemberStatus ? true : null"
                         class="schedule_checkbox"
                         type="checkbox"
                         formControlName="scheduleSubWednesday"
@@ -1779,7 +1784,7 @@
                   <div class="frequency_sub_panel">
                     <div class="schedule_week_item">
                       <input
-                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        [readonly="AssigneeMemberStatus ? true : null"
                         class="schedule_checkbox"
                         type="checkbox"
                         formControlName="scheduleSubThursday"
@@ -1793,7 +1798,7 @@
                     </div>
                     <div class="schedule_week_item">
                       <input
-                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        [readonly]="AssigneeMemberStatus ? true : null"
                         class="schedule_checkbox"
                         type="checkbox"
                         formControlName="scheduleSubFriday"
@@ -1807,7 +1812,7 @@
                     </div>
                     <div class="schedule_week_item">
                       <input
-                        [attr.disabled]="AssigneeMemberStatus ? true : null"
+                        [readonly="AssigneeMemberStatus ? true : null"
                         class="schedule_checkbox"
                         type="checkbox"
                         formControlName="scheduleSubSaturday"
@@ -1822,7 +1827,7 @@
                   </div>
                   <div class="schedule_week_item">
                     <input
-                      [attr.disabled]="AssigneeMemberStatus ? true : null"
+                      [readonly]="AssigneeMemberStatus ? true : null"
                       class="schedule_checkbox"
                       type="checkbox"
                       formControlName="scheduleSubSunday"
@@ -1835,7 +1840,9 @@
                 </div>
               </div>
             </div>
-          </div>
+           </div>
+           </fieldset>
+
 
           <div class="common_content">
             <p class="common_content_title">Assignee Name</p>
@@ -2225,6 +2232,7 @@
               placeholder="Date"
               class="common_input_dropdown"
               formControlName="medicationstartDate"
+              [attr.min]="minStartDate"
             />
             <div class="warn">
               <ng-container

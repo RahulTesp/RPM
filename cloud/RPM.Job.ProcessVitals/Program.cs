@@ -1,59 +1,60 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
-//cron contiuous
+using System.Data.Common;
+
 class Program
 {
     static string CONN_STRING = string.Empty;
-
     static async Task Main(string[] args)
     {
-        // Set up configuration
+        // Load configuration from appsettings.json and environment variables
         var config = new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json", optional: true)
-        .AddEnvironmentVariables() // Allows overriding via Azure App Settings
-        .Build();
-        if (config == null)
-        {
-            Console.WriteLine("Configuration is null.");
-            return;
-        }
-        // Access a specific config value
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+
         string? connStr = config["RPM:ConnectionString"];
-        Console.WriteLine($"RPM Connection String: {connStr}");
-        if (connStr == null)
+        if (string.IsNullOrEmpty(connStr))
         {
-            Console.WriteLine("Connection string is null in appsettings.json.");
-            return;
-        }
-        CONN_STRING = connStr;
-        Console.WriteLine(CONN_STRING);
-        if (string.IsNullOrEmpty(CONN_STRING))
-        {
-            Console.WriteLine("Connection string is null or empty.");
+            Console.WriteLine("Connection string is missing in appsettings.json.");
             return;
         }
 
+        // Parse connection string for server and database info
+        var builder = new DbConnectionStringBuilder { ConnectionString = connStr };
+        string server = builder.ContainsKey("Server") ? builder["Server"].ToString() : "";
+        string database = builder.ContainsKey("Initial Catalog") ? builder["Initial Catalog"].ToString() : "";
+
+        Console.WriteLine($"Server: {server}");
+        Console.WriteLine($"Database: {database}");
+
+        CONN_STRING = connStr;
         Console.WriteLine("WebJob started...");
-        await TimerCallback();
-        
+
+        // Continuous loop: execute job every 5 seconds
+        while (true)
+        {
+            try
+            {
+                await TimerCallback();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[{DateTime.Now}] Exception: {ex}");
+            }
+            await Task.Delay(TimeSpan.FromSeconds(20)); // Non-blocking delay
+        }
     }
 
     private static async Task TimerCallback()
     {
-        try
-        {
-            Console.WriteLine($"[{DateTime.Now}] Timer triggered.");
+        Console.WriteLine($"[{DateTime.Now}] Timer triggered.");
 
-            using SqlConnection connection = new SqlConnection(CONN_STRING);
-            await connection.OpenAsync();
-            await ExecuteStoredProcedure(connection, "usp_InsPatientVitalMeasures");    
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[{DateTime.Now}] Exception: {ex.Message}");
-        }
+        using SqlConnection connection = new SqlConnection(CONN_STRING);
+        await connection.OpenAsync();
+        await ExecuteStoredProcedure(connection, "usp_InsPatientVitalMeasures");
     }
 
     private static async Task ExecuteStoredProcedure(SqlConnection connection, string procedureName, int timeoutSeconds = 300)

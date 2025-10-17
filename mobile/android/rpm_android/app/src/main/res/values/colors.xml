@@ -69,9 +69,8 @@
 <color name="colorchangepassword">#8BE3D9</color>
 <color name="changepasswordtext">#164D61</color>
 
-
-
-
+    <color name="colorOnClick">#FFE0B2</color> <!-- Light orange -->
+    <color name="colorOnLongPress">#FFCDD2</color> <!-- Light red -->
 
 <color name="overlay_dark_10">#1A000000</color>
 <color name="overlay_dark_20">#33000000</color>

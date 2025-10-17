@@ -28,9 +28,10 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
-
+ 
 @Component({
   selector: 'app-side-panel-patient',
   templateUrl: './side-panel-patient.component.html',
@@ -68,7 +69,8 @@ export class SidePanelPatientComponent implements OnInit {
   nightSchedule = false;
   loading: any;
   loading_note: any;
-
+  minStartDate: string | null = null; 
+  programId: any;
 
   @Input() activityMenuVariable: any;
 
@@ -77,6 +79,7 @@ export class SidePanelPatientComponent implements OnInit {
   public NoteSec = '00';
   public isManagerProvider = false;
   public noteId: any;
+  
   public noteData: any;
 
   weekFrequency = [
@@ -170,12 +173,15 @@ export class SidePanelPatientComponent implements OnInit {
     this.updateTaskAssignees();
   }
 
+ 
+
   private handleMenuChoiceSpecificLogic(choice: number): void {
     if (choice === 2) {
       this.NoteTime = sessionStorage.getItem('PageTimer');
       this.startNoteTimeInterval();
 
       this.patientProgramName = sessionStorage.getItem('patientPgmName');
+      this.programId = sessionStorage.getItem('ProgramId');
 
       if (this.selection_flag) {
         this.getMasterDataQuestions(this.patientProgramName);
@@ -377,6 +383,8 @@ export class SidePanelPatientComponent implements OnInit {
       Notes: '',
     },
   ];
+  this.minStartDate = this.datepipe.transform(new Date(), 'yyyy-MM-dd');
+
 }
 
 
@@ -1676,7 +1684,11 @@ export class SidePanelPatientComponent implements OnInit {
   }
 
   convertDate(dateval: any) {
+    console.log('convert Date');
+    console.log(dateval)
     let today = new Date(dateval);
+       console.log('convert Date After');
+    console.log(today)
     let dd = today.getDate();
     let dd2;
     if (dd < 10) {
@@ -1903,9 +1915,10 @@ export class SidePanelPatientComponent implements OnInit {
             that.registerSchedule.controls['scheduleDescription'].setValue(
               this.ScheduleDatabyId.CurrentScheduleComments
             );
-
+	    var CurrentScheduleDateVal = this.ScheduleDatabyId.CurrentScheduleDate;
+	    let CurrentScheduleDateFinalValue = Array.isArray(CurrentScheduleDateVal) ? CurrentScheduleDateVal[0] : CurrentScheduleDateVal;
             that.registerSchedule.controls['startDate'].setValue(
-              this.convertDateData(this.ScheduleDatabyId.CurrentScheduleDate)
+              this.convertDateData(CurrentScheduleDateFinalValue)
             );
             that.registerSchedule.controls['endDate'].setValue(
               this.ScheduleDatabyId.EndDate
@@ -1994,11 +2007,24 @@ export class SidePanelPatientComponent implements OnInit {
 
 
   private updateSingleSchedule() {
-    if (!this.registerSchedule.valid) return this.showWarning('Please complete the form');
+    
+  const startDateValue = this.registerSchedule.controls.startDate.value;
 
+  // Convert to string if it's a Date object or something else
+  const dateString = typeof startDateValue === 'string'
+    ? startDateValue
+    : new Date(startDateValue).toISOString().split('T')[0]; // Converts to 'YYYY-MM-DD'
+
+  // Use the converted string here
+  const [scheduleyear, schedulemonth, scheduleday] = dateString.split('-').map(Number)
+
+    //const [scheduleyear, schedulemonth, scheduleday] = this.registerSchedule.controls.startDate.value.split('-').map(Number);
+    var scheduleDate = new Date(scheduleyear, schedulemonth - 1, scheduleday, 0, 0, 0);
+    if (!this.registerSchedule.valid) return this.showWarning('Please complete the form');
+    var scheduleDate = new Date(this.DateConversionLogicFromStringToDate(this.registerSchedule.controls.startDate.value));
     const req_body = {
       CurrentScheduleId: this.schedule_edit_id,
-      ScheduleDate: this.convertDate(this.registerSchedule.controls.startDate.value),
+      ScheduleDate: this.convertDate(scheduleDate),
       StartTime: this.registerSchedule.controls.startTime.value,
       Duration: this.durationValue,
       Comments: this.registerSchedule.controls.scheduleDescription.value,
@@ -2028,8 +2054,8 @@ export class SidePanelPatientComponent implements OnInit {
     if (!this.schedule_careteam_id)
       return this.showWarning('Please select a Assignee Name.');
 
-    const startDate = this.convertDate(this.registerSchedule.controls.startDate.value);
-    const endDate = this.convertDate(this.registerSchedule.controls.endDate.value);
+    const startDate = this.convertDate(this.DateConversionLogicFromStringToDate(this.registerSchedule.controls.startDate.value));
+    const endDate = this.convertDate(this.DateConversionLogicFromStringToDate(this.registerSchedule.controls.endDate.value));
 
     if (endDate <= startDate)
       return this.showWarning('Please select a valid Start Date and End Date.');
@@ -2527,6 +2553,8 @@ export class SidePanelPatientComponent implements OnInit {
   Htmlele: any;
 
   getReviewNoteUpdation(data: any, patientstatus: any) {
+    this.loadPatientInfo();
+     this.ProgramId = this.http_rpm_patientList['PatientProgramdetails'].ProgramId;
     this.patientStatus = patientstatus;
     if (this.roleId[0].Id == 1 || this.roleId[0].Id == 3) {
       this.isManagerProvider = true;
@@ -2541,7 +2569,8 @@ export class SidePanelPatientComponent implements OnInit {
 
     this.rpm
       .rpm_get(
-        `/api/patient/getpatientnotesbyprogram?ProgramName=${this.patientProgramName}&Type=REVIEW&PatientNoteId=${this.noteId}`
+        //`/api/patient/getpatientnotesbyprogram?ProgramName=${this.patientProgramName}&Type=REVIEW&PatientNoteId=${this.noteId}`
+         `/api/patient/getpatientnotesbyprogramid?ProgramId=${this.ProgramId}&Type=REVIEW&PatientNoteId=${this.noteId}`
       )
       .then((data) => {
         if (data) {
@@ -2595,11 +2624,16 @@ export class SidePanelPatientComponent implements OnInit {
     this.isOpen = false;
     this.callType = null;
   }
+  ProgramId: any;
   MasterDataQuestionTemp: any;
-  getMasterDataQuestions(patientProgramName: any) {
+  http_rpm_patientList: any;
+ getMasterDataQuestions(patientProgramName: any) {
+    this.loadPatientInfo()
+    this.ProgramId = this.http_rpm_patientList['PatientProgramdetails'].ProgramId;
     this.rpm
       .rpm_get(
-        `/api/patient/getmasterdatanotes?ProgramName=${patientProgramName}&Type=REVIEW`
+        //`/api/patient/getmasterdatanotes?ProgramName=${patientProgramName}&Type=REVIEW`
+        `/api/patient/getmasterdatanotes?ProgramId=${this.ProgramId}&Type=REVIEW`
       )
       .then(
         (data) => {
@@ -2714,7 +2748,7 @@ export class SidePanelPatientComponent implements OnInit {
     return combineDateIsoFrm;
   }
 
-  http_rpm_patientList: any;
+  //http_rpm_patientList: any;
 
 
   refresh() {
@@ -2770,5 +2804,32 @@ export class SidePanelPatientComponent implements OnInit {
   {
     this.showNoteModal=false;
   }
+  private DateConversionLogicFromStringToDate(rawDate: string) {
+    let year: number, month: number, day: number;
+    let rawDatefinalValue = Array.isArray(rawDate) ? rawDate[0] : rawDate;
+    const parts = rawDatefinalValue.split('-').map(Number);
+    if (parts[0] > 999) {
+      // Format: YYYY-MM-DD
+      [year, month, day] = parts;
+    } else {
+      // Format: MM-DD-YYYY
+      [month, day, year] = parts;
+    }
+    var scheduleDate = new Date(year, month - 1, day, 0, 0, 0);
+    return scheduleDate;
+  }
 
+  async loadPatientInfo() {
+    this.currentProgramId = sessionStorage.getItem('ProgramId');
+    this.patientId = sessionStorage.getItem('PatientId');
+    try {
+      this.http_rpm_patientList = await this.patientService.fetchPatientInfo(
+        this.patientId,
+        this.currentProgramId
+      );
+      
+    } catch (error) {
+      console.error('Error loading patient info:', error);
+    }
+  }
 }

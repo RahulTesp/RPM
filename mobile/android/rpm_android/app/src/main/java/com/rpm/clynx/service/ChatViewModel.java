@@ -11,7 +11,15 @@ import android.content.Context;
 public class ChatViewModel extends ViewModel {
     private MutableLiveData<List<Chat>> chatListLiveData = new MutableLiveData<>(new ArrayList<>());
     private ChatListAdapter chatListAdapter;
+    private boolean conversationsLoaded = false;
 
+    public boolean isConversationsLoaded() {
+        return conversationsLoaded;
+    }
+
+    public void setConversationsLoaded(boolean loaded) {
+        this.conversationsLoaded = loaded;
+    }
     public ChatListAdapter getChatListAdapter(Context context) {
         if (chatListAdapter == null) {
             chatListAdapter = new ChatListAdapter(chatListLiveData.getValue(), context, "");

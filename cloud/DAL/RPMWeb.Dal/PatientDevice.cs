@@ -1,7 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.InkML;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RPMWeb.Data.Common;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
@@ -13,6 +16,7 @@ namespace RPMWeb.Dal
 {
     public class PatientDevice
     {
+        static ConcurrentDictionary<string, string> vitalunits_dictionary = new ConcurrentDictionary<string, string>();
         public List<WorldTimeZone> GetWorldTimeZone(string ConnectionString)
         {
             List<WorldTimeZone> info = new List<WorldTimeZone>();
@@ -85,7 +89,7 @@ namespace RPMWeb.Dal
                             }
                             response.HttpRetCode = 200;//added
                             response.DevicUserId = dr.PatientNumber;//added
-                            response.Message = "Device set to active without vendor activation.";//added
+                            response.Message = "Device Added Successfully";//added
                             return response;
                         }
 

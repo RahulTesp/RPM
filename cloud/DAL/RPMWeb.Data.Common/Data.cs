@@ -103,6 +103,13 @@ namespace RPMWeb.Data.Common
         public string OTP { get; set; }
         public string token { get; set; }
     }
+    public class UserLoginVerify
+    {
+        public string UserName { get; set; }
+     
+        public string OTP { get; set; }
+      
+    }
     public class RPMLogin
     {
         [Required]
@@ -557,7 +564,7 @@ namespace RPMWeb.Data.Common
         public string DOB { get; set; }
 
         public string Gender { get; set; }
-        public int Height { get; set; }
+        public float Height { get; set; }
         public int Weight { get; set; }
         public string Email { get; set; }
         public string PhoneNo { get; set; }
@@ -589,7 +596,7 @@ namespace RPMWeb.Data.Common
         public int PatientProgramId { get; set; }
         public int ProgramId { get; set; }
         public List<int> VitalIds { get; set; }//ccm change
-        public string? PhysicianId { get; set; }
+        public int PhysicianId { get; set; }
         public string? ConsultationDate { get; set; }
         public int CareTeamUserId { get; set; }
         public string PatientStatus { get; set; }
@@ -730,6 +737,7 @@ namespace RPMWeb.Data.Common
         public List<ProgramVitals> Vitals { get; set; }
         public List<GoalDetails> goalDetails { get; set; }
         public int Duration { get; set; }
+        public string Name { get; set; }
 
     }
     public class PatientProgramDetails
@@ -933,11 +941,22 @@ namespace RPMWeb.Data.Common
         public string ProgramName { get; set; }
         public string Program { get; set; }
         public string EnrolledDate { get; set; }
+        public string EnrolledDateTime { get; set; }
         public string PhysicianName { get; set; }
         public string AssignedMember { get; set; }
         public string PatientType { get; set; }
-        public string Vital { get; set; }
+        public List<VitalInfo> VitalInfo { get; set; }
         public string Priority { get; set; }
+        public GetAllPatientInfo()
+        {
+            VitalInfo = new List<VitalInfo>();
+        }
+    }
+    public class VitalInfo
+    {
+        public string Vital { get; set; }
+        public string VitalPriority { get; set; }
+        public int AlertTypeId { get; set; }
     }
     public class GetAllPatientSmsInfo
     {
@@ -1397,6 +1416,10 @@ namespace RPMWeb.Data.Common
 
 
     }
+    public class PatientHealthTrends
+    {
+        public List<HealthTrends> Values { get; set; }
+    }
     public class Values
     {
         public List<string> data { get; set; }
@@ -1539,7 +1562,7 @@ namespace RPMWeb.Data.Common
         public int createdAt { get; set; }
         public object data { get; set; }
         public bool isTest { get; set; }
-    }
+    }   
 
     public class TranstekDeviceTelemetry
     {
@@ -1549,6 +1572,7 @@ namespace RPMWeb.Data.Common
         public object deviceData { get; set; }
         public bool isTest { get; set; }
         public string modelNumber { get; set; }
+        public string messageType { get; set; }
     }
 
     public class DeviceTelemetryStatus
@@ -2370,8 +2394,9 @@ namespace RPMWeb.Data.Common
     }
 
 
-    public class chathook {
-        public string author { get; set; }
+    public class chathook
+    {
+        public string Author { get; set; }
         public string Body { get; set; }
         public string Attributes { get; set; }
         public string AccountSid { get; set; }
@@ -2380,29 +2405,20 @@ namespace RPMWeb.Data.Common
         public string Source { get; set; }
         public string ConversationSid { get; set; }
         public string ParticipantSid { get; set; }
-        //public string DateCreated { get; set; }
-
-
     }
 
     public class smshook
     {
-        public string MessageSid { get; set; }
-        public string SmsSid { get; set; }
+        public string SmsSid { get; set; }          
         public string AccountSid { get; set; }
-        public string MessagingServiceSid { get; set; }
-
         public string From { get; set; }
         public string To { get; set; }
-
         public string Body { get; set; }
-
         public string SmsStatus { get; set; }
 
-
-
-
+        //public string SentDateUTC { get; set; }  // ❌ Twilio doesn’t send this
     }
+
     public class commUserNamesforVideoCall
     {
         public string CommUserNameCareTeam { get; set; }

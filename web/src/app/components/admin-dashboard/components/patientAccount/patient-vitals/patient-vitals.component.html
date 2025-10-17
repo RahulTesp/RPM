@@ -1940,35 +1940,47 @@
         >
           <button
             class="vitalReading_menu_item"
-            *ngIf="http_vitalGlucoseData && http_vitalGlucoseData.length > 0"
-            id="pd_vital_BG"
-            (click)="ChangeVitalScreen('BloodGlucose')"
-          >
-            BloodGlucose
-          </button>
-          <button
-            class="vitalReading_menu_item"
             *ngIf="vital_temporaryData && vital_temporaryData.length > 0"
             id="pd_Vital_BP"
             (click)="ChangeVitalScreen('BloodPressure')"
+            [ngClass]="{
+              'vital_selected_': currentVital === 'BloodPressure'
+            }"
           >
             BloodPressure
           </button>
           <button
             class="vitalReading_menu_item"
-            *ngIf="http_VitalOxygen && http_VitalOxygen.length > 0"
-            (click)="ChangeVitalScreen('Oxygen')"
-            id="pd_Vital_O"
+            *ngIf="http_vitalGlucoseData && http_vitalGlucoseData.length > 0"
+            id="pd_vital_BG"
+            (click)="ChangeVitalScreen('BloodGlucose')"
+            [ngClass]="{
+              'vital_selected_': currentVital === 'BloodGlucose'
+            }"
           >
-            Oxygen
+            BloodGlucose
           </button>
           <button
             class="vitalReading_menu_item"
             *ngIf="http_VitalWight && http_VitalWight.length > 0"
-            (click)="ChangeVitalScreen('Weight')"
             id="pd_Vital_W"
+            (click)="ChangeVitalScreen('Weight')"
+            [ngClass]="{
+              'vital_selected_': currentVital === 'Weight'
+            }"
           >
             Weight
+          </button>
+          <button
+            class="vitalReading_menu_item"
+            *ngIf="http_VitalOxygen && http_VitalOxygen.length > 0"
+            id="pd_Vital_O"
+            (click)="ChangeVitalScreen('Oxygen')"
+             [ngClass]="{
+              'vital_selected_': currentVital === 'BloodOxygen'
+            }"
+          >
+            Oxygen
           </button>
         </div>
       </div>

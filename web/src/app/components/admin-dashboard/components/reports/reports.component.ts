@@ -1,3 +1,4 @@
+
 import {
   Component,
   OnInit,
@@ -14,6 +15,7 @@ import { Router } from '@angular/router';
 import { jsPDF } from 'jspdf';
 import { AuthService } from 'src/app/services/auth.service';
 import { DatePipe } from '@angular/common';
+import { PatientDataDetailsService } from '../patient-detail-page/Models/service/patient-data-details.service';
 import { Subscription } from 'rxjs';
 import { ReportDataService } from './services/report-data.service';
 import { DownloadPatientReportService } from './services/download-patient-report.service';
@@ -24,13 +26,12 @@ import {
   CHART_TYPE,
 } from './interfaces/chart-config-interface';
 import { PatientReportApiService } from './services/patient-report-api.service';
+import { PatientUtilService } from '../patient-detail-page/Models/service/patient-util.service';
 import * as FileSaver from 'file-saver';
+import { HttpClient } from '@angular/common/http';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 @Component({
   selector: 'app-reports',
@@ -41,8 +42,7 @@ export class ReportsComponent implements OnInit {
   @Output() emitter: EventEmitter<string> = new EventEmitter<string>();
 
   @ViewChild('autocompletebilling') autocompletebilling: any;
-  @ViewChild('pdfGraph') chartElementRef: ElementRef;
-
+  @ViewChild('pdfData') chartElementRef: ElementRef;
   campaignOne: FormGroup;
   accessRights: any;
   master_data: any;
@@ -70,6 +70,7 @@ export class ReportsComponent implements OnInit {
   patientVital: any;
   programDetails: any;
   patientProgramname: any;
+  idProgram: any
   patientListArray: any;
   today = new Date();
   http_healthtrends: any;
@@ -149,9 +150,12 @@ export class ReportsComponent implements OnInit {
     public rpmservice: RPMService,
     private _router: Router,
     public datepipe: DatePipe,
+    private httpobj: HttpClient,
     private auth: AuthService,
+    private patientService: PatientDataDetailsService,
     private patientreportService: ReportDataService,
     private patientdownloadService: DownloadPatientReportService,
+    private patientUtilService: PatientUtilService,
     private PatientReportapi: PatientReportApiService
   ) {}
   range = new FormGroup({
@@ -160,7 +164,7 @@ export class ReportsComponent implements OnInit {
   });
 
   loadPatients() {
-    this.patientreportService
+    this.patientreportService 
       .getPatientList()
       .then((data) => {
         // Call billing detail method in component
@@ -845,16 +849,19 @@ export class ReportsComponent implements OnInit {
       }
     }
     stillUtc = stillUtc + 'Z';
-    const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+    const local = dayjs.utc(stillUtc).local().format('HH:mm:ss');
     return local;
   }
 
   // Report Patient Data
+  currentY: number=15;
+  healthtrendVitalNameArray: any;
 
   downloadPatientReport() {
     this.patientStatusData = this.http_rpm_patient.PatientProgramdetails.Status;
     this.patientProgramname =
       this.http_rpm_patient['PatientProgramdetails'].ProgramName;
+    this.idProgram = this.http_rpm_patient['PatientProgramdetails'].ProgramId;
     this.reportStart();
     this.getPatientAndProgramInfo();
   }
@@ -902,7 +909,7 @@ export class ReportsComponent implements OnInit {
     this.lineChartData = chartData;
     this.lineChartLabels = chartLabels;
   }
-
+  // Manjusha code change
   async getPatientAndProgramInfo() {
     this.patientStatusData = this.http_rpm_patient.PatientProgramdetails.Status;
     this.PatientCriticalAlerts =
@@ -925,7 +932,7 @@ export class ReportsComponent implements OnInit {
       endDate,
       this.selectedPatient,
       this.selectedProgram,
-      this.patientProgramname
+      this.idProgram
     );
     if (this.patientProgramname == 'CCM' || this.patientProgramname == 'PCM') {
       this.patientdownloadService.generatePatientSummaryReport(
@@ -939,11 +946,21 @@ export class ReportsComponent implements OnInit {
       this.doc.save('PatientReport.pdf');
       this.buttonclick1 = true;
     } else {
-      this.HtmlGraph = document.querySelector('#pdfGraph');
-      await this.patientdownloadService.captureHealthTrendsChart(
-        this.doc,
-        this.HtmlGraph
-      );
+      this.doc.setFontSize(14);
+      this.doc.text('Patient Health Trends', 15, this.currentY);
+      this.doc.setDrawColor('black');
+      const headingWidth = this.doc.getTextWidth('Patient Health Trends');
+      this.doc.line(15, this.currentY + 1, 15 + headingWidth, this.currentY + 1);
+      this.currentY += 20;
+      await this.patientdownloadService.resetPosition();
+      const allGraphs = Array.from(document.querySelectorAll('.pdfData'));
+
+      for (let i = 0; i < allGraphs.length; i++) {
+        const graph = allGraphs[i] as HTMLElement;
+        const vitalTitle = this.healthtrendVitalNameArray[i] || `Chart ${i + 1}`;
+        await this.patientdownloadService.captureHealthTrendsChart(this.doc, graph, vitalTitle);
+      }
+      this.currentY = this.patientdownloadService.getChartCurrentY();
       this.patientdownloadService.generateHealthTrendsTable(
         this.doc,
         this.http_vitalData
@@ -957,7 +974,7 @@ export class ReportsComponent implements OnInit {
         this.BillingInfo,
         this.http_SmsData
       );
-      this.patientdownloadService.generateVitalReadingSummary(this.doc);
+      await this.patientdownloadService.generateVitalReadingSummary(this.doc,this.selectedPatient, this.selectedProgram);
       this.doc.save('PatientReport.pdf');
       this.buttonclick1 = true;
     }
@@ -1032,6 +1049,7 @@ export class ReportsComponent implements OnInit {
           endDate
         );
 
+      console.log('✅ Patient data loaded successfully');
       this.downloadPatientReport();
     } catch (error) {
       console.error('🚨 Error loading patient data:', error);

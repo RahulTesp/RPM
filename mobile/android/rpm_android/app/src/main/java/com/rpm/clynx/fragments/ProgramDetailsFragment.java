@@ -171,7 +171,7 @@ public class ProgramDetailsFragment extends Fragment {
                     jsonArrayData = new JSONArray(jsonObjectLVM.getString("goalDetails"));
                     jsonArrayVM = new JSONArray(jsonObjectPgmDet.getString("PatientVitalInfos"));
                     Duration = jsonObjectPgmDet.getString("Duration");
-                    duration.setText(Duration);
+                    duration.setText(Duration + " Months");
                     StartDate = DateUtils.convertUtcToLocalFormatted(jsonObjectPgmDet.getString("StartDate"),"MMM dd, yyyy");
                     Log.d("StartDate",StartDate.toString());
                     startdate.setText(StartDate);

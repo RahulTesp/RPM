@@ -574,6 +574,29 @@ namespace RPMWeb.Dal
             catch (Exception ex) { throw; }
             return response;
         }
+        public bool DeleteFirebaseToken(string UserName, string Bearer, string Token, string ConnectionString)
+        {
+            bool response = false;
+            try
+            {
+                using (SqlConnection con = new SqlConnection(ConnectionString))
+                {
+                    SqlCommand command = new SqlCommand("usp_DelFirebaseToken", con);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("FirebaseToken", Token);
+                    con.Open();
+                    SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
+                    returnParameter.Direction = ParameterDirection.ReturnValue;
+                    command.ExecuteNonQuery();
+                    int r = (int)returnParameter.Value;
+                    if (r>0)
+                    { response = true; }
+                    con.Close();
+                }
+            }
+            catch (Exception ex) { throw; }
+            return response;
+        }
 
         public bool IsPatientOnline(string PatientId, string UserName, string ConnectionString)
         {

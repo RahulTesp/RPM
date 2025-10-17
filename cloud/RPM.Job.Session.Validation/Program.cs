@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Data;
+using System.Data.Common;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 // cron 0 0 7 * * *
@@ -25,21 +26,26 @@ namespace SessionValidationJob
             }
             // Access a specific config value
             string? connStr = config["RPM:ConnectionString"];
-            Console.WriteLine($"RPM Connection String: {connStr}");
             if (connStr == null)
             {
                 Console.WriteLine("Connection string is null in appsettings.json.");
                 return;
             }
-            CONN_STRING = connStr;
-            Console.WriteLine("Starting Session validation WebJob...");
-
             if (string.IsNullOrWhiteSpace(CONN_STRING))
             {
                 Console.WriteLine("Connection string not found in environment variables.");
                 return;
             }
+            CONN_STRING = connStr;
+            // Parse connection string for server and database info
+            var builder = new DbConnectionStringBuilder { ConnectionString = connStr };
+            string server = builder.ContainsKey("Server") ? builder["Server"].ToString() : "";
+            string database = builder.ContainsKey("Initial Catalog") ? builder["Initial Catalog"].ToString() : "";
 
+            Console.WriteLine($"Server: {server}");
+            Console.WriteLine($"Database: {database}");
+
+            Console.WriteLine("Starting Session validation WebJob...");
             try
             {
                 IsTokenExpired();
