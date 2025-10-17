@@ -1,281 +1,114 @@
-import SwiftUI
-import Combine
 
+import SwiftUI
+ 
 @available(iOS 15, *)
 public struct OtpView_SwiftUI: View {
-
-    @State private var shouldShowLoginAlert: Bool = false
-    @State private var alertItem: AlertItem?
-    @EnvironmentObject var appModel: AppModel
-    @State private var isLogin = false
-    @FocusState private var isTextFieldFocused: Bool
-    @EnvironmentObject var navigationHelper: NavigationHelper
-    @EnvironmentObject var loginViewModel: RPMLoginViewModel
-    
-    //MARK: Fields
-    enum FocusField: Hashable {
-        case field
-    }
-    
-    @FocusState private var focusedField: FocusField?
     @Binding var otpCode: String
     var otpCodeLength: Int
     var textColor: Color
     var textSize: CGFloat
-    
-    //MARK: Constructor
-     init(otpCode: Binding<String>, otpCodeLength: Int, textColor: Color, textSize: CGFloat) {
+    @FocusState private var isTextFieldFocused: Bool
+    @EnvironmentObject var loginViewModel: RPMLoginViewModel
+    @EnvironmentObject var navigationHelper: NavigationHelper
+    @State private var alertItem: AlertItem?
+    @EnvironmentObject var appModel: AppModel
+    // MARK: Constructor
+    public init(otpCode: Binding<String>, otpCodeLength: Int, textColor: Color, textSize: CGFloat) {
         self._otpCode = otpCode
-        print("self._otpCode",self._otpCode.wrappedValue)
         self.otpCodeLength = otpCodeLength
         self.textColor = textColor
         self.textSize = textSize
-        
     }
-    
-    //MARK: Body
     public var body: some View {
-        HStack {
-       
-            ZStack(alignment: .center) {
-
-                TextField("", text: $otpCode ,
-                          
-                          onEditingChanged: { (changed) in
-                    // Editing has finished
-                    print("$changed")
-                    print(changed)
-                    print("Body - OTP Code:", self._otpCode.wrappedValue)
-               
-                    print("self.focusedField ")
-                 
-                    print("COMMITED!");
-                    
-                    print("$otpCodeFFFF",otpCode)
-                    print("$otpCodeFFFF",$otpCode)
-                    print("OTP Code:", $otpCode.wrappedValue)
- 
-                },
-             
-                          onCommit: {
-                    print("onCommitotpCode")
-                    print(otpCode)
-                    
-                    print($otpCode)
-                })
-                
-              
-            
-                .frame(width: 0, height: 0, alignment: .center)
-                .font(Font.system(size: 0))
-                .accentColor(.clear)
-            
-                .foregroundColor(.clear)
-                .multilineTextAlignment(.center)
+        ZStack {
+            // Invisible TextField for input
+            TextField("", text: $otpCode)
                 .keyboardType(.numberPad)
- 
-                .focused($focusedField, equals: .field)
- 
-                               .onTapGesture {
-                                   self.focusedField = .field
-                                   print("isTextFieldFocused")
-                                   print(isTextFieldFocused)
-                                   isTextFieldFocused = true
-                               }
-                
-                               .onChange(of: otpCode) { newOtpCode in
-                                   
-                                   print("otpCodeLengthVAL",otpCodeLength)
-                                   print("newOtpCode",newOtpCode)
-                                   if newOtpCode.count == otpCodeLength {
-                              
-                                       loginViewModel.verifyOtp( userName: (UserDefaults.standard.string(forKey: "pgmUserID") ?? ""), otp: otpCode, completed: { token, alertItem in
-                                           if let _ = token {
-                                               
-                                      
-                                               if(UserDefaults.standard.string(forKey: "MFAENABLEDTRUE") == "MFAENABLEDTRUE")
-                                               {
-                                                   print("signInOTP","signInOTP")
-                                                   signInOTP(chatacctoken: token ?? "")
-                                                   
-                                               }
-                                        
-                                               
-                                               print("isLogin otp")
-                                           
-                                               navigationHelper.path.append(.tabBarView)
-
-                                               print("self.isActive 2")
-                                         
-                                               print("isAuthenticated value")
-                                               print(loginViewModel.self.isAuthenticated)
-                                               print(loginViewModel.isAuthenticated)
-                                          
-                                               print("loggedin Value1")
-                                               print(UserDefaults.standard.bool(forKey: "loggedInValue") )
-                                               print("isAuthenticated value2222222")
-                                               print(loginViewModel.self.isAuthenticated)
-                                               print(loginViewModel.isAuthenticated)
-                                           
-                                           }else {
-                                               shouldShowLoginAlert = true
-                                               self.alertItem = alertItem
-                                           }
-                                      
-                                       })
-                                       
-                                       
-                                       DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                           self.focusedField = .field
-                                               
-                                             }
-                                
-                                   }
-                               }
-              
-                .task {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5)
-                    {
-                      
-                        print("$otpCode2",otpCode)
-                  
-                        print("$otpCode2",$otpCode)
-                        print("selfotpCodewrappedValue",self._otpCode.wrappedValue)
-                   
+                .textContentType(.oneTimeCode)
+                .accentColor(.clear)
+                .foregroundColor(.clear)
+                .frame(width: 1, height: 1) // non-zero
+                .focused($isTextFieldFocused)
+                .onChange(of: otpCode) { newValue in
+                    // Limit length
+                    if newValue.count > otpCodeLength {
+                        otpCode = String(newValue.prefix(otpCodeLength))
+                    }
+                    // Auto verify when full
+                    if otpCode.count == otpCodeLength {
+                        verifyOTP()
                     }
                 }
-                .padding()
-                HStack {
-                 
-                        ForEach(0..<otpCodeLength, id: \.self) { index in
-                        ZStack {
-                            Text(self.getPin(at: index))
-                                .font(Font.system(size: textSize))
-                                .fontWeight(.semibold)
-                                .foregroundColor(textColor)
-                       
-                                     Rectangle()
-                                         .frame(width: 30, height: 35)
-                                         .foregroundColor(Color.orange.opacity(0.0))
-                                         .overlay(RoundedRectangle(cornerRadius: 3).stroke(Color("lightGreen"), lineWidth: 1))
-                             
-                                         .padding(.trailing, 5)
-                                         .padding(.leading, 5)
-                                         .opacity(self.otpCode.count <= index ? 1 : 1)
-                      
-                        }
-                        .background(Color("bgColorDark"))
-                        .onTapGesture {
-                            print("Rectangle")
-                            self.focusedField = .field
-                        }
-                    
-                       .background(Color("bgColorDark"))
-                       .onTapGesture {
-                           print("Rectangle")
-                           self.focusedField = .field
-                       }
+            // OTP boxes
+            HStack(spacing: 8) {
+                ForEach(0..<otpCodeLength, id: \.self) { index in
+                    ZStack {
+                        Rectangle()
+                            .stroke(Color("lightGreen"), lineWidth: 1)
+                            .frame(width: 40, height: 50)
+                        Text(getPin(at: index))
+                            .font(.system(size: textSize))
+                            .foregroundColor(textColor)
                     }
+                    .onTapGesture { isTextFieldFocused = true }
                 }
-             
-            }
-           
-            .onSubmit {
-                print("Authenticating…")
-                print(otpCode)
-       
             }
         }
-     
-        .alert(item: $alertItem) { alertItem in
-        
-            Alert(
-                   title: Text(alertItem.title),
-                   message: alertItem.message != nil ? Text(alertItem.message!) : nil,
-                   dismissButton: .default(Text("OK"), action: {
-                       
-                print("alertItem.title", alertItem.title)
-                       print("alertItem.message", alertItem.message ?? "")
-                print( (UserDefaults.standard.bool(forKey: "userLocked") ))
-                               if( ((UserDefaults.standard.bool(forKey: "userLocked") ) == true))
-                                {
-                                   
-                                   print("ok clik lok")
-                                   print( (UserDefaults.standard.bool(forKey: "userLocked") ))
-                                   print("Ok Click")
-                             
-                               }
-                if( ((UserDefaults.standard.bool(forKey: "otpWrong") ) == true))
-                 {
-                    otpCode = ""
-                    print("otpCodeempty",otpCode)
-                    print( (UserDefaults.standard.bool(forKey: "otpWrong") ))
-                    print("Ok Click")
-                   
-                }
-                
-                else
-                {
-                   
-                }
-           
-                       }))
-         
-        }
-    
-    }
-    
-    
-    func signInOTP(chatacctoken : String) {
-        print("ManualSigninOTPPAGE",chatacctoken)
-
-        appModel.client.create(chatacctoken : chatacctoken ,delegate: appModel) { [self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success:
-               
-                    // remember current user and identity here
-                    appModel.saveUser(appModel.client.conversationsClient?.user)
-                
-                    if let user = appModel.client.conversationsClient?.user {
-                        print("appModelconvClientuser", user)
-                    } else {
-                        print("appModelconvClientuser is nil")
-                    }
-
-                case .failure(let error):
-                    NSLog("Sign in failed with error: \(error.localizedDescription)")
-                    if case .failure(LoginError.accessDenied) = result {
-                        NSLog("Sign in failed, erasing credentials")
-                 
-                    } else {
-                     
-                    }
-                }
-            }
+        .onAppear { isTextFieldFocused = true } // focus on appear
+        .alert(item: $alertItem) { item in
+            Alert(title: Text(item.title),
+                  message: item.message.map { Text($0) },
+                  dismissButton: .default(Text("OK")))
         }
     }
-    
-
-    //MARK: func
     private func getPin(at index: Int) -> String {
-        guard self.otpCode.count > index else {
-            return ""
-        }
-        return self.otpCode[index]
+        return index < otpCode.count ? String(otpCode[index]) : ""
     }
-    
-    private func limitText(_ upper: Int) {
-        if otpCode.count > upper {
-            otpCode = String(otpCode.prefix(upper))
+    private func verifyOTP() {
+        loginViewModel.verifyOtp(
+            userName: UserDefaults.standard.string(forKey: "pgmUserID") ?? "",
+            otp: otpCode
+        ) { token, alert in
+            if let token = token {
+                if UserDefaults.standard.string(forKey: "MFAENABLEDTRUE") == "MFAENABLEDTRUE" {
+                    signInOTP(chatacctoken: token)
+                }
+                navigationHelper.path.append(.tabBarView)
+            } else {
+                alertItem = alert
+            }
         }
+    }
+    private func signInOTP(chatacctoken: String) {
+        // Your chat login logic
+        print("ManualSigninOTPPAGE",chatacctoken)
+         
+                appModel.client.create(chatacctoken : chatacctoken ,delegate: appModel) { [self] result in
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .success:
+                            // remember current user and identity here
+                            appModel.saveUser(appModel.client.conversationsClient?.user)
+                            if let user = appModel.client.conversationsClient?.user {
+                                print("appModelconvClientuser", user)
+                            } else {
+                                print("appModelconvClientuser is nil")
+                            }
+         
+                        case .failure(let error):
+                            NSLog("Sign in failed with error: \(error.localizedDescription)")
+                            if case .failure(LoginError.accessDenied) = result {
+                                NSLog("Sign in failed, erasing credentials")
+                            } else {
+                            }
+                        }
+                    }
+                }
     }
 }
-
+ 
 extension String {
     subscript(idx: Int) -> String {
         String(self[index(startIndex, offsetBy: idx)])
     }
 }
-
-
