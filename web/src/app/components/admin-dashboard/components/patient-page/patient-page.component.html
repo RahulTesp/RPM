@@ -796,7 +796,7 @@
         </p>
       </div>
     </div>
-    <div class="patient_table_content" *ngIf="billingInfodata">
+    <div  *ngIf="billingInfodata">
       <div class="upperPanelbillingtable">
         <mat-paginator
           [length]="
@@ -814,8 +814,7 @@
           ><img class="refreshIcon" src="../../../../../assets/refresh.png"
         /></span>
       </div>
-
-      <mat-table #table [dataSource]="dataSourceTableList">
+      <div class="patient_table_content"><mat-table #table [dataSource]="dataSourceTableList">
         <!-- <ng-container matColumnDef="selection">
           <th><mat-header-cell style="border-radius: 16px 0px 0px 0px;" *matHeaderCellDef> </mat-header-cell></th>
 
@@ -1072,7 +1071,8 @@
           }"
           *matRowDef="let row; columns: BillingList_columHeader"
         ></mat-row>
-      </mat-table>
+      </mat-table></div>
+      
     </div>
   </div>
 </ng-template>
