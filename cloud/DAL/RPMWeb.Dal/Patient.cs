@@ -5028,7 +5028,7 @@ namespace RPMWeb.Dal
                                     PatientBilldata426.Completed = 0;
                                     PatientBilldata426.CPTCode = code.BillingCode;
                                 }
-                                PatientBilldata426.ProgramName="PCM-P";
+                                PatientBilldata426.ProgramName="PCM-C";
                                 PatientBilldateList.Add(PatientBilldata426);
 
                                 break;
@@ -5077,7 +5077,7 @@ namespace RPMWeb.Dal
                                     PatientBilldata427.Completed = 0;
                                     PatientBilldata427.CPTCode = code.BillingCode;
                                 }
-                                PatientBilldata427.ProgramName="PCM-P";
+                                PatientBilldata427.ProgramName="PCM-C";
                                 PatientBilldateList.Add(PatientBilldata427);
 
                                 break;
