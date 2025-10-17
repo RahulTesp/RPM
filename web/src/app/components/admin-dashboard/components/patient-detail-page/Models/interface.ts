@@ -9,18 +9,18 @@ export interface BillingData {
   AssignedMember?: string;
   TaskOrAlert?: string;
 }
-export const billingPCM_P = [
+export const billingPCM_C = [
   {
-    cptcode: 8,
+    cptcode: 99426,
     description: 'PCM Services - 1st 30 Mins - Clinical Staff ',
   },
   {
-    cptcode: 99,
+    cptcode: 99427,
     description: "PCM Services - Add'l 30 Mins - Clinical Staff ",
   },
 ];
 
-export const billingPCM_C = [
+export const billingPCM_P = [
   {
     cptcode: 99424,
     description: 'PCM Services - 1st 30 Mins - Physician or QHCP ',
