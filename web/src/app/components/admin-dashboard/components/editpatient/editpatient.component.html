@@ -1764,7 +1764,7 @@
                               [ngModelOptions]="{ standalone: true }"
                               (change)="onVitalChange(device, $event)"
                               >
-                              <ng-container *ngFor="let x of uniqueVitals">
+                              <ng-container *ngFor="let x of getUniqueVitals()">
                                 <option *ngIf="x.VitalName != ''" [value]="x.VitalId">
                                   {{ x.VitalName }}
                                 </option>
@@ -1816,7 +1816,7 @@
                               placeholder="LTE"
                               [(ngModel)]="deviceTypeDataId"
                               [ngModelOptions]="{ standalone: true }"
-                              (ngModelChange)="deviceCommunicationTypeChange()"
+                              (ngModelChange)="OndeviceCommunicationTypeChange(i)"
                             >
                               <option
                                 *ngFor="let v of CommunicationType"

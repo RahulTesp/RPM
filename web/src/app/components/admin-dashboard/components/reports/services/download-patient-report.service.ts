@@ -277,7 +277,7 @@ export class DownloadPatientReportService {
     ) {
       return this.generateEmptyChartData();
     }
-
+  console.log('healthTrends:', healthTrends);
     // Convert dates to readable format
     const chartLabels = this.convertDateforHealthTrends(healthTrends.Time);
 
@@ -1197,7 +1197,7 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
         'MMM d, y'
       ),
       this.datepipe.transform(
-        this.convertToLocalTime(med.EndDate)!,
+        //this.convertToLocalTime(med.EndDate)!,
         med.EndDate!,
         'MMM d, y'
       ),

@@ -27,7 +27,7 @@ import timezone from 'dayjs/plugin/timezone';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 export interface document {
-  type: string;
+  type: string; 
   name: string;
   date: string;
   document: string;
@@ -141,7 +141,7 @@ export class EditpatientComponent implements OnInit {
   programVitals: any;
   initialFormValues: any;
   allVitalsSelected = false;
-  uniqueVitals: any;
+  //uniqueVitals: any;
   private programNameValueChangesSubscription: Subscription | undefined;
   constructor(
     private _route: ActivatedRoute,
@@ -386,6 +386,15 @@ export class EditpatientComponent implements OnInit {
   }
 
   deviceCommunicationTypeChange() {
+    var that = this;
+    that.master_data = sessionStorage.getItem('add_patient_masterdata');
+    that.master_data = JSON.parse(that.master_data);
+    that.deviceList = that.master_data.DeviceDetails;
+    this.deviceVitalLists();
+  }
+
+  OndeviceCommunicationTypeChange(index: any) {
+    this.patientdevicedetails[index].DeviceNumber =null;
     var that = this;
     that.master_data = sessionStorage.getItem('add_patient_masterdata');
     that.master_data = JSON.parse(that.master_data);
@@ -1114,7 +1123,7 @@ export class EditpatientComponent implements OnInit {
             }
           }
           that.patientdevicedetails = vitalArr;
-           this.uniqueVitals = this.getUniqueVitals();
+         // this.uniqueVitals = this.getUniqueVitals();
           console.log('Patient Device Details');
           console.log(that.patientdevicedetails)
         }
@@ -1194,7 +1203,7 @@ export class EditpatientComponent implements OnInit {
       VitalName: '',
       DeviceStatus: 'InActive',
       VitalId: '',
-      DeviceNumber: '',
+      DeviceNumber: '', 
       isEditable: true,
     };
     if (this.patientdevicedetails?.length < 10) {
@@ -3839,8 +3848,8 @@ export class EditpatientComponent implements OnInit {
     const selectedValue = (event.target as HTMLSelectElement).value;
     const selectedId = Number(selectedValue);
 
-    //const selectedVital = this.getUniqueVitals().find((v: { VitalId: number }) => v.VitalId === selectedId);
-  const selectedVital = this.uniqueVitals.find((v: {VitalId: number}) => v.VitalId === selectedId);
+    const selectedVital = this.getUniqueVitals().find((v: { VitalId: number }) => v.VitalId === selectedId);
+  //const selectedVital = this.uniqueVitals.find((v: {VitalId: number}) => v.VitalId === selectedId);
   if (!selectedVital) return;
 
     if (!selectedVital) return;
