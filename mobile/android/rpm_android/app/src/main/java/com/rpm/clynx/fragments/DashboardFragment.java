@@ -154,7 +154,7 @@ public class DashboardFragment extends Fragment {
         Log.d("onStart", "Setting up Twilio Listeners...");
         setupTwilioListeners();
 
-        IntentFilter filter = new IntentFilter("com.rpm.clynx.NOTIFICATION_RECEIVED");
+        IntentFilter filter = new IntentFilter("com.rpm.tespcare.NOTIFICATION_RECEIVED");
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(notificationReceiver, filter);
 
     }
@@ -317,7 +317,7 @@ public class DashboardFragment extends Fragment {
             tv_vital_time = (TextView) view.findViewById(R.id.vital_card_time);
             emptyChart = (TextView) view.findViewById(R.id.empty_viewDB);
             recentvtls.setVisibility(View.VISIBLE);
-           }
+        }
 
         SimpleDateFormat DateFor = new SimpleDateFormat("EEEE, MMM dd, yyyy");
         tv_date.setText(DateFor.format(new Date()));
@@ -428,14 +428,14 @@ public class DashboardFragment extends Fragment {
         Log.d("EndDate(UTC):",formattedEndDate);
 
         if (ProgramName != null && ProgramName.equals("RPM"))
-       {
-           Log.d("pgmnameisRPM","pgmnameisRPM");
-           checkVitalData(formattedStart7Date,formattedEndDate);
-         }
-       else {
-           Log.d("pgmnameisCCM","pgmnameisCCM");
-       }
-      //  connectWebSocket();
+        {
+            Log.d("pgmnameisRPM","pgmnameisRPM");
+            checkVitalData(formattedStart7Date,formattedEndDate);
+        }
+        else {
+            Log.d("pgmnameisCCM","pgmnameisCCM");
+        }
+        //  connectWebSocket();
         todo_nofoactivites = view.findViewById(R.id.todo_nofoactivitesda_dash);
         return view;
     }
@@ -774,35 +774,50 @@ public class DashboardFragment extends Fragment {
 
             }
         }, new Response.ErrorListener() {
+
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getContext(), "No data available!", Toast.LENGTH_SHORT).show();
+                if (!isAdded()) {
+                    Log.w("DashboardFragment", "Fragment not attached — skipping error handling");
+                    return;
+                }
+
+                // Fragment is attached — safe to use context and UI
+                Toast.makeText(requireContext(), "No data available!", Toast.LENGTH_SHORT).show();
+
+                // if (l1 != null ) {
                 l1.dismiss();
+                //  }
 
                 NetworkErrorHandler.handleError(requireContext(), error, editor, db);
 
-                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
-                    Log.d("homecode", String.valueOf(error.networkResponse.statusCode));
-                    error.printStackTrace();
-                    Log.d("e", error.toString());
-                    editor.putBoolean("loginstatus", false);
-                    editor.apply();
-                    db.deleteProfileData("myprofileandprogram");
-                    db.deleteData();
-                    editor.clear();
-                    editor.commit();
-                    try {
-                        Intent intentlogout = new Intent(requireContext(), Login.class);
-                        intentlogout.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intentlogout);
-                    } catch (Exception e) {
-                        Log.e("onLogOff Clear", e.toString());
-                    }
-                }
-                else
-                    if (error.networkResponse.statusCode == 400) {
+                if (error.networkResponse != null) {
+                    int statusCode = error.networkResponse.statusCode;
+
+                    if (statusCode == 401) {
+                        Log.d("homecode", String.valueOf(statusCode));
+                        error.printStackTrace();
+                        Log.d("e", error.toString());
+
+                        editor.putBoolean("loginstatus", false);
+                        editor.apply();
+                        db.deleteProfileData("myprofileandprogram");
+                        db.deleteData();
+                        editor.clear();
+                        editor.commit();
+
+                        try {
+                            Intent intentlogout = new Intent(requireContext(), Login.class);
+                            intentlogout.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intentlogout);
+                        } catch (Exception e) {
+                            Log.e("onLogOff Clear", e.toString());
+                        }
+
+                    } else if (statusCode == 400) {
                         Log.e("API_ERROR", "Bad Request: " + new String(error.networkResponse.data));
                     }
+                }
             }
         }) {
             @Override
@@ -1004,7 +1019,7 @@ public class DashboardFragment extends Fragment {
                 }
                 if (jsonArray != null) {
                     if (jsonArray.length() <= 0) {
-                       // Toast.makeText(getContext(), "No Data Available", Toast.LENGTH_SHORT).show();
+                        // Toast.makeText(getContext(), "No Data Available", Toast.LENGTH_SHORT).show();
 
                         // Check if fragment is attached before showing Toast
                         if (isAdded() && getActivity() != null) {
@@ -1102,7 +1117,7 @@ public class DashboardFragment extends Fragment {
                 int value = Integer.parseInt(jsonObject.getString("TotalUnRead"));
                 Log.d("NotificationsCountvalue", String.valueOf(value));
 
-                if (isAdded()) { // 🔹 Only update UI if still attached
+                if (isAdded()) { //  Only update UI if still attached
                     if (value > 0) {
                         tv_notification_count.setText(String.valueOf(value));
                         tv_notification_count.setVisibility(View.VISIBLE);
@@ -1114,7 +1129,7 @@ public class DashboardFragment extends Fragment {
                 // Retry once if stale
                 if (!isRetry && lastNotificationCount != -1 && value <= lastNotificationCount) {
                     new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                        if (isAdded()) { // 🔹 check again before retry
+                        if (isAdded()) { //  check again before retry
                             getNotificationsCount(true);
                         }
                     }, 1500);
@@ -1134,7 +1149,7 @@ public class DashboardFragment extends Fragment {
             }
         };
 
-        // 🔹 Safe request queue
+        //  Safe request queue
         RequestQueue requestQueue = Volley.newRequestQueue(requireContext().getApplicationContext());
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(
                 60000,
