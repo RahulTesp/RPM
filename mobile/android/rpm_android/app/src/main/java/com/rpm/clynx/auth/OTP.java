@@ -26,9 +26,12 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.poovam.pinedittextfield.PinField;
 import com.poovam.pinedittextfield.SquarePinField;
 import com.rpm.clynx.fragments.Login;
+import com.rpm.clynx.fragments.LoginHelper;
+import com.rpm.clynx.fragments.TokenManager;
 import com.rpm.clynx.home.Home;
 import com.rpm.clynx.R;
 import com.rpm.clynx.utility.DataBaseHelper;
@@ -199,16 +202,23 @@ public class OTP extends AppCompatActivity {
     }
 
     private void verifycode(String otp, SquarePinField squarePinField) {
+        Log.d("VERIFYCODE_LOG", "verifycode() called with OTP: " + otp);
+
         final Loader l1 = new Loader(OTP.this);
         l1.show("Please wait...");
+        Log.d("VERIFYCODE_LOG", "Loader shown");
+
         String OTP_URL = BASE_URL + OTP_VERIFY.toString();
+        Log.d("VERIFYCODE_LOG", "OTP URL: " + OTP_URL);
 
         JSONObject postData = new JSONObject();
         try {
             postData.put("UserName", Usrnm);
             postData.put("OTP", otp);
+            Log.d("VERIFYCODE_LOG", "Post data prepared: " + postData.toString());
         } catch (JSONException e) {
             e.printStackTrace();
+            Log.e("VERIFYCODE_LOG", "JSONException while preparing post data: " + e.getMessage());
         }
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, OTP_URL, postData,
@@ -216,76 +226,124 @@ public class OTP extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         l1.dismiss();
-                        Log.d("Log_url", OTP_URL);
+                        Log.d("VERIFYCODE_LOG", "Response received: " + response.toString());
                         try {
-                            token = response.getString("tkn");
-                            Log.d("response", response.toString());
-                            JSONArray jsonArrayPS = null;
-                            JSONObject jsonObject = new JSONObject(response.toString());
-                            jsonArrayPS = new JSONArray(jsonObject.getString("Roles"));
-
-                            for (int i = 0; i < jsonArrayPS.length(); i++) {
-                                JSONObject jsonObjectPS = jsonArrayPS.getJSONObject(i);
-                                role = jsonObjectPS.getString("Id");
-                                System.out.println("My Role : - " + role);
+                            // Get token
+                            token = response.optString("tkn");
+                            Log.d("VERIFYCODE_LOG", "Token received: " + token);
+                            if (token == null || token.isEmpty()) {
+                                Log.e("VERIFYCODE_LOG", "Token is null or empty");
+                                Toast.makeText(OTP.this, "Invalid token received", Toast.LENGTH_SHORT).show();
+                                return;
                             }
 
-                            if ((response.getString("tkn") != null) && role.equals("7")) {
+                            // Parse Roles
+                            JSONArray rolesArray = response.optJSONArray("Roles");
+                            Log.d("VERIFYCODE_LOG", "Roles array: " + rolesArray);
+                            boolean hasRole7 = false;
+
+                            if (rolesArray != null) {
+                                for (int i = 0; i < rolesArray.length(); i++) {
+                                    JSONObject roleObj = rolesArray.getJSONObject(i);
+                                    int roleId = roleObj.optInt("Id", -1);
+                                    Log.d("VERIFYCODE_LOG", "RoleId at index " + i + ": " + roleId);
+                                    if (roleId == 7) {
+                                        hasRole7 = true;
+                                        break;
+                                    }
+                                }
+                            } else {
+                                Log.e("VERIFYCODE_LOG", "Roles array is null");
+                            }
+
+                            // Check for role and token
+
+                            if (hasRole7) {
                                 editor.putString("Token", token);
+
                                 editor.putBoolean("otpstatus", true);
+                                editor.putBoolean("loginstatus", true);
                                 editor.apply();
-                                Login login = new Login();
-                                login.retrieveTokenFromServer(token);
+
+                                // Retrieve Chat / Twilio token
+                                TokenManager.getInstance(getApplicationContext()).retrieveTokenFromServer(token);
+
+                                // Firebase
+                                FirebaseMessaging.getInstance().subscribeToTopic("videocall");
+                                FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+                                    if (!task.isSuccessful()) return;
+                                    String firebasetoken = task.getResult();
+                                    editor.putString("FirebaseToken", firebasetoken);
+                                    editor.apply();
+
+                                    LoginHelper.firebasetokenInsertion(OTP.this, token, firebasetoken);
+                                    LoginHelper.membersList(OTP.this, token);
+
+                                });
+
+                                // Navigate to Home
                                 Intent intent = new Intent(OTP.this, Home.class);
                                 startActivity(intent);
                                 finish();
-                            } else if (role != "7") {
-                                Toast.makeText(OTP.this, "Invalid User!", Toast.LENGTH_SHORT).show();
                             }
+
                             else {
-                                Toast.makeText(OTP.this, "Unauthorized !", Toast.LENGTH_SHORT).show();
+                                Log.e("VERIFYCODE_LOG", "User does not have role 7");
+                                Toast.makeText(OTP.this, "Invalid User or Unauthorized!", Toast.LENGTH_SHORT).show();
                             }
-                        } catch (Exception e) {
-                            Toast.makeText(OTP.this, "Invalid", Toast.LENGTH_SHORT).show();
+
+                        } catch (JSONException e) {
                             e.printStackTrace();
+                            Log.e("VERIFYCODE_LOG", "JSONException in onResponse: " + e.getMessage());
+                            Toast.makeText(OTP.this, "Invalid response format", Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e("VERIFYCODE_LOG", "Unexpected exception in onResponse: " + e.getMessage());
+                            Toast.makeText(OTP.this, "Unexpected error occurred", Toast.LENGTH_SHORT).show();
                         }
                     }
+
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         l1.dismiss();
+                        Log.e("VERIFYCODE_LOG", "VolleyError received");
                         if (error instanceof TimeoutError || error instanceof NoConnectionError) {
+                            Log.e("VERIFYCODE_LOG", "Timeout or No Connection");
                             Toast.makeText(getApplicationContext(), "Poor Network Connection", Toast.LENGTH_SHORT).show();
-                        } else {
-                            if (error.networkResponse.statusCode == 401) {
-                                Log.d("JSONE statusCoden", String.valueOf(error.networkResponse.statusCode));
-                                error.printStackTrace();
-                                Log.d("e", error.toString());
+                        } else if (error.networkResponse != null) {
+                            int statusCode = error.networkResponse.statusCode;
+                            Log.e("VERIFYCODE_LOG", "Server error code: " + statusCode);
+                            if (statusCode == 401) {
                                 Toast.makeText(getApplicationContext(), "OTP may be wrong!", Toast.LENGTH_LONG).show();
                                 squarePinField.getText().clear();
-                            } else if (error.networkResponse.statusCode == 403) {
-                                Log.d("JSONE statusCoden", String.valueOf(error.networkResponse.statusCode));
-                                error.printStackTrace();
-                                Log.d("e", error.toString());
+                            } else if (statusCode == 403) {
                                 Toast.makeText(getApplicationContext(), "The user is locked! Maximum number of attempts exceeded.", Toast.LENGTH_LONG).show();
                                 finish();
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Server error: " + statusCode, Toast.LENGTH_SHORT).show();
                             }
+                        } else {
+                            Log.e("VERIFYCODE_LOG", "Unexpected Volley error: " + error.toString());
+                            Toast.makeText(getApplicationContext(), "Unexpected error occurred", Toast.LENGTH_SHORT).show();
                         }
+                        error.printStackTrace();
                     }
                 }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
-                headers.put("Bearer", tokenOld);
-                Log.d("Token_profile_personal", tokenOld);
+                headers.put("Bearer", tokenOld != null ? tokenOld : "");
+                Log.d("VERIFYCODE_LOG", "Header tokenOld: " + tokenOld);
                 return headers;
             }
         };
 
-        //creating a request queue
         RequestQueue requestQueue = Volley.newRequestQueue(OTP.this);
         jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(0, -1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(jsonObjReq);
+
+        Log.d("VERIFYCODE_LOG", "Request added to queue");
     }
 }
