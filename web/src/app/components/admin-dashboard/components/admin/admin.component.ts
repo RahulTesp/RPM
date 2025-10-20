@@ -1181,7 +1181,7 @@ export class AdminComponent implements OnInit {
         },
         (err) => {
           this.confirmDialog.showConfirmDialog(
-          err.error || 'Could not deactivate user.',
+          err.error.message || 'Could not deactivate user.',
           'Error',
           null,
           false

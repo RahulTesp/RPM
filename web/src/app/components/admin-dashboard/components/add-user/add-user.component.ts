@@ -86,6 +86,8 @@ export class AddUserComponent implements OnInit {
   clinicdisplay: any;
 
   http_clinicData: any;
+  activeClinics: any;
+
   masterdata2: unknown;
   timezones: any;
 
@@ -116,6 +118,11 @@ export class AddUserComponent implements OnInit {
     this.timezones = this.http_state.TimeZones;
     this.http_clinicData = sessionStorage.getItem('clinic_masterdata');
     this.http_clinicData = JSON.parse(this.http_clinicData);
+
+    
+    // Filter only active clinics
+    this.activeClinics = this.http_clinicData.filter((clinic: any) => clinic.Active === true);
+
 
     // Only display clinicName When selection is Physician
     this.registerForm.get('userrole')?.valueChanges.subscribe((data) => {

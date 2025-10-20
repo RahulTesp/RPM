@@ -354,7 +354,7 @@
                         Select Clinic
                       </option>
                       <option
-                        *ngFor="let clinic of http_clinicData; let i = index"
+                        *ngFor="let clinic of activeClinics; let i = index"
                         [value]="clinic.Id"
                       >
                         {{ clinic.Name }}
