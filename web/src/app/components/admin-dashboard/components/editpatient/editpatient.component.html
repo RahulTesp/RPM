@@ -782,6 +782,11 @@
                       id="addPatientAdditionalNotes"
                       maxlength="500"
                     ></textarea>
+                    <span *ngIf="PatientInfoForm.get('additionalnotes')?.value?.length >= 500"
+                        style="color: red; margin-left: 10px;">
+                       ⚠️ Max length 500 reached.
+                        </span>
+
                   </div>
             </div>
 
@@ -1765,7 +1770,7 @@
                               [ngModelOptions]="{ standalone: true }"
                               (change)="onVitalChange(device, $event)"
                               >
-                              <ng-container *ngFor="let x of uniqueVitals">
+                              <ng-container *ngFor="let x of getUniqueVitals()">
                                 <option *ngIf="x.VitalName != ''" [value]="x.VitalId">
                                   {{ x.VitalName }}
                                 </option>
@@ -1817,7 +1822,7 @@
                               placeholder="LTE"
                               [(ngModel)]="deviceTypeDataId"
                               [ngModelOptions]="{ standalone: true }"
-                              (ngModelChange)="deviceCommunicationTypeChange()"
+                              (ngModelChange)="OndeviceCommunicationTypeChange(i)"
                             >
                               <option
                                 *ngFor="let v of CommunicationType"

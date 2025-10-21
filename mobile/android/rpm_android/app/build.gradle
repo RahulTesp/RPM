@@ -5,13 +5,13 @@ plugins {
 
 android {
     namespace 'com.rpm.clynx'
-    compileSdk 34
+    compileSdk 35
     defaultConfig {
         applicationId "com.rpm.clynx"
         minSdk 26
-        targetSdk 34
-        versionCode 13
-        versionName "1.6"
+        targetSdk 35
+        versionCode 1
+        versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

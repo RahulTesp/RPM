@@ -93,7 +93,7 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("logoutintentfrmlogn", String.valueOf(intent));
-            if (intent != null && "com.rpm.clynx.ACTION_LOGOUT_RESULT".equals(intent.getAction())) {
+            if (intent != null && "com.rpm.tespcare.ACTION_LOGOUT_RESULT".equals(intent.getAction())) {
                 boolean logoutResult = intent.getBooleanExtra("logoutResult", false);
                 String logToken = intent.getStringExtra("LOGINTOKEN");
                 // Handle the logout result here
@@ -111,7 +111,7 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
     };
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-   // private Timer timer;
+    // private Timer timer;
     @SuppressLint("SuspiciousIndentation")
     @Override
 
@@ -135,7 +135,7 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
         latestActivity = ((MyApplication) getApplication()).getLatestActivity();
 
         // Register the logout receiver
-        IntentFilter intentFilterlogout = new IntentFilter("com.rpm.clynx.ACTION_LOGOUT_RESULT");
+        IntentFilter intentFilterlogout = new IntentFilter("com.rpm.tespcare.ACTION_LOGOUT_RESULT");
         LocalBroadcastManager.getInstance(this).registerReceiver(logoutReceiver, intentFilterlogout);
 
         createNotificationChannel(); // Ensure channel exists
@@ -264,41 +264,14 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
         }
     }
 
-    public void retrieveTokenFromServer(String appAccessToken) {
-        Log.d("appAccessToken", String.valueOf(appAccessToken));
-        quickstartConversationsManager.retrieveAccessTokenFromServer(getApplicationContext(), appAccessToken, new TokenResponseListener() {
-            @Override
-            public void receivedTokenResponse(boolean success, @Nullable Exception exception) {
-                if (success) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            // need to modify user interface elements on the UI thread
-                            Log.d("success", String.valueOf(success));
-                        }
-                    });
-                }
-                else {
-                    String errorMessage = getString(R.string.error_retrieving_access_token);
-                    if (exception != null) {
-                        errorMessage = errorMessage + " " + exception.getLocalizedMessage();
-                    }
-                    Toast.makeText(Login.this,
-                                    errorMessage,
-                                    Toast.LENGTH_LONG)
-                            .show();
-                }
-            }
-        });
-    }
-
     private BroadcastReceiver newTokenReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Extract the token from the intent
             String refreshedtoken = intent.getStringExtra("onNewToken");
             // Call the method in the activity to save the new token to the server
-            firebasetokenInsertion(refreshedtoken);
+            // firebasetokenInsertion(refreshedtoken);
+            LoginHelper.firebasetokenInsertion(Login.this, token, refreshedtoken);
         }
     };
 
@@ -389,8 +362,9 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
                                         editor.putBoolean("loginstatus", true);
                                         editor.apply();
 
-                                        // Inside your login success callback
-                                        retrieveTokenFromServer(token);
+// Inside Login after successful login
+                                        TokenManager.getInstance(Login.this).retrieveTokenFromServer(token);
+
 
                                         Log.d("loginretrvchattoken", "loginretrvchattoken");
                                         Log.d("logintoknapply",pref.getString("Token", null)) ;
@@ -414,9 +388,9 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
                                                         Log.d(TAG, msg);
                                                         Toast.makeText(Login.this, msg, Toast.LENGTH_SHORT).show();
 
-                                                        firebasetokenInsertion(firebasetoken);
+                                                        LoginHelper.firebasetokenInsertion(Login.this, token, firebasetoken);
+                                                        LoginHelper.membersList(Login.this, token);
 
-                                                        membersList();
                                                     }
                                                 });
 
@@ -643,86 +617,6 @@ public class Login extends AppCompatActivity  implements QuickstartConversations
             Log.d("logininstancenew", String.valueOf(logininstance));
         }
         return logininstance;
-    }
-
-
-    private void membersList() {
-        String MEMBERS_LIST_URL = BASE_URL + MEMBERS_LIST;
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, MEMBERS_LIST_URL,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("MEMBERS_LIST_URL", MEMBERS_LIST_URL);
-                        Log.d("membersListresponse", response.toString());
-
-                        saveMembersList(response);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_LONG).show();
-                    }
-                })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Bearer",token);
-                Log.d("headers_myprofileandprogram",headers.toString());
-                Log.d("Token_myprofileandprogram", token);
-                return headers;
-            }
-        };
-
-        //creating a request queue
-        RequestQueue requestQueue = Volley.newRequestQueue(Login.this);
-        //adding the string request to request queue
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(0,-1,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        requestQueue.add(stringRequest);
-    }
-
-    private void saveMembersList(String response) {
-        SharedPreferences sharedPreferences = getSharedPreferences("RPMUserApp", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("members_list", response);
-        editor.apply(); // Saves asynchronously
-        Log.d("SharedPreferences", "Members list saved successfully");
-    }
-    private void firebasetokenInsertion(String fbtoken)  {
-        String FB_token_save_URL = BASE_URL+ FB_TOK_SAVE ;
-        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, FB_token_save_URL + fbtoken,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Handle the API response
-                        boolean success = Boolean.parseBoolean(response);
-                        // Process the boolean value as needed
-                        Log.e("firebasetokenInsertionSuccess",response);
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // Handle network or API errors
-                        System.out.println("VolleyError");
-                        Log.e("firebasetokenInsertionFailed", error.toString());
-                    }
-                }
-        )
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Bearer",token);
-                return headers;
-            }
-        };
-
-// Add the request to the request queue
-        requestQueue.add(stringRequest);
     }
 
     private boolean validateUserName() {
