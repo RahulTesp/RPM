@@ -267,6 +267,7 @@ export class EditpatientComponent implements OnInit {
         }
 
         that.editProgramGoal = ProgramSelected[0].goalDetails;
+        this.vitalEditPgmListChange();
         that.editProgramDiagoList = ProgramSelected[0].Vitals[0].Dignostics;
         for (let x of this.editProgramDiagoList) {
           x.DiagnosisFieldEdit = x.DiagnosisName;
