@@ -2177,7 +2177,7 @@
               </ng-container>
             </div>
           </div>
-          <div class="common_content" [class.disabled-div]="worklistgettaskbyid?.Status == 'Complete'">
+          <div class="common_content" [class.disabled-div]="Taskdiasble">
             <p class="common_content_title">Task Type</p>
             <select
               class="common_input_dropdown"
@@ -2219,7 +2219,7 @@
           </div>
           <!-- Tak Content date Start -->
           <div class="common_content task_content_date">
-            <div class="task_date_picker_container" [class.disabled-div]="worklistgettaskbyid?.Status == 'Complete'">
+            <div class="task_date_picker_container" [class.disabled-div]="Taskdiasble">
               <p class="common_content_title">Due Date</p>
 
               <input
@@ -2241,7 +2241,7 @@
                 </ng-container>
               </div>
             </div>
-            <div class="task_priority common_content" [class.disabled-div]="worklistgettaskbyid?.Status == 'Complete'">
+            <div class="task_priority common_content" [class.disabled-div]="Taskdiasble">
               <p class="common_content_title">Priority</p>
               <select
                 class="common_input_dropdown priority_task_dropdown"
@@ -2270,7 +2270,7 @@
             </div>
           </div>
           <!-- Tak Content date End -->
-          <div class="common_content" [class.disabled-div]="worklistgettaskbyid?.Status == 'Complete'">
+          <div class="common_content" [class.disabled-div]="Taskdiasble">
             <p class="common_content_title">Task Status</p>
             <select
               class="common_input_dropdown task_content_dropdown_self"
