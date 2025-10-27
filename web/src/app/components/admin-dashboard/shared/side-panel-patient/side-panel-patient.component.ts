@@ -1145,7 +1145,7 @@ export class SidePanelPatientComponent implements OnInit {
 
   medicationStartDate: any;
   caluculateEndDate(startDate: any) {
-    var numberOfDaysToAdd = this.medication_durationValue - 1;
+    var numberOfDaysToAdd = this.medication_durationValue;
     this.medicationStartDate = startDate;
     var result;
     if (this.SelectedMedicalScheduleInterval == 'Weekly') {
@@ -1501,7 +1501,9 @@ export class SidePanelPatientComponent implements OnInit {
               this.taskbyIdValue.Description
             );
             var duedate = this.convertToLocalTime(this.taskbyIdValue.DueDate);
-            this.registerTask.controls.duedate.setValue(duedate);
+            const dateOnly = duedate.split(" ")[0];  // "10-28-2025"
+
+            this.registerTask.controls.duedate.setValue(dateOnly);
             this.registerTask.controls.priority.setValue(
               parseInt(this.taskbyIdValue.PriorityId)
             );

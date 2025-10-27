@@ -1205,8 +1205,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.smsCancel();  // close the panel
         alert('Message Sent Successfully..!');
         this.loading_sms = false;
-        this.getSMSData();
+       this.variable=5;
        this.activityInfoMenuSelect(6);
+        this.getSMSData();
       },
       (err) => {
         // this.dialog.closeAll();
@@ -2498,6 +2499,8 @@ getFirstPresentVital(vitalScreen: any) {
         break;
       case 6:
         this.activityMenuVariable = 6;
+        console.log("Variable");
+        console.log(this.variable);
         this.dataSourceChange(this.variable, this.activityMenuVariable);
         break;
       case 7:
