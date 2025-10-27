@@ -169,8 +169,12 @@ struct RPMLoginView: View {
                 UserDefaults.standard.set(password, forKey: "passwordSaved")
 
                 print("Checking MFA flag:", UserDefaults.standard.string(forKey: "MFAENABLEDFALSE") ?? "nil")
+                
+                if UserDefaults.standard.bool(forKey: "MFAvalue") == false {
+                
+                print("MFAvalue:", UserDefaults.standard.bool(forKey: "MFAvalue"))
 
-                if UserDefaults.standard.string(forKey: "MFAENABLEDFALSE") == "MFAENABLEDFALSE" {
+//                if UserDefaults.standard.string(forKey: "MFAENABLEDFALSE") == "MFAENABLEDFALSE" {
                     print("mfafalse")
                     signIn(chatacctoken: token)
                     
