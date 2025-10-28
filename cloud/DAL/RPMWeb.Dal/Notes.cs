@@ -421,7 +421,7 @@ namespace RPMWeb.Dal
                                             question.Question = (dr3["NoteCategoryName"]).ToString();
                                             question.IsMandatory = Convert.ToBoolean(dr3["IsMandatory"]);
                                             question.IsMultipleChoice = Convert.ToBoolean(dr3["IsMultipleChoise"]);
-                                            question.Notes = (from DataRow dr in ds.Tables[1].Rows
+                                            question.Notes = (from DataRow dr in ds.Tables[0].Rows
                                                               where (int)dr["NotecategoryId"] == question.QuestionId
                                                               select (string)dr["Notes"]).FirstOrDefault();
                                             List<AnswerType> lstanstype = new List<AnswerType>();

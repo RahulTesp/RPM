@@ -9992,10 +9992,10 @@ namespace RPMWeb.Dal
                         }
 
 
-                        if (reader.FieldCount == 0)
-                        {
-                            return null;
-                        }
+                        //if (reader.FieldCount == 0)
+                        //{
+                        //    return null;
+                        //}
                         return list1;
                     }
                 }
@@ -10173,10 +10173,10 @@ namespace RPMWeb.Dal
                         }
 
 
-                        if (reader.FieldCount == 0)
-                        {
-                            return null;
-                        }
+                        //if (reader.FieldCount == 0)
+                        //{
+                        //    return null;
+                        //}
                         return list1;
                     }
                 }
