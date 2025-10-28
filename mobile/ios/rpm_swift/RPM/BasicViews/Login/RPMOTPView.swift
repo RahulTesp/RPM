@@ -14,6 +14,7 @@ import SwiftUI
 struct RPMOTPView: View {
     @EnvironmentObject var loginViewModel: RPMLoginViewModel
     @EnvironmentObject var navigationHelper: NavigationHelper
+    @EnvironmentObject var appModel: AppModel
     @State var otpCode: String = ""
     let otpCodeLength = 8
     @State var showText = false

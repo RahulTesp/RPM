@@ -42,25 +42,32 @@ final class RPMLoginViewModel: ObservableObject {
                     self.loginData = loginDataModel
                     defaults.setValue(loginDataModel.mobilenumber, forKey: "MobileNumber")
 
+      
                     if loginDataModel.mfa == true {
-                        // MFA true → temporary token
-                        defaults.setValue(loginDataModel.tkn, forKey: "jsonwebtokenold")
-                        print("Saved MFA token (old):", defaults.string(forKey: "jsonwebtokenold") ?? "nil")
-                        // Trigger the completion to SwiftUI
-                                                completed(loginDataModel.tkn, nil)
-                     
-                    } else {
-                        SessionManager.shared.reset()
-                        self.isAuthenticated = true
-                        print("User authenticated:", self.isAuthenticated)
-                        // MFA false → final token
-                        defaults.setValue(loginDataModel.tkn, forKey: "jsonwebtoken")
-                        print("Saved login token:", defaults.string(forKey: "jsonwebtoken") ?? "nil")
-                        defaults.setValue("MFAENABLEDFALSE", forKey: "MFAENABLEDFALSE")
-                        //  Save Firebase token to server
-                        self.saveFirebaseTokenIfAvailable()
-                    }
-     
+                                            // MFA true → temporary token
+                                            defaults.setValue(loginDataModel.tkn, forKey: "jsonwebtokenold")
+                                            defaults.set(true, forKey: "MFAvalue")
+                                            print("Saved MFA token (old):", defaults.string(forKey: "jsonwebtokenold") ?? "nil")
+                                            // Trigger the completion to SwiftUI
+                                                                    completed(loginDataModel.tkn, nil)
+                                         
+                                        } else {
+                                            SessionManager.shared.reset()
+                                            self.isAuthenticated = true
+                                            print("User authenticated:", self.isAuthenticated)
+                                            // MFA false → final token
+                                            defaults.setValue(loginDataModel.tkn, forKey: "jsonwebtoken")
+                                            defaults.set(false, forKey: "MFAvalue")
+                                            print("Saved login token:", defaults.string(forKey: "jsonwebtoken") ?? "nil")
+                                            defaults.setValue("MFAENABLEDFALSE", forKey: "MFAENABLEDFALSE")
+                                            //  Save Firebase token to server
+                                            self.saveFirebaseTokenIfAvailable()
+                                        }
+                    
+                    
+                    
+                    
+                    
                 case .failure(let error):
                     switch error {
                     case .invalidData:
