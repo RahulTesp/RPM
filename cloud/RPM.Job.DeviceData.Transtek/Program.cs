@@ -559,9 +559,10 @@ namespace azuretranstekwebjob
                 }
                 if (isNone)
                 {
-                    blood_glucose.data_type = "None";
-                    blood_glucose.before_meal = false;
-                    blood_glucose.event_flag = null;
+                    var mealInfo = ProcessMealZero(dateTime);
+                    blood_glucose.data_type = mealInfo.data_type;
+                    blood_glucose.before_meal = mealInfo.before_meal;
+                    blood_glucose.event_flag = mealInfo.event_flag;
                 }
                 string jsonData = JsonConvert.SerializeObject(blood_glucose);
                 StagingTableInsertJson(stagingInsert + "('" + jsonData + "')", ConnectionString);
@@ -572,6 +573,25 @@ namespace azuretranstekwebjob
                 ret = false;
             }
             return ret;
+        }
+        public static StagingInput ProcessMealZero(DateTime utcDateTime)
+        {
+            StagingInput bg = new StagingInput();          
+            var t = utcDateTime.TimeOfDay;
+            bool val= t >= TimeSpan.FromHours(7) && t < TimeSpan.FromHours(15);
+            if(val)
+            {
+                bg.data_type= "Fasting";
+                bg.before_meal= true;
+                bg.event_flag= "0";
+            }
+            else 
+            {
+                bg.data_type= "Non-Fasting";
+                bg.before_meal= false;
+                bg.event_flag= "1";
+            }
+            return bg;
         }
         private static bool ProcessWeightData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert)
         {
