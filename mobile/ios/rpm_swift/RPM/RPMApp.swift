@@ -157,6 +157,8 @@ struct RPMApp: App {
                             RPMOTPView()
                                 .environmentObject(navigationHelper)
                                 .environmentObject(loginStateViewModel)
+                                .environmentObject(model)
+                            
                             
                         case .resetPassword:
                             RPMResetPasswordView()

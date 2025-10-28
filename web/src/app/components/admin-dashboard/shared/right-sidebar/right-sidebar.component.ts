@@ -99,6 +99,7 @@ export class RightSidebarComponent implements OnInit {
   StatesAndCities: any;
   cities: any;
   statesArray: any;
+  Taskdiasble=false;
 
   weekFrequency = [
     {
@@ -176,6 +177,7 @@ export class RightSidebarComponent implements OnInit {
   }
   onClickCancel() {
     this.registerTask.reset();
+    this.Taskdiasble = false;
     this.SelectId = undefined;
     this.menuChoice = 1;
     this.getMenuChioce(1);
@@ -1601,16 +1603,35 @@ export class RightSidebarComponent implements OnInit {
       IsCompleted: this.AssigneeMemberStatus
     };
   }
-
+ private DateConversionLogicFromStringToDate(rawDate: string) {
+    let year: number, month: number, day: number;
+    let rawDatefinalValue = Array.isArray(rawDate) ? rawDate[0] : rawDate;
+    const parts = rawDatefinalValue.split('-').map(Number);
+    if (parts[0] > 999) {
+      // Format: YYYY-MM-DD
+      [year, month, day] = parts;
+    } else {
+      // Format: MM-DD-YYYY
+      [month, day, year] = parts;
+    }
+    var scheduleDate = new Date(year, month - 1, day, 0, 0, 0);
+    return scheduleDate;
+  }
   private buildSeriesScheduleUpdatePayload(isPatient: boolean): any {
+    const startDate = this.convertDate(this.DateConversionLogicFromStringToDate(this.registerSchedule.controls.startDate.value));
+    const endDate = this.convertDate(this.DateConversionLogicFromStringToDate(this.registerSchedule.controls.endDate.value));
+
+    if (endDate <= startDate)
+      return this.showWarning('Please select a valid Start Date and End Date.');
+
     return {
       Id: this.ScheduleDatabyId.Id,
       AssignedTo: parseInt(this.Scheduled_user),
       ScheduleTypeId: parseInt(this.registerSchedule.controls.scheduleType.value),
       Schedule: this.registerSchedule.controls.frequency.value,
       Comments: this.registerSchedule.controls.scheduleDescription.value,
-      StartDate: this.convertDate(this.registerSchedule.controls.startDate.value),
-      EndDate: this.convertDate(this.registerSchedule.controls.endDate.value),
+      StartDate: startDate,
+      EndDate: endDate,
       StartTime: this.registerSchedule.controls.startTime.value,
       AssignedBy: parseInt(this.schedule_careteam_id),
       Mon: this.dayMonSelectionValue,
@@ -1854,6 +1875,16 @@ export class RightSidebarComponent implements OnInit {
         .then(
           (data) => {
             this.worklistgettaskbyid = data;
+            if(this.worklistgettaskbyid?.Status == 'Complete' )
+            {
+              this.Taskdiasble = true;
+            }else
+            {
+              this.Taskdiasble = false;
+
+            }
+          
+            
              this.alertAssigneeName = this.worklistgettaskbyid.CareTeamId;
             //const uniqueCareTeam = [...new Set(this.worklistgettaskbyid.CareTeamId)];
              //this.alertAssigneeName = uniqueCareTeam;

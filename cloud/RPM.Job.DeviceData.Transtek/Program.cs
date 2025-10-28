@@ -139,7 +139,7 @@ namespace azuretranstekwebjob
                     DateTime newstart = lastRecodDate.AddSeconds(2);
 
                     string sdata = GetJsonFromStagingTable(val.Deviceid, newstart);
-                    if (sdata == null)
+                    if (sdata == null || sdata == "[]")
                         continue;
                     JObject parsedJson = JObject.Parse(sdata);
                     JArray readingsArray = parsedJson["readings"] as JArray;
@@ -164,8 +164,8 @@ namespace azuretranstekwebjob
                                 if (telemetry != null)
                                 {
 
-                                    if (telemetry.messageType == "telemetry")
-                                    {
+                                    //if (telemetry.messageType == "telemetry")
+                                    //{
 
                                         if (telemetry.data == null || telemetry.data.ToString() == "{}")
                                         {
@@ -184,11 +184,11 @@ namespace azuretranstekwebjob
                                         {
                                             Console.WriteLine($"Failed to insert reading for deviceId: {telemetry.deviceId}");
                                         }
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine($"Skipping non-telemetry messageType: {telemetry.messageType}");
-                                    }
+                                    //}
+                                    //else
+                                    //{
+                                    //    Console.WriteLine($"Skipping non-telemetry messageType: {telemetry.messageType}");
+                                    //}
                                 }
                                 else
                                 {
@@ -284,7 +284,7 @@ namespace azuretranstekwebjob
                         }
                     }
                 }
-                return JsonConvert.SerializeObject(jsonReadings);
+                return JsonConvert.SerializeObject(new { readings = jsonReadings });
 
 
             }
