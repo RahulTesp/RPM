@@ -513,6 +513,7 @@ namespace azuretranstekwebjob
                 blood_glucose.device_id = dev.deviceId;
                 blood_glucose.device_model = dev.modelNumber;
                 var dateTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(obj["ts"])).DateTime;
+                var timezone= Convert.ToInt16(obj["tz_tz"]);
                 blood_glucose.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
                 var dateTimeRx = DateTimeOffset.FromUnixTimeSeconds(dev.createdAt).DateTime;
                 blood_glucose.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
@@ -542,6 +543,7 @@ namespace azuretranstekwebjob
                 }
                 bool isFasting = obj["meal"].ToString() == "1";
                 bool isNonFasting = obj["meal"].ToString() == "2";
+                bool isNone = obj["meal"].ToString() == "0";
                 if (isFasting)
                 {
                     blood_glucose.data_type = "Fasting";
@@ -554,6 +556,12 @@ namespace azuretranstekwebjob
                     blood_glucose.data_type = "Non-Fasting";
                     blood_glucose.before_meal = false;
                     blood_glucose.event_flag = "1";
+                }
+                if (isNone)
+                {
+                    blood_glucose.data_type = "None";
+                    blood_glucose.before_meal = false;
+                    blood_glucose.event_flag = null;
                 }
                 string jsonData = JsonConvert.SerializeObject(blood_glucose);
                 StagingTableInsertJson(stagingInsert + "('" + jsonData + "')", ConnectionString);
