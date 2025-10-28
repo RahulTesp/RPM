@@ -34,15 +34,6 @@ export class DownloadPatientReportService {
   currentpPatientId: any;
   currentProgramId: any;
 
-  /**
-   * Set main heading style for PDF
-   */
-  setMainHeadingStyle(doc: jsPDF): void {
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.setTextColor('#590CA7');
-  }
-
   generatePatientAndProgramInfo(
     doc: jsPDF,
     patientDetails: any,
@@ -52,9 +43,9 @@ export class DownloadPatientReportService {
     let textHeight = 70;
 
     // Patient Information Section
-    this.setMainHeadingStyle(doc);
+    this. Style_SetMainHeading(doc);
     doc.text('Patient Information', 10, textHeight);
-    this.setContentStyle(doc);
+    this.Style_SetContent(doc);
 
     // Patient name
     doc.setDrawColor('#818495');
@@ -90,7 +81,8 @@ export class DownloadPatientReportService {
     doc.setTextColor('black');
 
     doc.text(
-      this.formatDate(patientDetails['PatientDetails'].DOB),
+      //this.formatDate(patientDetails['PatientDetails'].DOB)
+      this.convertToLocalFormat(patientDetails['PatientDetails'].DOB),
       60,
       textHeight
     );
@@ -124,9 +116,9 @@ export class DownloadPatientReportService {
     textHeight = textHeight + 20;
 
     // Program Information Section
-    this.setMainHeadingStyle(doc);
+    this. Style_SetMainHeading(doc);
     doc.text('Program Information', 10, textHeight);
-    this.setContentStyle(doc);
+    this.Style_SetContent(doc);
 
     // Program Name
     textHeight = textHeight + 5;
@@ -277,12 +269,13 @@ export class DownloadPatientReportService {
     ) {
       return this.generateEmptyChartData();
     }
-  console.log('healthTrends:', healthTrends);
+    
     // Convert dates to readable format
-    const chartLabels = this.convertDateforHealthTrends(healthTrends.Time);
+    const chartLabels = this.convertDateforHealthTrends(healthTrends[0].Time);
 
     // Process data points and clean up null values
-    let valuesArray = JSON.parse(JSON.stringify(healthTrends.Values)); // Deep copy
+    
+    let valuesArray = JSON.parse(JSON.stringify(healthTrends[0].Values)); // Deep copy
 
     // Filter out null values
     let j = 0;
@@ -291,7 +284,16 @@ export class DownloadPatientReportService {
       for (const value of item.data) {
         if (j === 0) {
           try {
-            if (value === null && i > 0 && i < item.data.length) {
+            //if (value === null && i > 0 && i < item.data.length) {
+            if (
+              value === null &&
+              i > 0 &&
+              i < item.data.length - 1 &&
+              chartLabels[i] &&
+              chartLabels[i - 1] &&
+              chartLabels[i + 1]
+            ) {
+
               const linedt1 = chartLabels[i].split(' - ');
               const linedt0 = chartLabels[i - 1].split(' - ');
               const linedt2 = chartLabels[i + 1].split(' - ');
@@ -309,7 +311,7 @@ export class DownloadPatientReportService {
             }
             i++;
           } catch (ex) {
-            console.error('Error processing health trend data:', ex);
+            //console.error('Error processing health trend data:', ex);
           }
         }
       }
@@ -470,12 +472,24 @@ export class DownloadPatientReportService {
       const day = dateSplit[2];
       const date = month + '-' + day;
 
+      
+    const localDateTime1 = this.convertToLocalTime(dateParts[0]);
+    const parsedDate = new Date(localDateTime1);
+
+      if (isNaN(parsedDate.getTime())) {
+        console.warn('Invalid date encountered:', localDateTime1);
+        continue; // Skip this iteration
+      }       
+
+        const time = this.datepipe.transform(parsedDate, 'h:mm a') || '';
+
+
       // Format time
-      const time =
+      /*const time =
         this.datepipe.transform(
           this.convertToLocalTime(dateParts[0]),
           'h:mm a'
-        ) || '';
+        ) || '';*/
 
       // Combine date and time
       formattedDates.push(date + ' - ' + time);
@@ -523,66 +537,6 @@ export class DownloadPatientReportService {
     this.renderCriticalEvents(doc, criticalAlerts, goalh);
   }
 
- /* // ✅ Render Goals
-  private renderGoals(doc: jsPDF, goals: any[], startHeight: number): number {
-    let goalh = startHeight;
-    goals.forEach((goal) => {
-      this.setSubHeadingStyle(doc);
-      doc.text(goal.Goal, 15, goalh);
-
-      const textWidth = doc.getTextWidth(goal.Goal);
-      doc.setDrawColor('black');
-      doc.line(15, goalh + 1, 15 + textWidth, goalh + 1);
-
-      this.setContentStyle(doc);
-      goalh += 10;
-      doc.text(goal.Description, 20, goalh);
-      goalh += 25;
-    });
-    return goalh;
-  }
-
-  // ✅ Render Critical Events
-  private renderCriticalEvents(
-    doc: jsPDF,
-    alerts: any[],
-    startHeight: number
-  ): void {
-    let goalh = startHeight;
-
-    this.setSubHeadingStyle(doc);
-    const eventsTitle = 'Critical Events';
-    doc.text(eventsTitle, 15, goalh);
-
-    const textWidth = doc.getTextWidth(eventsTitle);
-    doc.setDrawColor('black');
-    doc.line(15, goalh + 1, 15 + textWidth, goalh + 1);
-    goalh += 10;
-
-    this.setContentStyle(doc);
-
-    if (alerts.length > 0) {
-      alerts.forEach((alert) => {
-        const formattedDate = this.formatDate(alert.Time);
-        doc.text(formattedDate, 20, goalh);
-
-        const dateWidth = doc.getTextWidth(formattedDate);
-        doc.setDrawColor('black');
-        doc.line(20, goalh + 1, 20 + dateWidth, goalh + 1);
-        goalh += 10;
-
-        doc.text(alert.VitalAlert, 20, goalh);
-        goalh += 10;
-      });
-    } else {
-      doc.text('No Data', 20, goalh);
-    }
-  }*/
-
-
-
-
-    
 private renderGoals(doc: jsPDF, goals: any[], startHeight: number): number {
   let goalh = startHeight;
   const pageHeight = doc.internal.pageSize.height;
@@ -594,13 +548,13 @@ private renderGoals(doc: jsPDF, goals: any[], startHeight: number): number {
       goalh = 20;
     }
 
-    this.setSubHeadingStyle(doc);
+    this.Style_SetSubHeading(doc);
     doc.text(goal.Goal, 15, goalh);
     const textWidth = doc.getTextWidth(goal.Goal);
     doc.line(15, goalh + 1, 15 + textWidth, goalh + 1);
 
     goalh += 6;
-    this.setContentStyle(doc);
+    this.Style_SetContent(doc);
 
     const wrappedDescription = doc.splitTextToSize(goal.Description, 180);
     doc.text(wrappedDescription, 20, goalh);
@@ -616,14 +570,14 @@ private renderCriticalEvents(doc: jsPDF, alerts: any[], startHeight: number): vo
   let goalh = 20; // Reset Y for new page
   const pageHeight = doc.internal.pageSize.height;
 
-  this.setSubHeadingStyle(doc);
+  this.Style_SetSubHeading(doc);
   const eventsTitle = 'Critical Events';
   doc.text(eventsTitle, 15, goalh);
   const textWidth = doc.getTextWidth(eventsTitle);
   doc.line(15, goalh + 1, 15 + textWidth, goalh + 1);
   goalh += 6;
 
-  this.setContentStyle(doc);
+  this.Style_SetContent(doc);
 
   if (alerts.length > 0) {
     alerts.forEach(alert => {
@@ -675,7 +629,7 @@ generateCallNotesReport(doc: jsPDF, data: any[]): void {
   const lineHeight = 6;
   const pageHeight = doc.internal.pageSize.height;
   this.Notesh = 30;
-  this.setSubHeadingStyle(doc);
+  this.Style_SetSubHeading(doc);
   this.setPages(doc, 'Notes', 15);
   this.drawLine(doc, 'Notes', 15);
   this.Notesh += 10;
@@ -683,14 +637,14 @@ generateCallNotesReport(doc: jsPDF, data: any[]): void {
   
   for (const notes of data) {
     this.Notesh += 10;
-      this.setSubHeadingStyle(doc);
+      this.Style_SetSubHeading(doc);
       const formattedDate = this.datepipe.transform(
         this.convertToLocalTime(notes.CreatedOn)
       ) as string;
 
     this.setPages(doc, formattedDate, 20);
     this.drawLine(doc, formattedDate, 20);
-    this.setContentStyle(doc);
+   this.Style_SetContent(doc);
     this.Notesh += 5;
     
     this.addTextWithBreak(
@@ -731,8 +685,6 @@ generateCallNotesReport(doc: jsPDF, data: any[]): void {
   
   this.Notesh += 20; // Add bottom spacing
   doc.addPage();
-  //this.setMainHeadingStyle(doc);
-
 }
 
 private addTextWithBreak(
@@ -746,7 +698,7 @@ private addTextWithBreak(
   const pageHeight = doc.internal.pageSize.height;
 
   // Reset font and color before adding text
-  this.setNormalStyle(doc);
+  this.Style_SetContent(doc);
 
   if (this.Notesh + lines.length * lineHeight > pageHeight) {
     doc.addPage();
@@ -775,7 +727,7 @@ private forceWrapLongWords(text: string, maxWordLength: number = 50): string {
 // ✅ Render a block of text with wrapping and page-break handling
 private renderTextBlock(doc: jsPDF, text: string, x: number): void {
   
-  this.setNormalStyle(doc);
+  this.Style_SetContent(doc);
   const maxWidth = 170;
   const lineHeight = 6;
 
@@ -819,7 +771,7 @@ private renderAnswers(doc: jsPDF, answers: any[], x: number): void {
   const margin = 15;
   const maxWidth = pageWidth - margin * 2;
   const lineHeight = 6;
-  this.setNormalStyle(doc);
+  this.Style_SetContent(doc);
 
   if (answers.length > 0) {
     for (const answer of answers) {
@@ -935,7 +887,7 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
 
   // ✅ Process Sub Questions
   private processSubQuestions(doc: jsPDF, subQuestions: any[]): void {
-    this.setNormalStyle(doc);
+    this.Style_SetContent(doc);
     subQuestions.forEach((subQuestion) => {
        
       this.Notesh += 5;
@@ -1102,7 +1054,7 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
       doc.addPage();
     }
 
-    this.setMainHeadingStyle(doc);
+    this. Style_SetMainHeading(doc);
     doc.text('Patient Program Summary Report', 10, 20);
     this.symptomh = 30;
 
@@ -1135,7 +1087,7 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
     renderFunction: (doc: jsPDF, data: any[]) => void
   ): void {
     this.symptomh = 30;
-    this.setSubHeadingStyle(doc);
+   this.Style_SetSubHeading(doc);
 
     doc.text(title, 15, this.symptomh);
 
@@ -1580,8 +1532,7 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
   // Manjusha code change
   async generateVitalReadingSummary(doc: jsPDF,currentpPatientId:any, currentProgramId:any): Promise<void> {
     doc.addPage();
-    this.setSubHeadingStyle(doc);
-
+    this.Style_SetSubHeading(doc);
     const statSumm = 'Vital Readings - Status Summary';
     doc.text(statSumm, 15, 20);
     const textWidth = doc.getTextWidth(statSumm);
@@ -1876,7 +1827,7 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
   }
   // ✅ Utility function: Set Text on Page
   private setPages(doc: jsPDF, text: string, x: number): void { 
-   this.setNormalStyle(doc);
+   this.Style_SetContent(doc);
    const pageWidth = doc.internal.pageSize.getWidth();
    const margin = 15; // left/right margin
    const maxWidth = pageWidth - margin * 2; // available width for text
@@ -1886,7 +1837,7 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
   }
   
 private setSymptomPages(doc: jsPDF, text: string, x: number): void {
-  this.setNormalStyle(doc);
+  this.Style_SetContent(doc);
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 15;
@@ -1912,18 +1863,7 @@ private setSymptomPages(doc: jsPDF, text: string, x: number): void {
     return new Date(dateStr).toLocaleString(); // Modify as per requirements
   }
 
-  // ✅ Set Subheading Style
-  private setSubHeadingStyle(doc: jsPDF): void {
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor('black');
-  }
-
-  // ✅ Set Content Style
-  private setContentStyle(doc: jsPDF): void {
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-  }
+  
   Report_ConvertDate(dateval: any) {
     var dt = dateval.split('T');
     var dtSplit = dt[0].split('-');
@@ -1975,22 +1915,7 @@ private setSymptomPages(doc: jsPDF, text: string, x: number): void {
     dat = dat + ' - ' + time;
     return dat;
   }
-  Style_SetDocumentHeader(doc: jsPDF) {
-    doc.setFontSize(16);
-    doc.setTextColor('black');
-  }
-  Style_SetMainHeading(doc: jsPDF) {
-    doc.setFontSize(14);
-    doc.setTextColor('#590CA7');
-  }
-  Style_SetSubHeading(doc: jsPDF) {
-    doc.setFontSize(12);
-    doc.setTextColor('black');
-  }
-  Style_SetContent(doc: jsPDF) {
-    doc.setFontSize(10);
-    doc.setTextColor('black');
-  }
+  
   private convertToLocalFormat(dateStr: string): string {
   if (!dateStr) return '';
 
@@ -2006,13 +1931,20 @@ private setSymptomPages(doc: jsPDF, text: string, x: number): void {
   // Convert UTC → Local and format
   return dayjs.utc(normalized).local().format('MM/DD/YYYY');
 }
-
-
-
-private setNormalStyle(doc: jsPDF): void {
-  doc.setFont('helvetica', 'normal');  // Normal font
-  doc.setFontSize(12);                 // Standard size
-  doc.setTextColor(0, 0, 0);           // Black color
-}
-
+ Style_SetDocumentHeader(doc: jsPDF) {
+    doc.setFontSize(16);
+    doc.setTextColor('black');
+  }
+  Style_SetMainHeading(doc: jsPDF) {
+    doc.setFontSize(14);
+    doc.setTextColor('#590CA7');
+  }
+  Style_SetSubHeading(doc: jsPDF) {
+    doc.setFontSize(12);
+    doc.setTextColor('black');
+  }
+  Style_SetContent(doc: jsPDF) {
+    doc.setFontSize(10);
+    doc.setTextColor('black');
+  }
 }

@@ -25,6 +25,8 @@ export class PatientDataReportComponent implements OnInit {
   private master_data: any;
   private RptStartDate: any;
   private RptEndDate: any;
+  private RptStartDateDateRange: any;
+  private RptEndDateDateRange: any;
   private http_rpm_patient: any;
   private patientStatusData: any;
   public http_healthtrends: any;
@@ -535,9 +537,9 @@ export class PatientDataReportComponent implements OnInit {
       this.getVitalHealthTrendDataGraph(this.heath_trends_frequency, this.RptStartDate, this.RptEndDate);
     } else {
 
-      this.RptStartDate = this.patientreportService.convertDate(this.RptStartDate);
-      this.RptEndDate = this.patientreportService.convertDate(this.RptEndDate);
-      this.getVitalHealthTrendDataGraph(this.heath_trends_frequency, this.RptStartDate, this.RptEndDate);
+      this.RptStartDate = this.patientreportService.convertDate(this.RptStartDateDateRange);
+      this.RptEndDate = this.patientreportService.convertDate(this.RptEndDateDateRange);
+      this.getVitalHealthTrendDataGraph(this.heath_trends_frequency,this.RptStartDate, this.RptEndDate);
     }
     if (
       this.RptStartDate == null ||
@@ -553,8 +555,8 @@ export class PatientDataReportComponent implements OnInit {
   }
 
   GetDateRange(e: any) {
-    this.RptStartDate = e.startDate;
-    this.RptEndDate = e.endDate;
+    this.RptStartDateDateRange = e.startDate;
+    this.RptEndDateDateRange = e.endDate;
   }
 
   VitalsSevenDaysConsolidated: any;
