@@ -139,7 +139,7 @@ namespace azuretranstekwebjob
                     DateTime newstart = lastRecodDate.AddSeconds(2);
 
                     string sdata = GetJsonFromStagingTable(val.Deviceid, newstart);
-                    if (sdata == null)
+                    if (sdata == null || sdata.Length<5)
                         continue;
                     JObject parsedJson = JObject.Parse(sdata);
                     JArray readingsArray = parsedJson["readings"] as JArray;
