@@ -88,14 +88,14 @@ namespace RPMPatientBilling.PatientBilling
                                                                   patientProgramData1.PatientProgramid,
                                                                   billingCode.BillingCodeID, con);
                         DateTime startDate = billedDates.StartDate;
-                        //startDate = BillingProcess.GetLocalTimeFromUTC((DateTime)startDate, con);
-                        DateTime startDateTemp = BillingProcess.GetUTCFromLocalTime((DateTime)startDate, con);
+                        DateTime startDateTemp = BillingProcess.GetLocalTimeFromUTC((DateTime)startDate, con);
+                        //DateTime startDateTemp = BillingProcess.GetUTCFromLocalTime((DateTime)startDate, con);
                         DateTime Enddate = billedDates.EndDate;
-                        // Enddate = BillingProcess.GetLocalTimeFromUTC((DateTime)Enddate, con);
+                        //Enddate = BillingProcess.GetLocalTimeFromUTC((DateTime)Enddate, con);
                         DateTime endDatetemp = BillingProcess.GetUTCFromLocalTime((DateTime)Enddate, con);
 
-                        AddBilledData(patientProgramData1, startDateTemp, endDatetemp, startDate,
-                                      Enddate, true, (Enddate - startDate).Days);
+                        AddBilledData(patientProgramData1, startDate, Enddate, startDateTemp,
+                                      Enddate, true, (Enddate - startDateTemp).Days);
 
                     }
                 }

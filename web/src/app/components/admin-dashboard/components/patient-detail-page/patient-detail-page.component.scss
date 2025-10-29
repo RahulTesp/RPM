@@ -3598,7 +3598,7 @@ li + li {
 
 .progress-fill {
   height: 100%;
-
+background-color: hsl(40, 74%, 60%);
   transition: width 0.3s ease-in-out;
   border-radius: 5px;
 }
@@ -3893,7 +3893,7 @@ canvas.charttrends {
 }
 .task-type-truncated {
   display: inline-block;
-  min-width: 180px;
+  min-width: 100px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
