@@ -1027,8 +1027,11 @@ export class AddpatientComponent implements OnInit {
             this.Auth.reloadPatientList('PatientList Updated');
             this.dialog.closeAll();
             this.newProgramVariable = false;
-            let route = '/admin/patients';
-            this.router.navigate([route]);
+            this.responseData = data;
+            that.patientprogramid = this.responseData.message;
+            this.redirectToPateintDetails()
+            //let route = '/admin/patients';
+            //this.router.navigate([route]);
 
             // show success patient id created and show pop-up with 3 options
           },
