@@ -1384,7 +1384,7 @@ export class SidePanelPatientComponent implements OnInit {
       this.medication_durationValue = Number(
         this.diff_Months_set_duration(data.StartDate, data.EndDate)
       );
-      this.medication_durationValue = this.medication_durationValue + 1;
+      this.medication_durationValue = this.medication_durationValue ;
     }
   }
 

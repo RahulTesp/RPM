@@ -3908,23 +3908,16 @@ getFirstPresentVital(vitalScreen: any) {
           //   throw new Error('Invalid date range');
           // }
           // }
-          formattedStartDate = this.patientutilService.formatDateForApi(
           // formattedStartDate = this.patientutilService.formatDateForApi(
-            startDate,
           //   startDate,
-            true
-          //   false
-          );
+          //   true
           // );
           formattedStartDate = dateStr + 'T00:00:00'
-         formattedEndDate = dateEnd + 'T23:59:59'
-          formattedEndDate = this.patientutilService.formatDateForApi(
+         formattedEndDate = dateEnd + 'T00:00:00'
           // formattedEndDate = this.patientutilService.formatDateForApi(
-            endDate,
           //   endDate,
-            false
           //   false
-          );
+          // );
           // );
 
         } catch (error) {
