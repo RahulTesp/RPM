@@ -307,7 +307,10 @@ namespace SyncTranstekDevices
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return result.Trim('"');
+                        result =  result.Trim('"');
+                        JObject objResult = JsonConvert.DeserializeObject<JObject>(result);
+                        string message = objResult["message"]?.ToString()?.Trim();
+                        return message;
                     }
                     else if ((int)response.StatusCode == 404)
                     {
