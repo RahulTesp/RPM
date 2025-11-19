@@ -1,8 +1,7 @@
 using RPM.Job.PatientSmsWebJob;
 
-var builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddHostedService<Worker>();
-builder.Services.AddHostedService<PatientSmsQueueProcessor>();
 
-var host = builder.Build();
-host.Run();
+var builder = Host.CreateApplicationBuilder(args);
+var config = builder.Configuration;
+var processor = new PatientSmsQueueProcessor(config);
+await processor.RunOnceAsync();
