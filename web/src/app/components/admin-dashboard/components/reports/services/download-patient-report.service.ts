@@ -28,6 +28,7 @@ export class DownloadPatientReportService {
   private Notesh: number = 30;
   private vitalsConsolidated: any[] = []; // 🟢 Store consolidated vitals
   private VitalsSevenDaysConsolidated: any[] = []; // 🟢 Store last 7 days vitals
+  private VitalLast30DaysConsolidated: any[] = []; // 🟢 Store last 30 days vitals
   private reviewNotes: any;
   private callNotes: any;
   private selectedVitals: any;
@@ -501,7 +502,12 @@ export class DownloadPatientReportService {
    * Convert UTC time to local time
    */
   convertToLocalTime(stillUtc: any) {
-    stillUtc = stillUtc + 'Z';
+    //stillUtc = stillUtc + 'Z';
+    
+    if (typeof stillUtc === 'string' && !stillUtc.endsWith('Z')) {
+    stillUtc += 'Z';
+  }
+
     const local = dayjs.utc(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
     return local;
   }
@@ -814,77 +820,6 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
 }
 
 
-/*private checkPageBreak(doc: jsPDF, estimatedHeight: number = 0): void {
-  const pageHeight = doc.internal.pageSize.height;
-  const bottomMargin = 20;
-
-  if (this.Notesh + estimatedHeight > pageHeight - bottomMargin) {
-    doc.addPage();
-    this.Notesh = 30;
-  }
-}
-
-private renderTextBlock(doc: jsPDF, text: string, x: number): void {
-  const maxWidth = 170;
-  const lineHeight = 6;
-  const lines = doc.splitTextToSize(text, maxWidth);
-  const estimatedHeight = lines.length * lineHeight;
-
-  this.checkPageBreak(doc, estimatedHeight);
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(12);
-  doc.setTextColor(0, 0, 0);
-  doc.text(lines, x, this.Notesh);
-
-  this.Notesh += estimatedHeight;
-}
-
-private renderSectionHeader(doc: jsPDF, title: string, x: number): void {
-  this.checkPageBreak(doc, 15);
-  this.setPages(doc, title, x);
-  this.drawLine(doc, title, x);
-  this.Notesh += 10;
-}
-
-private renderAnswers(doc: jsPDF, answers: any[], x: number): void {
-  if (answers.length > 0) {
-    for (const answer of answers) {
-      this.checkPageBreak(doc, 6);
-      this.setPages(doc, `- ${answer.Answer}`, x);
-      this.Notesh += 6;
-    }
-  } else {
-    this.checkPageBreak(doc, 6);
-    this.setPages(doc, '- None', x);
-    this.Notesh += 6;
-  }
-}
-
-private processNoteDetails(doc: jsPDF, notes: any): void {
-  if (!notes.NoteDetails) return;
-
-  for (const mainQuestion of notes.NoteDetails.MainQuestions) {
-    this.renderSectionHeader(doc, mainQuestion.Question, 20);
-
-    const checkedAnswers = mainQuestion.AnswerTypes.filter((a: any) => a.Checked);
-    this.renderAnswers(doc, checkedAnswers, 25);
-
-    this.processSubQuestions(doc, mainQuestion.SubQuestions);
-
-    if (mainQuestion.Notes) {
-      this.renderTextBlock(doc, `Extra Notes : ${mainQuestion.Notes}`, 25);
-    }
-  }
-
-  if (notes.NoteDetails.Notes) {
-    this.renderSectionHeader(doc, 'Additional Notes', 20);
-    this.renderTextBlock(doc, notes.NoteDetails.Notes, 25);
-  }
-}
-
-*/
-
   // ✅ Process Sub Questions
   private processSubQuestions(doc: jsPDF, subQuestions: any[]): void {
     this.Style_SetContent(doc);
@@ -1116,7 +1051,10 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
     symptoms.forEach((symptom) => {
       this.setSymptomPages(
         doc,
-        `Date: ${this.Report_ConvertDate(symptom.SymptomStartDateTime)}`,
+        //`Date: ${this.convertToLocalTime(symptom.SymptomStartDateTime)}`,
+        `Date: ${this.datepipe.transform(
+          this.convertToLocalTime(symptom.SymptomStartDateTime),'MMM d - h:mm a' 
+        )}`,
         20
       );
       this.symptomh += 3;
@@ -1572,7 +1510,7 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
       const vital7 = this.VitalsSevenDaysConsolidated.filter(
         (v) => v.VitalType === vital
       );
-      const vital30 = this.vitalsConsolidated.filter(
+      const vital30 = this.VitalLast30DaysConsolidated.filter(
         (v) => v.VitalType === vital
       );
       // Total Days
@@ -1706,6 +1644,69 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
         for (let vv of vl.WeightReadings) {
           vv.VitalType = 'Weight';
           this.VitalsSevenDaysConsolidated.push(vv);
+        }
+      }
+    }
+  }
+
+  http_30day_vitalDataReport: any;
+  generate30DaysVitals(vitalData: any): void {
+    this.VitalLast30DaysConsolidated = [];
+    this.http_30day_vitalDataReport = vitalData;
+    var vitalBloodPressure =
+      this.http_30day_vitalDataReport &&
+      this.patientUtilService.newVitalreadingData(
+        this.http_30day_vitalDataReport.BloodPressure,
+        'BloodPressureReadings'
+      );
+
+    var vitalGlucoseData =
+      this.http_30day_vitalDataReport &&
+      this.patientUtilService.newVitalreadingData(
+        this.http_30day_vitalDataReport.BloodGlucose,
+        'BloodGlucoseReadings'
+      );
+
+    var VitalOxygen =
+      this.http_30day_vitalDataReport &&
+      this.patientUtilService.newVitalreadingData(
+        this.http_30day_vitalDataReport.BloodOxygen,
+        'BloodOxygenReadings'
+      );
+
+    var VitalWight =
+      this.http_30day_vitalDataReport &&
+      this.patientUtilService.newVitalreadingData(
+        this.http_30day_vitalDataReport.Weight,
+        'WeightReadings'
+      );
+
+    if (vitalGlucoseData && vitalGlucoseData.length > 0) {
+      for (let vl of vitalGlucoseData) {
+        for (let vv of vl.BloodGlucoseReadings) {
+          vv.VitalType = 'Blood Glucose';
+          this.VitalLast30DaysConsolidated.push(vv);
+        }
+      }
+    } if (vitalBloodPressure && vitalBloodPressure.length > 0) {
+      for (let vl of vitalBloodPressure) {
+        for (let vv of vl.BloodPressureReadings) {
+          vv.VitalType = 'Blood Pressure';
+          this.VitalLast30DaysConsolidated.push(vv);
+        }
+      }
+    } if (VitalOxygen && VitalOxygen.length > 0) {
+      for (let vl of VitalOxygen) {
+        for (let vv of vl.BloodOxygenReadings) {
+          vv.VitalType = 'Oxygen';
+          this.VitalLast30DaysConsolidated.push(vv);
+        }
+      }
+    } if (VitalWight && VitalWight.length > 0) {
+      for (let vl of VitalWight) {
+        for (let vv of vl.WeightReadings) {
+          vv.VitalType = 'Weight';
+          this.VitalLast30DaysConsolidated.push(vv);
         }
       }
     }

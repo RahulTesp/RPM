@@ -757,7 +757,11 @@ export class EditpatientComponent implements OnInit {
           that.PatientInfoForm.controls['cliniccode'].setValue(this.ccode);
           that.programForm.controls['cliniccode'].setValue(this.ccode);
         }else{
-          that.programForm.controls['cliniccode'].setValue('');
+          this.cname = this.Patientdata.PatientPrescribtionDetails.Clinic;
+          this.ccode = this.Patientdata.PatientPrescribtionDetails.ClinicCode;
+          //that.programForm.controls['cliniccode'].setValue('');
+          that.PatientInfoForm.controls['cliniccode'].setValue(this.ccode);
+          that.programForm.controls['cliniccode'].setValue(this.ccode);
         }
         that.PatientInfoForm.controls['clinicname'].setValue(this.cname);
         // this was commented in the original code as part of bug fix enabled this

@@ -734,7 +734,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       this.clinicName = clinic.ClinicName;
       this.clinicCode = clinic.ClinicCode;
     }
-
+    else{
+      this.clinicName = this.http_rpm_patientList['PatientPrescribtionDetails'].Clinic;
+      this.clinicCode = this.http_rpm_patientList['PatientPrescribtionDetails'].ClinicCode;
+    }
     // Assign State
     this.state = patientDetails.State;
 
@@ -5278,6 +5281,13 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
     var endDate = this.convertDate(today);
     startDate = startDate + 'T00:00:00';
     endDate = endDate + 'T23:59:59';
+    const startDate7Days = this.auth.ConvertToUTCRangeInput(
+        new Date(
+          new Date(this.endDateReport).setDate(
+            new Date(this.endDateReport).getDate() - 7
+          )
+        )
+      );
     try {
       this.startDateReport = this.auth.ConvertToUTCRangeInput(
         new Date(startDate)
@@ -5325,14 +5335,6 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
         this.selectedProgram,
         this.startDateReport,
         this.endDateReport
-      );
-
-      const startDate7Days = this.auth.ConvertToUTCRangeInput(
-        new Date(
-          new Date(this.endDateReport).setDate(
-            new Date(this.endDateReport).getDate() - 7
-          )
-        )
       );
 
       this.http7VitalData = await this.PatientReportapi.getVitalReading7Days(
@@ -5449,7 +5451,8 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
         this.doc,
         this.httpVitalData
       );
-      this.patientdownloadService.generateDaysVitals(this.http7VitalData);
+      this.patientdownloadService.generateDaysVitals(this.http7VitalData);    
+      this.patientdownloadService.generate30DaysVitals(this.httpVitalData);  
       this.patientdownloadService.generatePatientSummaryReport(
         this.doc,
         this.patientProgramname,
