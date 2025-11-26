@@ -5,7 +5,7 @@ using Twilio.Rest.Api.V2010.Account;
 using Twilio.TwiML.Messaging;
 using Twilio.Types;
 
-public class PatientSmsQueueProcessor : BackgroundService
+public class PatientSmsQueueProcessor
 {
     private readonly IConfiguration _config;
     private readonly string _conn;
@@ -18,36 +18,70 @@ public class PatientSmsQueueProcessor : BackgroundService
         _interval = config.GetValue<int>("PollingIntervalSeconds");
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public async Task RunOnceAsync()
     {
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            await ProcessQueueAsync();
-            await Task.Delay(_interval * 1000, stoppingToken);
-        }
+        await ProcessQueueAsync();
     }
 
     private async Task ProcessQueueAsync()
     {
         using var con = new SqlConnection(_conn);
+        await con.OpenAsync();
 
-        var pending = await con.QueryAsync<PatientSmsQueueItem>(
-            "SELECT TOP 10 * FROM PatientSMSQueue WHERE Processed = 0 ORDER BY QueueId ASC");
+        // Load all enabled SMS rules
+        var rules = await con.QueryAsync<SmsRule>(
+            "SELECT Id, RuleName, SelectClause, FromTable, JoinClause, ConditionClause, TemplateMessage FROM SMSRules WHERE IsEnabled = 1");
 
-        foreach (var item in pending)
+        foreach (var rule in rules)
         {
-            await ProcessSmsAsync(item, con);
+            var query = $@"
+                SELECT {rule.SelectClause}
+                FROM {rule.FromTable}
+                {rule.JoinClause}
+                WHERE {rule.ConditionClause}
+            ";
+
+            var results = await con.QueryAsync<SmsResult>(query);
+
+            foreach (var item in results)
+            {
+                await SendSmsAsync(item.MobileNo, rule.TemplateMessage);
+            }
         }
     }
 
-    private async Task ProcessSmsAsync(PatientSmsQueueItem item, SqlConnection con)
+    public class SmsRule
     {
+        public int Id { get; set; }
+        public string RuleName { get; set; }
+        public string SelectClause { get; set; }
+        public string FromTable { get; set; }
+        public string JoinClause { get; set; }
+        public string ConditionClause { get; set; }
+        public string TemplateMessage { get; set; }
+    }
+
+    public class SmsResult
+    {
+        public int PatientId { get; set; }
+        public string MobileNo { get; set; }
+    }
+
+    public async Task SendSmsAsync(string mobileNo, string messageTemplate)
+    {
+        // Basic mobile number validation (10-15 digits, can be adjusted as needed)
+        if (string.IsNullOrWhiteSpace(mobileNo)
+            || !System.Text.RegularExpressions.Regex.IsMatch(mobileNo, "^[1-9][0-9]{9,14}$")
+            || System.Text.RegularExpressions.Regex.IsMatch(mobileNo, "^0+$"))
+        {
+            Console.WriteLine($"[ERROR] Invalid mobile number: {mobileNo}");
+            return;
+        }
         try
         {
             var twilioConfig = GetTwilioConfigFromDb(_conn);
             if (twilioConfig == null)
             {
-                // Log missing Twilio configuration
                 Console.WriteLine("[ERROR] Twilio configuration is missing.");
                 return;
             }
@@ -55,83 +89,25 @@ public class PatientSmsQueueProcessor : BackgroundService
             string accSid = twilioConfig.AccountSid;
             string authToken = twilioConfig.AuthToken;
             string serviceSid = twilioConfig.MessagingServiceSid;
-            string fromPhone = twilioConfig.FromPhoneNumber;
             string CountryCode = twilioConfig.CountryCode;
 
-            // Initialize Twilio
             TwilioClient.Init(accSid, authToken);
-
-            var fullPhoneNumber = $"{CountryCode}{item.MobileNo}";
+            var fullPhoneNumber = $"{CountryCode}{mobileNo}";
             var msgOptions = new CreateMessageOptions(new PhoneNumber(fullPhoneNumber))
             {
                 MessagingServiceSid = serviceSid,
-                Body = $"Dear Patient {item.PatientNumber}, your account is now inactive. Please contact support if you have questions."
+                Body = messageTemplate
             };
             var message = await MessageResource.CreateAsync(msgOptions);
 
-            // Log SMS details to console
-            Console.WriteLine(
-                $"[SMS SENT] Patient: {item.PatientNumber}, " +
-                $"To: {fullPhoneNumber}, " +
-                $"CountryCode: {CountryCode}, " +
-                $"MessageSid: {message.Sid}, " +
-                $"Status: {message.Status}, " +
-                $"Body: {msgOptions.Body}"
-            );
-            // Mark queue record as processed
-            await con.ExecuteAsync(
-                "UPDATE PatientSMSQueue SET Processed = 1 WHERE QueueId = @QId",
-                new { QId = item.QueueId });
-
-            // Log SMS details
-            await LogSmsToDb(item, message, con, fromPhone);
-
-
+            Console.WriteLine($"[SMS SENT] To: {fullPhoneNumber}, MessageSid: {message.Sid}, Status: {message.Status}, Body: {msgOptions.Body}");
+            // Optionally log to DB if needed
         }
         catch (Exception ex)
         {
-            // Log SMS details to console
-            Console.WriteLine($"[ERROR] Failed to process SMS for Patient: {item.PatientNumber}. Error: {ex.Message}");
-
+            Console.WriteLine($"[ERROR] Failed to send SMS to: {mobileNo}. Error: {ex.Message}");
         }
     }
-
-    private async Task<int> LogSmsToDb(PatientSmsQueueItem item, MessageResource msg, SqlConnection con, string fromPhone)
-    {
-        try
-        {
-            using (var command = new SqlCommand("usp_InsPatientSMSDetails", con))
-            {
-                command.CommandType = System.Data.CommandType.StoredProcedure;
-                command.Parameters.AddWithValue("@CreatedBy", "WebJob");
-                command.Parameters.AddWithValue("@PatientUserName", item.PatientNumber);
-                command.Parameters.AddWithValue("@fromNo", fromPhone);
-                command.Parameters.AddWithValue("@toNo", item.MobileNo);
-                command.Parameters.AddWithValue("@Body", msg.Body);
-                command.Parameters.AddWithValue("@SentDate", msg.DateCreated);
-                command.Parameters.AddWithValue("@Direction", msg.Direction.ToString());
-                command.Parameters.AddWithValue("@Status", msg.Status.ToString());
-
-                var returnParameter = command.Parameters.Add("RetVal", System.Data.SqlDbType.Int);
-                returnParameter.Direction = System.Data.ParameterDirection.ReturnValue;
-
-                if (con.State != System.Data.ConnectionState.Open)
-                    await con.OpenAsync();
-
-                await command.ExecuteReaderAsync();
-                int retVal = (int)(returnParameter.Value ?? 0);
-
-                con.Close();
-                return retVal;
-            }
-        }
-        catch (Exception ex)
-        {
-            throw;
-        }
-    }
-
-
     private static TwilioConfig? GetTwilioConfigFromDb(string connectionString)
     {
         try
@@ -204,13 +180,6 @@ public class PatientSmsQueueProcessor : BackgroundService
             return null;
         }
 
-    }
-    public class PatientSmsQueueItem
-    {
-        public int QueueId { get; set; }
-        public int PatientId { get; set; }
-        public string PatientNumber { get; set; }
-        public string MobileNo { get; set; }
     }
     public class TwilioConfig
     {
