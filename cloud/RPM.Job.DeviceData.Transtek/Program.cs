@@ -182,7 +182,7 @@ namespace azuretranstekwebjob
                                         {
                                             continue;
                                         }
-                                        bool insertSuccess = StagingTableQueueInsert(telemetry, deviceType);
+                                        bool insertSuccess = StagingTableQueueInsert(telemetry, deviceType, readingItem.Key);
 
                                         if (insertSuccess)
                                         {
@@ -381,7 +381,7 @@ namespace azuretranstekwebjob
             }
         }
 
-        private static bool StagingTableQueueInsert(TranstekDeviceTelemetry dev, string deviceType)
+        private static bool StagingTableQueueInsert(TranstekDeviceTelemetry dev, string deviceType,DateTime createdOn)
         {
             GetVitalUnits();
             bool ret = false;
@@ -389,19 +389,19 @@ namespace azuretranstekwebjob
             deviceType = deviceType.Trim();
             if (deviceType == "Blood Pressure Monitor")
             {
-                ret = ProcessBloobPressureData(dev, CONN_STRING, stagingInsert);
+                ret = ProcessBloobPressureData(dev, CONN_STRING, stagingInsert, createdOn);
             }
             else if (deviceType == "Blood Glucose Monitor")
             {
-                ret = ProcessBloodGlucoseData(dev, CONN_STRING, stagingInsert);
+                ret = ProcessBloodGlucoseData(dev, CONN_STRING, stagingInsert, createdOn);
             }
             else if (deviceType == "Body Weight Monitor")
             {
-                ret = ProcessWeightData(dev, CONN_STRING, stagingInsert);
+                ret = ProcessWeightData(dev, CONN_STRING, stagingInsert, createdOn);
             }
             else if (deviceType == "Pulse Oximeter")
             {
-                ret = ProcessOxygenData(dev, CONN_STRING, stagingInsert);
+                ret = ProcessOxygenData(dev, CONN_STRING, stagingInsert, createdOn);
             }
             return ret;
         }
@@ -466,7 +466,7 @@ namespace azuretranstekwebjob
 
             return dateTimeRx;
         }
-        private static bool ProcessBloobPressureData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert)
+        private static bool ProcessBloobPressureData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert, DateTime createdOn)
         {
             bool ret;
             try
@@ -494,13 +494,9 @@ namespace azuretranstekwebjob
                 blood_pressuresystolic.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
                 blood_pressurediastolic.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
                 blood_pressurepulse.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
-                //blood_pressuresystolic.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
-                //blood_pressurediastolic.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
-                //blood_pressurepulse.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
-                var dateTimeRx = DateTimeOffset.FromUnixTimeSeconds(dev.createdAt).DateTime;
-                blood_pressuresystolic.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
-                blood_pressurediastolic.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
-                blood_pressurepulse.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
+                blood_pressuresystolic.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
+                blood_pressurediastolic.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
+                blood_pressurepulse.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
                 blood_pressuresystolic.reading_type = "blood_pressure";
                 blood_pressurediastolic.reading_type = "blood_pressure";
                 blood_pressurepulse.reading_type = "blood_pressure";
@@ -553,7 +549,7 @@ namespace azuretranstekwebjob
             }
             return ret;
         }
-        private static bool ProcessBloodGlucoseData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert)
+        private static bool ProcessBloodGlucoseData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert, DateTime createdOn)
         {
             bool ret;
             try
@@ -570,10 +566,7 @@ namespace azuretranstekwebjob
                 var dateTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(obj["ts"])).DateTime;
                 var timezone= Convert.ToInt16(obj["tz_tz"]);
                 blood_glucose.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
-                //blood_glucose.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
-                var dateTimeRx = DateTimeOffset.FromUnixTimeSeconds(dev.createdAt).DateTime;
-                blood_glucose.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
-
+                blood_glucose.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
                 blood_glucose.reading_type = "blood_glucose";
                 blood_glucose.battery = 0;
                 var time = obj["ts_tz"];
@@ -660,7 +653,7 @@ namespace azuretranstekwebjob
             }
            
         }
-        private static bool ProcessWeightData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert)
+        private static bool ProcessWeightData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert, DateTime createdOn)
         {
             bool ret;
             try
@@ -676,9 +669,7 @@ namespace azuretranstekwebjob
                 weight.device_model = dev.modelNumber;
                 var dateTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(obj["ts"])).DateTime;
                 weight.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
-                //weight.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
-                var dateTimeRx = DateTimeOffset.FromUnixTimeSeconds(dev.createdAt).DateTime;
-                weight.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
+                weight.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
                 weight.reading_type = "weight";
                 if (obj.TryGetValue("bat", out var batToken) && batToken != null && int.TryParse(batToken.ToString(), out int battery))
                 {
@@ -722,7 +713,7 @@ namespace azuretranstekwebjob
             }
             return ret;
         }
-        private static bool ProcessOxygenData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert)
+        private static bool ProcessOxygenData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert, DateTime createdOn)
         {
             bool ret;
             try
@@ -747,11 +738,8 @@ namespace azuretranstekwebjob
                 string formattedTime = time.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
                 pulseoximeter_oxygen.date_recorded = formattedTime;
                 pulseoximeter_pulse.date_recorded = formattedTime;
-                //pulseoximeter_oxygen.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
-                //pulseoximeter_pulse.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
-                var dateTimeRx = ConvertUnixTimestampToDateTime(dev.createdAt);
-                pulseoximeter_oxygen.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
-                pulseoximeter_pulse.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
+                pulseoximeter_oxygen.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
+                pulseoximeter_pulse.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
                 pulseoximeter_oxygen.reading_type = "pulse_ox";
                 pulseoximeter_pulse.reading_type = "pulse_ox";
                 pulseoximeter_oxygen.battery = (int)objOxygen["battery"];
