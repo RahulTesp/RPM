@@ -47,4 +47,11 @@ namespace azuretranstekwebjob
         public string modelNumber { get; set; }
         public string messageType { get; set; }
     }
+    public class SystemConfigInfo
+    {
+        public string Name { get; set; }
+        public string Value { get; set; }
+        public string Descripiton { get; set; }
+
+    }
 }
