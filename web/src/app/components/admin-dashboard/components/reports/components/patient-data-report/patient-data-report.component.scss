@@ -112,17 +112,20 @@ input[type="radio"] {
 }
 .chart-hidden-container
 {
-  opacity: 0; 
+  opacity: 1; 
 }
 
 canvas.charttrends {
-  width: 98% !important;
-  height: 98% !important;
+  width: 100% !important;
+  height: 400px !important;
   display: block;
   background-color: #ffffff;
 }
-.chart-wrapper-scrollfix {
-  position: relative;
-  overflow: hidden;
-  height: 0;
+.chart-wrapper-scrollfix
+{
+  width: 1600px;
+  height: 400px;
+  position: absolute;
+  top: -2000px;        
+  left: -2000px;
 }
