@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using System.Data;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.TwiML.Messaging;
@@ -45,7 +46,7 @@ public class PatientSmsQueueProcessor
 
             foreach (var item in results)
             {
-                await SendSmsAsync(item.MobileNo, rule.TemplateMessage);
+                await SendSmsAsync(item.MobileNo, item.UserName, rule.TemplateMessage);
             }
         }
     }
@@ -65,9 +66,10 @@ public class PatientSmsQueueProcessor
     {
         public int PatientId { get; set; }
         public string MobileNo { get; set; }
+        public string UserName { get; set; }
     }
 
-    public async Task SendSmsAsync(string mobileNo, string messageTemplate)
+    public async Task SendSmsAsync(string mobileNo, string userName, string messageTemplate)
     {
         // Basic mobile number validation (10-15 digits, can be adjusted as needed)
         if (string.IsNullOrWhiteSpace(mobileNo)
@@ -90,7 +92,7 @@ public class PatientSmsQueueProcessor
             string authToken = twilioConfig.AuthToken;
             string serviceSid = twilioConfig.MessagingServiceSid;
             string CountryCode = twilioConfig.CountryCode;
-
+            
             TwilioClient.Init(accSid, authToken);
             var fullPhoneNumber = $"{CountryCode}{mobileNo}";
             var msgOptions = new CreateMessageOptions(new PhoneNumber(fullPhoneNumber))
@@ -99,9 +101,17 @@ public class PatientSmsQueueProcessor
                 Body = messageTemplate
             };
             var message = await MessageResource.CreateAsync(msgOptions);
-
             Console.WriteLine($"[SMS SENT] To: {fullPhoneNumber}, MessageSid: {message.Sid}, Status: {message.Status}, Body: {msgOptions.Body}");
             // Optionally log to DB if needed
+            SaveSmsInfo Info = new SaveSmsInfo();
+            Info.PatientUserName = userName;
+            Info.fromNo = twilioConfig.FromPhoneNumber;
+            Info.toNo = mobileNo;
+            Info.Body = messageTemplate;
+            Info.SentDate = DateTime.UtcNow;
+            Info.Direction = "outbound-api";
+            Info.Status = message.Status.ToString();
+            UpdatePatientSmsDetails(userName, Info, _conn);
         }
         catch (Exception ex)
         {
@@ -181,6 +191,34 @@ public class PatientSmsQueueProcessor
         }
 
     }
+    public void UpdatePatientSmsDetails(string UserName, SaveSmsInfo Info, string ConnectionString)
+    {
+        try
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                SqlCommand command = new SqlCommand("usp_InsPatientSMSDetails", con);
+
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@CreatedBy", "Automated");
+                command.Parameters.AddWithValue("@PatientUserName", Info.PatientUserName);
+                command.Parameters.AddWithValue("@fromNo", Info.fromNo);
+                command.Parameters.AddWithValue("@toNo", Info.toNo);
+                command.Parameters.AddWithValue("@Body", Info.Body);
+                command.Parameters.AddWithValue("@SentDate", Info.SentDate);
+                command.Parameters.AddWithValue("@Direction", Info.Direction);
+                command.Parameters.AddWithValue("@Status", Info.Status);
+                SqlParameter returnParameter = command.Parameters.Add("RetVal", SqlDbType.Int);
+                returnParameter.Direction = ParameterDirection.ReturnValue;
+                con.Open();
+                command.ExecuteReader();
+                con.Close();
+            }
+
+        }
+        catch (Exception ex) { throw ex; }
+
+    }
     public class TwilioConfig
     {
         public string AccountSid { get; set; }
@@ -197,5 +235,17 @@ public class PatientSmsQueueProcessor
         public string Value { get; set; }
         public string Descripiton { get; set; }
 
+    }
+
+    public class SaveSmsInfo
+    {
+
+        public string PatientUserName { get; set; }
+        public string fromNo { get; set; }
+        public string toNo { get; set; }
+        public string Body { get; set; }
+        public DateTime SentDate { get; set; }
+        public string Direction { get; set; }
+        public string Status { get; set; }
     }
 }
