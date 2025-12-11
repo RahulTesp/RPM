@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Collections.Concurrent;
-using System.Data;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Concurrent;
+using System.Data;
 using System.Data.Common;
+using System.Globalization;
 //cron continuous
 
 namespace azuretranstekwebjob
@@ -14,8 +16,8 @@ namespace azuretranstekwebjob
         static string CONN_STRING = string.Empty;
         static ConcurrentDictionary<string, DeviceIDs> deviceid_dictionary = new ConcurrentDictionary<string, DeviceIDs>();
         static ConcurrentDictionary<string, string> vitalunits_dictionary = new ConcurrentDictionary<string, string>();
-        static string readingid = string.Empty;
-        static string acess_key = string.Empty;
+        static double bg_fastingStartTime = 0;
+        static double bg_fastingEndTime = 0;
         static async Task Main(string[] args)
         {
             var config = new ConfigurationBuilder()
@@ -115,7 +117,11 @@ namespace azuretranstekwebjob
                         }
                     }
                 }
-
+                List<SystemConfigInfo> config = GetSystemConfig(CONN_STRING, "TRANSTEK", "TranstekJob");
+                SystemConfigInfo? startTimeKey = config.Find(x => x.Name.Equals("BG_FastingStartTime"));
+                bg_fastingStartTime =  Convert.ToDouble( startTimeKey?.Value);
+                SystemConfigInfo? endTimeKey = config.Find(x => x.Name.Equals("BG_FastingEndTime"));
+                bg_fastingEndTime = Convert.ToDouble(endTimeKey?.Value);
                 Console.WriteLine("Reading DeviceId and Vitals end");
             }
             catch (Exception ex)
@@ -126,6 +132,7 @@ namespace azuretranstekwebjob
 
         private static void TimerApiCallback()
         {
+
             Console.WriteLine("TimerApiCallback begin");
             try
             {
@@ -138,11 +145,19 @@ namespace azuretranstekwebjob
                     Console.WriteLine("DeviceId: " + val.Deviceid + "; Last Recorded :" + lastRecodDate);
                     DateTime newstart = lastRecodDate.AddSeconds(2);
 
-                    string sdata = GetJsonFromStagingTable(val.Deviceid, newstart);
-                    if (sdata == null || sdata == "[]")
+                    List<KeyValuePair<DateTime, string>> sdata = GetJsonFromStagingTable(val.Deviceid, newstart);
+
+                    if (sdata == null || sdata.Count <= 0)
+                    {
+                        DateTime newenddate1 = newstart.AddDays(2);
+                        if (newenddate1 <  DateTime.Now)
+                        {
+                            UpdateAppJobLastBatch(val.Deviceid, newenddate1);
+                        }                                               
                         continue;
-                    JObject parsedJson = JObject.Parse(sdata);
-                    JArray readingsArray = parsedJson["readings"] as JArray;
+                    }
+                        
+                    
                     string deviceType = IsValidlifesenseDevice(val.Deviceid);
                     if (string.IsNullOrEmpty(deviceType))
                     {
@@ -150,16 +165,12 @@ namespace azuretranstekwebjob
                         continue;
                     }
                     List<DateTime> receivedTimes = new List<DateTime>();
-                    if (readingsArray.Count > 0)
-                    {
-                        foreach (var readingItem in readingsArray)
+                        foreach (var readingItem in sdata)
                         {
                             try
                             {
                                 // Each item is a JSON-encoded string, so parse it again
-                                string readingJson = readingItem.ToString();
-                                if (readingJson == null) continue;
-                                TranstekDeviceTelemetry telemetry = JsonConvert.DeserializeObject<TranstekDeviceTelemetry>(readingJson);
+                                TranstekDeviceTelemetry telemetry = JsonConvert.DeserializeObject<TranstekDeviceTelemetry>(readingItem.Value);
 
                                 if (telemetry != null)
                                 {
@@ -171,14 +182,13 @@ namespace azuretranstekwebjob
                                         {
                                             continue;
                                         }
-                                        bool insertSuccess = StagingTableQueueInsert(telemetry, deviceType);
+                                        bool insertSuccess = StagingTableQueueInsert(telemetry, deviceType, readingItem.Key);
 
                                         if (insertSuccess)
                                         {
                                             Console.WriteLine($"Successfully inserted reading for deviceId: {telemetry}");
                                             // Track createdAt timestamp
-                                            DateTime receivedTime = ConvertUnixTimestampToDateTime(telemetry.createdAt);
-                                            receivedTimes.Add(receivedTime);
+                                            receivedTimes.Add(readingItem.Key);
                                         }
                                         else
                                         {
@@ -201,23 +211,21 @@ namespace azuretranstekwebjob
                                 Console.WriteLine($"Error processing individual reading: {innerEx.Message}");
                             }
                         }
-                        // After processing all readings, update last batch if we inserted any
+                    DateTime newenddate = newstart.AddDays(2);
+                    if (newenddate < DateTime.Now)
+                    {
+                        UpdateAppJobLastBatch(val.Deviceid, newenddate);
+                    }
+                    else
+                    {
                         if (receivedTimes.Any())
                         {
                             DateTime maxReceivedTime = receivedTimes.Max();
                             UpdateAppJobLastBatch(val.Deviceid, maxReceivedTime);
                         }
-                        else
-                        {
-                            DateTime newenddate = newstart.AddDays(2);
-                            UpdateAppJobLastBatch(val.Deviceid, newenddate);
-                        }
                     }
-                    else
-                    {
-                        DateTime newenddate = newstart.AddDays(2);
-                        UpdateAppJobLastBatch(val.Deviceid, newenddate);
-                    }
+                    // After processing all readings, update last batch if we inserted any
+                    
                 }
                 Console.WriteLine("TimerApiCallback end");
             }
@@ -225,6 +233,36 @@ namespace azuretranstekwebjob
             {
                 Console.WriteLine("Exception before StagingTableQueueInsert:" + ex);
             }
+        }
+        public static List<SystemConfigInfo> GetSystemConfig(string cs, string category, string createdby)
+        {
+            List<SystemConfigInfo> ret = new List<SystemConfigInfo>();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(cs))
+                {
+                    //string query = "select * from SystemConfigurations where Category='iGlucose'";
+                    SqlCommand command = new SqlCommand("usp_GetSystemConfig", connection);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.Add("@Category", SqlDbType.NVarChar).Value = category;
+                    command.Parameters.Add("@CreatedBy", SqlDbType.NVarChar).Value = createdby;
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        SystemConfigInfo info = new SystemConfigInfo();
+                        info.Name = !reader.IsDBNull(reader.GetOrdinal("name")) ? reader["name"].ToString() : string.Empty;
+                        info.Value = !reader.IsDBNull(reader.GetOrdinal("Value")) ? reader["Value"].ToString() : string.Empty;
+                        info.Descripiton = !reader.IsDBNull(reader.GetOrdinal("Description")) ? reader["Description"].ToString() : string.Empty;
+                        ret.Add(info);
+                    }
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            return ret;
         }
         private static void UpdateAppJobLastBatch(string Deviceid, DateTime newenddate)
         {
@@ -251,8 +289,9 @@ namespace azuretranstekwebjob
                 }
             }
         }
-        private static string GetJsonFromStagingTable(string deviceId, DateTime startDate)
+        private static List<KeyValuePair<DateTime, string>> GetJsonFromStagingTable(string deviceId, DateTime startDate)
         {
+            var results = new List<KeyValuePair<DateTime, string>>();
             try
             {
                 DateTime newenddate = startDate.AddDays(2);
@@ -280,11 +319,24 @@ namespace azuretranstekwebjob
                     {
                         while (reader.Read())
                         {
-                            jsonReadings.Add(reader.GetString(0)); // raw JSON string
+                            object obj = reader["createdOn"];
+                            DateTime createdOn = obj != DBNull.Value ? ((DateTime)obj).ToUniversalTime() : DateTime.MinValue;
+                            var jsonValue = reader["Json"];
+                            string? jsonString = jsonValue?.ToString();
+                            if (jsonString != null)
+                            {
+                                KeyValuePair<DateTime, string> valuePair = new KeyValuePair<DateTime, string>(
+                                    createdOn,
+                                    jsonString
+                                );
+
+                                results.Add(valuePair); // raw JSON string
+                            }
+                            // If jsonString is null, skip adding to results
                         }
                     }
                 }
-                return JsonConvert.SerializeObject(new { readings = jsonReadings });
+                return results;
 
 
             }
@@ -329,27 +381,27 @@ namespace azuretranstekwebjob
             }
         }
 
-        private static bool StagingTableQueueInsert(TranstekDeviceTelemetry dev, string deviceType)
+        private static bool StagingTableQueueInsert(TranstekDeviceTelemetry dev, string deviceType,DateTime createdOn)
         {
             GetVitalUnits();
             bool ret = false;
             string stagingInsert = "INSERT INTO JsonStg([Json])VALUES";
-
+            deviceType = deviceType.Trim();
             if (deviceType == "Blood Pressure Monitor")
             {
-                ret = ProcessBloobPressureData(dev, CONN_STRING, stagingInsert);
+                ret = ProcessBloobPressureData(dev, CONN_STRING, stagingInsert, createdOn);
             }
             else if (deviceType == "Blood Glucose Monitor")
             {
-                ret = ProcessBloodGlucoseData(dev, CONN_STRING, stagingInsert);
+                ret = ProcessBloodGlucoseData(dev, CONN_STRING, stagingInsert, createdOn);
             }
             else if (deviceType == "Body Weight Monitor")
             {
-                ret = ProcessWeightData(dev, CONN_STRING, stagingInsert);
+                ret = ProcessWeightData(dev, CONN_STRING, stagingInsert, createdOn);
             }
             else if (deviceType == "Pulse Oximeter")
             {
-                ret = ProcessOxygenData(dev, CONN_STRING, stagingInsert);
+                ret = ProcessOxygenData(dev, CONN_STRING, stagingInsert, createdOn);
             }
             return ret;
         }
@@ -414,7 +466,7 @@ namespace azuretranstekwebjob
 
             return dateTimeRx;
         }
-        private static bool ProcessBloobPressureData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert)
+        private static bool ProcessBloobPressureData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert, DateTime createdOn)
         {
             bool ret;
             try
@@ -439,13 +491,12 @@ namespace azuretranstekwebjob
                 blood_pressurediastolic.device_model = dev.modelNumber;
                 blood_pressurepulse.device_model = dev.modelNumber;
                 var dateTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(obj["ts"])).DateTime;
-                blood_pressuresystolic.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-                blood_pressurediastolic.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-                blood_pressurepulse.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-                var dateTimeRx = DateTimeOffset.FromUnixTimeSeconds(dev.createdAt).DateTime;
-                blood_pressuresystolic.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
-                blood_pressurediastolic.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
-                blood_pressurepulse.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
+                blood_pressuresystolic.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
+                blood_pressurediastolic.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
+                blood_pressurepulse.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
+                blood_pressuresystolic.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
+                blood_pressurediastolic.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
+                blood_pressurepulse.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
                 blood_pressuresystolic.reading_type = "blood_pressure";
                 blood_pressurediastolic.reading_type = "blood_pressure";
                 blood_pressurepulse.reading_type = "blood_pressure";
@@ -498,7 +549,7 @@ namespace azuretranstekwebjob
             }
             return ret;
         }
-        private static bool ProcessBloodGlucoseData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert)
+        private static bool ProcessBloodGlucoseData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert, DateTime createdOn)
         {
             bool ret;
             try
@@ -513,9 +564,9 @@ namespace azuretranstekwebjob
                 blood_glucose.device_id = dev.deviceId;
                 blood_glucose.device_model = dev.modelNumber;
                 var dateTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(obj["ts"])).DateTime;
-                blood_glucose.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-                var dateTimeRx = DateTimeOffset.FromUnixTimeSeconds(dev.createdAt).DateTime;
-                blood_glucose.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
+                var timezone= Convert.ToInt16(obj["tz_tz"]);
+                blood_glucose.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
+                blood_glucose.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
                 blood_glucose.reading_type = "blood_glucose";
                 blood_glucose.battery = 0;
                 var time = obj["ts_tz"];
@@ -542,6 +593,7 @@ namespace azuretranstekwebjob
                 }
                 bool isFasting = obj["meal"].ToString() == "1";
                 bool isNonFasting = obj["meal"].ToString() == "2";
+                bool isNone = obj["meal"].ToString() == "0";
                 if (isFasting)
                 {
                     blood_glucose.data_type = "Fasting";
@@ -555,6 +607,13 @@ namespace azuretranstekwebjob
                     blood_glucose.before_meal = false;
                     blood_glucose.event_flag = "1";
                 }
+                if (isNone)
+                {
+                    var mealInfo = ProcessMealZero(dateTime, Convert.ToInt32(obj["ts_tz"]));
+                    blood_glucose.data_type = mealInfo.data_type;
+                    blood_glucose.before_meal = mealInfo.before_meal;
+                    blood_glucose.event_flag = mealInfo.event_flag;
+                }
                 string jsonData = JsonConvert.SerializeObject(blood_glucose);
                 StagingTableInsertJson(stagingInsert + "('" + jsonData + "')", ConnectionString);
                 ret = true;
@@ -565,7 +624,36 @@ namespace azuretranstekwebjob
             }
             return ret;
         }
-        private static bool ProcessWeightData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert)
+        public static StagingInput ProcessMealZero(DateTime utcDateTime,int zone=0)
+        {
+            try
+            {
+                DateTime shifted = utcDateTime.AddHours(zone);
+                StagingInput bg = new StagingInput();
+                var t = shifted.TimeOfDay;
+                bool val = t >= TimeSpan.FromHours(bg_fastingStartTime) && t < TimeSpan.FromHours(bg_fastingEndTime);
+                if (val)
+                {
+                    bg.data_type = "Fasting";
+                    bg.before_meal = true;
+                    bg.event_flag = "0";
+                }
+                else
+                {
+                    bg.data_type = "Non-Fasting";
+                    bg.before_meal = false;
+                    bg.event_flag = "1";
+                }
+                return bg;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+           
+        }
+        private static bool ProcessWeightData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert, DateTime createdOn)
         {
             bool ret;
             try
@@ -580,9 +668,8 @@ namespace azuretranstekwebjob
                 weight.device_id = dev.deviceId;
                 weight.device_model = dev.modelNumber;
                 var dateTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(obj["ts"])).DateTime;
-                weight.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-                var dateTimeRx = DateTimeOffset.FromUnixTimeSeconds(dev.createdAt).DateTime;
-                weight.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
+                weight.date_recorded = dateTime.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
+                weight.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
                 weight.reading_type = "weight";
                 if (obj.TryGetValue("bat", out var batToken) && batToken != null && int.TryParse(batToken.ToString(), out int battery))
                 {
@@ -610,11 +697,11 @@ namespace azuretranstekwebjob
                 weight.data_unit = Unitweight;
                 if (Unitweight == "kg")
                 {
-                    weight.data_value = Math.Round(Convert.ToDouble(obj["wt"]) / 1000,2);
+                    weight.data_value = Math.Round(Convert.ToDouble(obj["wt"]) / 1000,1);
                 }
                 else if (Unitweight == "lbs")
                 {
-                    weight.data_value = Math.Round(Convert.ToDouble(obj["wt"]) * 0.00220462,2);
+                    weight.data_value = Math.Round(Convert.ToDouble(obj["wt"]) * 0.00220462,1);
                 }
                 string jsonData = JsonConvert.SerializeObject(weight);
                 StagingTableInsertJson(stagingInsert + "('" + jsonData + "')", ConnectionString);
@@ -626,15 +713,17 @@ namespace azuretranstekwebjob
             }
             return ret;
         }
-        private static bool ProcessOxygenData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert)
+        private static bool ProcessOxygenData(TranstekDeviceTelemetry dev, string ConnectionString, string stagingInsert, DateTime createdOn)
         {
             bool ret;
             try
             {
                 vitalunits_dictionary.TryGetValue("Pulse", out string Unitpulse);
                 vitalunits_dictionary.TryGetValue("Oxygen", out string Unitspo2);
-                JObject objOxygen = JObject.Parse(dev.deviceData.ToString());
-                string readingIdWithPrefix = "TK" + objOxygen["imei"] + objOxygen["ts"];
+                JObject objOxygen = JObject.Parse(dev.data.ToString());
+                string timeStamp = objOxygen["time"]?.ToString();
+                long unixSeconds = ParseTranstekTimeToUnixSecondsUtc(timeStamp);
+                string readingIdWithPrefix = "TK" + objOxygen["imei"] + unixSeconds;
                 StagingInput pulseoximeter_oxygen = new StagingInput();
                 StagingInput pulseoximeter_pulse = new StagingInput();
                 pulseoximeter_oxygen.reading_id = readingIdWithPrefix;
@@ -646,12 +735,11 @@ namespace azuretranstekwebjob
                 string timeString = objOxygen["time"].ToString();
                 string dateTimePart = timeString.Substring(0, timeString.Length - 3);
                 DateTime time = DateTime.ParseExact(dateTimePart, "yy/MM/dd,HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-                string formattedTime = time.ToString("yyyy-MM-dd HH:mm:ss");
+                string formattedTime = time.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
                 pulseoximeter_oxygen.date_recorded = formattedTime;
                 pulseoximeter_pulse.date_recorded = formattedTime;
-                var dateTimeRx = ConvertUnixTimestampToDateTime(dev.createdAt);
-                pulseoximeter_oxygen.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
-                pulseoximeter_pulse.date_received = dateTimeRx.ToString("yyyy-MM-dd HH:mm:ss");
+                pulseoximeter_oxygen.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
+                pulseoximeter_pulse.date_received = createdOn.ToString("yyyy-MM-dd HH:mm:ss").Replace('.', ':');
                 pulseoximeter_oxygen.reading_type = "pulse_ox";
                 pulseoximeter_pulse.reading_type = "pulse_ox";
                 pulseoximeter_oxygen.battery = (int)objOxygen["battery"];
@@ -694,6 +782,37 @@ namespace azuretranstekwebjob
                 ret = false;
             }
             return ret;
+        }
+        private static long ParseTranstekTimeToUnixSecondsUtc(string timeString)
+        {
+            if (string.IsNullOrWhiteSpace(timeString))
+                return DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+            timeString = timeString.Trim();
+            if (timeString.Length < 3)
+                return DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+            // Last 3 chars are signed offset units of 15 minutes (e.g. "+04" or "-02")
+            string offsetRaw = timeString.Substring(timeString.Length - 3);
+            string datePart = timeString.Substring(0, timeString.Length - 3).Trim();
+
+            // Parse date part (expected "yy/MM/dd,HH:mm:ss")
+            if (!DateTime.TryParseExact(datePart, "yy/MM/dd,HH:mm:ss", CultureInfo.InvariantCulture,
+                    DateTimeStyles.None, out DateTime parsedLocal))
+            {
+                // fallback to loose parse
+                if (!DateTime.TryParse(datePart, CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedLocal))
+                    return DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            }
+
+            if (!int.TryParse(offsetRaw, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out int offsetUnits))
+                offsetUnits = 0;
+
+            // offsetUnits * 15 minutes => TimeSpan offset
+            var offset = TimeSpan.FromMinutes(offsetUnits * 15);
+            var dtoWithOffset = new DateTimeOffset(parsedLocal, offset);
+
+            return dtoWithOffset.ToUniversalTime().ToUnixTimeSeconds();
         }
         private static bool StagingTableInsertJson(string jsonData, string ConnectionString)
         {

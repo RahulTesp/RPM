@@ -37,6 +37,7 @@ export class PatientDataReportComponent implements OnInit {
   private BillingInfo: any;
   private http_get_symptoms: any;
   private http_7day_vitalData: any;
+  private http_last30day_vitalData: any;
   private doc: any;
   private http_medication_data: any;
   private selectedProgramName: any;
@@ -485,6 +486,7 @@ export class PatientDataReportComponent implements OnInit {
         this.http_vitalData
       );
       this.patientdownloadService.generateDaysVitals(this.http_7day_vitalData);
+      this.patientdownloadService.generate30DaysVitals(this.http_last30day_vitalData);
       this.patientdownloadService.generatePatientSummaryReport(
         this.doc,
         this.patientProgramname,
@@ -569,7 +571,13 @@ export class PatientDataReportComponent implements OnInit {
       const endDate = this.auth.ConvertToUTCRangeInput(
         new Date(this.RptEndDate + 'T23:59:59')
       );
-
+      const startDate30Days = this.auth.ConvertToUTCRangeInput(
+        new Date(
+          new Date(this.RptEndDate).setDate(
+            new Date(this.RptEndDate).getDate() - 30
+          )
+        )
+      );
       this.http_rpm_patient = await this.PatientReportapi.getPatientInfo(
         this.selectedPatient,
         this.selectedProgram
@@ -580,7 +588,7 @@ export class PatientDataReportComponent implements OnInit {
       this.http_healthtrends = await this.PatientReportapi.getTrends(
         this.selectedPatient,
         this.selectedProgram,
-        startDate,
+        startDate30Days,
         endDate
       );
       this.http_vitalData = await this.PatientReportapi.getVitalReading(
@@ -617,6 +625,13 @@ export class PatientDataReportComponent implements OnInit {
             new Date(this.RptEndDate).getDate() - 7
           )
         )
+      );
+
+      this.http_last30day_vitalData = await this.PatientReportapi.getVitalReading(
+        this.selectedPatient,
+        this.selectedProgram,
+        startDate30Days,
+        endDate
       );
 
       this.http_7day_vitalData =

@@ -31,8 +31,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Sync.Devices.Transt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Billing", "..\RPM.Job.Billing\RPM.Job.Billing.csproj", "{D430FE0B-081F-4FB8-9D42-569B555C1D8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Simulator.iGlucose", "..\RPM.Job.Simulator.iGlucose\RPM.Job.Simulator.iGlucose.csproj", "{7EA0D241-C64E-9A35-7B20-ED586CD9D2A3}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.AlertsSummary.Priority", "..\RPM.Job.AlertsSummary.Priority\RPM.Job.AlertsSummary.Priority.csproj", "{C50BC1B5-4514-4570-9E4E-68F54E5E8D09}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.AlertsTemp", "..\RPM.Job.AlertsTemp\RPM.Job.AlertsTemp.csproj", "{5D5F32D9-E7F7-467B-8679-79C23D940433}"
@@ -42,6 +40,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Session.Validation", "..\RPM.Job.Session.Validation\RPM.Job.Session.Validation.csproj", "{02F2E7EF-3E21-4B9B-BC23-8CE7F1AE04F1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.RPM.Event.logger", "..\RPM.Job.RPM.Event.logger\RPM.Job.RPM.Event.logger.csproj", "{56D05429-23D2-49EA-81BF-8967177DE54F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.PatientSmsWebJob", "..\RPM.Job.PatientSmsWebJob\RPM.Job.PatientSmsWebJob.csproj", "{3DE4EDED-46E7-4958-8CBA-676BFF8C2D96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,10 +105,6 @@ Global
 		{D430FE0B-081F-4FB8-9D42-569B555C1D8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D430FE0B-081F-4FB8-9D42-569B555C1D8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D430FE0B-081F-4FB8-9D42-569B555C1D8C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7EA0D241-C64E-9A35-7B20-ED586CD9D2A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7EA0D241-C64E-9A35-7B20-ED586CD9D2A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7EA0D241-C64E-9A35-7B20-ED586CD9D2A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7EA0D241-C64E-9A35-7B20-ED586CD9D2A3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C50BC1B5-4514-4570-9E4E-68F54E5E8D09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C50BC1B5-4514-4570-9E4E-68F54E5E8D09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C50BC1B5-4514-4570-9E4E-68F54E5E8D09}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -125,10 +121,6 @@ Global
 		{02F2E7EF-3E21-4B9B-BC23-8CE7F1AE04F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02F2E7EF-3E21-4B9B-BC23-8CE7F1AE04F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02F2E7EF-3E21-4B9B-BC23-8CE7F1AE04F1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{56D05429-23D2-49EA-81BF-8967177DE54F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{56D05429-23D2-49EA-81BF-8967177DE54F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{56D05429-23D2-49EA-81BF-8967177DE54F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{56D05429-23D2-49EA-81BF-8967177DE54F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

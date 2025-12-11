@@ -122,7 +122,7 @@ export class SideBarComponent implements OnInit {
       id: 'menuvitals',
       title: 'Vitals',
       icon: 'assets/04-Icons/Icons_Vitals.svg',
-      route: 'admin/patient-vitals/clinicInfo',
+      route: '/admin/patient-vitals/programInfo',
       activeIcon: '/assets/04-Icons/Icons_Vitals A.svg',
       patientOnly: true,
     },
