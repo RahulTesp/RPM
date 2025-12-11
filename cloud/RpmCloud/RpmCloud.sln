@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Lib.Billing.MedIT", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.Session.Validation", "..\RPM.Job.Session.Validation\RPM.Job.Session.Validation.csproj", "{02F2E7EF-3E21-4B9B-BC23-8CE7F1AE04F1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPM.Job.RPM.Event.logger", "..\RPM.Job.RPM.Event.logger\RPM.Job.RPM.Event.logger.csproj", "{56D05429-23D2-49EA-81BF-8967177DE54F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +125,10 @@ Global
 		{02F2E7EF-3E21-4B9B-BC23-8CE7F1AE04F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02F2E7EF-3E21-4B9B-BC23-8CE7F1AE04F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02F2E7EF-3E21-4B9B-BC23-8CE7F1AE04F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56D05429-23D2-49EA-81BF-8967177DE54F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56D05429-23D2-49EA-81BF-8967177DE54F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56D05429-23D2-49EA-81BF-8967177DE54F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56D05429-23D2-49EA-81BF-8967177DE54F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
