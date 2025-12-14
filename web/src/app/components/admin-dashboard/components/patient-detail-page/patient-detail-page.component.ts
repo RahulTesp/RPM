@@ -462,6 +462,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.patientInteractionMin = '00';
     this.patientInteractionSec = '00';
 
+    // Clear stale vital and health trend data
+    this.clearPatientData();
+
     // Assign patient & program IDs
     this.patient_id = patientId;
     this.program_id = programId;
@@ -2689,6 +2692,9 @@ getFirstPresentVital(vitalScreen: any) {
           : this.createEmptyGraph(30);
 
         this.allLineChartData[index] = emptyGraph;
+        // Trigger change detection for array mutation
+        this.allLineChartData = [...this.allLineChartData];
+        this.cdr.markForCheck();
         return;
       }
 
@@ -2711,6 +2717,10 @@ getFirstPresentVital(vitalScreen: any) {
         lineChartLabels,
         lineChartData,
       };
+
+      // Trigger change detection
+      this.allLineChartData = [...this.allLineChartData];
+      this.cdr.markForCheck();
 
     } catch (error) {
       console.error('Error loading individual health trend:', error);
@@ -2845,54 +2855,86 @@ getFirstPresentVital(vitalScreen: any) {
 
       const vitalHttpHealthTrends = data.trends;
       const healthtrendVitalNameArray = data.vitalNames;
-      //Set default frequency for all charts to 30 days
-      this.heath_trends_frequencies = new Array(data.vitalNames.length).fill(30);
-      //  Clear previous data before pushing new ones
+      
+      // Store for later use
+      this.http_healthtrends = vitalHttpHealthTrends;
+      this.healthtrendVitalNameArray = healthtrendVitalNameArray;
+      
+      //Set default frequency for all charts to requested daycount
+      this.heath_trends_frequencies = new Array((data.vitalNames || []).length).fill(daycount);
+      // Clear previous data before pushing new ones
       this.allLineChartData = []; // clear previous data
 
+      // If no trend data returned, show a fallback empty chart so UI isn't blank
+      if (!Array.isArray(vitalHttpHealthTrends) || vitalHttpHealthTrends.length === 0) {
+        const empty = this.createEmptyGraph(daycount);
+        this.allLineChartData = [empty];
+        this.lineChartLabels = empty.lineChartLabels;
+        this.lineChartData = empty.lineChartData;
+        this.selectedVital = healthtrendVitalNameArray?.[0] || '';
+        this.cdr.markForCheck();
+        return;
+      }
+
+      let isFirstVital = true;
       // Only process trends with actual data
       vitalHttpHealthTrends.forEach((trendData: any) => {
+        let chartData: any;
+
         if (!trendData.Values || trendData.Values.length === 0) {
-          if (daycount === 7) {
-            this.setEmptyGraphHealthInfo();
-          } else {
-            this.setEmpty30DaysGraphHealthInfo();
-          }
-          return;
+          // Create empty graph for vitals with no data
+          const emptyGraph = this.createEmptyGraph(daycount);
+          chartData = emptyGraph;
+        } else {
+          // Process actual data
+          const isVital = trendData.Values?.[0]?.label === 'Vital';
+          const originalLabels = this.patientService.convertDateforHealthTrends(
+            trendData.Time,
+            isVital
+          );
+
+          const originalDataSets = trendData.Values.map((item: any) => ({
+            data: [...item.data],
+            label: item.label,
+            fill: false,
+            lineTension: 0.5
+          }));
+
+          const {
+            filteredData,
+            filteredLabels
+          } = this.filterChartDataAndLabelsTogether(
+            originalDataSets,
+            originalLabels,
+            trendData.VitalName
+          );
+
+          const lineChartData = originalDataSets.map((ds: any, idx: any) => ({
+            ...ds,
+            data: filteredData[idx]
+          }));
+
+          chartData = {
+            lineChartLabels: filteredLabels,
+            lineChartData
+          };
         }
 
-        const isVital = trendData.Values?.[0]?.label === 'Vital';
-        const originalLabels = this.patientService.convertDateforHealthTrends(
-          trendData.Time,
-          isVital
-        );
+        // Push to Clinical Info section charts
+        this.allLineChartData.push(chartData);
 
-        const originalDataSets = trendData.Values.map((item: any) => ({
-          data: [...item.data],
-          label: item.label,
-          fill: false,
-          lineTension: 0.5
-        }));
-
-        const {
-          filteredData,
-          filteredLabels
-        } = this.filterChartDataAndLabelsTogether(
-          originalDataSets,
-          originalLabels,
-          trendData.VitalName
-        );
-
-        const lineChartData = originalDataSets.map((ds: any, idx: any) => ({
-          ...ds,
-          data: filteredData[idx]
-        }));
-
-        this.allLineChartData.push({
-          lineChartLabels: filteredLabels,
-          lineChartData
-        });
+        // Set the first vital's data for Summary section
+        if (isFirstVital) {
+          this.lineChartLabels = chartData.lineChartLabels;
+          this.lineChartData = chartData.lineChartData;
+          this.selectedVital = trendData.VitalName;
+          isFirstVital = false;
+        }
       });
+
+      // Create new array reference to trigger change detection for multiple charts
+      this.allLineChartData = [...this.allLineChartData];
+      this.cdr.markForCheck();
 
     } catch (error) {
       console.error('Error loading health trends:', error);
@@ -3675,6 +3717,43 @@ getFirstPresentVital(vitalScreen: any) {
     //clearInterval(this.intervalnote);
     clearInterval(this.interval3);
   }
+
+  /**
+   * Clear all patient-specific data to prevent stale data display when switching patients
+   */
+  private clearPatientData(): void {
+    // Clear Health Trend Data
+    this.http_healthtrends = [];
+    this.healthtrendVitalNameArray = [];
+    this.http_healthtrends_current_data = [];
+    this.allLineChartData = [];
+    this.lineChartLabels = [];
+    this.lineChartData = [
+      {
+        data: [],
+        label: 'Series A',
+        lineTension: 0,
+      },
+    ];
+    this.selectedVital = '';
+
+    // Clear Vital Reading Data
+    this.http_vitalData = null;
+    this.vital_temporaryData = null;
+    this.http_vitalGlucoseData = null;
+    this.http_VitalOxygen = null;
+    this.http_VitalWight = null;
+    this.ProcessVitalData = null;
+    this.currentVital = 'None';
+
+    // Clear other data sources
+    this.vitalDataSource = null;
+    this.vitalDataGlucoseSource = null;
+
+    // Reset form controls
+    this.frmvitalrange.reset();
+  }
+
   openSchedulebyId(id: any) {
     this.patientrightsidebar.navigateEditSchedule(id);
   }
@@ -5274,19 +5353,19 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
     var endDate = this.convertDate(today);
     startDate = startDate + 'T00:00:00';
     endDate = endDate + 'T23:59:59';
-    const startDate7Days = this.auth.ConvertToUTCRangeInput(
+     try {
+      this.startDateReport = this.auth.ConvertToUTCRangeInput(
+        new Date(startDate)
+      );
+      this.endDateReport = this.auth.ConvertToUTCRangeInput(new Date(endDate));
+     const startDate7Days = this.auth.ConvertToUTCRangeInput(
         new Date(
           new Date(this.endDateReport).setDate(
             new Date(this.endDateReport).getDate() - 7
           )
         )
       );
-    try {
-      this.startDateReport = this.auth.ConvertToUTCRangeInput(
-        new Date(startDate)
-      );
-      this.endDateReport = this.auth.ConvertToUTCRangeInput(new Date(endDate));
-
+   
       this.httpPatient = await this.PatientReportapi.getPatientInfo(
         this.selectedPatient,
         this.selectedProgram
@@ -5394,71 +5473,138 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
     this.lineChartLabels = chartLabels;
   }
 
-  async getPatientAndProgramInfo() {
-    this.patientStatusData = this.httpPatient.PatientProgramdetails.Status;
-    this.PatientCriticalAlerts =
-      this.patientdownloadService.extractCriticalAlerts(this.httpSymptoms);
-    this.patientdownloadService.generateProgramGoalsReport(
-      this.doc,
-      this.httpPatient.PatientProgramGoals,
-      this.PatientCriticalAlerts
-    );
-    this.doc.addPage();
-    await this.patientdownloadService.getReportNotes(
-      this.doc,
-      this.startDateReport,
-      this.endDateReport,
-      this.selectedPatient,
-      this.selectedProgram,
-      this.idProgram
-    );
-    if (this.patientProgramname == 'CCM' || this.patientProgramname == 'PCM') {
-      this.patientdownloadService.generatePatientSummaryReport(
-        this.doc,
-        this.patientProgramname,
-        this.httpSymptoms,
-        this.httpMedicationData,
-        this.httpbillingInfo,
-        this.httpSMSData
-      );
-      this.doc.save('PatientReport.pdf');
-      this.DownloadStatus = false;
-    } else {
-      // Manjusha code change
-      this.doc.setFontSize(14);
-      this.doc.text('Patient Health Trends', 15, this.currentY);
-      this.doc.setDrawColor('black');
-      const headingWidth = this.doc.getTextWidth('Patient Health Trends');
-      this.doc.line(15, this.currentY + 1, 15 + headingWidth, this.currentY + 1);
-      this.currentY += 20;
-      await this.patientdownloadService.resetPosition();
-      const allGraphs = Array.from(document.querySelectorAll('.pdfData'));
+async getPatientAndProgramInfo() {
+  this.patientStatusData = this.httpPatient.PatientProgramdetails.Status;
 
-      for (let i = 0; i < allGraphs.length; i++) {
-        const graph = allGraphs[i] as HTMLElement;
-        const vitalTitle = this.healthtrendVitalNameArray[i] || `Chart ${i + 1}`;
-        await this.patientdownloadService.captureHealthTrendsChart(this.doc, graph, vitalTitle);
-      }
-      this.currentY = this.patientdownloadService.getChartCurrentY();
-      this.patientdownloadService.generateHealthTrendsTable(
-        this.doc,
-        this.httpVitalData
-      );
-      this.patientdownloadService.generateDaysVitals(this.http7VitalData);    
-      this.patientdownloadService.generate30DaysVitals(this.httpVitalData);  
-      this.patientdownloadService.generatePatientSummaryReport(
-        this.doc,
-        this.patientProgramname,
-        this.httpSymptoms,
-        this.httpMedicationData,
-        this.BillingInfo,
-        this.httpSMSData
-      );
-      await this.patientdownloadService.generateVitalReadingSummary(this.doc, this.selectedPatient,this.selectedProgram);
-      this.DownloadStatus = false;
-      this.doc.save('PatientReport.pdf');
-    }
+  this.PatientCriticalAlerts =
+    this.patientdownloadService.extractCriticalAlerts(this.httpSymptoms);
+
+  // 1) Program goals
+  this.patientdownloadService.generateProgramGoalsReport(
+    this.doc,
+    this.httpPatient.PatientProgramGoals,
+    this.PatientCriticalAlerts
+  );
+
+  // 2) Notes on a new page
+  this.doc.addPage();
+  await this.patientdownloadService.getReportNotes(
+    this.doc,
+    this.startDateReport,
+    this.endDateReport,
+    this.selectedPatient,
+    this.selectedProgram,
+    this.idProgram
+  );
+
+  // 3) CCM/PCM short-circuit
+  if (this.patientProgramname === 'CCM' || this.patientProgramname === 'PCM') {
+    this.patientdownloadService.generatePatientSummaryReport(
+      this.doc,
+      this.patientProgramname,
+      this.httpSymptoms,
+      this.httpMedicationData,
+      this.httpbillingInfo,
+      this.httpSMSData
+    );
+    this.doc.save('PatientReport.pdf');
+    this.DownloadStatus = false;
+    return;
   }
+
+  // -----------------------------
+  // Patient Health Trends Section
+  // -----------------------------
+
+  this.currentY = 15; // top margin for the new page
+
+  // IMPORTANT: sync the service cursor; captureHealthTrendsChart uses its own `this.currentY`
+  (this.patientdownloadService as any).currentY = this.currentY;
+
+  // 4) Section heading FIRST
+  this.doc.setFontSize(14);
+  this.doc.text('Patient Health Trends', 15, this.currentY);
+  this.doc.setDrawColor('black');
+  const headingWidth = this.doc.getTextWidth('Patient Health Trends');
+  this.doc.line(15, this.currentY + 1, 15 + headingWidth, this.currentY + 1);
+
+  // Move the cursor below the section heading (both component and service)
+  this.currentY += 15;
+  (this.patientdownloadService as any).currentY = this.currentY;
+
+  // 5) Gather chart elements
+  const graphEls = Array.from(document.querySelectorAll('.pdfData')) as HTMLElement[];
+
+  // If you need a clinical order, ensure `graphEls` and `healthtrendVitalNameArray` align.
+  // We'll use the intersection count to avoid out-of-range indexing.
+  const titles = Array.isArray(this.healthtrendVitalNameArray)
+    ? this.healthtrendVitalNameArray
+    : [];
+  const count = Math.min(graphEls.length, titles.length);
+
+  // 6) Render charts with their titles (service prints title; we pass it in)
+  for (let i = 0; i < count; i++) {
+    const graph = graphEls[i];
+    const vitalTitle = titles[i] || `Chart ${i + 1}`;
+
+    // The service will print the vital title at its `currentY`,
+    // draw an underline, add the image, bump `currentY`, and handle page breaks.
+    await this.patientdownloadService.captureHealthTrendsChart(this.doc, graph, vitalTitle);
+
+    // Sync back component Y
+    this.currentY = (this.patientdownloadService as any).currentY;
+  }
+
+  // If there are more graphs than titles, render them with generic titles
+  for (let i = count; i < graphEls.length; i++) {
+    const graph = graphEls[i];
+    await this.patientdownloadService.captureHealthTrendsChart(this.doc, graph, `Chart ${i + 1}`);
+    this.currentY = (this.patientdownloadService as any).currentY;
+  }
+
+  // 7) Prevent table overlap: add a conditional page break if space is tight
+  const pageHeight =
+    (this.doc as any).internal?.pageSize?.getHeight?.() ??
+    (this.doc as any).internal?.pageSize?.height ??
+    297; // A4 fallback in mm
+  const bottomMargin = 15;
+  const minSpaceForTable = 50; // tune to your table's minimal height
+
+  if (this.currentY > pageHeight - bottomMargin - minSpaceForTable) {
+    this.doc.addPage();
+    this.currentY = 20;
+    (this.patientdownloadService as any).currentY = this.currentY;
+  }
+
+  // 8) Vital readings table (placed safely below charts or on a new page)
+  this.patientdownloadService.generateHealthTrendsTable(this.doc, this.httpVitalData);
+
+  // 9) Additional blocks (ensure they append, not reset Y/page unexpectedly)
+  this.patientdownloadService.generateDaysVitals(this.http7VitalData);
+  this.patientdownloadService.generate30DaysVitals(this.httpVitalData);
+
+  // 10) Patient summary
+  this.patientdownloadService.generatePatientSummaryReport(
+    this.doc,
+    this.patientProgramname,
+    this.httpSymptoms,
+    this.httpMedicationData,
+    this.BillingInfo,
+    this.httpSMSData
+  );
+
+  // 11) Vital reading summary
+  await this.patientdownloadService.generateVitalReadingSummary(
+    this.doc,
+    this.selectedPatient,
+    this.selectedProgram
+  );
+
+  // 12) Finalize
+  this.DownloadStatus = false;
+  this.doc.save('PatientReport.pdf');
+}
+
   closenoterDialogUpdateModal(){
     this.showNoteupdateModal = false;
   }

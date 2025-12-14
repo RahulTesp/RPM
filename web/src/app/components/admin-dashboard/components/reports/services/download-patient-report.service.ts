@@ -1728,57 +1728,133 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
   }
 
   currentY: number = 10;
-  async captureHealthTrendsChart(
-    doc: jsPDF,
-    chartElement: HTMLElement,
-    title: string
-  ): Promise<jsPDF> {
-    return new Promise((resolve, reject) => {
-      try {
-        // Make chart visible for capturing
-        chartElement.style.visibility = 'visible';
-        html2canvas(chartElement)
-          .then((canvas) => {
-            try {
-              // 🔹 Chart-specific heading
-            doc.setFontSize(12);
-            doc.text(title, 15, this.currentY);
+  
 
-            // Add underline
-            doc.setDrawColor('black');
-            const textWidth = doc.getTextWidth(title);
-            doc.line(15, this.currentY + 1, 15 + textWidth, this.currentY + 1);
+  
+async captureHealthTrendsChart(
+  doc: jsPDF,
+  chartElement: HTMLElement,
+  title: string
+): Promise<jsPDF> {
+  // === Layout config (readable, no shrinking) ===
+  const leftMargin = 10;
+  const rightMargin = 10;
+  const topMargin = 15;         // top margin for new pages
+  const bottomMargin = 12;
 
-            // Add chart image
-            const imgData = canvas.toDataURL('image/jpeg', 1.0);
-            const imageY = this.currentY + 6;
-            const imageHeight = 65;
-            doc.addImage(imgData, 10, imageY, 180, imageHeight);
+  const titleFontSize = 12;
+  const titleGapBelow = 6;      // gap between title and image
+  const spacingAfterImage = 10; // gap after image before next block
 
-            this.currentY = imageY + imageHeight + 15;
-              if (this.currentY > 270) {
-                doc.addPage();
-                this.currentY = 20;
-              }
-              resolve(doc);
-            } catch (error) {
-              console.error('Error processing chart canvas:', error);
-              //chartElement.style.visibility = 'hidden';
-              reject(error);
-            }
-          })
-          .catch((error) => {
-            console.error('Error capturing chart with html2canvas:', error);
-            // chartElement.style.visibility = 'hidden';
-            reject(error);
-          });
-      } catch (error) {
-        console.error('Error in captureHealthTrendsChart:', error);
-        //chartElement.style.visibility = 'hidden';
-        reject(error);
-      }
-    });
+  // Get page dimensions (robust across jsPDF versions)
+  const pageWidth =
+    (doc as any).internal?.pageSize?.getWidth?.() ??
+    (doc as any).internal?.pageSize?.width ??
+    210; // A4 width (mm)
+  const pageHeight =
+    (doc as any).internal?.pageSize?.getHeight?.() ??
+    (doc as any).internal?.pageSize?.height ??
+    297; // A4 height (mm)
+
+  // Fixed chart size (NO shrinking)
+  const imageWidthMm = pageWidth - leftMargin - rightMargin;
+  const imageHeightMm = 65;     // keep this fixed for readability
+
+  // Ensure the chart element is capturable
+  const prevVisibility = chartElement.style.visibility;
+  const prevDisplay = chartElement.style.display;
+  chartElement.style.visibility = 'visible';
+  chartElement.style.display = ''; // avoid display:none while capturing
+
+  // Normalize currentY if it somehow slipped above the top margin
+  if (!Number.isFinite(this.currentY) || this.currentY < topMargin) {
+    this.currentY = topMargin;
   }
+
+  return new Promise((resolve, reject) => {
+    try {
+      html2canvas(chartElement, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: null,
+      })
+        .then((canvas) => {
+          try {
+            const hasTitle = !!title && title.trim().length > 0;
+
+            // Compute the total block height needed (title + gap + fixed image + spacing after)
+            const titleBlockMm = hasTitle ? (titleFontSize * 0.4) + titleGapBelow : 0;
+            const totalNeededMm = titleBlockMm + imageHeightMm + spacingAfterImage;
+
+            // If not enough room on the current page, add a page BEFORE drawing
+            if (this.currentY + totalNeededMm > pageHeight - bottomMargin) {
+              doc.addPage();
+              this.currentY = topMargin;
+            }
+
+            // --- (1) Draw the vital title (UNDERLINED) ---
+            if (hasTitle) {
+              doc.setFontSize(titleFontSize);
+              doc.text(title, leftMargin + 5, this.currentY);
+
+              doc.setDrawColor('black');
+              const textWidth = doc.getTextWidth(title);
+              doc.line(
+                leftMargin + 5,
+                this.currentY + 1,
+                leftMargin + 5 + textWidth,
+                this.currentY + 1
+              );
+
+              // gap under the title
+              this.currentY += titleGapBelow;
+            }
+
+            // --- (2) Add the chart image at fixed size (NO shrinking) ---
+            const imgData = canvas.toDataURL('image/png');
+            doc.addImage(
+              imgData,
+              'PNG',
+              leftMargin,
+              this.currentY,
+              imageWidthMm,
+              imageHeightMm
+            );
+
+            // --- (3) Advance cursor after image ---
+            this.currentY += imageHeightMm + spacingAfterImage;
+
+            // If we land at the bottom, prep next content at top of next page
+            if (this.currentY > pageHeight - bottomMargin) {
+              doc.addPage();
+              this.currentY = topMargin;
+            }
+
+            resolve(doc);
+          } catch (error) {
+            console.error('Error processing chart canvas:', error);
+            reject(error);
+          } finally {
+            // Restore element styles
+            chartElement.style.visibility = prevVisibility;
+            chartElement.style.display = prevDisplay;
+          }
+        })
+        .catch((error) => {
+          console.error('Error capturing chart with html2canvas:', error);
+          chartElement.style.visibility = prevVisibility;
+          chartElement.style.display = prevDisplay;
+          reject(error);
+        });
+    } catch (error) {
+      console.error('Error in captureHealthTrendsChart:', error);
+      chartElement.style.visibility = prevVisibility;
+      chartElement.style.display = prevDisplay;
+      reject(error);
+    }
+  });
+}
 
   getChartCurrentY(): number {
     return this.currentY;
