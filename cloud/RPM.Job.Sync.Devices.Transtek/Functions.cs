@@ -146,84 +146,85 @@ namespace SyncTranstekDevices
             }
 
         }
-        public static JArray getDeviceList(string NextToken=null)
+        public static JArray getDeviceList(string NextToken = null, HashSet<string> visitedTokens = null)
         {
+            if (visitedTokens == null)
+                visitedTokens = new HashSet<string>();
+
             JArray ret = new JArray();
             try
             {
                 if (DEVICE_URL == null || TKN == null)
-                {
                     throw new Exception("Invalid Device List Configurations.");
-                }
 
                 using (HttpClient client = new HttpClient())
                 {
                     client.DefaultRequestHeaders.Clear();
                     client.DefaultRequestHeaders.Add("x-api-key", API_KEY);
                     string requestUrl = DEVICE_URL;
-                    if (NextToken != null && NextToken != "")
-                    {
-                        requestUrl = requestUrl + "?nextToken=" + NextToken;
-                    }
+                    if (!string.IsNullOrEmpty(NextToken))
+                        requestUrl += "?nextToken=" + NextToken;
+
                     HttpResponseMessage response = client.GetAsync(requestUrl).Result;
                     response.EnsureSuccessStatusCode();
-                    string result = null;
-                    result = response.Content.ReadAsStringAsync().Result;
+                    string result = response.Content.ReadAsStringAsync().Result;
                     JObject objResult = JsonConvert.DeserializeObject<JObject>(result);
-                    if (objResult != null)
+
+                    if (objResult != null && (int)response.StatusCode == 200)
                     {
-                        if ((int)response.StatusCode == 200)
+                        var items = objResult["items"] as JArray;
+                        var nextTokenVal = objResult["nextToken"]?.ToString();
+                        // Clear nextToken if it is missing or empty in the response
+                        if (objResult["nextToken"] == null || string.IsNullOrEmpty(nextTokenVal))
                         {
-                            var items = objResult["items"] as JArray;
-                            var nextTokenVal = objResult["nextToken"] as JToken;  // Fixed type and added null-conditional operator
-                            if (items != null)
-                            {
-                                JArray completeDevices = new JArray();
-                                foreach (var item in items)
-                                {
-                                    string retStatus = (string)item["status"];
+                            nextTokenVal = null;
+                        }
 
-                                    if (retStatus == "complete")
-                                    {
-                                        completeDevices.Add(item);
-                                    }
-                                }
-                                if (completeDevices.Count > 0)
-                                {
-                                    ret = completeDevices;
-                                }
-                                // here trying recursive if nextToken exists
-                                if (nextTokenVal != null && !string.IsNullOrEmpty(nextTokenVal.ToString()))
-                                {
-                                    JArray retRecursive = getDeviceList(nextTokenVal.ToString());
-                                    if (retRecursive != null && retRecursive.Count > 0)
-                                    {
-                                        foreach (var item in retRecursive)
-                                        {
-                                            ret.Add(item);
-                                        }
-                                    }
-                                }
-                                if (ret.Count == 0)
-                                {
-                                    Console.WriteLine("No devices with 'complete' status.");
-                                    ret = null;
-                                }
+                        // Only print if this page is unique (not visited before)
+                        if (string.IsNullOrEmpty(nextTokenVal) || !visitedTokens.Contains(nextTokenVal))
+                        {
+                            Console.WriteLine("Items count: " + (items != null ? items.Count : 0));
+                            Console.WriteLine("Next Token: " + (nextTokenVal ?? "null"));
+                        }
 
-                            }
-                            else
+                        JArray completeDevices = new JArray();
+                        if (items != null)
+                        {
+                            foreach (var item in items)
                             {
-                                Console.WriteLine("No items found.");
+                                if ((string)item["status"] == "complete")
+                                    completeDevices.Add(item);
                             }
                         }
-                        else
+
+                        if (completeDevices.Count > 0)
+                            ret = completeDevices;
+
+                        // Prevent infinite recursion by tracking tokens
+                        if (!string.IsNullOrEmpty(nextTokenVal) && !visitedTokens.Contains(nextTokenVal))
                         {
-                            Console.WriteLine("Request failed with status code: " + response.StatusCode);
+                            visitedTokens.Add(nextTokenVal);
+                            JArray retRecursive = getDeviceList(nextTokenVal, visitedTokens);
+                            if (retRecursive != null && retRecursive.Count > 0)
+                            {
+                                foreach (var item in retRecursive)
+                                    ret.Add(item);
+                            }
                         }
+
+                        if (ret.Count == 0)
+                        {
+                            Console.WriteLine("No devices with 'complete' status.");
+                            ret = null;
+                        }
+                    }
+                    else if (objResult == null)
+                    {
+                        Console.WriteLine("Error deserializing JSON response.");
                     }
                     else
                     {
-                        Console.WriteLine("Error deserializing JSON response.");
+                        Console.WriteLine("Request failed with status code: " + response.StatusCode);
                     }
                 }
             }
@@ -307,7 +308,7 @@ namespace SyncTranstekDevices
 
                     if (response.IsSuccessStatusCode)
                     {
-                        result =  result.Trim('"');
+                        result = result.Trim('"');
                         JObject objResult = JsonConvert.DeserializeObject<JObject>(result);
                         string message = objResult["message"]?.ToString()?.Trim();
                         return message;
@@ -556,7 +557,7 @@ namespace SyncTranstekDevices
             {
                 return "Failed to Send Email - " + ex;
             }
-        } 
+        }
     }
 
     public class login
