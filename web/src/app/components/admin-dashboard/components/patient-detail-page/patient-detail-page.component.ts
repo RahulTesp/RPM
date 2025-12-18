@@ -1438,13 +1438,13 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       var username = patientusername || this.http_rpm_patientList.PatientDetails.UserName;
 
       // Call the activity info method (kept from your original code)
-      this.activityInfoMenuSelect(5);
+      //this.activityInfoMenuSelect(5);
 
       // Get chat data through the service
       this.http_chatData = await this.patientchatservice.getPatientChat(username);
 
       // Call data source change method (kept from your original code)
-      this.dataSourceChange(5, 5);
+      //this.dataSourceChange(5, 5);
     } catch (error:any) {
       if(error.status == 404)
       {
