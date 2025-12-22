@@ -1,6 +1,4 @@
 .content {
-  // margin:  0px 40px;
-
   width: 100%;
   height: 100%;
   position: relative;
@@ -11,12 +9,6 @@
 // New Change
 ::-webkit-scrollbar {
   display: none;
-}
-
-.main_content {
-  // margin:30px;
-
-  padding: 0px 0px 0px 0px !important;
 }
 
 // New Change
@@ -32,6 +24,7 @@
 }
 
 .side-panel {
+  width: 27%;
   background-color: #ffffff;
   overflow-y: scroll;
 }
@@ -51,10 +44,7 @@ mat-progress-spinner {
   .side-panel {
     margin-left: 0px;
     width: 100%;
-    // height: 90px !important;
-    // background-color: #E1E6ED;
-    // margin-top: 1.5rem;
-    // width: 100vw;
+
   }
   .content-panel {
     display: flex;
@@ -93,37 +83,26 @@ mat-progress-spinner {
   .profile_container {
     display: flex;
     flex-direction: row;
-    max-width: 72% !important;
-    min-width: 72% !important;
+    max-width: 72% ;
+    min-width: 72% ;
     height: 100%;
   }
   .patient_info_panel {
-    height: 100% !important;
-    width: 100% !important;
+    height: 100% ;
+    width: 100% ;
   }
   .upper_container {
     width: 100%;
     height: 100%;
   }
   .img_container {
-    margin-top: 2% !important;
+    margin-top: 2% ;
   }
-
-  // .patient_communication_container {
-  //   float: right;
-  //   margin-top: -100px !important;
-  //   width: 50%;
-  // }
 
   .device_icon {
     width: 45%;
   }
-  .plan_data {
-    // float: right;
-    // margin-right: 2% !important;
-    // margin-top: -50px !important;
-    // width: 47.5% !important;
-  }
+ 
   .patient_vital_reading_panel {
     width: 100%;
     margin-left: 1rem;
@@ -263,9 +242,7 @@ mat-progress-spinner {
   .patient_vital_graph_bg_duration {
     margin-left: 75% !important;
   }
-  // .lower_container {
-  //   margin-top: -13%;
-  // }
+
 }
 @media only screen and (min-width: 770px) and (max-width: 1000px) {
   .patient_vital_graph_bg_duration {
@@ -994,13 +971,13 @@ li + li {
 .main_title:hover {
   color: #41eee1 !important;
 }
-.recent_vital_panel {
-  width: 100%;
-  height: 100%;
-  min-height: 476px;
-  margin-top: 12px;
-  overflow-y: scroll;
-}
+// .recent_vital_panel {
+//   width: 100%;
+//   height: 100%;
+//   min-height: 476px;
+//   margin-top: 12px;
+//   overflow-y: scroll;
+// }
 .patient_vital_bp_graph_container {
   background-color: white;
   border-radius: 15px;
@@ -1316,18 +1293,7 @@ frequency {
   // margin-bottom: 15px;
 }
 
-// upper Container End
-// Middle Container Start
-// .plan_data {
-//   background-color: #3bcbc4;
-//   color: #164d61;
-//   text-align: center;
-//   margin-bottom: 0px;
-//   font-size: 0.8rem;
-//   line-height: 1.5rem;
-//   font-family: "Rubik";
-//   padding: 0.5rem;
-// }
+
 .time_container {
   display: flex;
   justify-content: center;
@@ -1726,26 +1692,7 @@ frequency {
   width: 70%;
   padding-right: 2rem;
 }
-// .prefer_info_data .data_value {
-//   width: 100%;
-//   height: fit-content;
-//   background-color: #edeff5;
-//   padding: 0.31rem 0.31rem 0.31rem 0.5rem;
-//   border-radius: 0.5rem;
-//   font-size: 0.8rem;
-//   font-family: 'Rubik';
-//   line-height: 1.875rem;
-// }
-// .call_container_data_value {
-//   width: 20vw !important;
-//   height: 2rem;
-//   background-color: #edeff5;
-//   padding: 0.31rem 0.31rem 0.31rem 0.5rem;
-//   border-radius: 0.5rem;
-//   font-size: 0.7rem;
-//   font-family: 'Rubik';
-//   line-height: 1.875rem;
-// }
+
 .preference_call_container_left {
   width: 100%;
   margin-right: 2rem;
@@ -1868,13 +1815,7 @@ frequency {
 .summary_schedule {
   padding-bottom: 1.5rem;
 }
-.summary_graph_container {
-  height: 20rem !important;
-  width: 100% !important;
-  margin-bottom: 1.87rem;
-  background-color: #ffffff;
-  border-radius: 0.5rem;
-}
+
 .summary_core_team {
   padding-top: 1.87rem;
 }
@@ -2622,15 +2563,6 @@ td.mat-cell:last-child {
   border: none;
   border-radius: 8px 0px 0px 8px;
 }
-// .schedule-cell-data:first-child{
-//   border-radius:8px 0px 0px 8px;
-// }
-// tr.mat-row {
-//   background: #edeff5;
-// }
-// th.mat-header-cell {
-//   border-bottom-style: none;
-// }
 
 ::ng-deep.schedule-cell-data {
   margin: 0px 0px 4px 0px !important;
@@ -2760,15 +2692,6 @@ td.mat-cell:last-child {
   align-items: center;
 }
 
-// ::ng-deep .activity_schedule_datepicker .mat-form-field-wrapper
-// {
-// background-color: #FFFF !important;
-// border-radius: 8px;
-// }
-
-// Activity Info Schedule End
-
-// Activity Call Start
 
 .activityInfoCallData {
   width: 100%;
@@ -2786,11 +2709,6 @@ td.mat-cell:last-child {
   width: 100%;
 }
 
-// .activityInfoSMS_table .mat-header-cell {
-//   background-color: #cff4f5;
-//   color: #164d61;
-//   font-size: 14px;
-// }
 
 // Activity SMS End
 
@@ -2862,18 +2780,7 @@ td.mat-cell:last-child {
   background: #d8dce5;
   outline: none;
 }
-// .table-row:focus mat-cell {
-//   color: white;
-// }
 
-//  Activity Chat Container
-// .chat_container
-// {
-//   position: absolute;
-//   width: 30%;
-//   right: 0px;
-//   top: 0px;
-// }
 .activity_chatInfo_panel {
   width: 100%;
   border-radius: 16px;
@@ -2993,39 +2900,7 @@ td.mat-cell:last-child {
   padding: 0.35rem;
   outline: #ffffff;
 }
-// .lower_container {
-//   width: 90%;
-//   display: flex;
-//   justify-content: space-between;
-//   margin-top: 350px;
 
-//   margin-right: 40px;
-// }
-// .lower_container .btn_cancel {
-//   background-color: #edeff5;
-//   border: 1px solid #3bcbc4;
-//   width: 120px;
-//   height: 40px;
-//   color: #164d61;
-//   font-family: "Rubik";
-//   font-size: 16px;
-//   line-height: 1.875rem;
-
-//   border-radius: 20px !important;
-// }
-
-// .lower_container .btn_save {
-//   width: 120px;
-//   height: 40px;
-//   color: #164d61;
-//   font-family: "Rubik";
-//   font-size: 16px;
-//   line-height: 1.875rem;
-
-//   border-radius: 20px !important;
-//   background-color: #3bcbc4;
-//   border: 1px solid #edeff5;
-// }
 
 .phoneIcon {
   width: 1.25rem;
@@ -3085,12 +2960,7 @@ td.mat-cell:last-child {
   font-weight: 600;
   margin-bottom: 26px;
 }
-// .note_dropdown_title {
-//   font-size: 14px;
-//   line-height: 1.875rem;
-//   color: #8be3d9;
-//   margin-bottom: 0px;
-// }
+
 
 .vital_select {
   width: inherit;
@@ -3117,31 +2987,6 @@ td.mat-cell:last-child {
   font-family: "Rubik";
 }
 
-// ::ng-deep .noteTextArea {
-//   background-color: #edeff5 !important;
-//   height: 100%;
-//   border-radius: 8px !important;
-//   width: 100%;
-//   margin-top: 5px;
-//   margin-bottom: 5px;
-//   font-size: 0.8rem;
-//   font-family: "Rubik";
-//   padding: 0.4rem;
-// }
-// ::ng-deep .noteTextArea textarea
-// {
-//   padding-left: 0.8rem !important;
-//   width: 90% !important;
-// }
-// ::ng-deep .note_dropdown .mat-form-field-infix {
-//   font-size: 12px; // example
-//   background-color: #edeff5;
-//   padding: 0px !important;
-//   height: 25px !important;
-
-//   padding: 0px !important;
-//   border-radius: 8px;
-// }
 .note_dropdown_input {
   padding: 6px 3px 7px 16px;
   border-radius: 8px;
@@ -3278,52 +3123,13 @@ td.mat-cell:last-child {
   font-weight: 600;
 }
 @media only screen and (max-width: 1700px) {
-  // .summary_chat_container
-  // {
-  //   display: none;
-  // }
-
   .side-panel {
-    width: 10% !important;
+    width: 27% !important;
   }
-  // .callpanel {
-  //   width: 74%;
-  // }
-
-  // .main-panel
-  // {
-  //   width: 80% !important;
-  // }
-  // .main-content-panel01 {
-  //   width: 100% !important ;
-  // }
-  // .side-content-panel
-  // {
-  //   width: 1% !important ;
-
-  // }
+  
 }
 @media only screen and (max-width: 1570px) {
-  // .btn-download {
-  //   width: 180px;
-
-  //   padding: 5px 8px 6px 8px;
-  // }
-  // .callpanel {
-  //   width: 70%;
-  // }
-  // .data_value {
-  //   font-size: 14px;
-  // }
-  // .communiucation_info_data .data_value {
-  //   font-size: 14px;
-  // }
-  // .address {
-  //   font-size: 14px;
-  // }
-  // .prefer_info_data .data_value {
-  //   font-size: 14px;
-  // }
+ 
   .call_container_data_value {
     font-size: 14px;
   }
@@ -3333,12 +3139,7 @@ td.mat-cell:last-child {
   .data_value {
     font-size: 12px;
   }
-  // .communiucation_info_data .data_value {
-  //   font-size: 12px;
-  // }
-  // .address {
-  //   font-size: 12px;
-  // }
+ 
   .prefer_info_data .data_value {
     font-size: 12px;
   }
@@ -3429,8 +3230,8 @@ td.mat-cell:last-child {
 .side-content-panel {
   z-index: 500;
 }
-.main_page_lower_panel {
-  width: 100%;
+.main_page_panel {
+  width: 73%;
   height: 100%;
   display: flex;
   align-items: flex-start;
@@ -3727,60 +3528,7 @@ div.error-label:before {
   background-color: #3bcbc4;
   border-radius: 50%;
 }
-.call_timer_panel {
-  background-color: #590ca7;
-  width: 150px;
-  margin-left: 0.4rem;
-  margin-top: 0.4rem;
-  height: 44px;
-  border-radius: 10px;
-}
-.call_timer {
-  text-align: center;
-  color: white;
-  font-size: 26px;
-  font-family: "Rubik";
-  opacity: 1;
-  padding-top: 8%;
-}
-.mic_panel {
-  color: red;
-  height: 1.5rem;
-  width: 1.5rem;
-  border-radius: 50%;
-  // margin-left: 25.5rem;
-  // margin-top: -2.5rem;
-}
-.call_end_panel {
-  background-color: white;
-  border-radius: 15px;
-  height: 1.5rem;
-  width: 100px;
-  // margin-left: 30rem;
-  // margin-top: -2rem;
-}
-.call_end_svg {
-  height: 90%;
-  width: 90%;
-  padding-left: 0.4rem;
-}
-.video_panel {
-  height: 1.5rem;
-  width: 1.5rem;
-  border-radius: 50%;
-  // margin-left: 39rem;
-  // margin-top: -2.1rem;
-}
-.cancel_panel {
-  position: absolute;
-  top: 0;
-  right: 0;
-  // margin-top: -2.5rem;
-  height: 1.5rem;
-  width: 1.5rem;
-  border-radius: 50%;
-  margin-right: 0.5rem;
-}
+
 .inner-body-modal {
   position: relative;
   width: 100%;
@@ -3870,4 +3618,52 @@ div.error-label:before {
   font-family: "Rubik";
   text-align: center;
   font-size: 0.8rem;
+}
+.summary_graph_container {
+  height: 20rem !important;
+  width: 100% !important;
+  margin-bottom: 1.87rem;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  position: relative;
+  box-sizing: border-box;
+  padding: 1rem; /* Gives space for axis labels */
+}
+.date_btn_panel {
+  display: flex;
+  padding: 1px;
+  height: 1.6rem;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+.date_selected_ {
+  background-color: #164d61;
+  color: #ffffff;
+  outline: none;
+}
+.date_not_selected {
+  background-color: #e1e6ed;
+  color: #164d61;
+  outline: none;
+}
+.date_not_selected:hover {
+  background-color: #d8dce5;
+}
+.middle-panel-tab-view
+{
+  padding: 30px;
+}
+
+.health-panel
+{
+  padding-top: 2rem;
+}
+.btn-health-panel-ClinicInfo
+{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+::ng-deep .hidden-column {
+  display: none !important;
 }

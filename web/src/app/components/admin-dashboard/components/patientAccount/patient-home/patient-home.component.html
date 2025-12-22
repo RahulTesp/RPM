@@ -4,9 +4,8 @@
 </ng-container>
 
 <div class="content" id="desktop_view">
-  <div class="main_content">
     <div class="content-panel">
-      <div class="main_page_lower_panel">
+      <div class="main_page_panel">
         <div class="Profile_container">
           <div class="patient_info_panel">
             <div class="upper_container">
@@ -153,9 +152,10 @@
             </div> -->
           </div>
         </div>
+        <!--  Vital  data Information -->
         <div class="recent_vital_panel_container">
           <div class="right_upper_panel">
-            <!-- Start Program Overview test -->
+            <!-- Start Program Overview  -->
             <div class="summary-upper-panel">
               <div class="summary_program_overview">
                 <div class="summary_program_overview_container">
@@ -273,103 +273,58 @@
                 </div>
               </div>
             </div>
-            <!-- End Program OverView  Test -->
+            <!-- End Program OverView  -->
           </div>
-          <div
-            class="right_middile_panel"
-            *ngIf="rolelist[0].ProgramName == 'RPM'"
+          <div class="middle-panel" >
+           <p class="main_title">Recent Vitals</p>
+            <div class ="health-panel" *ngFor="let chartData of allLineChartData; let i = index">
+         <div class="btn-health-panel-ClinicInfo">
+           <span class="main_title_sub">{{ healthtrendVitalNameArray[i] }}</span>
+          <div class="date_btn_panel" > 
+             <button
+            class="btn-date_container"
+            id="pd_ClinicalHtrend_7"
+            (click)="healthtrendsHealthInfo(7, i)"
+            [ngClass]="
+              heath_trends_frequencies[i] === 7
+                ? 'date_selected_'
+                : 'date_not_selected'"
+           >
+            7 days
+          </button>
+          <button
+            class="btn-date_container"
+            id="pd_ClinicalHtrend_30"
+            (click)="healthtrendsHealthInfo(30, i)"
+            [ngClass]="
+              heath_trends_frequencies[i] === 30
+                ? 'date_selected_'
+                : 'date_not_selected'"
           >
-            <p class="main_title">Recent Vitals</p>
-            <div class="recent_vital_panel">
-              <!-- <div
-                class="patient_vital_bp_graph_container"
-                *ngIf="!loading && http_healthtrends"
-              > -->
-              <div
-                class="patient_vital_bp_graph_container"
-                *ngIf="!loading && http_healthtrends"
-              >
-                <div class="patient_vital_graph_container">
-                  <div>
-                    <p class="patient_vital_graph_bp_title">
-                      {{ patient_vital_name }}
-                    </p>
-                    <div>
-                      <span class="patient_vital_graph_bp_value"
-                        >{{ patient_bp_value }} </span
-                      ><span class="patient_vital_graph_bp_value_mmhg">{{
-                        vital_unit
-                      }}</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <span class="patient_vital_graph_bp_duration">{{
-                      notificationtime(patient_bp_duration)
-                    }}</span>
-                  </div>
-                </div>
-                <!-- <div style="display: block; width: 90%; height: 70%"> -->
-                <div style="display: block; width: 90%; min-height: 470px">
-                  <canvas
-                    class="charttrends"
-                    baseChart
-                    width="1"
-                    height="1"
-                    [datasets]="lineChartData"
-                    [labels]="lineChartLabels"
-                    [options]="lineChartOptions"
-                    [legend]="lineChartLegend"
-                  >
-                  </canvas>
-                </div>
-              </div>
-              <div class="patient_vital_bp_graph_container" *ngIf="pulseplan">
-                <div class="patient_vital_graph_container">
-                  <div>
-                    <p class="patient_vital_graph_bp_title">
-                      {{ patient_vital_name }}
-                    </p>
-                    <div>
-                      <span class="patient_vital_graph_bp_value"
-                        >{{ patient_pulse_value }} </span
-                      ><span class="patient_vital_graph_bp_value_mmhg">{{
-                        vital_unit
-                      }}</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <span class="patient_vital_graph_bp_duration">{{
-                      patient_bp_duration
-                    }}</span>
-                  </div>
-                </div>
-                <div
-                  style="
-                    display: block;
-                    width: 90%;
-                    height: 70%;
-                    margin-left: 5%;
-                  "
-                >
-                  <canvas
-                    class="charttrends"
-                    baseChart
-                    width="1"
-                    height="1"
-                    [datasets]="lineChartData"
-                    [labels]="lineChartLabels"
-                    [options]="lineChartOptions"
-                    [legend]="lineChartLegend"
-                  >
-                  </canvas>
-                </div>
-              </div>
-            </div>
+            30 days
+          </button>
+        </div> 
+      </div>
+      <div class="summary_graph_container">
+        <div style="display: block; width: 98%; height: 98%" id="pdfData">
+          <canvas
+            class="charttrends"
+            baseChart
+            width="1"
+            height="1"
+            [datasets]="chartData.lineChartData"
+            [labels]="chartData.lineChartLabels"
+            [options]="lineChartOptions"
+            [legend]="lineChartLegend"
+            id="pd_ClinicalHtrends"
+            [type]="'line'"
+          >
+          </canvas>
+        </div>
+      </div>
+            </div>     
           </div>
           <div class="right_lower_panel">
-            <div class="summary_core_team">
               <p class="main_title">Care Team</p>
               <div class="summary_core_team_content">
                 <div class="core_panel_left">
@@ -392,26 +347,13 @@
                     </p>
                   </div>
                 </div>
-                <!-- <div class="core_panel_right">
-                  <div>
-                    <p class="data_title">Delegation</p>
-                    <p class="data_value"></p>
-                  </div>
-                  <div>
-                    <p class="data_title">Duration</p>
-                    <p class="data_value"></p>
-                  </div>
-                </div> -->
               </div>
-            </div>
+            
           </div>
         </div>
       </div>
 
-      <!-- Side Panel -->
-      <div
-        class="side-panel"
-      >
+      <div class="side-panel">
         <ng-container [ngSwitch]="switchvariable">
           <ng-container *ngSwitchCase="1">
             <ng-container *ngTemplateOutlet="todolist"></ng-container>
@@ -467,115 +409,8 @@
           </div>
         </div>
       </ng-template>
-      <!-- </div> -->
-
-      <div
-        class="chat_box_modal"
-        *ngIf="chat_panel_visible"
-        (click)="close_chat_window()"
-      ></div>
-      <div class="chat_modal" *ngIf="chat_panel_visible">
-        <img
-          class="minimize-img"
-          src="../../../../../assets/04-Icons/Icons_Minimize A.svg"
-          (click)="close_chat_window()"
-        />
-        <div class="Chat_main_title">Chat/{{ patientName }}</div>
-        <div style="height: 77%; margin-top: 5px; overflow-y: scroll">
-          <div>
-            <h2 class="chat_h2_line">
-              <span class="chat_h2_span">Nov 4,2022</span>
-            </h2>
-          </div>
-          <div style="height: auto" *ngFor="let data of chatMessage">
-            <div
-              class="chat_window_settings"
-              *ngIf="
-                data.chat != 'receiver';
-                then senderTemplate;
-                else receiverTemplate
-              "
-            ></div>
-            <ng-template #senderTemplate>
-              <div class="sender_content">
-                <div class="sender_content_text">{{ data.text }}</div>
-              </div>
-            </ng-template>
-            <ng-template #receiverTemplate>
-              <br />
-              <div class="receiver_content">
-                <div class="receiver_content_text">{{ data.text }}</div>
-              </div>
-              <br />
-            </ng-template>
-            <!-- <div class="block">
-							Block
-						</div>
-						<div class="error-label">This field is required.</div> -->
-          </div>
-        </div>
-        <input class="message_input_field" placeholder="Type your Message..." />
-
-        <img
-          class="sms-send-img"
-          src="../../../../../assets/04-Icons/Icons_Send.svg"
-        />
-      </div>
-
-      <div class="box-modal" *ngIf="call_panel_visible" (click)="close_modal()">
-        <!--<div class="overlay"></div>-->
-      </div>
-      <div class="callpanel" *ngIf="call_panel_visible">
-        <!--<div class="call_leftpanel">
-           <div class="call_counter">
-              <p>00:02</p>
-           </div>
-        </div>-->
-        <div class="call_timer_panel">
-          <p class="call_timer">{{ Duration }}</p>
-        </div>
-        <div class="call_centerpanel">
-          <div class="callIcon_panel">
-            <img
-              class="micIcon"
-              src="../../../../../assets/04-Icons/Icons_Mic.svg"
-            />
-            <div class="callIcon_phone">
-              <img
-                class="phoneIcon"
-                src="../../../../../assets/04-Icons/Icons_Phone End.svg"
-              />
-            </div>
-            <img
-              class="micIcon"
-              src="../../../../../assets/04-Icons/Icons_Video.svg"
-            />
-
-            <!-- <div class="callIcon_container">
-            <img class="callIcon" src="../../../../../assets/04-Icons/Icons_Chat List.svg"/>
-            </div> -->
-
-            <!-- <div class="selectNumber"> -->
-            <!--  <select [(ngModel)]="phoneno" name="contactnumber" id="contactnumber">
-                <option [value]="phoneNumberPrimary">{{phoneNumberPrimary}}</option>
-                <option [value]="phoneNumberSecondary">{{phoneNumberSecondary}}</option>
-              </select> -->
-
-            <!--  <img class="phoneIcon"  src= "../../../../../assets/04-Icons/Icons_Phone End.svg"/>
-
-            </div> -->
-          </div>
-        </div>
-        <div class="call_rightpanel">
-          <img
-            class="call_close_icon"
-            src="../../../../../assets/04-Icons/Icons_Cancel.svg"
-            (click)="onclickcancel()"
-          />
-        </div>
-      </div>
+  
     </div>
-  </div>
 </div>
 
 <div class="content" id="tablet_view">
@@ -892,50 +727,55 @@
         </div>
         <!-- End Program OverView  Test -->
       </div>
-
-      <div
-        class="recent_vital_panel_container"
-        *ngIf="rolelist[0].ProgramName == 'RPM'"
-      >
-        <p class="main_title">Recent Vitals</p>
-        <div class="recent_vital_panel">
-          <div class="patient_vital_bp_graph_container">
-            <div class="patient_vital_graph_container">
-              <div>
-                <p class="patient_vital_graph_bp_title">
-                  {{ patient_vital_name }}
-                </p>
-                <div>
-                  <span class="patient_vital_graph_bp_value"
-                    >{{ patient_bp_value }} </span
-                  ><span class="patient_vital_graph_bp_value_mmhg">{{
-                    vital_unit
-                  }}</span>
-                </div>
-              </div>
-
-              <div>
-                <span class="patient_vital_graph_bp_duration">{{
-                  notificationtime(patient_bp_duration)
-                }}</span>
-              </div>
-            </div>
-            <div style="display: block; width: 100%; min-height: 470px">
-              <canvas
-                class="charttrends"
-                baseChart
-                width="1"
-                height="1"
-                [datasets]="lineChartData"
-                [labels]="lineChartLabels"
-                [options]="lineChartOptions"
-                [legend]="lineChartLegend"
-              >
-              </canvas>
-            </div>
-          </div>
+      <div class="middle-panel-tab-view" >
+           <p class="main_title">Recent Vitals</p>
+            <div class ="health-panel" *ngFor="let chartData of allLineChartData; let i = index">
+         <div class="btn-health-panel-ClinicInfo">
+           <span class="main_title_sub">{{ healthtrendVitalNameArray[i] }}</span>
+          <div class="date_btn_panel" > 
+             <button
+            class="btn-date_container"
+            id="pd_ClinicalHtrend_7"
+            (click)="healthtrendsHealthInfo(7, i)"
+            [ngClass]="
+              heath_trends_frequencies[i] === 7
+                ? 'date_selected_'
+                : 'date_not_selected'"
+           >
+            7 days
+          </button>
+          <button
+            class="btn-date_container"
+            id="pd_ClinicalHtrend_30"
+            (click)="healthtrendsHealthInfo(30, i)"
+            [ngClass]="
+              heath_trends_frequencies[i] === 30
+                ? 'date_selected_'
+                : 'date_not_selected'"
+          >
+            30 days
+          </button>
+        </div> 
+      </div>
+      <div class="summary_graph_container">
+        <div style="display: block; width: 98%; height: 98%" id="pdfData">
+          <canvas
+            class="charttrends"
+            baseChart
+            width="1"
+            height="1"
+            [datasets]="chartData.lineChartData"
+            [labels]="chartData.lineChartLabels"
+            [options]="lineChartOptions"
+            [legend]="lineChartLegend"
+            id="pd_ClinicalHtrends"
+            [type]="'line'"
+          >
+          </canvas>
         </div>
       </div>
+            </div>   
+          </div>
       <div class="right_lower_panel">
         <div class="summary_core_team">
           <p class="main_title">Care Team</p>

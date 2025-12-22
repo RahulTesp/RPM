@@ -2844,6 +2844,8 @@ getFirstPresentVital(vitalScreen: any) {
         daycount
       );
 
+      console.log("getVitalHealthTrendDataGraph");
+      console.log(data);
       const vitalHttpHealthTrends = data.trends;
       const healthtrendVitalNameArray = data.vitalNames;
       //Set default frequency for all charts to 30 days

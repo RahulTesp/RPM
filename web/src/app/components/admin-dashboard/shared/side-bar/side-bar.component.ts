@@ -122,8 +122,8 @@ export class SideBarComponent implements OnInit {
       id: 'menuvitals',
       title: 'Vitals',
       icon: 'assets/04-Icons/Icons_Vitals.svg',
-      route: '/admin/patient-vitals/programInfo',
-      activeIcon: '/assets/04-Icons/Icons_Vitals A.svg',
+      route: '/admin/patient-vitals/clinicInfo',
+      activeIcon: '/assets/04-Icons/Icons_Vitals.svg',
       patientOnly: true,
     },
   ];
@@ -139,11 +139,7 @@ export class SideBarComponent implements OnInit {
   ) {
     var that = this;
     this.host = this.auth.get_environment();
-
     // this.activePageMainMenu = sessionStorage.getItem('ActiveMainMenu');
-
-    this.activePage = sessionStorage.getItem('currentactivepage');
-    console.log('ActivePage:', this.activePage);
     this.roles = sessionStorage.getItem('Roles');
     this.roles = JSON.parse(this.roles);
     that.rpm

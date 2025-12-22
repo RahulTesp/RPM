@@ -25,9 +25,18 @@ export class MenuItemComponent implements OnInit {
 
   checkActiveRoute(menuItemPath: string) {
     this.currentPath = menuItemPath;
+    this.activeMainMenu( this.currentPath);
+  
   }
 
   isActiveMenu(menuItemPath: string): boolean {
     return this.currentPath === menuItemPath;
+  }
+  activeMainMenu(value: any) {
+    if (value == '/admin/patient-vitals/programInfo') {
+      sessionStorage.setItem('ActiveMainMenu', 'ProgramInfo');
+    } else if (value == '/admin/patient-vitals/clinicInfo') {
+      sessionStorage.setItem('ActiveMainMenu', 'ClinicalInfo');
+    }
   }
 }
