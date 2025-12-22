@@ -898,8 +898,7 @@ convertToLocalTime(stillUtc: any) {
       this.patientTypeSelect == undefined
     ) {
       dataSrc = dataSrc;
-      console.log('Data Source');
-      console.log(dataSrc)
+      
     }
 
     if (

@@ -2447,10 +2447,11 @@ export class SidePanelPatientComponent implements OnInit {
               'Note Updated Successfully!!',
               'Message',
               () => {
-                this.notesReload();
+                
 
                 this.QuestionArrayBase = this.noteMasterData.MainQuestions;
                 this.BillingInfoReload();
+                this.notesReload();
                 this.noteUpdationVariable = false;
                 this.dialog.closeAll();
                 this.resetCallPanel();
@@ -2508,10 +2509,9 @@ export class SidePanelPatientComponent implements OnInit {
               'Message',
               () => {
                 this.QuestionArrayBase = this.noteMasterData.MainQuestions;
-
-                this.notesReload();
                 this.resetReviewTimer();
                 this.BillingInfoReload();
+                this.notesReload();
                 this.dialog.closeAll();
                 this.resetCallPanel();
 
@@ -2632,8 +2632,8 @@ export class SidePanelPatientComponent implements OnInit {
   MasterDataQuestionTemp: any;
   http_rpm_patientList: any;
  getMasterDataQuestions(patientProgramName: any) {
-    this.loadPatientInfo()
-    this.ProgramId = this.http_rpm_patientList['PatientProgramdetails'].ProgramId;
+    this.loadPatientInfo();
+    this.ProgramId = this.http_rpm_patientList?.PatientProgramdetails?.ProgramId;
     this.rpm
       .rpm_get(
         //`/api/patient/getmasterdatanotes?ProgramName=${patientProgramName}&Type=REVIEW`
