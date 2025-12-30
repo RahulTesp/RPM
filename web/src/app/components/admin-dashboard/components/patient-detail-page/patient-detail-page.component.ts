@@ -517,10 +517,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       const isoString = ConsultationDateIso.toISOString();
           this.http_rpm_patientList["PatientPrescribtionDetails"].ConsultationDate = isoString;
       }
-
-
       this.getchatData(this.http_rpm_patientList.PatientDetails.UserName)
       this.setPatientData();
+
       this.loading = false;
     } catch (error) {
       console.error('Error loading patient info:', error);
@@ -951,12 +950,22 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  billingReload() {
+ async billingReload() {
     this.getBillingOverview(this.pid, this.currentProgramId);
     if (
       this.http_rpm_patientList['PatientProgramdetails'].Status == 'InActive'
     ) {
-      this.loadPatientInfo();
+      //this.loadPatientInfo();
+      if(this.CurrentMenu == 5 && this.activityMenuVariable == 3 )
+      {
+        // Inactive Patient will  change status Active when one call note added
+        this.http_rpm_patientList = await this.patientService.fetchPatientInfo(
+        this.patient_id,
+        this.program_id
+      );
+        this.dataSourceChange(5, 3);
+
+      }
     }
   }
   resetCallNotes() {
@@ -1411,10 +1420,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
   async getreviewData() {
     try {
-      this.activityInfoMenuSelect(4);
-
-      this.currentpPatientId = sessionStorage.getItem('PatientId') || '';
-      this.currentProgramId = sessionStorage.getItem('ProgramId') || '';
+      this.activityInfoMenuSelect(4);   
+      this.currentpPatientId = sessionStorage.getItem('PatientId') || this.patient_id;
+      this.currentProgramId = sessionStorage.getItem('ProgramId') || this.program_id;
 
       const { start, end } = this.patientService.getDateRange(
         this.frmactivityReviewrange.controls.start.value,
@@ -1444,13 +1452,13 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       var username = patientusername || this.http_rpm_patientList.PatientDetails.UserName;
 
       // Call the activity info method (kept from your original code)
-      //this.activityInfoMenuSelect(5);
+      this.activityInfoMenuSelect(5);
 
       // Get chat data through the service
       this.http_chatData = await this.patientchatservice.getPatientChat(username);
 
       // Call data source change method (kept from your original code)
-      //this.dataSourceChange(5, 5);
+      this.dataSourceChange(5, 5);
     } catch (error:any) {
       if(error.status == 404)
       {
@@ -1465,8 +1473,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     try {
       this.activityInfoMenuSelect(3);
 
-      this.currentpPatientId = sessionStorage.getItem('PatientId') || '';
-      this.currentProgramId = sessionStorage.getItem('ProgramId') || '';
+      this.currentpPatientId = sessionStorage.getItem('PatientId') || this.patient_id;
+      this.currentProgramId = sessionStorage.getItem('ProgramId') || this.program_id;
 
       const { start, end } = this.patientService.getDateRange(
         this.frmactivityCallrange.controls.start.value,
@@ -1482,7 +1490,6 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         start,
         end
       );
-
       this.dataSourceChange(5, 3);
     } catch (error) {
       console.error('❌ Error fetching alerts and tasks:', error);
@@ -2505,8 +2512,6 @@ getFirstPresentVital(vitalScreen: any) {
         break;
       case 6:
         this.activityMenuVariable = 6;
-        console.log("Variable");
-        console.log(this.variable);
         this.dataSourceChange(this.variable, this.activityMenuVariable);
         break;
       case 7:
@@ -2806,8 +2811,7 @@ getFirstPresentVital(vitalScreen: any) {
     this.http_healthtrends_current_data = this.http_healthtrends.filter(
       (item: { VitalName: string }) => item.VitalName === vital
     );
-     console.log("Health Trend onHealthTrendVitalClick");
-     console.log(this.http_healthtrends_current_data)
+
     if (!this.http_healthtrends_current_data[0] || this.http_healthtrends_current_data[0].Values.length === 0) {
       this.setGraphFallback(duration);
       return;
@@ -2853,6 +2857,8 @@ getFirstPresentVital(vitalScreen: any) {
         daycount
       );
 
+      console.log("getVitalHealthTrendDataGraph");
+      console.log(data);
       const vitalHttpHealthTrends = data.trends;
       const healthtrendVitalNameArray = data.vitalNames;
       
@@ -3302,8 +3308,7 @@ getFirstPresentVital(vitalScreen: any) {
               if (x.CPTCode == '99454') {
                 this.displayText = x.Completed + '/' + x.Total;
                  var billingStartDate  = this.convertDate(x.BillingStartDate);
-                 console.log('Billing Start Date');
-                 console.log(x.BillingStartDate)
+            
                   this.BillingPeriodStart = this.convertDate(
                   new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
@@ -4110,7 +4115,6 @@ getFirstPresentVital(vitalScreen: any) {
   intervalnote: any;
   showNoteModal = false;
   getDataforquestions() {
-    console.log('My Preview Clicked');
     this.showNoteModal = true;
     //this.dialog.open(this.myPreviewTemp);
   }
