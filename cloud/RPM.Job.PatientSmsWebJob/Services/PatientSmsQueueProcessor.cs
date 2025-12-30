@@ -31,7 +31,7 @@ public class PatientSmsQueueProcessor
 
         // Load all enabled SMS rules
         var rules = await con.QueryAsync<SmsRule>(
-            "SELECT Id, RuleName, SelectClause, FromTable, JoinClause, ConditionClause, TemplateMessage FROM SMSRules WHERE IsEnabled = 1");
+             "SELECT Id, RuleName, SelectClause, FromTable, JoinClause, ConditionClause, TemplateMessage, SmsGapDays FROM SMSRules WHERE IsEnabled = 1");
 
         foreach (var rule in rules)
         {
@@ -43,33 +43,22 @@ public class PatientSmsQueueProcessor
             ";
 
             var results = await con.QueryAsync<SmsResult>(query);
-
+            // Get list of patients who have NOT received an automated message in the last SmsGapDays
+            var patientsToSend = await GetPatientsWithoutRecentAutomatedSmsAsync(rule.SmsGapDays);
             foreach (var item in results)
             {
-                await SendSmsAsync(item.MobileNo, item.UserName, rule.TemplateMessage);
+                if (patientsToSend.Contains(item.PatientId))
+                {
+                    await SendSmsAsync(item.MobileNo, item.UserName, rule.TemplateMessage, rule.SmsGapDays);
+                }
+                else
+                {
+                    Console.WriteLine($"[INFO] PatientId {item.PatientId} already received an automated message in the last {rule.SmsGapDays} days. Skipping SMS.");
+                }
             }
         }
     }
-
-    public class SmsRule
-    {
-        public int Id { get; set; }
-        public string RuleName { get; set; }
-        public string SelectClause { get; set; }
-        public string FromTable { get; set; }
-        public string JoinClause { get; set; }
-        public string ConditionClause { get; set; }
-        public string TemplateMessage { get; set; }
-    }
-
-    public class SmsResult
-    {
-        public int PatientId { get; set; }
-        public string MobileNo { get; set; }
-        public string UserName { get; set; }
-    }
-
-    public async Task SendSmsAsync(string mobileNo, string userName, string messageTemplate)
+    public async Task SendSmsAsync(string mobileNo, string userName, string messageTemplate, int SmsGapDays)
     {
         // Basic mobile number validation (10-15 digits, can be adjusted as needed)
         if (string.IsNullOrWhiteSpace(mobileNo)
@@ -219,33 +208,70 @@ public class PatientSmsQueueProcessor
         catch (Exception ex) { throw ex; }
 
     }
-    public class TwilioConfig
+    public async Task<List<int>> GetPatientsWithoutRecentAutomatedSmsAsync(int gapDays)
     {
-        public string AccountSid { get; set; }
-        public string AuthToken { get; set; }
-        public string MessagingServiceSid { get; set; }
-        public string FromPhoneNumber { get; set; }
-        public string CountryCode { get; set; }
-        public string SystemPhoneNumber { get; set; }
+        using var con = new SqlConnection(_conn);
+        await con.OpenAsync();
+        var query = $@"
+            SELECT DISTINCT PatientId
+            FROM PatientSMSDetails
+            WHERE PatientId NOT IN (
+                SELECT PatientId
+                FROM PatientSMSDetails
+                WHERE Direction = 'outbound-api'
+                  AND CreatedBy = 'Automated'
+                  AND CreatedOn >= DATEADD(day, -{gapDays}, GETDATE())
+            )";
+        var result = await con.QueryAsync<int>(query);
+        return result.ToList();
     }
+}
 
-    public class SystemConfigInfo
-    {
-        public string Name { get; set; }
-        public string Value { get; set; }
-        public string Descripiton { get; set; }
+public class SmsRule
+{
+    public int Id { get; set; }
+    public string RuleName { get; set; }
+    public string SelectClause { get; set; }
+    public string FromTable { get; set; }
+    public string JoinClause { get; set; }
+    public string ConditionClause { get; set; }
+    public string TemplateMessage { get; set; }
+    public int SmsGapDays { get; set; }
+}
 
-    }
+public class SmsResult
+{
+    public int PatientId { get; set; }
+    public string MobileNo { get; set; }
+    public string UserName { get; set; }
+}
 
-    public class SaveSmsInfo
-    {
+public class TwilioConfig
+{
+    public string AccountSid { get; set; }
+    public string AuthToken { get; set; }
+    public string MessagingServiceSid { get; set; }
+    public string FromPhoneNumber { get; set; }
+    public string CountryCode { get; set; }
+    public string SystemPhoneNumber { get; set; }
+}
 
-        public string PatientUserName { get; set; }
-        public string fromNo { get; set; }
-        public string toNo { get; set; }
-        public string Body { get; set; }
-        public DateTime SentDate { get; set; }
-        public string Direction { get; set; }
-        public string Status { get; set; }
-    }
+public class SystemConfigInfo
+{
+    public string Name { get; set; }
+    public string Value { get; set; }
+    public string Descripiton { get; set; }
+
+}
+
+public class SaveSmsInfo
+{
+
+    public string PatientUserName { get; set; }
+    public string fromNo { get; set; }
+    public string toNo { get; set; }
+    public string Body { get; set; }
+    public DateTime SentDate { get; set; }
+    public string Direction { get; set; }
+    public string Status { get; set; }
 }
