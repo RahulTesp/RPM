@@ -1044,10 +1044,10 @@
               </div>
 
               <div class="userInfoItem">
-                <p class="main_input_title">Preference 2</p>
+                <p class="main_input_title">Preference 1</p>
                 <input
                   class="userInfovalue"
-                  placeholder="Add Preference 2"
+                  placeholder="Add Preference 1"
                   notrequired
                   formControlName="preference2"
                   id="addPatientCalltime2"
@@ -1055,10 +1055,10 @@
                 />
               </div>
               <div class="userInfoItem">
-                <p class="main_input_title">Preference 3</p>
+                <p class="main_input_title">Preference 2</p>
                 <input
                   class="userInfovalue"
-                  placeholder="Add Preference 3"
+                  placeholder="Add Preference 2"
                   notrequired
                   formControlName="preference3"
                   id="addPatientCalltime3"
@@ -1066,15 +1066,18 @@
                 />
               </div>
               <div class="userInfoItem">
-                <p class="main_input_title">Preference 4</p>
-                <input
+                <p class="main_input_title">SMS Preference</p>
+                <select
                   class="userInfovalue"
-                  placeholder="Add Preference 4"
-                  notrequired
+                  placeholder="Select SMS Preference"
                   formControlName="preference4"
                   id="addPatientCalltime4"
-                  maxlength="30"
-                />
+                  notrequired
+                >
+                  <option value="" disabled selected>Select</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
               </div>
             </div>
           </div>
