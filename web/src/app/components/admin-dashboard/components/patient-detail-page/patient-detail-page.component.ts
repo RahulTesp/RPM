@@ -396,8 +396,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((params) => {
         this.handleQueryParams(params);
-       this.patientchatservice.setChatPanelOpen(this.chatVariable);
-       this.patientchatservice.ensureInitialized(params.patientUserName);
+        this.patientchatservice.setChatPanelOpen(this.chatVariable);
+        this.patientchatservice.ensureInitialized(params.patientUserName);
       });
 
     this.initializedocumentColumns();
@@ -414,7 +414,11 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.chatHistoryDataSubscription = this.patientchatservice.chatHistoryData$.subscribe(data => {
       if (data) {
         this.http_chatData = data;
-        this.dataSourceChange(5, 5);
+
+        //refresh table ONLY if Chats tab is open
+        if (this.variable === 5 && this.activityMenuVariable === 5) {
+          this.dataSourceChange(5, 5);
+        }
       }
     });
   }
@@ -428,16 +432,16 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       //   enableRingingState: true,
       //   debug: true,
       // });
-       const deviceOptions = {
-       edge: 'umatilla',
-      //codecPreferences: ['opus', 'pcmu'],
-       fakeLocalDTMF: true,
-      enableRingingState: true,
-       debug: true,
+      const deviceOptions = {
+        edge: 'umatilla',
+        //codecPreferences: ['opus', 'pcmu'],
+        fakeLocalDTMF: true,
+        enableRingingState: true,
+        debug: true,
       };
 
-    this.device = new Device( this.data_json.token, deviceOptions);
-    this.device.register();
+      this.device = new Device( this.data_json.token, deviceOptions);
+      this.device.register();
       this.setupHandlers(this.device);
     });
   }
@@ -450,7 +454,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
     // Store previous Patient ID
     this.PatientIdOld = sessionStorage.getItem('PatientId');
-     this.CloseChatPanlBlock();
+    this.CloseChatPanlBlock();
     // Close previous patient chat window
     this.CloseChatPanlBlock();
 
@@ -512,10 +516,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       var ConsultationDate =  this.http_rpm_patientList["PatientPrescribtionDetails"].ConsultationDate
       if(ConsultationDate != "")
       {
-      var  ConsultationDateIso  = new Date(ConsultationDate);
-       // Convert to ISO string
-      const isoString = ConsultationDateIso.toISOString();
-          this.http_rpm_patientList["PatientPrescribtionDetails"].ConsultationDate = isoString;
+        var  ConsultationDateIso  = new Date(ConsultationDate);
+        // Convert to ISO string
+        const isoString = ConsultationDateIso.toISOString();
+        this.http_rpm_patientList["PatientPrescribtionDetails"].ConsultationDate = isoString;
       }
       this.getchatData(this.http_rpm_patientList.PatientDetails.UserName)
       this.setPatientData();
@@ -950,7 +954,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     }
   }
 
- async billingReload() {
+  async billingReload() {
     this.getBillingOverview(this.pid, this.currentProgramId);
     if (
       this.http_rpm_patientList['PatientProgramdetails'].Status == 'InActive'
@@ -960,9 +964,9 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       {
         // Inactive Patient will  change status Active when one call note added
         this.http_rpm_patientList = await this.patientService.fetchPatientInfo(
-        this.patient_id,
-        this.program_id
-      );
+          this.patient_id,
+          this.program_id
+        );
         this.dataSourceChange(5, 3);
 
       }
@@ -1165,7 +1169,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.callTimerEnabled = true;
     this.updateCallStatus('Calling ' + this.phoneNumber + '...');
 
-   var params = { To: this.phoneNumber };
+    var params = { To: this.phoneNumber };
     this.device.connect({ params });
   }
   Stop() {
@@ -1220,8 +1224,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
         this.smsCancel();  // close the panel
         alert('Message Sent Successfully..!');
         this.loading_sms = false;
-       this.variable=5;
-       this.activityInfoMenuSelect(6);
+        this.variable=5;
+        this.activityInfoMenuSelect(6);
         this.getSMSData();
       },
       (err) => {
@@ -1251,8 +1255,8 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   isSmall: boolean;
 
   ngAfterViewInit() {
-      this.getHealthTrends(this.heath_trends_frequency);
-      // this.getVitalReading();
+    this.getHealthTrends(this.heath_trends_frequency);
+    // this.getVitalReading();
     this.breakpoint
       .observe(['(max-width: 1280px)'])
       .subscribe((bs: BreakpointState) => {
@@ -1413,14 +1417,14 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
     this.ChangeScreen(5);
     this.getalertTask();
   }
- getOpenTaskDataReload() {
+  getOpenTaskDataReload() {
 
-   this.getLatestAlertsAndTasks();
+    this.getLatestAlertsAndTasks();
   }
 
   async getreviewData() {
     try {
-      this.activityInfoMenuSelect(4);   
+      this.activityInfoMenuSelect(4);
       this.currentpPatientId = sessionStorage.getItem('PatientId') || this.patient_id;
       this.currentProgramId = sessionStorage.getItem('ProgramId') || this.program_id;
 
@@ -1464,7 +1468,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
       {
         return;
       }else{
-      console.error('❌ Error fetching chat data:', error);
+        console.error('❌ Error fetching chat data:', error);
 
       }
     }
@@ -1592,24 +1596,27 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
     await this.getVitalReading(startDate, endDate);
   }
-getFirstPresentVital(vitalScreen: any) {
-  const fixedOrder = ['BloodGlucose', 'BloodPressure', 'BloodOxygen', 'Weight'];
+  getFirstPresentVital(vitalScreen: any) {
+    const fixedOrder = ['BloodGlucose', 'BloodPressure', 'BloodOxygen', 'Weight'];
 
-  for (const key of fixedOrder) {
-    if (vitalScreen && key in vitalScreen) {
-      return { key, value: vitalScreen[key] };
+    for (const key of fixedOrder) {
+      if (vitalScreen && key in vitalScreen) {
+        return { key, value: vitalScreen[key] };
+      }
     }
-  }
 
-  return null; // No matching keys found
-}
+    return null; // No matching keys found
+  }
   selectFirstAvailableVital() {
-  const vitalScreen = this.ProcessVitalData;
-   const result = this.getFirstPresentVital(vitalScreen);
-   if(result)
-   {
-    this.ChangeVitalScreen(result.key)
-   }
+    if (this.currentVital && this.currentVital !== 'None') {
+      return;
+    }
+    const vitalScreen = this.ProcessVitalData;
+    const result = this.getFirstPresentVital(vitalScreen);
+    if(result)
+    {
+      this.ChangeVitalScreen(result.key);
+    }
   }
 
   currentVital: any;
@@ -2673,7 +2680,7 @@ getFirstPresentVital(vitalScreen: any) {
         }else{
           this.onHealthTrendVitalClick(this.selectedVital, daycount);
         }
-        
+
       }
 
     } catch (error) {
@@ -2861,11 +2868,11 @@ getFirstPresentVital(vitalScreen: any) {
       console.log(data);
       const vitalHttpHealthTrends = data.trends;
       const healthtrendVitalNameArray = data.vitalNames;
-      
+
       // Store for later use
       this.http_healthtrends = vitalHttpHealthTrends;
       this.healthtrendVitalNameArray = healthtrendVitalNameArray;
-      
+
       //Set default frequency for all charts to requested daycount
       this.heath_trends_frequencies = new Array((data.vitalNames || []).length).fill(daycount);
       // Clear previous data before pushing new ones
@@ -3307,9 +3314,9 @@ getFirstPresentVital(vitalScreen: any) {
             if (this.pecentageValue >= 100) {
               if (x.CPTCode == '99454') {
                 this.displayText = x.Completed + '/' + x.Total;
-                 var billingStartDate  = this.convertDate(x.BillingStartDate);
-            
-                  this.BillingPeriodStart = this.convertDate(
+                var billingStartDate  = this.convertDate(x.BillingStartDate);
+
+                this.BillingPeriodStart = this.convertDate(
                   new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
                 if (this.billingtypeVariable == '30days') {
@@ -3334,17 +3341,17 @@ getFirstPresentVital(vitalScreen: any) {
                     );
                   }
                 } else {
-                      let endDate = new Date(this.BillingPeriodStart);
-                      endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
-                      endDate.setMonth(endDate.getMonth()+1);
-                      if (billingStartDate == '1-01-01') {
-                        this.BillingPeriodStart = undefined;
-                        this.BillingPeriodEnd = undefined;
-                      } 
-                      else {                        
-                        this.BillingPeriodEnd = this.Billing_ConvertDate(this.convertDate(endDate));
-                        this.BillingPeriodStart = this.Billing_ConvertDate(this.BillingPeriodStart);
-                      }
+                  let endDate = new Date(this.BillingPeriodStart);
+                  endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
+                  endDate.setMonth(endDate.getMonth()+1);
+                  if (billingStartDate == '1-01-01') {
+                    this.BillingPeriodStart = undefined;
+                    this.BillingPeriodEnd = undefined;
+                  }
+                  else {
+                    this.BillingPeriodEnd = this.Billing_ConvertDate(this.convertDate(endDate));
+                    this.BillingPeriodStart = this.Billing_ConvertDate(this.BillingPeriodStart);
+                  }
                   // this.BillingPeriodEnd = new Date(x.BillingStartDate);
                   // this.BillingPeriodEnd = new Date(
                   //   this.BillingPeriodEnd.setMonth(
@@ -3458,17 +3465,17 @@ getFirstPresentVital(vitalScreen: any) {
                     );
                   }
                 } else {
-                      let endDate = new Date(this.BillingPeriodStart);
-                      endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
-                      endDate.setMonth(endDate.getMonth()+1);
-                      if (billingStartDate == '1-01-01') {
-                        this.BillingPeriodStart = undefined;
-                        this.BillingPeriodEnd = undefined;
-                      } 
-                      else {                        
-                        this.BillingPeriodEnd = this.Billing_ConvertDate(this.convertDate(endDate));
-                        this.BillingPeriodStart = this.Billing_ConvertDate(this.BillingPeriodStart);
-                      }
+                  let endDate = new Date(this.BillingPeriodStart);
+                  endDate.setDate(endDate.getDate() <= 15 ? 1 : 16);
+                  endDate.setMonth(endDate.getMonth()+1);
+                  if (billingStartDate == '1-01-01') {
+                    this.BillingPeriodStart = undefined;
+                    this.BillingPeriodEnd = undefined;
+                  }
+                  else {
+                    this.BillingPeriodEnd = this.Billing_ConvertDate(this.convertDate(endDate));
+                    this.BillingPeriodStart = this.Billing_ConvertDate(this.BillingPeriodStart);
+                  }
                   // this.BillingPeriodEnd = new Date(x.BillingStartDate);
                   // this.BillingPeriodEnd = new Date(
                   //   this.BillingPeriodEnd.setMonth(
@@ -3664,8 +3671,8 @@ getFirstPresentVital(vitalScreen: any) {
     ).toLocaleTimeString();
     this.CurrentTime = new Date(
       new Date().getTime() +
-        (int * (60 * 60 * 1000) + dec * (60 * 1000)) -
-        (5 * 60 * 60 * 1000 + 30 * 60 * 1000)
+      (int * (60 * 60 * 1000) + dec * (60 * 1000)) -
+      (5 * 60 * 60 * 1000 + 30 * 60 * 1000)
     ).toLocaleTimeString();
     return this.CurrentTime.slice(0, -3);
   }
@@ -3970,20 +3977,20 @@ getFirstPresentVital(vitalScreen: any) {
         }
       } else {
         try {
-           // Use provided custom range
+          // Use provided custom range
           if (!startDate || !endDate) {
-          if (!startDate || !endDate) {
-            // Use form values if direct dates aren't provided
-            // Use form values if direct dates aren't provided
+            if (!startDate || !endDate) {
+              // Use form values if direct dates aren't provided
+              // Use form values if direct dates aren't provided
 
-            startDate = new Date(
-              this.frmactivitySchedulerange.controls.start.value);
+              startDate = new Date(
+                this.frmactivitySchedulerange.controls.start.value);
 
 
-            endDate = new Date(
-              this.frmactivitySchedulerange.controls.end.value)
+              endDate = new Date(
+                this.frmactivitySchedulerange.controls.end.value)
 
-          }
+            }
           }
           const dateStr = this.convertDate(startDate);
           const dateEnd = this.convertDate(endDate);
@@ -4000,7 +4007,7 @@ getFirstPresentVital(vitalScreen: any) {
           //   true
           // );
           formattedStartDate = dateStr + 'T00:00:00'
-         formattedEndDate = dateEnd + 'T00:00:00'
+          formattedEndDate = dateEnd + 'T00:00:00'
           // formattedEndDate = this.patientutilService.formatDateForApi(
           //   endDate,
           //   false
@@ -4087,7 +4094,7 @@ getFirstPresentVital(vitalScreen: any) {
 
   Billing_ConvertDate(dateval: string): string {
     if (!dateval) return '';
-     console.log(dateval)
+    console.log(dateval)
     const months = [
       'Jan',
       'Feb',
@@ -4683,7 +4690,7 @@ getFirstPresentVital(vitalScreen: any) {
 
     this.startDateValue = someDate;
 
-const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
+    const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
     this.renewProgramForm.controls['pgmendDate'].setValue(
       this.convertDate(someDateValue)
     );
@@ -4849,15 +4856,15 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
         patientStatus = 'patient_active';
       } else if (
         this.http_rpm_patientList['PatientProgramdetails'].Status ==
-          'Prescribed' ||
+        'Prescribed' ||
         this.http_rpm_patientList['PatientProgramdetails'].Status == 'Enrolled'
       ) {
         patientStatus = 'patient_prescribed';
       } else if (
         this.http_rpm_patientList['PatientProgramdetails'].Status ==
-          'Discharged' ||
+        'Discharged' ||
         this.http_rpm_patientList['PatientProgramdetails'].Status ==
-          'ReadyToDischarge'
+        'ReadyToDischarge'
       ) {
         patientStatus = 'patient_discharge';
       } else if (
@@ -5317,7 +5324,7 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
     }
     stillUtc = stillUtc + 'Z';
     const local = dayjs.utc(stillUtc).local().format('HH:mm:ss');
-      return local;
+    return local;
   }
 
   getTimefromDate(text: any) {
@@ -5357,19 +5364,19 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
     var endDate = this.convertDate(today);
     startDate = startDate + 'T00:00:00';
     endDate = endDate + 'T23:59:59';
-     try {
+    try {
       this.startDateReport = this.auth.ConvertToUTCRangeInput(
         new Date(startDate)
       );
       this.endDateReport = this.auth.ConvertToUTCRangeInput(new Date(endDate));
-     const startDate7Days = this.auth.ConvertToUTCRangeInput(
+      const startDate7Days = this.auth.ConvertToUTCRangeInput(
         new Date(
           new Date(this.endDateReport).setDate(
             new Date(this.endDateReport).getDate() - 7
           )
         )
       );
-   
+
       this.httpPatient = await this.PatientReportapi.getPatientInfo(
         this.selectedPatient,
         this.selectedProgram
@@ -5477,137 +5484,137 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
     this.lineChartLabels = chartLabels;
   }
 
-async getPatientAndProgramInfo() {
-  this.patientStatusData = this.httpPatient.PatientProgramdetails.Status;
+  async getPatientAndProgramInfo() {
+    this.patientStatusData = this.httpPatient.PatientProgramdetails.Status;
 
-  this.PatientCriticalAlerts =
-    this.patientdownloadService.extractCriticalAlerts(this.httpSymptoms);
+    this.PatientCriticalAlerts =
+      this.patientdownloadService.extractCriticalAlerts(this.httpSymptoms);
 
-  // 1) Program goals
-  this.patientdownloadService.generateProgramGoalsReport(
-    this.doc,
-    this.httpPatient.PatientProgramGoals,
-    this.PatientCriticalAlerts
-  );
+    // 1) Program goals
+    this.patientdownloadService.generateProgramGoalsReport(
+      this.doc,
+      this.httpPatient.PatientProgramGoals,
+      this.PatientCriticalAlerts
+    );
 
-  // 2) Notes on a new page
-  this.doc.addPage();
-  await this.patientdownloadService.getReportNotes(
-    this.doc,
-    this.startDateReport,
-    this.endDateReport,
-    this.selectedPatient,
-    this.selectedProgram,
-    this.idProgram
-  );
+    // 2) Notes on a new page
+    this.doc.addPage();
+    await this.patientdownloadService.getReportNotes(
+      this.doc,
+      this.startDateReport,
+      this.endDateReport,
+      this.selectedPatient,
+      this.selectedProgram,
+      this.idProgram
+    );
 
-  // 3) CCM/PCM short-circuit
-  if (this.patientProgramname === 'CCM' || this.patientProgramname === 'PCM') {
+    // 3) CCM/PCM short-circuit
+    if (this.patientProgramname === 'CCM' || this.patientProgramname === 'PCM') {
+      this.patientdownloadService.generatePatientSummaryReport(
+        this.doc,
+        this.patientProgramname,
+        this.httpSymptoms,
+        this.httpMedicationData,
+        this.httpbillingInfo,
+        this.httpSMSData
+      );
+      this.doc.save('PatientReport.pdf');
+      this.DownloadStatus = false;
+      return;
+    }
+
+    // -----------------------------
+    // Patient Health Trends Section
+    // -----------------------------
+
+    this.currentY = 15; // top margin for the new page
+
+    // IMPORTANT: sync the service cursor; captureHealthTrendsChart uses its own `this.currentY`
+    (this.patientdownloadService as any).currentY = this.currentY;
+
+    // 4) Section heading FIRST
+    this.doc.setFontSize(14);
+    this.doc.text('Patient Health Trends', 15, this.currentY);
+    this.doc.setDrawColor('black');
+    const headingWidth = this.doc.getTextWidth('Patient Health Trends');
+    this.doc.line(15, this.currentY + 1, 15 + headingWidth, this.currentY + 1);
+
+    // Move the cursor below the section heading (both component and service)
+    this.currentY += 15;
+    (this.patientdownloadService as any).currentY = this.currentY;
+
+    // 5) Gather chart elements
+    const graphEls = Array.from(document.querySelectorAll('.pdfData')) as HTMLElement[];
+
+    // If you need a clinical order, ensure `graphEls` and `healthtrendVitalNameArray` align.
+    // We'll use the intersection count to avoid out-of-range indexing.
+    const titles = Array.isArray(this.healthtrendVitalNameArray)
+      ? this.healthtrendVitalNameArray
+      : [];
+    const count = Math.min(graphEls.length, titles.length);
+
+    // 6) Render charts with their titles (service prints title; we pass it in)
+    for (let i = 0; i < count; i++) {
+      const graph = graphEls[i];
+      const vitalTitle = titles[i] || `Chart ${i + 1}`;
+
+      // The service will print the vital title at its `currentY`,
+      // draw an underline, add the image, bump `currentY`, and handle page breaks.
+      await this.patientdownloadService.captureHealthTrendsChart(this.doc, graph, vitalTitle);
+
+      // Sync back component Y
+      this.currentY = (this.patientdownloadService as any).currentY;
+    }
+
+    // If there are more graphs than titles, render them with generic titles
+    for (let i = count; i < graphEls.length; i++) {
+      const graph = graphEls[i];
+      await this.patientdownloadService.captureHealthTrendsChart(this.doc, graph, `Chart ${i + 1}`);
+      this.currentY = (this.patientdownloadService as any).currentY;
+    }
+
+    // 7) Prevent table overlap: add a conditional page break if space is tight
+    const pageHeight =
+      (this.doc as any).internal?.pageSize?.getHeight?.() ??
+      (this.doc as any).internal?.pageSize?.height ??
+      297; // A4 fallback in mm
+    const bottomMargin = 15;
+    const minSpaceForTable = 50; // tune to your table's minimal height
+
+    if (this.currentY > pageHeight - bottomMargin - minSpaceForTable) {
+      this.doc.addPage();
+      this.currentY = 20;
+      (this.patientdownloadService as any).currentY = this.currentY;
+    }
+
+    // 8) Vital readings table (placed safely below charts or on a new page)
+    this.patientdownloadService.generateHealthTrendsTable(this.doc, this.httpVitalData);
+
+    // 9) Additional blocks (ensure they append, not reset Y/page unexpectedly)
+    this.patientdownloadService.generateDaysVitals(this.http7VitalData);
+    this.patientdownloadService.generate30DaysVitals(this.httpVitalData);
+
+    // 10) Patient summary
     this.patientdownloadService.generatePatientSummaryReport(
       this.doc,
       this.patientProgramname,
       this.httpSymptoms,
       this.httpMedicationData,
-      this.httpbillingInfo,
+      this.BillingInfo,
       this.httpSMSData
     );
-    this.doc.save('PatientReport.pdf');
+
+    // 11) Vital reading summary
+    await this.patientdownloadService.generateVitalReadingSummary(
+      this.doc,
+      this.selectedPatient,
+      this.selectedProgram
+    );
+
+    // 12) Finalize
     this.DownloadStatus = false;
-    return;
+    this.doc.save('PatientReport.pdf');
   }
-
-  // -----------------------------
-  // Patient Health Trends Section
-  // -----------------------------
-
-  this.currentY = 15; // top margin for the new page
-
-  // IMPORTANT: sync the service cursor; captureHealthTrendsChart uses its own `this.currentY`
-  (this.patientdownloadService as any).currentY = this.currentY;
-
-  // 4) Section heading FIRST
-  this.doc.setFontSize(14);
-  this.doc.text('Patient Health Trends', 15, this.currentY);
-  this.doc.setDrawColor('black');
-  const headingWidth = this.doc.getTextWidth('Patient Health Trends');
-  this.doc.line(15, this.currentY + 1, 15 + headingWidth, this.currentY + 1);
-
-  // Move the cursor below the section heading (both component and service)
-  this.currentY += 15;
-  (this.patientdownloadService as any).currentY = this.currentY;
-
-  // 5) Gather chart elements
-  const graphEls = Array.from(document.querySelectorAll('.pdfData')) as HTMLElement[];
-
-  // If you need a clinical order, ensure `graphEls` and `healthtrendVitalNameArray` align.
-  // We'll use the intersection count to avoid out-of-range indexing.
-  const titles = Array.isArray(this.healthtrendVitalNameArray)
-    ? this.healthtrendVitalNameArray
-    : [];
-  const count = Math.min(graphEls.length, titles.length);
-
-  // 6) Render charts with their titles (service prints title; we pass it in)
-  for (let i = 0; i < count; i++) {
-    const graph = graphEls[i];
-    const vitalTitle = titles[i] || `Chart ${i + 1}`;
-
-    // The service will print the vital title at its `currentY`,
-    // draw an underline, add the image, bump `currentY`, and handle page breaks.
-    await this.patientdownloadService.captureHealthTrendsChart(this.doc, graph, vitalTitle);
-
-    // Sync back component Y
-    this.currentY = (this.patientdownloadService as any).currentY;
-  }
-
-  // If there are more graphs than titles, render them with generic titles
-  for (let i = count; i < graphEls.length; i++) {
-    const graph = graphEls[i];
-    await this.patientdownloadService.captureHealthTrendsChart(this.doc, graph, `Chart ${i + 1}`);
-    this.currentY = (this.patientdownloadService as any).currentY;
-  }
-
-  // 7) Prevent table overlap: add a conditional page break if space is tight
-  const pageHeight =
-    (this.doc as any).internal?.pageSize?.getHeight?.() ??
-    (this.doc as any).internal?.pageSize?.height ??
-    297; // A4 fallback in mm
-  const bottomMargin = 15;
-  const minSpaceForTable = 50; // tune to your table's minimal height
-
-  if (this.currentY > pageHeight - bottomMargin - minSpaceForTable) {
-    this.doc.addPage();
-    this.currentY = 20;
-    (this.patientdownloadService as any).currentY = this.currentY;
-  }
-
-  // 8) Vital readings table (placed safely below charts or on a new page)
-  this.patientdownloadService.generateHealthTrendsTable(this.doc, this.httpVitalData);
-
-  // 9) Additional blocks (ensure they append, not reset Y/page unexpectedly)
-  this.patientdownloadService.generateDaysVitals(this.http7VitalData);
-  this.patientdownloadService.generate30DaysVitals(this.httpVitalData);
-
-  // 10) Patient summary
-  this.patientdownloadService.generatePatientSummaryReport(
-    this.doc,
-    this.patientProgramname,
-    this.httpSymptoms,
-    this.httpMedicationData,
-    this.BillingInfo,
-    this.httpSMSData
-  );
-
-  // 11) Vital reading summary
-  await this.patientdownloadService.generateVitalReadingSummary(
-    this.doc,
-    this.selectedPatient,
-    this.selectedProgram
-  );
-
-  // 12) Finalize
-  this.DownloadStatus = false;
-  this.doc.save('PatientReport.pdf');
-}
 
   closenoterDialogUpdateModal(){
     this.showNoteupdateModal = false;

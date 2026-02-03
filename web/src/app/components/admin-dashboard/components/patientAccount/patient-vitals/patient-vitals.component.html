@@ -2157,10 +2157,12 @@
           </ng-container>
 
           <ng-container matColumnDef="Description">
-            <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
-            <mat-cell *matCellDef="let element">
-              {{ element.Description }}
-            </mat-cell>
+              <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+              <mat-cell *matCellDef="let element">
+                  <div class="description-scroll">
+                      {{ element.Description }}
+                  </div>
+              </mat-cell>
           </ng-container>
 
           <ng-container matColumnDef="SymptomStartDateTime">
@@ -2198,7 +2200,6 @@
             *matHeaderRowDef="symtomsTableColumn"
           ></mat-header-row>
           <mat-row
-            [style.minHeight.px]="30"
             *matRowDef="let row; columns: symtomsTableColumn"
           ></mat-row>
         </mat-table>

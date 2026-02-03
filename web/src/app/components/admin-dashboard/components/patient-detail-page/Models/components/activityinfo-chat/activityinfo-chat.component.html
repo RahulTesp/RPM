@@ -17,7 +17,9 @@
           <ng-container matColumnDef="LastMessage">
             <mat-header-cell *matHeaderCellDef> LastMessage </mat-header-cell>
             <mat-cell *matCellDef="let element">
-              {{ element.LastMessage }}
+              <span class="last-message-text">
+                {{ element.LastMessage }}
+              </span>
             </mat-cell>
           </ng-container>
 

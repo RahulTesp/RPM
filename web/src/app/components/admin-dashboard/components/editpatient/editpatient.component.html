@@ -1551,13 +1551,13 @@
                       <div class="userInfoItem">
                         <p class="main_input_title">Date</p>
                         <p class="userInfovalue">
-                           {{ 
-                              convertDateMMDD(
-                                this.convertToLocalTime(
-                                  ActiveDetails.AssignedDate
-                                )
-                              ) 
-                              | date: 'MM-dd-yyyy' 
+                            {{
+                            convertDateMMDD(
+                            this.convertToLocalTime(
+                            ActiveDetails.AssignedDate
+                            )
+                            )
+                            | date: 'dd-MM-yyyy'
                             }}
                         </p>
                       </div>
@@ -1590,13 +1590,13 @@
                       <div class="userInfoItem">
                         <p class="main_input_title">Date</p>
                         <p class="userInfovalue">
-                          {{
+                            {{
                             convertDateMMDD(
-                              this.convertToLocalTime(
-                                ReadyToDischarge.AssignedDate
-                              )
-                            ) | date: 'MM-dd-yyyy'
-                          }}
+                            this.convertToLocalTime(
+                            ReadyToDischarge.AssignedDate
+                            )
+                            ) | date: 'dd-MM-yyyy'
+                            }}
                         </p>
                       </div>
                     </div>
@@ -1628,7 +1628,7 @@
                       <div class="userInfoItem">
                         <p class="main_input_title">Date</p>
                         <p class="userInfovalue">
-                          {{ convertDateMMDD(Discharged.AssignedDate)| date: 'MM-dd-yyyy' }}
+                          {{ convertDateMMDD(Discharged.AssignedDate)| date: 'dd-MM-yyyy' }}
                         </p>
                       </div>
                     </div>
@@ -1661,7 +1661,7 @@
                           {{
                             convertDateMMDD(
                               this.convertToLocalTime(OnHold.AssignedDate)
-                            )| date: 'MM-dd-yyyy' 
+                            )| date: 'dd-MM-yyyy' 
                           }}
                         </p>
                       </div>
@@ -1693,7 +1693,7 @@
                           {{
                             convertDateMMDD(
                               this.convertToLocalTime(InActive.AssignedDate)
-                            )| date: 'MM-dd-yyyy' 
+                            )| date: 'dd-MM-yyyy' 
                           }}
                         </p>
                       </div>
@@ -1707,30 +1707,30 @@
 
         <!--edit patient page-->
         <div class="device_Vital_panel">
-          <div #devicedetails>
-            <div class="device-detail-panel">
-              <div
-                *ngIf="
+            <div #devicedetails>
+                <div class="device-detail-panel">
+                    <div
+                    *ngIf="
                   this.Patientdata &&
                   this.Patientdata.PatientProgramdetails.ProgramName != 'CCM' &&
                   this.Patientdata.PatientProgramdetails.ProgramName != 'PCM'
                 "
-              >
-                <div class="device">
-                  <p
-                    *ngIf="
+                    >
+                        <div class="device">
+                            <p
+                            *ngIf="
                       this.Patientdata &&
                       this.Patientdata.PatientProgramdetails.ProgramName !=
                         'CCM' &&
                       this.Patientdata.PatientProgramdetails.ProgramName !=
                         'PCM'
                     "
-                    class="main_input_main_heading"
-                  >
-                    Device Details
-                  </p>
-                  <img
-                    *ngIf="
+                               class="main_input_main_heading"
+                            >
+                                Device Details
+                            </p>
+                            <img
+                            *ngIf="
                       this.Patientdata &&
                       this.Patientdata.PatientProgramdetails.ProgramName !=
                         'CCM' &&
@@ -1738,832 +1738,755 @@
                         'PCM' &&
                       DeviceNotAvaliable
                     "
-                    id="editAddNewDevice"
-                    class="add_icon1"
-                    src="../../../../../assets/04-Icons/Icons_Add A.svg"
-                    (click)="addNewDevice()"
-                  />
-                </div>
-                <div
-                  class="program_info_data device_panel"
-                  *ngFor="let device of patientdevicedetails; let i = index"
-                >
-                  <form [name]="i">
-                    <div class="device-main-panel"
-                      *ngIf="
+                                 id="editAddNewDevice"
+                                 class="add_icon1"
+                                 src="../../../../../assets/04-Icons/Icons_Add A.svg"
+                                 (click)="addNewDevice()"
+                                 />
+                        </div>
+                        <div
+                        class="program_info_data device_panel"
+                             *ngFor="let device of patientdevicedetails; let i = index"
+                        >
+                            <form [name]="i">
+                                <div class="device-main-panel"
+                                     *ngIf="
                         this.Patientdata &&
                         this.Patientdata.PatientProgramdetails.ProgramName !=
                           'CCM' &&
                         this.Patientdata.PatientProgramdetails.ProgramName !=
                           'PCM'
                       "
-                    >
-
-                        <div class="first_panel">
-                          <div class="userInfoItem">
-                            <p class="main_input_title">*Vital Monitoring</p>
-                            <div *ngIf="device.DeviceStatus == 'InActive'">
-                              <!-- Renders only if the selection is valid -->
-                              <select 
-                              [disabled]="!device.isEditable"
-                              *ngIf="!device.invalidSelection"
-                              class="userInfovalue"
-                              id="editDeviceVitalInActive"
-                              [(ngModel)]="device.VitalId"
-                              [ngModelOptions]="{ standalone: true }"
-                              (change)="onVitalChange(device, $event)"
-                              >
-                              <ng-container *ngFor="let x of getUniqueVitals()">
-                                <option *ngIf="x.VitalName != ''" [value]="x.VitalId">
-                                  {{ x.VitalName }}
-                                </option>
-                              </ng-container> 
-                              </select>
-                            </div>
-                            <div *ngIf="device.DeviceStatus != 'InActive'">
-                              <select
-                                [disabled]="true"
-                                class="userInfovalue"
-                                id="editDeviceVitalActive"
-                                [(ngModel)]="device.VitalId"
-                                [ngModelOptions]="{ standalone: true }"
-                              >
-                                <ng-container
-                                  *ngFor="let x of patientdevicedetails"
                                 >
-                                  <option
-                                    *ngIf="x.VitalName != ''"
-                                    value="{{ x.VitalId }}"
-                                  >
-                                    {{ x.VitalName }}
-                                  </option>
-                                </ng-container>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="second_panel">
-                          <div class="userInfoItem">
-                            <p class="main_input_title">*Device Type</p>
-                           <select
-                              [disabled]="true"
-                              id="editDeviceType"
-                              *ngIf="device.DeviceCommunicationType"
-                              class="userInfovalue"
-                              [(ngModel)]="device.DeviceCommunicationType"
-                              [ngModelOptions]="{ standalone: true }"
-                            >
-                              <option [value]="device.DeviceCommunicationType">
-                                {{ device.DeviceCommunicationType }}
-                              </option>
-                            </select>
 
-                            <select
-                              *ngIf="!device.DeviceCommunicationType"
-                              class="userInfovalue"
-                              id="editDeviceTypeLTE_{{i}}"
-                              placeholder="LTE"
-                              [(ngModel)]="deviceTypeDataId"
-                              [ngModelOptions]="{ standalone: true }"
-                              (ngModelChange)="OndeviceCommunicationTypeChange(i)"
-                            >
-                              <option
-                                *ngFor="let v of CommunicationType"
-                                [value]="v.Id"
-                              >
-                                {{ v.DeviceCommunicationTypeName }}
-                              </option>
-                            </select>
-                          </div>
-                        </div>
+                                    <div class="first_panel">
+                                        <div class="userInfoItem">
+                                            <p class="main_input_title">*Vital Monitoring</p>
+                                            <div *ngIf="device.DeviceStatus == 'InActive'">
+                                                <!-- Renders only if the selection is valid -->
+                                                <select
+                                                [disabled]="!device.isEditable"
+                                                        *ngIf="!device.invalidSelection"
+                                                        class="userInfovalue"
+                                                        id="editDeviceVitalInActive"
+                                                        [(ngModel)]="device.VitalId"
+                                                        [ngModelOptions]="{ standalone: true }"
+                                                        (change)="onVitalChange(device, $event)"
+                                                        >
+                                                    <ng-container *ngFor="let x of getAvailableVitals(); trackBy: trackByVitalId">
+                                                        <option *ngIf="x.VitalName != ''" [value]="x.VitalId">
+                                                            {{ x.VitalName }}
+                                                        </option>
+                                                    </ng-container>
+                                                </select>
+                                            </div>
+                                            <div *ngIf="device.DeviceStatus != 'InActive'">
+                                                <select
+                                                [disabled]="true"
+                                                        class="userInfovalue"
+                                                        id="editDeviceVitalActive"
+                                                        [(ngModel)]="device.VitalId"
+                                                        [ngModelOptions]="{ standalone: true }"
+                                                >
+                                                    <ng-container
+                                                    *ngFor="let x of patientdevicedetails"
+                                                    >
+                                                        <option
+                                                        *ngIf="x.VitalName != ''"
+                                                                value="{{ x.VitalId }}"
+                                                        >
+                                                            {{ x.VitalName }}
+                                                        </option>
+                                                    </ng-container>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="second_panel">
+                                        <div class="userInfoItem">
+                                            <p class="main_input_title">*Device Type</p>
+                                            <select
+                                            [disabled]="true"
+                                                    id="editDeviceType"
+                                                    *ngIf="device.DeviceCommunicationType"
+                                                    class="userInfovalue"
+                                                    [(ngModel)]="device.DeviceCommunicationType"
+                                                    [ngModelOptions]="{ standalone: true }"
+                                                    >
+                                                <option [value]="device.DeviceCommunicationType">
+                                                    {{ device.DeviceCommunicationType }}
+                                                </option>
+                                            </select>
 
-
-                        <div class="third_panel">
-                          <div class="userInfoItem">
-                            <p class="main_input_title">*Device</p>
-                            <select
-                              [disabled]="true"
-                              id="editDeviceName"
-                              *ngIf="device.DeviceName"
-                              class="userInfovalue"
-                              [(ngModel)]="device.DeviceName"
-                              [ngModelOptions]="{ standalone: true }"
-                            >
-                              <option [value]="device.DeviceName">
-                                {{ device.DeviceName }}
-                              </option>
-                            </select>
-                            <select
-                              *ngIf="!device.DeviceName"
-                              class="userInfovalue"
-                            >
-                              <ng-container *ngFor="let v of devArr">
-                                <option
-                                  *ngIf="v.VitalId == device.VitalId"
-                                  [value]="v.DeviceName"
-                                >
-                                  {{ v.DeviceName }}
-                                </option>
-                              </ng-container>
-                            </select>
-                          </div>
-                          <div class="userInfoItem">
-                            <p class="main_input_title">*Device Id</p>
-                            <div *ngIf="!device.VitalId">
-                              <div *ngIf="device.DeviceStatus == 'InActive'">
-                                <ng-autocomplete
-                                  [data]="[]"
-                                  [searchKeyword]="keyword"
-                                  placeholder="Select Device"
-                                  id="editDeviceId1"
-                                  (selected)="selectEvent($event, i)"
-                                  (inputChanged)="onChangeSearch($event)"
-                                  (inputFocused)="onFocused($event)"
-                                  [itemTemplate]="itemTemplate"
-                                  [notFoundTemplate]="notFoundTemplate"
-                                >
-                                </ng-autocomplete>
-
-                                <ng-template #itemTemplate let-item>
-                                  <a [innerHTML]="item.DeviceNumber"></a>
-                                </ng-template>
-
-                                <ng-template #notFoundTemplate let-notFound>
-                                  <div [innerHTML]="notFound"></div>
-                                </ng-template>
-                              </div>
-                              
-                            </div>
-                            <div *ngIf="device.VitalId == 1">
-                              <div *ngIf="device.DeviceStatus == 'InActive'">
-                                <ng-autocomplete
-                                  [data]="deviceListBP"
-                                  [searchKeyword]="keyword"
-                                  placeholder="Select Device"
-                                  id="editDeviceId1"
-                                  (selected)="selectEvent($event, i)"
-                                  (inputChanged)="onChangeSearch($event)"
-                                  (inputFocused)="onFocused($event)"
-                                  [itemTemplate]="itemTemplate"
-                                  [notFoundTemplate]="notFoundTemplate"
-                                >
-                                </ng-autocomplete>
-
-                                <ng-template #itemTemplate let-item>
-                                  <a [innerHTML]="item.DeviceNumber"></a>
-                                </ng-template>
-
-                                <ng-template #notFoundTemplate let-notFound>
-                                  <div [innerHTML]="notFound"></div>
-                                </ng-template>
-                              </div>
-                              <select
-                                [disabled]="true"
-                                *ngIf="device.DeviceStatus != 'InActive'"
-                                class="userInfovalue"
-                                [(ngModel)]="device.DeviceNumber"
-                                [ngModelOptions]="{ standalone: true }"
-                              >
-                                <option [value]="device.DeviceNumber">
-                                  {{ device.DeviceNumber }}
-                                </option>
-                              </select>
-                            </div>
-                            <div *ngIf="device.VitalId == 2">
-                              <div *ngIf="device.DeviceStatus == 'InActive'">
-                                <ng-autocomplete
-                                  [data]="deviceListBG"
-                                  [searchKeyword]="keyword"
-                                  placeholder="Select Device"
-                                  id="editDeviceId2"
-                                  (selected)="selectEvent($event, i)"
-                                  (inputCleared)="clearEvent($event, i)"
-                                  (inputChanged)="onChangeSearch($event)"
-                                  (inputFocused)="onFocused($event)"
-                                  [itemTemplate]="itemTemplate"
-                                  [notFoundTemplate]="notFoundTemplate"
-                                >
-                                </ng-autocomplete>
-
-                                <ng-template #itemTemplate let-item>
-                                  <a [innerHTML]="item.DeviceNumber"></a>
-                                </ng-template>
-
-                                <ng-template #notFoundTemplate let-notFound>
-                                  <div [innerHTML]="notFound"></div>
-                                </ng-template>
-                              </div>
-                              <select
-                                [disabled]="true"
-                                *ngIf="device.DeviceStatus != 'InActive'"
-                                class="userInfovalue"
-                                [(ngModel)]="device.DeviceNumber"
-                                [ngModelOptions]="{ standalone: true }"
-                              >
-                                <option [value]="device.DeviceNumber">
-                                  {{ device.DeviceNumber }}
-                                </option>
-                              </select>
-                            </div>
-                            <div *ngIf="device.VitalId == 3">
-                              <div *ngIf="device.DeviceStatus == 'InActive'">
-                                <ng-autocomplete
-                                  [data]="deviceListWS"
-                                  [searchKeyword]="keyword"
-                                  placeholder="Select Device"
-                                  id="editDeviceId3"
-                                  (selected)="selectEvent($event, i)"
-                                  (inputCleared)="clearEvent($event, i)"
-                                  (inputChanged)="onChangeSearch($event)"
-                                  (inputFocused)="onFocused($event)"
-                                  [itemTemplate]="itemTemplate"
-                                  [notFoundTemplate]="notFoundTemplate"
-                                >
-                                </ng-autocomplete>
-
-                                <ng-template #itemTemplate let-item>
-                                  <a [innerHTML]="item.DeviceNumber"></a>
-                                </ng-template>
-
-                                <ng-template #notFoundTemplate let-notFound>
-                                  <div [innerHTML]="notFound"></div>
-                                </ng-template>
-                              </div>
-                              <select
-                                [disabled]="true"
-                                *ngIf="device.DeviceStatus != 'InActive'"
-                                class="userInfovalue"
-                                [(ngModel)]="device.DeviceNumber"
-                                [ngModelOptions]="{ standalone: true }"
-                              >
-                                <option [value]="device.DeviceNumber">
-                                  {{ device.DeviceNumber }}
-                                </option>
-                              </select>
-                            </div>
-                            <div *ngIf="device.VitalId == 4">
-                              <div *ngIf="device.DeviceStatus == 'InActive'">
-                                <ng-autocomplete
-                                  [data]="deviceListOX"
-                                  [searchKeyword]="keyword"
-                                  placeholder="Select Device"
-                                  id="editDeviceId4"
-                                  (selected)="selectEvent($event, i)"
-                                  (inputCleared)="clearEvent($event, i)"
-                                  (inputChanged)="onChangeSearch($event)"
-                                  (inputFocused)="onFocused($event)"
-                                  [itemTemplate]="itemTemplate"
-                                  [notFoundTemplate]="notFoundTemplate"
-                                >
-                                </ng-autocomplete>
-
-                                <ng-template #itemTemplate let-item>
-                                  <a [innerHTML]="item.DeviceNumber"></a>
-                                </ng-template>
-
-                                <ng-template #notFoundTemplate let-notFound>
-                                  <div [innerHTML]="notFound"></div>
-                                </ng-template>
-                              </div>
-                              <select
-                                [disabled]="true"
-                                *ngIf="device.DeviceStatus != 'InActive'"
-                                class="userInfovalue"
-                                [(ngModel)]="device.DeviceNumber"
-                                [ngModelOptions]="{ standalone: true }"
-                              >
-                                <option [value]="device.DeviceNumber">
-                                  {{ device.DeviceNumber }}
-                                </option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
+                                            <select
+                                            *ngIf="!device.DeviceCommunicationType"
+                                                    class="userInfovalue"
+                                                    id="editDeviceTypeLTE_{{i}}"
+                                                    placeholder="LTE"
+                                                    [(ngModel)]="deviceTypeDataId"
+                                                    [ngModelOptions]="{ standalone: true }"
+                                                    (ngModelChange)="OndeviceCommunicationTypeChange(i)"
+                                                    >
+                                                <option
+                                                *ngFor="let v of CommunicationType"
+                                                        [value]="v.Id"
+                                                >
+                                                    {{ v.DeviceCommunicationTypeName }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
 
 
-                        <div class="fourth_panel">
-                          <div class="userInfoItem">
-                            <p class="main_input_title">*Device Status</p>
-                            <select
-                              [disabled]="true"
-                              class="userInfovalue"
-                              id="editDeviceStatus"
-                              [(ngModel)]="patientdevicedetails[i].DeviceStatus"
-                              [ngModelOptions]="{ standalone: true }"
-                              placeholder="Error"
-                            >
-                              <option value="Error">Error</option>
-                              <option value="Active">Active</option>
-                              <option value="Used">Used</option>
-                            </select>
-                            <img
-                              *ngIf="
-                                patientdevicedetails[i].DeviceStatus == 'Active'
-                              "
-                              class="icon_error"
-                              src="../../../../../assets/04-Icons/Icons_Check.svg"
-                            />
-                            <img
-                              *ngIf="
+                                    <div class="third_panel">
+                                        <div class="userInfoItem">
+                                            <p class="main_input_title">*Device</p>
+                                            <select
+                                            [disabled]="true"
+                                                    id="editDeviceName"
+                                                    *ngIf="device.DeviceName"
+                                                    class="userInfovalue"
+                                                    [(ngModel)]="device.DeviceName"
+                                                    [ngModelOptions]="{ standalone: true }"
+                                            >
+                                                <option [value]="device.DeviceName">
+                                                    {{ device.DeviceName }}
+                                                </option>
+                                            </select>
+                                            <select
+                                            *ngIf="!device.DeviceName"
+                                                    class="userInfovalue"
+                                            >
+                                                <ng-container *ngFor="let v of devArr">
+                                                    <option
+                                                    *ngIf="v.VitalId == device.VitalId"
+                                                            [value]="v.DeviceName"
+                                                    >
+                                                        {{ v.DeviceName }}
+                                                    </option>
+                                                </ng-container>
+                                            </select>
+                                        </div>
+                                        <div class="userInfoItem">
+                                            <p class="main_input_title">*Device Id</p>
+                                            <div *ngIf="!device.VitalId">
+                                                <div *ngIf="device.DeviceStatus == 'InActive'">
+                                                    <ng-autocomplete
+                                                                     [data]="[]"
+                                                                     [searchKeyword]="keyword"
+                                                                     placeholder="Select Device"
+                                                                     id="editDeviceId1"
+                                                                     (selected)="selectEvent($event, i)"
+                                                                     (inputChanged)="onChangeSearch($event)"
+                                                                     (inputFocused)="onFocused($event)"
+                                                                     [itemTemplate]="itemTemplate"
+                                                                     [notFoundTemplate]="notFoundTemplate"
+                                                                     >
+                                                    </ng-autocomplete>
+
+                                                    <ng-template #itemTemplate let-item>
+                                                        <a [innerHTML]="item.DeviceNumber"></a>
+                                                    </ng-template>
+
+                                                    <ng-template #notFoundTemplate let-notFound>
+                                                        <div [innerHTML]="notFound"></div>
+                                                    </ng-template>
+                                                </div>
+
+                                            </div>
+                                            <div *ngIf="device.VitalId == 1">
+                                                <div *ngIf="device.DeviceStatus == 'InActive'">
+                                                    <ng-autocomplete
+                                                                     [data]="deviceListBP"
+                                                                     [searchKeyword]="keyword"
+                                                                     placeholder="Select Device"
+                                                                     id="editDeviceId1"
+                                                                     (selected)="selectEvent($event, i)"
+                                                                     (inputChanged)="onChangeSearch($event)"
+                                                                     (inputFocused)="onFocused($event)"
+                                                                     [itemTemplate]="itemTemplate"
+                                                                     [notFoundTemplate]="notFoundTemplate"
+                                                                     >
+                                                    </ng-autocomplete>
+
+                                                    <ng-template #itemTemplate let-item>
+                                                        <a [innerHTML]="item.DeviceNumber"></a>
+                                                    </ng-template>
+
+                                                    <ng-template #notFoundTemplate let-notFound>
+                                                        <div [innerHTML]="notFound"></div>
+                                                    </ng-template>
+                                                </div>
+                                                <select
+                                                        [disabled]="true"
+                                                        *ngIf="device.DeviceStatus != 'InActive'"
+                                                        class="userInfovalue"
+                                                        [(ngModel)]="device.DeviceNumber"
+                                                        [ngModelOptions]="{ standalone: true }"
+                                                >
+                                                    <option [value]="device.DeviceNumber">
+                                                        {{ device.DeviceNumber }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <div *ngIf="device.VitalId == 2">
+                                                <div *ngIf="device.DeviceStatus == 'InActive'">
+                                                    <ng-autocomplete
+                                                                     [data]="deviceListBG"
+                                                                     [searchKeyword]="keyword"
+                                                                     placeholder="Select Device"
+                                                                     id="editDeviceId2"
+                                                                     (selected)="selectEvent($event, i)"
+                                                                     (inputCleared)="clearEvent($event, i)"
+                                                                     (inputChanged)="onChangeSearch($event)"
+                                                                     (inputFocused)="onFocused($event)"
+                                                                     [itemTemplate]="itemTemplate"
+                                                                     [notFoundTemplate]="notFoundTemplate"
+                                                                     >
+                                                    </ng-autocomplete>
+
+                                                    <ng-template #itemTemplate let-item>
+                                                        <a [innerHTML]="item.DeviceNumber"></a>
+                                                    </ng-template>
+
+                                                    <ng-template #notFoundTemplate let-notFound>
+                                                        <div [innerHTML]="notFound"></div>
+                                                    </ng-template>
+                                                </div>
+                                                <select
+                                                        [disabled]="true"
+                                                        *ngIf="device.DeviceStatus != 'InActive'"
+                                                        class="userInfovalue"
+                                                        [(ngModel)]="device.DeviceNumber"
+                                                        [ngModelOptions]="{ standalone: true }"
+                                                >
+                                                    <option [value]="device.DeviceNumber">
+                                                        {{ device.DeviceNumber }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <div *ngIf="device.VitalId == 3">
+                                                <div *ngIf="device.DeviceStatus == 'InActive'">
+                                                    <ng-autocomplete
+                                                                     [data]="deviceListWS"
+                                                                     [searchKeyword]="keyword"
+                                                                     placeholder="Select Device"
+                                                                     id="editDeviceId3"
+                                                                     (selected)="selectEvent($event, i)"
+                                                                     (inputCleared)="clearEvent($event, i)"
+                                                                     (inputChanged)="onChangeSearch($event)"
+                                                                     (inputFocused)="onFocused($event)"
+                                                                     [itemTemplate]="itemTemplate"
+                                                                     [notFoundTemplate]="notFoundTemplate"
+                                                                     >
+                                                    </ng-autocomplete>
+
+                                                    <ng-template #itemTemplate let-item>
+                                                        <a [innerHTML]="item.DeviceNumber"></a>
+                                                    </ng-template>
+
+                                                    <ng-template #notFoundTemplate let-notFound>
+                                                        <div [innerHTML]="notFound"></div>
+                                                    </ng-template>
+                                                </div>
+                                                <select
+                                                        [disabled]="true"
+                                                        *ngIf="device.DeviceStatus != 'InActive'"
+                                                        class="userInfovalue"
+                                                        [(ngModel)]="device.DeviceNumber"
+                                                        [ngModelOptions]="{ standalone: true }"
+                                                >
+                                                    <option [value]="device.DeviceNumber">
+                                                        {{ device.DeviceNumber }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <div *ngIf="device.VitalId == 4">
+                                                <div *ngIf="device.DeviceStatus == 'InActive'">
+                                                    <ng-autocomplete
+                                                                     [data]="deviceListOX"
+                                                                     [searchKeyword]="keyword"
+                                                                     placeholder="Select Device"
+                                                                     id="editDeviceId4"
+                                                                     (selected)="selectEvent($event, i)"
+                                                                     (inputCleared)="clearEvent($event, i)"
+                                                                     (inputChanged)="onChangeSearch($event)"
+                                                                     (inputFocused)="onFocused($event)"
+                                                                     [itemTemplate]="itemTemplate"
+                                                                     [notFoundTemplate]="notFoundTemplate"
+                                                                     >
+                                                    </ng-autocomplete>
+
+                                                    <ng-template #itemTemplate let-item>
+                                                        <a [innerHTML]="item.DeviceNumber"></a>
+                                                    </ng-template>
+
+                                                    <ng-template #notFoundTemplate let-notFound>
+                                                        <div [innerHTML]="notFound"></div>
+                                                    </ng-template>
+                                                </div>
+                                                <select
+                                                        [disabled]="true"
+                                                        *ngIf="device.DeviceStatus != 'InActive'"
+                                                        class="userInfovalue"
+                                                        [(ngModel)]="device.DeviceNumber"
+                                                        [ngModelOptions]="{ standalone: true }"
+                                                >
+                                                    <option [value]="device.DeviceNumber">
+                                                        {{ device.DeviceNumber }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="fourth_panel">
+                                        <div class="userInfoItem">
+                                            <p class="main_input_title">*Device Status</p>
+                                            <select
+                                                    [disabled]="true"
+                                                    class="userInfovalue"
+                                                    id="editDeviceStatus"
+                                                    [(ngModel)]="patientdevicedetails[i].DeviceStatus"
+                                                    [ngModelOptions]="{ standalone: true }"
+                                                    placeholder="Error"
+                                            >
+                                                <option value="Error">Error</option>
+                                                <option value="Active">Active</option>
+                                                <option value="Used">Used</option>
+                                            </select>
+                                            <img
+                                            *ngIf="
+                                                 patientdevicedetails[i].DeviceStatus == 'Active'
+                                                "
+                                                 class="icon_error"
+                                                 src="../../../../../assets/04-Icons/Icons_Check.svg"
+                                                 />
+                                            <img
+                                            *ngIf="
                                 patientdevicedetails[i].DeviceStatus != 'Active'
                               "
-                              class="icon_error"
-                              src="../../../../../assets/04-Icons/Icons_Error A_add.svg"
-                            />
-                            <button
-                              *ngIf="
+                                                 class="icon_error"
+                                                 src="../../../../../assets/04-Icons/Icons_Error A_add.svg"
+                                                 />
+                                            <button
+                                            *ngIf="
                                 patientdevicedetails[i].DeviceStatus == 'Active'
                               "
-                              id="editMarkDeviceError"
-                              class="test_device"
-                              (click)="MarkDeviceErrorDialog(i)"
-                            >
-                              MARK ERROR
-                            </button>
-                            <button
-                              *ngIf="
+                                                    id="editMarkDeviceError"
+                                                    class="test_device"
+                                                    (click)="MarkDeviceErrorDialog(i)"
+                                            >
+                                                MARK ERROR
+                                            </button>
+                                            <button
+                                            *ngIf="
                                 patientdevicedetails[i].DeviceStatus == 'Active'
                               "
-                              id="editRemoveDevice"
-                              class="test_device"
-                              (click)="RemoveDeviceDialog(i)"
-                            >
-                              REMOVE DEVICE
-                            </button>
-                            <button
-                              *ngIf="
+                                                    id="editRemoveDevice"
+                                                    class="test_device"
+                                                    (click)="RemoveDeviceDialog(i)"
+                                            >
+                                                REMOVE DEVICE
+                                            </button>
+                                            <button
+                                            *ngIf="
                                 patientdevicedetails[i].DeviceStatus ==
                                 'InActive'
                               "
-                              id="editRegisterDevice"
-                              class="test_device"
-                              (click)="RegisterDevice(i)"
-                            >
-                              REGISTER DEVICE
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
-                    <div *ngIf="device.DeviceStatus == 'InActive'">
-                      <img
-                        class="add_icon1"
-                        src="../../../../../assets/04-Icons/Icons_Delete.svg"
-                        id="editdeleteDevice"
-                        (click)="deleteDevice(i)"
-                      />
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div #vitalScheduledata_>
-            <div
-              *ngFor="let PatientVitalInfo of PatientVitalInfos; let i = index"
-            >
-              <form [name]="i">
-                <div>
-                  <div class="device">
-                    <p class="main_input_main_heading">Vital schedules</p>
-                  </div>
-                  <div class="vital_data_panel">
-                    <div class="vital_data_left_panel">
-                      <div class="vital_data_left_sub1">
-                        <div class="userInfoItem">
-                          <p class="main_input_title">*Vital Monitoring</p>
-                          <select
-                            *ngIf="vital_selected"
-                            class="userInfovalue"
-                            id="editVitalMonitoring"
-                            [ngModelOptions]="{ standalone: true }"
-                            [(ngModel)]="PatientVitalInfo.VitalId"
-                            (ngModelChange)="vitalchanged($event, i)"
-                          >
-                            <ng-container *ngFor="let v of vital_selected">
-                              <option [value]="v.VitalId">
-                                {{ v.VitalName }}
-                              </option>
-                            </ng-container>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div class="vital_data_left_sub2">
-                        <div class="userInfoItem">
-                          <p class="main_input_title">Schedule</p>
-
-                          <select
-                            class="userInfovalue"
-                            id="editVitalSchedule"
-                            required
-                            [ngModelOptions]="{ standalone: true }"
-                            [(ngModel)]="PatientVitalInfo.VitalScheduleId"
-                            (ngModelChange)="
-                              scheduleChanged(PatientVitalInfo.VitalScheduleId)
-                            "
-                          >
-                            <ng-container *ngFor="let v of vitalschedule">
-                              <option [value]="v.Id">{{ v.Name }}</option>
-                            </ng-container>
-                          </select>
-                        </div>
-                        <div class="userInfoItem">
-                          <select
-                            class="userInfovalue"
-                            id="editVitalScheduleList"
-                            required
-                            [ngModelOptions]="{ standalone: true }"
-                            [(ngModel)]="PatientVitalInfo.ScheduleId"
-                          >
-                            <option
-                              *ngFor="let v of master_data.ScheduleLists"
-                              [value]="v.Id"
-                            >
-                              {{ v.Name }}
-                            </option>
-                          </select>
-                        </div>
-
-                        <p>*Intervals</p>
-                        <div class="vital_interval_item_panel">
-                          <div class="vital_interval_item">
-                          <label for="editVitalScheduleM" class="checkbox-label">
-                            <input type="checkbox" id="editVitalScheduleM" [(ngModel)]="PatientVitalInfo.Morning"
-                              [ngModelOptions]="{ standalone: true }"
-                                                      />
-                                                      M
-                                                    </label>
-
-                          </div>
-                          <div class="vital_interval_item">
-                        <label for="editVitalScheduleAN" class="checkbox-label">
-                          <input type="checkbox" id="editVitalScheduleAN" [(ngModel)]="PatientVitalInfo.Afternoon"
-                            [ngModelOptions]="{ standalone: true }"
-                                                      />
-                                                      AN
-                                                    </label>
-                                                  </div>
-                          <div class="vital_interval_item">
-                          <label for="editVitalScheduleE" class="checkbox-label">
-                            <input type="checkbox" id="editVitalScheduleE" [(ngModel)]="PatientVitalInfo.Evening"
-                              [ngModelOptions]="{ standalone: true }"
-                                                        />
-                                                        E
-                                                      </label>
-                                                    </div>
-                                                    <div class="vital_interval_item">
-                        <label for="editVitalScheduleN" class="checkbox-label">
-                          <input type="checkbox" id="editVitalScheduleN" [(ngModel)]="PatientVitalInfo.Night"
-                            [ngModelOptions]="{ standalone: true }"
-                                                      />
-                                                      N
-                                                    </label>
-                                                  </div>
-                                                </div>
-                      </div>
-                    </div>
-
-                    <div class="vital_data_right_panel">
-                      <form [name]="i">
-                        <div
-                          *ngFor="
-                            let VitalMeasureInfo of PatientVitalInfo.VitalMeasureInfos;
-                            let count = index
-                          "
-                        >
-                          <div class="vital_data_right_sub">
-                            <div class="vital_userInfoItem devicemeasure">
-                              <p class="main_input_title">Measurement</p>
-                              <input
-                                class="userInfovalue"
-                                id="editVitalMeasurement"
-                                [ngModelOptions]="{ standalone: true }"
-                                [(ngModel)]="VitalMeasureInfo.MeasureName"
-                              />
-                            </div>
-                            <div class="deviceunit_last_">
-                              <p class="main_input_title">Unit</p>
-                              <div class="deviceunit_last">
-                                <div class="userInfoItem deviceunit">
-                                  <p class="userInfovalue align_unit">
-                                    {{ VitalMeasureInfo.UnitName }}
-                                  </p>
+                                                    id="editRegisterDevice"
+                                                    class="test_device"
+                                                    (click)="RegisterDevice(i)"
+                                            >
+                                                REGISTER DEVICE
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <img
-                                  id="editVital"
-                                  (click)="editVital(i, count)"
-                                  class="edit-icon"
-                                  src="../../../../../assets/04-Icons/Icons_Edit.svg"
-                                />
-                              </div>
+
+                                <div *ngIf="device.DeviceStatus == 'InActive'">
+                                    <img
+                                    class="add_icon1"
+                                         src="../../../../../assets/04-Icons/Icons_Delete.svg"
+                                         id="editdeleteDevice"
+                                         (click)="deleteDevice(i)"
+                                         />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div #vitalScheduledata_>
+                <div
+                *ngFor="let PatientVitalInfo of PatientVitalInfos; let i = index"
+                >
+                    <form [name]="i">
+                        <div class="device">
+                            <p class="main_input_main_heading">Vital schedules</p>
+                        </div>
+                        <div class="vital_data_panel">
+                            <div class="vital_data_left_panel">
+                                <div class="vital_data_left_sub1">
+                                    <div class="userInfoItem">
+                                        <p class="main_input_title">*Vital Monitoring</p>
+                                        <select
+                                        *ngIf="vital_selected"
+                                                class="userInfovalue"
+                                                [(ngModel)]="PatientVitalInfo.VitalId"
+                                                [ngModelOptions]="{ standalone: true }"
+                                                (ngModelChange)="vitalchanged($event, i)">
+                                            <option *ngFor="let v of vital_selected"
+                                                    [value]="v.VitalId">
+                                                {{ v.VitalName }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="vital_data_left_sub2 schedule-interval-row">
+                                    <div class="schedule-column">
+                                        <p class="main_input_title">Schedule</p>
+
+                                        <select
+                                                class="userInfovalue"
+                                                *ngIf="PatientVitalInfo.scheduleList?.length"
+                                                [(ngModel)]="PatientVitalInfo.VitalScheduleId"
+                                                [ngModelOptions]="{ standalone: true }"
+                                        >
+                                            <option *ngFor="let s of PatientVitalInfo.scheduleList"
+                                                    [value]="s.Id">
+                                                {{ s.Name }}
+                                            </option>
+                                        </select>
+                                        <select class="userInfovalue"
+                                                [(ngModel)]="PatientVitalInfo.ScheduleId"
+                                                [ngModelOptions]="{ standalone: true }">
+                                            <option *ngFor="let f of master_data.ScheduleLists"
+                                                    [value]="f.Id">
+                                                {{ f.Name }}
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="interval-column">
+                                        <p class="main_input_title">*Intervals</p>
+
+                                        <div class="vital_interval_item_panel">
+                                            <label>
+                                                <input type="checkbox"
+                                                       [(ngModel)]="PatientVitalInfo.Morning"
+                                                       [ngModelOptions]="{ standalone: true }" /> M
+                                            </label>
+
+                                            <label>
+                                                <input type="checkbox"
+                                                       [(ngModel)]="PatientVitalInfo.Afternoon"
+                                                       [ngModelOptions]="{ standalone: true }" /> AN
+                                            </label>
+
+                                            <label>
+                                                <input type="checkbox"
+                                                       [(ngModel)]="PatientVitalInfo.Evening"
+                                                       [ngModelOptions]="{ standalone: true }" /> E
+                                            </label>
+
+                                            <label>
+                                                <input type="checkbox"
+                                                       [(ngModel)]="PatientVitalInfo.Night"
+                                                       [ngModelOptions]="{ standalone: true }" /> N
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                          </div>
+                            <div class="vital_data_right_panel">
+                                <div *ngFor="
+              let VitalMeasureInfo of PatientVitalInfo.VitalMeasureInfos;
+              let count = index
+            ">
+                                    <div class="vital_data_right_sub">
+                                        <div class="vital_userInfoItem devicemeasure">
+                                            <p class="main_input_title">Measurement</p>
+                                            <input class="userInfovalue"
+                                                   [(ngModel)]="VitalMeasureInfo.MeasureName"
+                                                   [ngModelOptions]="{ standalone: true }" />
+                                        </div>
 
-                          <app-sliderdata
-                            [low_critical]="VitalMeasureInfo.CriticallMinimum"
-                            [low_cautious]="VitalMeasureInfo.CautiousMinimum"
-                            [low_normal]="VitalMeasureInfo.NormalMinimum"
-                            [high_normal]="VitalMeasureInfo.NormalMaximum"
-                            [high_cautious]="VitalMeasureInfo.CautiousMaximum"
-                            [high_critical]="VitalMeasureInfo.CriticalMaximum"
-                          ></app-sliderdata>
+                                        <!-- UNIT + EDIT ICON -->
+                                        <div class="deviceunit_last_">
+                                            <p class="main_input_title">Unit</p>
 
-                          <!-- Measurement Panel End -->
+                                            <div class="deviceunit_last">
+                                                <p class="userInfovalue align_unit">
+                                                    {{ VitalMeasureInfo.UnitName }}
+                                                </p>
+
+                                                <img class="edit-icon"
+                                                     src="../../../../../assets/04-Icons/Icons_Edit.svg"
+                                                     alt="Edit"
+                                                     (click)="editVital(i, count)" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <app-sliderdata [low_critical]="VitalMeasureInfo.CriticallMinimum"
+                                                    [low_cautious]="VitalMeasureInfo.CautiousMinimum"
+                                                    [low_normal]="VitalMeasureInfo.NormalMinimum"
+                                                    [high_normal]="VitalMeasureInfo.NormalMaximum"
+                                                    [high_cautious]="VitalMeasureInfo.CautiousMaximum"
+                                                    [high_critical]="VitalMeasureInfo.CriticalMaximum">
+                                    </app-sliderdata>
+                                </div>
+                            </div>
                         </div>
-
-                        <!-- Measurement Second Panel -->
-                      </form>
-                    </div>
-                  </div>
+                    </form>
                 </div>
-              </form>
             </div>
-          </div>
-
-          <div [formGroup]="programForm_3">
-            <div #billingdetails class="billing_container">
-              <div class="device">
-                <p class="main_input_main_heading">Billing Information</p>
-              </div>
-
-              <div class="billing_panel">
-
-
-                    <div class="billing_first_panel">
-                      <div class="billing_userInfoItem">
-                        <p class="main_input_title">
-                          Available Billing CPT Code
-                        </p>
-                        <div class="bill_code_panel">
-                          <img
-                            class="arrow-check2"
-                            src="../../../../../assets/04-Icons/Icons_Check A.svg"
-                          />
-                          <input
-                            class="userInfovalue"
-                            formControlName="billingcode1"
-                            id="editBillingCode1"
-                            [attr.disabled]="true"
-                          />
-                        </div>
-                      </div>
-
-                      <div
-                        class="billing_userInfoItem"
-                        *ngIf="programForm_3.controls.billingcode3.value != ''"
-                      >
-                        <div class="bill_code_panel">
-                          <img
-                            class="arrow-check2"
-                            src="../../../../../assets/04-Icons/Icons_Check A.svg"
-                          />
-                          <input
-                            class="userInfovalue"
-                            formControlName="billingcode3"
-                            id="editBillingCode3"
-                            [attr.disabled]="true"
-                          />
-                        </div>
-                      </div>
+            <div [formGroup]="programForm_3">
+                <div #billingdetails class="billing_container">
+                    <div class="device">
+                        <p class="main_input_main_heading">Billing Information</p>
                     </div>
 
+                    <div class="billing_panel">
 
-                    <div class="billing_second_panel">
-                      <div class="billing_userInfoItem">
-                        <p class="main_input_title" style="visibility: hidden">
-                          Available Billing CPT Code
-                        </p>
 
-                        <div class="billing_userInfoItem">
-                          <div class="bill_code_panel">
-                            <img
-                              class="arrow-check2"
-                              src="../../../../../assets/04-Icons/Icons_Check A.svg"
-                            />
-                            <input
-                              class="userInfovalue"
-                              formControlName="billingcode2"
-                              id="editBillingCode2"
-                              [attr.disabled]="true"
-                            />
-                          </div>
+                        <div class="billing_first_panel">
+                            <div class="billing_userInfoItem">
+                                <p class="main_input_title">
+                                    Available Billing CPT Code
+                                </p>
+                                <div class="bill_code_panel">
+                                    <img class="arrow-check2"
+                                         src="../../../../../assets/04-Icons/Icons_Check A.svg" />
+                                    <input class="userInfovalue"
+                                           formControlName="billingcode1"
+                                           id="editBillingCode1"
+                                           [attr.disabled]="true" />
+                                </div>
+                            </div>
+
+                            <div class="billing_userInfoItem"
+                                 *ngIf="programForm_3.controls.billingcode3.value != ''">
+                                <div class="bill_code_panel">
+                                    <img class="arrow-check2"
+                                         src="../../../../../assets/04-Icons/Icons_Check A.svg" />
+                                    <input class="userInfovalue"
+                                           formControlName="billingcode3"
+                                           id="editBillingCode3"
+                                           [attr.disabled]="true" />
+                                </div>
+                            </div>
                         </div>
-                      </div>
 
-                      <div
-                        class="billing_userInfoItem"
-                        *ngIf="programForm_3.controls.billingcode4.value != ''"
-                      >
-                        <div class="bill_code_panel">
-                          <img
-                            class="arrow-check2"
-                            src="../../../../../assets/04-Icons/Icons_Check A.svg"
-                          />
-                          <input
-                            class="userInfovalue"
-                            formControlName="billingcode4"
-                            id="editBillingCode4"
-                            [attr.disabled]="true"
-                          />
+
+                        <div class="billing_second_panel">
+                            <div class="billing_userInfoItem">
+                                <p class="main_input_title" style="visibility: hidden">
+                                    Available Billing CPT Code
+                                </p>
+
+                                <div class="billing_userInfoItem">
+                                    <div class="bill_code_panel">
+                                        <img class="arrow-check2"
+                                             src="../../../../../assets/04-Icons/Icons_Check A.svg" />
+                                        <input class="userInfovalue"
+                                               formControlName="billingcode2"
+                                               id="editBillingCode2"
+                                               [attr.disabled]="true" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="billing_userInfoItem"
+                                 *ngIf="programForm_3.controls.billingcode4.value != ''">
+                                <div class="bill_code_panel">
+                                    <img class="arrow-check2"
+                                         src="../../../../../assets/04-Icons/Icons_Check A.svg" />
+                                    <input class="userInfovalue"
+                                           formControlName="billingcode4"
+                                           id="editBillingCode4"
+                                           [attr.disabled]="true" />
+                                </div>
+                            </div>
                         </div>
-                      </div>
+
+
                     </div>
-
-
-              </div>
-            </div>
-            <div class="program_last_container">
-              <div class="vital_schedules_container">
-                <div class="device">
-                  <p class="main_input_main_heading">Insurance Details</p>
                 </div>
-              </div>
-              <div class="insurance_panel">
+                <div class="program_last_container">
+                    <div class="vital_schedules_container">
+                        <div class="device">
+                            <p class="main_input_main_heading">Insurance Details</p>
+                        </div>
+                    </div>
+                    <div class="insurance_panel">
 
 
-                    <div class="first_panel">
-                      <div class="userInfoItem">
-                        <p class="main_input_title">Primary Insurance</p>
-                        <ng-autocomplete
-                          [data]="insuracevendors"
-                          [searchKeyword]="keyword_primary_insurance"
-                          [initialValue]="insurance_pname"
-                          placeholder="Select Insurance"
-                          id="editPrimaryInsurance"
-                          (selected)="selectEvent__primary_Insurance($event)"
-                          (inputChanged)="
+                        <div class="first_panel">
+                            <div class="userInfoItem">
+                                <p class="main_input_title">Primary Insurance</p>
+                                <ng-autocomplete [data]="insuracevendors"
+                                                 [searchKeyword]="keyword_primary_insurance"
+                                                 [initialValue]="insurance_pname"
+                                                 placeholder="Select Insurance"
+                                                 id="editPrimaryInsurance"
+                                                 (selected)="selectEvent__primary_Insurance($event)"
+                                                 (inputChanged)="
                             onChangeSearch_primary_Insurance($event)
                           "
-                          (inputFocused)="onFocused_primary_Insurance($event)"
-                          (inputCleared)="clearEvent_primary_Insurance($event)"
-                          [itemTemplate]="itemTemplate"
-                          [notFoundTemplate]="notFoundTemplate"
-                        >
-                        </ng-autocomplete>
+                                                 (inputFocused)="onFocused_primary_Insurance($event)"
+                                                 (inputCleared)="clearEvent_primary_Insurance($event)"
+                                                 [itemTemplate]="itemTemplate"
+                                                 [notFoundTemplate]="notFoundTemplate">
+                                </ng-autocomplete>
 
-                        <ng-template #itemTemplate let-item>
-                          <a [innerHTML]="item.VendorName"></a>
-                        </ng-template>
+                                <ng-template #itemTemplate let-item>
+                                    <a [innerHTML]="item.VendorName"></a>
+                                </ng-template>
 
-                        <ng-template #notFoundTemplate let-notFound>
-                          <div [innerHTML]="notFound"></div>
-                        </ng-template>
-                        <small
-                          class="text-danger"
-                          *ngIf="
+                                <ng-template #notFoundTemplate let-notFound>
+                                    <div [innerHTML]="notFound"></div>
+                                </ng-template>
+                                <small class="text-danger"
+                                       *ngIf="
                             programForm.get('insurance1')?.invalid &&
                             programForm.get('insurance1')?.touched
-                          "
-                          >Primary Insurace Required</small
-                        >
-                      </div>
-                    </div>
+                          ">Primary Insurace Required</small>
+                            </div>
+                        </div>
 
 
-                    <div class="second_panel">
-                      <div class="userInfoItem">
-                        <p class="main_input_title">
-                          Additional Insurance(optional)
-                        </p>
-                        <ng-autocomplete
-                          [data]="insuracevendors"
-                          [searchKeyword]="keyword_secondary_insurance"
-                          [initialValue]="insurance_sname"
-                          id="editAdditionalInsurance1"
-                          placeholder="Select Insurance"
-                          (selected)="selectEvent__secondary_Insurance($event)"
-                          (inputChanged)="
+                        <div class="second_panel">
+                            <div class="userInfoItem">
+                                <p class="main_input_title">
+                                    Additional Insurance(optional)
+                                </p>
+                                <ng-autocomplete [data]="insuracevendors"
+                                                 [searchKeyword]="keyword_secondary_insurance"
+                                                 [initialValue]="insurance_sname"
+                                                 id="editAdditionalInsurance1"
+                                                 placeholder="Select Insurance"
+                                                 (selected)="selectEvent__secondary_Insurance($event)"
+                                                 (inputChanged)="
                             onChangeSearch_secondary_Insurance($event)
                           "
-                          (inputFocused)="onFocused_secondary_Insurance($event)"
-                          (inputCleared)="
+                                                 (inputFocused)="onFocused_secondary_Insurance($event)"
+                                                 (inputCleared)="
                             clearEvent_secondary_Insurance($event)
                           "
-                          [itemTemplate]="itemTemplate"
-                          [notFoundTemplate]="notFoundTemplate"
-                        >
-                        </ng-autocomplete>
+                                                 [itemTemplate]="itemTemplate"
+                                                 [notFoundTemplate]="notFoundTemplate">
+                                </ng-autocomplete>
 
-                        <ng-template #itemTemplate let-item>
-                          <a [innerHTML]="item.VendorName"></a>
-                        </ng-template>
+                                <ng-template #itemTemplate let-item>
+                                    <a [innerHTML]="item.VendorName"></a>
+                                </ng-template>
 
-                        <ng-template #notFoundTemplate let-notFound>
-                          <div [innerHTML]="notFound"></div>
-                        </ng-template>
-                      </div>
-                      <div class="userInfoItem">
-                        <ng-autocomplete
-                          [data]="insuracevendors"
-                          [searchKeyword]="keyword_ternary_insurance"
-                          [initialValue]="insurance_tname"
-                          id="editAdditionalInsurance2"
-                          placeholder="Select Insurance"
-                          (selected)="selectEvent__ternary_Insurance($event)"
-                          (inputChanged)="
+                                <ng-template #notFoundTemplate let-notFound>
+                                    <div [innerHTML]="notFound"></div>
+                                </ng-template>
+                            </div>
+                            <div class="userInfoItem">
+                                <ng-autocomplete [data]="insuracevendors"
+                                                 [searchKeyword]="keyword_ternary_insurance"
+                                                 [initialValue]="insurance_tname"
+                                                 id="editAdditionalInsurance2"
+                                                 placeholder="Select Insurance"
+                                                 (selected)="selectEvent__ternary_Insurance($event)"
+                                                 (inputChanged)="
                             onChangeSearch_ternary_Insurance($event)
                           "
-                          (inputFocused)="onFocused_ternary_Insurance($event)"
-                          (inputCleared)="clearEvent_ternary_Insurance($event)"
-                          [itemTemplate]="itemTemplate"
-                          [notFoundTemplate]="notFoundTemplate"
-                        >
-                        </ng-autocomplete>
+                                                 (inputFocused)="onFocused_ternary_Insurance($event)"
+                                                 (inputCleared)="clearEvent_ternary_Insurance($event)"
+                                                 [itemTemplate]="itemTemplate"
+                                                 [notFoundTemplate]="notFoundTemplate">
+                                </ng-autocomplete>
 
-                        <ng-template #itemTemplate let-item>
-                          <a [innerHTML]="item.VendorName"></a>
-                        </ng-template>
+                                <ng-template #itemTemplate let-item>
+                                    <a [innerHTML]="item.VendorName"></a>
+                                </ng-template>
 
-                        <ng-template #notFoundTemplate let-notFound>
-                          <div [innerHTML]="notFound"></div>
-                        </ng-template>
-                      </div>
+                                <ng-template #notFoundTemplate let-notFound>
+                                    <div [innerHTML]="notFound"></div>
+                                </ng-template>
+                            </div>
+                        </div>
+
+
                     </div>
-
-
-              </div>
-              <div>
-                <div class="vital_schedules_container">
-                  <div class="device">
-                    <p class="main_input_main_heading">Documents</p>
-                    <img
-                      class="add_icon1"
-                      src="../../../../../assets/04-Icons/Icons_Add A.svg"
-                      id="editAddDocument"
-                      (click)="openAddDoc()"
-                    />
-                  </div>
+                    <div>
+                        <div class="vital_schedules_container">
+                            <div class="device">
+                                <p class="main_input_main_heading">Documents</p>
+                                <img class="add_icon1"
+                                     src="../../../../../assets/04-Icons/Icons_Add A.svg"
+                                     id="editAddDocument"
+                                     (click)="openAddDoc()" />
+                            </div>
+                        </div>
+                        <div #documents class="documents_panel">
+                            <table mat-table [dataSource]="datasourceDocument">
+                                <ng-container matColumnDef="position">
+                                    <th mat-header-cell *matHeaderCellDef>No.</th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{ element.position }}
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="Document_Type">
+                                    <th mat-header-cell
+                                        *matHeaderCellDef
+                                        style="border-radius: 20px 0px 0px 0px !important">
+                                        Document Type
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{ element.DocumentType }}
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="Document_Name">
+                                    <th mat-header-cell *matHeaderCellDef>Document Name</th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{ element.DocumentName }}
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="Uploaded_Date">
+                                    <th mat-header-cell *matHeaderCellDef>Uploaded Date</th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <span>
+                                            {{
+                                            datepipe.transform(element.CreatedOn, "dd-MM-yyyy")
+                                            }}
+                                        </span>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="Document">
+                                    <th mat-header-cell
+                                        *matHeaderCellDef
+                                        style="border-radius: 0px 20px 0px 0px">
+                                        Document
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <img class="notes_icon"
+                                             src="../../../../../assets/04-Icons/Icons_Reports.svg"
+                                             id="editDownlaodDocument"
+                                             (click)="downloadFile(element.DocumentUNC)" />
+                                        <img class="notes_icon"
+                                             src="../../../../../assets/04-Icons/Icons_Delete.svg"
+                                             id="editDownlaodDocument"
+                                             (click)="openDeleteDocumentDialog(element.Id)" />
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                <tr mat-row
+                                    *matRowDef="let row; columns: displayedColumns"
+                                    [style.minHeight.px]="35"></tr>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <div #documents class="documents_panel">
-                  <table mat-table [dataSource]="datasourceDocument">
-                    <ng-container matColumnDef="position">
-                      <th mat-header-cell *matHeaderCellDef>No.</th>
-                      <td mat-cell *matCellDef="let element">
-                        {{ element.position }}
-                      </td>
-                    </ng-container>
-                    <ng-container matColumnDef="Document_Type">
-                      <th
-                        mat-header-cell
-                        *matHeaderCellDef
-                        style="border-radius: 20px 0px 0px 0px !important"
-                      >
-                        Document Type
-                      </th>
-                      <td mat-cell *matCellDef="let element">
-                        {{ element.DocumentType }}
-                      </td>
-                    </ng-container>
-                    <ng-container matColumnDef="Document_Name">
-                      <th mat-header-cell *matHeaderCellDef>Document Name</th>
-                      <td mat-cell *matCellDef="let element">
-                        {{ element.DocumentName }}
-                      </td>
-                    </ng-container>
-                    <ng-container matColumnDef="Uploaded_Date">
-                      <th mat-header-cell *matHeaderCellDef>Uploaded Date</th>
-                      <td mat-cell *matCellDef="let element">
-                        <span>{{
-                          datepipe.transform(element.CreatedOn, "MMM d, y")
-                        }}</span>
-                      </td>
-                    </ng-container>
-                    <ng-container matColumnDef="Document">
-                      <th
-                        mat-header-cell
-                        *matHeaderCellDef
-                        style="border-radius: 0px 20px 0px 0px"
-                      >
-                        Document
-                      </th>
-                      <td mat-cell *matCellDef="let element">
-                        <img
-                          class="notes_icon"
-                          src="../../../../../assets/04-Icons/Icons_Reports.svg"
-                          id="editDownlaodDocument"
-                          (click)="downloadFile(element.DocumentUNC)"
-                        />
-                        <img
-                          class="notes_icon"
-                          src="../../../../../assets/04-Icons/Icons_Delete.svg"
-                          id="editDownlaodDocument"
-                          (click)="openDeleteDocumentDialog(element.Id)"
-                        />
-                      </td>
-                    </ng-container>
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr
-                      mat-row
-                      *matRowDef="let row; columns: displayedColumns"
-                      [style.minHeight.px]="35"
-                    ></tr>
-                  </table>
-                </div>
-              </div>
             </div>
-          </div>
         </div>
 
         <!--end of edit patient-->

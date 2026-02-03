@@ -2294,6 +2294,9 @@ export class SidePanelPatientComponent implements OnInit {
   }
 
   selfAssignSchedule() {
+    if (this.checkedSingle) {
+      return;
+    }
     var myid = sessionStorage.getItem('userid');
     var myname = sessionStorage.getItem('user_name');
 
