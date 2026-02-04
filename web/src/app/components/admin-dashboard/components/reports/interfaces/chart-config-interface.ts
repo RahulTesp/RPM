@@ -1,5 +1,6 @@
-export const CHART_OPTIONS = {
+export const CHART_OPTIONS: any = {
   responsive: true,
+  maintainAspectRatio: false,
   pan: {
     enabled: true,
     mode: 'xy',
@@ -27,27 +28,55 @@ export const CHART_OPTIONS = {
     },
     speed: 0.1,
   },
-  maintainAspectRatio: false,
   line: {
     tension: 0.5,
-
   },
-   scales: {
+  scales: {
     x: {
       ticks: {
         autoSkip: false,
-        maxRotation: 90,
-        minRotation: 45
+        maxRotation: 45,      // ✅ Angled for better spacing and larger appearance
+        minRotation: 45,
+        color: '#666666',     // ✅ Kept the professional grey color
+        font: {
+          size: 20,           // ✅ Increased size to match your screenshot
+          weight: 'normal',   // ✅ Kept standard weight (not bold)
+          family: 'Rubik'
+        }
+      },
+      grid: {
+        display: true,
+        drawOnChartArea: true,
+        color: '#E0E0E0'      // Standard light grey grid
+      }
+    },
+    y: {
+      ticks: {
+        color: '#666666',
+        font: {
+          size: 18,           // ✅ Match the x-axis size
+          weight: 'normal'
+        }
+      },
+      grid: {
+        color: '#E0E0E0'
       }
     }
   },
-  legend: {
-    display: true,
-    position: 'bottom',
-    labels: {
-      boxWidth: 10,
-    },
-  },
+  plugins: {
+    legend: {
+      display: true,
+      position: 'bottom',
+      labels: {
+        boxWidth: 15,
+        color: '#666666',     // ✅ Grey legend text
+        font: {
+          size: 16,
+          weight: 'normal'
+        }
+      },
+    }
+  }
 };
 
 export const CHART_COLORS = [
@@ -58,6 +87,7 @@ export const CHART_COLORS = [
     pointBorderColor: 'green',
     pointHoverBackgroundColor: '#fff',
     pointHoverBorderColor: 'rgba(148,159,177,0.8)',
+    borderWidth: 2
   },
   {
     fill: false,
@@ -66,6 +96,7 @@ export const CHART_COLORS = [
     pointBorderColor: 'red',
     pointHoverBackgroundColor: '#fff',
     pointHoverBorderColor: 'rgba(148,159,177,0.8)',
+    borderWidth: 2
   },
   {
     fill: false,
@@ -74,6 +105,7 @@ export const CHART_COLORS = [
     pointBorderColor: 'blue',
     pointHoverBackgroundColor: '#fff',
     pointHoverBorderColor: 'rgba(148,159,177,0.8)',
+    borderWidth: 2
   },
 ];
 

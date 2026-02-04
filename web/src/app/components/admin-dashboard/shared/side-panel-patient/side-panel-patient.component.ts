@@ -31,7 +31,7 @@ import timezone from 'dayjs/plugin/timezone';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
- 
+
 @Component({
   selector: 'app-side-panel-patient',
   templateUrl: './side-panel-patient.component.html',
@@ -69,7 +69,7 @@ export class SidePanelPatientComponent implements OnInit {
   nightSchedule = false;
   loading: any;
   loading_note: any;
-  minStartDate: string | null = null; 
+  minStartDate: string | null = null;
   programId: any;
 
   @Input() activityMenuVariable: any;
@@ -79,8 +79,8 @@ export class SidePanelPatientComponent implements OnInit {
   public NoteSec = '00';
   public isManagerProvider = false;
   public noteId: any;
-  
-  public noteData: any;
+
+  public noteData: any = { MainQuestions: [] };
 
   weekFrequency = [
     {
@@ -173,7 +173,7 @@ export class SidePanelPatientComponent implements OnInit {
     this.updateTaskAssignees();
   }
 
- 
+
 
   private handleMenuChoiceSpecificLogic(choice: number): void {
     if (choice === 2) {
@@ -1712,26 +1712,19 @@ export class SidePanelPatientComponent implements OnInit {
     return dateval;
   }
   convertDateData(dateval: any) {
-    let today = new Date(dateval);
-    let dd = today.getDate();
-    let dd2;
-    if (dd < 10) {
-      dd2 = '0' + dd;
-    } else {
-      dd2 = dd;
-    }
-    let mm = today.getMonth() + 1;
-    let mm2;
-    if (mm < 10) {
-      mm2 = '0' + mm;
-    } else {
-      mm2 = mm;
-    }
-    const yyyy = today.getFullYear();
-    dateval = mm2 + '-' + dd2 + '-' + yyyy;
-    const myArray = dateval.split('T');
-    return myArray;
-  }
+  if (!dateval) return [''];
+  let today = new Date(dateval);
+// Still using UTC to keep Arizona dates from jumping back to the previous day
+  let dd = today.getUTCDate();
+  let dd2 = dd < 10 ? '0' + dd : dd;
+
+  let mm = today.getUTCMonth() + 1;
+  let mm2 = mm < 10 ? '0' + mm : mm;
+  const yyyy = today.getUTCFullYear();
+  // CHANGE: Return YYYY-MM-DD format so the backend can parse it correctly
+  const formattedDate = yyyy + '-' + mm2 + '-' + dd2;
+  return [formattedDate];
+}
   openDialog(title: any, item: any) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = '400px';
@@ -2009,97 +2002,113 @@ export class SidePanelPatientComponent implements OnInit {
     }
   }
 
-
-  private updateSingleSchedule() {
-    
+private updateSingleSchedule() {
   const startDateValue = this.registerSchedule.controls.startDate.value;
 
-  // Convert to string if it's a Date object or something else
-  const dateString = typeof startDateValue === 'string'
-    ? startDateValue
-    : new Date(startDateValue).toISOString().split('T')[0]; // Converts to 'YYYY-MM-DD'
+  if (!startDateValue) return this.showWarning('Start Date is required');
 
-  // Use the converted string here
-  const [scheduleyear, schedulemonth, scheduleday] = dateString.split('-').map(Number)
+  // 1. USE YOUR UPDATED FUNCTION HERE
+  // This gets the Arizona-safe [ "02-03-2026" ] array
+  const startDateResult = this.convertDateData(startDateValue);
+  const finalStartDate = startDateResult[0];
+  if (!this.registerSchedule.valid) return this.showWarning('Please complete the form');
+// 2. Build the request body
+  const req_body = {
+    Id: this.schedule_edit_id,
 
-    //const [scheduleyear, schedulemonth, scheduleday] = this.registerSchedule.controls.startDate.value.split('-').map(Number);
-    var scheduleDate = new Date(scheduleyear, schedulemonth - 1, scheduleday, 0, 0, 0);
-    if (!this.registerSchedule.valid) return this.showWarning('Please complete the form');
-    var scheduleDate = new Date(this.DateConversionLogicFromStringToDate(this.registerSchedule.controls.startDate.value));
-    const req_body = {
-      CurrentScheduleId: this.schedule_edit_id,
-      ScheduleDate: this.convertDate(scheduleDate),
-      StartTime: this.registerSchedule.controls.startTime.value,
-      Duration: this.durationValue,
-      Comments: this.registerSchedule.controls.scheduleDescription.value,
-      IsCompleted: false,
-    };
+    // Using the MM-DD-YYYY string from your function
+    StartDate: finalStartDate,
+    EndDate: finalStartDate,
+    StartTime: this.registerSchedule.controls.startTime.value,
+    Duration: this.durationValue,
+    Comments: this.registerSchedule.controls.scheduleDescription.value,
+    Mon: this.dayMonSelectionValue,
+    Tue: this.dayTueSelectionValue,
+    Wed: this.dayWedSelectionValue,
+    Thu: this.dayThurSelectionValue,
+    Fri: this.dayFriSelectionValue,
+    Sat: this.daySatSelectionValue,
+    Sun: this.daySunSelectionValue,
 
-    this.rpm.rpm_post('/api/schedules/updatecurrentschedule', req_body).then(
-      () => {
-        this.confirmDialog.showConfirmDialog(
-          'Worklist Schedule Updated Successfully!!',
-          'Message',
-          () => this.onScheduleUpdateSuccess(),
-          false
-        );
-      },
-      () => this.showWarning('Something Went Wrong', 'Error')
-    );
-  }
+    WeekSelection: this.weekSelectionValue,
+    ScheduleTypeId: parseInt(this.registerSchedule.controls.scheduleType.value),
+    ModifiedBy: this.userName
+  };
 
+  // 3. API Call
+  this.loading = true;
+  this.rpm.rpm_post('/api/schedules/updatecurrentschedule', req_body).then(
+    () => {
+      this.loading = false;
+      this.confirmDialog.showConfirmDialog(
+        'Worklist Schedule Updated Successfully!!',
+        'Message',
+        () => {
+          this.onScheduleUpdateSuccess();
+        },
+        false
+      );
+    },
+    (err) => {
+      this.loading = false;
+      this.showWarning('Something Went Wrong', 'Error');
+    }
+  );
+}
 
   private updateRecurringSchedule() {
-    this.setFrequencyDaySelections();
+  this.setFrequencyDaySelections();
 
-    if (!this.registerSchedule.valid) return this.showWarning('Please complete the form');
-    if (!this.validateFrequencyAndDays()) return;
+  if (!this.registerSchedule.valid) return this.showWarning('Please complete the form');
+  if (!this.validateFrequencyAndDays()) return;
 
-    if (!this.schedule_careteam_id)
-      return this.showWarning('Please select a Assignee Name.');
+  if (!this.schedule_careteam_id)
+    return this.showWarning('Please select a Assignee Name.');
 
-    const startDate = this.convertDate(this.DateConversionLogicFromStringToDate(this.registerSchedule.controls.startDate.value));
-    const endDate = this.convertDate(this.DateConversionLogicFromStringToDate(this.registerSchedule.controls.endDate.value));
+  // ARIZONA FIX: Use convertDateData to avoid the -7 hour shift
+  // We take index [0] because your helper returns an array
+  const startDate = this.convertDateData(this.registerSchedule.controls.startDate.value)[0];
+  const endDate = this.convertDateData(this.registerSchedule.controls.endDate.value)[0];
 
-    if (endDate <= startDate)
-      return this.showWarning('Please select a valid Start Date and End Date.');
+  // Logic check for valid range
+  if (endDate <= startDate)
+    return this.showWarning('Please select a valid Start Date and End Date.');
 
-    this.userId = sessionStorage.getItem('userid');
+  this.userId = sessionStorage.getItem('userid');
 
-    const req_body = {
-      Id: this.ScheduleDatabyId.Id,
-      AssignedTo: parseInt(this.ScheduleDatabyId.AssignedTo),
-      ScheduleTypeId: parseInt(this.registerSchedule.controls.scheduleType.value),
-      Schedule: this.registerSchedule.controls.frequency.value,
-      Comments: this.registerSchedule.controls.scheduleDescription.value,
-      StartDate: startDate,
-      EndDate: endDate,
-      StartTime: this.registerSchedule.controls.startTime.value,
-      AssignedBy: parseInt(this.schedule_careteam_id),
-      Mon: this.dayMonSelectionValue,
-      Tue: this.dayTueSelectionValue,
-      Wed: this.dayWedSelectionValue,
-      Thu: this.dayThurSelectionValue,
-      Fri: this.dayFriSelectionValue,
-      Sat: this.daySatSelectionValue,
-      Sun: this.daySunSelectionValue,
-      WeekSelection: this.weekSelectionValue,
-      Duration: this.durationValue,
-    };
+  const req_body = {
+    Id: this.ScheduleDatabyId.Id,
+    AssignedTo: parseInt(this.ScheduleDatabyId.AssignedTo),
+    ScheduleTypeId: parseInt(this.registerSchedule.controls.scheduleType.value),
+    Schedule: this.registerSchedule.controls.frequency.value,
+    Comments: this.registerSchedule.controls.scheduleDescription.value,
+    StartDate: startDate, // Now safely "MM-DD-YYYY" or "YYYY-MM-DD"
+    EndDate: endDate,     // Now safely "MM-DD-YYYY" or "YYYY-MM-DD"
+    StartTime: this.registerSchedule.controls.startTime.value,
+    AssignedBy: parseInt(this.schedule_careteam_id),
+    Mon: this.dayMonSelectionValue,
+    Tue: this.dayTueSelectionValue,
+    Wed: this.dayWedSelectionValue,
+    Thu: this.dayThurSelectionValue,
+    Fri: this.dayFriSelectionValue,
+    Sat: this.daySatSelectionValue,
+    Sun: this.daySunSelectionValue,
+    WeekSelection: this.weekSelectionValue,
+    Duration: this.durationValue,
+  };
 
-    this.rpm.rpm_post('/api/schedules/updateschedule', req_body).then(
-      () => {
-        this.confirmDialog.showConfirmDialog(
-          'Worklist Schedule Updated Successfully!!',
-          'Message',
-          () => this.onScheduleUpdateSuccess(),
-          false
-        );
-      },
-      () => this.showWarning('Something Went Wrong', 'Error')
-    );
-  }
-
+  this.rpm.rpm_post('/api/schedules/updateschedule', req_body).then(
+    () => {
+      this.confirmDialog.showConfirmDialog(
+        'Worklist Schedule Updated Successfully!!',
+        'Message',
+        () => this.onScheduleUpdateSuccess(),
+        false
+      );
+    },
+    () => this.showWarning('Something Went Wrong', 'Error')
+  );
+}
 
   private showWarning(message: string, title: string = 'Warning') {
     this.confirmDialog.showConfirmDialog(message, title, () => null, false);
@@ -2345,202 +2354,199 @@ export class SidePanelPatientComponent implements OnInit {
   MainQuestionReturnArray = Array();
 
   previewConfirm() {
-    this.MainQuestionReturnArray = [];
-    if (this.QuestionArrayBase) {
-      for (let i = 0; i < this.QuestionArrayBase.length; i++) {
-        if (this.QuestionArrayBase[i].AnswerTypes.length > 0) {
-          this.checkedAns = this.QuestionArrayBase[i].AnswerTypes.filter(
-            (item: { Checked: any }) => {
-              return item.Checked;
-            }
-          );
+  this.MainQuestionReturnArray = [];
+
+  // 1. CRITICAL GUARD: Stop the process if QuestionArrayBase is missing
+  if (!this.QuestionArrayBase) {
+    console.error("Submission failed: QuestionArrayBase is undefined.");
+    alert("Data is still loading. Please try again in a moment.");
+    return;
+  }
+
+  // Your existing loop logic remains, but is now protected by the guard above
+  if (this.QuestionArrayBase) {
+    for (let i = 0; i < this.QuestionArrayBase.length; i++) {
+      if (this.QuestionArrayBase[i].AnswerTypes && this.QuestionArrayBase[i].AnswerTypes.length > 0) {
+        this.checkedAns = this.QuestionArrayBase[i].AnswerTypes.filter(
+          (item: { Checked: any }) => {
+            return item.Checked;
+          }
+        );
+        var AnswerArray = this.ProcessArray(this.checkedAns);
+        this.checkedAns = [];
+
+        if (AnswerArray.length > 0) {
+          this.MainQuestionReturnArray.push({
+            QuestionId: this.QuestionArrayBase[i].QuestionId,
+            Notes: this.QuestionArrayBase[i].Notes,
+            AnswersIds: AnswerArray,
+          });
+        } else {
+          this.MainQuestionReturnArray.push({
+            QuestionId: this.QuestionArrayBase[i].QuestionId,
+            Notes: this.QuestionArrayBase[i].Notes,
+            AnswersIds: [],
+          });
+        }
+      }
+      // Check for SubQuestions existence before looping
+      if (this.QuestionArrayBase[i].SubQuestions && this.QuestionArrayBase[i].SubQuestions.length > 0) {
+        for (
+          let j = 0;
+          j < this.QuestionArrayBase[i].SubQuestions.length;
+          j++
+        ) {
+          this.checkedAns = this.QuestionArrayBase[i].SubQuestions[
+            j
+          ].AnswerTypes.filter((item: { Checked: any }) => {
+            return item.Checked;
+          });
           var AnswerArray = this.ProcessArray(this.checkedAns);
           this.checkedAns = [];
 
           if (AnswerArray.length > 0) {
             this.MainQuestionReturnArray.push({
-              QuestionId: this.QuestionArrayBase[i].QuestionId,
-              Notes: this.QuestionArrayBase[i].Notes,
+              QuestionId:
+                this.QuestionArrayBase[i].SubQuestions[j].QuestionId,
+              Notes: this.QuestionArrayBase[i].SubQuestions[j].Notes,
               AnswersIds: AnswerArray,
             });
           } else {
             this.MainQuestionReturnArray.push({
-              QuestionId: this.QuestionArrayBase[i].QuestionId,
-              Notes: this.QuestionArrayBase[i].Notes,
+              QuestionId:
+                this.QuestionArrayBase[i].SubQuestions[j].QuestionId,
+              Notes: this.QuestionArrayBase[i].SubQuestions[j].Notes,
               AnswersIds: [],
             });
           }
         }
-
-        if (this.QuestionArrayBase[i].SubQuestions.length > 0) {
-          for (
-            let j = 0;
-            j < this.QuestionArrayBase[i].SubQuestions.length;
-            j++
-          ) {
-            this.checkedAns = this.QuestionArrayBase[i].SubQuestions[
-              j
-            ].AnswerTypes.filter((item: { Checked: any }) => {
-              return item.Checked;
-            });
-            var AnswerArray = this.ProcessArray(this.checkedAns);
-            this.checkedAns = [];
-
-            if (AnswerArray.length > 0) {
-              this.MainQuestionReturnArray.push({
-                QuestionId:
-                  this.QuestionArrayBase[i].SubQuestions[j].QuestionId,
-                Notes: this.QuestionArrayBase[i].SubQuestions[j].Notes,
-                AnswersIds: AnswerArray,
-              });
-            } else {
-              this.MainQuestionReturnArray.push({
-                QuestionId:
-                  this.QuestionArrayBase[i].SubQuestions[j].QuestionId,
-                Notes: this.QuestionArrayBase[i].SubQuestions[j].Notes,
-                AnswersIds: [],
-              });
-            }
-          }
-        }
       }
-    }
-    this.pid = sessionStorage.getItem('PatientId');
-    this.cid = sessionStorage.getItem('userid');
-
-    this.currentProgramId = sessionStorage.getItem('ProgramId');
-    if (
-      this.NoteTypeId != undefined &&
-      this.NoteTypeId != 'undefined' &&
-      this.NoteTime != undefined
-    ) {
-      if (this.additionaNotes == undefined) {
-        this.additionaNotes = '';
-      }
-
-      if (this.noteUpdationVariable == true) {
-        var timeDuration =
-          this.NoteHours + ':' + this.NoteMinutes + ':' + this.NoteSec;
-
-        var req_body: any = {};
-        req_body['Id'] = parseInt(this.noteId);
-        req_body['NoteTypeId'] = parseInt(this.NoteTypeId);
-        req_body['NoteType'] = 'REVIEW';
-        req_body['IsEstablishedCall'] = false;
-        req_body['IsCareGiver'] = true;
-        req_body['IsCallNote'] = false;
-        req_body['Duration'] = this.convertTimeToSec(timeDuration);
-        req_body['Notes'] = this.additionaNotes;
-        req_body['CompletedByUserId'] = parseInt(this.cid);
-        req_body['MainQuestions'] = this.MainQuestionReturnArray;
-        req_body['CreatedBy'] = 'sa';
-        this.loading_note = true;
-
-        this.rpm.rpm_post('/api/notes/updatenotev1', req_body).then(
-          (data) => {
-            this.menu_choice = 1;
-            this.getMenuChioce(1);
-            this.isOpen = false;
-            this.loading_note = false;
-           this.showNoteModal=false;
-            this.confirmDialog.showConfirmDialog(
-              'Note Updated Successfully!!',
-              'Message',
-              () => {
-                
-
-                this.QuestionArrayBase = this.noteMasterData.MainQuestions;
-                this.BillingInfoReload();
-                this.notesReload();
-                this.noteUpdationVariable = false;
-                this.dialog.closeAll();
-                this.resetCallPanel();
-
-              },
-              false
-            );
-
-          },
-          (err) => {
-
-            this.confirmDialog.showConfirmDialog(
-              'Could not Update Note...!!',
-              'Error',
-              () => {
-                this.loading_note = false;
-
-                this.QuestionArrayBase = this.noteMasterData.MainQuestions;
-              },
-              false
-            );
-            this.dialog.closeAll();
-          }
-        );
-      } else if (this.noteUpdationVariable == false) {
-        var req_body: any = {};
-        req_body['PatientId'] = parseInt(this.pid);
-        req_body['PatientProgramId'] = parseInt(this.currentProgramId);
-        req_body['NoteTypeId'] = parseInt(this.NoteTypeId);
-        req_body['NoteType'] = 'REVIEW';
-        req_body['IsEstablishedCall'] = false;
-        req_body['IsCareGiver'] = true;
-        req_body['IsCallNote'] = false;
-
-        req_body['Duration'] = this.convertTimeToSec(this.NoteTime);
-
-        req_body['Notes'] = this.additionaNotes;
-        req_body['CompletedByUserId'] = parseInt(this.cid);
-        req_body['MainQuestions'] = this.MainQuestionReturnArray;
-        req_body['CreatedBy'] = 'sa';
-        //New Change 13/07/2023
-        req_body['calltype'] = null;
-
-        this.loading_note = true;
-
-        this.rpm.rpm_post('/api/notes/addnotev1', req_body).then(
-          (data) => {
-            this.showNoteModal=false;
-            this.isOpen = false;
-            this.loading_note = false;
-            this.menu_choice = 1;
-            this.getMenuChioce(1);
-            this.confirmDialog.showConfirmDialog(
-              'New Note Added Successfully!!',
-              'Message',
-              () => {
-                this.QuestionArrayBase = this.noteMasterData.MainQuestions;
-                this.resetReviewTimer();
-                this.BillingInfoReload();
-                this.notesReload();
-                this.dialog.closeAll();
-                this.resetCallPanel();
-
-              },
-              false
-            );
-
-          },
-          (err) => {
-            // this.confirmDialog.showConfirmDialog(
-            //   'Could not add Note...!!',
-            //   'Error',
-            //   () => {
-            //     this.QuestionArrayBase = this.noteMasterData.MainQuestions;
-            //     this.loading_note = false;
-            //   },
-            //   false
-            // );
-            alert('Could not add Note...!!')
-            this.dialog.closeAll();
-          }
-        );
-      }
-    } else {
-      this.loading_note = false;
-      alert('Please Complete The Form ');
-      this.dialog.closeAll();
     }
   }
+  this.pid = sessionStorage.getItem('PatientId');
+  this.cid = sessionStorage.getItem('userid');
+  this.currentProgramId = sessionStorage.getItem('ProgramId');
+  if (
+    this.NoteTypeId != undefined &&
+    this.NoteTypeId != 'undefined' &&
+    this.NoteTime != undefined
+  ) {
+    if (this.additionaNotes == undefined) {
+      this.additionaNotes = '';
+    }
+
+    if (this.noteUpdationVariable == true) {
+      var timeDuration =
+        this.NoteHours + ':' + this.NoteMinutes + ':' + this.NoteSec;
+
+      var req_body: any = {};
+      req_body['Id'] = parseInt(this.noteId);
+      req_body['NoteTypeId'] = parseInt(this.NoteTypeId);
+      req_body['NoteType'] = 'REVIEW';
+      req_body['IsEstablishedCall'] = false;
+      req_body['IsCareGiver'] = true;
+      req_body['IsCallNote'] = false;
+      req_body['Duration'] = this.convertTimeToSec(timeDuration);
+      req_body['Notes'] = this.additionaNotes;
+      req_body['CompletedByUserId'] = parseInt(this.cid);
+      req_body['MainQuestions'] = this.MainQuestionReturnArray;
+      req_body['CreatedBy'] = 'sa';
+      this.loading_note = true;
+
+      this.rpm.rpm_post('/api/notes/updatenotev1', req_body).then(
+        (data) => {
+          this.menu_choice = 1;
+          this.getMenuChioce(1);
+          this.isOpen = false;
+          this.loading_note = false;
+          this.showNoteModal = false;
+          this.confirmDialog.showConfirmDialog(
+            'Note Updated Successfully!!',
+            'Message',
+            () => {
+              // 2. SAFETY CHECK: Re-assign only if noteMasterData exists
+              if (this.noteMasterData && this.noteMasterData.MainQuestions) {
+                this.QuestionArrayBase = this.noteMasterData.MainQuestions;
+              }
+              this.BillingInfoReload();
+              this.notesReload();
+              this.noteUpdationVariable = false;
+              this.dialog.closeAll();
+              this.resetCallPanel();
+            },
+            false
+          );
+        },
+        (err) => {
+          this.confirmDialog.showConfirmDialog(
+            'Could not Update Note...!!',
+            'Error',
+            () => {
+              this.loading_note = false;
+              // Safety check on error too
+              if (this.noteMasterData && this.noteMasterData.MainQuestions) {
+                this.QuestionArrayBase = this.noteMasterData.MainQuestions;
+              }
+            },
+            false
+          );
+          this.dialog.closeAll();
+        }
+      );
+    } else if (this.noteUpdationVariable == false) {
+      var req_body: any = {};
+      req_body['PatientId'] = parseInt(this.pid);
+      req_body['PatientProgramId'] = parseInt(this.currentProgramId);
+      req_body['NoteTypeId'] = parseInt(this.NoteTypeId);
+      req_body['NoteType'] = 'REVIEW';
+      req_body['IsEstablishedCall'] = false;
+      req_body['IsCareGiver'] = true;
+      req_body['IsCallNote'] = false;
+      req_body['Duration'] = this.convertTimeToSec(this.NoteTime);
+      req_body['Notes'] = this.additionaNotes;
+      req_body['CompletedByUserId'] = parseInt(this.cid);
+      req_body['MainQuestions'] = this.MainQuestionReturnArray;
+      req_body['CreatedBy'] = 'sa';
+      req_body['calltype'] = null;
+
+      this.loading_note = true;
+
+      this.rpm.rpm_post('/api/notes/addnotev1', req_body).then(
+        (data) => {
+          this.showNoteModal = false;
+          this.isOpen = false;
+          this.loading_note = false;
+          this.menu_choice = 1;
+          this.getMenuChioce(1);
+          this.confirmDialog.showConfirmDialog(
+            'New Note Added Successfully!!',
+            'Message',
+            () => {
+              // 3. SAFETY CHECK: Re-assign only if noteMasterData exists
+              if (this.noteMasterData && this.noteMasterData.MainQuestions) {
+                this.QuestionArrayBase = this.noteMasterData.MainQuestions;
+              }
+              this.resetReviewTimer();
+              this.BillingInfoReload();
+              this.notesReload();
+              this.dialog.closeAll();
+              this.resetCallPanel();
+            },
+            false
+          );
+        },
+        (err) => {
+          alert('Could not add Note...!!');
+          this.dialog.closeAll();
+        }
+      );
+    }
+  } else {
+    this.loading_note = false;
+    alert('Please Complete The Form ');
+    this.dialog.closeAll();
+  }
+}
 
   ProcessArray(answerItemArray: any) {
     var AnswerIdArray = Array();
@@ -2556,42 +2562,57 @@ export class SidePanelPatientComponent implements OnInit {
   }
   Htmlele: any;
 
-  getReviewNoteUpdation(data: any, patientstatus: any) {
-    this.loadPatientInfo();
-     this.ProgramId = this.http_rpm_patientList['PatientProgramdetails'].ProgramId;
+// 1. Added 'async' so we can use 'await' inside
+async getReviewNoteUpdation(data: any, patientstatus: any) {
+
+    // 2. Wait for the API call to finish downloading patient info
+    await this.loadPatientInfo();
+
+    // 3. Safety Guard: Check if the data exists before reading properties
+    if (!this.http_rpm_patientList || !this.http_rpm_patientList['PatientProgramdetails']) {
+        console.warn("Patient data not available yet.");
+        return; // Stop here to prevent the 'undefined' crash
+    }
+
+    // Now this line is safe because we 'awaited' the data above
+    this.ProgramId = this.http_rpm_patientList['PatientProgramdetails'].ProgramId;
     this.patientStatus = patientstatus;
-    if (this.roleId[0].Id == 1 || this.roleId[0].Id == 3) {
+ // Safety check for roleId array
+    if (this.roleId && this.roleId.length > 0 && (this.roleId[0].Id == 1 || this.roleId[0].Id == 3)) {
       this.isManagerProvider = true;
     } else {
       this.isManagerProvider = false;
     }
     this.getMenuChioce(2);
     this.noteUpdationVariable = true;
-    this.noteId = data.Id;
-
+// Safety check for the incoming 'data' object
+    this.noteId = data ? data.Id : null;
     this.QuestionArrayBase = null;
-
-    this.rpm
-      .rpm_get(
-        //`/api/patient/getpatientnotesbyprogram?ProgramName=${this.patientProgramName}&Type=REVIEW&PatientNoteId=${this.noteId}`
-         `/api/patient/getpatientnotesbyprogramid?ProgramId=${this.ProgramId}&Type=REVIEW&PatientNoteId=${this.noteId}`
-      )
-      .then((data) => {
-        if (data) {
-          this.patientNoteArray(this.patientProgramName);
-          this.noteData = data;
-          this.NoteTypeId = this.noteData.NoteTypeId;
-          var noteDurationString = this.convertSecToTime(
-            this.noteData.Duration
-          ).split(':');
-          this.NoteHours = noteDurationString[0];
-          this.NoteMinutes = noteDurationString[1];
-          this.NoteSec = noteDurationString[2];
-          this.additionaNotes = this.noteData.Notes;
-          this.QuestionArrayBase = this.noteData.MainQuestions;
-        }
-      });
-  }
+    if (this.noteId && this.ProgramId) {
+        this.rpm
+          .rpm_get(
+              `/api/patient/getpatientnotesbyprogramid?ProgramId=${this.ProgramId}&Type=REVIEW&PatientNoteId=${this.noteId}`
+          )
+          .then((res) => { // renamed to 'res' to avoid confusion with function params
+            if (res) {
+              this.patientNoteArray(this.patientProgramName);
+              this.noteData = res;
+              this.NoteTypeId = this.noteData.NoteTypeId;
+             var noteDurationString = this.convertSecToTime(
+                this.noteData.Duration
+              ).split(':');
+              this.NoteHours = noteDurationString[0];
+              this.NoteMinutes = noteDurationString[1];
+              this.NoteSec = noteDurationString[2];
+              this.additionaNotes = this.noteData.Notes;
+              this.QuestionArrayBase = this.noteData.MainQuestions;
+            }
+          })
+          .catch(err => {
+              console.error("Error fetching note details:", err);
+          });
+    }
+}
   convertSecToTime(seconds: any) {
     var hs = Math.trunc(seconds / 3600);
     var remh = Math.trunc(seconds % 3600);
@@ -2630,34 +2651,44 @@ export class SidePanelPatientComponent implements OnInit {
   }
   ProgramId: any;
   MasterDataQuestionTemp: any;
-  http_rpm_patientList: any;
- getMasterDataQuestions(patientProgramName: any) {
-    this.loadPatientInfo();
+  http_rpm_patientList: any = {};
+async getMasterDataQuestions(patientProgramName: any) {
+    // 1. Wait for loadPatientInfo to finish fetching from the service
+    await this.loadPatientInfo();
+
+    // 2. Extract the ProgramId safely now that we know the data has arrived
     this.ProgramId = this.http_rpm_patientList?.PatientProgramdetails?.ProgramId;
-    this.rpm
-      .rpm_get(
-        //`/api/patient/getmasterdatanotes?ProgramName=${patientProgramName}&Type=REVIEW`
-        `/api/patient/getmasterdatanotes?ProgramId=${this.ProgramId}&Type=REVIEW`
-      )
-      .then(
-        (data) => {
-          if (data) {
-            this.noteMasterData = data;
-            this.MasterDataQuestionTemp = this.noteMasterData.MainQuestions;
-            sessionStorage.setItem(
-              'MasterDataQuestionTemp',
-              JSON.stringify(this.MasterDataQuestionTemp)
-            );
-            this.QuestionArrayBase = this.noteMasterData.MainQuestions;
+
+    // 3. Only fetch the template if we have a valid ProgramId
+    if (this.ProgramId) {
+      this.rpm
+        .rpm_get(
+          `/api/patient/getmasterdatanotes?ProgramId=${this.ProgramId}&Type=REVIEW`
+        )
+        .then(
+          (data) => {
+            if (data) {
+              this.noteMasterData = data;
+              this.MasterDataQuestionTemp = this.noteMasterData.MainQuestions;          // Store in sessionStorage for the reset/cancel logic
+              sessionStorage.setItem(
+                'MasterDataQuestionTemp',
+                JSON.stringify(this.MasterDataQuestionTemp)
+              );
+
+              // This assignment triggers the template to render in the UI
+              this.QuestionArrayBase = this.noteMasterData.MainQuestions;
+            }
+          },
+          (err) => {
+            console.error("Error fetching master data notes:", err);
+            this.noteMasterData = [];
           }
-        },
-        (err) => {
-          this.noteMasterData = [];
-        }
-      );
-
+        );
+    } else {
+        console.warn("Could not fetch template: ProgramId is undefined after loading patient info.");
+    }
+    // 4. Handle noteTypeIdArray filtering (Logic remains unchanged)
     var that = this;
-
     patientProgramName = sessionStorage.getItem('patientPgmName');
 
     if (patientProgramName == 'RPM') {
@@ -2673,7 +2704,7 @@ export class SidePanelPatientComponent implements OnInit {
         return data.Type == 'PCMNotes' && data.Name != 'Incoming Call';
       });
     }
-  }
+}
 
   patientNoteArray(patientProgramName: any) {
     var that = this;
@@ -2823,17 +2854,19 @@ export class SidePanelPatientComponent implements OnInit {
     return scheduleDate;
   }
 
-  async loadPatientInfo() {
-    this.currentProgramId = sessionStorage.getItem('ProgramId');
-    this.patientId = sessionStorage.getItem('PatientId');
-    try {
-      this.http_rpm_patientList = await this.patientService.fetchPatientInfo(
-        this.patientId,
-        this.currentProgramId
-      );
-      
-    } catch (error) {
-      console.error('Error loading patient info:', error);
-    }
+ async loadPatientInfo() {
+  this.currentProgramId = sessionStorage.getItem('ProgramId');
+  this.patientId = sessionStorage.getItem('PatientId');
+  try {
+    // We wait here for the API
+    this.http_rpm_patientList = await this.patientService.fetchPatientInfo(
+      this.patientId,
+      this.currentProgramId
+    );
+    return this.http_rpm_patientList; // Return it so the caller knows it's done
+  } catch (error) {
+    console.error('Error loading patient info:', error);
+    return null;
   }
+}
 }
