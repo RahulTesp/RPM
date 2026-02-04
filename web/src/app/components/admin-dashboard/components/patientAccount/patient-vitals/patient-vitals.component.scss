@@ -1475,10 +1475,20 @@ td.mat-cell {
   padding-right: 2rem !important;
   flex: 0 0 14% !important;
 }
-.mat-column-Description {
-  flex: 3% 0 25% !important;
-  padding-right: 16px !important;
-  padding-bottom: 16px !important;
+:host ::ng-deep .mat-cell.mat-column-Description {
+  align-items: flex-start;
+  white-space: normal;
+  padding: 4px 0;
+}
+.description-scroll {
+  line-height: 20px;
+  max-height: 40px; 
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+  box-sizing: border-box;
+  width: 100%;
+  word-break: break-word;
 }
 .rowCritical {
   color: red;
@@ -1958,7 +1968,9 @@ td.mat-cell:last-child {
   flex: 0 0 0 !important;
 }
 .mat-column-Id {
-  flex: 0 0 0 !important;
+  flex: 0 0 60px !important;
+  min-width: 60px;
+  padding-left: 12px;
 }
 .mat-column-selection {
   flex: 0 0 5% !important;

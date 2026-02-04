@@ -659,10 +659,45 @@ export class EditpatientComponent implements OnInit {
 
         that.datasourceDocument =
           that.Patientdata.PatientDocumentDetails.PatientDocumentinfos;
-        that.groupedVitalScheduleLists = _.mapValues(
-          _.groupBy(this.master_data.VitalScheduleLists, 'VitalId'),
-          (vlist) => vlist.map((vital) => _.omit(vital, 'VitalId'))
+        that.master_data = sessionStorage.getItem('add_patient_masterdata');
+        that.master_data = JSON.parse(that.master_data);
+        that.groupedVitalScheduleLists = _.groupBy(
+          that.master_data.VitalScheduleLists,
+          'VitalId'
         );
+        this.vitalScheduleList.clear();
+
+        that.PatientVitalInfos.forEach((v: any) => {
+          v.scheduleList = that.groupedVitalScheduleLists[v.VitalId] ?? [];
+
+          let scheduleId: number | null = null;
+
+          if (v.VitalScheduleId && v.scheduleList?.some((s: any) => s.Id === v.VitalScheduleId)) {
+            scheduleId = v.VitalScheduleId;
+          }
+
+          else if (v.VitalId === 2) {
+            const combined = v.scheduleList.find((s: any) =>
+              s.Name?.toLowerCase().includes('fast') &&
+              s.Name?.toLowerCase().includes('non')
+            );
+            scheduleId = combined?.Id;
+          }
+
+          else if (v.VitalId === 3 || v.VitalId === 4) {
+            scheduleId = v.scheduleList.find(
+              (s: any) => s.Name === 'Anytime'
+            )?.Id;
+          }
+
+          else if (v.scheduleList.length) {
+            scheduleId = v.scheduleList[0].Id;
+          }
+
+          setTimeout(() => {
+            v.VitalScheduleId = scheduleId ?? null;
+          });
+        });
         that.resp = that.Patientdata.PatientDetails;
         that.master_data = sessionStorage.getItem('add_patient_masterdata');
         that.master_data = JSON.parse(that.master_data);
@@ -1608,6 +1643,12 @@ export class EditpatientComponent implements OnInit {
   }
 
   confirm_action() {
+    this.markFormGroupTouched(this.PatientInfoForm);
+
+    if (this.PatientInfoForm.invalid) {
+      alert('Please complete all mandatory fields..!');
+      return;
+    }
       this.submitImage(this.pid).then((res) => {
         if (this.variable === 1 || this.variable === 2) {
           this.UpdatePatientInfo();
@@ -1680,8 +1721,8 @@ export class EditpatientComponent implements OnInit {
         }
       );
     } else {
-      alert('Please complete all mandatory fields..!');
       this.loading = false;
+      return;
     }
   }
   backtodetailpage() {
@@ -2176,13 +2217,13 @@ export class EditpatientComponent implements OnInit {
     this.markFormGroupTouched(this.programForm_2);
     this.markFormGroupTouched(this.programForm_3);
     this.isDeviceActive = false;
-    for (let obj of this.patientdevicedetails) {
-      if (obj.DeviceStatus == 'Active' || obj.DeviceStatus == 'Error') {
-        this.isDeviceActive = true;
-      }
-    }
+    this.isDeviceActive = this.patientdevicedetails.some(
+      (d: { DeviceStatus: string }) => d.DeviceStatus === 'Active'
+    );
 
-    if (this.status_to_send == 'Active') {
+    if (this.status_to_send == 'Active' &&
+      this.current_status_value !== 'ReadyToDischarge'
+    ) {
       if (
         this.Patientdata &&
         this.Patientdata.PatientProgramdetails.ProgramName != 'CCM' &&
@@ -2279,7 +2320,6 @@ export class EditpatientComponent implements OnInit {
         }
       );
     } else {
-      alert('Please complete all mandatory fields..!');
       this.loading = false;
       return;
     }
@@ -2417,18 +2457,17 @@ export class EditpatientComponent implements OnInit {
 
       this.rpm.rpm_post('/api/device/account/create/iglucose', req_body).then(
         (data:any) => {
-          // this.openDialogWindow('Success', `Device Added Successfully!!!`);
-          this.showconfirmDialog.showConfirmDialog(
-            data.Message,
-            'Success',
-            () => {
               this.ReloadDeviceList(1);
               this.ReloadDeviceList(2);
               this.ReloadDeviceList(3);
               this.ReloadDeviceList(4);
               this.UpdatePatient_Device(this.pid, this.patientprogramid);
               this.ChangeScreen(2);
-
+          // this.openDialogWindow('Success', `Device Added Successfully!!!`);
+          this.showconfirmDialog.showConfirmDialog(
+            data.Message,
+            'Success',
+            () => {
             },
             false
           );
@@ -3095,7 +3134,6 @@ export class EditpatientComponent implements OnInit {
       )
       .then((data) => {
         that.Patientdata_Device = data;
-        that.processMasterData();
         var patientdevicedetailsData =
           that.Patientdata_Device.PatientDevicesDetails.PatientDeviceInfos;
         var vitalArr = [];
@@ -3848,7 +3886,24 @@ export class EditpatientComponent implements OnInit {
       return true;
     });
   }
-  
+
+  getAvailableVitals() {
+    if (!this.PatientVitalInfos || !this.patientdevicedetails) {
+      return [];
+    }
+    const activeVitalIds = new Set<number>(
+      this.patientdevicedetails
+        .filter(
+          (d: { DeviceStatus: string; VitalId: number }) =>
+            d.DeviceStatus === 'Active'
+        )
+        .map((d: { VitalId: number }) => d.VitalId)
+    );
+    return this.PatientVitalInfos.filter(
+      (v: { VitalId: number }) => !activeVitalIds.has(v.VitalId)
+    );
+  }
+
   onVitalChange(device: any, event: Event) {
     const selectedValue = (event.target as HTMLSelectElement).value;
     const selectedId = Number(selectedValue);

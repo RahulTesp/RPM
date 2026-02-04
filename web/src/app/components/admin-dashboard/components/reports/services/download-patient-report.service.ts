@@ -229,11 +229,14 @@ export class DownloadPatientReportService {
       }
     }
 
-    const splitDiagnosis = doc.splitTextToSize(diagnosis, 150);
-    doc.text(splitDiagnosis, 60, textHeight);
+    const valueX = 60;      
+    const valueWidth = 120;  
 
-    const diagnosisDim = doc.getTextDimensions(splitDiagnosis);
-    textHeight = textHeight + diagnosisDim.h;
+    const splitDiagnosis = doc.splitTextToSize(diagnosis, valueWidth);
+    doc.text(splitDiagnosis, valueX, textHeight);
+
+    textHeight += splitDiagnosis.length * 5;
+
     doc.line(10, textHeight, 200, textHeight);
     doc.setTextColor('#818495');
 
@@ -251,7 +254,7 @@ export class DownloadPatientReportService {
     doc.line(10, textHeight, 200, textHeight);
 
     // Signature and Date
-    textHeight = textHeight + 50;
+    textHeight += 20;
     doc.line(28, textHeight, 95, textHeight);
     doc.line(120, textHeight, 195, textHeight);
     doc.setTextColor('#818495');
