@@ -101,7 +101,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   room_name: any;
   access_tokan: any;
   app_id: any;
-  additionaNotes: any;
+  additionaNotes: any ='' ;
   totalInteractionTime: any;
   pecentageValue: any;
   displayText: any;
@@ -156,7 +156,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
   patient_city: any;
   phoneExtension: any;
-  vitals: any;
+  vitals: any = [];
   patientHeight: any;
   timezone: any;
   patientdataUserId: any;
@@ -291,10 +291,10 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
   // Medication  Template variable Declaration End
 
-  programDetails: any;
-  QuestionArrayBase: any;
+  programDetails: any= {};
+  QuestionArrayBase: any = [];
   patientProgramName: any;
-  ProgramHistory: any;
+  ProgramHistory: any = [];
   patientProgramId: any;
   selectedVital: string = '';
   private chatHistoryDataSubscription: Subscription;
@@ -357,67 +357,78 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   callType: any;
 
   ngOnInit(): void {
-    this.callType = null;
+  this.callType = null;
 
-    this.twilioService.localVideo = this.localVideo;
-    this.twilioService.remoteVideo = this.remoteVideo;
-    this.twilioService.disconnectCallOnParticipantDisconnect(
-      this.disconnect.bind(this)
-    );
-    this.ProgramHistory = [];
-    this.CurrentProgramSelected = undefined;
-    this.unlockAccountStatus = false;
-    this.establishedValue = undefined;
+  this.twilioService.localVideo = this.localVideo;
+  this.twilioService.remoteVideo = this.remoteVideo;
+  this.twilioService.disconnectCallOnParticipantDisconnect(
+    this.disconnect.bind(this)
+  );
+  this.ProgramHistory = [];
+  this.CurrentProgramSelected = undefined;
+  this.unlockAccountStatus = false;
+  this.establishedValue = undefined;
 
-    this.today_date = this.datepipe.transform(new Date(), 'yyyy-MM-dd');
+  this.today_date = this.datepipe.transform(new Date(), 'yyyy-MM-dd');
 
-    //this.loading_two = true;
-    this.heath_trends_frequency = 30;
-    this.billingTableColumns = [
-      'CPTCode',
-      'Last_Billing_Cycle',
-      'reading',
-      'status',
-    ];
-    this.documentTableColumns = [
-      'DocumentType',
-      'DocumentName',
-      'CreatedOn',
-      'DocumentUNC',
-    ];
-    this.screenHeight = screen.height;
+  this.heath_trends_frequency = 30;
+  this.billingTableColumns = [
+    'CPTCode',
+    'Last_Billing_Cycle',
+    'reading',
+    'status',
+  ];
+  this.documentTableColumns = [
+    'DocumentType',
+    'DocumentName',
+    'CreatedOn',
+    'DocumentUNC',
+  ];
+  this.screenHeight = screen.height;
 
-    this.loading = true;
-    //  check Ashwin
+  this.loading = true;
 
-    // When initial Load Get Data from Query Parameter
+  this._route.queryParams
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((params) => {
+      // 1. Process params first to set this.patient_id/this.userId
+      this.handleQueryParams(params);
 
-    this._route.queryParams
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((params) => {
-        this.handleQueryParams(params);
-       this.patientchatservice.setChatPanelOpen(this.chatVariable);
-       this.patientchatservice.ensureInitialized(params.patientUserName);
-      });
+      // 2. Initialize chat panel
+      this.patientchatservice.setChatPanelOpen(this.chatVariable);
 
-    this.initializedocumentColumns();
-
-    this.defaultScreen(this.vital_menu_item[0].vital_name);
-    this.getCallTokenMethod();
-    // Only subscribe to the unread count observable Twilio Chat
-    this.unreadSubscription = this.patientchatservice.unreadCount$.subscribe(
-      (count) => {
-        this.unreadCount = count;
+      // 3. Ensure chat is initialized ONLY if we have the username
+      if (params.patientUserName) {
+        this.patientchatservice.ensureInitialized(params.patientUserName);
       }
-    );
 
-    this.chatHistoryDataSubscription = this.patientchatservice.chatHistoryData$.subscribe(data => {
-      if (data) {
-        this.http_chatData = data;
-        this.dataSourceChange(5, 5);
+      // 4. CALL THIS HERE so it has the Patient ID from handleQueryParams
+      this.getCallTokenMethod();
+
+      // 5. Load the default screen data (Vitals) once ID is ready
+      if (this.vital_menu_item && this.vital_menu_item[0]) {
+        this.defaultScreen(this.vital_menu_item[0].vital_name);
       }
     });
-  }
+
+  // These can stay outside as they don't depend on the specific Patient ID immediately
+  this.initializedocumentColumns();
+
+  // Subscribe to unread count
+  this.unreadSubscription = this.patientchatservice.unreadCount$.subscribe(
+    (count) => {
+      this.unreadCount = count;
+    }
+  );
+
+  // Subscribe to chat history
+  this.chatHistoryDataSubscription = this.patientchatservice.chatHistoryData$.subscribe(data => {
+    if (data) {
+      this.http_chatData = data;
+      this.dataSourceChange(5, 5);
+    }
+  });
+}
 
   getCallTokenMethod() {
     this.rpm.rpm_get('/api/comm/CallToken').then((data: any) => {
@@ -875,10 +886,22 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   isManagerProvider = false;
 
   OpenUpdateNotes(element: any) {
-    var patientStatus = this.http_rpm_patientList['PatientDetails'].Status;
+    // 1. Safety check: Ensure the list and PatientDetails exist
+    if (this.http_rpm_patientList && this.http_rpm_patientList['PatientDetails']) {
+        var patientStatus = this.http_rpm_patientList['PatientDetails'].Status;
 
-    this.patientrightsidebar.getReviewNoteUpdation(element, patientStatus);
-  }
+        // 3. Safety check: Ensure the sidebar component is ready
+        if (this.patientrightsidebar) {
+            this.patientrightsidebar.getReviewNoteUpdation(element, patientStatus);
+        } else {
+            console.error("Sidebar component (patientrightsidebar) not initialized yet.");
+        }
+
+    } else {
+        // This handles the case where the user clicks before the API finishes
+        console.warn("Patient details not loaded yet. Please wait a moment.");
+    }
+}
 
   OnCancelNotes() {
     if (this.EditcallNotes) {
@@ -1420,7 +1443,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
 
   async getreviewData() {
     try {
-      this.activityInfoMenuSelect(4);   
+      this.activityInfoMenuSelect(4);
       this.currentpPatientId = sessionStorage.getItem('PatientId') || this.patient_id;
       this.currentProgramId = sessionStorage.getItem('ProgramId') || this.program_id;
 
@@ -1504,6 +1527,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   getScheduleDataReload() {
     this.ChangeScreen(5);
     this.getScheduleData();
+       this.getScheduleData(true);
   }
 
   getPatientDetails() {
@@ -2673,7 +2697,7 @@ getFirstPresentVital(vitalScreen: any) {
         }else{
           this.onHealthTrendVitalClick(this.selectedVital, daycount);
         }
-        
+
       }
 
     } catch (error) {
@@ -2861,11 +2885,11 @@ getFirstPresentVital(vitalScreen: any) {
       console.log(data);
       const vitalHttpHealthTrends = data.trends;
       const healthtrendVitalNameArray = data.vitalNames;
-      
+
       // Store for later use
       this.http_healthtrends = vitalHttpHealthTrends;
       this.healthtrendVitalNameArray = healthtrendVitalNameArray;
-      
+
       //Set default frequency for all charts to requested daycount
       this.heath_trends_frequencies = new Array((data.vitalNames || []).length).fill(daycount);
       // Clear previous data before pushing new ones
@@ -3308,7 +3332,7 @@ getFirstPresentVital(vitalScreen: any) {
               if (x.CPTCode == '99454') {
                 this.displayText = x.Completed + '/' + x.Total;
                  var billingStartDate  = this.convertDate(x.BillingStartDate);
-            
+
                   this.BillingPeriodStart = this.convertDate(
                   new Date(this.convertToLocalTime(x.BillingStartDate))
                 );
@@ -3340,8 +3364,8 @@ getFirstPresentVital(vitalScreen: any) {
                       if (billingStartDate == '1-01-01') {
                         this.BillingPeriodStart = undefined;
                         this.BillingPeriodEnd = undefined;
-                      } 
-                      else {                        
+                      }
+                      else {
                         this.BillingPeriodEnd = this.Billing_ConvertDate(this.convertDate(endDate));
                         this.BillingPeriodStart = this.Billing_ConvertDate(this.BillingPeriodStart);
                       }
@@ -3464,8 +3488,8 @@ getFirstPresentVital(vitalScreen: any) {
                       if (billingStartDate == '1-01-01') {
                         this.BillingPeriodStart = undefined;
                         this.BillingPeriodEnd = undefined;
-                      } 
-                      else {                        
+                      }
+                      else {
                         this.BillingPeriodEnd = this.Billing_ConvertDate(this.convertDate(endDate));
                         this.BillingPeriodStart = this.Billing_ConvertDate(this.BillingPeriodStart);
                       }
@@ -4523,7 +4547,6 @@ getFirstPresentVital(vitalScreen: any) {
   OnpreviewUpdateCancel() {
     this.notes_update_panel = false;
 
-
     if (this.EditcallNotes) {
       clearInterval(this.interval);
       this.timerValue = this.timerValue + this.callNoteUpdateTimer;
@@ -4558,10 +4581,10 @@ getFirstPresentVital(vitalScreen: any) {
       }, 1000);
     }
 
-    //this.callTimerEnabled=false;
     this.stopCallEditTimer();
     this.resetCallPanel();
-  }
+    this.dialog.closeAll(); // add this
+}
   OnCancelNotesTimer() {
     clearInterval(this.interval);
     this.timerValue = this.timerValue + this.calltimerValue;
@@ -5369,7 +5392,7 @@ const someDateValue = dayjs(someDate).add(this.durationValue, 'month');
           )
         )
       );
-   
+
       this.httpPatient = await this.PatientReportapi.getPatientInfo(
         this.selectedPatient,
         this.selectedProgram
