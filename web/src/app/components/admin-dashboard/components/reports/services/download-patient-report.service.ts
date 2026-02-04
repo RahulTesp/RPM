@@ -35,6 +35,31 @@ export class DownloadPatientReportService {
   currentpPatientId: any;
   currentProgramId: any;
 
+  // Draw split text with page breaks
+  private drawSplitTextHalfPage(
+    doc: jsPDF,
+    lines: string[],
+    x: number,
+    y: number,
+    lineHeight: number = 5,
+    topMargin: number = 20,
+    bottomMargin: number = 20
+  ): number {
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    for (const line of lines) {
+      if (y + lineHeight > pageHeight - bottomMargin) {
+        doc.addPage();
+        y = topMargin;
+      }
+      doc.text(line, x, y);
+      y += lineHeight;
+    }
+
+    return y;
+  }
+
+
   generatePatientAndProgramInfo(
     doc: jsPDF,
     patientDetails: any,
@@ -187,10 +212,12 @@ export class DownloadPatientReportService {
     }
 
     const splitVitals = doc.splitTextToSize(vitals, 150);
-    doc.text(splitVitals, 60, textHeight);
-
-    const vitalsDim = doc.getTextDimensions(splitVitals);
-    textHeight = textHeight + vitalsDim.h;
+    textHeight = this.drawSplitTextHalfPage(
+      doc,
+      splitVitals,
+      60,
+      textHeight
+    );
     doc.line(10, textHeight, 200, textHeight);
 
     // Program Enrollment
@@ -233,9 +260,12 @@ export class DownloadPatientReportService {
     const valueWidth = 120;  
 
     const splitDiagnosis = doc.splitTextToSize(diagnosis, valueWidth);
-    doc.text(splitDiagnosis, valueX, textHeight);
-
-    textHeight += splitDiagnosis.length * 5;
+    textHeight = this.drawSplitTextHalfPage(
+      doc,
+      splitDiagnosis,
+      valueX,
+      textHeight
+    );
 
     doc.line(10, textHeight, 200, textHeight);
     doc.setTextColor('#818495');
@@ -254,6 +284,12 @@ export class DownloadPatientReportService {
     doc.line(10, textHeight, 200, textHeight);
 
     // Signature and Date
+    const pageHeight = doc.internal.pageSize.getHeight();
+    if (textHeight + 25 > pageHeight - 20) {
+      doc.addPage();
+      textHeight = 20;
+    }
+
     textHeight += 20;
     doc.line(28, textHeight, 95, textHeight);
     doc.line(120, textHeight, 195, textHeight);
