@@ -1847,50 +1847,50 @@
           <div class="common_content">
             <p class="common_content_title">Assignee Name</p>
             <div class="Self_assign">
-              <div class="self_assign_input_panel">
-                <ng-autocomplete
-                  id="Sch_UpdateCareTeam"
-                  [disabled]="AssigneeMemberStatus || checkedSingle"
-                  [data]="http_AssigneeListSchedule"
-                  [searchKeyword]="keyword_schedule_careteam"
-                  [initialValue]="schedule_careteam_name"
-                  placeholder="Select CareTeam"
-                  (selected)="selectEvent_schedule_careteam($event)"
-                  (inputChanged)="onChangeSearch_schedule_careteam($event)"
-                  (inputFocused)="onFocused_schedule_careteam($event)"
-                  (inputCleared)="clearscheduleEvent($event)"
-                  [itemTemplate]="itemTemplate"
-                  [notFoundTemplate]="notFoundTemplate"
-                >
-                </ng-autocomplete>
+                <div class="self_assign_input_panel">
+                    <ng-autocomplete
+                                     id="Sch_UpdateCareTeam"
+                                     [disabled]="AssigneeMemberStatus || checkedSingle"
+                                     [data]="http_AssigneeListSchedule"
+                                     [searchKeyword]="keyword_schedule_careteam"
+                                     [initialValue]="schedule_careteam_name"
+                                     placeholder="Select CareTeam"
+                                     (selected)="selectEvent_schedule_careteam($event)"
+                                     (inputChanged)="onChangeSearch_schedule_careteam($event)"
+                                     (inputFocused)="onFocused_schedule_careteam($event)"
+                                     (inputCleared)="clearscheduleEvent($event)"
+                                     [itemTemplate]="itemTemplate"
+                                     [notFoundTemplate]="notFoundTemplate"
+                                     >
+                    </ng-autocomplete>
 
-                <ng-template #itemTemplate let-item>
-                  <a [innerHTML]="item.UserName"></a>
-                </ng-template>
+                    <ng-template #itemTemplate let-item>
+                        <a [innerHTML]="item.UserName"></a>
+                    </ng-template>
 
-                <ng-template #notFoundTemplate let-notFound>
-                  <div [innerHTML]="notFound"></div>
-                </ng-template>
-              </div>
-
-              <div class="self_assign_icon">
-                <div
-                  [ngClass]="
-                    self_assignee_variable
-                      ? 'self_assign_icon_cont_active'
-                      : 'self_assign_icon_cont_inactive'
-                  "
-                  class="self_assign_icon_cont"
-                  id="Sch_UpdateSelfAssign"
-                  (click)="selfAssignSchedule()"
-                >
-                  <img
-                    class="add_check_icon"
-                    src="../../../../../assets/04-Icons/Icons_Check A.svg"
-                  />
+                    <ng-template #notFoundTemplate let-notFound>
+                        <div [innerHTML]="notFound"></div>
+                    </ng-template>
                 </div>
-                <p class="common_content_title">Self Assign</p>
-              </div>
+
+                <div class="self_assign_icon">
+                    <div
+                    [ngClass]="
+                            {
+                              'self_assign_icon_cont_active': self_assignee_variable && !checkedSingle,
+                              'self_assign_icon_cont_inactive': !self_assignee_variable || checkedSingle,
+                              'disabled': checkedSingle
+                            }"
+                         class="self_assign_icon_cont"
+                         id="Sch_UpdateSelfAssign"
+                         (click)="!checkedSingle && selfAssignSchedule()">
+                        <img
+                          class="add_check_icon"
+                             src="../../../../../assets/04-Icons/Icons_Check A.svg"
+                        />
+                    </div>
+                    <p class="common_content_title">Self Assign</p>
+                </div>
             </div>
             <!-- <div class="warn">
               <ng-container *ngIf="registerSchedule.get('assigneeName')?.invalid && registerSchedule.get('assigneeName')?.touched"> AssigneeName is Required
