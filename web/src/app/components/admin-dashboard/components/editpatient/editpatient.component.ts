@@ -390,8 +390,8 @@ export class EditpatientComponent implements OnInit {
     var that = this;
     that.master_data = sessionStorage.getItem('add_patient_masterdata');
     that.master_data = JSON.parse(that.master_data);
-    that.deviceList = that.master_data.DeviceDetails;
-    this.deviceVitalLists();
+    //that.deviceList = that.master_data.DeviceDetails;
+    this.deviceVitalLists(that.master_data.DeviceDetails);
   }
 
   OndeviceCommunicationTypeChange(index: any) {
@@ -399,8 +399,8 @@ export class EditpatientComponent implements OnInit {
     var that = this;
     that.master_data = sessionStorage.getItem('add_patient_masterdata');
     that.master_data = JSON.parse(that.master_data);
-    that.deviceList = that.master_data.DeviceDetails;
-    this.deviceVitalLists();
+    //that.deviceList = that.master_data.DeviceDetails;
+    this.deviceVitalLists(that.master_data.DeviceDetails);
   }
   insuracevendors: any;
   private initForms() {
@@ -1277,8 +1277,8 @@ export class EditpatientComponent implements OnInit {
     }
     that.master_data = sessionStorage.getItem('add_patient_masterdata');
     that.master_data = JSON.parse(that.master_data);
-    that.deviceList = that.master_data.DeviceDetails;
-    this.deviceVitalLists();
+    //that.deviceList = that.master_data.DeviceDetails;
+    this.deviceVitalLists(that.master_data.DeviceDetails);
 
     that.Program_Selected = that.master_data.ProgramDetailsMasterData.filter(
       (Pgm: { ProgramId: number }) =>
@@ -2330,21 +2330,23 @@ export class EditpatientComponent implements OnInit {
   deviceListBG: any;
   deviceListWS: any;
   deviceListOX: any;
-  deviceVitalLists() {
+  deviceVitalLists(deviceList :any) {
     var that = this;
 
-    this.deviceListBP = this.deviceList.filter((data: { VitalId: any }) => {
+    this.deviceListBP = deviceList.filter((data: { VitalId: any }) => {
       return data.VitalId == 1;
     });
-    this.deviceListBG = this.deviceList.filter((data: { VitalId: any }) => {
+    this.deviceListBG = deviceList.filter((data: { VitalId: any }) => {
       return data.VitalId == 2;
     });
-    this.deviceListWS = this.deviceList.filter((data: { VitalId: any }) => {
+    this.deviceListWS = deviceList.filter((data: { VitalId: any }) => {
       return data.VitalId == 3;
     });
-    this.deviceListOX = this.deviceList.filter((data: { VitalId: any }) => {
+    this.deviceListOX = deviceList.filter((data: { VitalId: any }) => {
       return data.VitalId == 4;
     });
+    console.log('Device Oxygen List');
+    console.log(this.deviceListOX);
     this.deviceListBP = this.deviceListBP.filter(
       (data: { DeviceCommunicationTypeId: any }) => {
         return data.DeviceCommunicationTypeId == this.deviceTypeDataId;
@@ -2366,7 +2368,6 @@ export class EditpatientComponent implements OnInit {
       }
     );
   }
-
   processDiagnosis(diag: any) {
     if (this.DiagnosisInfos) {
       for (let i = 0; i < this.DiagnosisInfos.length; i++) {
@@ -3942,8 +3943,53 @@ export class EditpatientComponent implements OnInit {
     }
 
     // If valid, update previousVitalId
-    device.previousVitalId = selectedId;
-    device.DeviceName = this.devArr.find((d: any) => d.VitalId === selectedId)?.DeviceName ?? '';
+    // device.previousVitalId = selectedId;
+    // device.DeviceName = this.devArr.find((d: any) => d.VitalId === selectedId)?.DeviceName ?? '';
+    console.log("Device Array:", JSON.stringify(this.devArr, null, 2));
+console.log("Master Array:", JSON.stringify(this.add_patient_masterdata, null, 2));
+    
+    // If valid, update previousVitalId
+    device.DeviceName = '';
+    device.DeviceNumber = null;
+    device.device_id = null;
+    this.setDeviceName(device);
   }
   
+
+   setDeviceName(device: any) {
+  const deviceData = JSON.stringify(this.add_patient_masterdata)
+  const data = JSON.parse(deviceData);
+  const deviceDetails = data?.DeviceDetails;
+  if (!deviceDetails?.length || !device?.VitalId) {
+    device.DeviceName = '';
+    device.DeviceNumber = '';
+    return;
+  }
+this.deviceVitalLists(deviceDetails);
+  const match = deviceDetails.find(
+    (    d: { VitalId: any; }) => Number(d.VitalId) === Number(device.VitalId)
+  );
+    
+
+  device.DeviceName = match?.DeviceName || '';
+  device.DeviceNumber = match?.DeviceNumber || '';
+}
+  setDeviceNameFeild(device: any) {
+  const deviceData = JSON.stringify(this.add_patient_masterdata)
+  const data = JSON.parse(deviceData);
+  const deviceDetails = data?.DeviceDetails;
+  if (!deviceDetails?.length || !device?.VitalId) {
+    device.DeviceName = '';
+    device.DeviceNumber = '';
+    return;
+  }
+this.deviceVitalLists(deviceDetails);
+  const match = deviceDetails.find(
+    (    d: { VitalId: any; }) => Number(d.VitalId) === Number(device.VitalId)
+  );
+    
+
+  device.DeviceName = match?.DeviceName || '';
+}
+
 }
