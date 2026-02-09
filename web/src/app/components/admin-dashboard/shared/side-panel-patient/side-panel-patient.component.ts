@@ -1403,8 +1403,7 @@ export class SidePanelPatientComponent implements OnInit {
       (this.addMedicationForm.get('scheduleMorning')?.value ||
         this.addMedicationForm.get('scheduleAfterNoon')?.value ||
         this.addMedicationForm.get('scheduleEvening')?.value ||
-        this.addMedicationForm.get('scheduleNight')?.value ||
-        medicalSchedule != undefined)
+        this.addMedicationForm.get('scheduleNight')?.value)
     ) {
       req_body['PatientId'] = this.currentpPatientId;
       req_body['PatientProgramId'] = this.currentProgramId;
@@ -2038,7 +2037,7 @@ export class SidePanelPatientComponent implements OnInit {
     this.rpm.rpm_post('/api/schedules/updatecurrentschedule', req_body).then(
       () => {
         this.confirmDialog.showConfirmDialog(
-          'Worklist Schedule Updated Successfully!!',
+          'Schedule Updated Successfully!!',
           'Message',
           () => this.onScheduleUpdateSuccess(),
           false
@@ -2090,7 +2089,7 @@ export class SidePanelPatientComponent implements OnInit {
     this.rpm.rpm_post('/api/schedules/updateschedule', req_body).then(
       () => {
         this.confirmDialog.showConfirmDialog(
-          'Worklist Schedule Updated Successfully!!',
+          'Schedule Updated Successfully!!',
           'Message',
           () => this.onScheduleUpdateSuccess(),
           false

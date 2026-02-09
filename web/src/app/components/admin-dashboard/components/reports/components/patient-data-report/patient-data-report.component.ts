@@ -159,6 +159,8 @@ export class PatientDataReportComponent implements OnInit {
   }
 
   reportStart() {
+    this.currentY = 15;
+    this.patientdownloadService.resetPosition();
     this.doc = new jsPDF();
     this.patientdownloadService.generateReportHeading(
       this.doc,

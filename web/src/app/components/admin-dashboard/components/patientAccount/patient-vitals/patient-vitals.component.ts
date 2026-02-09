@@ -868,7 +868,6 @@ export class PatientVitalsComponent implements OnInit {
     this.fileName = this.Doc.name;
   }
   CallNotesColumnHeader = [
-    'Id',
     'AllCalls',
     'Date',
     'Time',

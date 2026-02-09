@@ -675,8 +675,10 @@ generateCallNotesReport(doc: jsPDF, data: any[]): void {
   const pageHeight = doc.internal.pageSize.height;
   this.Notesh = 30;
   this.Style_SetSubHeading(doc);
+  doc.setFont('Helvetica', 'bold'); 
   this.setPages(doc, 'Notes', 15);
   this.drawLine(doc, 'Notes', 15);
+  doc.setFont('Helvetica', 'normal');
   this.Notesh += 10;
   doc.setFontSize(14);
   
@@ -686,9 +688,10 @@ generateCallNotesReport(doc: jsPDF, data: any[]): void {
       const formattedDate = this.datepipe.transform(
         this.convertToLocalTime(notes.CreatedOn)
       ) as string;
-
+    doc.setFont('Helvetica', 'bold');
     this.setPages(doc, formattedDate, 20);
     this.drawLine(doc, formattedDate, 20);
+    doc.setFont('Helvetica', 'normal');
    this.Style_SetContent(doc);
     this.Notesh += 5;
     
@@ -1096,9 +1099,8 @@ private processNoteDetails(doc: jsPDF, notes: any): void {
         )}`,
         20
       );
-      this.symptomh += 3;
       doc.line(20, this.symptomh, 100, this.symptomh);
-      this.symptomh += 5;
+      this.symptomh += 6;
       this.setSymptomPages(
         doc,
         `${symptom.Symptom}: ${symptom.Description}`,
@@ -1968,7 +1970,7 @@ private setSymptomPages(doc: jsPDF, text: string, x: number): void {
 
   doc.text(wrappedText, x, this.symptomh);
   // Compact spacing
-  this.symptomh += wrappedText.length * 5 + 4;
+  this.symptomh += wrappedText.length * 5;
 }
 
   

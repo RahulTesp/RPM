@@ -987,7 +987,7 @@ export class HomeComponent implements OnInit {
   navigatePatientPage(patientCat: any, programStatus: any, pageOption: any) {
     // this.clinicorteam = this.overview;
 
-    this.clinicorteam = this.clinicorpatientInfo;
+    const roleId = this.roles[0].Id;
 
     let route = '/admin/patients';
     this.route.navigate([route], {
@@ -995,7 +995,7 @@ export class HomeComponent implements OnInit {
         PageOption: pageOption,
         patientCategory: patientCat,
         programStatus: programStatus,
-        clinicorTeam: this.clinicorteam,
+        clinicorTeam: roleId === 1 || roleId === 6 ? this.clinicorpatientInfo : undefined,
         vitalSelection: this.health_overview_vital,
         durationSelection: this.heath_overview_frequency,
       },

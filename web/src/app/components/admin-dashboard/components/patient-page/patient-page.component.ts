@@ -2291,6 +2291,8 @@ convertToLocalTime(stillUtc: any) {
   assigneeSerach: any;
   programSearch:any;
   redirectionFilter(value: any) {
+    this.dataSourceTableList.filter = '';
+    this.dataSourceTableList.filterPredicate = () => true;
     if (value == 'undefined') {
       value = '';
     }

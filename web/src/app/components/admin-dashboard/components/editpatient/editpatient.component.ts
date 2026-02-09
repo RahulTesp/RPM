@@ -278,7 +278,7 @@ export class EditpatientComponent implements OnInit {
       this.programnamechangefirst = false;
     });
 
-    this.PatientInfoForm.get('clinicname')?.valueChanges.subscribe((val) => {
+/*    this.PatientInfoForm.get('clinicname')?.valueChanges.subscribe((val) => {
       that.Clinic_Selected = that.master_data.ClinicDetails.filter(
         (clinic: { Id: any }) => clinic.Id === parseInt(val)
       );
@@ -290,10 +290,9 @@ export class EditpatientComponent implements OnInit {
           that.Clinic_Selected[0].ClinicCode
         );
       }
-
       this.getPhysicianList();
       this.getLastPatientStatus();
-    });
+    });*/
 
     this.programForm.get('startdate')?.valueChanges.subscribe((val) => {
       if (this.programForm.controls.startdate.value) {
@@ -436,8 +435,8 @@ export class EditpatientComponent implements OnInit {
       preference2: new UntypedFormControl(null),
       preference3: new UntypedFormControl(null),
       preference4: new UntypedFormControl(null),
-      clinicname: new UntypedFormControl('', [Validators.required]),
-      cliniccode: new UntypedFormControl({ value: '' }),
+      clinicname: new UntypedFormControl({ value: '', disabled: true }, [Validators.required]),
+      cliniccode: new UntypedFormControl({ value: '', disabled: true }),
       additionalnotes: new UntypedFormControl(''),
     });
 
