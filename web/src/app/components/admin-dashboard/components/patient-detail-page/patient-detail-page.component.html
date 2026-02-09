@@ -201,7 +201,7 @@
                       src="../../../../../assets/04-Icons/Icons_Video A.svg"
                       (click)="getVideoconnection(false)"
                     />
-                    
+
                   </div>
                 </div>
 
@@ -221,7 +221,7 @@
                       src="../../../../../assets/04-Icons/Icons_Chat A.svg"
                       (click)="openChatPanel()"
                     />
-                     
+
                   </div>
                 </div>
                 <div
@@ -845,7 +845,7 @@
              maxlength="200"
           ></textarea>
         </div>
-        <span *ngIf="additionaNotes.length >= 200" style="color: red; font-weight: bold; margin-left: 10px;">
+        <span *ngIf="additionaNotes?.length >= 200" style="color: red; font-weight: bold; margin-left: 10px;">
             ⚠️ Max length 200 reached.
         </span>
       </div>
@@ -1540,7 +1540,7 @@
                   src="../../../../../assets/04-Icons/Icons_Video A.svg"
                   (click)="getVideoconnection(false)"
                 />
-                 
+
               </div>
             </div>
             <div
@@ -1559,8 +1559,8 @@
                   id="pd_chat"
                   src="../../../../../assets/04-Icons/Icons_Chat A.svg"
                   (click)="openChatPanel()"
-                />  
-                  
+                />
+
               </div>
             </div>
             <div
@@ -3617,7 +3617,7 @@
         <div
           class="vitalReadingsMenu"
           *ngIf="ProcessVitalData">
-          
+
           <button
             class="vitalReading_menu_item"
             *ngIf="ProcessVitalData && ProcessVitalData.BloodPressure != null"
@@ -3662,7 +3662,7 @@
           >
             Oxygen
           </button>
-          
+
         </div>
       </div>
 
@@ -4859,7 +4859,7 @@
       *ngIf="http_ActivityScheduleData && http_ActivityScheduleData.length > 0"
     >
       <!-- btn_save -->
-      <button   *ngIf="rolelist[0]?.Id !== 8 && rolelist[0]?.Id !== 6" 
+      <button   *ngIf="rolelist[0]?.Id !== 8 && rolelist[0]?.Id !== 6"
       class="addCommonBtn" id="pd_SaveSch" (click)="saveCompleteTask()">
         Save
       </button>
