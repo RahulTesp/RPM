@@ -1729,7 +1729,6 @@ export class SidePanelPatientComponent implements OnInit {
     }
     const yyyy = today.getFullYear();
     dateval = mm2 + '-' + dd2 + '-' + yyyy;
-    dateval = yyyy + '-' + dd2 + '-' + mm2;
     const myArray = dateval.split('T');
     return myArray;
   }
