@@ -240,152 +240,331 @@ export class EditpatientComponent implements OnInit {
   programnamechangefirst_2 = true;
   cityFlag: any;
   diagnosisFormGroups: FormGroup[] = [];
-  ngOnInit(): void {
-    this.variable = 1;
-    this.documentAddFlag = false;
-    this.programnamechangefirst = true;
-    this.cityFlag = false;
-    this.diagnosisFormGroups = this.selectedDiagnoses.map((d: { DiagnosisName: any; DiagnosisCode:any;}) =>
-      new FormGroup({
-        diagnosis: new FormControl(d.DiagnosisName),
-        DiagnosisCode: new FormControl(d.DiagnosisCode)
-      })
-    );
-    // Edit Program
-    var that = this;
-    this.getLanguage();
+  // ngOnInit(): void {
+  //   this.variable = 1;
+  //   this.documentAddFlag = false;
+  //   this.programnamechangefirst = true;
+  //   this.cityFlag = false;
+  //   this.diagnosisFormGroups = this.selectedDiagnoses.map((d: { DiagnosisName: any; DiagnosisCode:any;}) =>
+  //     new FormGroup({
+  //       diagnosis: new FormControl(d.DiagnosisName),
+  //       DiagnosisCode: new FormControl(d.DiagnosisCode)
+  //     })
+  //   );
+  //   // Edit Program
+  //   var that = this;
+  //   this.getLanguage();
 
-    this.editProgramdata.get('programname')?.valueChanges.subscribe((val) => {
-      var ProgramSelected = that.master_data.ProgramDetailsMasterData.filter(
-        (Pgm: { ProgramId: number }) => Pgm.ProgramId === parseInt(val)
-      );
-      if (ProgramSelected.length > 0) {
-        this.ediProgramSelectedId = ProgramSelected;
-        that.editProgramVital = this.ediProgramSelectedId[0].Vitals;
-        if (!this.programnamechangefirst) {
-          //that.vitalList = [];
-        }
+  //   this.editProgramdata.get('programname')?.valueChanges.subscribe((val) => {
+  //     var ProgramSelected = that.master_data.ProgramDetailsMasterData.filter(
+  //       (Pgm: { ProgramId: number }) => Pgm.ProgramId === parseInt(val)
+  //     );
+  //     if (ProgramSelected.length > 0) {
+  //       this.ediProgramSelectedId = ProgramSelected;
+  //       that.editProgramVital = this.ediProgramSelectedId[0].Vitals;
+  //       if (!this.programnamechangefirst) {
+  //         //that.vitalList = [];
+  //       }
 
-        that.editProgramGoal = ProgramSelected[0].goalDetails;
-        this.vitalEditPgmListChange();
-        that.editProgramDiagoList = ProgramSelected[0].Vitals[0].Dignostics;
-        for (let x of this.editProgramDiagoList) {
-          x.DiagnosisFieldEdit = x.DiagnosisName;
-        }
-      }
-      this.diaganosisMainList = [{ DiagnosisName: '', DiagnosisCode: '' }];
-      this.selectedDiagnoses = [{ DiagnosisName: '', DiagnosisCode: '' }];
-      this.programnamechangefirst = false;
-    });
+  //       that.editProgramGoal = ProgramSelected[0].goalDetails;
+  //       this.vitalEditPgmListChange();
+  //       that.editProgramDiagoList = ProgramSelected[0].Vitals[0].Dignostics;
+  //       for (let x of this.editProgramDiagoList) {
+  //         x.DiagnosisFieldEdit = x.DiagnosisName;
+  //       }
+  //     }
+  //     this.diaganosisMainList = [{ DiagnosisName: '', DiagnosisCode: '' }];
+  //     this.selectedDiagnoses = [{ DiagnosisName: '', DiagnosisCode: '' }];
+  //     this.programnamechangefirst = false;
+  //   });
 
-    this.PatientInfoForm.get('clinicname')?.valueChanges.subscribe((val) => {
-      that.Clinic_Selected = that.master_data.ClinicDetails.filter(
-        (clinic: { Id: any }) => clinic.Id === parseInt(val)
-      );
-      if (that.Clinic_Selected.length > 0) {
-        that.PatientInfoForm.controls['cliniccode'].setValue(
-          that.Clinic_Selected[0].ClinicCode
-        );
-        that.programForm.controls['cliniccode'].setValue(
-          that.Clinic_Selected[0].ClinicCode
-        );
-      }
+  //   this.PatientInfoForm.get('clinicname')?.valueChanges.subscribe((val) => {
+  //     that.Clinic_Selected = that.master_data.ClinicDetails.filter(
+  //       (clinic: { Id: any }) => clinic.Id === parseInt(val)
+  //     );
+  //     if (that.Clinic_Selected.length > 0) {
+  //       that.PatientInfoForm.controls['cliniccode'].setValue(
+  //         that.Clinic_Selected[0].ClinicCode
+  //       );
+  //       that.programForm.controls['cliniccode'].setValue(
+  //         that.Clinic_Selected[0].ClinicCode
+  //       );
+  //     }
 
-      this.getPhysicianList();
-      this.getLastPatientStatus();
-    });
+  //     this.getPhysicianList();
+  //     this.getLastPatientStatus();
+  //   });
 
-    this.programForm.get('startdate')?.valueChanges.subscribe((val) => {
-      if (this.programForm.controls.startdate.value) {
-        this.calculateEndDate();
-      }
-    });
+  //   this.programForm.get('startdate')?.valueChanges.subscribe((val) => {
+  //     if (this.programForm.controls.startdate.value) {
+  //       this.calculateEndDate();
+  //     }
+  //   });
 
-    this.programForm.get('programname')?.valueChanges.subscribe((value) => {
-      that.Program_Selected = that.master_data.ProgramDetailsMasterData.filter(
-        (Pgm: { ProgramId: number }) => Pgm.ProgramId === parseInt(value)
-      );
-      console.log('Program Selected:');
-      console.log(that.Program_Selected);
-      if (that.Program_Selected.length > 0) {
-        that.vital_selected = that.Program_Selected[0].Vitals;
-      }
-      if (!this.programnamechangefirst_1) {
-        //that.vitalList = [];
-      }
-      this.programnamechangefirst_1 = false;
-      // this.vitalList=[];
-    });
-    this.programForm.get('diagnosisData')?.valueChanges.subscribe((val) => {
-      that.Diagnosis_code_selected =
-        that.Program_Selected[0].Vitals[0].Dignostics.filter(
-          (diagnosis: { DiagnosisName: any }) =>
-            diagnosis.DiagnosisName == val[0].DiagnosisName
-        );
-      that.diagonisticsData = that.Diagnosis_code_selected[0].DiagnosisCode;
-    });
+  //   this.programForm.get('programname')?.valueChanges.subscribe((value) => {
+  //     that.Program_Selected = that.master_data.ProgramDetailsMasterData.filter(
+  //       (Pgm: { ProgramId: number }) => Pgm.ProgramId === parseInt(value)
+  //     );
+  //     console.log('Program Selected:');
+  //     console.log(that.Program_Selected);
+  //     if (that.Program_Selected.length > 0) {
+  //       that.vital_selected = that.Program_Selected[0].Vitals;
+  //     }
+  //     if (!this.programnamechangefirst_1) {
+  //       //that.vitalList = [];
+  //     }
+  //     this.programnamechangefirst_1 = false;
+  //     // this.vitalList=[];
+  //   });
+  //   this.programForm.get('diagnosisData')?.valueChanges.subscribe((val) => {
+  //     that.Diagnosis_code_selected =
+  //       that.Program_Selected[0].Vitals[0].Dignostics.filter(
+  //         (diagnosis: { DiagnosisName: any }) =>
+  //           diagnosis.DiagnosisName == val[0].DiagnosisName
+  //       );
+  //     that.diagonisticsData = that.Diagnosis_code_selected[0].DiagnosisCode;
+  //   });
 
-    this.PatientInfoForm.get('state')?.valueChanges.subscribe((data) => {
-      if (this.cityFlag == true) {
-        this.PatientInfoForm.get('city')?.reset();
-      }
-      that.cities = that.StatesAndCities.Cities.filter(
-        (c: { StateId: number }) => c.StateId === parseInt(data)
-      );
-      this.cityFlag = true;
-    });
-    this.loading = true;
-    var that = this;
-    this.rolelist = sessionStorage.getItem('Roles');
-    this.rolelist = JSON.parse(this.rolelist);
-    this.rpm
-      .rpm_get(
-        '/api/patient/getprogramdetailsmasterdataaddpatient?RoleId=' +
-          this.rolelist[0].Id
-      )
-      .then((data) => {
-        that.add_patient_masterdata = data;
+  //   this.PatientInfoForm.get('state')?.valueChanges.subscribe((data) => {
+  //     if (this.cityFlag == true) {
+  //       this.PatientInfoForm.get('city')?.reset();
+  //     }
+  //     that.cities = that.StatesAndCities.Cities.filter(
+  //       (c: { StateId: number }) => c.StateId === parseInt(data)
+  //     );
+  //     this.cityFlag = true;
+  //   });
+  //   this.loading = true;
+  //   var that = this;
+  //   this.rolelist = sessionStorage.getItem('Roles');
+  //   this.rolelist = JSON.parse(this.rolelist);
+  //   this.rpm
+  //     .rpm_get(
+  //       '/api/patient/getprogramdetailsmasterdataaddpatient?RoleId=' +
+  //         this.rolelist[0].Id
+  //     )
+  //     .then((data) => {
+  //       that.add_patient_masterdata = data;
 
-        sessionStorage.setItem(
-          'add_patient_masterdata',
-          JSON.stringify(that.add_patient_masterdata)
-        );
-      });
-    that.master_data = sessionStorage.getItem('add_patient_masterdata');
-    that.master_data = JSON.parse(that.master_data);
-    that.CommunicationType = that.master_data?.DeviceCommunicationTypes;
-    that.deviceTypeDataId = 1;
+  //       sessionStorage.setItem(
+  //         'add_patient_masterdata',
+  //         JSON.stringify(that.add_patient_masterdata)
+  //       );
+  //     });
+  //   that.master_data = sessionStorage.getItem('add_patient_masterdata');
+  //   that.master_data = JSON.parse(that.master_data);
+  //   that.CommunicationType = that.master_data?.DeviceCommunicationTypes;
+  //   that.deviceTypeDataId = 1;
 
-    this.devArr = [];
-    this.careTeamMembers = this.master_data.CareTeamMembers;
-    this.programDetails = this.master_data.ProgramDetailsMasterData;
-    this.programDetails = this.master_data.ProgramDetailsMasterData.filter((program: { Name: string; Vitals: string | any[]; }) =>
-      program.Name === "RPM" && program.Vitals.length > 1
-    );
-    var myuser = sessionStorage.getItem('user_name');
-    var myid = sessionStorage.getItem('userid');
+  //   this.devArr = [];
+  //   this.careTeamMembers = this.master_data.CareTeamMembers;
+  //   this.programDetails = this.master_data.ProgramDetailsMasterData;
+  //   this.programDetails = this.master_data.ProgramDetailsMasterData.filter((program: { Name: string; Vitals: string | any[]; }) =>
+  //     program.Name === "RPM" && program.Vitals.length > 1
+  //   );
+  //   var myuser = sessionStorage.getItem('user_name');
+  //   var myid = sessionStorage.getItem('userid');
 
-    const uniqueValuesSet = new Set();
-    this.devArr = this.master_data.DeviceDetails.filter((obj: any) => {
-      // check if name property value is already in the set
-      const isPresentInSet = uniqueValuesSet.has(obj.DeviceName);
-      uniqueValuesSet.add(obj.DeviceName);
+  //   const uniqueValuesSet = new Set();
+  //   this.devArr = this.master_data.DeviceDetails.filter((obj: any) => {
+  //     // check if name property value is already in the set
+  //     const isPresentInSet = uniqueValuesSet.has(obj.DeviceName);
+  //     uniqueValuesSet.add(obj.DeviceName);
 
-      // return the negated value of
-      // isPresentInSet variable
-      return !isPresentInSet;
-    });
-    this.deviceCommunicationTypeChange();
-    that.insuracevendors = that.master_data.InsurenceDetails;
+  //     // return the negated value of
+  //     // isPresentInSet variable
+  //     return !isPresentInSet;
+  //   });
+  //   this.deviceCommunicationTypeChange();
+  //   that.insuracevendors = that.master_data.InsurenceDetails;
 
+  //   this._route.queryParams.subscribe((params) => {
+  //     that.GetPatientInfo(params.id, params.programId);
+
+  //     that.pid = params.id;
+  //     that.patientprogramid = params.programId;
+  //   });
+  // }
+ngOnInit(): void {
+  // Initialize flags
+  this.variable = 1;
+  this.documentAddFlag = false;
+  this.programnamechangefirst = true;
+  this.programnamechangefirst_1 = true;
+  this.cityFlag = false;
+  
+  // Initialize diagnosis form groups
+  this.diagnosisFormGroups = this.selectedDiagnoses.map((d: { DiagnosisName: any; DiagnosisCode: any; }) =>
+    new FormGroup({
+      diagnosis: new FormControl(d.DiagnosisName),
+      DiagnosisCode: new FormControl(d.DiagnosisCode)
+    })
+  );
+
+  this.getLanguage();
+  this.rolelist = sessionStorage.getItem('Roles');
+  this.rolelist = JSON.parse(this.rolelist);
+
+  // CRITICAL FIX: Load master data FIRST before setting up subscriptions
+  this.loadMasterData().then(() => {
+    // Only set up subscriptions after master data is loaded
+    this.setupFormSubscriptions();
+    
+    // Get route params after everything is initialized
     this._route.queryParams.subscribe((params) => {
-      that.GetPatientInfo(params.id, params.programId);
-
-      that.pid = params.id;
-      that.patientprogramid = params.programId;
+      this.GetPatientInfo(params.id, params.programId);
+      this.pid = params.id;
+      this.patientprogramid = params.programId;
     });
+  });
+}
+
+// Separate method to load master data
+private async loadMasterData(): Promise<void> {
+  this.loading = true;
+  
+  try {
+    // Try to get from API first
+    const data = await this.rpm.rpm_get(
+      '/api/patient/getprogramdetailsmasterdataaddpatient?RoleId=' + this.rolelist[0].Id
+    );
+    
+    this.add_patient_masterdata = data;
+    sessionStorage.setItem('add_patient_masterdata', JSON.stringify(this.add_patient_masterdata));
+    this.master_data = data;
+    
+  } catch (error) {
+    console.error('Error loading master data from API:', error);
+    
+    // Fallback to session storage if API fails
+    const cachedData = sessionStorage.getItem('add_patient_masterdata');
+    if (cachedData) {
+      this.master_data = JSON.parse(cachedData);
+    } else {
+      // Handle case where no data is available
+      console.error('No master data available in session storage');
+      this.loading = false;
+      return;
+    }
   }
 
+  // Initialize data that depends on master_data
+  this.CommunicationType = this.master_data?.DeviceCommunicationTypes;
+  this.deviceTypeDataId = 1;
+  this.careTeamMembers = this.master_data.CareTeamMembers;
+  this.insuracevendors = this.master_data.InsurenceDetails;
+  
+  // Filter program details
+  this.programDetails = this.master_data.ProgramDetailsMasterData?.filter(
+    (program: { Name: string; Vitals: string | any[]; }) =>
+      program.Name === "RPM" && program.Vitals?.length > 1
+  ) || [];
+
+  // Get unique device names
+  const uniqueValuesSet = new Set();
+  this.devArr = (this.master_data.DeviceDetails || []).filter((obj: any) => {
+    const isPresentInSet = uniqueValuesSet.has(obj.DeviceName);
+    uniqueValuesSet.add(obj.DeviceName);
+    return !isPresentInSet;
+  });
+
+  this.deviceCommunicationTypeChange();
+  this.loading = false;
+}
+
+// Separate method for form subscriptions
+private setupFormSubscriptions(): void {
+  // Edit Program - programname changes
+  this.editProgramdata.get('programname')?.valueChanges.subscribe((val) => {
+    const ProgramSelected = this.master_data.ProgramDetailsMasterData?.filter(
+      (Pgm: { ProgramId: number }) => Pgm.ProgramId === parseInt(val)
+    ) || [];
+
+    if (ProgramSelected.length > 0) {
+      this.ediProgramSelectedId = ProgramSelected;
+      this.editProgramVital = this.ediProgramSelectedId[0].Vitals;
+      this.editProgramGoal = ProgramSelected[0].goalDetails;
+      this.vitalEditPgmListChange();
+      this.editProgramDiagoList = ProgramSelected[0].Vitals[0]?.Dignostics || [];
+      
+      for (let x of this.editProgramDiagoList) {
+        x.DiagnosisFieldEdit = x.DiagnosisName;
+      }
+    }
+    
+    this.diaganosisMainList = [{ DiagnosisName: '', DiagnosisCode: '' }];
+    this.selectedDiagnoses = [{ DiagnosisName: '', DiagnosisCode: '' }];
+    this.programnamechangefirst = false;
+  });
+
+  // Clinic name changes
+  this.PatientInfoForm.get('clinicname')?.valueChanges.subscribe((val) => {
+    this.Clinic_Selected = this.master_data.ClinicDetails?.filter(
+      (clinic: { Id: any }) => clinic.Id === parseInt(val)
+    ) || [];
+
+    if (this.Clinic_Selected.length > 0) {
+      this.PatientInfoForm.controls['cliniccode'].setValue(
+        this.Clinic_Selected[0].ClinicCode
+      );
+      this.programForm.controls['cliniccode'].setValue(
+        this.Clinic_Selected[0].ClinicCode
+      );
+    }
+
+    this.getPhysicianList();
+    this.getLastPatientStatus();
+  });
+
+  // Start date changes
+  this.programForm.get('startdate')?.valueChanges.subscribe((val) => {
+    if (this.programForm.controls.startdate.value) {
+      this.calculateEndDate();
+    }
+  });
+
+  // Program name changes
+  this.programForm.get('programname')?.valueChanges.subscribe((value) => {
+    this.Program_Selected = this.master_data.ProgramDetailsMasterData?.filter(
+      (Pgm: { ProgramId: number }) => Pgm.ProgramId === parseInt(value)
+    ) || [];
+
+    console.log('Program Selected:', this.Program_Selected);
+
+    if (this.Program_Selected.length > 0) {
+      this.vital_selected = this.Program_Selected[0].Vitals;
+    }
+    
+    this.programnamechangefirst_1 = false;
+  });
+
+  // Diagnosis data changes
+  this.programForm.get('diagnosisData')?.valueChanges.subscribe((val) => {
+    if (this.Program_Selected?.[0]?.Vitals?.[0]?.Dignostics) {
+      this.Diagnosis_code_selected = this.Program_Selected[0].Vitals[0].Dignostics.filter(
+        (diagnosis: { DiagnosisName: any }) =>
+          diagnosis.DiagnosisName == val[0]?.DiagnosisName
+      );
+      
+      if (this.Diagnosis_code_selected.length > 0) {
+        this.diagonisticsData = this.Diagnosis_code_selected[0].DiagnosisCode;
+      }
+    }
+  });
+
+  // State changes
+  this.PatientInfoForm.get('state')?.valueChanges.subscribe((data) => {
+    if (this.cityFlag == true) {
+      this.PatientInfoForm.get('city')?.reset();
+    }
+    
+    this.cities = this.StatesAndCities?.Cities?.filter(
+      (c: { StateId: number }) => c.StateId === parseInt(data)
+    ) || [];
+    
+    this.cityFlag = true;
+  });
+}
   deviceCommunicationTypeChange() {
     var that = this;
     that.master_data = sessionStorage.getItem('add_patient_masterdata');
