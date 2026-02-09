@@ -31,7 +31,7 @@ import timezone from 'dayjs/plugin/timezone';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
- 
+
 @Component({
   selector: 'app-side-panel-patient',
   templateUrl: './side-panel-patient.component.html',
@@ -69,7 +69,7 @@ export class SidePanelPatientComponent implements OnInit {
   nightSchedule = false;
   loading: any;
   loading_note: any;
-  minStartDate: string | null = null; 
+  minStartDate: string | null = null;
   programId: any;
 
   @Input() activityMenuVariable: any;
@@ -79,8 +79,8 @@ export class SidePanelPatientComponent implements OnInit {
   public NoteSec = '00';
   public isManagerProvider = false;
   public noteId: any;
-  
-  public noteData: any;
+
+  public noteData: any = { MainQuestions :[] };
 
   weekFrequency = [
     {
@@ -173,7 +173,7 @@ export class SidePanelPatientComponent implements OnInit {
     this.updateTaskAssignees();
   }
 
- 
+
 
   private handleMenuChoiceSpecificLogic(choice: number): void {
     if (choice === 2) {
@@ -1711,7 +1711,7 @@ export class SidePanelPatientComponent implements OnInit {
     dateval = yyyy + '-' + mm2 + '-' + dd2;
     return dateval;
   }
-  convertDateData(dateval: any) {
+   convertDateData(dateval: any) {
     let today = new Date(dateval);
     let dd = today.getDate();
     let dd2;
@@ -1729,6 +1729,7 @@ export class SidePanelPatientComponent implements OnInit {
     }
     const yyyy = today.getFullYear();
     dateval = mm2 + '-' + dd2 + '-' + yyyy;
+    dateval = yyyy + '-' + dd2 + '-' + mm2;
     const myArray = dateval.split('T');
     return myArray;
   }
@@ -2011,7 +2012,7 @@ export class SidePanelPatientComponent implements OnInit {
 
 
   private updateSingleSchedule() {
-    
+
   const startDateValue = this.registerSchedule.controls.startDate.value;
 
   // Convert to string if it's a Date object or something else
@@ -2450,9 +2451,9 @@ export class SidePanelPatientComponent implements OnInit {
               'Note Updated Successfully!!',
               'Message',
               () => {
-                
 
-                this.QuestionArrayBase = this.noteMasterData.MainQuestions;
+
+                this.QuestionArrayBase = this.noteMasterData?.MainQuestions || [];
                 this.BillingInfoReload();
                 this.notesReload();
                 this.noteUpdationVariable = false;
@@ -2561,7 +2562,7 @@ export class SidePanelPatientComponent implements OnInit {
 
   getReviewNoteUpdation(data: any, patientstatus: any) {
     this.loadPatientInfo();
-     this.ProgramId = this.http_rpm_patientList['PatientProgramdetails'].ProgramId;
+    this.ProgramId = this.http_rpm_patientList?.['PatientProgramdetails']?.ProgramId || 0;
     this.patientStatus = patientstatus;
     if (this.roleId[0].Id == 1 || this.roleId[0].Id == 3) {
       this.isManagerProvider = true;
@@ -2634,8 +2635,8 @@ export class SidePanelPatientComponent implements OnInit {
   ProgramId: any;
   MasterDataQuestionTemp: any;
   http_rpm_patientList: any;
- getMasterDataQuestions(patientProgramName: any) {
-    this.loadPatientInfo();
+ async getMasterDataQuestions(patientProgramName: any) {
+   await  this.loadPatientInfo();
     this.ProgramId = this.http_rpm_patientList?.PatientProgramdetails?.ProgramId;
     this.rpm
       .rpm_get(
@@ -2834,7 +2835,7 @@ export class SidePanelPatientComponent implements OnInit {
         this.patientId,
         this.currentProgramId
       );
-      
+
     } catch (error) {
       console.error('Error loading patient info:', error);
     }

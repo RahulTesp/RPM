@@ -101,7 +101,7 @@ export class PatientDetailPageComponent implements OnInit, OnDestroy {
   room_name: any;
   access_tokan: any;
   app_id: any;
-  additionaNotes: any;
+  additionaNotes: any = '';
   totalInteractionTime: any;
   pecentageValue: any;
   displayText: any;

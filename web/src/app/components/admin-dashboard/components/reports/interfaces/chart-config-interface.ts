@@ -1,3 +1,5 @@
+import { Legend, plugins } from "chart.js";
+import plugin from "dayjs/plugin/utc";
 export const CHART_OPTIONS = {
   responsive: true,
   pan: {
@@ -36,8 +38,19 @@ export const CHART_OPTIONS = {
     x: {
       ticks: {
         autoSkip: false,
-        maxRotation: 90,
-        minRotation: 45
+        maxRotation: 45,
+        minRotation: 45,
+        color: '#666666',
+        font: {
+          size: 20,
+          weight: 'normal',
+          family: 'Rubik'
+        }
+      },
+      grid: {
+        display: true,
+        drawOnChartArea: true,
+        color:'#E0E0E0',
       }
     }
   },
@@ -47,7 +60,33 @@ export const CHART_OPTIONS = {
     labels: {
       boxWidth: 10,
     },
-  },
+  y: {
+      ticks: {
+        color: '#666666',
+        font: {
+
+        }
+     },
+
+      grid: {
+        color: '#E0E0E0',
+      }
+    }
+},
+plugins: {
+  Legend: {
+    display: true,
+    position: 'bottom',
+    labels: {
+      boxWidth: 15,
+      font: {
+        size: 14,
+        weight: 'normal',
+        family: 'Rubik'
+      }
+    },
+  }
+}
 };
 
 export const CHART_COLORS = [
